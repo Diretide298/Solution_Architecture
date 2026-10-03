@@ -43,15 +43,10 @@
        "label": "Every inspection template",
        "bindsTo": "InspectionTemplate",
        "columns": [
-        "InspectionTemplate.id",
         "InspectionTemplate.code",
         "InspectionTemplate.name",
-        "InspectionTemplate.venueId",
-        "InspectionTemplate.appliesToAssetCategoryId",
         "InspectionTemplate.frequency",
-        "InspectionTemplate.items",
-        "InspectionTemplate.retentionYears",
-        "InspectionTemplate.isActive"
+        "InspectionTemplate.retentionYears"
        ],
        "operation": "listInspectionTemplates",
        "provenance": "contract maintenance.yaml GET /inspection-templates"
@@ -61,18 +56,10 @@
        "label": "Every inspection",
        "bindsTo": "Inspection",
        "columns": [
-        "Inspection.id",
-        "Inspection.templateId",
         "Inspection.templateName",
-        "Inspection.venueId",
-        "Inspection.assetId",
         "Inspection.outcome",
         "Inspection.failedItemCount",
-        "Inspection.failedSafetyCriticalCount",
-        "Inspection.performedByPrincipalId",
-        "Inspection.performedAt",
-        "Inspection.recordedAt",
-        "Inspection.syncedAt"
+        "Inspection.failedSafetyCriticalCount"
        ],
        "operation": "listInspections",
        "provenance": "contract maintenance.yaml GET /inspections"
@@ -88,15 +75,11 @@
        "label": "The selected inspection template",
        "bindsTo": "InspectionTemplate",
        "columns": [
-        "InspectionTemplate.id",
         "InspectionTemplate.code",
         "InspectionTemplate.name",
-        "InspectionTemplate.venueId",
-        "InspectionTemplate.appliesToAssetCategoryId",
         "InspectionTemplate.frequency",
         "InspectionTemplate.items",
-        "InspectionTemplate.retentionYears",
-        "InspectionTemplate.isActive"
+        "InspectionTemplate.retentionYears"
        ],
        "operation": "listInspectionTemplates",
        "provenance": "contract maintenance.yaml GET /inspection-templates"
@@ -122,7 +105,7 @@
    "error": "Could not load. Names which read failed and leaves the opening checklist untouched.",
    "emptyFirstRun": "No opening checklist yet. Offers Submit inspection (`submitInspection`).",
    "emptyNoResults": "Never shown: `listInspectionTemplates` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `INSPECTION_VIEW`, which `listInspectionTemplates` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `INSPECTION_VIEW`, which `listInspectionTemplates` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INSPECTION_SUBMIT` for `submitInspection`.",
    "offline": "Works from the cached template. Completions queue"
   },
   "apis": [
@@ -162,7 +145,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-048"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSubmitInspection",
@@ -248,7 +231,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-047 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-047 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -291,18 +274,10 @@
        "label": "Every announcement",
        "bindsTo": "Announcement",
        "columns": [
-        "Announcement.id",
         "Announcement.title",
         "Announcement.body",
-        "Announcement.kind",
-        "Announcement.venueIds",
-        "Announcement.departmentIds",
-        "Announcement.roleIds",
-        "Announcement.requiresAcknowledgement",
         "Announcement.expiresAt",
-        "Announcement.publishedByPrincipalId",
-        "Announcement.publishedAt",
-        "Announcement.locale"
+        "Announcement.publishedAt"
        ],
        "operation": "listAnnouncements",
        "provenance": "contract workforce.yaml GET /announcements"
@@ -318,18 +293,11 @@
        "label": "The selected announcement",
        "bindsTo": "Announcement",
        "columns": [
-        "Announcement.id",
         "Announcement.title",
         "Announcement.body",
         "Announcement.kind",
-        "Announcement.venueIds",
-        "Announcement.departmentIds",
-        "Announcement.roleIds",
-        "Announcement.requiresAcknowledgement",
         "Announcement.expiresAt",
-        "Announcement.publishedByPrincipalId",
-        "Announcement.publishedAt",
-        "Announcement.locale"
+        "Announcement.publishedAt"
        ],
        "operation": "listAnnouncements",
        "provenance": "contract workforce.yaml GET /announcements"
@@ -385,7 +353,9 @@
    "params": [
     {
      "name": "announcementId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAnnouncements` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `announcementId`.",
@@ -402,7 +372,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-047"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "getAnnouncementReach",
@@ -478,7 +448,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-050 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-050 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -533,18 +503,10 @@
        "label": "Every incident",
        "bindsTo": "Incident",
        "columns": [
-        "Incident.id",
         "Incident.incidentNumber",
-        "Incident.kind",
         "Incident.severity",
         "Incident.status",
-        "Incident.venueId",
-        "Incident.assetId",
-        "Incident.locationDescription",
-        "Incident.isReportable",
-        "Incident.notificationDueAt",
-        "Incident.notifiedAt",
-        "Incident.assignedToPrincipalId"
+        "Incident.locationDescription"
        ],
        "operation": "listIncidents",
        "provenance": "contract maintenance.yaml GET /incidents"
@@ -560,22 +522,11 @@
        "label": "The selected incident",
        "bindsTo": "Incident",
        "columns": [
-        "Incident.id",
         "Incident.incidentNumber",
         "Incident.kind",
         "Incident.severity",
         "Incident.status",
-        "Incident.venueId",
-        "Incident.assetId",
-        "Incident.locationDescription",
-        "Incident.isReportable",
-        "Incident.notificationDueAt",
-        "Incident.notifiedAt",
-        "Incident.assignedToPrincipalId",
-        "Incident.reportedByPrincipalId",
-        "Incident.correctiveWorkOrderId",
-        "Incident.occurredAt",
-        "Incident.recordedAt"
+        "Incident.locationDescription"
        ],
        "operation": "listIncidents",
        "provenance": "contract maintenance.yaml GET /incidents"
@@ -585,22 +536,11 @@
        "label": "The incident",
        "bindsTo": "IncidentDetail",
        "columns": [
-        "IncidentDetail.id",
         "IncidentDetail.incidentNumber",
         "IncidentDetail.kind",
         "IncidentDetail.severity",
         "IncidentDetail.status",
-        "IncidentDetail.venueId",
-        "IncidentDetail.assetId",
-        "IncidentDetail.locationDescription",
-        "IncidentDetail.isReportable",
-        "IncidentDetail.notificationDueAt",
-        "IncidentDetail.notifiedAt",
-        "IncidentDetail.assignedToPrincipalId",
-        "IncidentDetail.reportedByPrincipalId",
-        "IncidentDetail.correctiveWorkOrderId",
-        "IncidentDetail.occurredAt",
-        "IncidentDetail.recordedAt"
+        "IncidentDetail.locationDescription"
        ],
        "operation": "getIncident",
        "provenance": "contract maintenance.yaml GET /incidents/{incidentId}"
@@ -626,7 +566,7 @@
    "error": "Could not load. Names which read failed and leaves the post-incident restore untouched.",
    "emptyFirstRun": "No post-incident restore yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on severity, status, isReportable and the post-incident restore are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `INCIDENT_VIEW`, which `listIncidents` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `INCIDENT_VIEW`, which `listIncidents` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_MANAGE` for `updateIncident`.",
    "offline": "**Works offline by design.** Post-incident restore is exactly when the network is worst"
   },
   "apis": [
@@ -673,7 +613,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-050"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formUpdateIncident",
@@ -757,7 +697,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-045 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-045 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -804,7 +744,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-045"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -854,7 +794,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-046 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-046 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -928,7 +868,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-046"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -979,7 +919,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-049 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-049 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1045,18 +985,8 @@
        "label": "Every scan event",
        "bindsTo": "ScanEvent",
        "columns": [
-        "ScanEvent.id",
-        "ScanEvent.accessPointId",
-        "ScanEvent.venueId",
-        "ScanEvent.scopePath",
-        "ScanEvent.ticketId",
         "ScanEvent.mediaCode",
-        "ScanEvent.outcome",
-        "ScanEvent.denyReason",
-        "ScanEvent.direction",
-        "ScanEvent.operatorPrincipalId",
-        "ScanEvent.deviceId",
-        "ScanEvent.overridesScanId"
+        "ScanEvent.outcome"
        ],
        "operation": "listScans",
        "provenance": "contract access.yaml GET /access/scans"
@@ -1079,19 +1009,9 @@
        "label": "The selected scan event",
        "bindsTo": "ScanEvent",
        "columns": [
-        "ScanEvent.id",
-        "ScanEvent.accessPointId",
-        "ScanEvent.venueId",
-        "ScanEvent.scopePath",
-        "ScanEvent.ticketId",
         "ScanEvent.mediaCode",
         "ScanEvent.outcome",
         "ScanEvent.denyReason",
-        "ScanEvent.direction",
-        "ScanEvent.operatorPrincipalId",
-        "ScanEvent.deviceId",
-        "ScanEvent.overridesScanId",
-        "ScanEvent.overrideReason",
         "ScanEvent.recordedAt",
         "ScanEvent.syncedAt"
        ],
@@ -1119,7 +1039,7 @@
    "error": "Could not load. Names which read failed and leaves the hand over the untouched.",
    "emptyFirstRun": "No hand over the yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the hand over the are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_VALIDATE` for `syncScans`.",
    "offline": "**The point of the screen.** It exists because the journal outlives the shift"
   },
   "apis": [
@@ -1153,7 +1073,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-049"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSyncScans",

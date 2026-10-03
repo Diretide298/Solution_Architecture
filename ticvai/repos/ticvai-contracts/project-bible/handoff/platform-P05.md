@@ -9,12 +9,12 @@
 | Contracts | 8 |
 | Modules | 2 |
 | Undrawn | 0 |
-| Operations with no screen | 14 |
-| Waves | wave2 17 |
+| Operations with no screen | 15 |
+| Waves | wave1 1 · wave2 16 |
 
 ## Gaps
 
-### 14 operations with no screen here
+### 15 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -29,6 +29,7 @@
 | `claimTableSession` | fnb | POST | Identify which table a guest is sitting at |
 | `checkGuestCheckoutMatch` | marketing-crm | POST | Does this contact already have a profile here |
 | `decideGuestCheckoutMatch` | marketing-crm | POST | Use the existing profile or keep this booking separate |
+| `getGuestConversation` | marketing-crm | GET | The guest's own handed-over conversation, with the agent's replies and the queue position |
 | `uploadGuestDocument` | marketing-crm | POST | Store a guest photo, ID or signed document |
 | `listTicketTransfers` | orders | GET | The ticket transfers this guest sent or received |
 | `revokeEntitlementShare` | orders | POST | Take back a share |
@@ -40,7 +41,7 @@
 | Module | Screens | Waves |
 |---|---|---|
 | Sell | 16 | 2 |
-| AI | 1 | 2 |
+| AI | 1 | 1 |
 
 ## Screens
 
@@ -60,7 +61,7 @@
 | `KSK-012` | Booking found | Sell | 2 | 1 | yes |
 | `KSK-013` | Call staff | Sell | 2 | 1 | yes |
 | `KSK-014` | Out of service | Sell | 2 | 0 | yes |
-| `KSK-015` | Assistant | AI | 2 | 6 | yes |
+| `KSK-015` | Assistant | AI | 1 | 6 | yes |
 | `KSK-016` | Order Food | Sell | 2 | 2 | yes |
 | `KSK-017` | Shop | Sell | 2 | 4 | yes |
 

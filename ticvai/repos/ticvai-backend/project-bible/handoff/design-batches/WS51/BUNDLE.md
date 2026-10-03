@@ -107,8 +107,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-198` | Targeting & Eligibility Command Center | B–D | 2 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-199` | Eligibility Rule Builder | A | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-200` | CRM & Customer Segment Manager | B–D | 0 | 16 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-199` | Eligibility Rule Builder | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-200` | CRM & Customer Segment Manager | B–D | 0 | 14 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 | `ADM-201` | Membership, Loyalty & Guest Eligibility | B–D | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
 | `ADM-202` | Behavioral & Transaction Targeting | B–D | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-203` | Context, Location, Channel & Time Targeting | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
@@ -321,7 +321,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block A · ticket #20657 (APP-SETUP-ADM-199) |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -474,8 +474,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Estimated audience | text | Estimated audience |
 | Last refreshed | 1 Oct 2026, 14:30 | Last refreshed |
 | Promotions using segment | text | Promotions using segment |
-| Conversion | 1,234.5 | Conversion |
-| Revenue | AED 1,234.50 | Revenue |
 | Status | 1,234 | Status |
 
 **The selected crm customer segment** (detail panel): The pack groups this record's detail under its own headings: “Segment Sources”.
@@ -561,7 +559,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-200?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-198`.

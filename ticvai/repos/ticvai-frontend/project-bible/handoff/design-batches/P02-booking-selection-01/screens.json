@@ -52,9 +52,10 @@
      "to": "GST-049",
      "trigger": "Picks a time on a seated event (inline step)",
      "carries": [
-      "performanceId"
+      "performanceId",
+      "eventId"
      ],
-     "provenance": "decided 29 September, rev 3 REV3-4 (`seatEventDateMode` `inlineStep`) and REV3-7"
+     "provenance": "authored 3 October 2026 (CHG-SPF-004): GST-007 holds eventId and GST-049 cannot load without it, so the edge carries it; was: decided 29 September, rev 3 REV3-4 (`seatEventDateMode` `inlineStep`) and REV3-7"
     },
     {
      "to": "GST-008",
@@ -267,7 +268,7 @@
     "differences": "Booking in the app runs the website booking engine; per-flow step order."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "eligibilityDeclaration",
@@ -600,7 +601,7 @@
     "differences": "Booking in the app runs the website booking engine."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "purposeNote": "Rewritten 29 September (decided 29 September, rev 3 GAP-D3). The screen had been defined as ticket transfer (`transferOrderTickets` only), a duplicate of GST-014 / GST-045; transfer stays there.",
   "overlays": [
    {
@@ -657,7 +658,7 @@
   "name": "Upsell / Cross-Sell",
   "module": "Booking & Selection",
   "requiresModule": "ticketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C88",
   "implementation": {
    "app": "guest-app",
@@ -776,7 +777,7 @@
    "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formAddCartLine",
@@ -838,7 +839,7 @@
   "name": "Interactive Seat Selection",
   "module": "Booking & Selection",
   "requiresModule": "seating",
-  "wave": 2,
+  "wave": 1,
   "capability": "C53",
   "implementation": {
    "app": "guest-app",
@@ -1009,7 +1010,9 @@
     },
     {
      "name": "holdId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createSeatHold`; a link or an edge that holds one opens it instead."
     }
    ],
    "coldEntry": "**A link to a performance that has happened.** Offers the next performance of the same event."
@@ -1029,7 +1032,7 @@
    "derivedFrom": "wireframes/reference/Seat Board 4.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRecommendSeats",
@@ -1110,7 +1113,7 @@
   "name": "Resource Booking – Cabana",
   "module": "Booking & Selection",
   "requiresModule": "ticketing",
-  "wave": 3,
+  "wave": 1,
   "capability": "C78",
   "implementation": {
    "app": "guest-app",
@@ -1245,7 +1248,7 @@
    "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formAddCartLine",
@@ -1307,7 +1310,7 @@
   "name": "Bundle Package",
   "module": "Booking & Selection",
   "requiresModule": "ticketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C87",
   "implementation": {
    "app": "guest-app",
@@ -1363,17 +1366,8 @@
         "Bundle.code",
         "Bundle.name",
         "Bundle.description",
-        "Bundle.kind",
         "Bundle.price",
-        "Bundle.components",
-        "Bundle.choiceGroups",
-        "Bundle.allocation",
-        "Bundle.validFrom",
-        "Bundle.validTo",
-        "Bundle.savingsAmount",
-        "Bundle.savingsPercentage",
-        "Bundle.hasBeenSold",
-        "Bundle.isActive"
+        "Bundle.savingsAmount"
        ],
        "operation": "getBundle",
        "provenance": "contract promotions.yaml GET /bundles/{bundleId}"
@@ -1449,7 +1443,7 @@
    "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formAddCartLine",
@@ -1519,7 +1513,7 @@
   "name": "Resource Availability (Cabana)",
   "module": "Booking & Selection",
   "requiresModule": "ticketing",
-  "wave": 3,
+  "wave": 1,
   "capability": "C78",
   "implementation": {
    "app": "guest-app",
@@ -1642,7 +1636,7 @@
    "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -1679,7 +1673,7 @@
   "name": "Share & Group Booking",
   "module": "Booking & Selection",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "read-write",
   "implementation": {
    "app": "guest-app",
@@ -1725,14 +1719,10 @@
        "label": "The group booking",
        "bindsTo": "GroupBooking",
        "columns": [
-        "GroupBooking.orderId",
-        "GroupBooking.leaderSubjectId",
         "GroupBooking.organisationName",
         "GroupBooking.expectedSize",
         "GroupBooking.confirmedSize",
         "GroupBooking.minimumSize",
-        "GroupBooking.attendeeCaptureRequired",
-        "GroupBooking.attendeeCaptureDueBy",
         "GroupBooking.status"
        ],
        "operation": "getGroupBooking",
@@ -1743,15 +1733,10 @@
        "label": "Group packages",
        "bindsTo": "GroupPackageDefinition",
        "columns": [
-        "GroupPackageDefinition.productId",
         "GroupPackageDefinition.kind",
-        "GroupPackageDefinition.maxParticipants",
         "GroupPackageDefinition.durationMinutes",
         "GroupPackageDefinition.hostCount",
-        "GroupPackageDefinition.pricingBasis",
-        "GroupPackageDefinition.freeLeaderRatio",
-        "GroupPackageDefinition.paymentMode",
-        "GroupPackageDefinition.includes"
+        "GroupPackageDefinition.paymentMode"
        ],
        "operation": "listGroupPackages",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
@@ -1762,15 +1747,11 @@
        "label": "The group package definition",
        "bindsTo": "GroupPackageDefinition",
        "columns": [
-        "GroupPackageDefinition.productId",
         "GroupPackageDefinition.kind",
         "GroupPackageDefinition.maxParticipants",
         "GroupPackageDefinition.durationMinutes",
         "GroupPackageDefinition.hostCount",
-        "GroupPackageDefinition.pricingBasis",
-        "GroupPackageDefinition.freeLeaderRatio",
-        "GroupPackageDefinition.paymentMode",
-        "GroupPackageDefinition.includes"
+        "GroupPackageDefinition.paymentMode"
        ],
        "operation": "getGroupPackageDefinition",
        "provenance": "contract catalogue.yaml GET /products/{productId}/group-package"
@@ -1853,11 +1834,15 @@
    "params": [
     {
      "name": "entitlementId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `shareEntitlement` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "groupBookingId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `requestGroupBooking`; a link or an edge that holds one opens it instead."
     },
     {
      "name": "subjectId",
@@ -1886,7 +1871,7 @@
     "view": "Account → All screens → Wave 2 → Share & group booking"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRequestGroupBooking",
@@ -2002,7 +1987,7 @@
   "name": "Map Booking — Cabanas & Spots",
   "module": "Booking & Selection",
   "requiresModule": "resources",
-  "wave": 3,
+  "wave": 1,
   "implementation": {
    "app": "guest-app",
    "route": "/general/map-booking",
@@ -2248,7 +2233,9 @@
     },
     {
      "name": "holdId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createResourceHold`; a link or an edge that holds one opens it instead."
     }
    ],
    "coldEntry": "**A link to a map that is no longer published, or a day that has passed,** says which and offers today on the current map. Nothing is held on arrival."
@@ -2322,7 +2309,7 @@
   "name": "Book a Space by the Hour",
   "module": "Booking & Selection",
   "requiresModule": "resources",
-  "wave": 3,
+  "wave": 1,
   "implementation": {
    "app": "guest-app",
    "route": "/general/space-by-the-hour",

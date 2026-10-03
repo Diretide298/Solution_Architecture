@@ -607,7 +607,7 @@
   "name": "AI Staffing Requirement Forecast",
   "module": "Rentals",
   "requiresModule": "resources",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "8",
@@ -781,7 +781,9 @@
    "params": [
     {
      "name": "requirementId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listOperationalRequirements` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "venueId",
@@ -1013,11 +1015,15 @@
    "params": [
     {
      "name": "actionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProposedActions` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "conversationId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createAiConversation`; a link or an edge that holds one opens it instead."
     }
    ]
   },
@@ -1165,11 +1171,15 @@
    "params": [
     {
      "name": "actionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProposedActions` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "conversationId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `sendAiMessage` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1549,7 +1559,9 @@
    "params": [
     {
      "name": "conversationId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiConversations` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

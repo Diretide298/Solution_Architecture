@@ -106,15 +106,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-007` | Product Directory | A | 97 | 62 | 6 | 75 | 3 | 0 | — | notStarted (generated) |
-| `BO-008` | Product Detail & Variants | A | 41 | 44 | 6 | 37 | 22 | 3 | — | notStarted (generated) |
-| `BO-009` | Pricing Rules | A | 57 | 25 | 6 | 19 | 3 | 0 | — | notStarted (generated) |
-| `BO-010` | Promotions & Coupons | A | 165 | 70 | 6 | 51 | 3 | 2 | — | notStarted (generated) |
-| `BO-011` | Packages & Bundles | A | 69 | 47 | 6 | 11 | 4 | 0 | — | notStarted (generated) |
-| `BO-012` | Membership Products | A | 115 | 53 | 6 | 112 | 0 | 0 | — | notStarted (generated) |
-| `BO-013` | Channel & Distribution | B–D | 40 | 54 | 6 | 34 | 2 | 0 | — | notStarted (generated) |
-| `BO-014` | Catalogue Publishing | B–D | 8 | 33 | 6 | 30 | 0 | 6 | — | notStarted (generated) |
-| `BO-015` | Performance Calendar | B–D | 39 | 58 | 6 | 38 | 5 | 0 | — | notStarted (generated) |
+| `BO-007` | Product Directory | A | 97 | 38 | 6 | 75 | 3 | 0 | — | notStarted (generated) |
+| `BO-008` | Product Detail & Variants | A | 41 | 34 | 6 | 37 | 22 | 3 | — | notStarted (generated) |
+| `BO-009` | Pricing Rules | A | 57 | 21 | 6 | 19 | 3 | 0 | — | notStarted (generated) |
+| `BO-010` | Promotions & Coupons | A | 165 | 39 | 6 | 51 | 3 | 2 | — | notStarted (generated) |
+| `BO-011` | Packages & Bundles | A | 69 | 36 | 6 | 11 | 4 | 0 | — | notStarted (generated) |
+| `BO-012` | Membership Products | A | 115 | 33 | 6 | 112 | 0 | 0 | — | notStarted (generated) |
+| `BO-013` | Channel & Distribution | B–D | 40 | 32 | 6 | 34 | 2 | 0 | — | notStarted (generated) |
+| `BO-014` | Catalogue Publishing | B–D | 8 | 19 | 6 | 30 | 0 | 6 | — | notStarted (generated) |
+| `BO-015` | Performance Calendar | B–D | 39 | 44 | 6 | 38 | 5 | 0 | — | notStarted (generated) |
 | `BO-016` | Performance Template | B–D | 19 | 15 | 6 | 0 | 5 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch

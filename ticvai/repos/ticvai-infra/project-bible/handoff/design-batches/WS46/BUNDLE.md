@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-148` | Promotion Rule Builder | A | 0 | 0 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
+| `ADM-148` | Promotion Rule Builder | B–D | 0 | 0 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
 | `ADM-149` | Percentage & Fixed Discount Configurator | B–D | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-150` | Cart & Transaction Threshold Rules | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 | `ADM-151` | Volume, Bulk & Tier Discount Configurator | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
@@ -135,7 +135,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block A · ticket #20647 (APP-SETUP-ADM-148) |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `PRICE_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1360,6 +1360,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS107 Promotions   Bundles Management Board 2.dc.html#adm-157`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 2
 - Flow F155 *Promotions Bundles Management board 2: Promotion Rule Builder*, step 18: Works in Rule Test, Simulation & AI Recommendation Workspace → Allow administrators to test promotional rules before activating them. This is critical because the matrix requires simulation of redemption, discount exposure, revenue impact, margin impact and …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 

@@ -51,7 +51,10 @@
      "to": "BO-247",
      "trigger": "Works in Unified Identity & Credential Lock Manager",
      "provenance": "flow F121 step 5→6",
-     "operation": "listAccessSecurityFraud"
+     "operation": "listAccessSecurityFraud",
+     "carries": [
+      "lockId"
+     ]
     },
     {
      "to": "BO-249",
@@ -852,7 +855,9 @@
    "params": [
     {
      "name": "lockId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listUnifiedIdentityCredential` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

@@ -4,7 +4,7 @@
   "name": "F&B – Browse & Order",
   "module": "In-venue Services",
   "requiresModule": "fnb",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "guest-web",
    "route": "/fandb--browse-and-order",
@@ -16,7 +16,18 @@
     "WEB-001"
    ],
    "exitTo": [
-    "WEB-001"
+    "WEB-001",
+    "WEB-037"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-037",
+     "trigger": "Menu Item Detail",
+     "carries": [
+      "outletId"
+     ],
+     "provenance": "authored 3 October 2026 (CHG-SPF-004): WEB-036 lists them, and WEB-037 cannot load without the one the user picks"
+    }
    ]
   },
   "notes": "**A guest scans a QR on a table and lands in a browser.** That is the single most common F&B ordering pattern anywhere, and until 24 August it was the one thing this surface could not do — `claimTableSession` and `claimLocationSession` were app-only. **Nobody installs an app to order a coffee.** **Renamed 31 August** from *F&B — Browse & Order*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added getGuestOrderStatus. **The same screen on web and app was calling different operations** — one side could do something the other could not, and nothing recorded the difference as deliberate.\n\n**Rev 3 (decided 29 September).** **Table reservation and waitlist stay out of the basket (REV3-8):** `createTableReservation` and `joinRestaurantWaitlist` confirm straight away with a *No card needed* confirmation; the prototype's basket line is prototype-only. **Deposit (REV3-8b, superseding audit R077 (a)):** where the venue has enabled a dining deposit, `createTableReservation` answers `awaitingDeposit`; the screen shows `deposit.amount` and basis, adds the deposit to the cart (`addCartLine` with `deposit.variantId` and `tableReservationId`), pays it through checkout, and shows `refundableUntil` and the late-cancel and no-show terms. Off by default; amount and basis are venue configuration, never a fixed AED 100. **Modifiers (REV3-9):** Add opens the modifier side panel of WEB-037 when the item has groups attached. Delivery fee, minimum order, area and full slots are unchanged (DG-5).\n\n**Where the outlet is (decided by Chinmay, 2 October 2026; DEC-070, DEC-206).** An outlet is *Inside the venue (needs an admission ticket)* or *Standalone (no ticket)* (`Outlet.admissionContext`). Ordering from an inside-the-venue outlet needs admission: a ticket, or a location claimed inside the venue; `createGuestFnbOrder` refuses 403 `entry-ticket-required` otherwise, and the screen says so and offers the tickets. A standalone restaurant sells takeaway and delivery without a ticket. **F&B keeps its own payment step and its own receipt** (DEC-071, DEC-052): DI-293's one cart and one receipt does not apply to F&B, so the food order is paid on its own pay step and its receipt does not join the guest's ticket receipt (CHG-SGU-001).",
@@ -255,7 +266,9 @@
    "params": [
     {
      "name": "outletId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getFnbDeliveryPolicy`; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "venueId",
@@ -263,7 +276,9 @@
     },
     {
      "name": "orderId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createGuestFnbOrder`; a link or an edge that holds one opens it instead."
     },
     {
      "name": "entryId",
@@ -277,7 +292,9 @@
     },
     {
      "name": "reservationId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createTableReservation`; a link or an edge that holds one opens it instead."
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land here, and the person holding it did nothing wrong. Arrives with `outletId`. **`venueId` is the venue the guest picked on the home screen** (WEB-001 on the web, GST-001 in the app), remembered on the device and changeable there; it is not read from the sign-in (decided 28 September, audit R267).",
@@ -298,7 +315,7 @@
     "differences": "Prototype splits in-venue table ordering (At the venue) from takeaway/delivery ordering (a booking flow with a delivery-area and slot check). Table reservation and waitlist (in YAML apis) are booking flows at Saffron Table. **The prototype sends the order with \"Send to the kitchen\" and no payment step: wrong here.** The contract takes payment before the kitchen sees a guest order unless the outlet runs a tab, and F11 puts the pay step (4) before the kitchen (5); the design shows the pay step (CHG-SGU-018)."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateTableReservation",
@@ -382,7 +399,7 @@
   "name": "Menu Item Detail",
   "module": "In-venue Services",
   "requiresModule": "fnb",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "guest-web",
    "route": "/menu-item-detail",
@@ -453,7 +470,9 @@
     },
     {
      "name": "menuItemId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getGuestMenu`; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land here, and the person holding it did nothing wrong. Arrives with `outletId`.",
@@ -478,7 +497,7 @@
     "differences": "Two renderings of the same thing (dialog in-venue, side panel in takeaway/delivery)."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "modifierPanel",
@@ -537,7 +556,7 @@
   "name": "F&B – Order Tracking",
   "module": "In-venue Services",
   "requiresModule": "fnb",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "guest-web",
    "route": "/fandb--order-tracking",
@@ -630,7 +649,9 @@
     },
     {
      "name": "orderId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getGuestBill`; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "sessionId",
@@ -656,7 +677,7 @@
     "differences": "No bill or settle-the-bill view (YAML getGuestBill, 'settle the bill')."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -693,7 +714,7 @@
   "name": "Venue Map & Wait Times",
   "module": "In-venue Services",
   "requiresModule": "queue",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "guest-web",
    "route": "/venue-map-and-wait-times",
@@ -868,7 +889,7 @@
    "derivedFrom": "wireframes/reference/Seat Board 3.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -905,7 +926,7 @@
   "name": "Virtual Queue",
   "module": "In-venue Services",
   "requiresModule": "queue",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "guest-web",
    "route": "/virtual-queue",
@@ -937,18 +958,10 @@
        "label": "The waiting guest",
        "bindsTo": "WaitingGuest",
        "columns": [
-        "WaitingGuest.id",
-        "WaitingGuest.queueId",
         "WaitingGuest.queueName",
-        "WaitingGuest.subjectId",
         "WaitingGuest.partyNumber",
-        "WaitingGuest.partySize",
         "WaitingGuest.status",
-        "WaitingGuest.positionInQueue",
-        "WaitingGuest.partiesAhead",
         "WaitingGuest.estimatedCallAt",
-        "WaitingGuest.isFastPass",
-        "WaitingGuest.entitlementId",
         "WaitingGuest.calledAt",
         "WaitingGuest.returnWindowEndsAt",
         "WaitingGuest.redeemedAt",
@@ -962,13 +975,9 @@
        "label": "The wait time",
        "bindsTo": "WaitTime",
        "columns": [
-        "WaitTime.queueId",
         "WaitTime.queueName",
-        "WaitTime.attractionProductId",
-        "WaitTime.attractionCategoryId",
         "WaitTime.status",
         "WaitTime.waitMinutes",
-        "WaitTime.source",
         "WaitTime.isStale",
         "WaitTime.heightRequirementCm",
         "WaitTime.zone",
@@ -1051,7 +1060,9 @@
     },
     {
      "name": "entryId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened from Home, the guest joins a queue here with `joinQueue` and the screen follows that place; a link to a place opens it directly."
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land here, and the person holding it did nothing wrong. Arrives with `entryId`."
@@ -1068,7 +1079,7 @@
     "view": "Summit Peaks → header 'At the venue' → Virtual queue"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formJoinQueue",
@@ -1130,7 +1141,7 @@
   "name": "Parking – Reserve & Pay",
   "module": "In-venue Services",
   "requiresModule": "access",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "guest-web",
    "route": "/parking--reserve-and-pay",
@@ -1286,7 +1297,7 @@
     "differences": "Shows live free-bay counts, which the YAML says it does not have (no live availability; full = soldOutForDay). Pays directly with 'Reserve and pay' rather than through cart and checkout (R166). Also a plate field in the cabana/party flows. **Do not draw live free-bay counts or \"Reserve and pay\"**: no live count in the first release, and parking goes through the basket (R166) (CHG-SGU-020)."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formAddCartLine",

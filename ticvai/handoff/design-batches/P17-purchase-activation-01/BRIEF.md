@@ -148,13 +148,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SGN-018` | Purchase / Trial Journey Selection | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `SGN-019` | Contract & Billing Cycle Selection | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `SGN-020` | Billing & Legal Entity Information | B–D | 29 | 2 | 5 | 0 | 1 | 0 | — | notStarted (—) |
-| `SGN-021` | Payment Method & Settlement Setup | B–D | 34 | 0 | 6 | 17 | 1 | 0 | — | notStarted (—) |
-| `SGN-022` | Order & Commercial Pricing Review | B–D | 0 | 10 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `SGN-023` | Commercial Agreement, Billable Definition & Customer Acceptance | B–D | 0 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `SGN-024` | Subscription Confirmation & Commercial Activation | B–D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `SGN-018` | Purchase / Trial Journey Selection | B | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `SGN-019` | Contract & Billing Cycle Selection | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `SGN-020` | Billing & Legal Entity Information | B | 29 | 2 | 5 | 0 | 1 | 0 | — | notStarted (—) |
+| `SGN-021` | Payment Method & Settlement Setup | C | 34 | 0 | 6 | 17 | 1 | 0 | — | notStarted (—) |
+| `SGN-022` | Order & Commercial Pricing Review | B | 0 | 10 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `SGN-023` | Commercial Agreement, Billable Definition & Customer Acceptance | B | 0 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `SGN-024` | Subscription Confirmation & Commercial Activation | B | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

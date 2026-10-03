@@ -124,18 +124,12 @@
        "label": "Every refund",
        "bindsTo": "Refund",
        "columns": [
-        "Refund.id",
-        "Refund.orderId",
-        "Refund.batchId",
         "Refund.fxRate",
-        "Refund.taxReversalEntryId",
         "Refund.settleTo",
         "Refund.fxVariance",
         "Refund.amount",
         "Refund.appliedPercentage",
-        "Refund.status",
-        "Refund.reason",
-        "Refund.requestedByPrincipalId"
+        "Refund.status"
        ],
        "operation": "listOrderRefunds",
        "provenance": "contract orders.yaml GET /orders/{orderId}/refunds"
@@ -170,22 +164,14 @@
        "label": "The order",
        "bindsTo": "Order",
        "columns": [
-        "Order.id",
         "Order.orderNumber",
         "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
         "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
         "Order.grossAmount",
         "Order.taxAmount",
         "Order.netAmount",
         "Order.refundedAmount",
-        "Order.totalPriceVariance",
-        "Order.lines",
-        "Order.payments",
-        "Order.principalId"
+        "Order.totalPriceVariance"
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
@@ -398,7 +384,7 @@
    "error": "Could not load. Names which read failed and leaves the order history untouched.",
    "emptyFirstRun": "No order history yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the order history are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createOrder`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_MODIFY` for `holdOrder`, `modifyOrder`, `resumeOrder`; `ORDER_REPRINT` for `reprintOrder`; `ORDER_RESCHEDULE` for `rescheduleOrder`."
   },
   "apis": [
    {
@@ -493,7 +479,9 @@
    "params": [
     {
      "name": "orderId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listOrders` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
@@ -510,7 +498,7 @@
    "provenance": "generated",
    "board": "wireframes/P10 Partner Web.dc.html#ptr-015"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "applyManualDiscount",
@@ -611,18 +599,12 @@
        "label": "Every refund",
        "bindsTo": "Refund",
        "columns": [
-        "Refund.id",
-        "Refund.orderId",
         "Refund.fxRate",
-        "Refund.taxReversalEntryId",
         "Refund.settleTo",
         "Refund.fxVariance",
         "Refund.amount",
         "Refund.appliedPercentage",
-        "Refund.status",
-        "Refund.reason",
-        "Refund.requestedByPrincipalId",
-        "Refund.secondaryPrincipalId"
+        "Refund.status"
        ],
        "operation": "listOrderRefunds",
        "provenance": "contract orders.yaml GET /orders/{orderId}/refunds"
@@ -632,14 +614,10 @@
        "label": "Every order",
        "bindsTo": "OrderSummary",
        "columns": [
-        "OrderSummary.id",
         "OrderSummary.orderNumber",
         "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
         "OrderSummary.channel",
         "OrderSummary.lineCount",
-        "OrderSummary.principalId",
         "OrderSummary.holdLabel",
         "OrderSummary.heldUntil"
        ],
@@ -664,21 +642,13 @@
        "label": "The selected refund",
        "bindsTo": "Refund",
        "columns": [
-        "Refund.id",
-        "Refund.orderId",
-        "Refund.batchId",
         "Refund.fxRate",
-        "Refund.taxReversalEntryId",
         "Refund.settleTo",
         "Refund.fxVariance",
         "Refund.amount",
         "Refund.appliedPercentage",
         "Refund.status",
         "Refund.reason",
-        "Refund.requestedByPrincipalId",
-        "Refund.secondaryPrincipalId",
-        "Refund.approvedByPrincipalId",
-        "Refund.ledgerEntryId",
         "Refund.gatewayReference"
        ],
        "operation": "listOrderRefunds",
@@ -706,22 +676,14 @@
        "label": "The order",
        "bindsTo": "Order",
        "columns": [
-        "Order.id",
         "Order.orderNumber",
         "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
         "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
         "Order.grossAmount",
         "Order.taxAmount",
         "Order.netAmount",
         "Order.refundedAmount",
-        "Order.totalPriceVariance",
-        "Order.lines",
-        "Order.payments",
-        "Order.principalId"
+        "Order.totalPriceVariance"
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
@@ -770,7 +732,7 @@
    "error": "Could not load. Names which read failed and leaves the voucher ticket download untouched.",
    "emptyFirstRun": "No voucher ticket download yet. Offers no create action — this screen declares no operation that makes one.",
    "emptyNoResults": "Never shown: `listOrderRefunds` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_REPRINT` for `reprintOrder`."
   },
   "apis": [
    {
@@ -825,7 +787,7 @@
    "provenance": "generated",
    "board": "wireframes/P10 Partner Web.dc.html#ptr-016"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "applyManualDiscount",

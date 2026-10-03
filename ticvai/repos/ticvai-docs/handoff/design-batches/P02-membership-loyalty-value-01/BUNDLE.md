@@ -127,9 +127,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-011` | Wallet Overview | A | 0 | 22 | 6 | 32 | 14 | 6 | guest | notStarted (designed) |
-| `GST-015` | Memberships | A | 10 | 42 | 6 | 53 | 7 | 0 | guest | notStarted (designed) |
-| `GST-036` | Loyalty & Rewards | A | 9 | 62 | 6 | 54 | 2 | 2 | guest | notStarted (designed) |
+| `GST-011` | Wallet Overview | A | 0 | 15 | 6 | 32 | 14 | 6 | guest | notStarted (designed) |
+| `GST-015` | Memberships | A | 10 | 26 | 6 | 53 | 7 | 0 | guest | notStarted (designed) |
+| `GST-036` | Loyalty & Rewards | A | 9 | 49 | 6 | 54 | 2 | 2 | guest | notStarted (designed) |
 
 ## Thin screens in this batch
 
@@ -148,8 +148,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Membership, Loyalty & Value · wave 2 · needs the `retail` module |
-| Block | Block A · ticket #18091 (APP-MOB-GST-011) |
+| Module | Membership, Loyalty & Value · wave 1 · needs the `retail` module |
+| Block | Block A · task APP-MOB-GST-011 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listWalletTransactions` reads the population and `getWallet` reads one of them — list, select, act |
@@ -190,13 +190,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Shows | Format | Notes |
 |---|---|---|
 | Balance | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Credits | list or chips (count when long) | 4.3.5 and 4.3.19. One balance and one bonus balance with one expiry could not express what the requirement asks for — cash, bonus and … |
 | Bonus balance | AED 1,234.50 | Promotional value. Typically non-refundable and spent first. |
-| Currency | text | — |
 | Status | chip: Active, Suspended, Closed | — |
 | Home cell name | text | Where the authoritative balance lives. Present when the guest is linked across cells. |
 | Expires at | 1 Oct 2026, 14:30 | — |
-| Last activity at | 1 Oct 2026, 14:30 | — |
 
 **The game card** (detail panel, from `getGameCard`): An arcade card's balance, read by its code, as the web wallet WEB-021 shows it (flow F18 step 2; CHG-CLN-006).
 
@@ -204,13 +201,9 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|
 | Card code | text | A pre-printed card keeps the code printed on it. A generated code (a digital card, or a card issued with no printed code) is the venue … |
 | Kind | text | — |
-| Credits | 1,234 | Bought with money. Buys plays. |
-| Bonus credits | 1,234 | From a promotion. Typically non-refundable and spent before paid credits. |
 | Points | 1,234 | Won by playing. Buys prizes. |
 | Status | chip: Active, Blocked, Expired, Transferred | — |
-| Blocked reason | text | — |
 | Last played at | 1 Oct 2026, 14:30 | — |
-| Expires at | 1 Oct 2026, 14:30 | — |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
 
@@ -338,7 +331,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409, 412, 422).
-- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-011?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `GST-001`, `GST-020`, `BO-395`.
@@ -356,8 +349,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Membership, Loyalty & Value · wave 2 · needs the `ticketing` module |
-| Block | Block A · ticket #18171 (APP-MOB-GST-015) |
+| Module | Membership, Loyalty & Value · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-MOB-GST-015 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listDelegations` reads the population and `getMyMemberships` reads one of them — list, select, act |
@@ -435,14 +428,10 @@ Errors to draw in the form: 409 A cycle, or a minor granting authority over an a
 
 | Shows | Format | Notes |
 |---|---|---|
-| Role | the name it points at, never the id | — |
 | Permission | text | From the permission enum. `*` permitted on DENY only. |
-| Over subject | the name it points at, never the id | Whose behalf. Null for a staff grant, which is the existing behaviour — every grant written before 18 August means exactly what it meant … |
 | Over object ref | text | Where the authority is over a thing rather than a scope — a wallet, an entitlement, a booking. |
 | Delegation kind | chip: Primary holder, Family member, Group leader, Attendee, Corporate admin, Corporate … | What kind of relationship this expresses, for display and for reporting. The mechanism does not branch on it — a family member and a group … |
-| Quota | 1,234 | 2.14.15 and 4.3.11. How many the holder may assign. |
 | Is revocable by subject | yes / no (icon or chip) | Whether the person it is over can end it. A guest who linked a family member should be able to unlink them; a corporate member should not … |
-| Effect | chip: ALLOW, DENY | — |
 
 **Statements** (card list, from `listBillingStatements`): Was the generated table 'Every billing statement'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
 
@@ -458,16 +447,10 @@ Errors to draw in the form: 409 A cycle, or a minor granting authority over an a
 
 | Shows | Format | Notes |
 |---|---|---|
-| Order | text | The order whose renewal failed. |
-| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | State | chip: Scheduled, In progress, Exhausted, Recovered, Resolved manually | BL-100. `exhausted` and `recovered` are both endings and only one of them is a failure. |
-| Decline class | chip: Soft, Hard, Unknown | From the most recent attempt. A case that begins `soft` and turns `hard` stops immediately rather than finishing its schedule — the card … |
-| Attempts made | 1,234 | — |
 | Next attempt at | 1 Oct 2026, 14:30 | Null where the case has ended or the decline is hard. A scheduled time on a case nothing will act on is the field that makes a queue … |
 | First failed at | 1 Oct 2026, 14:30 | — |
 | Resolved at | 1 Oct 2026, 14:30 | — |
-| Resolution | chip: Paid by other means, Card replaced, Write off, Cancelled by guest | — |
-| Resolution note | text | What `resolveDunningCase` was told, which had nowhere to land until now. The enum above tells `writeOff` from `cardReplaced`; which … |
 
 **Membership plans** (card list, from `listProducts`): The venue's membership plans, to join or upgrade. The venue is the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
 
@@ -491,17 +474,11 @@ Errors to draw in the form: 409 A cycle, or a minor granting authority over an a
 
 | Shows | Format | Notes |
 |---|---|---|
-| Entitlement | the name it points at, never the id | The `access.Entitlement.id` this membership is — a UUIDv7, like every entitlement id. |
-| Product | the name it points at, never the id | — |
 | Name | text | — |
 | Tier | text | — |
 | Status | chip: Active, Frozen, Suspended, Expired, Cancelled | Derived from the entitlement, not held here. This schema is a view assembled from the entitlement, the product that granted it and the … |
 | Valid from | 1 Oct 2026 | — |
-| Valid to | 1 Oct 2026 | — |
-| Frozen days | 1,234 | Days lost to a freeze and added back to `validTo`. Shown because a guest who paused a pass will check the maths, and a validity date that … |
-| Benefits | list or chips (count when long) | 5.4.31. From the product's entitlement template. |
 | Renews on | 1 Oct 2026 | — |
-| Previous terms | list or chips (count when long) | Prior terms, including lapsed ones. |
 
 **Actions and what each produces**
 
@@ -627,7 +604,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (10), with its required mark, default, format and its error state (400, 403, 409, 422).
-- [ ] Every output is drawn (42 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-015?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Let a family member use it, Retry the payment.
 - [ ] Every transition is wired: `GST-001`, `ADM-003`.
@@ -645,8 +622,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Membership, Loyalty & Value · wave 2 · needs the `marketing` module |
-| Block | Block A · ticket #18198 (APP-MOB-GST-036) |
+| Module | Membership, Loyalty & Value · wave 1 · needs the `marketing` module |
+| Block | Block A · task APP-MOB-GST-036 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listLoyaltyProgrammes` reads the population and `getLoyaltyPosition` reads one of them — list, select, act |
@@ -730,13 +707,8 @@ The nickname shown on the leaderboard.
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | Unique per tenant (decided 28 September, audit R108). A code already used by any loyalty programme in the tenant, at any venue, is refused … |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Points liability account | the name it points at, never the id | Points post here on accrual. They are a liability from the moment they are earned, not from the moment they are spent. |
-| Earn rules | list or chips (count when long) | — |
-| Tiers | list or chips (count when long) | Rows of `marketing.programme_tier`, the same shape `MarketingProgrammeTier` has — one definition of a tier, not a second copy that cannot … |
 | Points expire after months | 1,234 | — |
 | Is active | yes / no (icon or chip) | — |
 
@@ -747,15 +719,7 @@ The nickname shown on the leaderboard.
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Venue | the name it points at, never the id | — |
-| Discount | grouped details | — |
-| Conditions | grouped details | All conditions must hold. An empty object matches everything. |
-| Stacking mode | chip: Exclusive, Stackable, Best only, Stack with group | How this promotion combines with others. Declared, never inferred from creation order — two reasonable promotions can otherwise combine … |
-| Stacking group | text | — |
-| Precedence | 1,234 | Higher evaluates first where several could apply. |
 | Valid from | 1 Oct 2026, 14:30 | — |
-| Valid to | 1 Oct 2026, 14:30 | — |
-| Max redemptions | 1,234 | — |
 
 **Rewards** (card list, from `listRewards`): What points can be turned into, with the points each needs; Redeem on a reward the guest can afford.
 
@@ -956,7 +920,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (9), with its required mark, default, format and its error state (403, 409).
-- [ ] Every output is drawn (62 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (49 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-036?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Redeem, Invite a friend, Choose my name.
 - [ ] Every transition is wired: `GST-001`, `WEB-024`.

@@ -102,7 +102,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-020` | F&B Order Management | B–D | 25 | 25 | 6 | 15 | 0 | 1 | — | notStarted (generated) |
 | `BO-021` | Order Search | B–D | 5 | 40 | 5 | 1 | 0 | 0 | — | notStarted (generated) |
 | `BO-045` | Menu Management | A | 68 | 75 | 6 | 15 | 3 | 2 | — | notStarted (generated) |
-| `BO-046` | Kitchen Display | B–D | 8 | 27 | 6 | 7 | 0 | 3 | — | notStarted (generated) |
+| `BO-046` | Kitchen Display | B–D | 8 | 14 | 6 | 7 | 0 | 3 | — | notStarted (generated) |
 | `BO-104` | Food & Beverage | B–D | 1 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-134` | Kitchen & Preparation Stations | B–D | 15 | 16 | 6 | 1 | 1 | 6 | — | notStarted (generated) |
 | `BO-135` | Order Routing & KDS/Printer Rules | B–D | 7 | 7 | 6 | 0 | 1 | 0 | — | notStarted (generated) |

@@ -1,5 +1,5 @@
 id: LLD-maintenance
-title: maintenance — 42 operations
+title: maintenance — 44 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -19,6 +19,17 @@ operations:
   writes:
   - cache:idempotency
   - maintenance.work_order
+- operation: addIncidentPerson
+  verb: POST
+  path: /incidents/{incidentId}/people
+  scope: venue
+  permission: INCIDENT_REPORT
+  audience:
+  - staff
+  offline: true
+  reads:
+  - maintenance.incident_involved_party
+  writes: []
 - operation: attachWorkOrderEvidence
   verb: POST
   path: /work-orders/{workOrderId}/attachments
@@ -568,6 +579,17 @@ operations:
   writes:
   - cache:idempotency
   - maintenance.work_order
+- operation: uploadIncidentMedia
+  verb: POST
+  path: /incidents/{incidentId}/media
+  scope: venue
+  permission: INCIDENT_REPORT
+  audience:
+  - staff
+  offline: false
+  reads:
+  - maintenance.incident_media
+  writes: []
 - operation: verifyWorkOrder
   verb: POST
   path: /work-orders/{workOrderId}/verify

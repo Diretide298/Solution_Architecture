@@ -4,7 +4,7 @@
   "name": "Interactive Map",
   "module": "In-venue Services",
   "requiresModule": "seating",
-  "wave": 2,
+  "wave": 1,
   "capability": "C39",
   "implementation": {
    "app": "guest-app",
@@ -112,10 +112,8 @@
         "WaitTime.queueName",
         "WaitTime.status",
         "WaitTime.waitMinutes",
-        "WaitTime.isStale",
         "WaitTime.heightRequirementCm",
-        "WaitTime.zone",
-        "WaitTime.asOf"
+        "WaitTime.zone"
        ],
        "operation": "getWaitTimes",
        "provenance": "contract queue.yaml GET /queues/wait-times"
@@ -191,7 +189,7 @@
    "derivedFrom": "wireframes/reference/Seat Board 4.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -228,7 +226,7 @@
   "name": "Attraction Wait Times",
   "module": "In-venue Services",
   "requiresModule": "queue",
-  "wave": 2,
+  "wave": 1,
   "capability": "C82",
   "implementation": {
    "app": "guest-app",
@@ -275,7 +273,7 @@
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101) with the queue platform F21 runs on.\n\n**Mobile v4 (decided 29 September, MOB-1).** The **Waits** view of GST-038 At the Venue: **one implementation with GST-038, the ids kept** (as GAP-D3).",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Pulled forward (CF-101) with the queue platform F21 runs on; in Block A since the 1 October plan.\n\n**Mobile v4 (decided 29 September, MOB-1).** The **Waits** view of GST-038 At the Venue: **one implementation with GST-038, the ids kept** (as GAP-D3).",
   "density": "comfortable",
   "pattern": "statusTracker",
   "patternReason": "`getWaitTimes` reads one record and nothing reads a population — the screen is about that one thing",
@@ -292,15 +290,10 @@
        "label": "The wait time",
        "bindsTo": "WaitTime",
        "columns": [
-        "WaitTime.queueId",
         "WaitTime.queueName",
-        "WaitTime.attractionProductId",
         "WaitTime.status",
         "WaitTime.waitMinutes",
-        "WaitTime.source",
         "WaitTime.isStale",
-        "WaitTime.heightRequirementCm",
-        "WaitTime.zone",
         "WaitTime.asOf"
        ],
        "operation": "getWaitTimes",
@@ -337,7 +330,7 @@
     "view": "At the venue → Waits"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -374,7 +367,7 @@
   "name": "Virtual Queue",
   "module": "In-venue Services",
   "requiresModule": "queue",
-  "wave": 3,
+  "wave": 1,
   "capability": "C82",
   "implementation": {
    "app": "guest-app",
@@ -424,21 +417,10 @@
        "label": "The waiting guest",
        "bindsTo": "WaitingGuest",
        "columns": [
-        "WaitingGuest.id",
-        "WaitingGuest.queueId",
         "WaitingGuest.queueName",
-        "WaitingGuest.subjectId",
         "WaitingGuest.partyNumber",
-        "WaitingGuest.partySize",
         "WaitingGuest.status",
-        "WaitingGuest.positionInQueue",
-        "WaitingGuest.partiesAhead",
         "WaitingGuest.estimatedCallAt",
-        "WaitingGuest.isFastPass",
-        "WaitingGuest.entitlementId",
-        "WaitingGuest.calledAt",
-        "WaitingGuest.returnWindowEndsAt",
-        "WaitingGuest.redeemedAt",
         "WaitingGuest.admittedCount"
        ],
        "operation": "getWaitingGuest",
@@ -449,17 +431,11 @@
        "label": "The wait time",
        "bindsTo": "WaitTime",
        "columns": [
-        "WaitTime.queueId",
         "WaitTime.queueName",
-        "WaitTime.attractionProductId",
-        "WaitTime.attractionCategoryId",
         "WaitTime.status",
         "WaitTime.waitMinutes",
-        "WaitTime.source",
-        "WaitTime.isStale",
         "WaitTime.heightRequirementCm",
-        "WaitTime.zone",
-        "WaitTime.asOf"
+        "WaitTime.zone"
        ],
        "operation": "getWaitTimes",
        "provenance": "contract queue.yaml GET /queues/wait-times"
@@ -544,7 +520,9 @@
     },
     {
      "name": "entryId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened from Home, the guest joins a queue here with `joinQueue` and the screen follows that place; a link to a place opens it directly."
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `entryId`."
@@ -562,7 +540,7 @@
     "differences": "Prototype allows two queues at once; the YAML states no limit."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formJoinQueue",
@@ -624,7 +602,7 @@
   "name": "F&B – Browse & Order",
   "module": "In-venue Services",
   "requiresModule": "fnb",
-  "wave": 2,
+  "wave": 1,
   "capability": "C05",
   "implementation": {
    "app": "guest-app",
@@ -642,7 +620,8 @@
     "GST-001",
     "GST-002",
     "GST-009",
-    "GST-025"
+    "GST-025",
+    "GST-061"
    ],
    "fromFlows": true,
    "transitions": [
@@ -650,6 +629,14 @@
      "to": "GST-001",
      "trigger": "Home – Default",
      "provenance": "derived — GST-001 declares entryState.params  and GST-024 holds none of them. The edge carries nothing: GST-024 is opened from GST-001, so this edge is the way back and GST-001 keeps its own state"
+    },
+    {
+     "to": "GST-061",
+     "trigger": "Menu Item Detail",
+     "carries": [
+      "outletId"
+     ],
+     "provenance": "authored 3 October 2026 (CHG-SPF-004): GST-024 lists them, and GST-061 cannot load without the one the user picks"
     },
     {
      "to": "GST-009",
@@ -690,10 +677,7 @@
         "DiningOutlet.name",
         "DiningOutlet.zone",
         "DiningOutlet.cuisine",
-        "DiningOutlet.orderingMethod",
-        "DiningOutlet.closesAt",
-        "DiningOutlet.estimatedWaitMinutes",
-        "DiningOutlet.imageAssetRef"
+        "DiningOutlet.estimatedWaitMinutes"
        ],
        "operation": "listDiningOutlets",
        "notes": "Outlets open now: photo, name, zone, cuisine, how to order (\"Order to your seat\", \"Collect\", \"Counter only\") and closing time; a wait only when the outlet reports one. No ids.",
@@ -873,7 +857,7 @@
     "view": "Account → All screens → Wave 2 → F&B – browse & order"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -910,7 +894,7 @@
   "name": "F&B – Order Tracking",
   "module": "In-venue Services",
   "requiresModule": "fnb",
-  "wave": 2,
+  "wave": 1,
   "capability": "C05",
   "implementation": {
    "app": "guest-app",
@@ -977,7 +961,6 @@
        "label": "The guest order status",
        "bindsTo": "GuestOrderStatus",
        "columns": [
-        "GuestOrderStatus.orderId",
         "GuestOrderStatus.orderNumber",
         "GuestOrderStatus.status",
         "GuestOrderStatus.estimatedReadyAt",
@@ -992,11 +975,8 @@
        "label": "The bill",
        "bindsTo": "Bill",
        "columns": [
-        "Bill.visitId",
         "Bill.covers",
-        "Bill.lines",
         "Bill.subtotal",
-        "Bill.serviceCharge",
         "Bill.taxAmount",
         "Bill.discountAmount",
         "Bill.total"
@@ -1055,7 +1035,7 @@
     "differences": "The YAML states come from an availability template (\"Selection is blocked\") and do not fit order tracking."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -1092,7 +1072,7 @@
   "name": "Parking – Reserve & Pay",
   "module": "In-venue Services",
   "requiresModule": "access",
-  "wave": 3,
+  "wave": 1,
   "capability": "C23",
   "implementation": {
    "app": "guest-app",
@@ -1262,7 +1242,7 @@
     "view": "Account → All screens → Wave 3 → Parking – reserve & pay"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formAddCartLine",
@@ -1353,7 +1333,7 @@
   "name": "Parking – Reservation Confirmed",
   "module": "In-venue Services",
   "requiresModule": "access",
-  "wave": 3,
+  "wave": 1,
   "capability": "C23",
   "implementation": {
    "app": "guest-app",
@@ -1482,7 +1462,7 @@
     "view": "Account → All screens → Wave 3 → Parking – reservation confirmed"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -1519,7 +1499,7 @@
   "name": "Venue Info & Services",
   "module": "In-venue Services",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "C17",
   "implementation": {
    "app": "guest-app",
@@ -1668,7 +1648,7 @@
     "differences": "Prototype shows only dining and delivery points, no other venue services."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -1705,12 +1685,12 @@
   "name": "At the Venue",
   "module": "In-venue Services",
   "requiresModule": "queue",
-  "wave": 3,
+  "wave": 1,
   "capability": "C105",
   "implementation": {
    "app": "guest-app",
-   "route": "/general/digital-companion-mode",
-   "component": "apps/guest-app/src/routes/general/DigitalCompanionModeDetail.tsx",
+   "route": "/general/at-the-venue",
+   "component": "apps/guest-app/src/routes/general/AtTheVenueDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1829,10 +1809,8 @@
         "WaitTime.queueName",
         "WaitTime.status",
         "WaitTime.waitMinutes",
-        "WaitTime.isStale",
         "WaitTime.heightRequirementCm",
-        "WaitTime.zone",
-        "WaitTime.asOf"
+        "WaitTime.zone"
        ],
        "operation": "getWaitTimes",
        "provenance": "contract queue.yaml GET /queues/wait-times"
@@ -1893,7 +1871,7 @@
     "differences": "The live Map view renders the park in 3D with the route and the position dot (2D when the prototype's Maps setting is 2D). No guest-facing 2D/3D switch, and no map3dUnavailable or weakGps state: both pending in design: specified, and built from the definition until the design shows it (handoff/design-batches/apps/1-guest-app/README.md)."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -1930,7 +1908,7 @@
   "name": "Reserve a Table",
   "module": "In-venue Services",
   "requiresModule": "fnb",
-  "wave": 2,
+  "wave": 1,
   "capability": "read-write",
   "implementation": {
    "app": "guest-app",
@@ -2008,6 +1986,26 @@
        "provenance": "contract fnb.yaml POST /waitlist/{entryId}/leave"
       }
      ]
+    },
+    {
+     "name": "contentBody",
+     "components": [
+      {
+       "kind": "cardList",
+       "label": "Your reservations and waitlist places",
+       "operation": "listMyTableReservations",
+       "notes": "The guest's own, upcoming first; each opens Change or cancel, or Leave the waitlist. Empty: *No reservations yet* with Reserve.",
+       "provenance": "decided by Chinmay, 3 October 2026 (CHG-SPF-013)"
+      },
+      {
+       "kind": "selectField",
+       "label": "Restaurant",
+       "bindsTo": "TableReservation.outletId",
+       "operation": "listBookableOutlets",
+       "notes": "Only the restaurants that take bookings, as published; the choice scopes Reserve and Join the waitlist.",
+       "provenance": "decided by Chinmay, 3 October 2026 (CHG-SPF-013)"
+      }
+     ]
     }
    ]
   },
@@ -2050,17 +2048,35 @@
     "contract": "orders",
     "purpose": "Add the table deposit to the cart when the venue requires one",
     "trigger": "onAction"
+   },
+   {
+    "operationId": "listMyTableReservations",
+    "contract": "fnb",
+    "purpose": "The guest's own table reservations and waitlist places (self-scoped)",
+    "trigger": "onLoad",
+    "provenance": "decided by Chinmay, 3 October 2026 (CHG-SPF-013)"
+   },
+   {
+    "operationId": "listBookableOutlets",
+    "contract": "fnb",
+    "purpose": "The restaurants that take bookings, published data",
+    "trigger": "onLoad",
+    "provenance": "decided by Chinmay, 3 October 2026 (CHG-SPF-013)"
    }
   ],
   "entryState": {
    "params": [
     {
      "name": "entryId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `leaveRestaurantWaitlist` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "reservationId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createTableReservation`; a link or an edge that holds one opens it instead."
     },
     {
      "name": "subjectId",
@@ -2070,6 +2086,10 @@
      "name": "cartId",
      "from": "session",
      "optional": true
+    },
+    {
+     "name": "venueId",
+     "from": "session"
     }
    ],
    "coldEntry": "**Resolves from the session.** A guest arriving cold is asked to sign in and returned here afterwards — never a 404, and never a screen that silently shows somebody else's data (ADR-0030)."
@@ -2087,7 +2107,7 @@
     "differences": "The YAML covers tables only (cabanas are staff-booked, R073c) and has no deposit (R077a). The prototype also reserves cabanas and shows a deposit on the reservation, and the Rev 3 web flow has a deposit-hold variant at AED 100 per guest. **Stale since 29 September: REV3-8b superseded R077 (a); the dining deposit is a venue option, off by default** (CHG-SGU-018)."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateTableReservation",
@@ -2105,7 +2125,6 @@
       "outletId",
       "partySize",
       "startsAt",
-      "id",
       "subjectId",
       "guestName",
       "contactPoint",
@@ -2113,9 +2132,7 @@
       "tables",
       "status",
       "groupId",
-      "notes",
-      "actualPartySize",
-      "tableVisitId"
+      "notes"
      ]
     },
     "provenance": "corrected 2 October 2026 (CHG-SGU-002, decided by Chinmay 2 October 2026, DEC-204)"
@@ -2136,7 +2153,6 @@
       "outletId",
       "partySize",
       "startsAt",
-      "id",
       "subjectId",
       "guestName",
       "contactPoint",
@@ -2144,9 +2160,7 @@
       "tables",
       "status",
       "groupId",
-      "notes",
-      "actualPartySize",
-      "tableVisitId"
+      "notes"
      ]
     },
     "provenance": "corrected 2 October 2026 (CHG-SGU-018, design-notes correction)"
@@ -2173,7 +2187,6 @@
       "quotedWaitMinutes",
       "seatingPreference",
       "notifiedAt",
-      "syncedAt",
       "holdExpiresAt"
      ]
     },

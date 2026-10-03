@@ -7,8 +7,8 @@
   "wave": 1,
   "implementation": {
    "app": "venue-management-web",
-   "route": "/fnb/bo-020",
-   "component": "apps/venue-management-web/src/routes/fnb/BO020List.tsx",
+   "route": "/fnb/fnb-order-management",
+   "component": "apps/venue-management-web/src/routes/fnb/FnBOrderManagementList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -350,7 +350,9 @@
     },
     {
      "name": "ticketId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listFnbOrders` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "An order opened from a list or a link. A kitchen ticket opened from the rail.",
@@ -367,7 +369,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-020"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "createFnbOrder",
@@ -419,8 +421,8 @@
   "wave": 1,
   "implementation": {
    "app": "venue-management-web",
-   "route": "/fnb/bo-021",
-   "component": "apps/venue-management-web/src/routes/fnb/BO021List.tsx",
+   "route": "/fnb/order-search",
+   "component": "apps/venue-management-web/src/routes/fnb/OrderSearchList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -484,7 +486,7 @@
    "loading": "The order search, read by `listFnbOrders`.",
    "error": "Could not load. Names which read failed and leaves the order search untouched.",
    "emptyFirstRun": "No order search yet. Offers Record order handover (`recordOrderHandover`).",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_MODIFY`, which `recordOrderHandover` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listFnbOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `recordOrderHandover`."
   },
   "apis": [
    {
@@ -529,7 +531,7 @@
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRecordOrderHandover",
@@ -592,8 +594,8 @@
   "wave": 1,
   "implementation": {
    "app": "venue-management-web",
-   "route": "/fnb/bo-045",
-   "component": "apps/venue-management-web/src/routes/fnb/BO045List.tsx",
+   "route": "/fnb/menu-management",
+   "component": "apps/venue-management-web/src/routes/fnb/MenuManagementList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -832,7 +834,7 @@
    "error": "Could not load. Names which read failed and leaves the menu untouched.",
    "emptyFirstRun": "No menu yet. Offers Create menu (`createMenu`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on outletId, activeAt and the menu are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listMenus` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listMenus` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_REQUEST` for `createApprovalRequest`; `PRODUCT_CONFIGURE` for `createMenu`, `setMenuSections`, `updateMenu`, `publishMenu` and 5 more."
   },
   "apis": [
    {
@@ -1016,7 +1018,7 @@
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateMenu",
@@ -1193,8 +1195,8 @@
   "wave": 1,
   "implementation": {
    "app": "venue-management-web",
-   "route": "/fnb/bo-046",
-   "component": "apps/venue-management-web/src/routes/fnb/BO046List.tsx",
+   "route": "/fnb/kitchen-display",
+   "component": "apps/venue-management-web/src/routes/fnb/KitchenDisplayList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1245,18 +1247,12 @@
        "label": "Every kitchen ticket",
        "bindsTo": "KitchenTicket",
        "columns": [
-        "KitchenTicket.id",
-        "KitchenTicket.orderId",
         "KitchenTicket.orderNumber",
-        "KitchenTicket.outletId",
         "KitchenTicket.tableLabel",
         "KitchenTicket.serviceMode",
-        "KitchenTicket.coursing",
         "KitchenTicket.buzzerCode",
         "KitchenTicket.status",
-        "KitchenTicket.priority",
-        "KitchenTicket.prioritisedByPrincipalId",
-        "KitchenTicket.prioritiseReason"
+        "KitchenTicket.priority"
        ],
        "operation": "listKitchenTickets",
        "provenance": "contract fnb.yaml GET /kitchen/tickets"
@@ -1272,19 +1268,12 @@
        "label": "The selected kitchen ticket",
        "bindsTo": "KitchenTicket",
        "columns": [
-        "KitchenTicket.id",
-        "KitchenTicket.orderId",
         "KitchenTicket.orderNumber",
-        "KitchenTicket.outletId",
         "KitchenTicket.tableLabel",
         "KitchenTicket.serviceMode",
-        "KitchenTicket.coursing",
         "KitchenTicket.buzzerCode",
         "KitchenTicket.status",
         "KitchenTicket.priority",
-        "KitchenTicket.prioritisedByPrincipalId",
-        "KitchenTicket.prioritiseReason",
-        "KitchenTicket.lines",
         "KitchenTicket.targetReadyAt",
         "KitchenTicket.elapsedSeconds"
        ],
@@ -1318,7 +1307,7 @@
    "error": "Could not load. Names which read failed and leaves the kitchen display untouched.",
    "emptyFirstRun": "No kitchen display yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on stationId, status and the kitchen display are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listKitchenTickets` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listKitchenTickets` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `setKitchenTicketStatus`, `prioritiseKitchenTicket`."
   },
   "apis": [
    {
@@ -1354,7 +1343,9 @@
     },
     {
      "name": "ticketId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listKitchenTickets` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "A kitchen ticket opened from the rail.",
@@ -1371,7 +1362,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-046"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetKitchenTicketStatus",
@@ -1508,7 +1499,7 @@
     {
      "to": "BO-136",
      "trigger": "F&B Global Settings & Controls",
-     "provenance": "derived — BO-136 declares entryState.params outletId and BO-104 holds none of them. The edge carries nothing: BO-104 is the Food & Beverage hub and this is its menu entry; BO-136 has no source yet for outletId"
+     "provenance": "derived — BO-136 declares entryState.params  and BO-104 holds none of them. The edge carries nothing: BO-136 needs nothing to open"
     }
    ]
   },
@@ -1616,7 +1607,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-104"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "createMenu",
@@ -1784,7 +1775,7 @@
    "error": "Could not load. Names which read failed and leaves the kitchen preparation stations untouched.",
    "emptyFirstRun": "No kitchen preparation stations yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on outletId and the kitchen preparation stations are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listKitchenStations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listKitchenStations` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setKitchenStations`, `setKitchenSla`."
   },
   "apis": [
    {
@@ -1858,7 +1849,7 @@
    "derivedFrom": "wireframes/reference/FnB Board 1.dc.html",
    "note": "**Drawn by Claude Design on `FnB Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetKitchenStations",
@@ -2098,7 +2089,7 @@
   "name": "F&B Global Settings & Controls",
   "module": "Food & Beverage",
   "requiresModule": "fnb",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "venue-management-web",
    "route": "/food-beverage/f-b-global-settings-controls",
@@ -2191,7 +2182,7 @@
    "error": "Could not load. Names which read failed and leaves the global settings controls untouched.",
    "emptyFirstRun": "No global settings controls yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on status, locationKind, from and the global settings controls are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getVenueSettings` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettings` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setCourseRules`; `TENANT_CONFIGURE` for `setVenueSettings`."
   },
   "apis": [
    {
@@ -2222,7 +2213,8 @@
     },
     {
      "name": "outletId",
-     "from": "navigation"
+     "from": "session",
+     "notes": "From the session (3 October 2026, CHG-SPF-004): a staff screen works in the outlet its sign-in or device is scoped to; nothing navigates to it (the venue-scope rule)."
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first. A plan opened from the list.",
@@ -2242,7 +2234,7 @@
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetCourseRules",

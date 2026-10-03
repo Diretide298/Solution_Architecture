@@ -1,18 +1,18 @@
 id: LLD-FnbService
-title: FnbService — 131 operations, 52 tables
+title: FnbService — 133 operations, 52 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**131 operations and 52 tables — the largest single domain after marketing.** Its own service
+why: '**133 operations and 52 tables — the largest single domain after marketing.** Its own service
   because a kitchen pass has a latency profile nothing else shares: a bump must land in under a second
   on a display that may be offline.'
 scale: Write-heavy during service, idle between. **Two peaks a day, sharply.**
 ifDown: Down means the kitchen falls back to paper. Offline-capable by design.
 coverage:
-  operations: 131
+  operations: 133
   inAFlow: 65
-  percent: 50%
+  percent: 49%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -23,7 +23,7 @@ schemas:
   largestTable: fnb.table_reservation
 operationsByContract:
 - contract: fnb
-  count: 131
+  count: 133
   operations:
   - operation: acceptFnbOrder
     verb: POST
@@ -417,6 +417,14 @@ operationsByContract:
     offline: true
     reads: 2
     writes: 0
+  - operation: listBookableOutlets
+    verb: GET
+    path: /venues/{venueId}/bookable-outlets
+    scope: venue
+    permission: null
+    offline: false
+    reads: 0
+    writes: 0
   - operation: listDeliveryLocations
     verb: GET
     path: /venues/{venueId}/delivery-locations
@@ -512,6 +520,14 @@ operationsByContract:
     permission: PRODUCT_VIEW
     offline: true
     reads: 2
+    writes: 0
+  - operation: listMyTableReservations
+    verb: GET
+    path: /me/table-reservations
+    scope: tenant
+    permission: null
+    offline: true
+    reads: 3
     writes: 0
   - operation: listOutletTemplates
     verb: GET
@@ -1370,7 +1386,7 @@ tables:
 - table: fnb.kitchen_routing_rule
   columns: 6
   store: postgres
-  parent: null
+  parent: platform.outlet
   writtenBy:
   - fnb
   foreignWriters: null

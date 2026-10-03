@@ -85,7 +85,13 @@
   "offlineCapable": true,
   "conflictPolicy": "serverWins",
   "scopeLevel": "venue",
-  "parameters": [],
+  "parameters": [
+   {
+    "name": "at",
+    "in": "query",
+    "required": false
+   }
+  ],
   "requestBody": null,
   "responds": "FareTable"
  },

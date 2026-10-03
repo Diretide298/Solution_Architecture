@@ -4,7 +4,7 @@
   "name": "Retail / Merchandise",
   "module": "Retail",
   "requiresModule": "retail",
-  "wave": 2,
+  "wave": 1,
   "capability": "C08",
   "implementation": {
    "app": "guest-app",
@@ -44,9 +44,10 @@
      "to": "GST-041",
      "trigger": "Checkout Entry",
      "carries": [
+      "lineId",
       "performanceId"
      ],
-     "provenance": "derived — GST-041 declares entryState.params holdId, lineId, performanceId, productId and GST-026 holds performanceId, so an edge into it carries them"
+     "provenance": "derived — GST-041 declares entryState.params holdId, lineId, performanceId, productId and GST-026 holds lineId, performanceId, so an edge into it carries them"
     }
    ]
   },
@@ -207,7 +208,7 @@
     "differences": "Prototype only reserves for collection (reserveMerchandise). The YAML also declares addCartLine/checkoutCart/createPayment and getGameCard, and the prototype shows neither a buy-now path nor a game card."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formReserveMerchandise",

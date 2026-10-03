@@ -149,6 +149,10 @@ properties:
           description: >
             **Waves 1 to 3 are the first release (Block A on the four platforms it covers). Wave 4 is
             a later release**, used from 28 September 2026 together with `deferred`, which says why.
+            **Every screen a Block A task builds is wave 1** (3 October 2026, CHG-SPF-006): the Block A
+            audit found 211 of them still carrying wave 2 or 3 from before the 1 October plan, and a
+            ticket reading "wave 3" beside "Block A" reads as not this release.
+            `tools/check-screen-patterns.py` (P8) holds it, reading Block A from the release.
         deferred:
           type: object
           required: [release, decided, decision, reason]
@@ -787,6 +791,14 @@ properties:
             app: { type: string }
             route: { type: string }
             component: { type: string }
+            sectionOf:
+              type: string
+              description: >
+                **The screen this one renders inside, as a section** (3 October 2026, CHG-SPF-005).
+                The workshop-pack screens merged into a venue screen on 2 October (CHG-MOV-002) keep
+                their ids, routes and operations but render in their host's component; this says so,
+                so a shared component reads as the design and not as a screen wearing another's.
+                `tools/check-screen-patterns.py` (P7b) allows a shared component only this way.
         density:
           type: string
           enum: [compact, comfortable, touchLarge]

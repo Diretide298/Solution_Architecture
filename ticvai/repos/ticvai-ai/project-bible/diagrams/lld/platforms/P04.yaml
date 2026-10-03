@@ -275,7 +275,7 @@ screens:
   name: Sell — Seat Map
   module: Sell
   requiresModule: seating
-  wave: 2
+  wave: 1
   density: touchLarge
   operations:
   - createOrder
@@ -441,7 +441,7 @@ screens:
   name: Reports
   module: Reports
   requiresModule: analytics
-  wave: 2
+  wave: 1
   density: touchLarge
   operations:
   - askReportingQuestion
@@ -469,7 +469,7 @@ screens:
   name: Staff Roster
   module: Shift
   requiresModule: core
-  wave: 2
+  wave: 1
   density: touchLarge
   operations:
   - listRotaAssignments

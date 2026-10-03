@@ -7,19 +7,19 @@
  "audience": "staff",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-10-02",
+ "generated": "2026-10-03",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 96,
-  "operations": 217,
+  "operations": 220,
   "contracts": 21,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 144
+  "operationsWithNoScreen": 147
  },
  "waves": {
-  "wave1": 25,
-  "wave2": 40,
+  "wave1": 30,
+  "wave2": 35,
   "wave3": 31
  },
  "modules": [
@@ -43,6 +43,7 @@
    "module": "Floor Service",
    "screens": 10,
    "waves": [
+    1,
     2
    ]
   },
@@ -50,6 +51,7 @@
    "module": "Stock on the Floor",
    "screens": 10,
    "waves": [
+    1,
     2
    ]
   }
@@ -61,14 +63,14 @@
   },
   {
    "contract": "maintenance",
-   "operations": 25
-  },
-  {
-   "contract": "orders",
-   "operations": 22
+   "operations": 27
   },
   {
    "contract": "inventory",
+   "operations": 22
+  },
+  {
+   "contract": "orders",
    "operations": 22
   },
   {
@@ -85,7 +87,7 @@
   },
   {
    "contract": "marketing-crm",
-   "operations": 11
+   "operations": 12
   },
   {
    "contract": "catalogue",
@@ -96,11 +98,11 @@
    "operations": 8
   },
   {
-   "contract": "queue",
+   "contract": "access",
    "operations": 7
   },
   {
-   "contract": "access",
+   "contract": "queue",
    "operations": 7
   },
   {
@@ -124,19 +126,19 @@
    "operations": 2
   },
   {
-   "contract": "approvals",
-   "operations": 1
-  },
-  {
    "contract": "payments",
    "operations": 1
   },
   {
-   "contract": "accreditation",
+   "contract": "assets",
    "operations": 1
   },
   {
-   "contract": "assets",
+   "contract": "approvals",
+   "operations": 1
+  },
+  {
+   "contract": "accreditation",
    "operations": 1
   }
  ],
@@ -336,7 +338,7 @@
    "module": "Operations",
    "wave": 1,
    "route": "/operations/incident-report",
-   "operations": 3,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -388,7 +390,7 @@
    "id": "EMP-032",
    "name": "Manual wait entry",
    "module": "Operations",
-   "wave": 2,
+   "wave": 1,
    "route": "/operations/manual-wait-entry",
    "operations": 3,
    "drawn": true
@@ -622,7 +624,7 @@
    "id": "EMP-058",
    "name": "Live Table & Service Management",
    "module": "Floor Service",
-   "wave": 2,
+   "wave": 1,
    "route": "/operations/live-table-service-management",
    "operations": 12,
    "drawn": true
@@ -631,7 +633,7 @@
    "id": "EMP-059",
    "name": "Table Order, Bill & Payment Management",
    "module": "Floor Service",
-   "wave": 2,
+   "wave": 1,
    "route": "/operations/table-order-bill-payment-management",
    "operations": 8,
    "drawn": true
@@ -685,7 +687,7 @@
    "id": "EMP-065",
    "name": "Receiving",
    "module": "Stock on the Floor",
-   "wave": 2,
+   "wave": 1,
    "route": "/operations/receiving-store-put-away",
    "operations": 6,
    "drawn": true
@@ -703,7 +705,7 @@
    "id": "EMP-067",
    "name": "Damage, Loss, Shrinkage & Stock Adjustment",
    "module": "Stock on the Floor",
-   "wave": 2,
+   "wave": 1,
    "route": "/operations/damage-loss-shrinkage-stock-adjustment",
    "operations": 5,
    "drawn": true
@@ -1417,6 +1419,18 @@
     "summary": "Change many products at once, with a preview"
    },
    {
+    "operation": "rejectRequisition",
+    "contract": "inventory",
+    "verb": "POST",
+    "summary": "Reject a requisition"
+   },
+   {
+    "operation": "returnRequisition",
+    "contract": "inventory",
+    "verb": "POST",
+    "summary": "Return a requisition for more information"
+   },
+   {
     "operation": "actOnWaiverRequirements",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -1643,6 +1657,12 @@
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Store a guest photo, ID or signed document"
+   },
+   {
+    "operation": "cancelPaymentLink",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Cancel a live payment link"
    },
    {
     "operation": "convertToTermProduct",
@@ -1875,11 +1895,25 @@
   ],
   "modulesSplitAcrossWaves": [
    {
+    "module": "Floor Service",
+    "waves": [
+     1,
+     2
+    ]
+   },
+   {
     "module": "Operations",
     "waves": [
      1,
      2,
      3
+    ]
+   },
+   {
+    "module": "Stock on the Floor",
+    "waves": [
+     1,
+     2
     ]
    }
   ],

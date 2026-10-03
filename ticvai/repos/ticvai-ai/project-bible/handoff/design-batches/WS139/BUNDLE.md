@@ -245,7 +245,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `BO-780` Guest Engagement Journeys: *Guest Engagement Journeys*
 - → `BO-781` Cross-Sell & Service Recovery: *Cross-Sell & Service Recovery*; carries `journeyId`
 - → `BO-782` AI Journey Optimization: *AI Journey Optimization*
-- → `BO-783` Journey Analytics & Audit: *Journey Analytics & Audit*
+- → `BO-783` Journey Analytics & Audit: *Journey Analytics & Audit*; carries `journeyId`
 
 #### States
 
@@ -374,7 +374,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Where the user goes next**
 
-- → `BO-774` Journey Automation Center: *Back to Journey Automation Center*
+- → `BO-774` Journey Automation Center: *Back to Journey Automation Center*; carries `journeyId`
 
 #### States
 
@@ -639,7 +639,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Where the user goes next**
 
-- → `BO-774` Journey Automation Center: *Back to Journey Automation Center*
+- → `BO-774` Journey Automation Center: *Back to Journey Automation Center*; carries `journeyId`
 
 #### States
 
@@ -857,7 +857,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Where the user goes next**
 
-- → `BO-774` Journey Automation Center: *Back to Journey Automation Center*
+- → `BO-774` Journey Automation Center: *Back to Journey Automation Center*; carries `journeyId`
 
 #### States
 
@@ -990,7 +990,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Where the user goes next**
 
-- → `BO-774` Journey Automation Center: *Back to Journey Automation Center*
+- → `BO-774` Journey Automation Center: *Back to Journey Automation Center*; carries `journeyId`
 
 #### States
 
@@ -1111,7 +1111,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Where the user goes next**
 
-- → `BO-774` Journey Automation Center: *Back to Journey Automation Center*
+- → `BO-774` Journey Automation Center: *Back to Journey Automation Center*; carries `journeyId`
 
 #### States
 
@@ -1232,7 +1232,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Where the user goes next**
 
-- → `BO-774` Journey Automation Center: *Back to Journey Automation Center*
+- → `BO-774` Journey Automation Center: *Back to Journey Automation Center*; carries `journeyId`
 
 #### States
 
@@ -1377,7 +1377,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Where the user goes next**
 
-- → `BO-774` Journey Automation Center: *Back to Journey Automation Center*
+- → `BO-774` Journey Automation Center: *Back to Journey Automation Center*; carries `journeyId`
 
 #### States
 

@@ -94,7 +94,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-002` | Partner Dashboard | B–D | 105 | 66 | 6 | 71 | 0 | 0 | — | notStarted (generated) |
+| `PTR-002` | Partner Dashboard | C | 105 | 47 | 6 | 71 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -110,7 +110,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Overview · wave 2 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-PARTNER-PTR-002 |
 | Who uses it | partner staff holding `ORDER_CREATE`, `ORDER_EXCHANGE`, `ORDER_MODIFY`, `ORDER_REPRINT`, `ORDER_RESCHEDULE`, `ORDER_VIEW` (5 operate, 1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listOrders` reads the population and `getB2bCredit` reads one of them — list, select, act |
@@ -326,18 +326,12 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | — |
-| Batch | the name it points at, never the id | The `RefundBatch` that raised this refund, where `createBulkRefund` did. Null for a refund raised on its own. |
 | FX rate | text | The rate on the original payment, not today's (BL-087, CF-118). `Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the … |
-| Tax reversal entry | the name it points at, never the id | A refund reverses the tax entry it created, and this is where that is stated rather than implied. |
 | Settle to | chip: Original tender, Advance balance, Wire transfer, Store credit | BL-086. A refund could only go back the way it came. |
 | FX variance | AED 1,234.50 | Where the sale rate and the current rate differ, the difference is booked as an FX variance rather than hidden in the refund. |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Applied percentage | 1,234.5 | From the venue's time bands, or an approver override. |
 | Status | chip: Pending approval, Pending gateway, Completed, Declined, Failed | — |
-| Reason | text | — |
-| Requested by principal | the name it points at, never the id | — |
 
 **The selected order** (detail panel, from `listOrders`)
 
@@ -358,22 +352,14 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The client UUIDv7 from `CreateOrderRequest.id`. |
 | Order number | text | The number a guest reads and a cashier types. Server-assigned: the venue prefix and a sequence per venue, for example `DXB1-000123` … |
 | Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Net amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Total price variance | AED 1,234.50 | Sum across lines. Zero on a normal order. |
-| Lines | list or chips (count when long) | — |
-| Payments | list or chips (count when long) | — |
-| Principal | the name it points at, never the id | — |
 
 **The order statement** (detail panel, from `getOrderStatement`)
 
@@ -392,19 +378,14 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
-| Account | the name it points at, never the id | — |
 | Account name | text | — |
 | Credit limit | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Used | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Available | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Is over limit | yes / no (icon or chip) | — |
-| Is suspended | yes / no (icon or chip) | — |
 | Payment terms days | 1,234 | — |
 | Oldest unpaid invoice at | 1 Oct 2026, 14:30 | — |
 | Days overdue | 1,234 | — |
 | Active overrides | list or chips (count when long) | — |
-| Scope path | text | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it … |
 
 **Actions and what each produces**
 
@@ -440,7 +421,7 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the partner untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No partner yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the partner are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createOrder`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_MODIFY` for `holdOrder`, `modifyOrder`, `resumeOrder` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A lease covering a line has expired (`leaseExpired`), capacity is exhausted (`capacityExhausted`), or the catalogue bundle the client priced from is beyond its … (OrderRefusedProblem); 409 A targeted line's entitlement has been redeemed (`lineRedeemed`, naming it in `lineIds`), or the order is voided (`orderVoided`). (OrderRefusedProblem); 409 Held order expired … |
 
@@ -464,11 +445,11 @@ credit: Limit AED 50,000 · used AED 31,240 · available AED 18,760
 - `holdOrder` → `ORDER_MODIFY` (operate) · staff, partner
 - `listOrderRefunds` → `ORDER_VIEW` (read) · staff, partner
 - `modifyOrder` → `ORDER_MODIFY` (operate) · staff, partner
-- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner
+- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner, device
 - `rescheduleOrder` → `ORDER_RESCHEDULE` (operate) · staff, partner
 - `resumeOrder` → `ORDER_MODIFY` (operate) · staff, partner
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createOrder`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_MODIFY` for `holdOrder`, `modifyOrder`, `resumeOrder` …
 
 #### Requirements it meets
 
@@ -507,11 +488,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client design-board frames: `Dashboards Board.dc.html#ptr-002`
 - Flow F03 *Partner books on credit*, step 1: Reviews credit position → Sees available credit before building an order, not after
 - Flow F10 *Partner books, uses and settles*, step 1: Signs in and sees the allocation → Knows what they may sell and what they owe. The door PTR-001 reads no credit (CHG-DOOR-003); the partner home PTR-002 reads `getB2bCredit`
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (105), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (66 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (47 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-002?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create order, Exchange order lines, Hold order, Modify order, Reprint order, Reschedule order, Resume order.
 - [ ] Every transition is wired: `PTR-007`, `PTR-001`, `PTR-003`, `PTR-008`.

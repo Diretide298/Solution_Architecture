@@ -137,7 +137,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-1051` | Seat Analytics Command Center | B–D | 0 | 0 | 6 | 3 | 0 | 6 | — | notStarted (—) |
-| `BO-1052` | Occupancy Reporting | B–D | 3 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1052` | Occupancy Reporting | B–D | 3 | 17 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1053` | Zone Performance Reporting | B–D | 3 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1054` | Revenue by Section | B–D | 3 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1055` | Revenue by Seat Category | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |

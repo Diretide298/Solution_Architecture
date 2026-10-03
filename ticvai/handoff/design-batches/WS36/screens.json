@@ -4,7 +4,7 @@
   "name": "Tax Profile & Jurisdiction Configuration",
   "module": "Commercial",
   "requiresModule": "ticketing",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "3",
@@ -640,7 +640,7 @@
     "id": "formSetFeeDefinition",
     "component": "modal",
     "trigger": "Save fee definition",
-    "body": "**Collects what `setFeeDefinition` sends before it is called.** Required: `id`, `scopePath`, `code`, `name`, `feeType`, `valueType`, `chargeBasis`, `status`. Optional: `description`, `amount`, `percentage`, `tiers`, `taxTreatment`, `refundability`, `visibility`, `effectiveFrom`, `effectiveTo`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setFeeDefinition` sends before it is called.** Required: `code`, `name`, `feeType`, `valueType`, `chargeBasis`, `status`. Optional: `description`, `amount`, `percentage`, `tiers`, `taxTreatment`, `refundability`, `visibility`, `effectiveFrom`, `effectiveTo`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "PricingFee",
     "confirm": {
      "label": "Save fee definition",
@@ -649,8 +649,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "code",
       "name",
       "feeType",
@@ -1240,7 +1238,7 @@
     "id": "formSetPriceCalculationPolicy",
     "component": "modal",
     "trigger": "Save price calculation policy",
-    "body": "**Collects what `setPriceCalculationPolicy` sends before it is called.** Required: `id`, `scopePath`, `code`, `name`, `status`. Optional: `isDefault`, `effectiveFrom`, `effectiveTo`, `steps`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setPriceCalculationPolicy` sends before it is called.** Required: `code`, `name`, `status`. Optional: `isDefault`, `effectiveFrom`, `effectiveTo`, `steps`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "CalculationProfile",
     "confirm": {
      "label": "Save price calculation policy",
@@ -1249,8 +1247,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "code",
       "name",
       "status",
@@ -1433,7 +1429,7 @@
     "id": "formSetCurrencyRoundingRule",
     "component": "modal",
     "trigger": "Save currency rounding rule",
-    "body": "**Collects what `setCurrencyRoundingRule` sends before it is called.** Required: `id`, `scopePath`, `currency`, `decimalPlaces`, `roundingMethod`, `roundingStage`, `status`. Optional: `code`, `name`, `minimumMonetaryUnit`, `displayPrecision`, `calculationPrecision`, `cashRoundingIncrement`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setCurrencyRoundingRule` sends before it is called.** Required: `currency`, `decimalPlaces`, `roundingMethod`, `roundingStage`, `status`. Optional: `code`, `name`, `minimumMonetaryUnit`, `displayPrecision`, `calculationPrecision`, `cashRoundingIncrement`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "RoundingProfile",
     "confirm": {
      "label": "Save currency rounding rule",
@@ -1442,8 +1438,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "currency",
       "decimalPlaces",
       "roundingMethod",
@@ -1676,7 +1670,7 @@
   "name": "Calculation Validation, Reconciliation & Service Interface",
   "module": "Commercial",
   "requiresModule": "ticketing",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Pricing___Revenue_Management_Reference.pdf",
    "board": "3",

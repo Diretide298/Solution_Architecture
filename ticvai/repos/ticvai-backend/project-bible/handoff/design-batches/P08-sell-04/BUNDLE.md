@@ -125,10 +125,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-122` | POS Experience Dashboard | B–D | 3 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-123` | POS Profile Management | B–D | 9 | 12 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
-| `BO-124` | Layout & Journey Builder | A | 38 | 22 | 6 | 9 | 2 | 6 | — | notStarted (generated) |
+| `BO-124` | Layout & Journey Builder | B | 38 | 22 | 6 | 9 | 2 | 6 | — | notStarted (generated) |
 | `BO-125` | Product & Category Button Configuration | B–D | 19 | 6 | 6 | 14 | 3 | 0 | — | notStarted (generated) |
 | `BO-126` | Deployment, Preview & Audit | B–D | 23 | 47 | 5 | 2 | 0 | 0 | — | notStarted (generated) |
-| `BO-142` | Store Rules, Controls & Permissions | B–D | 11 | 9 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
+| `BO-142` | Store Rules, Controls & Permissions | B–D | 11 | 5 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
 | `BO-143` | Retail Global Settings & Controls | B–D | 10 | 10 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
@@ -316,7 +316,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save configuration profile** (modal, opened by *Save configuration profile*; *Save configuration profile* calls `setConfigurationProfile`, *Cancel* sends nothing)
 
-**Collects what `setConfigurationProfile` sends before it is called.** Required: `name`, `venueKindScope`. Optional: `scopePath`, `settings`, `deployedCount`, `publishedAt`. **Not asked:** `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setConfigurationProfile` sends before it is called.** Required: `name`, `venueKindScope`. Optional: `scopePath`, `settings`. **Not asked:** `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `deployedCount`, `publishedAt` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -380,7 +380,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the pos profile untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No pos profile yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, kind and the pos profile are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SCOPE_VIEW`, which `listSaleBoards` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SCOPE_VIEW`, which `listSaleBoards` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_CONFIGURE` for `setConfigurationProfile`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
@@ -413,7 +413,7 @@ profile:
 - `setConfigurationProfile` → `TENANT_CONFIGURE` (configure) · staff
 - `listSaleBoards` → `SCOPE_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `SCOPE_VIEW`, which `listSaleBoards` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `SCOPE_VIEW`, which `listSaleBoards` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_CONFIGURE` for `setConfigurationProfile`.
 
 #### Requirements it meets
 
@@ -461,7 +461,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `core` module |
-| Block | Block A · ticket #17825 (APP-SETUP-BO-124) |
+| Block | Block B · task APP-SETUP-BO-124 |
 | Who uses it | venue staff holding `DEVICE_VIEW`, `SCOPE_VIEW`, `TENANT_CONFIGURE`, `WORKSTATION_CONFIGURE` (2 read, 2 configure); in the flows as technician |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAuditRecords` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -495,7 +495,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save sale board** (modal, opened by *Save sale board*; *Save sale board* calls `updateSaleBoard`, *Cancel* sends nothing)
 
-**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -519,7 +519,7 @@ Errors to draw in the form: 400 A tile references an unknown or unsellable varia
 
 **Form: Create sale board** (modal, opened by *Create sale board*; *Create sale board* calls `createSaleBoard`, *Cancel* sends nothing)
 
-**Collects what `createSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `createSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -633,7 +633,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the layout journey untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No layout journey yet. Offers Create sale board (`createSaleBoard`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on orgUnitId, principalId, workstationId, action, subjectRef, from and the layout journey are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_CONFIGURE` for `deployConfigurationProfile` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A tile references an unknown or unsellable variant; 409 The named version is not deployable — it is still a `draft`, or this profile has no such version. |
 
@@ -676,7 +676,7 @@ deploy:
 - `listDevices` → `DEVICE_VIEW` (read) · staff
 - `listSaleBoards` → `SCOPE_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_CONFIGURE` for `deployConfigurationProfile` …
 
 #### Requirements it meets
 
@@ -781,7 +781,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 
 **Form: Save sale board** (modal, opened by *Save sale board*; *Save sale board* calls `updateSaleBoard`, *Cancel* sends nothing)
 
-**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -846,7 +846,7 @@ Errors to draw in the form: 400 A tile references an unknown or unsellable varia
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the product category button untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No product category button yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, kind, isSellable and the product category button are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WORKSTATION_CONFIGURE` for `updateSaleBoard`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 400 A tile references an unknown or unsellable variant |
 
@@ -881,7 +881,7 @@ buttons:
 - `updateSaleBoard` → `WORKSTATION_CONFIGURE` (configure) · staff
 - `listProducts` → `PRODUCT_VIEW` (read) · staff, guest, partner
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WORKSTATION_CONFIGURE` for `updateSaleBoard`.
 
 #### Requirements it meets
 
@@ -924,6 +924,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Drawn by: Claude Design POS pack, 24 August
 - Client design-board frames: `POS Board 1.dc.html#pos-1e`
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -988,7 +989,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Deploy configuration profile** (modal, opened by *Deploy configuration profile*; *Deploy configuration profile* calls `deployConfigurationProfile`, *Cancel* sends nothing)
 
-**Collects what `deployConfigurationProfile` sends before it is called.** Required: `profileId`. Optional: `targetWorkstationIds`, `targetFilter`, `strategy`, `succeededCount`, `failedCount`, `failureReasons`, `startedAt`, `completedAt`. **Not asked:** `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `deployConfigurationProfile` sends before it is called.** Nothing in the body is required. Optional: `targetWorkstationIds`, `targetFilter`, `strategy`. **Not asked:** is a client UUIDv7 generated silently; is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `completedAt`, `failedCount`, `failureReasons`, `id`, `profileId`, `startedAt`, `status`, `succeededCount` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1004,7 +1005,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 **Form: Save sale board** (modal, opened by *Save sale board*; *Save sale board* calls `updateSaleBoard`, *Cancel* sends nothing)
 
-**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1123,7 +1124,7 @@ Errors to draw in the form: 400 A tile references an unknown or unsellable varia
 | Loading (`?state=loading`) | The deployment preview audit figures; each tile loads on its own. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the deployment preview audit untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | **Nothing to show yet**: the figures fill as activity is recorded. Offers no create action — a monitor creates nothing — and says so rather than showing empty tiles. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `AUDIT_VIEW`, which `listAuditRecords` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `AUDIT_VIEW`, which `listAuditRecords` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_CONFIGURE` for `deployConfigurationProfile` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A tile references an unknown or unsellable variant; 409 The named version is not deployable — it is still a `draft`, or this profile has no such version. |
 
@@ -1154,7 +1155,7 @@ deployment:
 - `listSaleBoards` → `SCOPE_VIEW` (read) · staff
 - `listWorkstations` → `SCOPE_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `AUDIT_VIEW`, which `listAuditRecords` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `AUDIT_VIEW`, which `listAuditRecords` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_CONFIGURE` for `deployConfigurationProfile` …
 
 #### Requirements it meets
 
@@ -1271,15 +1272,11 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Outlet | the name it points at, never the id | — |
 | Kind | chip: Discount limit, Refund threshold, Age check, Manager override, Price override | — |
 | Threshold amount | AED 1,234.50 | The amount above which `requiresPermission` is needed. For `refundThreshold`, and for a `discountLimit` or `priceOverride` whose … |
 | Minimum age years | 1,234 | The age a guest must have reached. For `ageCheck`. |
 | Requires permission | text | The permission a person needs to act past this rule. |
 | Enabled | yes / no (icon or chip) | — |
-| Updated by principal | the name it points at, never the id | Who last changed this rule. Set by the server from the caller of `setStoreRules`. |
 
 **Actions and what each produces**
 
@@ -1309,7 +1306,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the store rules controls untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No store rules controls yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listStoreRules` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listStoreRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setStoreRules`. |
 | Offline (`?state=offline`) | online only |
 
 #### Consistency with other screens
@@ -1346,7 +1343,7 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `listStoreRules` → `PRODUCT_VIEW` (read) · staff
 - `setStoreRules` → `PRODUCT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listStoreRules` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listStoreRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setStoreRules`.
 
 #### Requirements it meets
 
@@ -1377,7 +1374,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (11), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-142?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save store rules.
 - [ ] Every transition is wired: `BO-102`.
@@ -1402,7 +1399,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | statusTracker (compact density): `getVenueSettings` reads one record and nothing reads a population — the screen is about that one thing |
 | Offline | online only |
-| Opens with | `venueId` (session), `dropId` (navigation), `outletId` (navigation) · cold entry: Resolves from the session. A principal with more than one venue is asked which first. |
+| Opens with | `venueId` (session), `dropId` (navigation), `outletId` (session) · cold entry: Resolves from the session. A principal with more than one venue is asked which first. |
 | Route | `/sell/retail-global-settings-controls` |
 
 **What the spec says about it.** **Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not. **Drawn 31 August** — `Retail Board 1.dc.html` frame `ret-1k`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Retail Global Settings &amp; Controls* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.
@@ -1479,7 +1476,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 | Loading (`?state=loading`) | The retail global settings, read by `getReturnPolicy`. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the retail global settings untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No retail global settings yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `getReturnPolicy` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `getReturnPolicy` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `disposeShopAndDrop`; `REGION_CONFIGURE` for `setReturnPolicy`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 No identifier supplied |
 
@@ -1518,7 +1515,7 @@ getVenueSettings (VenueSettings):
 - `getReturnPolicy` → `ORDER_VIEW` (read) · staff
 - `setReturnPolicy` → `REGION_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `getReturnPolicy` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `getReturnPolicy` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `disposeShopAndDrop`; `REGION_CONFIGURE` for `setReturnPolicy`.
 
 #### Requirements it meets
 
@@ -1542,6 +1539,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-143` · status **notStarted** · provenance generated · **Drawn by Claude Design on `Retail Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed …
 - Derived from `wireframes/reference/Retail Board 1.dc.html`
 - Client design-board frames: `Retail Board 1.dc.html#ret-1k`
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 

@@ -836,7 +836,7 @@
   "method": "PATCH",
   "path": "/incidents/{incidentId}",
   "contract": "maintenance",
-  "summary": "Investigate, escalate or close an incident",
+  "summary": "Investigate, escalate, close or reopen an incident",
   "permission": "INCIDENT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "append",

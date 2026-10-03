@@ -103,7 +103,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-227` | Validation Exception & Reason Code Manager | B–D | 9 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-228` | Manual Override & Supervisor Approval | B–D | 11 | 0 | 5 | 0 | 1 | 3 | — | notStarted (generated) |
 | `BO-229` | Credential Disable, Blacklist & Whitelist Operations | B–D | 9 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-230` | Live Gate Mode & Lane Control | B–D | 8 | 8 | 6 | 3 | 1 | 0 | — | notStarted (generated) |
+| `BO-230` | Live Gate Mode & Lane Control | A | 8 | 8 | 6 | 3 | 1 | 0 | — | notStarted (generated) |
 | `BO-231` | Queue, Throughput & Lane Optimization | B–D | 0 | 2 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-232` | Operational Incident & Exception Workspace | B–D | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-233` | Operations Audit, Shift Handover & Control Summary | B–D | 1 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
@@ -1266,7 +1266,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Loading (`?state=loading`) | The manual override supervisor configuration as saved. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the manual override supervisor untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No manual override supervisor configured yet. Carries the create action and says what the platform does in the meantime. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission, **ACCESS_OVERRIDE** (was ACCESS_POINT_CONFIGURE until 29 September, K1: recording an admission against a failed validation is an override, not gate configuration). Never an empty table. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission, **`ACCESS_OVERRIDE`** (was ACCESS_POINT_CONFIGURE until 29 September, K1: recording an admission against a failed validation is an override, not gate configuration). Never an empty table. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The scan was not a denial, or has already been overridden |
 
@@ -1305,7 +1305,7 @@ decision:
 
 - `overrideAccess` → `ACCESS_OVERRIDE` (operate) · staff
 
-**A refused user sees:** Names the missing permission, **ACCESS_OVERRIDE** (was ACCESS_POINT_CONFIGURE until 29 September, K1: recording an admission against a failed validation is an override, not gate configuration). Never an empty table.
+**A refused user sees:** Names the missing permission, **`ACCESS_OVERRIDE`** (was ACCESS_POINT_CONFIGURE until 29 September, K1: recording an admission against a failed validation is an override, not gate configuration). Never an empty table.
 
 #### Requirements it meets
 
@@ -1542,9 +1542,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ACCESS_DIRECTION_SET`, `SCOPE_VIEW`, `TURNSTILE_MODE_SET` (1 ?, 1 read, 1 operate); in the flows as venue manager |
+| Module | Access & Venue · wave 1 · needs the `access` module |
+| Block | Block A · task APP-SETUP-BO-230 |
+| Who uses it | venue staff holding `ACCESS_DIRECTION_SET`, `SCOPE_VIEW`, `TURNSTILE_MODE_SET` (2 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
 | Offline | online only |
@@ -1700,7 +1700,7 @@ change:
 - `setTurnstileMode` → `TURNSTILE_MODE_SET` (operate) · staff
 - `listAccessPoints` → `SCOPE_VIEW` (read) · staff
 - `cancelGateModeChange` → `TURNSTILE_MODE_SET` (operate) · staff
-- `setAccessPointDirection` → `ACCESS_DIRECTION_SET` (tier not set) · staff
+- `setAccessPointDirection` → `ACCESS_DIRECTION_SET` (operate) · staff
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -1995,7 +1995,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the operational incident exception untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No operational incident exception yet. Carries the create action; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the operational incident exception are still there. The pack's own statuses are Open → Investigating → Resolved → Closed — the state names which is selected. |
-| Permission denied (`?state=emptyNoAccess`) | Names the missing permission, **INCIDENT_MANAGE** (was ACCESS_POINT_CONFIGURE until 29 September, K1: investigating, assigning and closing an incident is incident management, as for F&B and maintenance incidents). Never an empty table. |
+| Permission denied (`?state=emptyNoAccess`) | Names the missing permission, **`INCIDENT_MANAGE`** (was ACCESS_POINT_CONFIGURE until 29 September, K1: investigating, assigning and closing an incident is incident management, as for F&B and maintenance incidents). Never an empty table. |
 | Offline (`?state=offline`) | online only |
 
 #### Edge cases to draw
@@ -2028,7 +2028,7 @@ resolution: Original credential retained; duplicate media QR-91XX-0K2M revoked
 
 - `setOperationalIncidentException` → `INCIDENT_MANAGE` (configure) · staff
 
-**A refused user sees:** Names the missing permission, **INCIDENT_MANAGE** (was ACCESS_POINT_CONFIGURE until 29 September, K1: investigating, assigning and closing an incident is incident management, as for F&B and maintenance incidents). Never an empty table.
+**A refused user sees:** Names the missing permission, **`INCIDENT_MANAGE`** (was ACCESS_POINT_CONFIGURE until 29 September, K1: investigating, assigning and closing an incident is incident management, as for F&B and maintenance incidents). Never an empty table.
 
 #### Requirements it meets
 

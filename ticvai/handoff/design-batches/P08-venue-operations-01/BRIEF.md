@@ -178,15 +178,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-036` | Device Registry | B–D | 32 | 57 | 6 | 66 | 10 | 0 | — | notStarted (generated) |
-| `BO-044` | F&B Outlets | A | 72 | 59 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
-| `BO-058` | Reporting Home | B–D | 91 | 47 | 6 | 100 | 2 | 0 | — | notStarted (generated) |
-| `BO-060` | Attendance & Footfall | B–D | 111 | 70 | 6 | 153 | 1 | 0 | — | notStarted (generated) |
-| `BO-064` | Zones & Areas | A | 32 | 41 | 6 | 27 | 0 | 0 | — | notStarted (generated) |
+| `BO-036` | Device Registry | B–D | 32 | 41 | 6 | 66 | 10 | 0 | — | notStarted (generated) |
+| `BO-044` | F&B Outlets | A | 72 | 38 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
+| `BO-058` | Reporting Home | B–D | 91 | 26 | 6 | 100 | 2 | 0 | — | notStarted (generated) |
+| `BO-060` | Attendance & Footfall | B–D | 111 | 38 | 6 | 153 | 1 | 0 | — | notStarted (generated) |
+| `BO-064` | Zones & Areas | A | 32 | 27 | 6 | 27 | 0 | 0 | — | notStarted (generated) |
 | `BO-067` | Integrations | B–D | 5 | 40 | 6 | 27 | 1 | 0 | — | notStarted (generated) |
-| `BO-070` | Work Orders | B–D | 61 | 41 | 6 | 17 | 6 | 2 | — | notStarted (generated) |
-| `BO-100` | Venue Home | B–D | 4 | 43 | 6 | 18 | 2 | 0 | — | notStarted (generated) |
-| `BO-108` | Venue Operations | B–D | 6 | 58 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
+| `BO-070` | Work Orders | B–D | 61 | 31 | 6 | 17 | 6 | 2 | — | notStarted (generated) |
+| `BO-100` | Venue Home | B–D | 4 | 29 | 6 | 18 | 2 | 0 | — | notStarted (generated) |
+| `BO-108` | Venue Operations | B–D | 6 | 32 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
 | `BO-128` | Live Workstation Health Monitor | B–D | 3 | 12 | 6 | 0 | 9 | 6 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings

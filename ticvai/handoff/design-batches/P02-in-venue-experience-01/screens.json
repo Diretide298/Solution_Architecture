@@ -4,7 +4,7 @@
   "name": "Menu Item Detail",
   "module": "In-Venue Experience",
   "requiresModule": "fnb",
-  "wave": 2,
+  "wave": 1,
   "capability": "C05",
   "implementation": {
    "app": "guest-app",
@@ -77,12 +77,9 @@
        "label": "The dish",
        "bindsTo": "GuestMenu",
        "columns": [
-        "GuestMenu.outletId",
-        "GuestMenu.menuId",
         "GuestMenu.name",
         "GuestMenu.inForceUntil",
         "GuestMenu.currency",
-        "GuestMenu.currencyScale",
         "GuestMenu.sections"
        ],
        "operation": "getGuestMenu",
@@ -116,7 +113,9 @@
     },
     {
      "name": "menuItemId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getGuestMenu`; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `outletId`.",
@@ -141,7 +140,7 @@
     "differences": "Rev 3 adds min/max selection rules for each modifier group, priced add-ons, leave-outs and a live total."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "modifierPanel",
@@ -200,7 +199,7 @@
   "name": "Shop & Drop Collection",
   "module": "In-Venue Experience",
   "requiresModule": "retail",
-  "wave": 2,
+  "wave": 1,
   "capability": "C21",
   "implementation": {
    "app": "guest-app",
@@ -230,6 +229,7 @@
      "crossesDevice": true,
      "back": false,
      "carries": [
+      "dropId",
       "orderId"
      ]
     }
@@ -297,7 +297,7 @@
     "differences": "Prototype uses a separate SD code; the YAML says the guest collects with the ticket."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",

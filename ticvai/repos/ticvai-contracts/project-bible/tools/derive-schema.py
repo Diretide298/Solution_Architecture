@@ -1245,6 +1245,74 @@ def main() -> int:
             and not _valid.match(str(c["references"])))]
     if _dropped:
         print(f"  pseudo-tables dropped (not <schema>.<table>): {len(_dropped)}")
+
+    # **A key column is required** (3 October, CHG-TBF-001; Block A audit pattern 6). derive-ddl keys a
+    # table by the columns its contract names (`x-ticvai-primary-key`), else `id`, `<table>_id` or
+    # `<table>_code`, else its only column, and a partitioned table adds its time column (the
+    # `x-ticvai-append-only` one). PostgreSQL makes every one of those NOT NULL, but 355 of them said
+    # `required: no` here, because the field behind them is optional on the wire (a create request
+    # has no id yet). A reader of the schema reference -- the ticket, ADAM's table view -- was told
+    # `return_policy.id` may be null. The wire keeps its own rule; the column is required.
+    # `tools/check-table-keys.py` holds it.
+    _marks = {}
+    for _sname, _body in all_schemas.items():
+        if not isinstance(_body, dict):
+            continue
+        _tag = persistence_of(_body)
+        if not (isinstance(_tag, str) and "." in _tag):
+            continue
+        _tbl = _tag.split("+")[0].strip()
+        for _mk in ("x-ticvai-primary-key", "x-ticvai-append-only"):
+            if _body.get(_mk):
+                _marks.setdefault(_tbl, {})[_mk] = _body[_mk]
+
+    def _col_of(_row, prop):
+        for _c in _row:
+            if str(_c.get("source") or "").rsplit(".", 1)[-1] == str(prop):
+                return _c["column"]
+        return None
+
+    # The keys the DDL already has (the baseline is frozen at r1, and a partitioned table's key carries its time
+    # column, which derive-ddl adds from the partitioning rule rather than from a mark this file can read).
+    _ddl_keys: dict = {}
+    for _f in sorted((ROOT / "backend").glob("*/*.sql")):
+        _txt = _f.read_text(encoding="utf-8")
+        for _m in re.finditer(r'CREATE TABLE IF NOT EXISTS ([a-z_]+\.(?:"?[a-z_0-9]+"?)) \((.*?)\n\)[^;]*;', _txt, re.S):
+            _tn, _ks = _m.group(1).replace('"', ""), set()
+            for _line in _m.group(2).split("\n"):
+                _line = _line.strip().rstrip(",")
+                _c = re.match(r"CONSTRAINT \w+ PRIMARY KEY \(([^)]*)\)", _line)
+                if _c:
+                    _ks |= {x.strip() for x in _c.group(1).split(",")}
+                    continue
+                _c = re.match(r"([a-z_][a-z_0-9]*)\s+\S+(.*)", _line)
+                if _c and "PRIMARY KEY" in _c.group(2):
+                    _ks.add(_c.group(1))
+            _ddl_keys.setdefault(_tn, set()).update(_ks)
+
+    _req_fixed = 0
+    for _t, _row in existing.items():
+        if "." not in _t or ":" in _t or not _row:
+            continue
+        _names = [c["column"] for c in _row]
+        _m = _marks.get(_t, {})
+        _keys = set()
+        _dpk = _m.get("x-ticvai-primary-key")
+        if isinstance(_dpk, list) and _dpk:
+            _keys |= {_col_of(_row, p) for p in _dpk} - {None}
+        else:
+            _k = _own_key(_t, _names) or (_names[0] if len(_names) == 1 else None)
+            if _k:
+                _keys.add(_k)
+        _keys |= _ddl_keys.get(_t, set()) & set(_names)
+        _ao = _m.get("x-ticvai-append-only")
+        if isinstance(_ao, str) and _ao.strip():
+            _keys |= {_col_of(_row, _ao.strip())} - {None}
+        for _c in _row:
+            if _c["column"] in _keys and _c.get("required") != "yes":
+                _c["required"] = "yes"
+                _req_fixed += 1
+    print(f"  key columns marked required: {_req_fixed}")
     S["cols"] = existing
     ref_path.write_text(json.dumps(S), encoding="utf-8")
 

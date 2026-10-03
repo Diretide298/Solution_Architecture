@@ -96,15 +96,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-419` | Provisioning Command Center | B–D | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-420` | Tenant & Organization Provisioning | B–D | 12 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-421` | Venue & Operational Structure Creation | B–D | 18 | 7 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-422` | Administrator & Security Initialization | B–D | 27 | 6 | 7 | 15 | 0 | 0 | — | notStarted (—) |
-| `ADM-423` | License & Entitlement Activation | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-424` | Module Activation & Dependency Validation | B–D | 9 | 57 | 7 | 10 | 1 | 0 | configures | notStarted (—) |
-| `ADM-425` | Venue Template Application | B–D | 6 | 13 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-426` | Initial Configuration & Regional Defaults | B–D | 114 | 66 | 7 | 18 | 1 | 0 | — | notStarted (—) |
-| `ADM-427` | Provisioning Validation & Exception Management | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-419` | Provisioning Command Center | B | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-420` | Tenant & Organization Provisioning | B | 12 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-421` | Venue & Operational Structure Creation | B | 18 | 7 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-422` | Administrator & Security Initialization | B | 27 | 6 | 7 | 15 | 0 | 0 | — | notStarted (—) |
+| `ADM-423` | License & Entitlement Activation | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-424` | Module Activation & Dependency Validation | A | 9 | 57 | 7 | 10 | 1 | 0 | configures | notStarted (—) |
+| `ADM-425` | Venue Template Application | B | 6 | 13 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-426` | Initial Configuration & Regional Defaults | B | 114 | 66 | 7 | 18 | 1 | 0 | — | notStarted (—) |
+| `ADM-427` | Provisioning Validation & Exception Management | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

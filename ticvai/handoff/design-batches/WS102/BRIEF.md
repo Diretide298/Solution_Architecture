@@ -126,16 +126,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-409` | Purchase / Trial Journey Selection | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `ADM-410` | Contract & Billing Cycle Selection | B–D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `ADM-411` | Billing & Legal Entity Information | B–D | 17 | 19 | 7 | 9 | 0 | 0 | — | notStarted (—) |
+| `ADM-409` | Purchase / Trial Journey Selection | B | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `ADM-410` | Contract & Billing Cycle Selection | B | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `ADM-411` | Billing & Legal Entity Information | B | 17 | 19 | 7 | 9 | 0 | 0 | — | notStarted (—) |
 | `ADM-412` | Payment Method & Settlement Setup | A | 41 | 7 | 7 | 24 | 0 | 0 | — | notStarted (—) |
-| `ADM-413` | Trial Configuration & Conversion Rules | B–D | 16 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `ADM-414` | Order & Commercial Pricing Review | B–D | 0 | 10 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `ADM-415` | Commercial Agreement, Billable Definition & Customer Acceptance | B–D | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-416` | Payment, Contract & Commercial Validation | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-417` | Subscription Confirmation & Commercial Activation | B–D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `ADM-418` | Subscription Lifecycle & Trial-to-Paid Handoff | B–D | 0 | 28 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-413` | Trial Configuration & Conversion Rules | B | 16 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ADM-414` | Order & Commercial Pricing Review | B | 0 | 10 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `ADM-415` | Commercial Agreement, Billable Definition & Customer Acceptance | B | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-416` | Payment, Contract & Commercial Validation | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-417` | Subscription Confirmation & Commercial Activation | B | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `ADM-418` | Subscription Lifecycle & Trial-to-Paid Handoff | B | 0 | 28 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

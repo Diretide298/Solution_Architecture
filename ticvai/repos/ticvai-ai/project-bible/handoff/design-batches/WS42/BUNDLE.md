@@ -103,16 +103,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `CMS-031` | Privacy Operations Command Center | B–D | 2 | 26 | 6 | 0 | 1 | 4 | — | notStarted (generated) |
-| `CMS-032` | Customer Privacy, Consent & Preference 360° | B–D | 0 | 8 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
-| `CMS-033` | Consent Evidence, History & Withdrawal Management | B–D | 0 | 4 | 6 | 1 | 0 | 4 | — | notStarted (generated) |
-| `CMS-034` | Data Subject / Customer Privacy Request Management | B–D | 0 | 8 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
-| `CMS-035` | Data Discovery, Access, Export & Correction Workspace | B–D | 0 | 4 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `CMS-036` | Deletion, Anonymization & Restriction Operations | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `CMS-037` | Data Retention, Expiry & Legal Hold Operations | B–D | 15 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `CMS-038` | Privacy Compliance, Exception & Investigation Workspace | B–D | 0 | 40 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
-| `CMS-039` | Privacy Audit, Evidence & Compliance Reporting | B–D | 14 | 0 | 5 | 1 | 0 | 4 | — | notStarted (generated) |
-| `CMS-040` | Privacy Analytics & AI Compliance Intelligence | B–D | 2 | 26 | 6 | 1 | 0 | 4 | — | notStarted (generated) |
+| `CMS-031` | Privacy Operations Command Center | D | 2 | 26 | 6 | 0 | 1 | 4 | — | notStarted (generated) |
+| `CMS-032` | Customer Privacy, Consent & Preference 360° | D | 0 | 8 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `CMS-033` | Consent Evidence, History & Withdrawal Management | D | 0 | 4 | 6 | 1 | 0 | 4 | — | notStarted (generated) |
+| `CMS-034` | Data Subject / Customer Privacy Request Management | D | 0 | 8 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `CMS-035` | Data Discovery, Access, Export & Correction Workspace | D | 0 | 4 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `CMS-036` | Deletion, Anonymization & Restriction Operations | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `CMS-037` | Data Retention, Expiry & Legal Hold Operations | D | 15 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `CMS-038` | Privacy Compliance, Exception & Investigation Workspace | D | 0 | 40 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `CMS-039` | Privacy Audit, Evidence & Compliance Reporting | D | 14 | 0 | 5 | 1 | 0 | 4 | — | notStarted (generated) |
+| `CMS-040` | Privacy Analytics & AI Compliance Intelligence | D | 2 | 26 | 6 | 1 | 0 | 4 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -132,7 +132,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CMS-CMS-031 |
 | Who uses it | venue staff holding `GUEST_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -311,7 +311,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CMS-CMS-032 |
 | Who uses it | venue staff holding `GUEST_VIEW_PII` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -435,7 +435,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CMS-CMS-033 |
 | Who uses it | venue staff holding `GUEST_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -575,7 +575,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CMS-CMS-034 |
 | Who uses it | venue staff holding `GUEST_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -722,7 +722,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CMS-CMS-035 |
 | Who uses it | venue staff holding `GUEST_VIEW_PII` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -838,7 +838,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CMS-CMS-036 |
 | Who uses it | venue staff holding `GUEST_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -962,7 +962,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CMS-CMS-037 |
 | Who uses it | venue staff holding `GUEST_MANAGE`, `GUEST_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1138,7 +1138,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CMS-CMS-038 |
 | Who uses it | venue staff holding `GUEST_MANAGE`, `GUEST_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1313,7 +1313,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CMS-CMS-039 |
 | Who uses it | venue staff holding `AUDIT_VIEW`, `GUEST_VIEW` (2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Capture significant activities such as) and no display directory — it is settings, not a population |
@@ -1456,7 +1456,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CMS-CMS-040 |
 | Who uses it | venue staff holding `AUDIT_VIEW`, `GUEST_VIEW` (2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Analyze) and no metric row |

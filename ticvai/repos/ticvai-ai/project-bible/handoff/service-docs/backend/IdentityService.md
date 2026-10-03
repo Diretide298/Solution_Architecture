@@ -29,12 +29,12 @@
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
 | administration | [`createRole`](#createrole) | POST | `/roles` | setup | 1 | ADM-021, BO-054 |
-| administration | [`listOwnPlatformStaffGrants`](#listownplatformstaffgrants) | GET | `/platform-staff-grants/mine` | core | 2 | ADM-004, ADM-005, ADM-006, ADM-015, ADM-016, ADM-017 … |
-| administration | [`listPrincipals`](#listprincipals) | GET | `/principals` | core | 2 | ADM-020, ANL-003, BO-053, BO-057, BO-873, CMS-019 … |
-| administration | [`listRoles`](#listroles) | GET | `/roles` | core | 2 | ADM-021, BO-054, BO-106, CMS-019 |
-| administration | [`openPlatformStaffGrant`](#openplatformstaffgrant) | POST | `/platform-staff-grants` | core | 2 | ADM-004, ADM-005, ADM-006, ADM-015, ADM-016, ADM-017 … |
-| administration | [`updatePrincipal`](#updateprincipal) | PATCH | `/principals/{principalId}` | core | 2 | ADM-020, BO-053, BO-054, CMS-019, PTR-003 |
-| guestAuth | [`deleteGuestAccount`](#deleteguestaccount) | DELETE | `/auth/guest/account` | core | 2 | GST-066, WEB-024 |
+| administration | [`listOwnPlatformStaffGrants`](#listownplatformstaffgrants) | GET | `/platform-staff-grants/mine` | core | 1 | ADM-004, ADM-005, ADM-006, ADM-015, ADM-016, ADM-017 … |
+| administration | [`listPrincipals`](#listprincipals) | GET | `/principals` | core | 1 | ADM-020, ANL-003, BO-053, BO-057, BO-873, CMS-019 … |
+| administration | [`listRoles`](#listroles) | GET | `/roles` | core | 1 | ADM-021, BO-054, BO-106, CMS-019 |
+| administration | [`openPlatformStaffGrant`](#openplatformstaffgrant) | POST | `/platform-staff-grants` | core | 1 | ADM-004, ADM-005, ADM-006, ADM-015, ADM-016, ADM-017 … |
+| administration | [`updatePrincipal`](#updateprincipal) | PATCH | `/principals/{principalId}` | core | 1 | ADM-020, BO-053, BO-054, CMS-019, PTR-003 |
+| guestAuth | [`deleteGuestAccount`](#deleteguestaccount) | DELETE | `/auth/guest/account` | core | 1 | GST-066, WEB-024 |
 | guestAuth | [`getGuestSession`](#getguestsession) | GET | `/auth/guest/session` | core | 1 | GST-042, GST-073, WEB-016 |
 | guestAuth | [`getMyIdentityVerification`](#getmyidentityverification) | GET | `/auth/guest/identity-verifications/current` | core | 1 | WEB-020 |
 | guestAuth | [`guestLogout`](#guestlogout) | DELETE | `/auth/guest/session` | core | 1 | GST-042, GST-073, WEB-016 |
@@ -47,11 +47,11 @@
 | guestAuth | [`submitGuestIdentityDocument`](#submitguestidentitydocument) | POST | `/auth/guest/identity-verifications` | core | 1 | WEB-020 |
 | guestAuth | [`verifyGuestOtp`](#verifyguestotp) | POST | `/auth/guest/otp/verify` | core | 1 | GST-042, WEB-016 |
 | identity | [`changeOwnCredential`](#changeowncredential) | POST | `/auth/credential` | core | 1 | ADM-001, ADM-699, EMP-001, POS-000, PTR-001, SCN-001 … |
-| identity | [`exportSubjectData`](#exportsubjectdata) | POST | `/guests/{subjectId}/data-export` | core | 2 | GST-066, WEB-024 |
+| identity | [`exportSubjectData`](#exportsubjectdata) | POST | `/guests/{subjectId}/data-export` | core | 1 | GST-066, WEB-024 |
 | identity | [`forceLogout`](#forcelogout) | POST | `/auth/sessions/{sessionId}/force-logout` | core | 1 | BO-053, POS-000 |
 | identity | [`getCurrentSession`](#getcurrentsession) | GET | `/auth/session` | core | 1 | ADM-001, EMP-001, EMP-002, EMP-042, POS-000, PTR-001 … |
-| identity | [`grantDelegation`](#grantdelegation) | POST | `/guests/{subjectId}/delegations` | core | 2 | GST-015 |
-| identity | [`listDelegations`](#listdelegations) | GET | `/guests/{subjectId}/delegations` | core | 2 | GST-015, GST-069, WEB-024 |
+| identity | [`grantDelegation`](#grantdelegation) | POST | `/guests/{subjectId}/delegations` | core | 1 | GST-015 |
+| identity | [`listDelegations`](#listdelegations) | GET | `/guests/{subjectId}/delegations` | core | 1 | GST-015, GST-069, WEB-024 |
 | identity | [`login`](#login) | POST | `/auth/login` | core | 1 | ADM-001, EMP-001, POS-000, PTR-001, SCN-001, SUP-001 |
 | identity | [`refreshToken`](#refreshtoken) | POST | `/auth/refresh` | core | 1 | GST-042, WEB-016 |
 | identity | [`selectRole`](#selectrole) | POST | `/auth/select-role` | core | 1 | ADM-001, EMP-001, EMP-002, POS-000, POS-001, PTR-001 … |
@@ -59,11 +59,11 @@
 | identity | [`setPasswordPolicy`](#setpasswordpolicy) | PUT | `/password-policy` | setup | 1 | ADM-342, ADM-422 |
 | identity | [`verifyGuestEmail`](#verifyguestemail) | POST | `/auth/guest/verify-email` | core | 1 | GST-073, WEB-020 |
 | mfa | [`createMfaChallenge`](#createmfachallenge) | POST | `/auth/mfa/challenge` | core | 1 | ADM-001, ADM-247, ADM-699, ADM-700, BO-053, BO-284 … |
-| mfa | [`enrolMfaMethod`](#enrolmfamethod) | POST | `/auth/mfa/methods` | core | 2 | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001 … |
-| mfa | [`listMfaMethods`](#listmfamethods) | GET | `/auth/mfa/methods` | core | 2 | ADM-342, ADM-699, EMP-042, GST-073, WEB-024 |
-| mfa | [`removeMfaMethod`](#removemfamethod) | DELETE | `/auth/mfa/methods/{methodId}` | core | 2 | ADM-699, EMP-042, GST-073, WEB-024 |
+| mfa | [`enrolMfaMethod`](#enrolmfamethod) | POST | `/auth/mfa/methods` | core | 1 | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001 … |
+| mfa | [`listMfaMethods`](#listmfamethods) | GET | `/auth/mfa/methods` | core | 1 | ADM-342, ADM-699, EMP-042, GST-073, WEB-024 |
+| mfa | [`removeMfaMethod`](#removemfamethod) | DELETE | `/auth/mfa/methods/{methodId}` | core | 1 | ADM-699, EMP-042, GST-073, WEB-024 |
 | mfa | [`verifyMfaChallenge`](#verifymfachallenge) | POST | `/auth/mfa/challenge/{challengeId}/verify` | core | 1 | ADM-001, ADM-247, ADM-699, ADM-700, BO-053, BO-284 … |
-| mfa | [`verifyMfaEnrolment`](#verifymfaenrolment) | POST | `/auth/mfa/methods/{methodId}` | core | 2 | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001 … |
+| mfa | [`verifyMfaEnrolment`](#verifymfaenrolment) | POST | `/auth/mfa/methods/{methodId}` | core | 1 | ADM-001, ADM-699, EMP-042, GST-073, PTR-001, SUP-001 … |
 | session | [`listActiveSessions`](#listactivesessions) | GET | `/auth/sessions` | core | 1 | BO-053, POS-000 |
 
 ## Group: administration
@@ -137,7 +137,7 @@
 | Permission | `PLATFORM_TENANT_ACCESS` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -187,7 +187,7 @@
 | Permission | `USER_MANAGE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -248,7 +248,7 @@ A role is a grouping for permission management — code, name, description and t
 | Permission | `ROLE_MANAGE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -303,7 +303,7 @@ Requires step-up: the operator holds `PLATFORM_*` permissions, which require MFA
 | Permission | `PLATFORM_TENANT_ACCESS` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Step-up auth | mfa |
@@ -361,7 +361,7 @@ Deactivation invalidates any live session immediately. **A change to `validTo`, 
 | Permission | `USER_MANAGE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.principal` |
@@ -424,7 +424,7 @@ Where the guest is linked across cells, the request fans out (ADR-0010).
 | Permission | `None` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `pii.subject` |
@@ -1155,7 +1155,7 @@ Includes what is held and where it came from. **Excludes another guest's data ev
 | Permission | `GUEST_VIEW_PII` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
@@ -1196,6 +1196,7 @@ Includes what is held and where it came from. **Excludes another guest's data ev
 **`POST /auth/sessions/{sessionId}/force-logout`**: Supervisor termination of an abandoned session
 
 Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displaces a second login — an operator who went home still logged in would otherwise be locked out until token expiry.
+**Callable on the POS-000 door with no session, under a supervisor's PIN step-up** (Chinmay, 3 October 2026, Block A business rules: "POS-000: session management stays on the door"; CHG-RUL-015, which reverses CHG-DOOR-003 for this). Somebody else is signed in to the till, so nobody at it has a session: the till calls this with no token (`security` admits `{}`), names itself (`workstationId`), and carries the supervisor's own principal and PIN (`supervisorStepUp` in the body). The PIN is verified against the principal as `common.yaml` `SupervisorStepUp` says; that principal must hold `SESSION_FORCE_LOGOUT` at the till's venue, and the call reaches only a session at a workstation of that venue. Anything else is `403 supervisor-step-up-refused` and nothing is read or written. **No session is opened** by the step-up: it authorises this one call. With a session (BO-053 Staff Directory) the caller's own `SESSION_FORCE_LOGOUT` applies as before and no step-up is asked.
 
 |  |  |
 |---|---|
@@ -1205,6 +1206,7 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | append |
+| Step-up auth | pin |
 | Reads | `cache:idempotency`, `identity.session` |
 | Writes | `cache:idempotency`, `identity.session` |
 | Called by | BO-053, POS-000 |
@@ -1222,13 +1224,17 @@ Requires SESSION_FORCE_LOGOUT. Exists because §3.1.3 rejects rather than displa
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | reason | string | yes | (min length 3; max length 500) |
+| workstationId | string (uuid) |  | The till making the call. (nullable) |
+| supervisorStepUp | object |  | The supervisor ending the session, signing on this device. |
+| supervisorStepUp.principalId | string (uuid) | yes | The supervisor signing. |
+| supervisorStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
 
 **Responses**
 
 | Code | Shape | Meaning |
 |---|---|---|
 | 204 |  | Session terminated and audited |
-| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 403 |  | The caller lacks SESSION_FORCE_LOGOUT, or, with no session, the supervisor step-up is missing or failed or the session is not at the till's venue (supervisor-step-up-refused; CHG-RUL-015). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### getCurrentSession
@@ -1309,7 +1315,7 @@ Covers a primary holder assigning entitlements, a group leader holding tickets, 
 | Permission | `GUEST_MANAGE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
@@ -1378,7 +1384,7 @@ CF-132. **Both directions, because a guest is usually in both.** A parent holds 
 | Permission | `GUEST_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -1947,7 +1953,7 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 | Permission | `None` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_recovery_code`, `identity.principal` |
@@ -1997,7 +2003,7 @@ Returns a secret or challenge to complete enrolment. **The method is not active 
 | Permission | `None` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -2023,7 +2029,7 @@ Refused where it is the only active method and the principal holds a permission 
 | Permission | `None` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_method` |
@@ -2050,6 +2056,8 @@ Refused where it is the only active method and the principal holds a permission 
 **`POST /auth/mfa/challenge/{challengeId}/verify`**: Complete a sign-in or step-up challenge
 
 For a `signIn` challenge (decided 28 September, audit R135) a correct code completes the sign-in: the pending session becomes usable and is returned in `session`, or, where `login` also answered `requiresRoleSelection`, the client goes on to `selectRole`. For any other action it returns a short-lived, single-purpose `stepUpToken`.
+
+**How an MFA step-up reaches the operation that demands it: the session** (Chinmay, 3 October 2026, defaults taken; CHG-RUL-020). A successful step-up is also recorded against the caller's own session, bound to the challenge's `action` and to that session, for the token's short life. Every operation that declares `x-ticvai-step-up: mfa` declares `x-ticvai-step-up-carrier: session` and reads the step-up from the session that calls it: the client sends no token field and no header, and a step-up made on another session or for another action does not count. It is single-use: the operation that consumes it clears it. Without a fresh step-up the operation is refused 403, and the client runs `createMfaChallenge` and this operation, then retries. A call with no session (`{}`) cannot carry an MFA step-up; a supervisor PIN step-up travels in the body or a header instead (`SupervisorStepUp`, CHG-RUL-014). The returned `stepUpToken` stays for clients built at r1.
 
 |  |  |
 |---|---|
@@ -2130,7 +2138,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 | Permission | `None` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.mfa_method` |
@@ -2179,6 +2187,7 @@ For a `signIn` challenge (decided 28 September, audit R135) a correct code compl
 **`GET /auth/sessions`**: List active sessions
 
 Who is logged in, on which workstation, since when. There was previously no way to see this — only to terminate a session someone already knew about.
+**Callable on the POS-000 door with no session, under a supervisor's PIN step-up** (Chinmay, 3 October 2026, Block A business rules: "POS-000: session management stays on the door"; CHG-RUL-015, which reverses CHG-DOOR-003 for this). Somebody else is signed in to the till, so nobody at it has a session: the till calls this with no token (`security` admits `{}`), names itself (`workstationId`), and carries the supervisor's own principal and PIN (the `X-Supervisor-Principal-Id` and `X-Supervisor-Pin` headers, since a GET has no body). The PIN is verified against the principal as `common.yaml` `SupervisorStepUp` says; that principal must hold `SESSION_FORCE_LOGOUT` at the till's venue, and the call reaches only the sessions at that one till (`workstationId` is required then). Anything else is `403 supervisor-step-up-refused` and nothing is read or written. **No session is opened** by the step-up: it authorises this one call. With a session (BO-053 Staff Directory) the caller's own `SESSION_FORCE_LOGOUT` applies as before and no step-up is asked.
 
 |  |  |
 |---|---|
@@ -2189,6 +2198,7 @@ Who is logged in, on which workstation, since when. There was previously no way 
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
+| Step-up auth | pin |
 | Reads | `identity.principal`, `identity.session` |
 | Writes | - |
 | Called by | BO-053, POS-000 |
@@ -2197,6 +2207,8 @@ Who is logged in, on which workstation, since when. There was previously no way 
 
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
+| X-Supervisor-Principal-Id | header |  | string (uuid) | With no session (POS-000), the supervisor signing the step-up (CHG-RUL-015). |
+| X-Supervisor-Pin | header |  | string (password) | With no session (POS-000), the supervisor's staff PIN, as SupervisorStepUp.credential (CHG-RUL-015). |
 | venueId | query |  | string (uuid) | Exact match on ActiveSession.venueId. |
 | principalId | query |  | string (uuid) | Exact match on ActiveSession.principalId. |
 | workstationId | query |  | string (uuid) | Exact match on ActiveSession.workstationId — who holds this till, which POS-000 Sign In asks before offering a force-logout, without paging through every session in the venue. |
@@ -2231,6 +2243,7 @@ Who is logged in, on which workstation, since when. There was previously no way 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Sessions |
+| 403 |  | The caller lacks SESSION_FORCE_LOGOUT, or, with no session, the supervisor step-up is missing or failed, or workstationId is missing (supervisor-step-up-refused; CHG-RUL-015). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ## Tables
@@ -2292,7 +2305,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | scope_path | text | no | The tenant, written by the server (x-ticvai-config-scope: tenant). |
 | registration_requires | text[] | yes | Verifications a new account must pass before it is usable. |
 | id_document_required_for | text[] | no | The moments that need a verified ID document. |
@@ -2399,7 +2412,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | principal_id | uuid | yes |  |
 | hash | text | yes |  |
 | expires_at | timestamptz | yes |  |

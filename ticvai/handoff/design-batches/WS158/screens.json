@@ -636,11 +636,6 @@
         "StaffingCoverage.positionCode",
         "StaffingCoverage.from",
         "StaffingCoverage.to",
-        "StaffingCoverage.required",
-        "StaffingCoverage.rostered",
-        "StaffingCoverage.qualified",
-        "Checked in",
-        "StaffingCoverage.gap",
         "StaffingCoverage.severity"
        ],
        "operation": "getStaffingCoverage",
@@ -1235,7 +1230,9 @@
    "params": [
     {
      "name": "recordId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `amendAttendance` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1611,7 +1608,7 @@
     "id": "formSetLabourBudget",
     "component": "modal",
     "trigger": "Save labour budget",
-    "body": "**Collects what `setLabourBudget` sends before it is called.** Required: `id`, `venueId`, `periodStart`, `periodEnd`, `budgetAmount`. Optional: `departmentId`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setLabourBudget` sends before it is called.** Required: `venueId`, `periodStart`, `periodEnd`, `budgetAmount`. Optional: `departmentId`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "LabourBudget",
     "confirm": {
      "label": "Save labour budget",
@@ -1620,7 +1617,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "venueId",
       "periodStart",
       "periodEnd",
@@ -1809,9 +1805,6 @@
         "StaffingCoverage.from",
         "StaffingCoverage.to",
         "StaffingCoverage.required",
-        "StaffingCoverage.rostered",
-        "StaffingCoverage.qualified",
-        "StaffingCoverage.gap",
         "StaffingCoverage.severity"
        ],
        "operation": "getStaffingCoverage",

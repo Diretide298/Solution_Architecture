@@ -615,7 +615,9 @@
    "params": [
     {
      "name": "entryId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiRiskRegister` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "tenantId",
@@ -844,7 +846,9 @@
    "params": [
     {
      "name": "controlKey",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiControls` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "tenantId",
@@ -1129,7 +1133,9 @@
    "params": [
     {
      "name": "alertId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiGovernanceAlerts` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "tenantId",
@@ -1439,7 +1445,9 @@
    "params": [
     {
      "name": "alertId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiGovernanceAlerts` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "tenantId",
@@ -1500,7 +1508,7 @@
   "name": "AI Quality, Behavior & Governance Drift Monitoring",
   "module": "Platform",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "4",
@@ -2049,7 +2057,9 @@
    "params": [
     {
      "name": "alertId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiGovernanceAlerts` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "tenantId",
@@ -2110,7 +2120,7 @@
   "name": "AI Incident & Remediation Management",
   "module": "Platform",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "AI_Governance_Reference.pdf",
    "board": "4",

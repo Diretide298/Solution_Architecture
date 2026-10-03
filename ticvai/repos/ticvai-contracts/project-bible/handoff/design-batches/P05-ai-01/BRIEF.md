@@ -95,7 +95,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `KSK-015` | Assistant | B–D | 3 | 37 | 5 | 35 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-015` | Assistant | A | 3 | 37 | 5 | 35 | 0 | 0 | guest | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

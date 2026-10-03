@@ -209,10 +209,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `BO-100` Venue Home: *Back to Venue Home*
 - → `BO-755` Dynamic Segment Builder: *Dynamic Segment Builder*; carries `segmentId`
 - → `BO-756` Static Lists & Imports: *Static Lists & Imports*
-- → `BO-757` Behavioral Segmentation: *Behavioral Segmentation*
-- → `BO-758` Membership & Loyalty Segments: *Membership & Loyalty Segments*
+- → `BO-757` Behavioral Segmentation: *Behavioral Segmentation*; carries `segmentId`
+- → `BO-758` Membership & Loyalty Segments: *Membership & Loyalty Segments*; carries `segmentId`
 - → `BO-759` Demographic & Geographic: *Demographic & Geographic*
-- → `BO-760` Revenue & Engagement Segments: *Revenue & Engagement Segments*
+- → `BO-760` Revenue & Engagement Segments: *Revenue & Engagement Segments*; carries `segmentId`
 - → `BO-761` AI Audience Discovery: *AI Audience Discovery*
 - → `BO-762` Predictive Audiences: *Predictive Audiences*; carries `segmentId`
 - → `BO-763` Activation & Governance: *Activation & Governance*
@@ -307,8 +307,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | Block A · ticket #20765 (APP-SETUP-BO-755) |
+| Module | Engagement & Support · wave 1 · needs the `marketing` module |
+| Block | Block A · task APP-SETUP-BO-755 |
 | Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

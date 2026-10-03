@@ -103,16 +103,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `CMS-041` | Waiver & Consent Command Center | B–D | 2 | 24 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
-| `CMS-042` | Waiver Template Library & Master Setup | B–D | 35 | 0 | 5 | 0 | 2 | 4 | — | notStarted (generated) |
-| `CMS-043` | Digital Waiver & Form Builder | B–D | 26 | 0 | 6 | 75 | 2 | 4 | — | notStarted (generated) |
-| `CMS-044` | Dynamic Fields, Questions & Conditional Logic | B–D | 18 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `CMS-045` | Signatory, Signature & Guardian Rule Configuration | B–D | 12 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `CMS-046` | Product, Event & Experience Association | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `CMS-047` | Waiver Trigger, Eligibility & Completion Rules | B–D | 15 | 0 | 5 | 0 | 1 | 4 | — | notStarted (generated) |
-| `CMS-048` | Versioning, Effective Dates & Legal Change Control | B–D | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `CMS-049` | Localization, Branding & Customer Experience Configuration | B–D | 0 | 32 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `CMS-050` | Waiver Approval, Testing & Publication Workspace | B–D | 4 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
+| `CMS-041` | Waiver & Consent Command Center | D | 2 | 24 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
+| `CMS-042` | Waiver Template Library & Master Setup | D | 35 | 0 | 5 | 0 | 2 | 4 | — | notStarted (generated) |
+| `CMS-043` | Digital Waiver & Form Builder | D | 26 | 0 | 6 | 75 | 2 | 4 | — | notStarted (generated) |
+| `CMS-044` | Dynamic Fields, Questions & Conditional Logic | D | 18 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `CMS-045` | Signatory, Signature & Guardian Rule Configuration | D | 12 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `CMS-046` | Product, Event & Experience Association | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `CMS-047` | Waiver Trigger, Eligibility & Completion Rules | D | 15 | 0 | 5 | 0 | 1 | 4 | — | notStarted (generated) |
+| `CMS-048` | Versioning, Effective Dates & Legal Change Control | D | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `CMS-049` | Localization, Branding & Customer Experience Configuration | D | 0 | 32 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `CMS-050` | Waiver Approval, Testing & Publication Workspace | D | 4 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

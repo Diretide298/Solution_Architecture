@@ -4,7 +4,7 @@
   "name": "Intercity Trip — Route & Schedule",
   "module": "Transport",
   "requiresModule": "transport",
-  "wave": 3,
+  "wave": 1,
   "implementation": {
    "app": "guest-app",
    "route": "/transport/route-and-schedule",
@@ -117,9 +117,7 @@
        "columns": [
         "DepartureOffer.routeCode",
         "DepartureOffer.departsAt",
-        "DepartureOffer.arrivesAt",
         "DepartureOffer.durationMinutes",
-        "DepartureOffer.seatsLeft",
         "DepartureOffer.fare"
        ],
        "operation": "searchTransportDepartures",
@@ -241,7 +239,7 @@
   "name": "Intercity Trip — Route & Passengers",
   "module": "Transport",
   "requiresModule": "transport",
-  "wave": 3,
+  "wave": 1,
   "implementation": {
    "app": "guest-app",
    "route": "/transport/route-and-passengers",
@@ -481,7 +479,7 @@
   "name": "Intercity Trip — Multi-trip Passes",
   "module": "Transport",
   "requiresModule": "transport",
-  "wave": 3,
+  "wave": 1,
   "implementation": {
    "app": "guest-app",
    "route": "/transport/multi-trip-passes",
@@ -665,7 +663,7 @@
   "name": "Intercity Trip — Favourite Routes",
   "module": "Transport",
   "requiresModule": "transport",
-  "wave": 3,
+  "wave": 1,
   "implementation": {
    "app": "guest-app",
    "route": "/transport/favourite-routes",

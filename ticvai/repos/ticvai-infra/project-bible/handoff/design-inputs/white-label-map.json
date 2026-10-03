@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/build-white-label-map.py",
- "generated": "2026-10-02",
+ "generated": "2026-10-03",
  "note": "Derived from the configuring operations' request schemas and the screens. Never edit; rerun the tool.",
  "elements": [
   {

@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `queue`, `maintenance`, `resources`, `venue-map`, `assets`, `games`, `rental`, `transport` |
 | Schemas owned | `queue`, `maintenance`, `resources`, `venuemap`, `assets`, `games`, `rental`, `transport` |
-| Operations in the slice | 69 of 285 |
+| Operations in the slice | 69 of 287 |
 | Scale | Low and steady. Queue readings are the only frequent write. |
 | If it is down | Down degrades venue operations. Selling and admitting continue. |
 
@@ -29,66 +29,66 @@
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
-| asset | [`deleteMediaAsset`](#deletemediaasset) | DELETE | `/media/{mediaId}` | core | 2 | CMS-010, CMS-075 |
+| asset | [`deleteMediaAsset`](#deletemediaasset) | DELETE | `/media/{mediaId}` | core | 1 | CMS-010, CMS-075 |
 | asset | [`getMediaAsset`](#getmediaasset) | GET | `/media/{mediaId}` | core | 1 | CMS-010, CMS-068, CMS-082, EMP-036, POS-010 |
-| asset | [`replaceMediaAsset`](#replacemediaasset) | POST | `/media/{mediaId}/replace` | core | 2 | CMS-010, CMS-076, CMS-095 |
-| asset | [`searchMedia`](#searchmedia) | GET | `/media` | core | 2 | BO-008, BO-094, CMS-010, CMS-061, CMS-062, CMS-067 … |
-| asset | [`updateMediaAsset`](#updatemediaasset) | PATCH | `/media/{mediaId}` | core | 2 | CMS-010, CMS-075, CMS-082 |
-| card | [`getGameCard`](#getgamecard) | GET | `/game-cards/{cardCode}` | core | 2 | BO-454, BO-455, BO-457, BO-462, BO-486, GST-011 … |
+| asset | [`replaceMediaAsset`](#replacemediaasset) | POST | `/media/{mediaId}/replace` | core | 1 | CMS-010, CMS-076, CMS-095 |
+| asset | [`searchMedia`](#searchmedia) | GET | `/media` | core | 1 | BO-008, BO-094, CMS-010, CMS-061, CMS-062, CMS-067 … |
+| asset | [`updateMediaAsset`](#updatemediaasset) | PATCH | `/media/{mediaId}` | core | 1 | CMS-010, CMS-075, CMS-082 |
+| card | [`getGameCard`](#getgamecard) | GET | `/game-cards/{cardCode}` | core | 1 | BO-454, BO-455, BO-457, BO-462, BO-486, GST-011 … |
 | card | [`issueGameCard`](#issuegamecard) | POST | `/game-cards` | core | 1 | POS-002 |
-| collection | [`createCollection`](#createcollection) | POST | `/media/collections` | core | 2 | CMS-010, CMS-064 |
-| collection | [`listCollections`](#listcollections) | GET | `/media/collections` | core | 2 | CMS-010, CMS-062, CMS-064 |
-| departure | [`getNextTransportDeparture`](#getnexttransportdeparture) | GET | `/transport/departures/next` | core | 3 | GST-076, WEB-049 |
-| departure | [`searchTransportDepartures`](#searchtransportdepartures) | GET | `/transport/departures` | core | 3 | GST-076, WEB-049 |
-| entry | [`getWaitingGuest`](#getwaitingguest) | GET | `/waiting-guests/{entryId}` | core | 2 | GST-023, WEB-040 |
-| entry | [`joinQueue`](#joinqueue) | POST | `/waiting-guests` | core | 2 | GST-023, WEB-040 |
-| entry | [`leaveQueue`](#leavequeue) | DELETE | `/waiting-guests/{entryId}` | core | 2 | GST-023, WEB-040 |
-| fare | [`getTransportFareTable`](#gettransportfaretable) | GET | `/transport/routes/{routeId}/fare-table` | core | 3 | BO-1185, GST-077, WEB-049 |
-| fare | [`quoteTransportFare`](#quotetransportfare) | POST | `/transport/fare-quotes` | core | 3 | BO-1185, GST-077, WEB-049 |
-| fare | [`setTransportFareTable`](#settransportfaretable) | PUT | `/transport/routes/{routeId}/fare-table` | setup | 3 | BO-1185 |
-| favourite | [`deleteFavouriteRoute`](#deletefavouriteroute) | DELETE | `/transport/favourite-routes/{favouriteId}` | core | 3 | GST-079, WEB-049 |
-| favourite | [`listMyFavouriteRoutes`](#listmyfavouriteroutes) | GET | `/transport/favourite-routes` | core | 3 | GST-079, WEB-049 |
-| favourite | [`saveFavouriteRoute`](#savefavouriteroute) | POST | `/transport/favourite-routes` | core | 3 | GST-077, WEB-049 |
+| collection | [`createCollection`](#createcollection) | POST | `/media/collections` | core | 1 | CMS-010, CMS-064 |
+| collection | [`listCollections`](#listcollections) | GET | `/media/collections` | core | 1 | CMS-010, CMS-062, CMS-064 |
+| departure | [`getNextTransportDeparture`](#getnexttransportdeparture) | GET | `/transport/departures/next` | core | 1 | GST-076, WEB-049 |
+| departure | [`searchTransportDepartures`](#searchtransportdepartures) | GET | `/transport/departures` | core | 1 | GST-076, WEB-049 |
+| entry | [`getWaitingGuest`](#getwaitingguest) | GET | `/waiting-guests/{entryId}` | core | 1 | GST-023, WEB-040 |
+| entry | [`joinQueue`](#joinqueue) | POST | `/waiting-guests` | core | 1 | GST-023, WEB-040 |
+| entry | [`leaveQueue`](#leavequeue) | DELETE | `/waiting-guests/{entryId}` | core | 1 | GST-023, WEB-040 |
+| fare | [`getTransportFareTable`](#gettransportfaretable) | GET | `/transport/routes/{routeId}/fare-table` | core | 1 | BO-1185, GST-077, WEB-049 |
+| fare | [`quoteTransportFare`](#quotetransportfare) | POST | `/transport/fare-quotes` | core | 1 | BO-1185, GST-077, WEB-049 |
+| fare | [`setTransportFareTable`](#settransportfaretable) | PUT | `/transport/routes/{routeId}/fare-table` | setup | 1 | BO-1185 |
+| favourite | [`deleteFavouriteRoute`](#deletefavouriteroute) | DELETE | `/transport/favourite-routes/{favouriteId}` | core | 1 | GST-079, WEB-049 |
+| favourite | [`listMyFavouriteRoutes`](#listmyfavouriteroutes) | GET | `/transport/favourite-routes` | core | 1 | GST-079, WEB-049 |
+| favourite | [`saveFavouriteRoute`](#savefavouriteroute) | POST | `/transport/favourite-routes` | core | 1 | GST-077, WEB-049 |
 | inspection | [`createInspectionTemplate`](#createinspectiontemplate) | POST | `/inspection-templates` | setup | 1 | BO-911 |
-| networkImport | [`applyTransportNetworkImport`](#applytransportnetworkimport) | POST | `/transport/network-imports/{importId}/apply` | setup | 3 | BO-1189 |
-| networkImport | [`importTransportNetwork`](#importtransportnetwork) | POST | `/transport/network-imports` | setup | 3 | BO-1189 |
-| pass | [`createTransportPassType`](#createtransportpasstype) | POST | `/transport/pass-types` | setup | 3 | BO-1188 |
-| pass | [`listTransportPassOffers`](#listtransportpassoffers) | GET | `/transport/pass-offers` | core | 3 | GST-078, WEB-049 |
+| networkImport | [`applyTransportNetworkImport`](#applytransportnetworkimport) | POST | `/transport/network-imports/{importId}/apply` | setup | 1 | BO-1189 |
+| networkImport | [`importTransportNetwork`](#importtransportnetwork) | POST | `/transport/network-imports` | setup | 1 | BO-1189 |
+| pass | [`createTransportPassType`](#createtransportpasstype) | POST | `/transport/pass-types` | setup | 1 | BO-1188 |
+| pass | [`listTransportPassOffers`](#listtransportpassoffers) | GET | `/transport/pass-offers` | core | 1 | GST-078, WEB-049 |
 | queue | [`createQueue`](#createqueue) | POST | `/queues` | setup | 1 | BO-001, BO-002, BO-005 |
-| queue | [`listQueues`](#listqueues) | GET | `/queues` | core | 2 | BO-001, BO-002, BO-004, BO-005, BO-221, EMP-031 … |
+| queue | [`listQueues`](#listqueues) | GET | `/queues` | core | 1 | BO-001, BO-002, BO-004, BO-005, BO-221, EMP-031 … |
 | queue | [`updateQueue`](#updatequeue) | PATCH | `/queues/{queueId}` | setup | 1 | BO-001, BO-002, BO-005, BO-221 |
-| resources | [`createResource`](#createresource) | POST | `/resources` | setup | 2 | BO-095, BO-857 |
-| resources | [`createResourceBlock`](#createresourceblock) | POST | `/resource-blocks` | setup | 2 | BO-864, BO-870, BO-880, BO-910 |
-| resources | [`createResourceHold`](#createresourcehold) | POST | `/resource-holds` | core | 3 | GST-074, WEB-047 |
-| resources | [`createResourcePackage`](#createresourcepackage) | POST | `/resource-packages` | setup | 3 | BO-861, BO-895, BO-918 |
-| resources | [`extendResourceHold`](#extendresourcehold) | POST | `/resource-holds/{holdId}/extend` | core | 3 | GST-074, WEB-047 |
-| resources | [`getMapResourceAvailability`](#getmapresourceavailability) | GET | `/resource-availability` | core | 3 | GST-074, WEB-047 |
-| resources | [`getResourceAvailability`](#getresourceavailability) | GET | `/resources/{resourceId}/availability` | core | 2 | BO-096, BO-857, BO-866, WEB-031 |
+| resources | [`createResource`](#createresource) | POST | `/resources` | setup | 1 | BO-095, BO-857 |
+| resources | [`createResourceBlock`](#createresourceblock) | POST | `/resource-blocks` | setup | 1 | BO-864, BO-870, BO-880, BO-910 |
+| resources | [`createResourceHold`](#createresourcehold) | POST | `/resource-holds` | core | 1 | GST-074, WEB-047 |
+| resources | [`createResourcePackage`](#createresourcepackage) | POST | `/resource-packages` | setup | 1 | BO-861, BO-895, BO-918 |
+| resources | [`extendResourceHold`](#extendresourcehold) | POST | `/resource-holds/{holdId}/extend` | core | 1 | GST-074, WEB-047 |
+| resources | [`getMapResourceAvailability`](#getmapresourceavailability) | GET | `/resource-availability` | core | 1 | GST-074, WEB-047 |
+| resources | [`getResourceAvailability`](#getresourceavailability) | GET | `/resources/{resourceId}/availability` | core | 1 | BO-096, BO-857, BO-866, WEB-031 |
 | resources | [`getResourceHold`](#getresourcehold) | GET | `/resource-holds/{holdId}` | core | 1 | GST-041, GST-074, WEB-010, WEB-047 |
-| resources | [`listProductStartTimes`](#listproductstarttimes) | GET | `/resource-start-times` | core | 3 | GST-075, WEB-048 |
-| resources | [`releaseResourceBlock`](#releaseresourceblock) | DELETE | `/resource-blocks/{blockId}` | setup | 2 | BO-870, BO-910 |
-| resources | [`relinquishResourceHold`](#relinquishresourcehold) | DELETE | `/resource-holds/{holdId}` | core | 3 | GST-074, WEB-047 |
-| resources | [`setExperienceResourceRequirements`](#setexperienceresourcerequirements) | PUT | `/experiences/{experienceId}/resource-requirements` | setup | 3 | BO-877, BO-893, BO-894 |
-| resources | [`setResourceSchedule`](#setresourceschedule) | PUT | `/resources/{resourceId}/schedule` | setup | 3 | BO-866, BO-867, BO-878 |
-| resources | [`updateResource`](#updateresource) | PUT | `/resources/{resourceId}` | setup | 2 | BO-857, BO-866 |
-| resources | [`updateResourcePackage`](#updateresourcepackage) | PUT | `/resource-packages/{packageId}` | setup | 3 | BO-861, BO-895, BO-918 |
-| rights | [`getExpiringRights`](#getexpiringrights) | GET | `/media/rights-expiring` | core | 2 | CMS-010, CMS-081, CMS-088, CMS-090 |
-| route | [`createTransportRoute`](#createtransportroute) | POST | `/transport/routes` | setup | 3 | BO-1184 |
-| route | [`getTransportRoute`](#gettransportroute) | GET | `/transport/routes/{routeId}` | core | 3 | BO-1184, GST-077, WEB-049 |
-| route | [`getTransportRouteMap`](#gettransportroutemap) | GET | `/transport/routes/{routeId}/map` | core | 3 | GST-077, WEB-049 |
-| route | [`listTransportRoutes`](#listtransportroutes) | GET | `/transport/routes` | core | 3 | BO-1184, BO-1185, BO-1186, BO-1187, BO-1188, GST-076 … |
-| route | [`updateTransportRoute`](#updatetransportroute) | PATCH | `/transport/routes/{routeId}` | setup | 3 | BO-1184 |
-| station | [`createTransportStation`](#createtransportstation) | POST | `/transport/stations` | setup | 3 | BO-1183 |
-| station | [`listTransportStations`](#listtransportstations) | GET | `/transport/stations` | core | 3 | BO-1183, BO-1184, GST-076, GST-078, WEB-049 |
-| timetable | [`createTransportTimetable`](#createtransporttimetable) | POST | `/transport/routes/{routeId}/timetables` | setup | 3 | BO-1186 |
-| timetable | [`publishTransportTimetable`](#publishtransporttimetable) | POST | `/transport/timetables/{timetableId}/publish` | setup | 3 | BO-1186 |
-| upload | [`completeUpload`](#completeupload) | POST | `/media/uploads/{uploadId}/complete` | core | 2 | BO-1189, BO-955, CMS-002, CMS-010, CMS-063, SUP-013 |
-| upload | [`createUpload`](#createupload) | POST | `/media/uploads` | core | 2 | BO-1189, BO-955, CMS-002, CMS-010, CMS-063, SUP-013 |
+| resources | [`listProductStartTimes`](#listproductstarttimes) | GET | `/resource-start-times` | core | 1 | GST-075, WEB-048 |
+| resources | [`releaseResourceBlock`](#releaseresourceblock) | DELETE | `/resource-blocks/{blockId}` | setup | 1 | BO-870, BO-910 |
+| resources | [`relinquishResourceHold`](#relinquishresourcehold) | DELETE | `/resource-holds/{holdId}` | core | 1 | GST-074, WEB-047 |
+| resources | [`setExperienceResourceRequirements`](#setexperienceresourcerequirements) | PUT | `/experiences/{experienceId}/resource-requirements` | setup | 1 | BO-877, BO-893, BO-894 |
+| resources | [`setResourceSchedule`](#setresourceschedule) | PUT | `/resources/{resourceId}/schedule` | setup | 1 | BO-866, BO-867, BO-878 |
+| resources | [`updateResource`](#updateresource) | PUT | `/resources/{resourceId}` | setup | 1 | BO-857, BO-866 |
+| resources | [`updateResourcePackage`](#updateresourcepackage) | PUT | `/resource-packages/{packageId}` | setup | 1 | BO-861, BO-895, BO-918 |
+| rights | [`getExpiringRights`](#getexpiringrights) | GET | `/media/rights-expiring` | core | 1 | CMS-010, CMS-081, CMS-088, CMS-090 |
+| route | [`createTransportRoute`](#createtransportroute) | POST | `/transport/routes` | setup | 1 | BO-1184 |
+| route | [`getTransportRoute`](#gettransportroute) | GET | `/transport/routes/{routeId}` | core | 1 | BO-1184, GST-077, WEB-049 |
+| route | [`getTransportRouteMap`](#gettransportroutemap) | GET | `/transport/routes/{routeId}/map` | core | 1 | GST-077, WEB-049 |
+| route | [`listTransportRoutes`](#listtransportroutes) | GET | `/transport/routes` | core | 1 | BO-1184, BO-1185, BO-1186, BO-1187, BO-1188, GST-076 … |
+| route | [`updateTransportRoute`](#updatetransportroute) | PATCH | `/transport/routes/{routeId}` | setup | 1 | BO-1184 |
+| station | [`createTransportStation`](#createtransportstation) | POST | `/transport/stations` | setup | 1 | BO-1183 |
+| station | [`listTransportStations`](#listtransportstations) | GET | `/transport/stations` | core | 1 | BO-1183, BO-1184, GST-076, GST-078, WEB-049 |
+| timetable | [`createTransportTimetable`](#createtransporttimetable) | POST | `/transport/routes/{routeId}/timetables` | setup | 1 | BO-1186 |
+| timetable | [`publishTransportTimetable`](#publishtransporttimetable) | POST | `/transport/timetables/{timetableId}/publish` | setup | 1 | BO-1186 |
+| upload | [`completeUpload`](#completeupload) | POST | `/media/uploads/{uploadId}/complete` | core | 1 | BO-1189, BO-955, CMS-002, CMS-010, CMS-063, SUP-013 |
+| upload | [`createUpload`](#createupload) | POST | `/media/uploads` | core | 1 | BO-1189, BO-955, CMS-002, CMS-010, CMS-063, SUP-013 |
 | venueMap | [`createVenueMap`](#createvenuemap) | POST | `/venue-maps` | setup | 1 | BO-092 |
 | venueMap | [`getVenueMap`](#getvenuemap) | GET | `/venue-maps/{mapId}` | core | 1 | BO-094, EMP-030, GST-004, GST-021, GST-074, WEB-039 … |
-| venueMap | [`getVenueMapGraph`](#getvenuemapgraph) | GET | `/venue-maps/{mapId}/graph` | core | 2 | BO-094, GST-021, WEB-039 |
+| venueMap | [`getVenueMapGraph`](#getvenuemapgraph) | GET | `/venue-maps/{mapId}/graph` | core | 1 | BO-094, GST-021, WEB-039 |
 | venueMap | [`importVenueGeometry`](#importvenuegeometry) | POST | `/venue-maps/{mapId}/import` | setup | 1 | BO-093 |
-| venueMap | [`listBookableVenueMaps`](#listbookablevenuemaps) | GET | `/bookable-venue-maps` | core | 3 | GST-074, WEB-047 |
+| venueMap | [`listBookableVenueMaps`](#listbookablevenuemaps) | GET | `/bookable-venue-maps` | core | 1 | GST-074, WEB-047 |
 | venueMap | [`publishVenueMap`](#publishvenuemap) | POST | `/venue-maps/{mapId}/publish` | setup | 1 | BO-094 |
 | venueMap | [`setPlacedResource`](#setplacedresource) | POST | `/venue-maps/{mapId}/resources` | setup | 1 | BO-094 |
 | venueMap | [`setVenuePoint`](#setvenuepoint) | POST | `/venue-maps/{mapId}/points` | setup | 1 | BO-094 |
@@ -113,7 +113,7 @@
 | Permission | `ASSET_LIBRARY_MANAGE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `assets.media_usage`, `cache:idempotency` |
@@ -244,7 +244,7 @@ Derivatives regenerate. The previous version is retained for rollback.
 | Permission | `ASSET_LIBRARY_MANAGE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `assets.media_asset`, `cache:idempotency` |
@@ -330,7 +330,7 @@ Filter by kind, tag, collection, venue or usage. `unusedOnly` surfaces assets no
 | Permission | `ASSET_LIBRARY_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -418,7 +418,7 @@ A partial update: only the fields sent change. `collectionIds`, when sent, repla
 | Permission | `ASSET_LIBRARY_MANAGE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `assets.media_asset`, `assets.media_usage`, `cache:idempotency` |
@@ -521,7 +521,7 @@ The reader path. Offline-capable so a machine can validate a card during a netwo
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | primary |
@@ -636,7 +636,7 @@ Physical cards are pre-printed and activated at sale; digital cards live in the 
 | Permission | `ASSET_LIBRARY_MANAGE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `assets.media_collection`, `cache:idempotency` |
@@ -689,7 +689,7 @@ Folders — by campaign, venue, season or product line. An asset may sit in seve
 | Permission | `ASSET_LIBRARY_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -718,7 +718,7 @@ Folders — by campaign, venue, season or product line. An asset may sit in seve
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -780,7 +780,7 @@ Only departures `onSale` and before the route's booking cut-off are returned; a 
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -858,7 +858,7 @@ Position, parties ahead, estimated call time. Polled by the guest app, so it is 
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
@@ -923,7 +923,7 @@ Where the party includes someone below the height requirement, the join is refus
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `marketing.loyalty_position`, `promotions.promotion`, `queue.entry`, `queue.queue` |
@@ -994,7 +994,7 @@ Where the party includes someone below the height requirement, the join is refus
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `queue.entry` |
@@ -1025,13 +1025,14 @@ Where the party includes someone below the height requirement, the join is refus
 **`GET /transport/routes/{routeId}/fare-table`**: A route's fares and passenger types
 
 The passenger picker reads its types from here (adult, child, student, person of determination), with the proof each asks for. 404 when the route has none yet.
+**Versioned by `effectiveFrom`** (Chinmay, 3 October 2026, Block A business rules; CHG-RUL-012). Returns the table in force at `at` (default now), with `effectiveTo` (when the next version takes over, null if none) and `upcoming` (the next version, if one is set), so BO-1185 shows the current table and the future one beside it.
 
 |  |  |
 |---|---|
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -1044,6 +1045,7 @@ The passenger picker reads its types from here (adult, child, student, person of
 | Name | In | Required | Type | Notes |
 |---|---|---|---|---|
 | routeId | path | yes | string (uuid) |  |
+| at | query |  | string (date-time) | The instant whose table is returned (the travel time for a guest). |
 
 **Response**: `FareTable`
 
@@ -1078,6 +1080,10 @@ The passenger picker reads its types from here (adult, child, student, person of
 | effectiveFrom | string (date-time) | yes |  |
 | id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | routeId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| effectiveTo | string (date-time) |  | When the next version takes over; null when none is set (CHG-RUL-012). (read-only; nullable) |
+| upcoming | object |  | The next version, set and not yet in force (CHG-RUL-012); null when none. (read-only; nullable) |
+| upcoming.id | string (uuid) |  | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| upcoming.effectiveFrom | string (date-time) |  |  |
 
 **Responses**
 
@@ -1093,14 +1099,15 @@ The passenger picker reads its types from here (adult, child, student, person of
 
 **Creates nothing; POST because the party is a body.** Returns the adult fare between the two stations, the price per passenger type and the total — or, with `passTypeId`, the pass price and its saving against single trips.
 **The order service calls this when a transport line is added to a cart** (a line whose `attributes.transport` names the route and stations), so the price a guest saw on the departure card and the price on the cart line come from one rule.
-Fare: `stopCount` is `baseFare + perStopFare × stops travelled`; `matrix` reads the pair. Per passenger, fare × multiplier, rounded to the currency's minor unit. A pass is `round(fare × pass.fareMultiplier)`; its saving is `fare × referenceTrips − price`.
+Fare: `stopCount` is `baseFare + perStopFare × stops travelled`; `matrix` reads the pair.
+**Priced by the fare table in force at travel time** (Chinmay, 3 October 2026, Block A business rules; CHG-RUL-012): `travelAt`, the departure the guest is buying, else now. A future fare table applies to trips from its `effectiveFrom`, whenever they are sold. Per passenger, fare × multiplier, rounded to the currency's minor unit. A pass is `round(fare × pass.fareMultiplier)`; its saving is `fare × referenceTrips − price`.
 
 |  |  |
 |---|---|
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `transport.fare_matrix_cell`, `transport.fare_passenger_type`, `transport.fare_table`, `transport.pass_type`, `transport.route_stop` |
@@ -1118,7 +1125,8 @@ Fare: `stopCount` is `baseFare + perStopFare × stops travelled`; `matrix` reads
 | passengers[].code | string | yes |  |
 | passengers[].count | integer | yes | (min 0; max 99) |
 | passTypeId | string (uuid) |  | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
-| at | string (date-time) |  | The sale instant the fare table is read at. |
+| travelAt | string (date-time) |  | When the trip is travelled (the departure's time; for a pass, its first valid day). |
+| at | string (date-time) |  | Deprecated on 3 October (CHG-RUL-012): quotes price at travel time, so send travelAt. |
 
 **Response**: `FareQuote`
 
@@ -1167,13 +1175,14 @@ Fare: `stopCount` is `baseFare + perStopFare × stops travelled`; `matrix` reads
 Replaces the route's fare table as a whole (decided 29 September, rev 3 REV3-21). **A change applies to sales from `effectiveFrom`; a ticket already sold keeps its price.** Adding or removing a passenger type adds or retires the matching variant on the route's catalogue product.
 **The fares are the venue's own configuration**, set here by a holder of `TRANSPORT_PRICE` (decided 29 September, rev 3 REV3-21: the network is operator configuration); a route has no fare table until one is set. The prototype's values are seed data for the demo tenant, not a default: `stopCount` model, base AED 5, AED 2.50 per stop travelled; adult ×1 (age 12+), child ×0.5 (age 5–11), student ×0.5 (valid student card), person of determination ×0 (Sanad card).
 **PUT semantics.** Creates the table if the route has none; otherwise replaces it.
+**Fare tables are versioned by `effectiveFrom`** (Chinmay, 3 October 2026, Block A business rules; CHG-RUL-012). Each PUT sets the version that starts at its `effectiveFrom`: a later date adds a **future table beside the current one**, which takes over at that instant; the same `effectiveFrom` as a version not yet in force replaces that version. **A version already in force is never edited**: an `effectiveFrom` in the past, or equal to the current version's, is refused 422 `fare-version-in-force` (set a new version from now instead). A ticket already sold keeps its price. **Quotes use the table in force at travel time** (`quoteTransportFare.travelAt`), not at the time of sale, so a trip booked today for next month is priced by next month's table.
 
 |  |  |
 |---|---|
 | Permission | `TRANSPORT_PRICE` |
 | Scope level | venue |
 | Part of slice | setup, makes `transport.fare_matrix_cell`, `transport.fare_passenger_type`, `transport.fare_table` non-empty |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `transport.fare_matrix_cell`, `transport.fare_passenger_type`, `transport.fare_table`, `transport.route` |
@@ -1252,6 +1261,10 @@ Replaces the route's fare table as a whole (decided 29 September, rev 3 REV3-21)
 | effectiveFrom | string (date-time) | yes |  |
 | id | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
 | routeId | string (uuid) | yes | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| effectiveTo | string (date-time) |  | When the next version takes over; null when none is set (CHG-RUL-012). (read-only; nullable) |
+| upcoming | object |  | The next version, set and not yet in force (CHG-RUL-012); null when none. (read-only; nullable) |
+| upcoming.id | string (uuid) |  | Every id is a uuid, and every new one is a UUIDv7 (ADR-0056, 30 September): time-ordered, so a key in an index stays in insertion order, and minted by the service with the kernel's Id.New(). |
+| upcoming.effectiveFrom | string (date-time) |  |  |
 
 **Responses**
 
@@ -1274,7 +1287,7 @@ Replaces the route's fare table as a whole (decided 29 September, rev 3 REV3-21)
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `transport.favourite_route` |
@@ -1307,7 +1320,7 @@ The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of sta
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
@@ -1362,7 +1375,7 @@ The Favourites tab (decided 29 September, rev 3 REV3-21): each saved pair of sta
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `transport.favourite_route`, `transport.station` |
@@ -1510,7 +1523,7 @@ Refused `409` while the import has any `error` finding, is not `previewReady`, o
 | Permission | `TRANSPORT_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, makes `transport.fare_table`, `transport.route`, `transport.route_stop`, `transport.station`, `transport.timetable` non-empty |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `transport.network_import` |
@@ -1576,7 +1589,7 @@ Refused `409` while the import has any `error` finding, is not `previewReady`, o
 | Permission | `TRANSPORT_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, makes `transport.network_import` non-empty |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `transport.network_import` |
@@ -1649,7 +1662,7 @@ Refused `409` while the import has any `error` finding, is not `previewReady`, o
 | Permission | `TRANSPORT_PRICE` |
 | Scope level | venue |
 | Part of slice | setup, makes `transport.pass_type` non-empty |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
@@ -1718,7 +1731,7 @@ The Multi-trip tab (decided 29 September, rev 3 REV3-21): 5-trip and 10-trip car
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -1891,16 +1904,18 @@ Bound to an attraction and, where one exists, to an asset — so a ride taken ou
 **`GET /queues`**: List queues
 
 Guest-facing when called with a guest token — returns only queues that are open and visible.
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets queues that are open and visible, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `QUEUE_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
 |  |  |
 |---|---|
 | Permission | `QUEUE_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
+| Guest callable | True |
 | Reads | `queue.queue`, `queue.queue_operating_window` |
 | Writes | - |
 | Called by | BO-001, BO-002, BO-004, BO-005, BO-221, EMP-031, GST-023, WEB-039 |
@@ -2081,7 +2096,7 @@ Guest-facing when called with a guest token — returns only queues that are ope
 | Permission | `RESOURCE_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, makes `resources.resource` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
@@ -2173,7 +2188,7 @@ Board 2.07. **A block is not a booking and the difference is operational.** An o
 | Permission | `RESOURCE_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, makes `resources.resource_block` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `resources.resource_block` |
@@ -2235,7 +2250,7 @@ Board 2.07. **A block is not a booking and the difference is operational.** An o
 | Permission | `ORDER_CREATE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Lock | rowExclusive |
@@ -2306,7 +2321,7 @@ Board 2.07. **A block is not a booking and the difference is operational.** An o
 | Permission | `RESOURCE_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `resources.resource_requirement` non-empty |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `resources.resource_package`, `resources.resource_requirement` |
@@ -2401,7 +2416,7 @@ For a guest still completing payment. **The same bounds as a seat hold**: `Venue
 | Permission | `ORDER_CREATE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
@@ -2462,7 +2477,7 @@ For a guest still completing payment. **The same bounds as a seat hold**: `Venue
 | Permission | `RESOURCE_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
@@ -2531,7 +2546,7 @@ Includes maintenance windows and blackouts. **A resource under repair is unavail
 | Permission | `RESOURCE_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -2638,7 +2653,7 @@ Start times fall on `stepMinutes` from the venue's opening on that date, and a w
 | Permission | `RESOURCE_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -2687,7 +2702,7 @@ Start times fall on `stepMinutes` from the venue's opening on that date, and a w
 | Permission | `RESOURCE_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, changes rows of `resources.resource_block` that another operation creates |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `resources.resource_block` |
@@ -2719,7 +2734,7 @@ The guest picked another cabana or left the map. The resource is free at once.
 | Permission | `ORDER_CREATE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
@@ -2755,7 +2770,7 @@ Requirements are stated as type and quantity with optional qualifications — *o
 | Permission | `RESOURCE_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `resources.resource_requirement` non-empty |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `resources.resource_requirement` |
@@ -2805,7 +2820,7 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | Permission | `RESOURCE_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `resources.resource_schedule` non-empty |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `resources.resource_schedule` |
@@ -2882,7 +2897,7 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | Permission | `RESOURCE_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, changes rows of `resources.resource` that another operation creates |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `resources.resource` |
@@ -2971,7 +2986,7 @@ Boards 2.03 and 2.04. **A pattern, not a list of days.** A schedule written as c
 | Permission | `RESOURCE_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, changes rows of `resources.resource_requirement` that another operation creates |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `resources.resource_package`, `resources.resource_requirement` |
@@ -3071,7 +3086,7 @@ A stock photograph licensed for one season and still on a website two years late
 | Permission | `ASSET_LIBRARY_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3107,7 +3122,7 @@ Created as `draft`. **Creating a route creates its catalogue side** — a catalo
 | Permission | `TRANSPORT_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, makes `transport.route`, `transport.route_stop` non-empty |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `transport.route`, `transport.route_stop`, `transport.station` |
@@ -3192,7 +3207,7 @@ The stop list from origin to end. A guest or public caller gets 404 for a route 
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3259,7 +3274,7 @@ The stop list from departure to arrival and the street map beside it (decided 29
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3321,7 +3336,7 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3386,7 +3401,7 @@ A guest or public caller sees `active` routes only; `status` is honoured only fo
 | Permission | `TRANSPORT_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, changes rows of `transport.route`, `transport.route_stop` that another operation creates |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `transport.route`, `transport.route_stop`, `transport.station` |
@@ -3471,7 +3486,7 @@ Venue Management transport setup (decided 29 September, rev 3 REV3-21). **A stat
 | Permission | `TRANSPORT_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, makes `transport.station` non-empty |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `transport.station` |
@@ -3529,7 +3544,7 @@ The From and To station menus (decided 29 September, rev 3 REV3-21). A guest or 
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3584,7 +3599,7 @@ Departure times from the route's origin by day of week, valid over a date range.
 | Permission | `TRANSPORT_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, makes `transport.timetable` non-empty |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `transport.route`, `transport.timetable`, `transport.timetable_run` |
@@ -3655,7 +3670,7 @@ The route must be `active` and have a fare table.
 | Permission | `TRANSPORT_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, makes `transport.departure`, `transport.timetable` non-empty |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `transport.timetable`, `transport.timetable_run` |
@@ -3716,7 +3731,7 @@ Files are scanned before becoming available. An asset that fails scanning is qua
 | Permission | `ASSET_LIBRARY_MANAGE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `assets.media_asset`, `assets.media_upload`, `cache:idempotency` |
@@ -3815,7 +3830,7 @@ Confirm with `POST /media/uploads/{id}/complete` once the transfer finishes. The
 | Permission | `ASSET_LIBRARY_MANAGE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `assets.media_upload`, `cache:idempotency` |
@@ -4089,7 +4104,7 @@ Returns nodes, edges, precomputed distances and **the connected components**. A 
 | Permission | `VENUE_MAP_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -4246,7 +4261,7 @@ A venue with no published bookable map is an empty `maps` list, not a 404.
 | Permission | `VENUE_MAP_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -4555,6 +4570,7 @@ Unlinked points are fine and expected — a toilet is a toilet.
 **"Book this plan"** (29 September, MOB-6). For each item that is bought (an admission per day, a timed attraction, a show performance, a meal combo, an accepted Fast Track add-on) the server adds a line to the guest's cart **by the orders service's `addCartLine`, with its rules unchanged**: the 15-minute lease, the capacity refusal, the seat limit, the info-only refusal. Free items (a walk-up ride, a toilet, a photo spot) add nothing. Quantities come from the party: one admission per person by their age band's variant, per day, **for that day's venue** (`VisitPlan.days[].venueId`; 30 September, MoM 4.7), so a two-park plan books each park's own admission.
 **The cart handoff.** With `cartId`, lines are added to that cart; without it a cart is created for the venue and the guest channel (`orders.createCart`), exactly as the Buy tickets button would. The response is the cart id, the lines added and each item that could not be added with the `addCartLine` refusal it met (`soldOutForSession`, `productInfoOnly`, ...). **A partly booked plan is still a success**: the guest goes to GST-041 with what was added and the plan marks the rest, rather than losing the whole plan to one sold-out show. Nothing is paid here; checkout is `orders.checkoutCart`.
 The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets shows what was bought. `baseVersion` must be current (409 as `updateVisitPlan`).
+**Sign in to book** (Chinmay, 3 October 2026, Block A business rules; CHG-RUL-003). An anonymous device session is refused `403 sign-in-required` and nothing is added; the app asks the guest to sign in, the plan moves to the account (`generateVisitPlan`), and the guest books it. Add-ons on the plan (`addOnProductIds`, `addOnAccepted`) are priced here, at booking, by the lines `addCartLine` creates; the plan itself carries no price.
 
 |  |  |
 |---|---|
@@ -4608,6 +4624,7 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 409 |  | baseVersion is not current (plan-version-conflict), or the cart is not the caller's or is no longer open (cart-not-open). |
 | 422 |  | Nothing on the plan could be added (nothing-bookable); the problem lists each item's refusal, so the guest is told why rather than taken to an empty cart. |
+| 403 |  | The caller is an anonymous device session (sign-in-required; CHG-RUL-003). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### generateVisitPlan
@@ -4619,6 +4636,7 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 **Rules, in order, per day.** (1) Candidates: the day venue's published map points that are destinations and have a `typicalDurationMinutes`, and the performances dated that day at that venue. **Retail is a candidate as F&B is** (30 September, MoM 4.7; until then only dining points were venue-linked): a `shop`, or a `kiosk` carrying `retailTags`, is placed as a `shop` stop. (2) Eligibility: a ride whose product's `catalogue.ProductEligibilityRule` excludes anyone in the party by height or age is dropped, and the reason is kept on the plan (`excluded`); a `mustIncludePointIds` point that is at none of the plan's venues is kept there with `notAtVenue`. (3) Scoring: interest tags matched, then the venue's featured order. (4) Layout: from opening time, the next item is the best-scoring one reachable by walking time over the published graph (`venuemap.path`), with the typical wait for that hour and its duration; a meal is placed at a dining point of the day's venue whose `cuisineTags` match, around 12:30 and 19:00, and where no dining point of that venue matches, at its best other dining point, with the unmatched cuisine recorded; a retail stop is placed when the party chose `shopping` or a `retailTags` value, at a retail point of the day's venue that matches, late in the day or on the way to the exit; `relaxed` leaves a 30-minute gap after every two items and stops by 18:00, `packed` fills to closing. (5) Add-ons: where the expected wait on a planned ride exceeds 30 minutes and the venue sells a Fast Track for it, the add-on is suggested on that item, never added.
 **The same inputs give the same plan**, so the guest can trust that a regenerate changes only what they changed. `presetKey` (or the older `preset`) gives the ready-made day plans of GST-052 (the same rules with preset interests and pace). **The AI planner agent refines a plan; it does not make the first one** (ai `requestSuggestion` kind `itinerary`): when AI is off or fails, this answer is the plan.
 **Owned by the guest session**, as a cart is: a signed-in guest's plan is theirs, an anonymous one is bound to the device session and claimed on sign-in. Nothing is held or sold here; `bookVisitPlan` turns the plan into cart lines.
+**Signed out, a guest builds and changes; signed in, they save, share and book** (Chinmay, 3 October 2026, Block A business rules; CHG-RUL-003). This operation, `getVisitPlan`, `updateVisitPlan` and `listVisitPlanAlternatives` accept the anonymous guest session a device holds before sign-in (the `guestAuth` token `orders.createCart` uses), so the Plan tab works without an account. The plan is kept against that device session (`VisitPlan.sessionRef`) and is not saved to any account: it lapses with the session. **When the guest signs in on that device, every draft plan of the session moves to the account** (`subjectId` set, `sessionRef` cleared, `ownership` becomes `account`), in the same step as the cart is claimed, with no call from the client and with its versions intact. Booking (`bookVisitPlan`) needs a signed-in guest; sharing a plan is a signed-in act as well (no share operation is contracted yet).
 
 |  |  |
 |---|---|
@@ -4670,6 +4688,7 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 | scopePath | string |  | Derived from venueId. (read-only) |
 | subjectId | string (uuid) |  | The signed-in guest. (read-only; nullable) |
 | sessionRef | string |  | The anonymous device session that owns the plan until sign-in. (read-only; nullable) |
+| ownership | enum (anonymous, account) |  | anonymous while the plan belongs to a device session (built and changed only; it lapses with the session), account once the guest signed in and the plan moved to their account, where it is saved and… (read-only) |
 | status | enum (draft, booked, archived) | yes | booked after bookVisitPlan; a booked plan is read-only. (read-only) |
 | version | integer | yes | The current version. (min 1; read-only) |
 | source | enum (rules, preset, aiAgent) |  | What produced the current version: the rules planner, a preset, or the AI planner agent acting for the guest. (read-only) |
@@ -4726,6 +4745,7 @@ The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets show
 | days[].items[].expectedWaitMinutes | integer |  | The typical wait at that hour when the plan was laid out; GST-059 replaces it with the live one. (min 0; nullable) |
 | days[].items[].addOnSuggestion | object |  | A suggested add-on for this stop, e.g. (nullable) |
 | days[].items[].addOnAccepted | boolean |  | (default False) |
+| days[].items[].addOnProductIds | array of string (uuid) |  | Add-ons the guest put on this stop with addAddOn (CHG-RUL-009), beside an accepted suggestion, as catalogue product ids. (read-only) |
 | days[].items[].pinned | boolean |  | The guest fixed this stop; a re-lay moves other stops around it. (default False) |
 | days[].items[].note | string |  | (max length 200; nullable) |
 | createdAt | string (date-time) |  | (read-only) |
@@ -4776,6 +4796,7 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 | scopePath | string |  | Derived from venueId. (read-only) |
 | subjectId | string (uuid) |  | The signed-in guest. (read-only; nullable) |
 | sessionRef | string |  | The anonymous device session that owns the plan until sign-in. (read-only; nullable) |
+| ownership | enum (anonymous, account) |  | anonymous while the plan belongs to a device session (built and changed only; it lapses with the session), account once the guest signed in and the plan moved to their account, where it is saved and… (read-only) |
 | status | enum (draft, booked, archived) | yes | booked after bookVisitPlan; a booked plan is read-only. (read-only) |
 | version | integer | yes | The current version. (min 1; read-only) |
 | source | enum (rules, preset, aiAgent) |  | What produced the current version: the rules planner, a preset, or the AI planner agent acting for the guest. (read-only) |
@@ -4832,6 +4853,7 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 | days[].items[].expectedWaitMinutes | integer |  | The typical wait at that hour when the plan was laid out; GST-059 replaces it with the live one. (min 0; nullable) |
 | days[].items[].addOnSuggestion | object |  | A suggested add-on for this stop, e.g. (nullable) |
 | days[].items[].addOnAccepted | boolean |  | (default False) |
+| days[].items[].addOnProductIds | array of string (uuid) |  | Add-ons the guest put on this stop with addAddOn (CHG-RUL-009), beside an accepted suggestion, as catalogue product ids. (read-only) |
 | days[].items[].pinned | boolean |  | The guest fixed this stop; a re-lay moves other stops around it. (default False) |
 | days[].items[].note | string |  | (max length 200; nullable) |
 | createdAt | string (date-time) |  | (read-only) |
@@ -4908,10 +4930,11 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 
 **`PUT /visit-plans/{planId}`**: Swap, remove, add, move or undo, as a new version
 
-**Every change is a new version, so undo is a change too** (29 September, MOB-6). The body names the version it was made against (`baseVersion`) and a list of changes: `swap` an item for an alternative from `listVisitPlanAlternatives`, `remove`, `add` a point or a performance, `move` an item to another time, or `revertTo` an earlier version. The server re-lays the affected day with the same rules as `generateVisitPlan`, so the times after a change still add up, and returns the new current version.
+**Every change is a new version, so undo is a change too** (29 September, MOB-6). The body names the version it was made against (`baseVersion`) and a list of changes: `swap` an item for an alternative from `listVisitPlanAlternatives`, `remove`, `add` a point or a performance, `move` an item to another time, `addAddOn` or `removeAddOn` an add-on on an item, or `revertTo` an earlier version. The server re-lays the affected day with the same rules as `generateVisitPlan`, so the times after a change still add up, and returns the new current version.
 **A stale `baseVersion` is refused 409 `plan-version-conflict`** rather than merged: the AI planner agent and the guest can both change a plan, and a change made against a plan the guest no longer sees is a change they did not choose.
 **The AI planner agent calls this as the guest** (ai `setAiTool`, toolKey `venue-map.updateVisitPlan`): the agent's proposal becomes a version the guest can undo. AI never writes the plan tables itself (ADR-0020).
 **A day keeps to its venue** (30 September client meeting, MoM 4.7). An `add` or `swap` may only name a point on the published map of that day's venue, or a performance dated at that venue; anything else is refused 422 `point-not-at-day-venue`, whoever sends it. This is the backstop for the AI planner agent: a restaurant or shop it names from another park never reaches the plan. Moving a day to another venue is a new plan from changed answers (`generateVisitPlan` with `dayVenues`), not a change here.
+**Add-ons are changes too** (Chinmay, 3 October 2026, Block A business rules, GST-053; CHG-RUL-009). `addAddOn` puts an add-on the venue sells for that stop (`addOnProductId`, e.g. Fast Track on a ride, a photo pass) on an item, whether or not the planner suggested it; `removeAddOn` takes one off. `acceptAddOn` and `declineAddOn` still answer the planner's own suggestion (`addOnSuggestion`). An add-on not sold for that stop's product is refused 422 `add-on-not-offered`. **Nothing is priced on the plan**: the add-on is priced when the plan is booked (`bookVisitPlan`, by `addCartLine`). Allowed in an anonymous session, like every change here.
 
 |  |  |
 |---|---|
@@ -4939,12 +4962,13 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 |---|---|---|---|
 | baseVersion | integer | yes | (min 1) |
 | changes | array of object | yes | (min items 1; max items 20) |
-| changes[].op | enum (swap, remove, add, move, pin, acceptAddOn, declineAddOn, revertTo) | yes |  |
+| changes[].op | enum (swap, remove, add, move, pin, acceptAddOn, declineAddOn, addAddOn, …) | yes |  |
 | changes[].itemId | string (uuid) |  | (nullable) |
 | changes[].date | string (date) |  | (nullable) |
 | changes[].pointId | string (uuid) |  | (nullable) |
 | changes[].performanceId | string (uuid) |  | (nullable) |
 | changes[].startsAt | string (date-time) |  | (nullable) |
+| changes[].addOnProductId | string (uuid) |  | For addAddOn and removeAddOn (CHG-RUL-009): the add-on product (a catalogue product sold for the item's stop, e.g. (nullable) |
 | changes[].version | integer |  | For revertTo, the earlier version to restore (undo). (nullable) |
 
 **Response**: `VisitPlan`
@@ -4956,6 +4980,7 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 | scopePath | string |  | Derived from venueId. (read-only) |
 | subjectId | string (uuid) |  | The signed-in guest. (read-only; nullable) |
 | sessionRef | string |  | The anonymous device session that owns the plan until sign-in. (read-only; nullable) |
+| ownership | enum (anonymous, account) |  | anonymous while the plan belongs to a device session (built and changed only; it lapses with the session), account once the guest signed in and the plan moved to their account, where it is saved and… (read-only) |
 | status | enum (draft, booked, archived) | yes | booked after bookVisitPlan; a booked plan is read-only. (read-only) |
 | version | integer | yes | The current version. (min 1; read-only) |
 | source | enum (rules, preset, aiAgent) |  | What produced the current version: the rules planner, a preset, or the AI planner agent acting for the guest. (read-only) |
@@ -5012,6 +5037,7 @@ The plan with its days and items (29 September, MOB-6). **`version` reads an ear
 | days[].items[].expectedWaitMinutes | integer |  | The typical wait at that hour when the plan was laid out; GST-059 replaces it with the live one. (min 0; nullable) |
 | days[].items[].addOnSuggestion | object |  | A suggested add-on for this stop, e.g. (nullable) |
 | days[].items[].addOnAccepted | boolean |  | (default False) |
+| days[].items[].addOnProductIds | array of string (uuid) |  | Add-ons the guest put on this stop with addAddOn (CHG-RUL-009), beside an accepted suggestion, as catalogue product ids. (read-only) |
 | days[].items[].pinned | boolean |  | The guest fixed this stop; a re-lay moves other stops around it. (default False) |
 | days[].items[].note | string |  | (max length 200; nullable) |
 | createdAt | string (date-time) |  | (read-only) |
@@ -5152,7 +5178,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no | Added 20 August. |
+| id | uuid | yes | Added 20 August. |
 | upload_id | uuid | yes |  |
 | upload_url | text | yes | Signed. |
 | method | text | yes |  |
@@ -5170,7 +5196,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | extracted_text | text | no | Text pulled out of an uploaded document, after extraction. |
-| id | uuid | no | Added 20 August. |
+| id | uuid | yes | Added 20 August. |
 | surface | text | yes |  |
 | reference_id | text | yes |  |
 | label | text | no |  |
@@ -5435,7 +5461,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | resource_id | uuid | yes |  |
 | valid_from | timestamptz | yes |  |
 | valid_to | timestamptz | yes |  |
@@ -5468,7 +5494,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | code | text | yes |  |
 | name | text | yes |  |
 | description | text | no |  |
@@ -5486,7 +5512,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | resource_type_id | uuid | no |  |
 | category_id | uuid | no |  |
 | resource_id | uuid | no | A fixed component, and the exception rather than the rule. |
@@ -5561,6 +5587,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | effective_from | timestamptz | yes |  |
 | id | uuid | yes |  |
 | route_id | uuid | yes |  |
+| effective_to | timestamptz | no | When the next version takes over; null when none is set (CHG-RUL-012). |
 
 ### `transport.favourite_route`
 
@@ -5791,6 +5818,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | scope_path | text | no | Derived from venueId. |
 | subject_id | uuid | no | The signed-in guest. |
 | session_ref | text | no | The anonymous device session that owns the plan until sign-in. |
+| ownership | text | no | anonymous while the plan belongs to a device session (built and changed only; it lapses with the session), account once the guest signed in and the plan moved to their account, where it is saved and… |
 | status | text | yes | booked after bookVisitPlan; a booked plan is read-only. |
 | version | integer | yes | The current version. |
 | source | text | no | What produced the current version: the rules planner, a preset, or the AI planner agent acting for the guest. |
@@ -5820,12 +5848,13 @@ Every table this service owns that the slice reads or writes, with its columns a
 | expected_wait_minutes | integer | no | The typical wait at that hour when the plan was laid out; GST-059 replaces it with the live one. |
 | add_on_suggestion | jsonb | no | A suggested add-on for this stop, e.g. |
 | is_add_on_accepted | boolean | no |  |
+| add_on_product_ids | text[] | no | Add-ons the guest put on this stop with addAddOn (CHG-RUL-009), beside an accepted suggestion, as catalogue product ids. |
 | is_pinned | boolean | no | The guest fixed this stop; a re-lay moves other stops around it. |
 | note | text | no |  |
 
 ## Not in the first release
 
-216 operations, added to this service in later releases without changing any of the above.
+218 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -5837,7 +5866,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | feed | `configureQueueFeed`, `getQueueFeedHealth`, `listQueueFeeds`, `submitQueueReading`, `testQueueFeed` |
 | game | `cloneGame`, `createGame`, `listGames`, `updateGame` |
 | games | `authoriseGameplay`, `cloneReaderConfiguration`, `createGameEntitlement`, `deployReaderConfiguration`, `getGameEligibility`, `getGamePricing`, `getGameplaySyncStatus`, `getGameplayValidationRules`, `listAttractionTypes`, `listGameEntitlements`, `listGameplayTransactions`, `listReaders`, `reportReaderQueue`, `setAttractionType`, `setGameCardExpiryRules`, `setGameCardLifecycle`, `setGameKioskConfiguration`, `setGameOperationalConfiguration`, `setGamePricing`, `setGameplayValidationRules`, `setPrizeCost`, `setReaderConfiguration`, `setReaderProfile`, `setRedemptionRules`, `simulateGameplayAuthorisation`, `testReader`, `validateGameConfiguration` |
-| incident | `getIncident`, `listIncidents`, `recordAuthorityNotification`, `reportIncident`, `updateIncident` |
+| incident | `addIncidentPerson`, `getIncident`, `listIncidents`, `recordAuthorityNotification`, `reportIncident`, `updateIncident`, `uploadIncidentMedia` |
 | inspection | `listInspectionTemplates`, `listInspections`, `submitInspection` |
 | maintenance | `acceptWorkOrder`, `attachWorkOrderEvidence`, `closeWorkOrder`, `pauseWorkOrder`, `rejectWorkOrder`, `resumeWorkOrder`, `startWorkOrder` |
 | networkImport | `getTransportNetworkImport` |

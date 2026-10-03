@@ -49,7 +49,7 @@ screens:
   name: Partner Login / MFA
   module: Access & Account
   requiresModule: partner
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - changeOwnCredential
@@ -828,7 +828,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - challengeId<-navigation
   goesTo:
   - PTR-022
   boardFrames: null
@@ -963,7 +964,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - challengeId<-navigation
   goesTo:
   - PTR-032
   boardFrames: null

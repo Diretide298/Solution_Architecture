@@ -53,7 +53,7 @@ screens:
   name: Venue Management Sign In
   module: Access & Availability
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - changeOwnCredential
@@ -104,7 +104,7 @@ screens:
   name: Agent Dashboard
   module: Overview
   requiresModule: marketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - addCaseMessage
@@ -157,7 +157,7 @@ screens:
   name: Conversation Queue
   module: Conversations
   requiresModule: marketing
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - claimConversation
@@ -185,7 +185,7 @@ screens:
   name: Live Chat Workspace
   module: Conversations
   requiresModule: marketing
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - addCaseMessage
@@ -420,6 +420,7 @@ screens:
   offlineState: false
   entryParams:
   - caseId<-navigation
+  - uploadId<-navigation
   goesTo:
   - SUP-009
   boardFrames: null

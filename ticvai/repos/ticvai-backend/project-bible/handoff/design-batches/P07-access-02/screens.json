@@ -27,7 +27,7 @@
     {
      "to": "SCN-001",
      "trigger": "Sign in",
-     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-016 holds none of them. The edge carries nothing: SCN-001 finds challengeId (createMfaChallenge) itself, and SCN-001 opens on its own"
+     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-016 holds none of them. The edge carries nothing: challengeId only pre-selects (deep link or optional), and SCN-001 opens on its own"
     },
     {
      "to": "SCN-002",
@@ -68,18 +68,10 @@
        "label": "Every access point",
        "bindsTo": "AccessPoint",
        "columns": [
-        "AccessPoint.id",
         "AccessPoint.code",
         "AccessPoint.name",
-        "AccessPoint.venueId",
-        "AccessPoint.scopePath",
-        "AccessPoint.externalCredentialSources",
-        "AccessPoint.scanAnomalyRules",
         "AccessPoint.operatingMode",
-        "AccessPoint.vehicleLocationCapture",
-        "AccessPoint.mode",
-        "AccessPoint.direction",
-        "AccessPoint.antiPassbackEnabled"
+        "AccessPoint.mode"
        ],
        "operation": "listAccessPoints",
        "provenance": "contract access.yaml GET /access-points"
@@ -95,19 +87,10 @@
        "label": "The selected access point",
        "bindsTo": "AccessPoint",
        "columns": [
-        "AccessPoint.id",
         "AccessPoint.code",
         "AccessPoint.name",
-        "AccessPoint.venueId",
-        "AccessPoint.scopePath",
-        "AccessPoint.externalCredentialSources",
-        "AccessPoint.scanAnomalyRules",
         "AccessPoint.operatingMode",
-        "AccessPoint.vehicleLocationCapture",
         "AccessPoint.mode",
-        "AccessPoint.direction",
-        "AccessPoint.antiPassbackEnabled",
-        "AccessPoint.isActive",
         "AccessPoint.lastHeartbeatAt"
        ],
        "operation": "getAccessPoint",
@@ -150,7 +133,7 @@
    "error": "Could not load. Names which read failed and leaves the gate mode untouched.",
    "emptyFirstRun": "No gate mode yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on venueId and the gate mode are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `getAccessPoint` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listAccessPoints` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_DIRECTION_SET` for `setAccessPointDirection`; `TURNSTILE_MODE_SET` for `setTurnstileMode`, `cancelGateModeChange`.",
    "offline": "**Requests only.** Hardware control is out of contract and the vendor SDK is outstanding (CF-33)"
   },
   "apis": [
@@ -217,7 +200,7 @@
    "provenance": "generated",
    "board": "wireframes/P07 Venue Scanner.dc.html#scn-016"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetTurnstileMode",

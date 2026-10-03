@@ -48,7 +48,10 @@
     {
      "to": "BO-1125",
      "trigger": "Gift Card Issuance, Activation & Distribution",
-     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "carries": [
+      "cardCode"
+     ]
     },
     {
      "to": "BO-1126",
@@ -788,11 +791,15 @@
    "params": [
     {
      "name": "giftCardId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `issueGiftCard`; a link or an edge that holds one opens it instead."
     },
     {
      "name": "cardCode",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `issueGiftCard`; a link or an edge that holds one opens it instead."
     }
    ]
   },

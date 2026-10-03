@@ -9,12 +9,12 @@
 | Contracts | 10 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 121 |
-| Waves | wave3 71 |
+| Operations with no screen | 124 |
+| Waves | wave1 3 · wave3 68 |
 
 ## Gaps
 
-### 121 operations with no screen here
+### 124 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,13 +60,19 @@
 | `getPrincipalModuleAccess` | identity | GET | What this person may do, as ticks |
 | `listAccessDecisions` | identity | GET | What was decided, for whom, where and why |
 | `listAuthorisationPolicyTemplates` | identity | GET | Reusable policy shapes |
-| … | | | 81 more |
+| … | | | 84 more |
+
+### 1 modules split across waves
+
+**A platform that sells in one wave and cannot refund until a later one can take money and not give it back.** Not always wrong — worth a look each time.
+
+- **Analytics** — waves 1, 3
 
 ## Modules
 
 | Module | Screens | Waves |
 |---|---|---|
-| Analytics | 71 | 3 |
+| Analytics | 71 | 1, 3 |
 
 ## Screens
 
@@ -93,9 +99,9 @@
 | `ANL-020` | Multi-Site & Performance Comparison | Analytics | 3 | 2 | yes |
 | `ANL-021` | Dashboard Library | Analytics | 3 | 4 | yes |
 | `ANL-022` | Dashboard Creation Wizard | Analytics | 3 | 1 | yes |
-| `ANL-023` | Drag-and-Drop Dashboard Canvas | Analytics | 3 | 6 | yes |
+| `ANL-023` | Drag-and-Drop Dashboard Canvas | Analytics | 1 | 7 | yes |
 | `ANL-024` | Widget & Visualization Library | Analytics | 3 | 1 | yes |
-| `ANL-025` | KPI Builder | Analytics | 3 | 2 | yes |
+| `ANL-025` | KPI Builder | Analytics | 1 | 2 | yes |
 | `ANL-026` | Targets, Thresholds & KPI Status Rules | Analytics | 3 | 2 | yes |
 | `ANL-027` | Data & Filter Configuration | Analytics | 3 | 2 | yes |
 | `ANL-028` | Drill-Down & Interaction Designer | Analytics | 3 | 1 | yes |
@@ -136,7 +142,7 @@
 | `ANL-063` | KPI Targets, Thresholds & Scorecards | Analytics | 3 | 2 | yes |
 | `ANL-064` | Benchmark & Comparative Analytics Configuration | Analytics | 3 | 3 | yes |
 | `ANL-065` | Data Source & Integration Registry | Analytics | 3 | 1 | yes |
-| `ANL-066` | Semantic Model & Business Data Catalogue | Analytics | 3 | 2 | yes |
+| `ANL-066` | Semantic Model & Business Data Catalogue | Analytics | 1 | 2 | yes |
 | `ANL-067` | Data Refresh, Pipeline & Data Health Monitor | Analytics | 3 | 1 | yes |
 | `ANL-068` | Embedded BI, Workspace & Tenant Administration | Analytics | 3 | 1 | yes |
 | `ANL-069` | Analytics Performance, Usage & Cost Monitor | Analytics | 3 | 1 | yes |

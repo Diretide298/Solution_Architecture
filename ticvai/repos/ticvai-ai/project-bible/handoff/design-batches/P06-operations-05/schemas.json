@@ -205,6 +205,35 @@
     "format": "uuid",
     "nullable": true
    },
+   "escalation": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Set while the incident is escalated** (the optional Escalated step of the 3 October flow; CHG-RUL-011). Screens show \"Escalated\" when `status` is `underInvestigation` and this is set. Cleared when the incident closes.\n",
+    "properties": {
+     "toPrincipalId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "byPrincipalId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "reason": {
+      "type": "string"
+     },
+     "escalatedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   },
+   "reopenCount": {
+    "type": "integer",
+    "minimum": 0,
+    "readOnly": true,
+    "description": "How many times the incident was reopened (CHG-RUL-011). Each reopen is a logged row."
+   },
    "occurredAt": {
     "type": "string",
     "format": "date-time"
@@ -364,6 +393,33 @@
     "type": "string",
     "maxLength": 10000
    },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "note",
+     "statusChange",
+     "escalation",
+     "reopen"
+    ],
+    "default": "note",
+    "description": "**Every change is logged here** (CHG-RUL-011): an investigator's note, or a row the server writes for a status change, an escalation or a reopen, with `note` as its reason.\n"
+   },
+   "fromStatus": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/IncidentStatus"
+     }
+    ],
+    "nullable": true
+   },
+   "toStatus": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/IncidentStatus"
+     }
+    ],
+    "nullable": true
+   },
    "writtenByPrincipalId": {
     "type": "string",
     "format": "uuid"
@@ -410,6 +466,23 @@
     "format": "uuid",
     "nullable": true,
     "description": "The staff principal where `kind` is `staff`."
+   },
+   "role": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "injured",
+     "involved",
+     "witness",
+     "reporter",
+     null
+    ],
+    "description": "The person's part in the incident, from `addIncidentPerson` (CHG-RUL-013)."
+   },
+   "contactStored": {
+    "type": "boolean",
+    "readOnly": true,
+    "description": "Whether a contact is held for the person: only with their consent to be contacted (`AddIncidentPersonRequest.contactConsent`; CHG-RUL-013).\n"
    }
   }
  },

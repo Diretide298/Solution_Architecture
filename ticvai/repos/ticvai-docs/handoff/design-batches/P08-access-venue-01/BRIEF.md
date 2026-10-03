@@ -128,15 +128,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-001` | Queue Directory | A | 62 | 72 | 6 | 23 | 1 | 6 | — | notStarted (generated) |
-| `BO-002` | Queue Configuration | B–D | 59 | 28 | 6 | 21 | 4 | 6 | — | notStarted (generated) |
+| `BO-001` | Queue Directory | A | 62 | 46 | 6 | 23 | 1 | 6 | — | notStarted (generated) |
+| `BO-002` | Queue Configuration | B–D | 59 | 18 | 6 | 21 | 4 | 6 | — | notStarted (generated) |
 | `BO-003` | Queue Integration Setup | B–D | 12 | 23 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-004` | Manual Wait Time Entry | B–D | 6 | 56 | 6 | 6 | 2 | 6 | — | notStarted (generated) |
-| `BO-005` | Queue Monitor | A | 55 | 62 | 6 | 34 | 3 | 6 | — | notStarted (generated) |
-| `BO-006` | Parking Configuration | A | 11 | 12 | 6 | 3 | 2 | 2 | — | notStarted (generated) |
-| `BO-030` | Work Order Verification | B–D | 7 | 44 | 6 | 10 | 0 | 2 | — | notStarted (generated) |
+| `BO-004` | Manual Wait Time Entry | B–D | 6 | 32 | 6 | 6 | 2 | 6 | — | notStarted (generated) |
+| `BO-005` | Queue Monitor | A | 55 | 38 | 6 | 34 | 3 | 6 | — | notStarted (generated) |
+| `BO-006` | Parking Configuration | A | 11 | 6 | 6 | 3 | 2 | 2 | — | notStarted (generated) |
+| `BO-030` | Work Order Verification | B–D | 7 | 22 | 6 | 10 | 0 | 2 | — | notStarted (generated) |
 | `BO-031` | Asset Register | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-032` | Admission Profiles | A | 94 | 31 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
+| `BO-032` | Admission Profiles | A | 94 | 14 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
 | `BO-033` | Blacklist Management | A | 5 | 10 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch

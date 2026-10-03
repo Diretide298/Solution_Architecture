@@ -247,7 +247,8 @@ def test_main_records_the_git_blob_of_each_input(tmp_path, monkeypatch):
     import subprocess
     import sys
     out = tmp_path / "bundle.json"
-    monkeypatch.setattr(sys, "argv", ["op-release.py", "--release", "r1", "--out", str(out), "--no-key-check"])
+    monkeypatch.setattr(sys, "argv", ["op-release.py", "--release", "r1", "--out", str(out), "--no-key-check",
+                                      "--project", "999"])
     assert rel.main() == 0
     b = json.loads(out.read_text(encoding="utf-8"))
     assert list(b)[:4] == ["release", "built_from", "built_at", "inputs"]
@@ -258,6 +259,16 @@ def test_main_records_the_git_blob_of_each_input(tmp_path, monkeypatch):
     # the server greps these lines out of the file as written
     text = out.read_text(encoding="utf-8")
     assert '"release": "r1"' in text and f'"tasks.csv": "{b["inputs"]["tasks.csv"]}"' in text
+
+
+def test_main_refuses_an_empty_map_against_the_archived_project(tmp_path, monkeypatch):
+    """Fresh start (3 October, CHG-GTR-001): with no pushed ticket, project 153 would get every ticket twice."""
+    import sys
+    if rel.pushed(json.loads((DOCS / "pms-map.json").read_text(encoding="utf-8"))):
+        pytest.skip("pms-map.json holds pushed tickets")
+    monkeypatch.setattr(sys, "argv", ["op-release.py", "--release", "r1", "--out", str(tmp_path / "b.json"),
+                                      "--no-key-check"])
+    assert rel.main() == 1 and not (tmp_path / "b.json").exists()
 
 
 def test_main_refuses_a_non_release_tag(monkeypatch):

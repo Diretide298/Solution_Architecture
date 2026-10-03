@@ -1,19 +1,19 @@
 id: LLD-VenueOpsService
-title: VenueOpsService — 285 operations, 123 tables
+title: VenueOpsService — 287 operations, 124 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**Six small domains, 285 operations, one team.** Queue, maintenance, bookable resources, venue
+why: '**Six small domains, 287 operations, one team.** Queue, maintenance, bookable resources, venue
   mapping, media assets and arcade. None is large enough to deploy alone, all are venue-scoped, none
   is on the critical sale path, and **all six are licensed as optional modules** — a venue that buys
   none of them should not be running six idle services.'
 scale: Low and steady. Queue readings are the only frequent write.
 ifDown: Down degrades venue operations. Selling and admitting continue.
 coverage:
-  operations: 285
+  operations: 287
   inAFlow: 53
-  percent: 19%
+  percent: 18%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -23,7 +23,7 @@ schemas:
   - postgres
   largestTable: queue.queue
 - schema: maintenance
-  tables: 17
+  tables: 18
   stores:
   - postgres
   largestTable: maintenance.work_order
@@ -549,6 +549,361 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 1
+- contract: maintenance
+  count: 44
+  operations:
+  - operation: acceptWorkOrder
+    verb: POST
+    path: /work-orders/{workOrderId}/accept
+    scope: venue
+    permission: MAINTENANCE_EXECUTE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: addIncidentPerson
+    verb: POST
+    path: /incidents/{incidentId}/people
+    scope: venue
+    permission: INCIDENT_REPORT
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: attachWorkOrderEvidence
+    verb: POST
+    path: /work-orders/{workOrderId}/attachments
+    scope: venue
+    permission: MAINTENANCE_EXECUTE
+    offline: true
+    reads: 4
+    writes: 2
+  - operation: cancelWorkOrder
+    verb: POST
+    path: /work-orders/{workOrderId}/cancel
+    scope: venue
+    permission: WORK_ORDER_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: closeWorkOrder
+    verb: POST
+    path: /work-orders/{workOrderId}/close
+    scope: venue
+    permission: MAINTENANCE_APPROVE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: completeWorkOrder
+    verb: POST
+    path: /work-orders/{workOrderId}/complete
+    scope: venue
+    permission: WORK_ORDER_MANAGE
+    offline: true
+    reads: 2
+    writes: 3
+  - operation: createAsset
+    verb: POST
+    path: /assets
+    scope: venue
+    permission: ASSET_MANAGE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: createInspectionTemplate
+    verb: POST
+    path: /inspection-templates
+    scope: tenant
+    permission: INSPECTION_MANAGE
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: createMaintenancePlan
+    verb: POST
+    path: /maintenance-plans
+    scope: venue
+    permission: ASSET_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createVendorServiceRequest
+    verb: POST
+    path: /vendor-service-requests
+    scope: venue
+    permission: WORK_ORDER_MANAGE
+    offline: false
+    reads: 4
+    writes: 2
+  - operation: createWorkOrder
+    verb: POST
+    path: /work-orders
+    scope: venue
+    permission: WORK_ORDER_MANAGE
+    offline: true
+    reads: 4
+    writes: 2
+  - operation: getAsset
+    verb: GET
+    path: /assets/{assetId}
+    scope: venue
+    permission: ASSET_VIEW
+    offline: true
+    reads: 4
+    writes: 0
+  - operation: getAssetHistory
+    verb: GET
+    path: /assets/{assetId}/history
+    scope: venue
+    permission: ASSET_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: getDueMaintenance
+    verb: GET
+    path: /maintenance-plans/due
+    scope: venue
+    permission: ASSET_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: getIncident
+    verb: GET
+    path: /incidents/{incidentId}
+    scope: venue
+    permission: INCIDENT_VIEW
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: getWorkOrder
+    verb: GET
+    path: /work-orders/{workOrderId}
+    scope: venue
+    permission: WORK_ORDER_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: getWorkOrderPriorityPolicy
+    verb: GET
+    path: /work-order-priority-policy
+    scope: venue
+    permission: WORK_ORDER_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listAssets
+    verb: GET
+    path: /assets
+    scope: venue
+    permission: ASSET_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listIncidents
+    verb: GET
+    path: /incidents
+    scope: venue
+    permission: INCIDENT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listInspectionTemplates
+    verb: GET
+    path: /inspection-templates
+    scope: venue
+    permission: INSPECTION_VIEW
+    offline: true
+    reads: 2
+    writes: 0
+  - operation: listInspections
+    verb: GET
+    path: /inspections
+    scope: venue
+    permission: INSPECTION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listMaintenancePlans
+    verb: GET
+    path: /maintenance-plans
+    scope: venue
+    permission: ASSET_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listVendorServiceRequests
+    verb: GET
+    path: /vendor-service-requests
+    scope: venue
+    permission: WORK_ORDER_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listWorkOrders
+    verb: GET
+    path: /work-orders
+    scope: venue
+    permission: WORK_ORDER_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: lookupAsset
+    verb: GET
+    path: /assets/lookup
+    scope: venue
+    permission: ASSET_VIEW
+    offline: true
+    reads: 4
+    writes: 0
+  - operation: pauseWorkOrder
+    verb: POST
+    path: /work-orders/{workOrderId}/pause
+    scope: venue
+    permission: MAINTENANCE_EXECUTE
+    offline: true
+    reads: 2
+    writes: 3
+  - operation: recordAuthorityNotification
+    verb: POST
+    path: /incidents/{incidentId}/notify-authority
+    scope: venue
+    permission: INCIDENT_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: recordWorkOrderParts
+    verb: POST
+    path: /work-orders/{workOrderId}/parts
+    scope: venue
+    permission: WORK_ORDER_MANAGE
+    offline: false
+    reads: 3
+    writes: 4
+  - operation: recordWorkOrderTime
+    verb: POST
+    path: /work-orders/{workOrderId}/time
+    scope: venue
+    permission: WORK_ORDER_MANAGE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: rejectWorkOrder
+    verb: POST
+    path: /work-orders/{workOrderId}/reject
+    scope: venue
+    permission: MAINTENANCE_EXECUTE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: reportIncident
+    verb: POST
+    path: /incidents
+    scope: venue
+    permission: INCIDENT_REPORT
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: resumeWorkOrder
+    verb: POST
+    path: /work-orders/{workOrderId}/resume
+    scope: venue
+    permission: MAINTENANCE_EXECUTE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: setAssetStatus
+    verb: PUT
+    path: /assets/{assetId}/status
+    scope: venue
+    permission: ASSET_MANAGE
+    offline: true
+    reads: 2
+    writes: 3
+  - operation: setWorkOrderPriorityPolicy
+    verb: PUT
+    path: /work-order-priority-policy
+    scope: venue
+    permission: WORK_ORDER_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: startWorkOrder
+    verb: POST
+    path: /work-orders/{workOrderId}/start
+    scope: venue
+    permission: MAINTENANCE_EXECUTE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: submitInspection
+    verb: POST
+    path: /inspections
+    scope: venue
+    permission: INSPECTION_SUBMIT
+    offline: true
+    reads: 3
+    writes: 3
+  - operation: suggestWorkOrderAssignee
+    verb: GET
+    path: /work-orders/{workOrderId}/assignee-suggestions
+    scope: venue
+    permission: WORK_ORDER_VIEW
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: updateAsset
+    verb: PATCH
+    path: /assets/{assetId}
+    scope: venue
+    permission: ASSET_MANAGE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: updateIncident
+    verb: PATCH
+    path: /incidents/{incidentId}
+    scope: venue
+    permission: INCIDENT_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateMaintenancePlan
+    verb: PATCH
+    path: /maintenance-plans/{planId}
+    scope: venue
+    permission: ASSET_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateVendorServiceRequest
+    verb: PATCH
+    path: /vendor-service-requests/{vendorServiceRequestId}
+    scope: venue
+    permission: WORK_ORDER_MANAGE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateWorkOrder
+    verb: PATCH
+    path: /work-orders/{workOrderId}
+    scope: venue
+    permission: WORK_ORDER_MANAGE
+    offline: true
+    reads: 2
+    writes: 2
+  - operation: uploadIncidentMedia
+    verb: POST
+    path: /incidents/{incidentId}/media
+    scope: venue
+    permission: INCIDENT_REPORT
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: verifyWorkOrder
+    verb: POST
+    path: /work-orders/{workOrderId}/verify
+    scope: venue
+    permission: WORK_ORDER_VERIFY
+    offline: false
+    reads: 2
+    writes: 3
 - contract: rental
   count: 43
   operations:
@@ -896,345 +1251,6 @@ operationsByContract:
     offline: false
     reads: 12
     writes: 1
-- contract: maintenance
-  count: 42
-  operations:
-  - operation: acceptWorkOrder
-    verb: POST
-    path: /work-orders/{workOrderId}/accept
-    scope: venue
-    permission: MAINTENANCE_EXECUTE
-    offline: true
-    reads: 2
-    writes: 2
-  - operation: attachWorkOrderEvidence
-    verb: POST
-    path: /work-orders/{workOrderId}/attachments
-    scope: venue
-    permission: MAINTENANCE_EXECUTE
-    offline: true
-    reads: 4
-    writes: 2
-  - operation: cancelWorkOrder
-    verb: POST
-    path: /work-orders/{workOrderId}/cancel
-    scope: venue
-    permission: WORK_ORDER_MANAGE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: closeWorkOrder
-    verb: POST
-    path: /work-orders/{workOrderId}/close
-    scope: venue
-    permission: MAINTENANCE_APPROVE
-    offline: false
-    reads: 3
-    writes: 2
-  - operation: completeWorkOrder
-    verb: POST
-    path: /work-orders/{workOrderId}/complete
-    scope: venue
-    permission: WORK_ORDER_MANAGE
-    offline: true
-    reads: 2
-    writes: 3
-  - operation: createAsset
-    verb: POST
-    path: /assets
-    scope: venue
-    permission: ASSET_MANAGE
-    offline: false
-    reads: 2
-    writes: 3
-  - operation: createInspectionTemplate
-    verb: POST
-    path: /inspection-templates
-    scope: tenant
-    permission: INSPECTION_MANAGE
-    offline: false
-    reads: 3
-    writes: 3
-  - operation: createMaintenancePlan
-    verb: POST
-    path: /maintenance-plans
-    scope: venue
-    permission: ASSET_MANAGE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: createVendorServiceRequest
-    verb: POST
-    path: /vendor-service-requests
-    scope: venue
-    permission: WORK_ORDER_MANAGE
-    offline: false
-    reads: 4
-    writes: 2
-  - operation: createWorkOrder
-    verb: POST
-    path: /work-orders
-    scope: venue
-    permission: WORK_ORDER_MANAGE
-    offline: true
-    reads: 4
-    writes: 2
-  - operation: getAsset
-    verb: GET
-    path: /assets/{assetId}
-    scope: venue
-    permission: ASSET_VIEW
-    offline: true
-    reads: 4
-    writes: 0
-  - operation: getAssetHistory
-    verb: GET
-    path: /assets/{assetId}/history
-    scope: venue
-    permission: ASSET_VIEW
-    offline: false
-    reads: 2
-    writes: 0
-  - operation: getDueMaintenance
-    verb: GET
-    path: /maintenance-plans/due
-    scope: venue
-    permission: ASSET_VIEW
-    offline: false
-    reads: 2
-    writes: 0
-  - operation: getIncident
-    verb: GET
-    path: /incidents/{incidentId}
-    scope: venue
-    permission: INCIDENT_VIEW
-    offline: false
-    reads: 4
-    writes: 0
-  - operation: getWorkOrder
-    verb: GET
-    path: /work-orders/{workOrderId}
-    scope: venue
-    permission: WORK_ORDER_VIEW
-    offline: true
-    reads: 1
-    writes: 0
-  - operation: getWorkOrderPriorityPolicy
-    verb: GET
-    path: /work-order-priority-policy
-    scope: venue
-    permission: WORK_ORDER_VIEW
-    offline: true
-    reads: 1
-    writes: 0
-  - operation: listAssets
-    verb: GET
-    path: /assets
-    scope: venue
-    permission: ASSET_VIEW
-    offline: true
-    reads: 1
-    writes: 0
-  - operation: listIncidents
-    verb: GET
-    path: /incidents
-    scope: venue
-    permission: INCIDENT_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listInspectionTemplates
-    verb: GET
-    path: /inspection-templates
-    scope: venue
-    permission: INSPECTION_VIEW
-    offline: true
-    reads: 2
-    writes: 0
-  - operation: listInspections
-    verb: GET
-    path: /inspections
-    scope: venue
-    permission: INSPECTION_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listMaintenancePlans
-    verb: GET
-    path: /maintenance-plans
-    scope: venue
-    permission: ASSET_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listVendorServiceRequests
-    verb: GET
-    path: /vendor-service-requests
-    scope: venue
-    permission: WORK_ORDER_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listWorkOrders
-    verb: GET
-    path: /work-orders
-    scope: venue
-    permission: WORK_ORDER_VIEW
-    offline: true
-    reads: 1
-    writes: 0
-  - operation: lookupAsset
-    verb: GET
-    path: /assets/lookup
-    scope: venue
-    permission: ASSET_VIEW
-    offline: true
-    reads: 4
-    writes: 0
-  - operation: pauseWorkOrder
-    verb: POST
-    path: /work-orders/{workOrderId}/pause
-    scope: venue
-    permission: MAINTENANCE_EXECUTE
-    offline: true
-    reads: 2
-    writes: 3
-  - operation: recordAuthorityNotification
-    verb: POST
-    path: /incidents/{incidentId}/notify-authority
-    scope: venue
-    permission: INCIDENT_MANAGE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: recordWorkOrderParts
-    verb: POST
-    path: /work-orders/{workOrderId}/parts
-    scope: venue
-    permission: WORK_ORDER_MANAGE
-    offline: false
-    reads: 3
-    writes: 4
-  - operation: recordWorkOrderTime
-    verb: POST
-    path: /work-orders/{workOrderId}/time
-    scope: venue
-    permission: WORK_ORDER_MANAGE
-    offline: true
-    reads: 2
-    writes: 2
-  - operation: rejectWorkOrder
-    verb: POST
-    path: /work-orders/{workOrderId}/reject
-    scope: venue
-    permission: MAINTENANCE_EXECUTE
-    offline: true
-    reads: 2
-    writes: 2
-  - operation: reportIncident
-    verb: POST
-    path: /incidents
-    scope: venue
-    permission: INCIDENT_REPORT
-    offline: true
-    reads: 2
-    writes: 2
-  - operation: resumeWorkOrder
-    verb: POST
-    path: /work-orders/{workOrderId}/resume
-    scope: venue
-    permission: MAINTENANCE_EXECUTE
-    offline: true
-    reads: 2
-    writes: 2
-  - operation: setAssetStatus
-    verb: PUT
-    path: /assets/{assetId}/status
-    scope: venue
-    permission: ASSET_MANAGE
-    offline: true
-    reads: 2
-    writes: 3
-  - operation: setWorkOrderPriorityPolicy
-    verb: PUT
-    path: /work-order-priority-policy
-    scope: venue
-    permission: WORK_ORDER_MANAGE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: startWorkOrder
-    verb: POST
-    path: /work-orders/{workOrderId}/start
-    scope: venue
-    permission: MAINTENANCE_EXECUTE
-    offline: true
-    reads: 2
-    writes: 2
-  - operation: submitInspection
-    verb: POST
-    path: /inspections
-    scope: venue
-    permission: INSPECTION_SUBMIT
-    offline: true
-    reads: 3
-    writes: 3
-  - operation: suggestWorkOrderAssignee
-    verb: GET
-    path: /work-orders/{workOrderId}/assignee-suggestions
-    scope: venue
-    permission: WORK_ORDER_VIEW
-    offline: false
-    reads: 4
-    writes: 0
-  - operation: updateAsset
-    verb: PATCH
-    path: /assets/{assetId}
-    scope: venue
-    permission: ASSET_MANAGE
-    offline: false
-    reads: 2
-    writes: 3
-  - operation: updateIncident
-    verb: PATCH
-    path: /incidents/{incidentId}
-    scope: venue
-    permission: INCIDENT_MANAGE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: updateMaintenancePlan
-    verb: PATCH
-    path: /maintenance-plans/{planId}
-    scope: venue
-    permission: ASSET_MANAGE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: updateVendorServiceRequest
-    verb: PATCH
-    path: /vendor-service-requests/{vendorServiceRequestId}
-    scope: venue
-    permission: WORK_ORDER_MANAGE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: updateWorkOrder
-    verb: PATCH
-    path: /work-orders/{workOrderId}
-    scope: venue
-    permission: WORK_ORDER_MANAGE
-    offline: true
-    reads: 2
-    writes: 2
-  - operation: verifyWorkOrder
-    verb: POST
-    path: /work-orders/{workOrderId}/verify
-    scope: venue
-    permission: WORK_ORDER_VERIFY
-    offline: false
-    reads: 2
-    writes: 3
 - contract: games
   count: 40
   operations:
@@ -2859,7 +2875,7 @@ tables:
   - maintenance
   foreignWriters: null
 - table: maintenance.incident
-  columns: 26
+  columns: 28
   store: postgres
   parent: null
   writtenBy:
@@ -2872,13 +2888,19 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: maintenance.incident_investigation_note
-  columns: 5
+  columns: 8
   store: postgres
   parent: maintenance.incident
   writtenBy: []
   foreignWriters: null
 - table: maintenance.incident_involved_party
-  columns: 5
+  columns: 7
+  store: postgres
+  parent: maintenance.incident
+  writtenBy: []
+  foreignWriters: null
+- table: maintenance.incident_media
+  columns: 9
   store: postgres
   parent: maintenance.incident
   writtenBy: []
@@ -3308,7 +3330,7 @@ tables:
   - transport
   foreignWriters: null
 - table: transport.fare_table
-  columns: 6
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -3412,14 +3434,14 @@ tables:
   - venue-map
   foreignWriters: null
 - table: venuemap.visit_plan
-  columns: 13
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
   - venue-map
   foreignWriters: null
 - table: venuemap.visit_plan_item
-  columns: 18
+  columns: 19
   store: postgres
   parent: venuemap.visit_plan
   writtenBy:

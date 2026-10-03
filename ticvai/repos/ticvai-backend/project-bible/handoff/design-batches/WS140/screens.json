@@ -169,7 +169,7 @@
   "name": "Template Library",
   "module": "Engagement & Support",
   "requiresModule": "marketing",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "6",
@@ -1066,7 +1066,9 @@
    "params": [
     {
      "name": "dispatchId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `retryMessageDispatch` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1323,7 +1325,9 @@
    "params": [
     {
      "name": "actionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `decideProposedAction` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

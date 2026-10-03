@@ -74168,5 +74168,166 @@
    "postgres",
    "redis"
   ]
+ },
+ "addIncidentPerson": {
+  "contract": "maintenance",
+  "verb": "POST",
+  "path": "/incidents/{incidentId}/people",
+  "reads": [
+   "maintenance.incident_involved_party"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "INCIDENT_REPORT",
+  "offline": true,
+  "summary": "Add a person involved in an incident",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "cancelPaymentLink": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/payment-links/{linkId}/cancel",
+  "reads": [
+   "orders.payment_link"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_CREATE",
+  "offline": false,
+  "summary": "Cancel a live payment link",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getGuestConversation": {
+  "contract": "marketing-crm",
+  "verb": "GET",
+  "path": "/my/conversations/{conversationId}",
+  "reads": [],
+  "writes": [],
+  "routing": "primary",
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "The guest's own handed-over conversation, with the agent's replies and the queue position",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listBookableOutlets": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/venues/{venueId}/bookable-outlets",
+  "reads": [],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": null,
+  "offline": false,
+  "summary": "The restaurants a guest can book a table at",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "listMyTableReservations": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/me/table-reservations",
+  "reads": [
+   "fnb.reservation_table",
+   "fnb.table_reservation",
+   "fnb.waitlist_entry"
+  ],
+  "writes": [],
+  "routing": "primary",
+  "scope": "tenant",
+  "perm": null,
+  "offline": true,
+  "summary": "The guest's own table bookings and waitlist places",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "sendGuestConversationMessage": {
+  "contract": "marketing-crm",
+  "verb": "POST",
+  "path": "/my/conversations/{conversationId}/messages",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": null,
+  "offline": false,
+  "summary": "Write to the agent, as the guest, in the guest's own handed-over conversation",
+  "source": "derived",
+  "audience": [
+   "guest"
+  ],
+  "service": "MarketingService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "uploadIncidentMedia": {
+  "contract": "maintenance",
+  "verb": "POST",
+  "path": "/incidents/{incidentId}/media",
+  "reads": [
+   "maintenance.incident_media"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "INCIDENT_REPORT",
+  "offline": false,
+  "summary": "Add a photo, video or document to an incident",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
  }
 }

@@ -4028,6 +4028,50 @@
  "Theme": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
+  "x-ticvai-contrast-pairs": [
+   {
+    "foreground": "textColour",
+    "background": "backgroundColour",
+    "use": "text",
+    "ratio": 4.5
+   },
+   {
+    "foreground": "textColour",
+    "background": "backgroundColour",
+    "use": "largeText",
+    "ratio": 3.0
+   },
+   {
+    "foreground": "primaryColour",
+    "background": "backgroundColour",
+    "use": "nonText",
+    "ratio": 3.0
+   },
+   {
+    "foreground": "secondaryColour",
+    "background": "backgroundColour",
+    "use": "nonText",
+    "ratio": 3.0
+   },
+   {
+    "foreground": "accentColour",
+    "background": "backgroundColour",
+    "use": "nonText",
+    "ratio": 3.0
+   },
+   {
+    "foreground": "componentColours.*.text",
+    "background": "componentColours.*.background",
+    "use": "text",
+    "ratio": 4.5
+   },
+   {
+    "foreground": "componentColours.*.background",
+    "background": "backgroundColour",
+    "use": "nonText",
+    "ratio": 3.0
+   }
+  ],
   "required": [
    "primaryColour",
    "secondaryColour",

@@ -193,13 +193,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 - → `BO-100` Venue Home: *Back to Venue Home*
 - → `BO-535` New Rental Booking Wizard: *New Rental Booking Wizard*
 - → `BO-536` Availability Selection & Alternative Options: *Availability Selection & Alternative Options*
-- → `BO-537` Customer & Participant Information: *Customer & Participant Information*
-- → `BO-538` Group Rental & Participant Management: *Group Rental & Participant Management*
-- → `BO-539` Rental Agreement & Waiver Completion: *Rental Agreement & Waiver Completion*
+- → `BO-537` Customer & Participant Information: *Customer & Participant Information*; carries `bookingId`
+- → `BO-538` Group Rental & Participant Management: *Group Rental & Participant Management*; carries `bookingId`
+- → `BO-539` Rental Agreement & Waiver Completion: *Rental Agreement & Waiver Completion*; carries `bookingId`
 - → `BO-540` Booking Commercial Summary & Payment: *Booking Commercial Summary & Payment*
-- → `BO-541` Reservation Confirmation & QR Voucher: *Reservation Confirmation & QR Voucher*
-- → `BO-542` Reservation Modification, Cancellation & No-Show: *Reservation Modification, Cancellation & No-Show*
-- → `BO-543` Reservation Detail, Timeline & Readiness: *Reservation Detail, Timeline & Readiness*
+- → `BO-541` Reservation Confirmation & QR Voucher: *Reservation Confirmation & QR Voucher*; carries `bookingId`
+- → `BO-542` Reservation Modification, Cancellation & No-Show: *Reservation Modification, Cancellation & No-Show*; carries `bookingId`
+- → `BO-543` Reservation Detail, Timeline & Readiness: *Reservation Detail, Timeline & Readiness*; carries `bookingId`
 
 #### States
 

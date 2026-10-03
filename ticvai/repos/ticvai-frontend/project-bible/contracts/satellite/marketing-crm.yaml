@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 229
+  x-ticvai-screen-count: 230
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -300,6 +300,165 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/CaseDetail'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /my/conversations/{conversationId}:
+    parameters:
+    - name: conversationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      operationId: getGuestConversation
+      security:
+      - guestAuth: []
+      summary: The guest's own handed-over conversation, with the agent's replies and the queue position
+      description: '**How a guest reads the agent''s replies** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-004).
+        After `handoverToAgent` the guest chat (GST-031, GST-032, WEB-044) shows the thread, where the guest is
+        in the queue and how long the wait is. `getConversation` is the agent''s read under `CASE_VIEW` and
+        carries the routing, the assistant''s summary and the agents'' ids; this is the guest''s, with none of
+        them.
+
+
+        **Scoped to the caller, not filtered by it** (`x-ticvai-self-scoped: subject`): a conversation the
+        guest is not the party to answers 404, exactly as one that does not exist. Staff notes and the
+        assistant''s internal summary are never in it.
+
+
+        **The position and wait come from the live agent queue** (audit R149, as on `handoverToAgent`):
+        `queuePosition` and `estimatedWaitSeconds` are computed on read, and both are null once an agent has
+        claimed the conversation. Read from the primary, because a reply a replica has not seen yet reads to
+        the guest as an agent who went quiet. The chat polls this with `afterMessageId` while it is open.
+
+        '
+      tags:
+      - marketing
+      x-ticvai-permission: null
+      x-ticvai-self-scoped: subject
+      x-ticvai-audience:
+      - guest
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: primary
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: afterMessageId
+        in: query
+        required: false
+        description: Only the messages sent after this one, oldest first, so a polling chat fetches what is new
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The conversation as the guest sees it, messages oldest first
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestConversation'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /my/conversations/{conversationId}/messages:
+    parameters:
+    - name: conversationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: sendGuestConversationMessage
+      x-ticvai-consumed-by:
+        - "P01 WEB-044 AI Concierge – Home"
+        - "P02 GST-031 AI Concierge – Home"
+        - "P02 GST-032 AI Concierge – Chat"
+      security:
+      - guestAuth: []
+      summary: Write to the agent, as the guest, in the guest's own handed-over conversation
+      description: '**The guest''s side of a handed-over conversation** (Chinmay, 3 October 2026, Pattern 4;
+        CHG-GCF-004). `sendConversationMessage` needs `CASE_MANAGE`, which no guest holds, and the guest chat
+        (GST-031, GST-032, WEB-044) called it; this replaces it on every guest screen. The agent''s replies
+        and the queue position are read with `getGuestConversation`.
+
+
+        **Scoped to the caller** (`x-ticvai-self-scoped: subject`): the message is written with `sender:
+        guest`, never declared by the caller, and a conversation the guest is not the party to answers 404,
+        exactly as one that does not exist.
+
+
+        **Only once a person has it.** While the conversation is still with the assistant the guest asks
+        with ai `sendAiMessage`; once it is queued, with an agent or waiting on the guest, they write here.
+        A conversation that has ended (`resolved`, `abandoned`, `timedOut`) or never left the assistant is a
+        409 (`conversation-not-with-agent`), and the chat offers a new question or a case instead.
+
+        '
+      tags:
+      - marketing
+      x-ticvai-permission: null
+      x-ticvai-self-scoped: subject
+      x-ticvai-audience:
+      - guest
+      x-ticvai-scope-level: tenant
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: append
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - body
+              properties:
+                body:
+                  type: string
+                  minLength: 1
+                  maxLength: 4000
+                attachments:
+                  type: array
+                  description: What the guest attaches, from their own uploads or their own tickets
+                  items:
+                    type: object
+                    properties:
+                      assetId:
+                        type: string
+                        format: uuid
+                      kind:
+                        type: string
+                        enum:
+                        - image
+                        - video
+                        - document
+                        - ticket
+                        - qr
+                        - paymentLink
+      responses:
+        '201':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Sent, as the guest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GuestConversationMessage'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The conversation is not with a person (`conversation-not-with-agent`), still with the
+            assistant or ended
+          x-ticvai-problem-types:
+          - conversation-not-with-agent
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /guest-match-policy:
@@ -2783,9 +2942,6 @@ paths:
     post:
       operationId: sendConversationMessage
       x-ticvai-consumed-by:
-        - "P01 WEB-044 AI Concierge – Home"
-        - "P02 GST-031 AI Concierge – Home"
-        - "P02 GST-032 AI Concierge – Chat"
         - "P08 BO-799 Agent Workspace"
         - "P12 SUP-005 Live Chat Workspace"
       security:
@@ -2800,6 +2956,11 @@ paths:
         **The sender is resolved, not declared.** A guest session sends as the guest; an agent session
         sends as that agent; the assistant sends as the assistant and is labelled as one — **a guest talking
         to a bot that presents as a person is a complaint waiting for the moment they find out.**
+
+        **A guest writes with `sendGuestConversationMessage`** (Chinmay, 3 October 2026, Pattern 4;
+        CHG-GCF-004): the guest screens (GST-031, GST-032, WEB-044) no longer call this; it is the agent''s
+        send and needs `CASE_MANAGE`. The guest audience and `guestAuth` stay only so a client built against
+        r1 is not broken; they go at the next major version.
 
         '
       tags:
@@ -3491,6 +3652,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-027 Guest Lookup"
         - "P04 POS-030 Sales Journal"
+        - "P06 EMP-026 Incident report"
         - "P08 BO-734 CRM Command Center"
         - "P08 BO-735 Guest Directory"
       x-ticvai-audience:
@@ -3749,10 +3911,17 @@ paths:
         to and when. A consent whose notice version has since been superseded is reported as requiring
         renewal.
 
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own
+        consents (`subjectId` is the caller''s); another guest''s consents is refused exactly as one that does
+        not exist, never returned. `GUEST_VIEW` is what a staff caller must hold to act for any guest
+        (ADR-0025).
+
         '
       tags:
       - consent
       x-ticvai-permission: GUEST_VIEW
+      x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -4013,12 +4182,19 @@ paths:
       - guest
       x-ticvai-read-routing: replica
       summary: Configured consent purposes
+      description: >
+        **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026,
+        Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets the active consent
+        purposes a guest is asked for, and nothing in draft, unpublished or withdrawn; asked for by id, such a
+        record answers as not found. `GUEST_VIEW` is what a staff caller must hold, and staff also see drafts
+        (ADR-0025).
       tags:
       - consent
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       x-ticvai-permission: GUEST_VIEW
+      x-ticvai-guest-callable: true
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
@@ -5949,12 +6125,18 @@ paths:
       - guest
       x-ticvai-read-routing: replica
       summary: List loyalty programmes
+      description: >
+        **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026,
+        Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets published loyalty
+        programmes, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as
+        not found. `MARKETING_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
       tags:
       - loyalty
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-guest-callable: true
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
@@ -6285,10 +6467,16 @@ paths:
       summary: What this guest has opted into
       description: '**Drafted 4 September as a stub.** WEB-027 *Newsletter Subscription* sat on the wishlist and consent operations, which is why it read as a duplicate of the account dashboard. **A marketing subscription is not a consent record**: consent says what may be done with data, a subscription says what the guest asked to receive, and conflating them is how somebody unsubscribes and keeps getting email. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
 
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own
+        marketing subscription; another guest''s subscription is refused exactly as one that does not exist,
+        never returned. `MARKETING_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
+
         '
       tags:
       - marketing
       x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-self-scoped: subject
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -6320,10 +6508,16 @@ paths:
       summary: Subscribe or unsubscribe
       description: '**Drafted 4 September as a stub.** **Unsubscribe has to work without a login**, so the shape carries a token rather than relying on a session. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
 
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own
+        marketing subscription; another guest''s subscription is refused exactly as one that does not exist,
+        never returned. `MARKETING_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
+
         '
       tags:
       - marketing
       x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-self-scoped: subject
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -14986,9 +15180,15 @@ paths:
       - guestAuth: []
       - bearerAuth: []
       summary: What points can be turned into
+      description: >
+        **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026,
+        Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets published rewards, and
+        nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found.
+        `MARKETING_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
       tags:
       - loyalty
       x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-guest-callable: true
       x-ticvai-audience:
       - staff
       - guest
@@ -15229,10 +15429,17 @@ paths:
         a list of names — a guest page showing a lapsed badge as current is a promise the venue did
         not make.
 
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own
+        badges (`customerId` is the caller''s); another guest''s badges is refused exactly as one that does
+        not exist, never returned. `MARKETING_VIEW` is what a staff caller must hold to act for any guest
+        (ADR-0025).
+
         '
       tags:
       - loyalty
       x-ticvai-permission: MARKETING_VIEW
+      x-ticvai-self-scoped: subject
       x-ticvai-audience:
       - staff
       - guest
@@ -21599,6 +21806,88 @@ components:
       - resolved
       - abandoned
       - timedOut
+    GuestConversation:
+      x-ticvai-persistence: none — a guest view of marketing.conversation and its guest-visible messages
+      description: '**A handed-over conversation as the guest sees it** (`getGuestConversation`; Chinmay, 3 October
+        2026, Pattern 4; CHG-GCF-004). The thread, where the guest is in the queue and the wait; no agent ids,
+        no routing, no assistant summary, which are the agent''s (`Conversation`).
+
+        '
+      type: object
+      required:
+      - id
+      - state
+      - messages
+      properties:
+        id:
+          type: string
+          format: uuid
+        state:
+          $ref: '#/components/schemas/ConversationState'
+        queuePosition:
+          type: integer
+          nullable: true
+          readOnly: true
+          x-ticvai-derived: onRead
+          description: Place among the unclaimed conversations in its queue, from the live agent queue (audit
+            R149). Null once claimed.
+        estimatedWaitSeconds:
+          type: integer
+          nullable: true
+          readOnly: true
+          x-ticvai-derived: onRead
+          description: From the live agent queue, the conversations ahead divided across that queue's agents
+            online now (audit R149). Null once claimed.
+        messages:
+          type: array
+          description: Oldest first; after `afterMessageId` when it was sent
+          items:
+            $ref: '#/components/schemas/GuestConversationMessage'
+    GuestConversationMessage:
+      x-ticvai-persistence: none — a guest view of marketing.conversation_message
+      description: '**One message as the guest sees it.** `sender` says whether a person, the assistant or the
+        system wrote it, so the assistant is never taken for a person; which agent wrote it is not shown.
+
+        '
+      type: object
+      required:
+      - id
+      - sender
+      - body
+      - sentAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        sender:
+          type: string
+          enum:
+          - guest
+          - agent
+          - assistant
+          - system
+        body:
+          type: string
+        attachments:
+          type: array
+          items:
+            type: object
+            properties:
+              assetId:
+                type: string
+                format: uuid
+              kind:
+                type: string
+                enum:
+                - image
+                - video
+                - document
+                - ticket
+                - qr
+                - paymentLink
+        sentAt:
+          type: string
+          format: date-time
     ConversationMessage:
       type: object
       x-ticvai-persistence: marketing.conversation_message + marketing.conversation_message_attachment

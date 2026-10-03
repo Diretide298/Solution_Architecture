@@ -130,16 +130,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `EMP-061` | Retail Inventory Command Center | B–D | 6 | 40 | 6 | 12 | 0 | 4 | — | notStarted (generated) |
-| `EMP-062` | Store Stock & SKU Availability | A | 1 | 37 | 5 | 12 | 2 | 4 | — | notStarted (generated) |
-| `EMP-063` | Requisition & Smart Store Replenishment | B–D | 18 | 36 | 6 | 9 | 2 | 0 | — | notStarted (generated) |
-| `EMP-064` | Store-to-Store & Warehouse Transfers | B–D | 14 | 54 | 6 | 11 | 1 | 0 | — | notStarted (generated) |
-| `EMP-065` | Receiving | A | 31 | 32 | 5 | 7 | 2 | 0 | — | notStarted (generated) |
-| `EMP-066` | Stock Count & Cycle Count Management | B–D | 17 | 20 | 5 | 1 | 3 | 4 | — | notStarted (generated) |
-| `EMP-067` | Damage, Loss, Shrinkage & Stock Adjustment | B–D | 37 | 6 | 5 | 16 | 1 | 4 | — | notStarted (generated) |
-| `EMP-068` | Reservation, Allocation & Omnichannel Inventory | B–D | 8 | 12 | 5 | 14 | 1 | 4 | — | notStarted (generated) |
-| `EMP-069` | Barcode, RFID, Serialized Stock & Traceability | B–D | 3 | 18 | 6 | 0 | 2 | 4 | — | notStarted (generated) |
-| `EMP-070` | Inventory Exceptions, AI Replenishment & Action Center | B–D | 18 | 24 | 6 | 6 | 0 | 4 | — | notStarted (generated) |
+| `EMP-061` | Retail Inventory Command Center | D | 6 | 14 | 6 | 12 | 0 | 4 | — | notStarted (generated) |
+| `EMP-062` | Store Stock & SKU Availability | C | 1 | 30 | 5 | 12 | 2 | 4 | — | notStarted (generated) |
+| `EMP-063` | Requisition & Smart Store Replenishment | D | 18 | 21 | 6 | 9 | 2 | 0 | — | notStarted (generated) |
+| `EMP-064` | Store-to-Store & Warehouse Transfers | D | 14 | 48 | 6 | 11 | 1 | 0 | — | notStarted (generated) |
+| `EMP-065` | Receiving | A | 31 | 25 | 5 | 7 | 2 | 0 | — | notStarted (generated) |
+| `EMP-066` | Stock Count & Cycle Count Management | D | 17 | 20 | 5 | 1 | 3 | 4 | — | notStarted (generated) |
+| `EMP-067` | Damage, Loss, Shrinkage & Stock Adjustment | A | 37 | 6 | 5 | 16 | 1 | 4 | — | notStarted (generated) |
+| `EMP-068` | Reservation, Allocation & Omnichannel Inventory | C | 8 | 5 | 5 | 14 | 1 | 4 | — | notStarted (generated) |
+| `EMP-069` | Barcode, RFID, Serialized Stock & Traceability | D | 3 | 8 | 6 | 0 | 2 | 4 | — | notStarted (generated) |
+| `EMP-070` | Inventory Exceptions, AI Replenishment & Action Center | D | 18 | 9 | 6 | 6 | 0 | 4 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

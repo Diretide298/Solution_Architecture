@@ -182,15 +182,15 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Where the user goes next**
 
 - → `BO-100` Venue Home: *Back to Venue Home*
-- → `BO-665` Accreditation Status Workflow: *Accreditation Status Workflow*
+- → `BO-665` Accreditation Status Workflow: *Accreditation Status Workflow*; carries `holderId`
 - → `BO-666` Validity Period Configuration: *Validity Period Configuration*
 - → `BO-667` Event & Venue Accreditation Assignment: *Event & Venue Accreditation Assignment*; carries `programmeId`
 - → `BO-668` Multi-Venue Accreditation Management: *Multi-Venue Accreditation Management*
 - → `BO-669` Temporary & Seasonal Accreditation: *Temporary & Seasonal Accreditation*
-- → `BO-670` Suspension & Reactivation Management: *Suspension & Reactivation Management*
-- → `BO-671` Accreditation Revocation Management: *Accreditation Revocation Management*
-- → `BO-672` Expiry Monitor & Expiration Rules: *Expiry Monitor & Expiration Rules*
-- → `BO-673` Accreditation Renewal Workspace: *Accreditation Renewal Workspace*
+- → `BO-670` Suspension & Reactivation Management: *Suspension & Reactivation Management*; carries `holderId`
+- → `BO-671` Accreditation Revocation Management: *Accreditation Revocation Management*; carries `holderId`
+- → `BO-672` Expiry Monitor & Expiration Rules: *Expiry Monitor & Expiration Rules*; carries `holderId`
+- → `BO-673` Accreditation Renewal Workspace: *Accreditation Renewal Workspace*; carries `holderId`
 
 #### States
 

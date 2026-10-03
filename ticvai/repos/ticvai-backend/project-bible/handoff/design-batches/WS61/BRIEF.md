@@ -97,7 +97,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-354` | Credential Operations Command Center | B–D | 2 | 28 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-354` | Credential Operations Command Center | B–D | 2 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-355` | Virtual Ticket & Credential 360° Workspace | B–D | 0 | 46 | 6 | 2 | 3 | 0 | — | notStarted (generated) |
 | `BO-356` | Credential Generation & Issuance Monitor | B–D | 10 | 28 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-357` | Credential Delivery & Distribution Operations | B–D | 5 | 20 | 6 | 0 | 1 | 0 | — | notStarted (generated) |

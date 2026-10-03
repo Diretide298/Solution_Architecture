@@ -120,6 +120,12 @@ def main() -> int:
         # CRLF as well: on a CRLF contract the old blocks were never stripped, and a block written in
         # the wrong place stayed there on every later run.
         text = _re.sub(r"^ +x-ticvai-consumed-by:\r?\n(?:[ ]+- [^\n]*\n)+", "", text, flags=_re.M)
+        # **The flow form as well** (3 October, CHG-GTR-003). The business-rules branch authored new
+        # operations with `x-ticvai-consumed-by: []`; the block pattern above never matched it, so the
+        # block written below landed beside it and YAML kept the empty list (check-package duplicate
+        # keys in fnb.yaml and maintenance.yaml; check-screen-wiring S-CONSUMED-MIRROR on the same
+        # four operations). This tool owns the key, whatever form an author left it in.
+        text = _re.sub(r"^ +x-ticvai-consumed-by: *\[[^\n]*\] *\r?\n", "", text, flags=_re.M)
         n = 0
         for oid, screens in sorted(op_screens.items()):
             # A whole line at the operation's own indent. A substring match also hit an OpenAPI

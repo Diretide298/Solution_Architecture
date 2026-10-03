@@ -9,12 +9,12 @@
 | Contracts | 5 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 46 |
+| Operations with no screen | 47 |
 | Waves | wave1 11 |
 
 ## Gaps
 
-### 46 operations with no screen here
+### 47 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -51,6 +51,7 @@
 | `listSegregationViolations` | identity | GET | Who already holds a conflicting pair |
 | `setPrincipalModuleAccess` | identity | PUT | Tick what they may do |
 | `updateRole` | identity | PATCH | Rename a role or change its description |
+| `cancelPaymentLink` | orders | POST | Cancel a live payment link |
 | `convertToTermProduct` | orders | POST | Turn a visit into a membership or season pass |
 | `issueInvitation` | orders | POST | Issue a complimentary entitlement, with no payment expected |
 | `listInvitationAllowances` | orders | GET | Who may issue comps, and how many are left |
@@ -59,8 +60,7 @@
 | `listOrderFees` | orders | GET | Fees charged on an order |
 | `listPaymentProviders` | orders | GET | Gateways configured for this scope |
 | `openGuestCreditAccount` | orders | POST | A credit limit for an individual booking ahead |
-| `overrideCreditLimit` | orders | POST | Authorise an order beyond the credit limit |
-| … | | | 6 more |
+| … | | | 7 more |
 
 ## Modules
 

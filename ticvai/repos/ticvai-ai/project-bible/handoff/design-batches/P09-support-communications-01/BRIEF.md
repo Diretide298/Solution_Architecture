@@ -96,8 +96,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-035` | Support & Escalation Console | B–D | 7 | 10 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-036` | Platform Notification Broadcast | B–D | 7 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-035` | Support & Escalation Console | B | 7 | 10 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-036` | Platform Notification Broadcast | B | 7 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

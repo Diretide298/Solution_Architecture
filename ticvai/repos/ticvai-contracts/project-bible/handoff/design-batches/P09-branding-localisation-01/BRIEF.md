@@ -124,10 +124,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-016` | White-Label Branding Management | A | 53 | 51 | 7 | 12 | 0 | 6 | configures | notStarted (generated) |
-| `ADM-017` | Domain & Certificate Management | A | 9 | 33 | 7 | 1 | 1 | 0 | configures | notStarted (generated) |
+| `ADM-016` | White-Label Branding Management | A | 53 | 47 | 7 | 12 | 0 | 6 | configures | notStarted (generated) |
+| `ADM-017` | Domain & Certificate Management | A | 9 | 27 | 7 | 1 | 1 | 0 | configures | notStarted (generated) |
 | `ADM-018` | Interface Languages | A | 8 | 27 | 7 | 9 | 2 | 6 | configures | notStarted (generated) |
-| `ADM-019` | Global Configuration & Defaults | B–D | 85 | 17 | 7 | 18 | 0 | 0 | — | notStarted (generated) |
+| `ADM-019` | Global Configuration & Defaults | B | 85 | 17 | 7 | 18 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

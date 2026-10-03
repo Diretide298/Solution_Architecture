@@ -60,15 +60,6 @@
      "operation": "listCustomerService"
     },
     {
-     "to": "SUP-013",
-     "trigger": "Works in Case Investigation & Resolution Workspace",
-     "provenance": "flow F134 step 7→8",
-     "operation": "listCustomerService",
-     "carries": [
-      "caseId"
-     ]
-    },
-    {
      "to": "SUP-014",
      "trigger": "Works in Order, Booking & Ticket Service Workspace",
      "provenance": "flow F134 step 9→10",
@@ -87,6 +78,21 @@
      "operation": "listCustomerService"
     },
     {
+     "to": "SUP-018",
+     "trigger": "Works in AI Customer Service Copilot & Knowledge Workspace",
+     "provenance": "flow F134 step 17→18",
+     "operation": "listCustomerService"
+    },
+    {
+     "to": "SUP-013",
+     "trigger": "Works in Case Investigation & Resolution Workspace",
+     "provenance": "flow F134 step 7→8",
+     "operation": "listCustomerService",
+     "carries": [
+      "caseId"
+     ]
+    },
+    {
      "to": "SUP-017",
      "trigger": "Works in Case Resolution, Closure & Customer Feedback",
      "provenance": "flow F134 step 15→16",
@@ -94,12 +100,6 @@
      "carries": [
       "caseId"
      ]
-    },
-    {
-     "to": "SUP-018",
-     "trigger": "Works in AI Customer Service Copilot & Knowledge Workspace",
-     "provenance": "flow F134 step 17→18",
-     "operation": "listCustomerService"
     }
    ]
   },
@@ -1090,7 +1090,9 @@
     },
     {
      "name": "uploadId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createUpload`; a link or an edge that holds one opens it instead."
     }
    ]
   },
@@ -2084,7 +2086,9 @@
    "params": [
     {
      "name": "profileKey",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAssistantProfiles` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

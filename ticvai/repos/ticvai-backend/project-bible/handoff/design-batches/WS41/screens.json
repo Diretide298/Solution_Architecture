@@ -850,7 +850,7 @@
   "name": "Cookie, Tracking & Digital Technology Registry",
   "module": "Policy",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "1",
@@ -1086,7 +1086,9 @@
    "params": [
     {
      "name": "scanRunId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listCookieScans` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1169,7 +1171,7 @@
   "name": "Cookie Banner & Preference Center Designer",
   "module": "Policy",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Privacy__Consent___Preference_Management_Reference.pdf",
    "board": "1",
@@ -1746,7 +1748,7 @@
     "id": "formSetPrivacyNoticePolicyGovernance",
     "component": "modal",
     "trigger": "Save privacy notice policy governance",
-    "body": "**Collects what `setPrivacyNoticePolicyGovernance` sends before it is called.** Required: `id`, `policyId`, `documentType`, `status`. Optional: `changeClassification`, `requiresReAcceptance`, `requiresNotification`, `ownerPrincipalId`, `approvedByPrincipalId`, `approvalRequestId`, `approvedAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setPrivacyNoticePolicyGovernance` sends before it is called.** Required: `policyId`, `documentType`, `status`. Optional: `changeClassification`, `requiresReAcceptance`, `requiresNotification`, `ownerPrincipalId`, `approvedByPrincipalId`, `approvedAt`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `approvalRequestId`, `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "PrivacyNoticeGovernance",
     "confirm": {
      "label": "Save privacy notice policy governance",
@@ -1755,7 +1757,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "policyId",
       "documentType",
       "status",
@@ -1764,9 +1765,7 @@
       "requiresNotification",
       "ownerPrincipalId",
       "approvedByPrincipalId",
-      "approvalRequestId",
-      "approvedAt",
-      "scopePath"
+      "approvedAt"
      ]
     },
     "provenance": "contract marketing-crm.yaml PUT /privacy-notice-policy"
@@ -2220,7 +2219,7 @@
     "id": "formSetPrivacyNoticePolicyGovernance",
     "component": "modal",
     "trigger": "Save privacy notice policy governance",
-    "body": "**Collects what `setPrivacyNoticePolicyGovernance` sends before it is called.** Required: `id`, `policyId`, `documentType`, `status`. Optional: `changeClassification`, `requiresReAcceptance`, `requiresNotification`, `ownerPrincipalId`, `approvedByPrincipalId`, `approvalRequestId`, `approvedAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setPrivacyNoticePolicyGovernance` sends before it is called.** Required: `policyId`, `documentType`, `status`. Optional: `changeClassification`, `requiresReAcceptance`, `requiresNotification`, `ownerPrincipalId`, `approvedByPrincipalId`, `approvedAt`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `approvalRequestId`, `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "PrivacyNoticeGovernance",
     "confirm": {
      "label": "Save privacy notice policy governance",
@@ -2229,7 +2228,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "policyId",
       "documentType",
       "status",
@@ -2238,9 +2236,7 @@
       "requiresNotification",
       "ownerPrincipalId",
       "approvedByPrincipalId",
-      "approvalRequestId",
-      "approvedAt",
-      "scopePath"
+      "approvedAt"
      ]
     },
     "provenance": "contract marketing-crm.yaml PUT /privacy-notice-policy"

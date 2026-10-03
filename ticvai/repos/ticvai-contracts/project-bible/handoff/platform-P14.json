@@ -7,7 +7,7 @@
  "audience": "partner",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-02",
+ "generated": "2026-10-03",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 8,
@@ -18,7 +18,8 @@
   "operationsWithNoScreen": 1
  },
  "waves": {
-  "wave2": 7,
+  "wave1": 3,
+  "wave2": 4,
   "wave3": 1
  },
  "modules": [
@@ -26,6 +27,7 @@
    "module": "Developer & API",
    "screens": 8,
    "waves": [
+    1,
     2,
     3
    ]
@@ -51,7 +53,7 @@
    "id": "DEV-002",
    "name": "Register & Organisation",
    "module": "Developer & API",
-   "wave": 2,
+   "wave": 1,
    "route": "/developer/organisation",
    "operations": 2,
    "drawn": true
@@ -60,7 +62,7 @@
    "id": "DEV-003",
    "name": "Clients & Credentials",
    "module": "Developer & API",
-   "wave": 2,
+   "wave": 1,
    "route": "/developer/clients",
    "operations": 6,
    "drawn": true
@@ -105,7 +107,7 @@
    "id": "DEV-008",
    "name": "Programme Administration",
    "module": "Developer & API",
-   "wave": 2,
+   "wave": 1,
    "route": "/developer/admin",
    "operations": 7,
    "drawn": true
@@ -124,6 +126,7 @@
    {
     "module": "Developer & API",
     "waves": [
+     1,
      2,
      3
     ]

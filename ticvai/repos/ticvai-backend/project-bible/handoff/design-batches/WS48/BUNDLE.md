@@ -107,12 +107,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-168` | Advanced Offer Command Center | B–D | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-169` | Buy X Get Y / BOGO Rule Builder | A | 15 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-169` | Buy X Get Y / BOGO Rule Builder | B–D | 15 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-170` | Multi-Buy & Quantity Offer Configurator | B–D | 3 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-171` | Cheapest / Lowest-Value Item Promotion | B–D | 7 | 0 | 5 | 0 | 1 | 2 | — | notStarted (generated) |
-| `ADM-172` | Fixed-Price & “N for X” Offer Builder | A | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-173` | Gift, Free Product & Added-Value Offer Builder | A | 5 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-174` | Cross-Category Promotion Builder | A | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
+| `ADM-172` | Fixed-Price & “N for X” Offer Builder | B–D | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-173` | Gift, Free Product & Added-Value Offer Builder | B–D | 5 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-174` | Cross-Category Promotion Builder | B–D | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
 | `ADM-175` | Reward Selection, Substitution & Customer Choice | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-176` | Advanced Offer Guardrails & Conflict Controls | B–D | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-177` | Offer Simulation, Basket Trace & AI Optimization | B–D | 15 | 0 | 6 | 18 | 0 | 0 | — | notStarted (generated) |
@@ -308,7 +308,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block A · ticket #20650 (APP-SETUP-ADM-169) |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -656,7 +656,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block A · ticket #20651 (APP-SETUP-ADM-172) |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configuration) and no display directory — it is settings, not a population |
@@ -771,7 +771,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block A · ticket #20652 (APP-SETUP-ADM-173) |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -881,7 +881,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block A · ticket #20653 (APP-SETUP-ADM-174) |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1361,6 +1361,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS109 Promotions   Bundles Management Board 4.dc.html#adm-177`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 4
 - Flow F157 *Promotions Bundles Management board 4: Advanced Offer Command Center*, step 18: Works in Offer Simulation, Basket Trace & AI Optimization → Test complex promotion mechanics before publication.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 

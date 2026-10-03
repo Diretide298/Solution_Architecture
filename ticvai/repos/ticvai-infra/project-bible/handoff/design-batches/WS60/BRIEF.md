@@ -131,7 +131,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-344` | Media Design Studio Command Center | B–D | 8 | 26 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-344` | Media Design Studio Command Center | B–D | 8 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-345` | Digital QR & Barcode Ticket Designer | B–D | 15 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-346` | PDF, Printable & POS Ticket Designer | A | 20 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-347` | Apple Wallet Pass Designer | B–D | 24 | 0 | 5 | 0 | 2 | 6 | — | notStarted (generated) |

@@ -119,11 +119,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-002` | Platform Dashboard | B–D | 2 | 55 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
-| `ADM-003` | Cross-Tenant Health Dashboard | B–D | 4 | 45 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-004` | Platform Audit Log | B–D | 9 | 45 | 7 | 4 | 0 | 0 | — | notStarted (generated) |
-| `ADM-013` | Tenant Performance Monitor | B–D | 0 | 45 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-029` | Deployment Monitor | B–D | 5 | 66 | 7 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-002` | Platform Dashboard | B | 2 | 33 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
+| `ADM-003` | Cross-Tenant Health Dashboard | A | 4 | 37 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-004` | Platform Audit Log | D | 9 | 30 | 7 | 4 | 0 | 0 | — | notStarted (generated) |
+| `ADM-013` | Tenant Performance Monitor | B | 0 | 37 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-029` | Deployment Monitor | B | 5 | 53 | 7 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

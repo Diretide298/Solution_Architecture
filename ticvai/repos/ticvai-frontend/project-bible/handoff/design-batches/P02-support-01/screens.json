@@ -4,7 +4,7 @@
   "name": "Lost & Found",
   "module": "Support",
   "requiresModule": "fnb",
-  "wave": 2,
+  "wave": 1,
   "capability": "C18",
   "implementation": {
    "app": "guest-app",
@@ -70,18 +70,10 @@
        "label": "Every case",
        "bindsTo": "Case",
        "columns": [
-        "Case.id",
         "Case.caseNumber",
-        "Case.subjectId",
         "Case.guestName",
         "Case.subject",
-        "Case.categoryId",
-        "Case.status",
-        "Case.priority",
-        "Case.assignedToPrincipalId",
-        "Case.venueId",
-        "Case.relatedOrderId",
-        "Case.slaDueAt"
+        "Case.status"
        ],
        "operation": "listMyCases",
        "provenance": "contract marketing-crm.yaml GET /my/cases"
@@ -97,21 +89,10 @@
        "label": "The selected case",
        "bindsTo": "Case",
        "columns": [
-        "Case.id",
         "Case.caseNumber",
-        "Case.subjectId",
         "Case.guestName",
         "Case.subject",
-        "Case.categoryId",
         "Case.status",
-        "Case.priority",
-        "Case.assignedToPrincipalId",
-        "Case.venueId",
-        "Case.relatedOrderId",
-        "Case.slaDueAt",
-        "Case.isSlaBreached",
-        "Case.slaPausedSeconds",
-        "Case.escalationCount",
         "Case.resolvedAt"
        ],
        "operation": "listMyCases",
@@ -211,7 +192,7 @@
     "view": "Account → All screens → Wave 2 → Lost & found (also Account → Lost & found)"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRaiseMyCase",

@@ -137,7 +137,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-1051` | Seat Analytics Command Center | B–D | 0 | 0 | 6 | 3 | 0 | 6 | — | notStarted (—) |
-| `BO-1052` | Occupancy Reporting | B–D | 3 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1052` | Occupancy Reporting | B–D | 3 | 17 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1053` | Zone Performance Reporting | B–D | 3 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1054` | Revenue by Section | B–D | 3 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1055` | Revenue by Seat Category | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
@@ -373,14 +373,11 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Shows | Format | Notes |
 |---|---|---|
 | Name | text | — |
-| Scope path | text | — |
 | Period | text | — |
 | Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
 | Target | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
-| Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
 | Variance percent | 1,234.5 | — |
 | Status | chip: Green, Amber, Red, No target | — |
-| As of | 1 Oct 2026, 14:30 | — |
 
 **Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
 
@@ -453,7 +450,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (3), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (17 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1052?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-1051`.

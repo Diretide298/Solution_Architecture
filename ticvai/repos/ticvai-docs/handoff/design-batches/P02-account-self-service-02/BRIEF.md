@@ -146,9 +146,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `GST-067` | Refunds & Resale | A | 6 | 0 | 6 | 10 | 7 | 6 | guest | notStarted (client-verified) |
-| `GST-069` | Face Pass | A | 14 | 10 | 7 | 36 | 5 | 6 | guest | notStarted (client-verified) |
-| `GST-071` | Payment Methods | A | 9 | 13 | 6 | 7 | 1 | 0 | guest | notStarted (client-verified) |
-| `GST-073` | Security & Sign-in | A | 5 | 19 | 5 | 3 | 2 | 0 | guest | notStarted (designed) |
+| `GST-069` | Face Pass | A | 14 | 5 | 7 | 36 | 5 | 6 | guest | notStarted (client-verified) |
+| `GST-071` | Payment Methods | A | 9 | 9 | 6 | 7 | 1 | 0 | guest | notStarted (client-verified) |
+| `GST-073` | Security & Sign-in | A | 5 | 15 | 5 | 3 | 2 | 0 | guest | notStarted (designed) |
 
 ## Thin screens in this batch
 

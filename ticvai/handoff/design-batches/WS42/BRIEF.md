@@ -103,16 +103,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `CMS-031` | Privacy Operations Command Center | B–D | 2 | 26 | 6 | 0 | 1 | 4 | — | notStarted (generated) |
-| `CMS-032` | Customer Privacy, Consent & Preference 360° | B–D | 0 | 8 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
-| `CMS-033` | Consent Evidence, History & Withdrawal Management | B–D | 0 | 4 | 6 | 1 | 0 | 4 | — | notStarted (generated) |
-| `CMS-034` | Data Subject / Customer Privacy Request Management | B–D | 0 | 8 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
-| `CMS-035` | Data Discovery, Access, Export & Correction Workspace | B–D | 0 | 4 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `CMS-036` | Deletion, Anonymization & Restriction Operations | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `CMS-037` | Data Retention, Expiry & Legal Hold Operations | B–D | 15 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `CMS-038` | Privacy Compliance, Exception & Investigation Workspace | B–D | 0 | 40 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
-| `CMS-039` | Privacy Audit, Evidence & Compliance Reporting | B–D | 14 | 0 | 5 | 1 | 0 | 4 | — | notStarted (generated) |
-| `CMS-040` | Privacy Analytics & AI Compliance Intelligence | B–D | 2 | 26 | 6 | 1 | 0 | 4 | — | notStarted (generated) |
+| `CMS-031` | Privacy Operations Command Center | D | 2 | 26 | 6 | 0 | 1 | 4 | — | notStarted (generated) |
+| `CMS-032` | Customer Privacy, Consent & Preference 360° | D | 0 | 8 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `CMS-033` | Consent Evidence, History & Withdrawal Management | D | 0 | 4 | 6 | 1 | 0 | 4 | — | notStarted (generated) |
+| `CMS-034` | Data Subject / Customer Privacy Request Management | D | 0 | 8 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `CMS-035` | Data Discovery, Access, Export & Correction Workspace | D | 0 | 4 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `CMS-036` | Deletion, Anonymization & Restriction Operations | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `CMS-037` | Data Retention, Expiry & Legal Hold Operations | D | 15 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `CMS-038` | Privacy Compliance, Exception & Investigation Workspace | D | 0 | 40 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `CMS-039` | Privacy Audit, Evidence & Compliance Reporting | D | 14 | 0 | 5 | 1 | 0 | 4 | — | notStarted (generated) |
+| `CMS-040` | Privacy Analytics & AI Compliance Intelligence | D | 2 | 26 | 6 | 1 | 0 | 4 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

@@ -25,7 +25,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-318 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-318 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     }
    ]
   },
@@ -157,17 +157,11 @@
        "label": "The selected republish and its progress",
        "bindsTo": "OutboxRepublish",
        "columns": [
-        "OutboxRepublish.id",
-        "OutboxRepublish.tenantId",
         "OutboxRepublish.from",
         "OutboxRepublish.to",
-        "OutboxRepublish.eventNames",
-        "OutboxRepublish.reason",
         "OutboxRepublish.status",
         "OutboxRepublish.cursorAt",
         "OutboxRepublish.rowsPublished",
-        "OutboxRepublish.lastError",
-        "OutboxRepublish.requestedBy",
         "OutboxRepublish.requestedAt",
         "OutboxRepublish.startedAt",
         "OutboxRepublish.finishedAt"
@@ -241,7 +235,7 @@
    "error": "Could not load. Names which read failed and leaves the dead letters untouched.",
    "emptyFirstRun": "No dead letters yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on consumer, since and the dead letters are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listDeadLetters` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listDeadLetters` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `replayDeadLetter`, `republishOutbox`, `cancelOutboxRepublish`."
   },
   "apis": [
    {
@@ -295,11 +289,15 @@
    "params": [
     {
      "name": "deadLetterId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listDeadLetters` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "republishId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listOutboxRepublishes` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**The ordinary path is a row on this screen**, and `replayDeadLetter` takes the id from the row the operator chose. A deep link is how an alert reaches one directly; if that id is already replayed or gone the screen says so and shows the list, because a replay issued against a row nobody can see is a replay nobody can account for.",
@@ -316,7 +314,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-318"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen. The four outbox republish operations (ADR-0058, amended 1 October) were added on 1 October 2026 and sit here until republish has a screen of its own.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself. The four outbox republish operations (ADR-0058, amended 1 October) were added on 1 October 2026 and sit here until republish has a screen of its own.",
   "_platform": {
    "code": "P09",
    "audience": "platformAdmin",

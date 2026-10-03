@@ -126,9 +126,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-014` | Settlement & Payment History | B–D | 12 | 39 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `PTR-017` | Commission Statement | B–D | 2 | 36 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
-| `PTR-018` | Reports & Sales Performance | B–D | 76 | 35 | 6 | 93 | 0 | 0 | — | notStarted (generated) |
+| `PTR-014` | Settlement & Payment History | C | 12 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `PTR-017` | Commission Statement | B | 2 | 22 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
+| `PTR-018` | Reports & Sales Performance | D | 76 | 20 | 6 | 93 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -144,7 +144,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Reports & Settlement · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-PARTNER-PTR-014 |
 | Who uses it | partner staff holding `SETTLEMENT_RECONCILE`, `SETTLEMENT_VIEW` (1 operate, 1 read); in the flows as finance controller |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listSettlements` reads the population and `getSettlement` reads one of them — list, select, act |
@@ -217,55 +217,36 @@ Errors to draw in the form: 400 `matchedManually` without a `matchedPaymentId`, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Provider name | text | — |
-| Period start | 1 Oct 2026 | A day in the region's time zone, local midnight to local midnight. |
-| Period end | 1 Oct 2026 | A day in the region's time zone, local midnight to local midnight. |
 | Status | chip: Ingesting, Parsing, Matching, Matched, Has exceptions, Resolved… | — |
 | Line count | 1,234 | — |
 | Matched count | 1,234 | — |
 | Exception count | 1,234 | — |
-| Provider gross | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Provider fees | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Provider net | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Ledger gross | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **Every settlement exception** (data table, from `listSettlementExceptions`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Server-created when parsing finds the exception, so a UUID (naming-and-style 4). |
-| Settlement | the name it points at, never the id | — |
 | Kind | chip: Unmatched in provider, Unmatched in ledger, Amount mismatch, Duplicate in provider … | — |
 | Provider reference | text | — |
-| Payment | the name it points at, never the id | — |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Expected amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Resolution | chip: Matched manually, Write off, Dispute raised, Provider error, Timing difference | Null while the exception is open. |
-| Note | text | The `note` given to `resolveSettlementException`, stored with the resolution. |
-| Resolved by principal | the name it points at, never the id | — |
 | Resolved at | 1 Oct 2026, 14:30 | — |
 
 **The selected settlement** (detail panel, from `getSettlement`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Provider name | text | — |
-| Period start | 1 Oct 2026 | A day in the region's time zone, local midnight to local midnight. |
-| Period end | 1 Oct 2026 | A day in the region's time zone, local midnight to local midnight. |
 | Status | chip: Ingesting, Parsing, Matching, Matched, Has exceptions, Resolved… | — |
 | Line count | 1,234 | — |
 | Matched count | 1,234 | — |
 | Exception count | 1,234 | — |
-| Provider gross | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Provider fees | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Provider net | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Ledger gross | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Difference | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Ingested at | 1 Oct 2026, 14:30 | — |
 | Completed at | 1 Oct 2026, 14:30 | — |
-| Scope path | text | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it … |
 
 **Actions and what each produces**
 
@@ -299,7 +280,7 @@ Errors to draw in the form: 400 `matchedManually` without a `matchedPaymentId`, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the settlement payment history untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No settlement payment history yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on providerName, status and the settlement payment history are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SETTLEMENT_VIEW`, which `listSettlements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SETTLEMENT_VIEW`, which `listSettlements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `SETTLEMENT_RECONCILE` for `ingestSettlementFile`, `resolveSettlementException`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 `fileReference` names no completed upload in the caller's scope, or the period is not a single day (`settlement-period-not-a-day`, audit R110 (b)).; 400 `matchedManually` without a `matchedPaymentId`, or one that names no payment. `errors[]` names the field.; 409 The exception is already resolved. |
 
@@ -332,7 +313,7 @@ prepaidPartner: Al Noor Travel & Tourism · prepaid · balance AED 42,300.00 · 
 - `listSettlementExceptions` → `SETTLEMENT_VIEW` (read) · staff, partner
 - `resolveSettlementException` → `SETTLEMENT_RECONCILE` (operate) · staff, partner
 
-**A refused user sees:** Shown when the caller lacks `SETTLEMENT_VIEW`, which `listSettlements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `SETTLEMENT_VIEW`, which `listSettlements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `SETTLEMENT_RECONCILE` for `ingestSettlementFile`, `resolveSettlementException`.
 
 #### Requirements it meets
 
@@ -356,7 +337,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (12), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (39 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-014?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Ingest settlement file, Resolve settlement exception.
 - [ ] Every transition is wired: `PTR-003`.
@@ -377,7 +358,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Reports & Settlement · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-PARTNER-PTR-017 |
 | Who uses it | partner staff holding `PARTNER_MANAGE`, `PARTNER_VIEW` (1 configure, 1 read) |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listPartnerAgreements` reads the population and `getCommissionStatement` reads one of them — list, select, act |
@@ -414,38 +395,26 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | — |
 | Rate mode | chip: Net rate, Commission | Alternatives, not both. A partner buys at a net rate and keeps the margin, or sells at face value and is paid commission. |
 | Commission percent | 1,234.5 | — |
-| Volume tiers | list or chips (count when long) | Retired: the tiers are rows of control.partner_rate_volume_band (`PartnerRate.volumeBands`, written by setPartnerRateNet), one set per rate … |
-| Volume window | chip: Calendar month, Calendar quarter, Calendar year, Agreement year, Rolling12 months | — |
 | Seasonal rates | list or chips (count when long) | Retired: a seasonal rate is a control.partner_rate row with `seasonalRate: true` and its own `effectiveFrom`/`effectiveTo` (`PartnerRate` … |
 | Segment tier | text | — |
-| Storefront subdomain | text | — |
 
 **The selected partner agreement** (detail panel, from `listPartnerAgreements`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Partner | the name it points at, never the id | The partner (control.partner) this agreement is with. The agreement carries the terms; control.partner carries who the partner is and … |
 | Partner name | text | The partner's trading name, read from control.partner.trading_name (Partner.tradingName) when the agreement is returned and never stored on … |
 | Status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | — |
 | Rate mode | chip: Net rate, Commission | Alternatives, not both. A partner buys at a net rate and keeps the margin, or sells at face value and is paid commission. |
 | Commission percent | 1,234.5 | — |
 | Volume tiers | list or chips (count when long) | Retired: the tiers are rows of control.partner_rate_volume_band (`PartnerRate.volumeBands`, written by setPartnerRateNet), one set per rate … |
-| Volume window | chip: Calendar month, Calendar quarter, Calendar year, Agreement year, Rolling12 months | — |
 | Seasonal rates | list or chips (count when long) | Retired: a seasonal rate is a control.partner_rate row with `seasonalRate: true` and its own `effectiveFrom`/`effectiveTo` (`PartnerRate` … |
 | Segment tier | text | — |
-| Branding image | the image or video | 2.7.x, BL-078. A reseller selling a venue's tickets under their own brand is a second scope level white-label does not have — … |
-| Storefront subdomain | text | — |
-| Sponsorship | grouped details | BL-050. Sponsorship inventory is sellable capacity of a different kind — logo placements, hospitality allocations, naming rights. |
 | Net rates | list or chips (count when long) | Retired: net rates are rows of control.partner_rate (`PartnerRate` with `pricingModel: netRate`, `netRate` and the `maxDiscountPercent` … |
-| Credit term days | 1,234 | 2.7.36. Net 30, net 60. |
-| Accepted by principal | the name it points at, never the id | BL-079. Electronic acceptance against a version, following the `signatureRef` precedent. |
 
 **The commission statement** (detail panel, from `getCommissionStatement`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Agreement | the name it points at, never the id | — |
 | Partner name | text | — |
 | From | 1 Oct 2026 | — |
 | To | 1 Oct 2026 | — |
@@ -453,9 +422,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Gross sales | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Refunds | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Net sales | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Commission earned | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Amount due | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Lines | list or chips (count when long) | Reconcilable order by order. A statement a partner cannot check line by line is a statement they will dispute, and the dispute costs more … |
 
 **Data it reads**: `listPartnerAgreements` (onLoad, Commercial agreements with B2B partners)
 
@@ -471,7 +438,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the commission statement untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No commission statement for this agreement and period yet: nothing has settled against it. Offers no action; the statement fills as bookings settle. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on expiringWithinDays, status and the commission statement are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PARTNER_VIEW`, which `getCommissionStatement` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PARTNER_MANAGE`, which `listPartnerAgreements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PARTNER_VIEW` for `getCommissionStatement`. |
 | Offline (`?state=offline`) | online only |
 
 #### Sample data for the mock-up
@@ -491,7 +458,7 @@ statement:
 - `getCommissionStatement` → `PARTNER_VIEW` (read) · staff, partner
 - `listPartnerAgreements` → `PARTNER_MANAGE` (configure) · staff, partner
 
-**A refused user sees:** Shown when the caller lacks `PARTNER_VIEW`, which `getCommissionStatement` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PARTNER_MANAGE`, which `listPartnerAgreements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PARTNER_VIEW` for `getCommissionStatement`.
 
 #### Requirements it meets
 
@@ -530,7 +497,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (2), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (36 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-017?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `PTR-003`.
@@ -548,7 +515,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Reports & Settlement · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-PARTNER-PTR-018 |
 | Who uses it | partner staff holding `REPORT_MANAGE`, `REPORT_VIEW_VENUE` (1 configure, 1 operate) |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listReports` reads the population and `getFinancialReport` reads one of them — list, select, act |
@@ -711,14 +678,7 @@ Errors to draw in the form: 409 The report is a system report, which is clone-on
 | Name | text | — |
 | Description | text | — |
 | Category | chip: Sales, Admission, Financial, Inventory, Guest, Operations… | — |
-| Data source | chip: Orders, Order lines, Payments, Refunds, Shifts, Scan events… | What a report may be built over. A closed set, and that is the point — a builder that accepts any table will happily produce a report over … |
-| Columns | list or chips (count when long) | — |
-| Filters | list or chips (count when long) | — |
-| Group by | list or chips (count when long) | — |
-| Parameters | list or chips (count when long) | — |
-| Required permission | chip: SESSION FORCE LOGOUT, USER MANAGE, ROLE MANAGE, PERMISSION GRANT, PERMISSION VIEW … | Permission needed to run this report, from the shared `Permission` vocabulary. The author cannot assign one they do not hold — otherwise a … |
 | Max date range days | 1,234 | Guards against a query spanning years of scan events. When a report sets none, 366 days applies (decided 28 September, audit R158), so … |
-| ID | the name it points at, never the id | — |
 | Is system | yes / no (icon or chip) | Shipped with the platform — seeded at provisioning (BL-053, `SeededReport`). Clone-only (decided 28 September, audit R096): `updateReport` … |
 
 **The selected report definition** (detail panel, from `getReport`)
@@ -731,15 +691,7 @@ Errors to draw in the form: 409 The report is a system report, which is clone-on
 | Data source | chip: Orders, Order lines, Payments, Refunds, Shifts, Scan events… | What a report may be built over. A closed set, and that is the point — a builder that accepts any table will happily produce a report over … |
 | Columns | list or chips (count when long) | — |
 | Filters | list or chips (count when long) | — |
-| Group by | list or chips (count when long) | — |
-| Parameters | list or chips (count when long) | — |
-| Required permission | chip: SESSION FORCE LOGOUT, USER MANAGE, ROLE MANAGE, PERMISSION GRANT, PERMISSION VIEW … | Permission needed to run this report, from the shared `Permission` vocabulary. The author cannot assign one they do not hold — otherwise a … |
-| Max date range days | 1,234 | Guards against a query spanning years of scan events. When a report sets none, 366 days applies (decided 28 September, audit R158), so … |
-| ID | the name it points at, never the id | — |
-| Is system | yes / no (icon or chip) | Shipped with the platform — seeded at provisioning (BL-053, `SeededReport`). Clone-only (decided 28 September, audit R096): `updateReport` … |
-| Is retired | yes / no (icon or chip) | — |
 | Estimated cost | chip: Low, Medium, High | Informs whether it may run inline or must be queued. |
-| Created by principal | the name it points at, never the id | — |
 | Last run at | 1 Oct 2026, 14:30 | — |
 
 **The financial report** (detail panel, from `getFinancialReport`)
@@ -787,7 +739,7 @@ Errors to draw in the form: 409 The report is a system report, which is clone-on
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the reports sales performance untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No reports sales performance yet. Offers Create report (`createReport`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on category, search and the reports sales performance are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REPORT_MANAGE` for `createReport`, `deleteReport`, `saveNaturalLanguageQuery`, `updateReport`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Question could not be interpreted. (ReportQuestionProblem); 400 Required parameter missing, or the date range exceeds `maxDateRangeDays` (366 days when the definition sets none, audit R158); 400 Unknown field, invalid filter, or estimated cost beyond the limit; 409 Active schedules reference this report (`report-scheduled`), or it is a system report, which is clone-only (`system-report` … |
 
@@ -812,7 +764,7 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `saveNaturalLanguageQuery` → `REPORT_MANAGE` (configure) · staff, partner
 - `updateReport` → `REPORT_MANAGE` (configure) · staff, partner
 
-**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REPORT_MANAGE` for `createReport`, `deleteReport`, `saveNaturalLanguageQuery`, `updateReport`.
 
 #### Requirements it meets
 
@@ -853,7 +805,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (76), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (35 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-018?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Run report, Ask reporting question, Create report, Delete report, Save natural language query, Save report.
 - [ ] Every transition is wired: `PTR-003`.

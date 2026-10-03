@@ -126,16 +126,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SUP-009` | Customer Service Command Center | B–D | 0 | 44 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `SUP-010` | Customer 360° Service Profile | B–D | 0 | 38 | 6 | 0 | 4 | 0 | — | notStarted (generated) |
-| `SUP-011` | Unified Interaction & Communication History | B–D | 11 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `SUP-012` | Case Creation, Classification & Intelligent Routing | B–D | 30 | 7 | 5 | 8 | 2 | 0 | — | notStarted (generated) |
-| `SUP-013` | Case Investigation & Resolution Workspace | B–D | 32 | 42 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
-| `SUP-014` | Order, Booking & Ticket Service Workspace | B–D | 2 | 37 | 6 | 5 | 2 | 6 | — | notStarted (generated) |
-| `SUP-015` | Refund, Compensation & Service Exception Workspace | B–D | 0 | 16 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
-| `SUP-016` | Escalation, Collaboration & Internal Resolution | B–D | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `SUP-017` | Case Resolution, Closure & Customer Feedback | B–D | 27 | 0 | 5 | 1 | 1 | 0 | — | notStarted (generated) |
-| `SUP-018` | AI Customer Service Copilot & Knowledge Workspace | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `SUP-009` | Customer Service Command Center | D | 0 | 44 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `SUP-010` | Customer 360° Service Profile | D | 0 | 38 | 6 | 0 | 4 | 0 | — | notStarted (generated) |
+| `SUP-011` | Unified Interaction & Communication History | D | 11 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `SUP-012` | Case Creation, Classification & Intelligent Routing | D | 30 | 7 | 5 | 8 | 2 | 0 | — | notStarted (generated) |
+| `SUP-013` | Case Investigation & Resolution Workspace | D | 32 | 42 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
+| `SUP-014` | Order, Booking & Ticket Service Workspace | D | 2 | 37 | 6 | 5 | 2 | 6 | — | notStarted (generated) |
+| `SUP-015` | Refund, Compensation & Service Exception Workspace | D | 0 | 16 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
+| `SUP-016` | Escalation, Collaboration & Internal Resolution | D | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `SUP-017` | Case Resolution, Closure & Customer Feedback | D | 27 | 0 | 5 | 1 | 1 | 0 | — | notStarted (generated) |
+| `SUP-018` | AI Customer Service Copilot & Knowledge Workspace | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -155,7 +155,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
 | Module | Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-SUPPORT-SUP-009 |
 | Who uses it | venue staff holding `CASE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display; Show) and no metric row |
@@ -265,12 +265,12 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `SUP-010` Customer 360° Service Profile: *Works in Customer 360° Service Profile*; calls `listCustomerService`
 - → `SUP-011` Unified Interaction & Communication History: *Works in Unified Interaction & Communication History*; calls `listCustomerService`
 - → `SUP-012` Case Creation, Classification & Intelligent Routing: *Works in Case Creation, Classification & Intelligent Routing*; calls `listCustomerService`
-- → `SUP-013` Case Investigation & Resolution Workspace: *Works in Case Investigation & Resolution Workspace*; carries `caseId`; calls `listCustomerService`
 - → `SUP-014` Order, Booking & Ticket Service Workspace: *Works in Order, Booking & Ticket Service Workspace*; calls `listCustomerService`
 - → `SUP-015` Refund, Compensation & Service Exception Workspace: *Works in Refund, Compensation & Service Exception Workspace*; calls `listCustomerService`
 - → `SUP-016` Escalation, Collaboration & Internal Resolution: *Works in Escalation, Collaboration & Internal Resolution*; calls `listCustomerService`
-- → `SUP-017` Case Resolution, Closure & Customer Feedback: *Works in Case Resolution, Closure & Customer Feedback*; carries `caseId`; calls `listCustomerService`
 - → `SUP-018` AI Customer Service Copilot & Knowledge Workspace: *Works in AI Customer Service Copilot & Knowledge Workspace*; calls `listCustomerService`
+- → `SUP-013` Case Investigation & Resolution Workspace: *Works in Case Investigation & Resolution Workspace*; carries `caseId`; calls `listCustomerService`
+- → `SUP-017` Case Resolution, Closure & Customer Feedback: *Works in Case Resolution, Closure & Customer Feedback*; carries `caseId`; calls `listCustomerService`
 
 #### States
 
@@ -348,7 +348,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SUP-009?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: New Case, Find Customer, Find Order, Find Ticket, Find Booking, Assign Case, Escalate, Open AI Assistant.
-- [ ] Every transition is wired: `SUP-001`, `SUP-010`, `SUP-011`, `SUP-012`, `SUP-013`, `SUP-014`, `SUP-015`, `SUP-016`, `SUP-017`, `SUP-018`.
+- [ ] Every transition is wired: `SUP-001`, `SUP-010`, `SUP-011`, `SUP-012`, `SUP-014`, `SUP-015`, `SUP-016`, `SUP-018`, `SUP-013`, `SUP-017`.
 - [ ] Every gated control is gated: `CASE_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
@@ -364,7 +364,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
 | Module | Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-SUPPORT-SUP-010 |
 | Who uses it | venue staff holding `CASE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display; Show) and no metric row |
@@ -533,7 +533,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
 | Module | Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-SUPPORT-SUP-011 |
 | Who uses it | venue staff holding `CASE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population |
@@ -664,7 +664,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
 | Module | Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-SUPPORT-SUP-012 |
 | Who uses it | venue staff holding `CASE_MANAGE`, `CASE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population |
@@ -852,7 +852,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
 | Module | Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-SUPPORT-SUP-013 |
 | Who uses it | venue staff holding `ASSET_LIBRARY_MANAGE`, `CASE_MANAGE`, `CASE_VIEW` (2 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1098,7 +1098,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
 | Module | Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-SUPPORT-SUP-014 |
 | Who uses it | venue staff holding `CASE_MANAGE`, `ORDER_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1290,7 +1290,7 @@ Also apply: 7 for all of P12, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
 | Module | Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-SUPPORT-SUP-015 |
 | Who uses it | venue staff holding `ORDER_REFUND` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1438,7 +1438,7 @@ Also apply: 7 for all of P12, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
 | Module | Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-SUPPORT-SUP-016 |
 | Who uses it | venue staff holding `CASE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population |
@@ -1561,7 +1561,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
 | Module | Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-SUPPORT-SUP-017 |
 | Who uses it | venue staff holding `CASE_MANAGE`, `CASE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Capture; Where configured, send) and no display directory — it is settings, not a population |
@@ -1719,7 +1719,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
 | Module | Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-SUPPORT-SUP-018 |
 | Who uses it | venue staff holding `AI_CONFIGURE`, `AI_USE` (1 configure, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

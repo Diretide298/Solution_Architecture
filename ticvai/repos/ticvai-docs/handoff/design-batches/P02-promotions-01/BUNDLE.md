@@ -96,7 +96,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-037` | Offers & Promotions | A | 0 | 21 | 6 | 2 | 0 | 2 | guest | notStarted (client-verified) |
+| `GST-037` | Offers & Promotions | A | 0 | 14 | 6 | 2 | 0 | 2 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch
 
@@ -115,8 +115,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Promotions · wave 2 · needs the `ticketing` module |
-| Block | Block A · ticket #18199 (APP-MOB-GST-037) |
+| Module | Promotions · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-MOB-GST-037 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listPromotions` reads the population and `getPromotion` reads one of them — list, select, act |
@@ -156,9 +156,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Discount | grouped details | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
-| Valid to | 1 Oct 2026, 14:30 | — |
 
 **The selected promotion** (detail panel, from `getPromotion`)
 
@@ -169,8 +167,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Description | text | — |
 | Discount | grouped details | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
-| Valid to | 1 Oct 2026, 14:30 | — |
-| Max redemptions per guest | 1,234 | — |
 
 **The coupon code** (detail panel, from `getCouponCode`)
 
@@ -180,10 +176,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Status | chip: Issued, Assigned, Redeemed, Expired, Voided | — |
 | Redemption count | 1,234 | — |
 | Discount | grouped details | — |
-| Invalid reason | chip: Expired, Already redeemed, Voided, Not yet valid, Wrong venue, Conditions not met… | Why the code cannot be applied. A cashier reading `expired` to a guest is a very different conversation from reading `already used`. |
 | Valid from | 1 Oct 2026, 14:30 | — |
-| Valid to | 1 Oct 2026, 14:30 | — |
-| Redeemed at | 1 Oct 2026, 14:30 | — |
 
 **Data it reads**: `listPromotions` (onLoad, List promotions)
 
@@ -263,7 +256,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 404).
-- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-037?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `GST-001`, `GST-011`.

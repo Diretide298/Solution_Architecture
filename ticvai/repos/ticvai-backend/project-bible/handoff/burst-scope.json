@@ -6,9 +6,9 @@
   "services": 17,
   "deployed": 3,
   "operations": 32,
-  "ofTotalOperations": 2731,
+  "ofTotalOperations": 2738,
   "tables": 62,
-  "ofTotalTables": 1112
+  "ofTotalTables": 1113
  },
  "routing": {
   "note": "**Normal traffic and sale traffic are separate systems running concurrently.** The burst environment carries the on-sale and nothing else; everything a venue does that day continues in the shared cell. **They meet once, afterwards, at reconciliation.**",
@@ -17,8 +17,8 @@
     "name": "normal",
     "target": "shared cell",
     "services": 17,
-    "operations": 2699,
-    "tables": 1112,
+    "operations": 2706,
+    "tables": 1113,
     "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
     "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
    },
@@ -665,7 +665,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "One request per action needing authorisation. The subject is a reference, never a copy **Hangs off**: **a root** — nothing above it in its schema; references `identity.principal`. **Reached by**: 31 operations read it an"
+   "note": "One request per action needing authorisation. The subject is a reference, never a copy **Hangs off**: **a root** — nothing above it in its schema; references `identity.principal`. **Reached by**: 34 operations read it an"
   },
   {
    "table": "catalogue.channel_allocation",
@@ -731,7 +731,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "configured rates with effective windows. A rate change is a new row; the old is never edited **Hangs off**: reaches `ledger.account` through its keys; references `identity.principal`, `platform.scope`. **Reached by**: 17"
+   "note": "configured rates with effective windows. A rate change is a new row; the old is never edited **Hangs off**: reaches `ledger.account` through its keys; references `identity.principal`, `platform.scope`. **Reached by**: 18"
   },
   {
    "table": "ledger.journal_line",

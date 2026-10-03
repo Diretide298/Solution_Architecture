@@ -259,35 +259,6 @@
   "requestBody": null,
   "responds": "WaitTime"
  },
- "listAnalyticsProviders": {
-  "method": "GET",
-  "path": "/tenant-config/analytics-providers",
-  "contract": "white-label",
-  "summary": "The analytics platforms the storefront and app report to",
-  "permission": "TENANT_CONFIGURE",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": "venueId",
-    "in": "query",
-    "required": false
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   },
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Page"
- },
  "listMyEntitlements": {
   "method": "GET",
   "path": "/guests/me/entitlements",

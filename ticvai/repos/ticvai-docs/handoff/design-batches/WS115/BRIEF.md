@@ -155,7 +155,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-685` | Accreditation Status & Portfolio Reporting | B–D | 0 | 0 | 6 | 3 | 1 | 6 | — | notStarted (—) |
 | `BO-686` | Accreditation Utilization Analytics | B–D | 0 | 22 | 6 | 3 | 1 | 6 | — | notStarted (—) |
 | `BO-687` | Accreditation Access Activity Reporting | B–D | 0 | 0 | 6 | 3 | 0 | 6 | — | notStarted (—) |
-| `BO-688` | Accreditation Trend & Comparative Analysis | B–D | 4 | 19 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-688` | Accreditation Trend & Comparative Analysis | B–D | 4 | 15 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-689` | Accreditation Audit Reporting | B–D | 0 | 0 | 6 | 2 | 0 | 6 | — | notStarted (—) |
 | `BO-690` | Immutable Accreditation Audit Log | B–D | 14 | 0 | 6 | 2 | 0 | 6 | — | notStarted (—) |
 | `BO-691` | Accreditation API Management | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |

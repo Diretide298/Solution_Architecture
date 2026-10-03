@@ -1443,8 +1443,6 @@
         "AiInsight.title",
         "AiInsight.kind",
         "AiInsight.priority",
-        "AiInsight.metricKey",
-        "AiInsight.magnitude",
         "AiInsight.status",
         "AiInsight.detectedAt"
        ],
@@ -1495,8 +1493,7 @@
         "AiMetricChangeExplanation.changePercent",
         "AiMetricChangeExplanation.drivers",
         "AiMetricChangeExplanation.narrative",
-        "AiMetricChangeExplanation.reliability",
-        "AiMetricChangeExplanation.dataAsOf"
+        "AiMetricChangeExplanation.reliability"
        ],
        "operation": "explainMetricChange",
        "notes": "The drivers in order of contribution and how reliable the explanation is (grounded, partial, conflicting sources, insufficient evidence).",
@@ -1542,7 +1539,7 @@
    "error": "Could not load. Names which read failed and leaves the insights untouched.",
    "emptyFirstRun": "No insights yet: nothing has moved enough to report. Good news, not a failure; the ask panel stays available.",
    "emptyNoResults": "Nothing matches the kind, priority or status filter, and the insights are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `listAiInsights` requires, and names that permission. **Never an empty list.**"
+   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `listAiInsights` requires, and names that permission. **Never an empty list.** A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REPORT_VIEW_VENUE` for `askReportingQuestion`."
   },
   "apis": [
    {
@@ -1584,7 +1581,9 @@
    "params": [
     {
      "name": "insightId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiInsights` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1842,8 +1841,6 @@
        "label": "Every site normalisation basis",
        "bindsTo": "SiteNormalisationBasis",
        "columns": [
-        "SiteNormalisationBasis.id",
-        "SiteNormalisationBasis.scopePath",
         "SiteNormalisationBasis.periodStart",
         "SiteNormalisationBasis.periodEnd",
         "SiteNormalisationBasis.visitors",

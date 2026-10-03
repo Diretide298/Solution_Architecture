@@ -115,7 +115,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1019` | Accessible Route Mapping | B–D | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1020` | Accessible Filters & Eligibility | B–D | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1021` | Flexible Spacing Rules | B–D | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1022` | Compliance Validation & Audit | B–D | 1 | 19 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1022` | Compliance Validation & Audit | B–D | 1 | 16 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -1443,9 +1443,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Message | text | — |
 | Required | 1,234.5 | — |
 | Actual | 1,234.5 | — |
-| Affected seats | list or chips (count when long) | — |
 | Owner | text | not in the schema: `Owner` |
-| Deadline | text | not in the schema: `Deadline` |
 
 **The selected finding** (detail panel, from `validateSeatCompliance`): Rule reference, remediation and evidence are pack labels.
 
@@ -1456,7 +1454,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Message | text | — |
 | Required | 1,234.5 | — |
 | Actual | 1,234.5 | — |
-| Affected seats | list or chips (count when long) | — |
 | Rule reference | text | not in the schema: `Rule reference` |
 | Remediation | text | not in the schema: `Remediation` |
 | Evidence | text | not in the schema: `Evidence` |
@@ -1531,7 +1528,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (1), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1022?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Run validation, Export compliance evidence.
 - [ ] Every transition is wired: `BO-1013`.

@@ -1,6 +1,6 @@
 # P08-orders-money-01 — P08 · Orders & Money (1 of 3)
 
-**10 screens · 62 operations · 91 schemas · 21 permissions**
+**10 screens · 62 operations · 92 schemas · 21 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -163,16 +163,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-022` | Order Detail | B–D | 127 | 53 | 6 | 72 | 1 | 0 | — | notStarted (generated) |
-| `BO-023` | Refunds & Exchanges | B–D | 95 | 71 | 6 | 60 | 3 | 6 | — | notStarted (generated) |
+| `BO-022` | Order Detail | B–D | 127 | 39 | 6 | 72 | 1 | 0 | — | notStarted (generated) |
+| `BO-023` | Refunds & Exchanges | B–D | 95 | 43 | 6 | 60 | 3 | 6 | — | notStarted (generated) |
 | `BO-024` | Payment Exceptions | B–D | 29 | 28 | 5 | 2 | 0 | 0 | — | notStarted (generated) |
-| `BO-025` | Chargebacks & Disputes | B–D | 10 | 49 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
-| `BO-026` | Group Bookings | B–D | 158 | 69 | 6 | 77 | 2 | 6 | — | notStarted (generated) |
+| `BO-025` | Chargebacks & Disputes | B–D | 10 | 27 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
+| `BO-026` | Group Bookings | B–D | 158 | 47 | 6 | 77 | 2 | 6 | — | notStarted (generated) |
 | `BO-027` | Reissue & Media Replacement | B–D | 13 | 7 | 6 | 22 | 0 | 0 | — | notStarted (generated) |
 | `BO-028` | Refund Approval Queue | B–D | 2 | 0 | 4 | 1 | 5 | 6 | — | notStarted (generated) |
-| `BO-029` | Report Builder | A | 76 | 28 | 6 | 88 | 1 | 0 | — | notStarted (generated) |
-| `BO-039` | Shift Directory | B–D | 4 | 35 | 6 | 1 | 2 | 6 | — | notStarted (generated) |
-| `BO-040` | Variance Approval | B–D | 17 | 59 | 6 | 5 | 1 | 3 | — | notStarted (generated) |
+| `BO-029` | Report Builder | A | 76 | 13 | 6 | 88 | 1 | 0 | — | notStarted (generated) |
+| `BO-039` | Shift Directory | B–D | 4 | 21 | 6 | 1 | 2 | 6 | — | notStarted (generated) |
+| `BO-040` | Variance Approval | B–D | 26 | 34 | 6 | 5 | 1 | 3 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -230,7 +230,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Status | radio group | — | Issued · Partially credited · Fully credited · Superseded | `listTaxInvoices` ?status |
 | Issued from | date picker | — | — | `listTaxInvoices` ?issuedFrom |
 | Issued to | date picker | — | — | `listTaxInvoices` ?issuedTo |
-| Language | text field | — | pattern `^[a-z]{2}(-[A-Z]{2})?$` | `getTaxDocumentRendition` ?language |
 
 **Form: Create order** (modal, opened by *Create order*; *Create order* calls `createOrder`, *Cancel* sends nothing)
 
@@ -450,18 +449,12 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | — |
-| Batch | the name it points at, never the id | The `RefundBatch` that raised this refund, where `createBulkRefund` did. Null for a refund raised on its own. |
 | FX rate | text | The rate on the original payment, not today's (BL-087, CF-118). `Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the … |
-| Tax reversal entry | the name it points at, never the id | A refund reverses the tax entry it created, and this is where that is stated rather than implied. |
 | Settle to | chip: Original tender, Advance balance, Wire transfer, Store credit | BL-086. A refund could only go back the way it came. |
 | FX variance | AED 1,234.50 | Where the sale rate and the current rate differ, the difference is booked as an FX variance rather than hidden in the refund. |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Applied percentage | 1,234.5 | From the venue's time bands, or an approver override. |
 | Status | chip: Pending approval, Pending gateway, Completed, Declined, Failed | — |
-| Reason | text | — |
-| Requested by principal | the name it points at, never the id | — |
 
 **The selected order** (detail panel, from `listOrders`)
 
@@ -495,22 +488,14 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The client UUIDv7 from `CreateOrderRequest.id`. |
 | Order number | text | The number a guest reads and a cashier types. Server-assigned: the venue prefix and a sequence per venue, for example `DXB1-000123` … |
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
 | Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Net amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Total price variance | AED 1,234.50 | Sum across lines. Zero on a normal order. |
-| Lines | list or chips (count when long) | — |
-| Payments | list or chips (count when long) | — |
-| Principal | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
@@ -533,7 +518,7 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 - **order header and statement**: Order number, channel, status badge, guest, totals; the statement with a running balance; card masked to the last four. *(source: contracts/spine/orders.yaml#getOrderStatement / DI-069)*
 - **tax documents**: Tax invoices and credit memos with PDF in English or Arabic; "Issue tax invoice" for a paid order that has none (simplified, full or consolidated). *(source: contracts/spine/finance.yaml#issueTaxInvoice / contracts/spine/finance.yaml#getTaxDocumentRendition)*
 
-**Data it reads**: `listOrders` (onLoad, List orders); `listTaxInvoices` (onLoad, List tax invoices); `getTaxInvoice` (onLoad, Show a tax invoice); `getTaxDocumentRendition` (onLoad, Download the invoice / credit memo PDF)
+**Data it reads**: `listOrders` (onLoad, List orders); `listTaxInvoices` (onLoad, List tax invoices); `getTaxInvoice` (onLoad, Show a tax invoice)
 
 **Where the user goes next**
 
@@ -551,7 +536,7 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the order untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No order yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the order are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission (the screen's other reads need `LEDGER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_POST` for `issueTaxInvoice`, `issueCreditMemo`; `ORDER_CREATE` for … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A lease covering a line has expired (`leaseExpired`), capacity is exhausted (`capacityExhausted`), or the catalogue bundle the client priced from is beyond its … (OrderRefusedProblem); 409 A targeted line's entitlement has been redeemed (`lineRedeemed`, naming it in `lineIds`), or the order is voided (`orderVoided`). (OrderRefusedProblem); 409 An order is not paid, is … |
 
@@ -585,7 +570,7 @@ order:
 - `holdOrder` → `ORDER_MODIFY` (operate) · staff, partner
 - `listOrderRefunds` → `ORDER_VIEW` (read) · staff, partner
 - `modifyOrder` → `ORDER_MODIFY` (operate) · staff, partner
-- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner
+- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner, device
 - `rescheduleOrder` → `ORDER_RESCHEDULE` (operate) · staff, partner
 - `resumeOrder` → `ORDER_MODIFY` (operate) · staff, partner
 - `voidOrder` → `ORDER_VOID` (operate) · staff, partner
@@ -595,7 +580,7 @@ order:
 - `issueCreditMemo` → `LEDGER_POST` (operate) · staff, service
 - `getTaxDocumentRendition` → `LEDGER_VIEW` (read) · staff, guest
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission (the screen's other reads need `LEDGER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_POST` for `issueTaxInvoice`, `issueCreditMemo`; `ORDER_CREATE` for …
 
 #### Requirements it meets
 
@@ -632,11 +617,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### References
 
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-022` · status **notStarted** · provenance generated
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (127), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (53 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (39 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-022?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Create order, Apply manual discount, Create refund, Exchange order lines, Hold order, Modify order, Reprint order, Reschedule order, Resume order, Void order.
 - [ ] Every transition is wired: `BO-008`.
@@ -689,7 +675,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Legal entity | picker: choose a legal entity | — | — | `listCreditMemos` ?legalEntityId |
 | Issued from | date picker | — | — | `listCreditMemos` ?issuedFrom |
 | Issued to | date picker | — | — | `listCreditMemos` ?issuedTo |
-| Language | text field | — | pattern `^[a-z]{2}(-[A-Z]{2})?$` | `getTaxDocumentRendition` ?language |
 
 **Form: Create refund** (modal, opened by *Create refund*; *Create refund* calls `createRefund`, *Cancel* sends nothing)
 
@@ -868,31 +853,21 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | — |
 | FX rate | text | The rate on the original payment, not today's (BL-087, CF-118). `Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the … |
-| Tax reversal entry | the name it points at, never the id | A refund reverses the tax entry it created, and this is where that is stated rather than implied. |
 | Settle to | chip: Original tender, Advance balance, Wire transfer, Store credit | BL-086. A refund could only go back the way it came. |
 | FX variance | AED 1,234.50 | Where the sale rate and the current rate differ, the difference is booked as an FX variance rather than hidden in the refund. |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Applied percentage | 1,234.5 | From the venue's time bands, or an approver override. |
 | Status | chip: Pending approval, Pending gateway, Completed, Declined, Failed | — |
-| Reason | text | — |
-| Requested by principal | the name it points at, never the id | — |
-| Secondary principal | the name it points at, never the id | — |
 
 **Every order** (data table, from `listOrders`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Order number | text | — |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
-| Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | The same vocabulary as `Order.channel`, which this projects. |
 | Line count | 1,234 | — |
-| Principal | the name it points at, never the id | The cashier who raised it — what the held-orders list shows. |
 | Hold label | text | As `Order.holdLabel`. |
 | Held until | 1 Oct 2026, 14:30 | As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse. |
 
@@ -900,21 +875,13 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | — |
-| Batch | the name it points at, never the id | The `RefundBatch` that raised this refund, where `createBulkRefund` did. Null for a refund raised on its own. |
 | FX rate | text | The rate on the original payment, not today's (BL-087, CF-118). `Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the … |
-| Tax reversal entry | the name it points at, never the id | A refund reverses the tax entry it created, and this is where that is stated rather than implied. |
 | Settle to | chip: Original tender, Advance balance, Wire transfer, Store credit | BL-086. A refund could only go back the way it came. |
 | FX variance | AED 1,234.50 | Where the sale rate and the current rate differ, the difference is booked as an FX variance rather than hidden in the refund. |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Applied percentage | 1,234.5 | From the venue's time bands, or an approver override. |
 | Status | chip: Pending approval, Pending gateway, Completed, Declined, Failed | — |
 | Reason | text | — |
-| Requested by principal | the name it points at, never the id | — |
-| Secondary principal | the name it points at, never the id | — |
-| Approved by principal | the name it points at, never the id | — |
-| Ledger entry | the name it points at, never the id | Written before the gateway is called. |
 | Gateway reference | text | — |
 
 **The order statement** (detail panel, from `getOrderStatement`)
@@ -934,8 +901,6 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
-| Venue | the name it points at, never the id | The venue in the path. Not taken from a `setRefundPolicy` body. |
 | Self authorise limit | AED 1,234.50 | Up to this, a holder of ORDER_REFUND refunds alone. Zero means every refund needs a second authoriser. |
 | Requires second user above | AED 1,234.50 | Above this, a second user — cashier OR supervisor — names themselves as audit control. |
 | Requires approval above | AED 1,234.50 | Above this, an ORDER_REFUND_APPROVE holder must approve. |
@@ -948,22 +913,14 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The client UUIDv7 from `CreateOrderRequest.id`. |
 | Order number | text | The number a guest reads and a cashier types. Server-assigned: the venue prefix and a sequence per venue, for example `DXB1-000123` … |
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
 | Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Net amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Total price variance | AED 1,234.50 | Sum across lines. Zero on a normal order. |
-| Lines | list or chips (count when long) | — |
-| Payments | list or chips (count when long) | — |
-| Principal | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
@@ -991,7 +948,7 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 - **Void**: Whole order only; refused after settlement or outside the shift with "use Refund"; the dialog names the tickets it revokes. *(source: contracts/spine/orders.yaml#voidOrder)*
 - **Reschedule**: The new performance is held before the original is released; if the new date is full nothing changes. *(source: contracts/spine/orders.yaml#exchangeOrderLines)*
 
-**Data it reads**: `listOrders` (onLoad, List orders); `getRefundPolicy` (onLoad, The policy this refund is judged against); `listCreditMemos` (onLoad, List credit memos); `getTaxDocumentRendition` (onLoad, Download the invoice / credit memo PDF)
+**Data it reads**: `listOrders` (onLoad, List orders); `getRefundPolicy` (onLoad, The policy this refund is judged against); `listCreditMemos` (onLoad, List credit memos)
 
 **Where the user goes next**
 
@@ -1009,7 +966,7 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the refunds exchanges untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No refunds exchanges yet. Offers Create refund (`createRefund`). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listOrderRefunds` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listOrderRefunds` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission (the screen's other reads need `LEDGER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_POST` for `issueCreditMemo`; `ORDER_DISCOUNT` for … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A targeted line's entitlement has been redeemed (`lineRedeemed`, naming it in `lineIds`), or the order is voided (`orderVoided`). (OrderRefusedProblem); 409 Replacement unavailable (`replacementUnavailable`), outside the exchange window (`outsideExchangeWindow`), or the original is redeemed (`lineRedeemed`). (OrderRefusedProblem); 409 Second authorisation required and … |
 
@@ -1063,7 +1020,7 @@ refundPolicy:
 - `getOrderStatement` → `ORDER_VIEW` (read) · staff, partner
 - `listOrders` → `ORDER_VIEW` (read) · staff, guest, partner
 - `modifyOrder` → `ORDER_MODIFY` (operate) · staff, partner
-- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner
+- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner, device
 - `rescheduleOrder` → `ORDER_RESCHEDULE` (operate) · staff, partner
 - `voidOrder` → `ORDER_VOID` (operate) · staff, partner
 - `getRefundPolicy` → `ORDER_VIEW` (read) · staff
@@ -1072,7 +1029,7 @@ refundPolicy:
 - `getTaxDocumentRendition` → `LEDGER_VIEW` (read) · staff, guest
 - `createBulkRefund` → `ORDER_REFUND_BULK` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listOrderRefunds` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission (the screen's other reads need `LEDGER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_POST` for `issueCreditMemo`; `ORDER_DISCOUNT` for …
 
 #### Requirements it meets
 
@@ -1124,11 +1081,12 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - Flow F09 branch at step 4 (recoverable): when Seats were sold, Seats return to available. If the performance is rescheduled rather than cancelled they must be held, and the two paths diverge here.
 - Flow F09 branch at step 4 (requiresStaff): when Entitlement is redeemable at another venue, Cross-cell. The redemption right must be revoked in the other cell too, and that cell may be unreachable.
 - Flow F09 branch at step 3 (requiresStaff): when Refund exceeds the manager threshold, Requires a second approver. CF-36 put the threshold at venue level.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (95), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (71 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (43 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-023?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Create refund, Apply manual discount, Exchange order lines, Modify order, Reprint order, Reschedule order, Void order, Refund every order.
 - [ ] Every transition is wired: `BO-008`.
@@ -1302,7 +1260,7 @@ Errors to draw in the form: 400 `partialForfeit` without an `amount`, or with on
 | Loading (`?state=loading`) | The saved payment exceptions. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the payment exceptions untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No payment exceptions configured. The form opens empty; it says what the platform does in the meantime. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listPaymentReconciliationException` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listPaymentReconciliationException` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_POST` for `settleDeposit`; `ORDER_CREATE` for `capturePayment`, `inquirePaymentStatus`; `SHIFT_CLOSE` for … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 `partialForfeit` without an `amount`, or with one that is not above zero and below the deposit, or in another currency.; 409 Only an `authorised` payment is captured (`notAuthorised`). The amount may not exceed what was authorised (`aboveAuthorisedAmount`), and less than that is … (PaymentProblem); 409 The deposit is not `held` (it has already been settled), or a forfeit was asked for while … |
 
@@ -1341,7 +1299,7 @@ exceptions:
 - `listPaymentReconciliationException` → `ORDER_VIEW` (read) · staff
 - `listDeposits` → `ORDER_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listPaymentReconciliationException` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listPaymentReconciliationException` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_POST` for `settleDeposit`; `ORDER_CREATE` for `capturePayment`, `inquirePaymentStatus`; `SHIFT_CLOSE` for …
 
 #### Requirements it meets
 
@@ -1370,6 +1328,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client design-board frames: `Retail Board 3.dc.html#ret-3k`
 - Flow F32 *A till opens, trades and settles*, step 8: The supervisor reviews the shift and the deposit reconciles. → Cash to the safe, shift `closed`, and the ledger posted. **`shift` writes `ledger.posting` here** — a till closing is a ledger act, which is why that cross-contract write is correct.
 - Flow F99 *A chargeback arrives and is defended*, step 2: Payment Exceptions. → 6 operations, 0 of them previously unwalked.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1476,70 +1435,48 @@ Errors to draw in the form: 400 `fileReference` names no completed upload in the
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Server-created when parsing finds the exception, so a UUID (naming-and-style 4). |
-| Settlement | the name it points at, never the id | — |
 | Kind | chip: Unmatched in provider, Unmatched in ledger, Amount mismatch, Duplicate in provider … | — |
 | Provider reference | text | — |
-| Payment | the name it points at, never the id | — |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Expected amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Resolution | chip: Matched manually, Write off, Dispute raised, Provider error, Timing difference | Null while the exception is open. |
-| Resolved by principal | the name it points at, never the id | — |
 | Resolved at | 1 Oct 2026, 14:30 | — |
 
 **Every settlement** (data table, from `listSettlements`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Currency code | text | A settlement has no account, so nothing else denominates it. A posting takes its currency from `ledger.account.currency` and a payment from … |
 | Provider name | text | — |
-| Period start | 1 Oct 2026 | A day in the region's time zone, local midnight to local midnight. |
-| Period end | 1 Oct 2026 | A day in the region's time zone, local midnight to local midnight. |
 | File reference | the name it points at, never the id | The `MediaAsset` holding the provider file, as given to `ingestSettlementFile`. Kept on the row because parsing is asynchronous: the job … |
-| Format | chip: Csv, Fixed width, Xml, Json | The file format given at ingest. Null when none was given. |
-| Status | chip: Ingesting, Parsing, Matching, Matched, Has exceptions, Resolved… | — |
 | Line count | 1,234 | — |
 | Matched count | 1,234 | — |
 | Exception count | 1,234 | — |
-| Provider gross | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **The selected settlement exception** (detail panel, from `listSettlementExceptions`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Server-created when parsing finds the exception, so a UUID (naming-and-style 4). |
-| Settlement | the name it points at, never the id | — |
 | Kind | chip: Unmatched in provider, Unmatched in ledger, Amount mismatch, Duplicate in provider … | — |
 | Provider reference | text | — |
-| Payment | the name it points at, never the id | — |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Expected amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Resolution | chip: Matched manually, Write off, Dispute raised, Provider error, Timing difference | Null while the exception is open. |
 | Note | text | The `note` given to `resolveSettlementException`, stored with the resolution. |
-| Resolved by principal | the name it points at, never the id | — |
 | Resolved at | 1 Oct 2026, 14:30 | — |
 
 **The settlement** (detail panel, from `getSettlement`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Currency code | text | A settlement has no account, so nothing else denominates it. A posting takes its currency from `ledger.account.currency` and a payment from … |
 | Provider name | text | — |
-| Period start | 1 Oct 2026 | A day in the region's time zone, local midnight to local midnight. |
-| Period end | 1 Oct 2026 | A day in the region's time zone, local midnight to local midnight. |
 | File reference | the name it points at, never the id | The `MediaAsset` holding the provider file, as given to `ingestSettlementFile`. Kept on the row because parsing is asynchronous: the job … |
-| Format | chip: Csv, Fixed width, Xml, Json | The file format given at ingest. Null when none was given. |
 | Status | chip: Ingesting, Parsing, Matching, Matched, Has exceptions, Resolved… | — |
 | Line count | 1,234 | — |
 | Matched count | 1,234 | — |
 | Exception count | 1,234 | — |
-| Provider gross | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Provider fees | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Provider net | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Ledger gross | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Difference | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **Actions and what each produces**
 
@@ -1576,7 +1513,7 @@ Errors to draw in the form: 400 `fileReference` names no completed upload in the
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the chargebacks disputes untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No chargebacks disputes yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listSettlementExceptions` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SETTLEMENT_VIEW`, which `listSettlementExceptions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SETTLEMENT_VIEW`, which `listSettlements` requires to show this screen, and names that permission (the screen's other reads need `ORDER_REFUND_APPROVE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `SETTLEMENT_RECONCILE` for `resolveSettlementException` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 `fileReference` names no completed upload in the caller's scope, or the period is not a single day (`settlement-period-not-a-day`, audit R110 (b)).; 400 `matchedManually` without a `matchedPaymentId`, or one that names no payment. `errors[]` names the field.; 409 The case already has an outcome, or was `accepted` by the venue (a conceded case cannot be won), or the fiscal period for the … |
 
@@ -1613,7 +1550,7 @@ analytics: September · 14 cases · 0.09% of card payments by count · win rate 
 - `recordChargebackOutcome` → `ORDER_REFUND_APPROVE` (operate) · staff, service
 - `getChargebackAnalytics` → `ORDER_REFUND_APPROVE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `SETTLEMENT_VIEW`, which `listSettlementExceptions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `SETTLEMENT_VIEW`, which `listSettlements` requires to show this screen, and names that permission (the screen's other reads need `ORDER_REFUND_APPROVE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `SETTLEMENT_RECONCILE` for `resolveSettlementException` …
 
 #### Requirements it meets
 
@@ -1647,7 +1584,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (10), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (49 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-025?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Resolve settlement exception, Ingest settlement file.
 - [ ] Every transition is wired: `BO-008`, `BO-024`.
@@ -1971,18 +1908,12 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | — |
-| Batch | the name it points at, never the id | The `RefundBatch` that raised this refund, where `createBulkRefund` did. Null for a refund raised on its own. |
 | FX rate | text | The rate on the original payment, not today's (BL-087, CF-118). `Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the … |
-| Tax reversal entry | the name it points at, never the id | A refund reverses the tax entry it created, and this is where that is stated rather than implied. |
 | Settle to | chip: Original tender, Advance balance, Wire transfer, Store credit | BL-086. A refund could only go back the way it came. |
 | FX variance | AED 1,234.50 | Where the sale rate and the current rate differ, the difference is booked as an FX variance rather than hidden in the refund. |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Applied percentage | 1,234.5 | From the venue's time bands, or an approver override. |
 | Status | chip: Pending approval, Pending gateway, Completed, Declined, Failed | — |
-| Reason | text | — |
-| Requested by principal | the name it points at, never the id | — |
 
 **The selected order** (detail panel, from `listOrders`)
 
@@ -2003,22 +1934,14 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Kind | chip: General, School, Corporate, Party | — |
-| Package product | text | The school-trip format or party package. |
 | Year group | text | — |
-| Access and dietary needs | text | — |
 | Celebrant name | text | The birthday child. |
-| Celebrant turning age | 1,234 | — |
-| Allergies and requests | text | — |
 | Final headcount due by | 1 Oct 2026, 14:30 | — |
 | Quote sent at | 1 Oct 2026, 14:30 | — |
 | Risk assessment sent at | 1 Oct 2026, 14:30 | — |
 | Preferred date | 1 Oct 2026 | The date the guest asked for on `requestGroupBooking` — what its `409 dateUnavailable` is checked against. |
-| Order | the name it points at, never the id | — |
-| Leader subject | the name it points at, never the id | — |
 | Organisation name | text | — |
-| Expected size | 1,234 | — |
 
 **The order statement** (detail panel, from `getOrderStatement`)
 
@@ -2037,22 +1960,14 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The client UUIDv7 from `CreateOrderRequest.id`. |
 | Order number | text | The number a guest reads and a cashier types. Server-assigned: the venue prefix and a sequence per venue, for example `DXB1-000123` … |
 | Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Net amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Total price variance | AED 1,234.50 | Sum across lines. Zero on a normal order. |
-| Lines | list or chips (count when long) | — |
-| Payments | list or chips (count when long) | — |
-| Principal | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
@@ -2094,7 +2009,7 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the group bookings untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No group bookings yet. Offers Create group booking (`createGroupBooking`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the group bookings are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `getGroupBooking` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createGroupBooking`, `createOrder`; `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_EXCHANGE` for `exchangeOrderLines` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A lease covering a line has expired (`leaseExpired`), capacity is exhausted (`capacityExhausted`), or the catalogue bundle the client priced from is beyond its … (OrderRefusedProblem); 409 A targeted line's entitlement has been redeemed (`lineRedeemed`, naming it in `lineIds`), or the order is voided (`orderVoided`). (OrderRefusedProblem); 409 Held order expired … |
 
@@ -2127,12 +2042,12 @@ group:
 - `holdOrder` → `ORDER_MODIFY` (operate) · staff, partner
 - `listOrderRefunds` → `ORDER_VIEW` (read) · staff, partner
 - `modifyOrder` → `ORDER_MODIFY` (operate) · staff, partner
-- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner
+- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner, device
 - `rescheduleOrder` → `ORDER_RESCHEDULE` (operate) · staff, partner
 - `resumeOrder` → `ORDER_MODIFY` (operate) · staff, partner
 - `voidOrder` → `ORDER_VOID` (operate) · staff, partner
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `getGroupBooking` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createGroupBooking`, `createOrder`; `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_EXCHANGE` for `exchangeOrderLines` …
 
 #### Requirements it meets
 
@@ -2177,11 +2092,12 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-026` · status **notStarted** · provenance generated · **Drawn by Claude Design on `Seat Platform Board 7.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been …
 - Derived from `wireframes/reference/Seat Platform Board 7.dc.html`
 - Client design-board frames: `Seat Platform Board 7.dc.html#seatp-7e`
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (158), with its required mark, default, format and its error state (400, 403, 404, 409, 412, 422).
-- [ ] Every output is drawn (69 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (47 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-026?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Create order, Apply manual discount, Create refund, Exchange order lines, Hold order, Modify order, Reprint order, Reschedule order, Resume order, Void order, Create group booking, Save group booking.
 - [ ] Every transition is wired: `BO-008`.
@@ -2300,7 +2216,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the reissue media replacement untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No reissue media replacement yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | The ticket reissue or credential replacement history for this media has nothing matching; the media itself is still shown. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`; `ORDER_EXCHANGE` for … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Media expired (`mediaExpired`), blocked (`mediaBlocked`), already surrendered at exit (`mediaSurrendered`), or the entitlement cannot share media … (AppendRefusedProblem); 409 replacement-limit, or approval-required, or the credential is revoked |
 
@@ -2326,7 +2242,7 @@ media:
 - `listCredentialReplacementReissue` → `SCOPE_VIEW` (read) · staff
 - `replaceCredential` → `ORDER_EXCHANGE` (operate) · staff · step-up mfa
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`; `ORDER_EXCHANGE` for …
 
 #### Requirements it meets
 
@@ -2512,8 +2428,8 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Orders & Money · wave 2 · needs the `analytics` module |
-| Block | Block A · ticket #20785 (APP-SETUP-BO-029) |
+| Module | Orders & Money · wave 1 · needs the `analytics` module |
+| Block | Block A · task APP-SETUP-BO-029 |
 | Who uses it | venue staff holding `REPORT_MANAGE`, `REPORT_VIEW_VENUE` (1 configure, 1 operate) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listReports` reads the population and `getFinancialReport` reads one of them — list, select, act |
@@ -2679,14 +2595,7 @@ Errors to draw in the form: 409 The report is a system report, which is clone-on
 | Name | text | — |
 | Description | text | — |
 | Category | chip: Sales, Admission, Financial, Inventory, Guest, Operations… | — |
-| Data source | chip: Orders, Order lines, Payments, Refunds, Shifts, Scan events… | What a report may be built over. A closed set, and that is the point — a builder that accepts any table will happily produce a report over … |
-| Columns | list or chips (count when long) | — |
-| Filters | list or chips (count when long) | — |
-| Group by | list or chips (count when long) | — |
-| Parameters | list or chips (count when long) | — |
-| Required permission | chip: SESSION FORCE LOGOUT, USER MANAGE, ROLE MANAGE, PERMISSION GRANT, PERMISSION VIEW … | Permission needed to run this report, from the shared `Permission` vocabulary. The author cannot assign one they do not hold — otherwise a … |
 | Max date range days | 1,234 | Guards against a query spanning years of scan events. When a report sets none, 366 days applies (decided 28 September, audit R158), so … |
-| ID | the name it points at, never the id | — |
 | Is system | yes / no (icon or chip) | Shipped with the platform — seeded at provisioning (BL-053, `SeededReport`). Clone-only (decided 28 September, audit R096): `updateReport` … |
 
 **The selected report definition** (detail panel, from `getReport`)
@@ -2699,15 +2608,7 @@ Errors to draw in the form: 409 The report is a system report, which is clone-on
 | Data source | chip: Orders, Order lines, Payments, Refunds, Shifts, Scan events… | What a report may be built over. A closed set, and that is the point — a builder that accepts any table will happily produce a report over … |
 | Columns | list or chips (count when long) | — |
 | Filters | list or chips (count when long) | — |
-| Group by | list or chips (count when long) | — |
-| Parameters | list or chips (count when long) | — |
-| Required permission | chip: SESSION FORCE LOGOUT, USER MANAGE, ROLE MANAGE, PERMISSION GRANT, PERMISSION VIEW … | Permission needed to run this report, from the shared `Permission` vocabulary. The author cannot assign one they do not hold — otherwise a … |
-| Max date range days | 1,234 | Guards against a query spanning years of scan events. When a report sets none, 366 days applies (decided 28 September, audit R158), so … |
-| ID | the name it points at, never the id | — |
-| Is system | yes / no (icon or chip) | Shipped with the platform — seeded at provisioning (BL-053, `SeededReport`). Clone-only (decided 28 September, audit R096): `updateReport` … |
-| Is retired | yes / no (icon or chip) | — |
 | Estimated cost | chip: Low, Medium, High | Informs whether it may run inline or must be queued. |
-| Created by principal | the name it points at, never the id | — |
 | Last run at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
@@ -2828,7 +2729,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (76), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-029?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Create report, Ask reporting question, Delete report, Run report, Save natural language query, Save report.
 - [ ] Every transition is wired: `BO-008`.
@@ -2921,36 +2822,22 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. |
 | Kind | chip: Opening float, Lift, Add | `openingFloat` is written by `openShift`; `lift` by `createCashMovement` and by `withdrawFromDepositBox`, which is a lift from one … |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Denominations | list or chips (count when long) | Stored as `orders.cash_count_line` rows with `countKind: movement` and this movement's `cashMovementId`, not as a column. |
 | Reference | text | Safe drop reference or bag number. |
 | Reason | text | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
-| Shift | the name it points at, never the id | — |
-| Deposit box | the name it points at, never the id | The box the cash moved in or out of. Set on every lift `withdrawFromDepositBox` records (26 September, pull audit R099). |
-| Witness principal | the name it points at, never the id | The cashier who countersigned a withdrawal. Null on other movements. |
 | Withdrawal reason | chip: Banking, Safe drop, Change order, Other | Why a supervisor took cash out of a box. Set only on lifts `withdrawFromDepositBox` records. |
-| Authorised by principal | the name it points at, never the id | The principal who authorised the movement, recorded for audit. |
 
 **The shift** (detail panel, from `getShift`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. Also the idempotency key. |
-| Workstation | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Principal | the name it points at, never the id | Who opened it. Cash reconciles to a person and a drawer. |
 | Principal display name | text | — |
 | Incidents | list or chips (count when long) | BL-097. A till has exceptions and there was nowhere to write them — a no-sale, a drawer opened without a transaction, a manager override, a … |
 | Status | chip: Pending approval, Open, Suspended, Pending variance, Pending closure, Closed… | — |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Deposit box code | text | — |
 | Bag number | text | — |
-| Opening float | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Sales total | AED 1,234.50 | What the till took in sales, as the guest paid it — tax included: the shift's takings, not Gross sales (CHG-FIN-002, CHG-FIN-010). |
 | Refunds total | AED 1,234.50 | What the till paid back, as the guest was refunded it — tax included. |
 | Lifts total | AED 1,234.50 | Cash taken out mid-shift by lifts and withdrawals. Cash, so neither gross nor net. |
@@ -3065,7 +2952,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (4), with its required mark, default, format and its error state (403, 404).
-- [ ] Every output is drawn (35 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-039?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] No transition is declared; back returns where the user came from.
@@ -3138,6 +3025,9 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
 | Reason `reason` | text area | required | — | min length 3; max length 500 | — | Retained for audit. The accepting principal is recorded. | `acceptShiftVariance` body |
+| Supervisor step up `supervisorStepUp` | group | optional | — | — | — | The supervisor accepting, signing on this device (CHG-RUL-019). Refused without it (`403 supervisor-step-up-refused`). | `acceptShiftVariance` body |
+| Principal `supervisorStepUp.principalId` | picker: choose a principal | required | — | — | shows names, sends the id | The supervisor signing. Recorded against the act. | `acceptShiftVariance` body |
+| Credential `supervisorStepUp.credential` | text area | required | — | max length 512 | — | The supervisor's staff PIN, as they sign in at a till with it. A PIN, never a password (audit R123 (7)). | `acceptShiftVariance` body |
 
 Errors to draw in the form: 403 The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is (problem type `approver-is-cashier`) — a cashier signing off their own …; 409 Shift is not `pendingVariance` (problem type `shift-not-pending-variance`) — within tolerance, still open, or already accepted.
 
@@ -3148,8 +3038,11 @@ Errors to draw in the form: 403 The caller lacks OVERSHORT_ACCEPT at this venue,
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
 | Reason `reason` | text area | required | — | min length 3; max length 500 | — | Why a recount is needed, shown to the cashier. Never the amount: "Count the AED 100 notes again", not "you are AED 100 short". | `rejectShiftVariance` body |
+| Supervisor step up `supervisorStepUp` | group | optional | — | — | — | The supervisor sending the shift back, signing on this device (CHG-RUL-014, as `reopenShift`). | `rejectShiftVariance` body |
+| Principal `supervisorStepUp.principalId` | picker: choose a principal | required | — | — | shows names, sends the id | The supervisor signing. Recorded against the act. | `rejectShiftVariance` body |
+| Credential `supervisorStepUp.credential` | text area | required | — | max length 512 | — | The supervisor's staff PIN, as they sign in at a till with it. A PIN, never a password (audit R123 (7)). | `rejectShiftVariance` body |
 
-Errors to draw in the form: 403 The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is (`approver-is-cashier`).; 409 Shift is not `pendingVariance` (`shift-not-pending-variance`), or a recount is already requested and not yet submitted (`recount-already-requested`).
+Errors to draw in the form: 403 The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is (`approver-is-cashier`); or the supervisor step-up is missing or failed …; 409 Shift is not `pendingVariance` (`shift-not-pending-variance`), or a recount is already requested and not yet submitted (`recount-already-requested`).
 
 **Form: Close shift** (modal, opened by *Close shift*; *Close shift* calls `closeShift`, *Cancel* sends nothing)
 
@@ -3168,6 +3061,9 @@ Errors to draw in the form: 403 The caller lacks OVERSHORT_ACCEPT at this venue,
 | Cashier reason `cashierReason` | radio group | optional | — | Till error · Unrecorded refund · Miscount · Other | — | Anything the cashier knows went wrong in the shift (DI-803: till error, unrecorded refund, miscount, other). | `closeShift` body |
 | Release held leases `releaseHeldLeases` | toggle | optional | on | — | — | Return unsold inventory leases held by this workstation (ADR-0013 C103). Closing without releasing strands capacity until TTL expiry, which is visible at a gate during peak. | `closeShift` body |
 | Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `closeShift` body |
+| Supervisor step up `supervisorStepUp` | group | optional | — | — | — | The supervisor closing the shift, signing on this device (CHG-RUL-019). Refused without it (`403 supervisor-step-up-refused`). | `closeShift` body |
+| Principal `supervisorStepUp.principalId` | picker: choose a principal | required | — | — | shows names, sends the id | The supervisor signing. Recorded against the act. | `closeShift` body |
+| Credential `supervisorStepUp.credential` | text area | required | — | max length 512 | — | The supervisor's staff PIN, as they sign in at a till with it. A PIN, never a password (audit R123 (7)). | `closeShift` body |
 
 Errors to draw in the form: 400 Validation failed; 403 The caller is the cashier whose shift it is and does not hold OVERSHORT_ACCEPT (problem type `blind-count-required`): their count goes through …; 409 Shift is not `open` or `suspended` — already closing or closed (problem type `shift-not-open`) — or open orders remain (`open-orders-remain`); 422 A counted line names an unknown or inactive denomination (`unknown-denomination`), repeats one (`duplicate-denomination`), or sends a `total` that disagrees …
 
@@ -3185,60 +3081,35 @@ Errors to draw in the form: 400 Validation failed; 403 The caller is the cashier
 | Shows | Format | Notes |
 |---|---|---|
 | Principal display name | text | — |
-| Incidents | list or chips (count when long) | BL-097. A till has exceptions and there was nowhere to write them — a no-sale, a drawer opened without a transaction, a manager override, a … |
 | Status | chip: Pending approval, Open, Suspended, Pending variance, Pending closure, Closed… | — |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Deposit box code | text | — |
 | Bag number | text | — |
 | Counted cash | AED 1,234.50 | What the close count found. Null until the shift is counted. |
-| Expected cash | AED 1,234.50 | 26 September, pull audit R207. The figure the blind count was measured against, revealed once the count is in — null until then. |
 | Variance | AED 1,234.50 | Counted minus expected, as `ShiftCloseResult.variance`. Negative is short. |
-| Cashier reason | chip: Till error, Unrecorded refund, Miscount, Other | What the cashier said went wrong, given with the blind count (`CloseShiftRequest.cashierReason`, DI-803) without seeing the variance; the … |
-| Cashier note | text | The cashier's note with the count (`CloseShiftRequest.notes`; CHG-FIN-003). |
 
 **Every cash movement** (data table, from `listCashMovements`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. |
 | Kind | chip: Opening float, Lift, Add | `openingFloat` is written by `openShift`; `lift` by `createCashMovement` and by `withdrawFromDepositBox`, which is a lift from one … |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Denominations | list or chips (count when long) | Stored as `orders.cash_count_line` rows with `countKind: movement` and this movement's `cashMovementId`, not as a column. |
 | Reference | text | Safe drop reference or bag number. |
 | Reason | text | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
-| Shift | the name it points at, never the id | — |
-| Deposit box | the name it points at, never the id | The box the cash moved in or out of. Set on every lift `withdrawFromDepositBox` records (26 September, pull audit R099). |
-| Witness principal | the name it points at, never the id | The cashier who countersigned a withdrawal. Null on other movements. |
 | Withdrawal reason | chip: Banking, Safe drop, Change order, Other | Why a supervisor took cash out of a box. Set only on lifts `withdrawFromDepositBox` records. |
-| Authorised by principal | the name it points at, never the id | The principal who authorised the movement, recorded for audit. |
 
 **The shift** (detail panel, from `getShift`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. Also the idempotency key. |
-| Workstation | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Principal | the name it points at, never the id | Who opened it. Cash reconciles to a person and a drawer. |
 | Principal display name | text | — |
-| Incidents | list or chips (count when long) | BL-097. A till has exceptions and there was nowhere to write them — a no-sale, a drawer opened without a transaction, a manager override, a … |
 | Status | chip: Pending approval, Open, Suspended, Pending variance, Pending closure, Closed… | — |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Deposit box code | text | — |
 | Bag number | text | — |
-| Opening float | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Sales total | AED 1,234.50 | What the till took in sales, as the guest paid it — tax included: the shift's takings, not Gross sales (CHG-FIN-002, CHG-FIN-010). |
 | Refunds total | AED 1,234.50 | What the till paid back, as the guest was refunded it — tax included. |
 | Lifts total | AED 1,234.50 | Cash taken out mid-shift by lifts and withdrawals. Cash, so neither gross nor net. |
-| Counted cash | AED 1,234.50 | What the close count found. Null until the shift is counted. |
-| Expected cash | AED 1,234.50 | 26 September, pull audit R207. The figure the blind count was measured against, revealed once the count is in — null until then. |
 | Variance | AED 1,234.50 | Counted minus expected, as `ShiftCloseResult.variance`. Negative is short. |
-| Cashier reason | chip: Till error, Unrecorded refund, Miscount, Other | What the cashier said went wrong, given with the blind count (`CloseShiftRequest.cashierReason`, DI-803) without seeing the variance; the … |
-| Cashier note | text | The cashier's note with the count (`CloseShiftRequest.notes`; CHG-FIN-003). |
 
 **Count by denomination** (data table, from `getShiftCountLines`): **The denomination breakdown of the closing count (decided 2 October 2026 by Chinmay, DEC-176).** Counted figures only, never the expected amount (blind close).
 
@@ -3264,7 +3135,7 @@ Errors to draw in the form: 400 Validation failed; 403 The caller is the cashier
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Accept variance (primary button) | `acceptShiftVariance` POST `/shifts/{shiftId}/accept-variance` | inline | Shift | 403 The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is (problem type `approver-is-cashier`) — a cashier signing off their own …; 409 Shift is not `pendingVariance` (problem type … | step-up: pin (A supervisor signs off a cashier's over/short in person, with their own PIN on the device they use (audit R080 (e); any …); opens modal first |
-| Reject and recount (secondary button) | `rejectShiftVariance` POST `/shifts/{shiftId}/reject-variance` | inline | Shift | 403 The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is (`approver-is-cashier`).; 409 Shift is not `pendingVariance` (`shift-not-pending-variance`), or a recount is already requested and … | step-up: pin (The same supervisor act as accepting a variance, in person with their own PIN (audit R080 (e); DEC-175).); opens modal first |
+| Reject and recount (secondary button) | `rejectShiftVariance` POST `/shifts/{shiftId}/reject-variance` | inline | Shift | 403 The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is (`approver-is-cashier`); or the supervisor step-up is missing or failed …; 409 Shift is not `pendingVariance` … | step-up: pin (The same supervisor act as accepting a variance, in person with their own PIN (audit R080 (e); DEC-175).); opens modal first |
 | Close shift (secondary button) | `closeShift` POST `/shifts/{shiftId}/close` | CloseShiftRequest | ShiftCloseResult | 400 Validation failed; 403 The caller is the cashier whose shift it is and does not hold OVERSHORT_ACCEPT (problem type `blind-count-required`): their count goes through …; 409 Shift is not `open` or `suspended` — … | step-up: pin (A supervisor closes a cashier's shift and sees the expected cash and the variance (CHG-FIN-003); their own PIN on the …); opens modal first |
 
 **Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
@@ -3293,7 +3164,7 @@ Errors to draw in the form: 400 Validation failed; 403 The caller is the cashier
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the variance approval untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | **Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on workstationId, status, openedFrom, openedTo and the variance approval are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT` for `acceptShiftVariance` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Shift is not `open` or `suspended` — already closing or closed (problem type `shift-not-open`) — or open orders remain (`open-orders-remain`); 409 Shift is not `pendingVariance` (`shift-not-pending-variance`), or a recount is already requested and not yet submitted (`recount-already-requested`).; 409 Shift is not `pendingVariance` (problem type … |
 
@@ -3348,7 +3219,7 @@ accepted:
 - `rejectShiftVariance` → `OVERSHORT_ACCEPT` (operate) · staff · step-up pin
 - `closeShift` → `SHIFT_CLOSE` (operate) · staff · step-up pin
 
-**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT` for `acceptShiftVariance` …
 
 #### Requirements it meets
 
@@ -3384,8 +3255,8 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (17), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (59 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (26), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
+- [ ] Every output is drawn (34 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-040?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Accept variance, Reject and recount, Close shift.
 - [ ] Every transition is wired: `BO-089`.
@@ -3653,6 +3524,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "Shift": {"x-ticvai-persistence":"orders.pos_shift + orders.pos_shift_approval + orders.pos_shift_incident","description":"**`approvals` and `incidents` are child rows** (26 September, pull audit R099): `orders.pos_shift_approval` and `orders.pos_shift_incident`, one row per item, keyed to the shift. Until then the contract carried both and `orders.pos_shift` had nowhere to put either.\n","type":"object","required":["id","workstationId","venueId","scopePath","principalId","status","currency","currencyScale","openedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7. Also the idempotency key."},"workstationId":{"type":"string","format":"uuid"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"principalId":{"type":"string","format":"uuid","description":"Who opened it. Cash reconciles to a person and a drawer."},"principalDisplayName":{"type":"string"},"incidents":{"type":"array","description":"BL-097. **A till has exceptions and there was nowhere to write them** — a no-sale, a drawer opened without a transaction, a manager override, a guest dispute.\n**This is the log a cash-up investigation starts from**, and a shift that balances with four unexplained no-sales is not a shift that balanced.\n","items":{"type":"object","properties":{"kind":{"type":"string","enum":["noSale","drawerOpen","override","voidAfterPayment","guestDispute","tillJam","priceQuery","other"]},"at":{"type":"string","format":"date-time"},"principalId":{"type":"string","format":"uuid"},"note":{"type":"string","nullable":true}}}},"status":{"$ref":"#/components/schemas/ShiftStatus"},"currency":{"type":"string","pattern":"^[A-Z]{3}$","x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"},"currencyScale":{"type":"integer","minimum":0,"maximum":4,"x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"},"depositBoxCode":{"type":"string","nullable":true},"bagNumber":{"type":"string","nullable":true},"openingFloat":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"salesTotal":{"x-ticvai-column":"gross_sales_amount","$ref":"../shared/common.yaml#/components/schemas/Money","description":"What the till took in sales, as the guest paid it — tax included: the shift's takings, not Gross sales (CHG-FIN-002, CHG-FIN-010). **Never shown to the shift's own cashier before the count is in** (CHG-FIN-003): with the float and the lifts it gives away the expected cash.\n"},"refundsTotal":{"x-ticvai-column":"gross_refunded_amount","$ref":"../shared/common.yaml#/components/schemas/Money","description":"What the till paid back, as the guest was refunded it — tax included."},"liftsTotal":{"x-ticvai-column":"lifted_amount","$ref":"../shared/common.yaml#/components/schemas/Money","description":"Cash taken out mid-shift by lifts and withdrawals. Cash, so neither gross nor net."},"expectedCash":{"x-ticvai-column":"expected_cash_amount","allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"readOnly":true,"nullable":true,"description":"26 September, pull audit R207. **The figure the blind count was measured against**, revealed once the count is in — null until then. Until this date only `ShiftCloseResult` carried it, returned once by `closeShift`, so BO-040 could not show the over/short it exists to accept. **Null to the shift's own cashier on every read** (CHG-FIN-003, 2 October): returned only to a caller holding OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER at the venue.\n"},"countedCash":{"x-ticvai-column":"counted_cash_amount","allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"readOnly":true,"nullable":true,"description":"What the close count found. Null until the shift is counted."},"variance":{"x-ticvai-column":"variance_amount","allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"readOnly":true,"nullable":true,"description":"Counted minus expected, as `ShiftCloseResult.variance`. Negative is short. Null to the shift's own cashier, as `expectedCash` (CHG-FIN-003)."},"cashierReason":{"type":"string","nullable":true,"readOnly":true,"enum":["tillError","unrecordedRefund","miscount","other"],"description":"What the cashier said went wrong, given with the blind count (`CloseShiftRequest.cashierReason`, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003).\n"},"cashierNote":{"type":"string","nullable":true,"readOnly":true,"maxLength":1000,"description":"The cashier's note with the count (`CloseShiftRequest.notes`; CHG-FIN-003)."},"heldLeaseCount":{"type":"integer","description":"Inventory leases currently held by this workstation. Surfaced so an operator closing a shift can see what will be returned.\n"},"openedAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time","description":"When the device recorded the open. `openedAt` is the server's time."},"suspendedAt":{"type":"string","format":"date-time","nullable":true},"suspendReason":{"type":"string","maxLength":200,"nullable":true,"description":"The `reason` given to `suspendShift`. Cleared on resume."},"closedAt":{"type":"string","format":"date-time","nullable":true},"closedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Who submitted the close count. `reopenShift` refuses an approver who is this principal, and until 26 September there was nothing to compare against (pull audit R099).\n"},"recountRequestedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"**Set by `rejectShiftVariance`, cleared by the cashier's recount** (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013; DI-804). While set, the shift is `pendingVariance` waiting for the cashier rather than the supervisor: the cashier's view says \"Recount requested\" instead of \"Under review\".\n"},"recountRequestedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The supervisor who sent the count back (CHG-CSP-013)."},"recountReason":{"type":"string","nullable":true,"readOnly":true,"maxLength":500,"description":"The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003)."},"countNumber":{"type":"integer","minimum":0,"readOnly":true,"description":"How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). The latest is the one measured.\n"},"syncedAt":{"type":"string","format":"date-time","nullable":true,"description":"Null while the shift has unsynced operations."},"approvals":{"type":"array","items":{"type":"object","required":["kind","principalId","at"],"properties":{"kind":{"type":"string","enum":["open","close","variance"],"description":"`open` from `approveShiftOpen`, `close` from `approveShiftClose`, `variance` from `acceptShiftVariance`.\n"},"principalId":{"type":"string","format":"uuid"},"at":{"type":"string","format":"date-time"},"reason":{"type":"string"}}}}}},
 "ShiftCloseResult": {"x-ticvai-persistence":"none — computed","type":"object","required":["shift","expectedCash","countedCash","variance","requiresAcceptance"],"properties":{"shift":{"$ref":"#/components/schemas/Shift"},"expectedCash":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"countedCash":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"variance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Counted minus expected. Negative is short."},"requiresAcceptance":{"type":"boolean","description":"True when the variance exceeds the venue's `shiftVarianceThreshold` (audit R094). The shift is then `pendingVariance` and only `acceptShiftVariance` finalises it (audit R080 (e)).\n"},"nonCashVariances":{"type":"array","items":{"type":"object","required":["tender","declared","captured","variance"],"properties":{"tender":{"type":"string"},"declared":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"captured":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"variance":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}}}},
 "ShiftStatus": {"type":"string","enum":["pendingApproval","open","suspended","pendingVariance","pendingClosure","closed","autoClosed"]},
+"SupervisorStepUp": {"type":"object","description":"**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n","required":["principalId","credential"],"properties":{"principalId":{"type":"string","format":"uuid","description":"The supervisor signing. Recorded against the act."},"credential":{"type":"string","maxLength":512,"writeOnly":true,"description":"The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."}}},
 "TenderKind": {"type":"string","description":"`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n","enum":["cash","card","wallet","voucher","bankTransfer","hotelCharge","installment","giftCard","complimentary"]},
 "TicketReissueFulfillmentRegenerationView": {"type":"object","x-ticvai-drafted-shape":true,"x-ticvai-persistence":"none — projection over orders state, assembled at read time from tables that already exist","description":"**What Ticket Reissue & Fulfillment Regeneration displays.** Read from the workshop pack's own display and configuration directory for this screen; each property names the sentence it came from. **Not a row** - the screen is a view over the module's existing state.","properties":{"maximumReissues":{"type":"string","description":"Maximum Reissues"},"freeReissueCount":{"type":"integer","description":"Free Reissue Count"},"supervisorThreshold":{"type":"integer","description":"Supervisor Threshold"},"reissueReason":{"type":"string","enum":["dateChanged","timeslotChanged","seatChanged","attendeeChanged","lostTicket","damagedCredential","emailNotReceived","walletPassIssue","printingError","credentialCompromised","administrativeCorrection"],"description":"Why the ticket is reissued."},"credentialMedia":{"type":"string","enum":["qr","dynamicQr","barcode","rfid","nfc","printedTicket","wearable"],"description":"Credential media regenerated."},"deliveryMethod":{"type":"string","enum":["email","smsWhatsappLink","mobileApp","walletPass","walletUpdate","posPrint","boxOfficeCollection"],"description":"How the reissue is delivered."},"reissueOption":{"type":"string","enum":["regenerateNew","resendExisting"],"description":"Regenerate a new credential (old one invalidated) or resend the existing one"}}},
 "UpdateGroupBookingRequest": {"type":"object","description":"Request only. Every field optional; absent means unchanged.","properties":{"packageProductId":{"type":"string","nullable":true,"description":"The school-trip format or party package."},"yearGroup":{"type":"string","maxLength":40,"nullable":true},"accessAndDietaryNeeds":{"type":"string","maxLength":1000,"nullable":true},"celebrantName":{"type":"string","maxLength":120,"nullable":true,"description":"The birthday child."},"celebrantTurningAge":{"type":"integer","minimum":1,"maximum":18,"nullable":true},"allergiesAndRequests":{"type":"string","maxLength":1000,"nullable":true},"finalHeadcountDueBy":{"type":"string","format":"date-time","nullable":true},"leaderSubjectId":{"type":"string","format":"uuid"},"organisationName":{"type":"string","maxLength":200,"nullable":true},"expectedSize":{"type":"integer","minimum":2},"confirmedSize":{"type":"integer","minimum":0},"minimumSize":{"type":"integer","minimum":1,"nullable":true},"attendeeCaptureRequired":{"type":"boolean"},"attendeeCaptureDueBy":{"type":"string","format":"date-time","nullable":true},"status":{"type":"string","enum":["confirmed","namesPending","complete","cancelled"]}}},

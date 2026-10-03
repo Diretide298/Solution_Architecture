@@ -60,13 +60,13 @@ except Exception:
 ROOT = Path(__file__).resolve().parents[1]
 DOCS = ROOT / "handoff" / "service-docs"
 OUT = DOCS / "op-release.json"
-SCREEN = re.compile(r"([A-Z]+-\d{3})$")
 TAG = re.compile(r"^r\d+$")
 POINTER_PREFIX = "Pull via ADAM:"               # a description holding this line is already a pointer
 RELEASE_PREFIX = "- Written at release "        # the one pointer line that may differ without a rewrite
 COMMENT_MARKER = "The spec for this ticket lives in ADAM"   # the one comment a started ticket gets, found by it
 REOPEN_MARKER = "Back in the plan"              # an On hold plan ticket set back to New, with one comment
 MAX_BUILDS = 60
+ARCHIVED_PROJECT = 153                          # the old project, archived at the fresh start of 3 October
 LAST_SPRINT = 13                                # Sprint 13 ends 2 April 2027; later work is planned into it
 INPUTS = ("tasks.csv", "pms-map.json", "block-a-schedule.json")    # in handoff/service-docs; checked at the tag
 
@@ -78,6 +78,8 @@ def _load(name, file):
     return mod
 
 
+_done = _load("ticket_done", "ticket_done.py")
+builds_of, DONE_WHEN, done_when, SCREEN = _done.builds_of, _done.DONE_WHEN, _done.done_when, _done.SCREEN
 push = _load("push_openproject", "push-openproject.py")
 assign_sync = _load("op_assign_sync", "op-assign-sync.py")
 OP_NAME = assign_sync.OP_NAME                   # plan name -> OpenProject name (Surendra -> Surendra Loke)
@@ -94,68 +96,8 @@ def summary_line(subject):
     return s if len(s) <= 200 else s[:197].rstrip() + "..."
 
 
-def builds_of(r, part, lineage):
-    """The artefact ids a ticket builds, as ADAM names them: operation contract#operationId, table schema.name,
-    screen id, service. Setup, onboarding and AI tasks build nothing ADAM indexes by id: their key is enough."""
-    def op_id(op):
-        c = lineage.get(op, {}).get("contract")
-        return f"{c}#{op}" if c else op
-
-    if r["type"] == "Task" and r["track"] == "Backend":
-        ops = [part] if part else (r["subject"].split(": ", 1)[1].split(", ") if ": " in r["subject"] else [])
-        return [f"operation {op_id(op)}" for op in ops]
-    if r["type"] == "Task" and r["track"] == "Database":
-        if part:
-            return [f"table {part}"]
-        m = re.search(r"Tables: (.+?)\. Source", r["description"])
-        return [f"table {t}" for t in (m.group(1).split(", ") if m else [])]
-    if r["type"] == "Task" and r["track"] == "Frontend":
-        m = SCREEN.search(r["key"])
-        return [f"screen {m.group(1)}"] if m else []
-    if r["type"] in ("Epic", "Feature") and r.get("service"):
-        return [f"service {r['service']}"]
-    return []
-
-
-DONE_WHEN = re.compile(r"Done when[:,]?\s*(.+)", re.S | re.I)
-
-
-def done_when(r, part, builds):
-    """What finishes this ticket, as one line every pointer carries (CHG-REL-003). The plan's own "Done when" when the
-    task has one; otherwise the test strategy's (docs/active/block-test-strategy.md) for its kind, naming what it
-    builds. Before 3 October the pointer said the done-when lived in ADAM, which serves contracts, screens and
-    tables but no task's done-when, so most tickets reached developers with none."""
-    m = DONE_WHEN.search(r.get("description") or "")
-    if m and not part:
-        return "Done when " + " ".join(m.group(1).split())[:700]
-    names = [b.split(" ", 1)[1] for b in builds]
-    named = ", ".join(f"`{n}`" for n in names[:8]) + (f" and {len(names) - 8} more" if len(names) > 8 else "")
-    kind, typ = r.get("track"), r.get("type")
-    if typ == "Epic":
-        return ("Done when every app-module in the block is done, every flow the block claims passes end to end on the "
-                "integration environment, and the client has run its acceptance session (block-test-strategy).")
-    if typ == "Feature":
-        return ("Done when every ticket under it is done and its module test passes on the integration environment with "
-                "no open severity 1 or 2 defect (block-test-strategy).")
-    if kind == "Backend" and names:
-        return (f"Done when {named} pass their contract tests against the contract in ADAM, including every documented "
-                "error response; each reads and writes only the tables its spec lists, under row-level security; unit "
-                "tests cover its rules; and a peer in the same stack has reviewed and tested it.")
-    if kind == "Database" and names:
-        return (f"Done when the migration for {named} runs forward on an empty database and on the previous release's "
-                "schema, every table matches its spec in ADAM (columns, keys, indexes, row-level security), and a peer "
-                "has reviewed it.")
-    if kind == "Frontend" and names:
-        step = {"build": "the layout is built from the screen spec (and its wireframe once client-verified)",
-                "wire": "every bound operation is called as the screen spec says, with its loading, empty and error states",
-                "test": "a component or interaction test covers every state, navigation link and permission"}.get(part)
-        if step:
-            return f"Done when, for {named}: {step}."
-        return (f"Done when {named} reaches every state its spec lists, every navigation link works, an allowed and a "
-                "refused user see what its permissions say, and it calls only its bound operations (block-test-strategy).")
-    return ("Done when the work in the description above is built, tested and reviewed by a peer in the same stack "
-            "(block-test-strategy).")
-
+# builds_of / DONE_WHEN / done_when: shared with build-service-docs.py so a tasks.csv description and its pointer
+# say the same done-when (tools/ticket_done.py, CHG-GTR-002).
 
 def pointer(key, summary, builds, release, what="", done=""):
     """The description a ticket carries from this release on. %ID% is its OpenProject id, filled in on the server.
@@ -418,6 +360,8 @@ def main() -> int:
     ap.add_argument("--out", default=str(OUT))
     ap.add_argument("--show", nargs="*", default=[], help="print these keys' bundle entries")
     ap.add_argument("--no-key-check", action="store_true", help="skip check-key-stability (never for a real push)")
+    ap.add_argument("--project", type=int, help="the OpenProject project id (default push-openproject.py PROJECT); "
+                                                "required while pms-map.json is empty (fresh start, 3 October)")
     a = ap.parse_args()
     release = a.release or git("describe", "--tags", "--exact-match", "HEAD")
     if not TAG.match(release or ""):
@@ -432,6 +376,14 @@ def main() -> int:
     retire_plan, unexplained = regroup(rows, mp, retire_plan, unexplained, release)
 
     bundle, errors = build(rows, mp, sched, lineage, retire_plan, unexplained, release)
+    # **Fresh start** (Chinmay, 3 October, CHG-GTR-001): r1 goes into a NEW OpenProject project; project 153's map
+    # is in service-docs/archive/ and pms-map.json starts empty. An empty map run against 153 would create every
+    # ticket a second time in the archived project, so the new project's id must be named.
+    if a.project:
+        bundle["project"] = a.project
+    if not pushed(mp) and bundle["project"] == ARCHIVED_PROJECT:
+        errors.append(f"pms-map.json holds no pushed ticket and the project is still #{ARCHIVED_PROJECT}, archived "
+                      "on 3 October: name the new project with --project <id>")
     errors += op10_problems()
     # CHG-REL-003: every task a developer pulls says what finishes it
     errors += [f"{t['key']}: its pointer has no done-when" for t in bundle["tickets"]

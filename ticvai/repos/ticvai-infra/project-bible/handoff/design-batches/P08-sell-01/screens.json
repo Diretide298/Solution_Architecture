@@ -43,7 +43,7 @@
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-007 holds none of them. The edge carries nothing: priceListId only pre-selects (deep link or optional); BO-009 finds ruleId (listDynamicPriceRules) itself, and BO-009 opens on its own"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-007 holds none of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional), and BO-009 opens on its own"
     },
     {
      "to": "BO-010",
@@ -100,16 +100,10 @@
        "label": "Every product",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
         "Product.code",
         "Product.name",
         "Product.description",
         "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
         "Product.onSaleFrom",
         "Product.onSaleTo"
        ],
@@ -152,12 +146,8 @@
        "label": "Every menu",
        "bindsTo": "Menu",
        "columns": [
-        "Menu.id",
         "Menu.code",
         "Menu.name",
-        "Menu.outletId",
-        "Menu.availability",
-        "Menu.sections",
         "Menu.isActive",
         "Menu.publishedVersion",
         "Menu.publishedAt"
@@ -171,17 +161,11 @@
        "bindsTo": "MerchandiseItem",
        "columns": [
         "MerchandiseItem.description",
-        "MerchandiseItem.id",
         "MerchandiseItem.sku",
         "MerchandiseItem.barcode",
         "MerchandiseItem.name",
-        "MerchandiseItem.outletId",
-        "MerchandiseItem.categoryId",
-        "MerchandiseItem.variantId",
-        "MerchandiseItem.inventoryItemId",
         "MerchandiseItem.price",
-        "MerchandiseItem.onHand",
-        "MerchandiseItem.isReturnable"
+        "MerchandiseItem.onHand"
        ],
        "operation": "listMerchandise",
        "provenance": "contract retail.yaml GET /merchandise"
@@ -197,21 +181,13 @@
        "label": "The selected product",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
         "Product.code",
         "Product.name",
         "Product.description",
         "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
         "Product.onSaleFrom",
         "Product.onSaleTo",
         "Product.lifecycleState",
-        "Product.isSellable",
-        "Product.hasVariants",
         "Product.variantCount"
        ],
        "operation": "getProduct",
@@ -296,7 +272,7 @@
    "error": "Could not load. Names which read failed and leaves the product untouched.",
    "emptyFirstRun": "No product yet. Offers Create product (`createProduct`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the product are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createProduct`, `setAlternativeCodes`, `setProductAttributes`, `transitionProductLifecycle` and 3 more; `TENANT_CONFIGURE` for `listBookingFlows`."
   },
   "apis": [
    {
@@ -438,7 +414,7 @@
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateProduct",
@@ -708,8 +684,6 @@
        "label": "The selected product variant",
        "bindsTo": "ProductVariant",
        "columns": [
-        "ProductVariant.id",
-        "ProductVariant.productId",
         "ProductVariant.sku",
         "ProductVariant.axisValues",
         "ProductVariant.name",
@@ -726,22 +700,14 @@
        "label": "The product",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
         "Product.code",
         "Product.name",
         "Product.description",
         "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
         "Product.onSaleFrom",
         "Product.onSaleTo",
-        "Product.categoryId",
         "Product.lifecycleState",
-        "Product.isSellable",
-        "Product.isStockTracked"
+        "Product.isSellable"
        ],
        "operation": "getProduct",
        "provenance": "contract catalogue.yaml GET /products/{productId}"
@@ -860,7 +826,7 @@
    "error": "Could not load. Names which read failed and leaves the product variants untouched.",
    "emptyFirstRun": "No product variants yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Never shown: `listProductVariants` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getProduct` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getProduct` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ASSET_LIBRARY_VIEW` for `searchMedia`; `GUEST_VIEW` for `listConsentQuestions`; `PRODUCT_CONFIGURE` for `setProductAttributes`, `updateProduct`, `updateProductVariant`, `restoreProductVersion` and 2 more; `TENANT_CONFIGURE` for `listBookingFlows`."
   },
   "apis": [
    {
@@ -1004,7 +970,7 @@
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetProductAttributes",
@@ -1181,15 +1147,11 @@
        "label": "Every price list",
        "bindsTo": "PriceList",
        "columns": [
-        "PriceList.id",
         "PriceList.code",
         "PriceList.name",
-        "PriceList.venueId",
         "PriceList.currency",
         "PriceList.currencyScale",
-        "PriceList.channels",
         "PriceList.validFrom",
-        "PriceList.validTo",
         "PriceList.priority"
        ],
        "operation": "listPriceLists",
@@ -1275,7 +1237,7 @@
    "error": "Could not load. Names which read failed and leaves the pricing rules untouched.",
    "emptyFirstRun": "No pricing rules yet. Offers Create price list (`createPriceList`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on channel and the pricing rules are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRICE_VIEW`, which `listPriceLists` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRICE_VIEW`, which `listPriceLists` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_CONFIGURE` for `createPriceList`, `copyPriceList`, `setPrices`, `updatePriceList` and 1 more; `PRODUCT_CONFIGURE` for `bulkChangePrices`."
   },
   "apis": [
    {
@@ -1380,7 +1342,9 @@
     },
     {
      "name": "ruleId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listDynamicPriceRules` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `priceListId`.",
@@ -1400,7 +1364,7 @@
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreatePriceList",
@@ -1515,7 +1479,7 @@
   "name": "Promotions & Coupons",
   "module": "Sell",
   "requiresModule": "ticketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -1542,7 +1506,7 @@
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-010 holds none of them. The edge carries nothing: priceListId only pre-selects (deep link or optional); BO-009 finds ruleId (listDynamicPriceRules) itself, and BO-009 opens on its own"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-010 holds none of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional), and BO-009 opens on its own"
     },
     {
      "to": "ANL-009",
@@ -1607,15 +1571,9 @@
         "Promotion.code",
         "Promotion.name",
         "Promotion.description",
-        "Promotion.venueId",
         "Promotion.discount",
-        "Promotion.conditions",
         "Promotion.stackingMode",
-        "Promotion.stackingGroup",
-        "Promotion.precedence",
-        "Promotion.validFrom",
-        "Promotion.validTo",
-        "Promotion.maxRedemptions"
+        "Promotion.validFrom"
        ],
        "operation": "listPromotions",
        "provenance": "contract promotions.yaml GET /promotions",
@@ -1628,14 +1586,8 @@
        "columns": [
         "CouponCampaign.code",
         "CouponCampaign.name",
-        "CouponCampaign.venueId",
-        "CouponCampaign.discount",
-        "CouponCampaign.conditions",
-        "CouponCampaign.isSingleUse",
         "CouponCampaign.maxRedemptionsPerCode",
         "CouponCampaign.validFrom",
-        "CouponCampaign.validTo",
-        "CouponCampaign.id",
         "CouponCampaign.generatedCount",
         "CouponCampaign.redeemedCount"
        ],
@@ -1649,16 +1601,10 @@
        "bindsTo": "CouponCode",
        "columns": [
         "CouponCode.code",
-        "CouponCode.campaignId",
-        "CouponCode.batchId",
         "CouponCode.status",
-        "CouponCode.assignedSubjectId",
         "CouponCode.redemptionCount",
-        "CouponCode.maxRedemptions",
         "CouponCode.discount",
-        "CouponCode.invalidReason",
         "CouponCode.validFrom",
-        "CouponCode.validTo",
         "CouponCode.redeemedAt"
        ],
        "operation": "listCouponCodes",
@@ -1715,16 +1661,11 @@
        "label": "Every commercial campaign",
        "bindsTo": "CommercialCampaign",
        "columns": [
-        "CommercialCampaign.id",
-        "CommercialCampaign.venueId",
         "CommercialCampaign.code",
         "CommercialCampaign.name",
         "CommercialCampaign.description",
-        "CommercialCampaign.ownerPrincipalId",
-        "CommercialCampaign.legalEntityId",
         "CommercialCampaign.validFrom",
-        "CommercialCampaign.validTo",
-        "CommercialCampaign.budgets"
+        "CommercialCampaign.validTo"
        ],
        "operation": "listCommercialCampaigns",
        "provenance": "contract promotions.yaml GET /commercial-campaigns",
@@ -1744,18 +1685,10 @@
         "Promotion.code",
         "Promotion.name",
         "Promotion.description",
-        "Promotion.venueId",
         "Promotion.discount",
         "Promotion.conditions",
         "Promotion.stackingMode",
-        "Promotion.stackingGroup",
-        "Promotion.precedence",
         "Promotion.validFrom",
-        "Promotion.validTo",
-        "Promotion.maxRedemptions",
-        "Promotion.maxRedemptionsPerGuest",
-        "Promotion.budgetCap",
-        "Promotion.id",
         "Promotion.status"
        ],
        "operation": "getPromotion",
@@ -2107,7 +2040,7 @@
    "error": "Could not load. Names which read failed and leaves the promotions coupons untouched.",
    "emptyFirstRun": "No promotions coupons yet. Offers Create coupon campaign (`createCouponCampaign`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, status, activeAt and the promotions coupons are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRICE_VIEW`, which `listPromotions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRICE_VIEW`, which `listPromotions` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_VENUE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_CONFIGURE` for `createCouponCampaign`, `createPromotion`, `endPromotion`, `generateCouponCodes` and 9 more."
   },
   "apis": [
    {
@@ -2344,7 +2277,9 @@
     },
     {
      "name": "dashboardId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the promotions themselves load without it; the dashboard panel shows only when a link names a saved dashboard."
     },
     {
      "name": "promotionId",
@@ -2360,7 +2295,9 @@
     },
     {
      "name": "voucherId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createVoucherBatch`; a link or an edge that holds one opens it instead."
     }
    ],
    "coldEntry": "A dashboard opened from a link or a saved view. A coupon code opened from the list, or scanned at a till.",
@@ -2380,7 +2317,7 @@
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2409,7 +2346,7 @@
   "name": "Packages & Bundles",
   "module": "Sell",
   "requiresModule": "ticketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -2485,11 +2422,8 @@
        "label": "Every bundle",
        "bindsTo": "BundleSummary",
        "columns": [
-        "BundleSummary.venueId",
         "BundleSummary.publishedAt",
         "BundleSummary.publishedBy",
-        "BundleSummary.contentHash",
-        "BundleSummary.signatureKeyId",
         "BundleSummary.staleAfter",
         "BundleSummary.sizeBytes",
         "BundleSummary.note",
@@ -2531,16 +2465,11 @@
        "label": "Every commercial campaign",
        "bindsTo": "CommercialCampaign",
        "columns": [
-        "CommercialCampaign.id",
-        "CommercialCampaign.venueId",
         "CommercialCampaign.code",
         "CommercialCampaign.name",
         "CommercialCampaign.description",
-        "CommercialCampaign.ownerPrincipalId",
-        "CommercialCampaign.legalEntityId",
         "CommercialCampaign.validFrom",
-        "CommercialCampaign.validTo",
-        "CommercialCampaign.budgets"
+        "CommercialCampaign.validTo"
        ],
        "operation": "listCommercialCampaigns",
        "provenance": "contract promotions.yaml GET /commercial-campaigns"
@@ -2574,8 +2503,6 @@
        "label": "The group package definition",
        "bindsTo": "GroupPackageDefinition",
        "columns": [
-        "GroupPackageDefinition.id",
-        "GroupPackageDefinition.productId",
         "GroupPackageDefinition.kind",
         "GroupPackageDefinition.maxParticipants",
         "GroupPackageDefinition.durationMinutes",
@@ -2583,8 +2510,7 @@
         "GroupPackageDefinition.pricingBasis",
         "GroupPackageDefinition.freeLeaderRatio",
         "GroupPackageDefinition.paymentMode",
-        "GroupPackageDefinition.includes",
-        "GroupPackageDefinition.scopePath"
+        "GroupPackageDefinition.includes"
        ],
        "operation": "getGroupPackageDefinition",
        "provenance": "contract catalogue.yaml GET /products/{productId}/group-package"
@@ -2669,7 +2595,7 @@
    "error": "Could not load. Names which read failed and leaves the packages bundles untouched.",
    "emptyFirstRun": "No packages bundles yet. Offers Create bundle (`createBundle`).",
    "emptyNoResults": "Never shown: `listCatalogueBundles` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getGroupPackageDefinition` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listCatalogueBundles` requires to show this screen, and names that permission (the screen's other reads need `PRICE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_CONFIGURE` for `setPackagePricingDefinition`; `PRODUCT_CONFIGURE` for `setGroupPackageDefinition`, `createBundle`, `createCombo`, `setComboSlots` and 1 more."
   },
   "apis": [
    {
@@ -2767,7 +2693,9 @@
     },
     {
      "name": "comboId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createCombo`; a link or an edge that holds one opens it instead."
     }
    ],
    "coldEntry": "**A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is not current, and links to the one that is. **An old version is history, not an error.** Arrives with `version`.",
@@ -2787,13 +2715,13 @@
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetGroupPackageDefinition",
     "component": "modal",
     "trigger": "Save group package definition",
-    "body": "**Collects what `setGroupPackageDefinition` sends before it is called.** Required: `kind`, `maxParticipants`, `durationMinutes`. Optional: `id`, `productId`, `hostCount`, `pricingBasis`, `freeLeaderRatio`, `paymentMode`, `includes`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setGroupPackageDefinition` sends before it is called.** Required: `kind`, `maxParticipants`, `durationMinutes`. Optional: `hostCount`, `pricingBasis`, `freeLeaderRatio`, `paymentMode`, `includes`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `productId`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "GroupPackageDefinition",
     "confirm": {
      "label": "Save group package definition",
@@ -2805,14 +2733,11 @@
       "kind",
       "maxParticipants",
       "durationMinutes",
-      "id",
-      "productId",
       "hostCount",
       "pricingBasis",
       "freeLeaderRatio",
       "paymentMode",
-      "includes",
-      "scopePath"
+      "includes"
      ]
     },
     "provenance": "contract catalogue.yaml PUT /products/{productId}/group-package"
@@ -2849,7 +2774,7 @@
     "id": "formSetPackagePricingDefinition",
     "component": "modal",
     "trigger": "Save package pricing definition",
-    "body": "**Collects what `setPackagePricingDefinition` sends before it is called.** Required: `id`, `scopePath`, `productId`, `recordKind`, `pricingModel`, `status`. Optional: `name`, `priceListId`, `addOnType`, `packagePrice`, `components`, `componentPriceVisibility`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setPackagePricingDefinition` sends before it is called.** Required: `productId`, `recordKind`, `pricingModel`, `status`. Optional: `name`, `priceListId`, `addOnType`, `packagePrice`, `components`, `componentPriceVisibility`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "PackagePricing",
     "confirm": {
      "label": "Save package pricing definition",
@@ -2858,8 +2783,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "productId",
       "recordKind",
       "pricingModel",
@@ -2917,7 +2840,7 @@
   "name": "Membership Products",
   "module": "Sell",
   "requiresModule": "ticketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -2956,7 +2879,7 @@
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-012 holds none of them. The edge carries nothing: priceListId only pre-selects (deep link or optional); BO-009 finds ruleId (listDynamicPriceRules) itself, and BO-009 opens on its own"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-012 holds none of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional), and BO-009 opens on its own"
     }
    ]
   },
@@ -2998,16 +2921,10 @@
        "label": "Every product",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
         "Product.code",
         "Product.name",
         "Product.description",
         "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
         "Product.onSaleFrom",
         "Product.onSaleTo"
        ],
@@ -3020,17 +2937,11 @@
        "bindsTo": "EntitlementTemplate",
        "columns": [
         "EntitlementTemplate.description",
-        "EntitlementTemplate.id",
         "EntitlementTemplate.code",
         "EntitlementTemplate.name",
         "EntitlementTemplate.validityKind",
-        "EntitlementTemplate.validFromOffsetDays",
-        "EntitlementTemplate.validForDays",
-        "EntitlementTemplate.daysOfWeek",
-        "EntitlementTemplate.expiryAnchor",
         "EntitlementTemplate.expiryDate",
-        "EntitlementTemplate.carriesStoredValue",
-        "EntitlementTemplate.includedValue"
+        "EntitlementTemplate.carriesStoredValue"
        ],
        "operation": "listEntitlementTemplates",
        "provenance": "contract catalogue.yaml GET /entitlement-templates"
@@ -3077,21 +2988,13 @@
        "label": "The selected product",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
         "Product.code",
         "Product.name",
         "Product.description",
         "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
         "Product.onSaleFrom",
         "Product.onSaleTo",
         "Product.lifecycleState",
-        "Product.isSellable",
-        "Product.hasVariants",
         "Product.variantCount"
        ],
        "operation": "getProduct",
@@ -3154,7 +3057,7 @@
    "error": "Could not load. Names which read failed and leaves the membership products untouched.",
    "emptyFirstRun": "No membership products yet. Offers Create entitlement template (`createEntitlementTemplate`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the membership products are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createEntitlementTemplate`, `createProduct`, `setAlternativeCodes`, `setProductAttributes` and 2 more."
   },
   "apis": [
    {
@@ -3252,7 +3155,9 @@
    "params": [
     {
      "name": "productId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProducts` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A shared product link after the product retired.** Shows what replaced it where a successor exists, and the catalogue where none does.",
@@ -3269,13 +3174,13 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-012"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateEntitlementTemplate",
     "component": "modal",
     "trigger": "Create entitlement template",
-    "body": "**Collects what `createEntitlementTemplate` sends before it is called.** Required: `id`, `code`, `name`, `validityKind`. Optional: `description`, `validFromOffsetDays`, `validForDays`, `daysOfWeek`, `expiryAnchor`, `expiryDate`, `carriesStoredValue`, `includedValue`, `validTimeWindows`, `blackoutDates`, `fastTrackTier`, `entriesAllowed` and 15 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createEntitlementTemplate` sends before it is called.** Required: `code`, `name`, `validityKind`. Optional: `description`, `validFromOffsetDays`, `validForDays`, `daysOfWeek`, `expiryAnchor`, `expiryDate`, `carriesStoredValue`, `includedValue`, `validTimeWindows`, `blackoutDates`, `fastTrackTier`, `entriesAllowed` and 15 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "EntitlementTemplate",
     "confirm": {
      "label": "Create entitlement template",
@@ -3284,7 +3189,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "code",
       "name",
       "validityKind",
@@ -3434,7 +3338,7 @@
   "name": "Channel & Distribution",
   "module": "Sell",
   "requiresModule": "ticketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -3474,7 +3378,7 @@
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-013 holds none of them. The edge carries nothing: priceListId only pre-selects (deep link or optional); BO-009 finds ruleId (listDynamicPriceRules) itself, and BO-009 opens on its own"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-013 holds none of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional), and BO-009 opens on its own"
     },
     {
      "to": "BO-011",
@@ -3514,18 +3418,12 @@
        "label": "Every channel capacity",
        "bindsTo": "ChannelCapacity",
        "columns": [
-        "ChannelCapacity.id",
-        "ChannelCapacity.performanceId",
         "ChannelCapacity.name",
-        "ChannelCapacity.seatCategoryId",
         "ChannelCapacity.oversellAllowance",
         "ChannelCapacity.oversellBasis",
         "ChannelCapacity.capacity",
         "ChannelCapacity.sold",
-        "ChannelCapacity.leased",
-        "ChannelCapacity.remaining",
-        "ChannelCapacity.hasChannelAllocations",
-        "ChannelCapacity.isSeated"
+        "ChannelCapacity.remaining"
        ],
        "operation": "listChannelCapacities",
        "provenance": "contract catalogue.yaml GET /channel-capacities"
@@ -3535,17 +3433,11 @@
        "label": "Every channel listing",
        "bindsTo": "ChannelListing",
        "columns": [
-        "ChannelListing.id",
         "ChannelListing.channelName",
-        "ChannelListing.productId",
         "ChannelListing.externalProductRef",
         "ChannelListing.status",
         "ChannelListing.allocationUnits",
-        "ChannelListing.priceListId",
-        "ChannelListing.adapter",
-        "ChannelListing.adapterCredentialRef",
         "ChannelListing.pushIntervalMinutes",
-        "ChannelListing.guestDataScope",
         "ChannelListing.lastPushedAt"
        ],
        "operation": "listChannelListings",
@@ -3556,16 +3448,10 @@
        "label": "Every product",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
         "Product.code",
         "Product.name",
         "Product.description",
         "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
         "Product.onSaleFrom",
         "Product.onSaleTo"
        ],
@@ -3589,18 +3475,14 @@
        "label": "The selected channel capacity",
        "bindsTo": "ChannelCapacity",
        "columns": [
-        "ChannelCapacity.id",
-        "ChannelCapacity.performanceId",
         "ChannelCapacity.name",
-        "ChannelCapacity.seatCategoryId",
         "ChannelCapacity.oversellAllowance",
         "ChannelCapacity.oversellBasis",
         "ChannelCapacity.capacity",
         "ChannelCapacity.sold",
         "ChannelCapacity.leased",
         "ChannelCapacity.remaining",
-        "ChannelCapacity.hasChannelAllocations",
-        "ChannelCapacity.isSeated"
+        "ChannelCapacity.hasChannelAllocations"
        ],
        "operation": "listChannelCapacities",
        "provenance": "contract catalogue.yaml GET /channel-capacities"
@@ -3677,7 +3559,7 @@
    "error": "Could not load. Names which read failed and leaves the channel distribution untouched.",
    "emptyFirstRun": "No channel distribution yet. Offers Create channel capacity (`createChannelCapacity`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on performanceId and the channel distribution are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getChannelAllocations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires to show this screen, and names that permission (the screen's other reads need `PARTNER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE` for `setChannelAllocations`, `createChannelCapacity`, `relinquishChannelAllocation`, `updateChannelCapacity`; `PARTNER_MANAGE` for `setChannelListing`; `PRODUCT_CONFIGURE` for `publishBundle`."
   },
   "apis": [
    {
@@ -3763,7 +3645,9 @@
    "params": [
     {
      "name": "channelCapacityId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listChannelCapacities` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `channelCapacityId`.",
@@ -3783,7 +3667,7 @@
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetChannelAllocations",
@@ -4020,16 +3904,10 @@
        "label": "Waiting to publish",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
         "Product.code",
         "Product.name",
         "Product.description",
         "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
         "Product.onSaleFrom",
         "Product.onSaleTo"
        ],
@@ -4068,21 +3946,13 @@
        "label": "The selected product",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
         "Product.code",
         "Product.name",
         "Product.description",
         "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
         "Product.onSaleFrom",
         "Product.onSaleTo",
         "Product.lifecycleState",
-        "Product.isSellable",
-        "Product.hasVariants",
         "Product.variantCount"
        ],
        "operation": "getProduct",
@@ -4122,7 +3992,7 @@
    "error": "Could not load. Names which read failed and leaves the catalogue publishing untouched.",
    "emptyFirstRun": "No catalogue publishing yet. Offers Publish bundle (`publishBundle`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the catalogue publishing are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission (the screen's other reads need `PRICE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `transitionProductLifecycle`, `publishBundle`."
   },
   "apis": [
    {
@@ -4170,7 +4040,9 @@
     },
     {
      "name": "itemId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that carries it only pre-selects the record."
     },
     {
      "name": "priceListId",
@@ -4198,7 +4070,7 @@
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formTransitionProductLifecycle",
@@ -4345,7 +4217,7 @@
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-015 holds none of them. The edge carries nothing: priceListId only pre-selects (deep link or optional); BO-009 finds ruleId (listDynamicPriceRules) itself, and BO-009 opens on its own"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-015 holds none of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional), and BO-009 opens on its own"
     },
     {
      "to": "BO-099",
@@ -4404,15 +4276,10 @@
        "label": "Every performance",
        "bindsTo": "Performance",
        "columns": [
-        "Performance.id",
-        "Performance.eventId",
         "Performance.startsAt",
         "Performance.endsAt",
-        "Performance.approvalRequestId",
         "Performance.requiresApprovalToCancel",
         "Performance.status",
-        "Performance.admissionRulesId",
-        "Performance.seatMapId",
         "Performance.language",
         "Performance.format"
        ],
@@ -4424,12 +4291,8 @@
        "label": "Every event",
        "bindsTo": "Event",
        "columns": [
-        "Event.id",
         "Event.code",
         "Event.name",
-        "Event.venueId",
-        "Event.scopePath",
-        "Event.parentEventId",
         "Event.performanceCount",
         "Event.isActive"
        ],
@@ -4454,15 +4317,10 @@
        "label": "The selected performance",
        "bindsTo": "Performance",
        "columns": [
-        "Performance.id",
-        "Performance.eventId",
         "Performance.startsAt",
         "Performance.endsAt",
-        "Performance.approvalRequestId",
         "Performance.requiresApprovalToCancel",
         "Performance.status",
-        "Performance.admissionRulesId",
-        "Performance.seatMapId",
         "Performance.language",
         "Performance.format"
        ],
@@ -4671,7 +4529,7 @@
    "error": "Could not load. Names which read failed and leaves the session calendar untouched.",
    "emptyFirstRun": "No session calendar yet. Offers Create performances (`createPerformances`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on from, to and the session calendar are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listPerformances` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getPerformance` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `EVENT_CONFIGURE` for `createEvent`, `updateEvent`; `PERFORMANCE_CONFIGURE` for `createPerformances`, `cancelPerformance`, `updatePerformance`."
   },
   "apis": [
    {
@@ -4763,7 +4621,9 @@
    "params": [
     {
      "name": "eventId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getPerformance`; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "performanceId",
@@ -4786,7 +4646,7 @@
    "derivedFrom": "wireframes/reference/Seat Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -4841,7 +4701,7 @@
     {
      "to": "BO-009",
      "trigger": "Pricing Rules",
-     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-016 holds none of them. The edge carries nothing: priceListId only pre-selects (deep link or optional); BO-009 finds ruleId (listDynamicPriceRules) itself, and BO-009 opens on its own"
+     "provenance": "derived — BO-009 declares entryState.params priceListId, ruleId and BO-016 holds none of them. The edge carries nothing: priceListId, ruleId only pre-select (deep link or optional), and BO-009 opens on its own"
     }
    ]
   },

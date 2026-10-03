@@ -1084,7 +1084,7 @@
   "fnb": {
    "title": "7 — F&B POS  ·  5 — F&B & Guest Management (service)",
    "capabilityCount": 8,
-   "unguardedOperations": 11,
+   "unguardedOperations": 13,
    "capabilities": [
     {
      "key": "INCIDENT_MANAGE",
@@ -1473,7 +1473,7 @@
       "listActiveSessions",
       "revokeAllSessions"
      ],
-     "elevated": false,
+     "elevated": true,
      "segregationConstrained": false
     },
     {
@@ -1705,9 +1705,11 @@
      "key": "INCIDENT_REPORT",
      "label": "deliberately wide. An unreported near-miss recurs",
      "group": "Maintenance & safety",
-     "operationCount": 1,
+     "operationCount": 3,
      "operations": [
-      "reportIncident"
+      "addIncidentPerson",
+      "reportIncident",
+      "uploadIncidentMedia"
      ],
      "elevated": false,
      "segregationConstrained": false
@@ -1832,7 +1834,7 @@
   "marketing-crm": {
    "title": "22 — Marketing & CRM",
    "capabilityCount": 16,
-   "unguardedOperations": 26,
+   "unguardedOperations": 28,
    "capabilities": [
     {
      "key": "AI_CONFIGURE",
@@ -2108,14 +2110,14 @@
      "key": "ORDER_CREATE",
      "label": null,
      "group": "Selling",
-     "operationCount": 43,
+     "operationCount": 44,
      "operations": [
       "appendEntitlementToMedia",
       "approveExceptionServiceRecovery",
       "approveGroupDiscountException",
       "approveListingModeration",
       "authoriseStoredValue",
-      "capturePayment"
+      "cancelPaymentLink"
      ],
      "elevated": false,
      "segregationConstrained": false

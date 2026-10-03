@@ -94,8 +94,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-012` | Checkout / Credit Purchase | B–D | 21 | 0 | 5 | 10 | 1 | 6 | — | notStarted (generated) |
-| `PTR-013` | Credit Limit & Balance | B–D | 0 | 13 | 5 | 5 | 1 | 0 | — | notStarted (generated) |
+| `PTR-012` | Checkout / Credit Purchase | C | 21 | 0 | 5 | 10 | 1 | 6 | — | notStarted (generated) |
+| `PTR-013` | Credit Limit & Balance | C | 0 | 8 | 5 | 5 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

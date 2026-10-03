@@ -551,6 +551,35 @@
     "format": "uuid",
     "nullable": true
    },
+   "escalation": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Set while the incident is escalated** (the optional Escalated step of the 3 October flow; CHG-RUL-011). Screens show \"Escalated\" when `status` is `underInvestigation` and this is set. Cleared when the incident closes.\n",
+    "properties": {
+     "toPrincipalId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "byPrincipalId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "reason": {
+      "type": "string"
+     },
+     "escalatedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   },
+   "reopenCount": {
+    "type": "integer",
+    "minimum": 0,
+    "readOnly": true,
+    "description": "How many times the incident was reopened (CHG-RUL-011). Each reopen is a logged row."
+   },
    "occurredAt": {
     "type": "string",
     "format": "date-time"
@@ -710,6 +739,33 @@
     "type": "string",
     "maxLength": 10000
    },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "note",
+     "statusChange",
+     "escalation",
+     "reopen"
+    ],
+    "default": "note",
+    "description": "**Every change is logged here** (CHG-RUL-011): an investigator's note, or a row the server writes for a status change, an escalation or a reopen, with `note` as its reason.\n"
+   },
+   "fromStatus": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/IncidentStatus"
+     }
+    ],
+    "nullable": true
+   },
+   "toStatus": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/IncidentStatus"
+     }
+    ],
+    "nullable": true
+   },
    "writtenByPrincipalId": {
     "type": "string",
     "format": "uuid"
@@ -756,6 +812,23 @@
     "format": "uuid",
     "nullable": true,
     "description": "The staff principal where `kind` is `staff`."
+   },
+   "role": {
+    "type": "string",
+    "nullable": true,
+    "enum": [
+     "injured",
+     "involved",
+     "witness",
+     "reporter",
+     null
+    ],
+    "description": "The person's part in the incident, from `addIncidentPerson` (CHG-RUL-013)."
+   },
+   "contactStored": {
+    "type": "boolean",
+    "readOnly": true,
+    "description": "Whether a contact is held for the person: only with their consent to be contacted (`AddIncidentPersonRequest.contactConsent`; CHG-RUL-013).\n"
    }
   }
  },
@@ -1619,6 +1692,27 @@
    "other"
   ],
   "description": "What a stock reservation is for (decided 17 September, M17-02; `rentalAgreement` is the existing use from `rental.agreement_item`)."
+ },
+ "SupervisorStepUp": {
+  "type": "object",
+  "description": "**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n",
+  "required": [
+   "principalId",
+   "credential"
+  ],
+  "properties": {
+   "principalId": {
+    "type": "string",
+    "format": "uuid",
+    "description": "The supervisor signing. Recorded against the act."
+   },
+   "credential": {
+    "type": "string",
+    "maxLength": 512,
+    "writeOnly": true,
+    "description": "The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."
+   }
+  }
  },
  "TicketStatus": {
   "x-ticvai-persistence": "none — computed from entitlement and scans",

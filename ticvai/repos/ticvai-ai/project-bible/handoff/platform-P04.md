@@ -9,12 +9,12 @@
 | Contracts | 19 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 158 |
-| Waves | wave1 29 · wave2 3 |
+| Operations with no screen | 161 |
+| Waves | wave1 32 |
 
 ## Gaps
 
-### 158 operations with no screen here
+### 161 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,23 +60,16 @@
 | `listInterEntityObligations` | finance | GET | What one entity owes another |
 | `recordWriteOff` | finance | POST | Write off an uncollectable balance |
 | `resolveObligationDispute` | finance | POST | Agree what is actually owed |
-| … | | | 118 more |
-
-### 2 modules split across waves
-
-**A platform that sells in one wave and cannot refund until a later one can take money and not give it back.** Not always wrong — worth a look each time.
-
-- **Sell** — waves 1, 2
-- **Shift** — waves 1, 2
+| … | | | 121 more |
 
 ## Modules
 
 | Module | Screens | Waves |
 |---|---|---|
-| Sell | 26 | 1, 2 |
-| Shift | 4 | 1, 2 |
+| Sell | 26 | 1 |
+| Shift | 4 | 1 |
 | Payment | 1 | 1 |
-| Reports | 1 | 2 |
+| Reports | 1 | 1 |
 
 ## Screens
 
@@ -86,12 +79,12 @@
 | `POS-001` | Begin Shift | Shift | 1 | 7 | yes |
 | `POS-002` | Sell — Ticket Catalogue | Sell | 1 | 32 | yes |
 | `POS-003` | Sell — Timed Entry | Sell | 1 | 8 | yes |
-| `POS-004` | Sell — Seat Map | Sell | 2 | 7 | yes |
+| `POS-004` | Sell — Seat Map | Sell | 1 | 7 | yes |
 | `POS-005` | Payment | Payment | 1 | 13 | yes |
 | `POS-006` | Held Orders | Sell | 1 | 14 | yes |
 | `POS-007` | Close Shift | Shift | 1 | 8 | yes |
-| `POS-008` | Reports | Reports | 2 | 4 | yes |
-| `POS-009` | Staff Roster | Shift | 2 | 3 | yes |
+| `POS-008` | Reports | Reports | 1 | 4 | yes |
+| `POS-009` | Staff Roster | Shift | 1 | 3 | yes |
 | `POS-010` | Add to Existing Ticket | Sell | 1 | 5 | yes |
 | `POS-011` | Returns, Refunds & Exchanges | Sell | 1 | 7 | yes |
 | `POS-012` | Omnichannel Order & Fulfilment Center | Sell | 1 | 6 | yes |

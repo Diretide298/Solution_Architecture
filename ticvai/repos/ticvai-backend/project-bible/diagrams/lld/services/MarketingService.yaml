@@ -1,10 +1,10 @@
 id: LLD-MarketingService
-title: MarketingService — 272 operations, 132 tables
+title: MarketingService — 274 operations, 132 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
 deployable: operations
 index: diagrams/hld/02-services.yaml
-why: '**272 operations and 132 tables — the biggest thing in the package, and probably two services
+why: '**274 operations and 132 tables — the biggest thing in the package, and probably two services
   eventually.** CRM and campaigns have different write patterns: a guest profile is read constantly
   and written rarely; a campaign send is a burst of millions of rows nobody reads again.
 
@@ -13,9 +13,9 @@ why: '**272 operations and 132 tables — the biggest thing in the package, and 
 scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
 ifDown: Down stops campaigns and guest lookup. Neither stops trading.
 coverage:
-  operations: 272
+  operations: 274
   inAFlow: 102
-  percent: 38%
+  percent: 37%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -26,7 +26,7 @@ schemas:
   largestTable: marketing.waiver_requirement
 operationsByContract:
 - contract: marketing-crm
-  count: 272
+  count: 274
   operations:
   - operation: accrueLoyaltyPoints
     verb: POST
@@ -411,6 +411,14 @@ operationsByContract:
     permission: GUEST_VIEW
     offline: false
     reads: 3
+    writes: 0
+  - operation: getGuestConversation
+    verb: GET
+    path: /my/conversations/{conversationId}
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 0
     writes: 0
   - operation: getGuestExtraValues
     verb: GET
@@ -1612,6 +1620,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 4
+  - operation: sendGuestConversationMessage
+    verb: POST
+    path: /my/conversations/{conversationId}/messages
+    scope: tenant
+    permission: null
+    offline: false
+    reads: 0
+    writes: 0
   - operation: sendTransactionalMessage
     verb: POST
     path: /messages
@@ -3441,6 +3457,7 @@ screens:
 - P04:POS-030 Sales Journal
 - P05:KSK-013 Call staff
 - P05:KSK-015 Assistant
+- P06:EMP-026 Incident report
 - P06:EMP-028 Lost & found
 - P06:EMP-029 Guest assistance
 - P06:EMP-055 Create / Edit Reservation

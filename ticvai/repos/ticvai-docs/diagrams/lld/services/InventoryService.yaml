@@ -11,8 +11,8 @@ scale: Mixed. Counting is bursty; procurement is not.
 ifDown: Down blocks receiving and counting; selling continues from the till's cache.
 coverage:
   operations: 58
-  inAFlow: 44
-  percent: 76%
+  inAFlow: 42
+  percent: 72%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:

@@ -118,10 +118,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-008` | Booking Creation | B–D | 105 | 53 | 6 | 66 | 0 | 6 | — | notStarted (generated) |
-| `PTR-009` | Group / Bulk Booking | B–D | 11 | 18 | 6 | 14 | 2 | 6 | — | notStarted (generated) |
-| `PTR-010` | Cart & Quote | B–D | 46 | 51 | 6 | 30 | 0 | 6 | — | notStarted (generated) |
-| `PTR-011` | Quote Management | B–D | 10 | 40 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
+| `PTR-008` | Booking Creation | C | 105 | 39 | 6 | 66 | 0 | 6 | — | notStarted (generated) |
+| `PTR-009` | Group / Bulk Booking | C | 11 | 12 | 6 | 14 | 2 | 6 | — | notStarted (generated) |
+| `PTR-010` | Cart & Quote | C | 46 | 29 | 6 | 30 | 0 | 6 | — | notStarted (generated) |
+| `PTR-011` | Quote Management | B | 10 | 26 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -137,7 +137,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Booking & Quotes · wave 2 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-PARTNER-PTR-008 |
 | Who uses it | partner staff holding `ORDER_CREATE`, `ORDER_EXCHANGE`, `ORDER_MODIFY`, `ORDER_REPRINT`, `ORDER_RESCHEDULE`, `ORDER_VIEW` (5 operate, 1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listOrders` reads the population and `getOrder` reads one of them — list, select, act |
@@ -347,18 +347,12 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | — |
-| Batch | the name it points at, never the id | The `RefundBatch` that raised this refund, where `createBulkRefund` did. Null for a refund raised on its own. |
 | FX rate | text | The rate on the original payment, not today's (BL-087, CF-118). `Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the … |
-| Tax reversal entry | the name it points at, never the id | A refund reverses the tax entry it created, and this is where that is stated rather than implied. |
 | Settle to | chip: Original tender, Advance balance, Wire transfer, Store credit | BL-086. A refund could only go back the way it came. |
 | FX variance | AED 1,234.50 | Where the sale rate and the current rate differ, the difference is booked as an FX variance rather than hidden in the refund. |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Applied percentage | 1,234.5 | From the venue's time bands, or an approver override. |
 | Status | chip: Pending approval, Pending gateway, Completed, Declined, Failed | — |
-| Reason | text | — |
-| Requested by principal | the name it points at, never the id | — |
 
 **The selected order** (detail panel, from `listOrders`)
 
@@ -392,22 +386,14 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The client UUIDv7 from `CreateOrderRequest.id`. |
 | Order number | text | The number a guest reads and a cashier types. Server-assigned: the venue prefix and a sequence per venue, for example `DXB1-000123` … |
 | Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Net amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Total price variance | AED 1,234.50 | Sum across lines. Zero on a normal order. |
-| Lines | list or chips (count when long) | — |
-| Payments | list or chips (count when long) | — |
-| Principal | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
@@ -442,7 +428,7 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the booking creation untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No booking creation yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the booking creation are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createOrder`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_MODIFY` for `holdOrder`, `modifyOrder`, `resumeOrder` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A lease covering a line has expired (`leaseExpired`), capacity is exhausted (`capacityExhausted`), or the catalogue bundle the client priced from is beyond its … (OrderRefusedProblem); 409 A targeted line's entitlement has been redeemed (`lineRedeemed`, naming it in `lineIds`), or the order is voided (`orderVoided`). (OrderRefusedProblem); 409 Held order expired … |
 
@@ -464,11 +450,11 @@ booking: DRT-2026-1042 · Day Pass Adult × 20 · AED 5,200 on credit
 - `holdOrder` → `ORDER_MODIFY` (operate) · staff, partner
 - `listOrderRefunds` → `ORDER_VIEW` (read) · staff, partner
 - `modifyOrder` → `ORDER_MODIFY` (operate) · staff, partner
-- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner
+- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner, device
 - `rescheduleOrder` → `ORDER_RESCHEDULE` (operate) · staff, partner
 - `resumeOrder` → `ORDER_MODIFY` (operate) · staff, partner
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createOrder`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_MODIFY` for `holdOrder`, `modifyOrder`, `resumeOrder` …
 
 #### Requirements it meets
 
@@ -515,11 +501,12 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 - Flow F03 branch at step 3 (requiresStaff): when The partner account is suspended, Refused with the reason. Suspension is commercial and must not read as a system fault.
 - Flow F10 branch at step 2 (requiresStaff): when Booking exceeds the credit limit, Refused, or requires an override. `overrideCreditLimit` exists and records who and why — a partner who can silently exceed their limit is a bad debt nobody saw.
 - Flow F10 branch at step 2 (recoverable): when Allocation exhausted, Refused. **The partner may buy at retail instead**, which is a different price and must be shown as one.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (105), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (53 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (39 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-008?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create order, Exchange order lines, Hold order, Modify order, Reprint order, Reschedule order, Resume order.
 - [ ] Every transition is wired: `PTR-002`, `PTR-003`, `SCN-003`, `PTR-016`.
@@ -537,7 +524,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Booking & Quotes · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-PARTNER-PTR-009 |
 | Who uses it | partner staff holding `CAPACITY_CONFIGURE`, `ORDER_CREATE`, `PRODUCT_VIEW` (1 configure, 1 operate, 1 read) |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listSeatBlocks` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -604,15 +591,9 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Performance | the name it points at, never the id | — |
-| Seats | list or chips (count when long) | — |
-| Reason | chip: Production hold, House seats, Group allocation, Maintenance, Accessibility reserve … | `other` is allowed only with a note (decided 28 September, audit R222). Every block already requires `note`, so an `other` block always … |
 | Note | text | — |
-| Created by principal | the name it points at, never the id | — |
 | Release at | 1 Oct 2026, 14:30 | — |
 | Released at | 1 Oct 2026, 14:30 | — |
-| Scope path | text | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it … |
 
 **The selected seat block** (detail panel, from `listSeatBlocks`)
 
@@ -655,7 +636,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the group bulk booking untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No group bulk booking yet. Offers Create seat block (`createSeatBlock`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on performanceId, reason and the group bulk booking are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listSeatBlocks` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listSeatBlocks` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE` for `createSeatBlock`, `relinquishSeatBlock`; `ORDER_CREATE` for `allocateBlockedSeats`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 One or more seats already sold. (SeatConflictProblem) |
 
@@ -674,7 +655,7 @@ batch: 5,000 × Day Pass · valid 1 Oct-31 Dec · AED 240 each · CSV
 - `listSeatBlocks` → `PRODUCT_VIEW` (read) · staff, partner
 - `relinquishSeatBlock` → `CAPACITY_CONFIGURE` (configure) · staff, partner
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listSeatBlocks` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listSeatBlocks` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE` for `createSeatBlock`, `relinquishSeatBlock`; `ORDER_CREATE` for `allocateBlockedSeats`.
 
 #### Requirements it meets
 
@@ -723,7 +704,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (11), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-009?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Allocate blocked seats, Create seat block, Release seat block.
 - [ ] Every transition is wired: `PTR-003`.
@@ -742,7 +723,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Booking & Quotes · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-PARTNER-PTR-010 |
 | Who uses it | partner staff holding `PRICE_VIEW` (1 read) |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listPromotions` reads the population and `getPromotion` reads one of them — list, select, act |
@@ -858,15 +839,9 @@ Errors to draw in the form: 400 `chargeCurrency` is not one the venue takes (pro
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Venue | the name it points at, never the id | — |
 | Discount | grouped details | — |
-| Conditions | grouped details | All conditions must hold. An empty object matches everything. |
 | Stacking mode | chip: Exclusive, Stackable, Best only, Stack with group | How this promotion combines with others. Declared, never inferred from creation order — two reasonable promotions can otherwise combine … |
-| Stacking group | text | — |
-| Precedence | 1,234 | Higher evaluates first where several could apply. |
 | Valid from | 1 Oct 2026, 14:30 | — |
-| Valid to | 1 Oct 2026, 14:30 | — |
-| Max redemptions | 1,234 | — |
 
 **The selected promotion** (detail panel, from `getPromotion`)
 
@@ -875,18 +850,10 @@ Errors to draw in the form: 400 `chargeCurrency` is not one the venue takes (pro
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Venue | the name it points at, never the id | — |
 | Discount | grouped details | — |
 | Conditions | grouped details | All conditions must hold. An empty object matches everything. |
 | Stacking mode | chip: Exclusive, Stackable, Best only, Stack with group | How this promotion combines with others. Declared, never inferred from creation order — two reasonable promotions can otherwise combine … |
-| Stacking group | text | — |
-| Precedence | 1,234 | Higher evaluates first where several could apply. |
 | Valid from | 1 Oct 2026, 14:30 | — |
-| Valid to | 1 Oct 2026, 14:30 | — |
-| Max redemptions | 1,234 | — |
-| Max redemptions per guest | 1,234 | — |
-| Budget cap | AED 1,234.50 | Total discount value after which the promotion stops automatically. Enforced at checkout, where an order whose discount would take the … |
-| ID | the name it points at, never the id | — |
 | Status | chip: Draft, Scheduled, Live, Paused, Expired, Ended | — |
 
 **The promotion usage** (detail panel, from `getPromotionUsage`)
@@ -905,22 +872,14 @@ Errors to draw in the form: 400 `chargeCurrency` is not one the venue takes (pro
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Token | text | How an anonymous guest returns to their cart, including from a recovery email. Rotated on claim, so a link shared before signing in does … |
-| Venue | the name it points at, never the id | — |
 | Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where a sale came from. Restored 24 August — this was lost in the `Money` rewrite and nine references across four contracts were pointing … |
-| Subject | the name it points at, never the id | Null while anonymous. Set by `claimCart`. |
 | Status | chip: Active, Expiring, Expired, Abandoned, Checked out | — |
-| Lines | list or chips (count when long) | — |
-| Conflicts | list or chips (count when long) | — |
 | Subtotal | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Discount total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Applied promotions | list or chips (count when long) | Re-evaluated on every read. A promotion that expired while the cart sat must not still be applied at checkout, and a promotion that became … |
 | Expires at | 1 Oct 2026, 14:30 | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
-| Extensions used | 1,234 | — |
-| Max extensions | 1,234 | — |
 
 **Actions and what each produces**
 
@@ -1020,6 +979,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 #### References
 
 - Wireframe frame: `wireframes/P10 Partner Web.dc.html#ptr-010` · status **notStarted** · provenance generated
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
 - ADR-0045 *Every order carries a proven contact, and the gate is the checkout page* (`docs/adr/0045-every-order-carries-a-proven-contact.md`)
 - ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
@@ -1028,7 +988,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (46), with its required mark, default, format and its error state (400, 403, 404, 409, 410, 412, 422).
-- [ ] Every output is drawn (51 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (29 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-010?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Evaluate promotions, Add cart line, Save cart line, Remove cart line, Checkout cart.
 - [ ] Every transition is wired: `PTR-002`, `PTR-003`.
@@ -1046,7 +1006,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Booking & Quotes · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-PARTNER-PTR-011 |
 | Who uses it | partner staff holding `PARTNER_MANAGE`, `PARTNER_VIEW` (1 configure, 1 read) |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listPartnerAgreements` reads the population and `getCommissionStatement` reads one of them — list, select, act |
@@ -1098,11 +1058,8 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 | Status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | — |
 | Rate mode | chip: Net rate, Commission | Alternatives, not both. A partner buys at a net rate and keeps the margin, or sells at face value and is paid commission. |
 | Commission percent | 1,234.5 | — |
-| Volume tiers | list or chips (count when long) | Retired: the tiers are rows of control.partner_rate_volume_band (`PartnerRate.volumeBands`, written by setPartnerRateNet), one set per rate … |
-| Volume window | chip: Calendar month, Calendar quarter, Calendar year, Agreement year, Rolling12 months | — |
 | Seasonal rates | list or chips (count when long) | Retired: a seasonal rate is a control.partner_rate row with `seasonalRate: true` and its own `effectiveFrom`/`effectiveTo` (`PartnerRate` … |
 | Segment tier | text | — |
-| Storefront subdomain | text | — |
 
 **Every partner quote** (data table, from `listPartnerQuotes`): The partner and agreement are shown by name; ids stay in the detail panel with a copy action.
 
@@ -1117,28 +1074,19 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Partner | the name it points at, never the id | The partner (control.partner) this agreement is with. The agreement carries the terms; control.partner carries who the partner is and … |
 | Partner name | text | The partner's trading name, read from control.partner.trading_name (Partner.tradingName) when the agreement is returned and never stored on … |
 | Status | chip: Pending approval, Active, Expiring soon, Expired, Suspended, Terminated | — |
 | Rate mode | chip: Net rate, Commission | Alternatives, not both. A partner buys at a net rate and keeps the margin, or sells at face value and is paid commission. |
 | Commission percent | 1,234.5 | — |
 | Volume tiers | list or chips (count when long) | Retired: the tiers are rows of control.partner_rate_volume_band (`PartnerRate.volumeBands`, written by setPartnerRateNet), one set per rate … |
-| Volume window | chip: Calendar month, Calendar quarter, Calendar year, Agreement year, Rolling12 months | — |
 | Seasonal rates | list or chips (count when long) | Retired: a seasonal rate is a control.partner_rate row with `seasonalRate: true` and its own `effectiveFrom`/`effectiveTo` (`PartnerRate` … |
 | Segment tier | text | — |
-| Branding image | the image or video | 2.7.x, BL-078. A reseller selling a venue's tickets under their own brand is a second scope level white-label does not have — … |
-| Storefront subdomain | text | — |
-| Sponsorship | grouped details | BL-050. Sponsorship inventory is sellable capacity of a different kind — logo placements, hospitality allocations, naming rights. |
 | Net rates | list or chips (count when long) | Retired: net rates are rows of control.partner_rate (`PartnerRate` with `pricingModel: netRate`, `netRate` and the `maxDiscountPercent` … |
-| Credit term days | 1,234 | 2.7.36. Net 30, net 60. |
-| Accepted by principal | the name it points at, never the id | BL-079. Electronic acceptance against a version, following the `signatureRef` precedent. |
 
 **The commission statement** (detail panel, from `getCommissionStatement`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Agreement | the name it points at, never the id | — |
 | Partner name | text | — |
 | From | 1 Oct 2026 | — |
 | To | 1 Oct 2026 | — |
@@ -1146,9 +1094,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 | Gross sales | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Refunds | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Net sales | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Commission earned | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Amount due | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Lines | list or chips (count when long) | Reconcilable order by order. A statement a partner cannot check line by line is a statement they will dispute, and the dispute costs more … |
 
 **Actions and what each produces**
 
@@ -1236,7 +1182,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (10), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-011?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create partner quote.
 - [ ] Every transition is wired: `PTR-003`.

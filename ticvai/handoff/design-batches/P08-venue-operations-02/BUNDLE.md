@@ -161,10 +161,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-129` | Software, Configuration & Version Management | B–D | 16 | 12 | 6 | 5 | 4 | 0 | — | notStarted (generated) |
-| `BO-130` | Offline Policy & Rules Configuration | B–D | 14 | 18 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
+| `BO-130` | Offline Policy & Rules Configuration | B–D | 14 | 13 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
 | `BO-131` | Connectivity & Auto-Switch Settings | B–D | 13 | 0 | 5 | 0 | 3 | 0 | — | notStarted (generated) |
-| `BO-132` | Offline Transaction Monitor & Sync Queue | B–D | 43 | 18 | 6 | 2 | 2 | 6 | — | notStarted (generated) |
-| `BO-133` | Offline Alerts, Limits & Audit | A | 25 | 37 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
+| `BO-132` | Offline Transaction Monitor & Sync Queue | B–D | 43 | 13 | 6 | 2 | 2 | 6 | — | notStarted (generated) |
+| `BO-133` | Offline Alerts, Limits & Audit | A | 25 | 26 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -215,7 +215,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Form: Save configuration profile** (modal, opened by *Save configuration profile*; *Save configuration profile* calls `setConfigurationProfile`, *Cancel* sends nothing)
 
-**Collects what `setConfigurationProfile` sends before it is called.** Required: `name`, `venueKindScope`. Optional: `scopePath`, `settings`, `deployedCount`, `publishedAt`. **Not asked:** `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setConfigurationProfile` sends before it is called.** Required: `name`, `venueKindScope`. Optional: `scopePath`, `settings`. **Not asked:** `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `deployedCount`, `publishedAt` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -230,7 +230,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 **Form: Deploy configuration profile** (modal, opened by *Deploy configuration profile*; *Deploy configuration profile* calls `deployConfigurationProfile`, *Cancel* sends nothing)
 
-**Collects what `deployConfigurationProfile` sends before it is called.** Required: `profileId`. Optional: `targetWorkstationIds`, `targetFilter`, `strategy`, `succeededCount`, `failedCount`, `failureReasons`, `startedAt`, `completedAt`. **Not asked:** `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `deployConfigurationProfile` sends before it is called.** Nothing in the body is required. Optional: `targetWorkstationIds`, `targetFilter`, `strategy`. **Not asked:** is a client UUIDv7 generated silently; is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `completedAt`, `failedCount`, `failureReasons`, `id`, `profileId`, `startedAt`, `status`, `succeededCount` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -304,7 +304,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the software version untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No software version yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, saleBoardKind and the software version are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `DEVICE_VIEW`, which `getWorkstationHealth` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SCOPE_VIEW`, which `listWorkstations` requires to show this screen, and names that permission (the screen's other reads need `DEVICE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVICE_MANAGE` for `startDeviceFirmwareRollout` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A release with this `deviceKind` and `version` already exists; 409 The firmware named by `firmwareId` is not `released`; 409 The move is not allowed from the release's current status (back to `draft`, out of `withdrawn`, or `deprecated` before `released`) |
 
@@ -345,7 +345,7 @@ firmware:
 - `getDeviceFirmware` → `DEVICE_VIEW` (read) · staff
 - `setDeviceFirmwareStatus` → `DEVICE_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `DEVICE_VIEW`, which `getWorkstationHealth` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `SCOPE_VIEW`, which `listWorkstations` requires to show this screen, and names that permission (the screen's other reads need `DEVICE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVICE_MANAGE` for `startDeviceFirmwareRollout` …
 
 #### Requirements it meets
 
@@ -433,7 +433,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save offline policy** (modal, opened by *Save offline policy*; *Save offline policy* calls `setOfflinePolicy`, *Cancel* sends nothing)
 
-**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional: `id`, `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional: `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -473,15 +473,10 @@ Errors to draw in the form: 409 Already resolved, differently (`alreadyResolved`
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Workstation | the name it points at, never the id | — |
 | Kind | chip: Order, Payment, Refund, Void, Scan | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
 | Rejected at | 1 Oct 2026, 14:30 | — |
-| Problem | grouped details | RFC 9457 problem details. Every error response uses this shape. |
-| Payload | grouped details | Deliberately open: the journal entry exactly as the till sent it. Its shape is the request schema for `kind` — an `OfflineOrder` for … |
 | Resolved at | 1 Oct 2026, 14:30 | — |
-| Resolved by principal | the name it points at, never the id | — |
 
 **The selected sync rejection** (detail panel, from `listSyncRejections`)
 
@@ -528,7 +523,7 @@ Errors to draw in the form: 409 Already resolved, differently (`alreadyResolved`
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the offline policy rules untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No offline policy rules yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on workstationId, kind, resolved and the offline policy rules are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `resolveSyncRejection`; `TENANT_CONFIGURE` for `setOfflinePolicy`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Already resolved, differently (`alreadyResolved`). (OrderRefusedProblem) |
 
@@ -557,7 +552,7 @@ rejection:
 - `listSyncRejections` → `ORDER_VIEW` (read) · staff
 - `resolveSyncRejection` → `ORDER_MODIFY` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `resolveSyncRejection`; `TENANT_CONFIGURE` for `setOfflinePolicy`.
 
 #### Requirements it meets
 
@@ -593,7 +588,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (14), with its required mark, default, format and its error state (403, 404, 409).
-- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-130?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save offline policy, Resolve rejection.
 - [ ] Every transition is wired: `BO-108`, `BO-129`, `BO-131`.
@@ -824,15 +819,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Workstation | the name it points at, never the id | — |
 | Kind | chip: Order, Payment, Refund, Void, Scan | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
 | Rejected at | 1 Oct 2026, 14:30 | — |
-| Problem | grouped details | RFC 9457 problem details. Every error response uses this shape. |
-| Payload | grouped details | Deliberately open: the journal entry exactly as the till sent it. Its shape is the request schema for `kind` — an `OfflineOrder` for … |
 | Resolved at | 1 Oct 2026, 14:30 | — |
-| Resolved by principal | the name it points at, never the id | — |
 
 **The selected sync rejection** (detail panel, from `listSyncRejections`)
 
@@ -872,7 +862,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the offline transaction sync untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No offline transaction sync yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on workstationId, kind, resolved and the offline transaction sync are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `syncOrders`. |
 | Offline (`?state=offline`) | online only |
 
 #### Consistency with other screens
@@ -896,7 +886,7 @@ device:
 - `listSyncRejections` → `ORDER_VIEW` (read) · staff
 - `syncOrders` → `ORDER_CREATE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `syncOrders`.
 
 #### Requirements it meets
 
@@ -932,7 +922,7 @@ Also apply: 1 for P08 · Venue Operations, 24 for all of P08, 29 for every app (
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (43), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-132?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Sync orders.
 - [ ] Every transition is wired: `BO-108`.
@@ -950,7 +940,7 @@ Also apply: 1 for P08 · Venue Operations, 24 for all of P08, 29 for every app (
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 1 · needs the `ticketing` module |
-| Block | Block A · ticket #17826 (APP-SETUP-BO-133) |
+| Block | Block A · task APP-SETUP-BO-133 |
 | Who uses it | venue staff holding `AUDIT_VIEW`, `ORDER_MODIFY`, `ORDER_VIEW`, `REPORT_MANAGE`, `REPORT_VIEW_VENUE`, `SCOPE_VIEW` (3 read, 2 operate, 1 configure); in the flows as cashier |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | approvalInbox (compact density): `decideApprovalRequest` decides items that `listSyncRejections` queues — every row is waiting for a person, so the empty state is success |
@@ -1058,32 +1048,21 @@ Errors to draw in the form: 409 Already resolved, differently (`alreadyResolved`
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Workstation | the name it points at, never the id | — |
 | Kind | chip: Order, Payment, Refund, Void, Scan | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
 | Rejected at | 1 Oct 2026, 14:30 | — |
-| Problem | grouped details | RFC 9457 problem details. Every error response uses this shape. |
-| Payload | grouped details | Deliberately open: the journal entry exactly as the till sent it. Its shape is the request schema for `kind` — an `OfflineOrder` for … |
 | Resolved at | 1 Oct 2026, 14:30 | — |
-| Resolved by principal | the name it points at, never the id | — |
 
 **Every alert** (data table, from `listAlerts`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Rule | the name it points at, never the id | — |
 | Rule name | text | `AlertRule.name` as it stood when the alert was raised. The line a person reads — a list of rule ids is not an alert panel, and a screen … |
 | Metric | chip: Occupancy, Capacity utilisation, Admission rate, No show rate, Conversion, Sales by … | The rule's metric, carried so the alert says what went out of range. |
 | Raised at | 1 Oct 2026, 14:30 | — |
 | Severity | chip: Info, Warning, Critical | How urgent an alert rule's breach is. Shared by `AlertRule`, `Alert` and the `listAlerts` filter. |
 | Status | chip: Raised, Acknowledged, Resolved, Expired | Where a raised alert is. Shared by `Alert` and the `listAlerts` filter. |
 | Observed value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
-| Threshold | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
-| Scope path | text | — |
-| Workstation | the name it points at, never the id | The workstation the reading was taken for, where the metric is measured per workstation (`salesByWorkstation`). |
-| Shift | the name it points at, never the id | The till shift (`orders.pos_shift`) the reading belongs to, where it was taken for a workstation with a shift open. |
 
 **Every audit** (data table, from `listAuditRecords`)
 
@@ -1144,7 +1123,7 @@ Errors to draw in the form: 409 Already resolved, differently (`alreadyResolved`
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the offline alerts limits untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | **Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on workstationId, kind, resolved and the offline alerts limits are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission (the screen's other reads need `AUDIT_VIEW`, `REPORT_VIEW_VENUE`, `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 An `outsideRange` rule without both `threshold` and `thresholdUpper`, or with the upper not above the lower (audit R158); 400 Required parameter missing, or the date range exceeds `maxDateRangeDays` (366 days when the definition sets none, audit R158); 409 Already resolved, differently (`alreadyResolved`). (OrderRefusedProblem) |
 
@@ -1179,7 +1158,7 @@ rule: Offline exposure · Till · above AED 15,000.00 or 120 sales · Critical �
 - `resolveSyncRejection` → `ORDER_MODIFY` (operate) · staff
 - `listWorkstations` → `SCOPE_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission (the screen's other reads need `AUDIT_VIEW`, `REPORT_VIEW_VENUE`, `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for …
 
 #### Requirements it meets
 
@@ -1218,7 +1197,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (25), with its required mark, default, format and its error state (400, 403, 409).
-- [ ] Every output is drawn (37 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-133?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Run report, Save alert rule, Resolve refused entry.
 - [ ] Every transition is wired: `BO-108`, `POS-002`.

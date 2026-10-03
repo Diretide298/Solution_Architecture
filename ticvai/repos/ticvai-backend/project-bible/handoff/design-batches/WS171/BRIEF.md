@@ -115,7 +115,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1019` | Accessible Route Mapping | B–D | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1020` | Accessible Filters & Eligibility | B–D | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1021` | Flexible Spacing Rules | B–D | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-1022` | Compliance Validation & Audit | B–D | 1 | 19 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1022` | Compliance Validation & Audit | B–D | 1 | 16 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

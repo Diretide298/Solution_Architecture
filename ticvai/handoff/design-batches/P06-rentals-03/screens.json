@@ -174,47 +174,74 @@
     {
      "to": "EMP-092",
      "trigger": "Return Scan & Rental Retrieval",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "EMP-093",
      "trigger": "Return Summary & Actual Return Time",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "EMP-094",
      "trigger": "Post-Rental Condition Inspection",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "EMP-095",
      "trigger": "Before vs After Condition Comparison",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "EMP-096",
      "trigger": "Damage Assessment & Charge Workflow",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "EMP-097",
      "trigger": "Partial Return & Missing Equipment",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "EMP-098",
      "trigger": "Late Fees, Damage Fees & Final Settlement",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "EMP-099",
      "trigger": "Deposit Release, Capture & Customer Confirmation",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "EMP-100",
      "trigger": "Return Completion & Equipment Disposition",
-     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 8 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     }
    ]
   },
@@ -339,7 +366,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -472,7 +501,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -602,7 +633,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `recordRentalInspection` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -737,7 +770,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `recordRentalInspection` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -867,7 +902,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assessRentalDamage` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1000,7 +1037,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1133,7 +1172,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1280,7 +1321,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "depositId",
@@ -1428,7 +1471,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `returnRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

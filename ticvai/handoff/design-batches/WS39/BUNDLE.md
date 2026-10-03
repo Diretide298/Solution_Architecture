@@ -234,8 +234,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `ADM-103` Market, Tourism, Holiday & Contextual Signal Hub: *Works in Market, Tourism, Holiday & Contextual Signal Hub*; calls `listPricing`
 - → `ADM-104` AI Demand Forecasting & Booking Curve Studio: *Works in AI Demand Forecasting & Booking Curve Studio*; calls `listPricing`
 - → `ADM-105` Price Elasticity & Revenue Response Intelligence: *Works in Price Elasticity & Revenue Response Intelligence*; calls `listPricing`
-- → `ADM-106` AI Pricing Recommendation & Explainability Center: *Works in AI Pricing Recommendation & Explainability Center*; carries `recommendationId`; calls `listPricing`
 - → `ADM-107` AI Signal Registry, Data Quality & Model Governance: *Works in AI Signal Registry, Data Quality & Model Governance*; calls `listPricing`
+- → `ADM-106` AI Pricing Recommendation & Explainability Center: *Works in AI Pricing Recommendation & Explainability Center*; carries `recommendationId`; calls `listPricing`
 
 #### States
 
@@ -305,7 +305,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-098?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `BO-100`, `ADM-099`, `ADM-100`, `ADM-101`, `ADM-102`, `ADM-103`, `ADM-104`, `ADM-105`, `ADM-106`, `ADM-107`.
+- [ ] Every transition is wired: `BO-100`, `ADM-099`, `ADM-100`, `ADM-101`, `ADM-102`, `ADM-103`, `ADM-104`, `ADM-105`, `ADM-107`, `ADM-106`.
 - [ ] Every gated control is gated: `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -467,7 +467,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Form: Save demand signal configuration** (modal, opened by *Save demand signal configuration*; *Save demand signal configuration* calls `setDemandSignalConfiguration`, *Cancel* sends nothing)
 
-**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`, `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -649,7 +649,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save demand signal configuration** (modal, opened by *Save demand signal configuration*; *Save demand signal configuration* calls `setDemandSignalConfiguration`, *Cancel* sends nothing)
 
-**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`, `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -796,7 +796,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save demand signal configuration** (modal, opened by *Save demand signal configuration*; *Save demand signal configuration* calls `setDemandSignalConfiguration`, *Cancel* sends nothing)
 
-**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`, `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -975,7 +975,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save demand signal configuration** (modal, opened by *Save demand signal configuration*; *Save demand signal configuration* calls `setDemandSignalConfiguration`, *Cancel* sends nothing)
 
-**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`, `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1596,7 +1596,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save signal registry policy** (modal, opened by *Save signal registry policy*; *Save signal registry policy* calls `setSignalRegistryPolicy`, *Cancel* sends nothing)
 
-**Collects what `setSignalRegistryPolicy` sends before it is called.** Required: `id`, `scopePath`, `registryKind`, `name`, `trustLevel`. Optional: `category`, `provider`, `source`, `internalExternal`, `marketCode`, `refreshFrequency`, `aiUsePermissions`, `fallbackPolicy`, `status`, `ownerPrincipalId`, `purpose`, `deployedAt` and 5 more. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setSignalRegistryPolicy` sends before it is called.** Required: `registryKind`, `name`, `trustLevel`. Optional: `category`, `provider`, `source`, `internalExternal`, `marketCode`, `refreshFrequency`, `aiUsePermissions`, `fallbackPolicy`, `status`, `ownerPrincipalId`, `purpose`, `deployedAt` and 5 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

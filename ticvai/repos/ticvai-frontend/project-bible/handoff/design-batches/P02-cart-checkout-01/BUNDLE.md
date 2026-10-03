@@ -96,9 +96,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-009` | Review & Payment | A | 14 | 80 | 5 | 31 | 23 | 0 | guest | notStarted (designed) |
-| `GST-010` | Booking Confirmation | A | 7 | 10 | 5 | 11 | 4 | 6 | guest | notStarted (client-verified) |
-| `GST-041` | Checkout Entry | A | 13 | 35 | 6 | 23 | 14 | 6 | guest | notStarted (client-verified) |
+| `GST-009` | Review & Payment | A | 14 | 74 | 5 | 31 | 23 | 0 | guest | notStarted (designed) |
+| `GST-010` | Booking Confirmation | A | 7 | 5 | 5 | 11 | 4 | 6 | guest | notStarted (client-verified) |
+| `GST-041` | Checkout Entry | A | 13 | 29 | 6 | 23 | 14 | 6 | guest | notStarted (client-verified) |
 
 ---
 
@@ -114,7 +114,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Cart & Checkout · wave 1 · needs the `ticketing` module |
-| Block | Block A · ticket #17996 (APP-MOB-GST-009) |
+| Block | Block A · task APP-MOB-GST-009 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): `getCart` reads one record and nothing reads a population — the screen is about that one thing |
@@ -182,17 +182,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Shows | Format | Notes |
 |---|---|---|
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where a sale came from. Restored 24 August — this was lost in the `Money` rewrite and nine references across four contracts were pointing … |
 | Status | chip: Active, Expiring, Expired, Abandoned, Checked out | — |
 | Lines | list or chips (count when long) | — |
 | Subtotal | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Discount total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Applied promotions | list or chips (count when long) | Re-evaluated on every read. A promotion that expired while the cart sat must not still be applied at checkout, and a promotion that became … |
-| Expires at | 1 Oct 2026, 14:30 | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
-| Extensions used | 1,234 | — |
-| Max extensions | 1,234 | — |
 
 **You pay in** (banner, from `checkoutCart`): After checkout: the amount in the selected currency, the base amount and the rate, and how long the rate holds (`Order.chargeCurrency`, `chargeTotal`, `chargeFxRate`, `chargeRateLockedUntil`; CHG-FIN-001).
 
@@ -318,8 +312,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 - → `GST-001` Home: *Home – Default*
 - → `GST-010` Booking Confirmation: *Paid: the booking confirmation*; carries `orderId`
-- → `BO-020` F&B Order Management: *Kitchen accepts and prepares*; carries `orderId`; calls `createPayment`
 - → `GST-028` Parking – Reservation Confirmed: *It is confirmed with a facility*; carries `orderId`
+- → `BO-020` F&B Order Management: *Kitchen accepts and prepares*; carries `orderId`; calls `createPayment`
 
 #### States
 
@@ -500,10 +494,10 @@ Also set there, as content the tenant writes: settings.
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (14), with its required mark, default, format and its error state (400, 402, 403, 404, 409, 410, 422).
-- [ ] Every output is drawn (80 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (74 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-009?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Pay.
-- [ ] Every transition is wired: `GST-001`, `GST-010`, `BO-020`, `GST-028`.
+- [ ] Every transition is wired: `GST-001`, `GST-010`, `GST-028`, `BO-020`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 23 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
@@ -520,7 +514,7 @@ Also set there, as content the tenant writes: settings.
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Cart & Checkout · wave 1 · needs the `ticketing` module |
-| Block | Block A · ticket #17911 (APP-MOB-GST-010) |
+| Block | Block A · task APP-MOB-GST-010 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): `getOrder` reads one record and nothing reads a population — the screen is about that one thing |
@@ -576,15 +570,10 @@ Errors to draw in the form: 403 Contact detail on the order does not match the v
 | Shows | Format | Notes |
 |---|---|---|
 | Order number | text | The number a guest reads and a cashier types. Server-assigned: the venue prefix and a sequence per venue, for example `DXB1-000123` … |
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for … |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Net amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Lines | list or chips (count when long) | — |
-| Payments | list or chips (count when long) | — |
 
 **Actions and what each produces**
 
@@ -638,7 +627,7 @@ tickets: 3 × 2 park ticket · Fri 2 Oct
 #### Permissions
 
 - `getOrder` → `ORDER_VIEW` (read) · staff, guest, partner
-- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner
+- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner, device
 - `linkGuestCheckout` → no permission · guest
 
 **A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that …
@@ -697,7 +686,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (7), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-010?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Resend my tickets, Transfer tickets, Set a password.
 - [ ] Every transition is wired: `GST-001`.
@@ -716,7 +705,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Cart & Checkout · wave 1 · needs the `ticketing` module |
-| Block | Block A · ticket #17997 (APP-MOB-GST-041) |
+| Block | Block A · task APP-MOB-GST-041 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): `getCart` reads one record and nothing reads a population — the screen is about that one thing |
@@ -781,17 +770,11 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 | Shows | Format | Notes |
 |---|---|---|
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where a sale came from. Restored 24 August — this was lost in the `Money` rewrite and nine references across four contracts were pointing … |
 | Status | chip: Active, Expiring, Expired, Abandoned, Checked out | — |
-| Lines | list or chips (count when long) | — |
 | Subtotal | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Discount total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Tax total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Applied promotions | list or chips (count when long) | Re-evaluated on every read. A promotion that expired while the cart sat must not still be applied at checkout, and a promotion that became … |
 | Expires at | 1 Oct 2026, 14:30 | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
-| Extensions used | 1,234 | — |
-| Max extensions | 1,234 | — |
 
 **Visit date per line** (card list, from `getPerformance`): Each line: the variant's name (`listProductVariants`), its visit date (`Performance.startsAt`, the match date for a fixture), quantity and price.
 
@@ -1035,12 +1018,13 @@ Also set there, as content the tenant writes: settings.
 - Flow F49 *A guest plans a day and follows it*, step 5: They check out. → Paid like any other basket; the tickets land on the Tickets tab.
 - ADR-0045 *Every order carries a proven contact, and the gate is the checkout page* (`docs/adr/0045-every-order-carries-a-proven-contact.md`)
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (13), with its required mark, default, format and its error state (400, 403, 404, 409, 410, 412, 422).
-- [ ] Every output is drawn (35 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (29 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-041?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Apply code, Empty cart, Claim cart, More time, Remove, Checkout.
 - [ ] Every transition is wired: `GST-042`, `GST-001`, `GST-059`, `GST-009`.

@@ -418,8 +418,8 @@ screens:
     - to: POS-016
       trigger: Till Configuration
       provenance: 'derived — POS-016 declares entryState.params deviceId and POS-001 holds none of them.
-        The edge carries nothing: POS-016 finds deviceId (listDevices) itself, and POS-016 opens on its
-        own'
+        The edge carries nothing: deviceId only pre-selects (deep link or optional), and POS-016 opens
+        on its own'
     - to: POS-017
       trigger: Cash In / Cash Out Operations
       carries:
@@ -917,9 +917,10 @@ screens:
         holds orderId, so an edge into it carries them
     - to: POS-020
       trigger: Shift Exceptions & Alerts
-      provenance: 'derived — POS-020 declares entryState.params reportId, requestId, shiftId and POS-002
-        holds none of them. The edge carries nothing: shiftId, reportId, requestId only pre-select (deep
-        link or optional), and POS-020 opens on its own'
+      carries:
+      - requestId
+      provenance: derived — POS-020 declares entryState.params reportId, requestId, shiftId and POS-002
+        holds requestId, so an edge into it carries them
     - to: POS-008
       trigger: Reports
       provenance: 'derived — POS-008 declares entryState.params conversationId, reportId and POS-002 holds
@@ -940,18 +941,23 @@ screens:
     - to: POS-018
       trigger: A guest wants cash back and the drawer is heavy
       provenance: 'wiring fix, 2 October 2026 (CHG-WIR-009): flow F32 step 3→4'
-    - to: POS-011
-      trigger: Three days later the guest returns one item
-      provenance: flow F34 step 5→6
-      carries:
-      - orderId
-      - outletId
     - to: BO-045
       trigger: The new price is wrong on eleven items
       provenance: flow F31 step 6→7
       operation: getLatestBundle
       crossesDevice: true
       back: false
+    - to: BO-133
+      trigger: The venue's offline exposure crosses a ceiling
+      provenance: flow F33 step 3→4
+      crossesDevice: true
+      back: false
+    - to: POS-011
+      trigger: Three days later the guest returns one item
+      provenance: flow F34 step 5→6
+      carries:
+      - orderId
+      - outletId
     - to: BO-084
       trigger: The manager sees it in their inbox
       provenance: flow F14 step 2→3
@@ -960,11 +966,7 @@ screens:
       back: false
       carries:
       - approvalRequestId
-    - to: BO-133
-      trigger: The venue's offline exposure crosses a ceiling
-      provenance: flow F33 step 3→4
-      crossesDevice: true
-      back: false
+      - requestId
     - to: GST-011
       trigger: Checks the card's balance in the app's wallet
       provenance: flow F18 step 1→2
@@ -2111,9 +2113,10 @@ screens:
     - to: POS-004
       trigger: Sell — Seat Map
       carries:
+      - holdId
       - performanceId
       provenance: derived — POS-004 declares entryState.params holdId, performanceId and POS-003 holds
-        performanceId, so an edge into it carries them
+        holdId, performanceId, so an edge into it carries them
     - to: POS-006
       trigger: Held Orders
       provenance: 'derived — POS-006 declares entryState.params orderId and POS-003 holds none of them.
@@ -2804,17 +2807,17 @@ screens:
       - entitlementId
       - orderId
       - saleId
-    - to: POS-010
-      trigger: The guest asks to add a locker to the ticket they just bought
-      provenance: flow F58 step 6→7
-      carries:
-      - orderId
     - to: GST-062
       trigger: Guest tracks it in the app
       provenance: flow F17 step 3→4
       operation: createShopAndDrop
       crossesDevice: true
       back: false
+    - to: POS-010
+      trigger: The guest asks to add a locker to the ticket they just bought
+      provenance: flow F58 step 6→7
+      carries:
+      - orderId
     uses:
     - posPrimaryRail
   notes: 'Design: Park_POS_dc.html, "Cash Payment". Add Tip appears in the design and had no operation
@@ -5878,6 +5881,8 @@ screens:
       operation: syncOrders
       crossesDevice: true
       back: false
+      carries:
+      - rejectionId
     uses:
     - posPrimaryRail
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
@@ -6293,6 +6298,7 @@ screens:
       trigger: Safe drop destinations are allocated
       provenance: flow F73 step 3→4
       carries:
+      - boxId
       - shiftId
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them.'
@@ -9362,8 +9368,9 @@ screens:
       trigger: Send to Kitchen
       carries:
       - orderId
+      - ticketId
       provenance: derived — POS-022 declares entryState.params orderId, ticketId and POS-029 holds orderId,
-        so an edge into it carries them
+        ticketId, so an edge into it carries them
   notes: '**The prototype models five stages with the action that leaves each one** — received → *send
     to kitchen*, preparing → *mark ready*, ready → *dispatch / hand over*, out for delivery → *mark delivered*,
     completed → *reopen*. P04 had `listFnbOrders` and nineteen queue operations and no board to work them

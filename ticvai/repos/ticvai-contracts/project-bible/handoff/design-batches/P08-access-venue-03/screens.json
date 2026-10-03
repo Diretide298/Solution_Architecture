@@ -4,7 +4,7 @@
   "name": "Resource Calendar",
   "module": "Access & Venue",
   "requiresModule": "resources",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "venue-management-web",
    "route": "/resources/calendar",
@@ -23,8 +23,11 @@
     {
      "to": "BO-097",
      "trigger": "The guest arrives;",
-     "provenance": "flow F25 step 3→4",
-     "operation": "bookResource"
+     "provenance": "authored 3 October 2026 (CHG-SPF-004): BO-096 holds bookingId and BO-097 cannot load without it, so the edge carries it; was: flow F25 step 3→4",
+     "operation": "bookResource",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "BO-099",
@@ -96,7 +99,7 @@
    "error": "Could not load availability. **Do not book blind** — a booking made against a stale calendar is the double-booking this screen exists to prevent.",
    "emptyFirstRun": "Nothing booked in this window. **Free is the default state and it is worth showing plainly** — an empty calendar at a venue that takes bookings is either a quiet week or a resource nobody knows exists.",
    "emptyNoResults": "No availability in this window. The response says why — booked, setup, teardown, maintenance or closed — because **wait and look elsewhere are different answers**.",
-   "emptyNoAccess": "You do not have RESOURCE_VIEW."
+   "emptyNoAccess": "You do not have `RESOURCE_VIEW`. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `RESOURCE_BOOK` for `bookResource`."
   },
   "apis": [
    {
@@ -126,7 +129,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-096"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formBookResource",
@@ -180,7 +183,7 @@
   "name": "Check Out & Check In",
   "module": "Access & Venue",
   "requiresModule": "resources",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "venue-management-web",
    "route": "/resources/check-out",
@@ -311,7 +314,7 @@
    "loading": "The booking and its condition history",
    "error": "Could not load. **Check-out and check-in work offline** — the deposit hold reconciles on sync.",
    "emptyFirstRun": "Nothing is out. **The list a poolside attendant checks at close** — anything still here at the end of the day is a conversation.",
-   "emptyNoAccess": "You do not have RESOURCE_BOOK.",
+   "emptyNoAccess": "Without `RENTAL_VIEW`, which `getRentalBooking` requires, the screen does not load and this state names that permission. You do not have `RESOURCE_BOOK`.",
    "offline": "Queued locally. The deposit is authorised on sync, and **the condition note taken now is the only defence against a dispute later**."
   },
   "apis": [
@@ -361,7 +364,9 @@
    "params": [
     {
      "name": "authorisationId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `relinquishStoredValue`, `captureStoredValue` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "bookingId",
@@ -375,7 +380,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-097"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCaptureStoredValue",
@@ -574,7 +579,7 @@
    "loading": "Qualifications with their expiry",
    "error": "Could not load.",
    "emptyFirstRun": "No qualifications recorded. **A role is not a skill** — 1.2.36 requires the check before assignment, not after.",
-   "emptyNoAccess": "You do not have RESOURCE_MANAGE."
+   "emptyNoAccess": "Without `RESOURCE_VIEW`, which `getResourceQualifications` requires, the screen does not load and this state names that permission. You do not have `RESOURCE_MANAGE`."
   },
   "apis": [
    {
@@ -605,7 +610,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-098"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -730,7 +735,7 @@
    "error": "Could not load the manifest.",
    "emptyFirstRun": "Nobody booked into this performance yet.",
    "emptyNoResults": "No participants match.",
-   "emptyNoAccess": "You do not have RESOURCE_VIEW.",
+   "emptyNoAccess": "You do not have `RESOURCE_VIEW`. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `RESOURCE_BOOK` for `reorderPerformanceManifest`.",
    "offline": "The cached manifest. **An instructor at the water edge needs this more than anyone**, and that is where the signal is worst."
   },
   "apis": [
@@ -761,7 +766,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-099"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formReorderPerformanceManifest",
@@ -885,7 +890,7 @@
     {
      "to": "BO-032",
      "trigger": "Admission Profiles",
-     "provenance": "derived — BO-032 declares entryState.params profileId, ruleId and BO-103 holds none of them. The edge carries nothing: profileId only pre-selects (deep link or optional); BO-032 finds ruleId (listAdmissionRules) itself, and BO-032 opens on its own"
+     "provenance": "derived — BO-032 declares entryState.params profileId, ruleId and BO-103 holds none of them. The edge carries nothing: profileId, ruleId only pre-select (deep link or optional), and BO-032 opens on its own"
     },
     {
      "to": "BO-033",
@@ -898,7 +903,7 @@
     {
      "to": "BO-038",
      "trigger": "Reconciliation Queue",
-     "provenance": "derived — BO-038 declares entryState.params  and BO-103 holds none of them. The edge carries nothing: BO-038 needs nothing to open"
+     "provenance": "derived — BO-038 declares entryState.params rejectionId and BO-103 holds none of them. The edge carries nothing: rejectionId only pre-selects (deep link or optional), and BO-038 opens on its own"
     },
     {
      "to": "BO-069",
@@ -908,7 +913,7 @@
     {
      "to": "BO-071",
      "trigger": "Planned Maintenance",
-     "provenance": "derived — BO-071 declares entryState.params  and BO-103 holds none of them. The edge carries nothing: BO-071 needs nothing to open"
+     "provenance": "derived — BO-071 declares entryState.params planId and BO-103 holds none of them. The edge carries nothing: planId only pre-selects (deep link or optional), and BO-071 opens on its own"
     },
     {
      "to": "BO-072",
@@ -918,7 +923,7 @@
     {
      "to": "BO-093",
      "trigger": "Map Import & Labelling",
-     "provenance": "derived — BO-093 declares entryState.params jobId, mapId and BO-103 holds none of them. The edge carries nothing: mapId only pre-selects (deep link or optional); BO-093 finds jobId (importVenueGeometry) itself, and BO-093 opens on its own"
+     "provenance": "derived — BO-093 declares entryState.params jobId, mapId and BO-103 holds none of them. The edge carries nothing: mapId, jobId only pre-select (deep link or optional), and BO-093 opens on its own"
     },
     {
      "to": "BO-094",
@@ -971,18 +976,12 @@
        "label": "Every access point",
        "bindsTo": "AccessPoint",
        "columns": [
-        "AccessPoint.id",
         "AccessPoint.code",
         "AccessPoint.name",
-        "AccessPoint.venueId",
-        "AccessPoint.scopePath",
         "AccessPoint.externalCredentialSources",
         "AccessPoint.scanAnomalyRules",
         "AccessPoint.operatingMode",
-        "AccessPoint.vehicleLocationCapture",
-        "AccessPoint.mode",
-        "AccessPoint.direction",
-        "AccessPoint.antiPassbackEnabled"
+        "AccessPoint.mode"
        ],
        "operation": "listAccessPoints",
        "provenance": "contract access.yaml GET /access-points"
@@ -992,18 +991,8 @@
        "label": "Every scan event",
        "bindsTo": "ScanEvent",
        "columns": [
-        "ScanEvent.id",
-        "ScanEvent.accessPointId",
-        "ScanEvent.venueId",
-        "ScanEvent.scopePath",
-        "ScanEvent.ticketId",
         "ScanEvent.mediaCode",
-        "ScanEvent.outcome",
-        "ScanEvent.denyReason",
-        "ScanEvent.direction",
-        "ScanEvent.operatorPrincipalId",
-        "ScanEvent.deviceId",
-        "ScanEvent.overridesScanId"
+        "ScanEvent.outcome"
        ],
        "operation": "listScans",
        "provenance": "contract access.yaml GET /access/scans"
@@ -1046,22 +1035,14 @@
        "label": "The selected access point",
        "bindsTo": "AccessPoint",
        "columns": [
-        "AccessPoint.id",
         "AccessPoint.code",
         "AccessPoint.name",
-        "AccessPoint.venueId",
-        "AccessPoint.scopePath",
         "AccessPoint.externalCredentialSources",
         "AccessPoint.scanAnomalyRules",
         "AccessPoint.operatingMode",
         "AccessPoint.vehicleLocationCapture",
         "AccessPoint.mode",
-        "AccessPoint.direction",
-        "AccessPoint.antiPassbackEnabled",
-        "AccessPoint.requiresExitBeforeReentry",
-        "AccessPoint.driver",
-        "AccessPoint.geofence",
-        "AccessPoint.isActive"
+        "AccessPoint.direction"
        ],
        "operation": "listAccessPoints",
        "provenance": "contract access.yaml GET /access-points"
@@ -1118,7 +1099,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-103"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "getVenueSettings",

@@ -785,8 +785,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block A · ticket #20759 (APP-SETUP-BO-927) |
+| Module | Rentals · wave 1 · needs the `resources` module |
+| Block | Block A · task APP-SETUP-BO-927 |
 | Who uses it | venue staff holding `AI_CONFIGURE`, `AI_USE`, `WORKFORCE_VIEW` (1 configure, 1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a configuration directory (§Configured rule) and no display directory — it is settings, not a population |
@@ -1170,6 +1170,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS133 Resource Management Configuration Board 8.dc.html#bo-928`
 - Workshop pack: Resource_Management_Configuration_Reference.pdf board 8
 - Flow F271 *Resource Management Configuration board 8: AI Resource Intelligence Command …*, step 10: Works in AI Conflict Resolution Assistant → Automatically analyze resource conflicts and recommend the most operationally appropriate resolution.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0020 *— Where AI runs, and what it is isolated from* (`docs/adr/0020-ai-isolation-boundary.md`)
 
 #### Acceptance for the design
@@ -1691,6 +1692,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS133 Resource Management Configuration Board 8.dc.html#bo-932`
 - Workshop pack: Resource_Management_Configuration_Reference.pdf board 8
 - Flow F271 *Resource Management Configuration board 8: AI Resource Intelligence Command …*, step 18: Works in Conversational AI Resource Copilot → Allow managers to interact with the complete Resource Management module using natural- language questions and commands.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0020 *— Where AI runs, and what it is isolated from* (`docs/adr/0020-ai-isolation-boundary.md`)
 
 #### Acceptance for the design

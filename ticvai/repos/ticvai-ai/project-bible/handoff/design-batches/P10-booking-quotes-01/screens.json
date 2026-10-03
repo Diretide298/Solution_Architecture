@@ -134,18 +134,12 @@
        "label": "Every refund",
        "bindsTo": "Refund",
        "columns": [
-        "Refund.id",
-        "Refund.orderId",
-        "Refund.batchId",
         "Refund.fxRate",
-        "Refund.taxReversalEntryId",
         "Refund.settleTo",
         "Refund.fxVariance",
         "Refund.amount",
         "Refund.appliedPercentage",
-        "Refund.status",
-        "Refund.reason",
-        "Refund.requestedByPrincipalId"
+        "Refund.status"
        ],
        "operation": "listOrderRefunds",
        "provenance": "contract orders.yaml GET /orders/{orderId}/refunds"
@@ -197,22 +191,14 @@
        "label": "The order",
        "bindsTo": "Order",
        "columns": [
-        "Order.id",
         "Order.orderNumber",
         "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
         "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
         "Order.grossAmount",
         "Order.taxAmount",
         "Order.netAmount",
         "Order.refundedAmount",
-        "Order.totalPriceVariance",
-        "Order.lines",
-        "Order.payments",
-        "Order.principalId"
+        "Order.totalPriceVariance"
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
@@ -408,7 +394,7 @@
    "error": "Could not load. Names which read failed and leaves the booking creation untouched.",
    "emptyFirstRun": "No booking creation yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the booking creation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createOrder`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_MODIFY` for `holdOrder`, `modifyOrder`, `resumeOrder`; `ORDER_REPRINT` for `reprintOrder`; `ORDER_RESCHEDULE` for `rescheduleOrder`."
   },
   "apis": [
    {
@@ -517,7 +503,7 @@
    "provenance": "generated",
    "board": "wireframes/P10 Partner Web.dc.html#ptr-008"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "applyManualDiscount",
@@ -625,15 +611,9 @@
        "label": "Every seat block",
        "bindsTo": "SeatBlock",
        "columns": [
-        "SeatBlock.id",
-        "SeatBlock.performanceId",
-        "SeatBlock.seatIds",
-        "SeatBlock.reason",
         "SeatBlock.note",
-        "SeatBlock.createdByPrincipalId",
         "SeatBlock.releaseAt",
-        "SeatBlock.releasedAt",
-        "SeatBlock.scopePath"
+        "SeatBlock.releasedAt"
        ],
        "operation": "listSeatBlocks",
        "provenance": "contract seating.yaml GET /seat-blocks"
@@ -702,7 +682,7 @@
    "error": "Could not load. Names which read failed and leaves the group bulk booking untouched.",
    "emptyFirstRun": "No group bulk booking yet. Offers Create seat block (`createSeatBlock`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on performanceId, reason and the group bulk booking are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listSeatBlocks` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listSeatBlocks` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE` for `createSeatBlock`, `relinquishSeatBlock`; `ORDER_CREATE` for `allocateBlockedSeats`."
   },
   "apis": [
    {
@@ -740,7 +720,9 @@
    "params": [
     {
      "name": "blockId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listSeatBlocks` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `blockId`.",
@@ -759,7 +741,7 @@
    "derivedFrom": "wireframes/reference/Seat Board 3.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formAllocateBlockedSeats",
@@ -923,15 +905,9 @@
         "Promotion.code",
         "Promotion.name",
         "Promotion.description",
-        "Promotion.venueId",
         "Promotion.discount",
-        "Promotion.conditions",
         "Promotion.stackingMode",
-        "Promotion.stackingGroup",
-        "Promotion.precedence",
-        "Promotion.validFrom",
-        "Promotion.validTo",
-        "Promotion.maxRedemptions"
+        "Promotion.validFrom"
        ],
        "operation": "listPromotions",
        "provenance": "contract promotions.yaml GET /promotions"
@@ -957,18 +933,10 @@
         "Promotion.code",
         "Promotion.name",
         "Promotion.description",
-        "Promotion.venueId",
         "Promotion.discount",
         "Promotion.conditions",
         "Promotion.stackingMode",
-        "Promotion.stackingGroup",
-        "Promotion.precedence",
         "Promotion.validFrom",
-        "Promotion.validTo",
-        "Promotion.maxRedemptions",
-        "Promotion.maxRedemptionsPerGuest",
-        "Promotion.budgetCap",
-        "Promotion.id",
         "Promotion.status"
        ],
        "operation": "getPromotion",
@@ -995,22 +963,14 @@
        "label": "The cart",
        "bindsTo": "Cart",
        "columns": [
-        "Cart.id",
         "Cart.token",
-        "Cart.venueId",
         "Cart.channel",
-        "Cart.subjectId",
         "Cart.status",
-        "Cart.lines",
-        "Cart.conflicts",
         "Cart.subtotal",
         "Cart.discountTotal",
         "Cart.taxTotal",
         "Cart.total",
-        "Cart.appliedPromotionIds",
-        "Cart.expiresAt",
-        "Cart.extensionsUsed",
-        "Cart.maxExtensions"
+        "Cart.expiresAt"
        ],
        "operation": "getCart",
        "provenance": "contract orders.yaml GET /carts/{cartId}"
@@ -1229,11 +1189,15 @@
     },
     {
      "name": "lineId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `addCartLine`; a link or an edge that holds one opens it instead."
     },
     {
      "name": "promotionId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPromotions` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `lineId`, `promotionId`.",
@@ -1250,7 +1214,7 @@
    "provenance": "generated",
    "board": "wireframes/P10 Partner Web.dc.html#ptr-010"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "analysePromotionConflicts",
@@ -1349,11 +1313,8 @@
         "PartnerAgreement.status",
         "PartnerAgreement.rateMode",
         "PartnerAgreement.commissionPercent",
-        "PartnerAgreement.volumeTiers",
-        "PartnerAgreement.volumeWindow",
         "PartnerAgreement.seasonalRates",
-        "PartnerAgreement.segmentTier",
-        "PartnerAgreement.storefrontSubdomain"
+        "PartnerAgreement.segmentTier"
        ],
        "operation": "listPartnerAgreements",
        "provenance": "contract subscription.yaml GET /partner-agreements",
@@ -1384,22 +1345,14 @@
        "label": "The selected partner agreement",
        "bindsTo": "PartnerAgreement",
        "columns": [
-        "PartnerAgreement.id",
-        "PartnerAgreement.partnerId",
         "PartnerAgreement.partnerName",
         "PartnerAgreement.status",
         "PartnerAgreement.rateMode",
         "PartnerAgreement.commissionPercent",
         "PartnerAgreement.volumeTiers",
-        "PartnerAgreement.volumeWindow",
         "PartnerAgreement.seasonalRates",
         "PartnerAgreement.segmentTier",
-        "PartnerAgreement.brandingAssetId",
-        "PartnerAgreement.storefrontSubdomain",
-        "PartnerAgreement.sponsorship",
-        "PartnerAgreement.netRates",
-        "PartnerAgreement.creditTermDays",
-        "PartnerAgreement.acceptedByPrincipalId"
+        "PartnerAgreement.netRates"
        ],
        "operation": "listPartnerAgreements",
        "provenance": "contract subscription.yaml GET /partner-agreements"
@@ -1409,7 +1362,6 @@
        "label": "The commission statement",
        "bindsTo": "CommissionStatement",
        "columns": [
-        "CommissionStatement.agreementId",
         "CommissionStatement.partnerName",
         "CommissionStatement.from",
         "CommissionStatement.to",
@@ -1417,9 +1369,7 @@
         "CommissionStatement.grossSales",
         "CommissionStatement.refunds",
         "CommissionStatement.netSales",
-        "CommissionStatement.commissionEarned",
-        "CommissionStatement.amountDue",
-        "CommissionStatement.lines"
+        "CommissionStatement.amountDue"
        ],
        "operation": "getCommissionStatement",
        "provenance": "contract subscription.yaml GET /partner-agreements/{agreementId}/commission-statement"
@@ -1480,7 +1430,9 @@
    "params": [
     {
      "name": "agreementId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPartnerAgreements` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `agreementId`.",
@@ -1497,7 +1449,7 @@
    "provenance": "generated",
    "board": "wireframes/P10 Partner Web.dc.html#ptr-011"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreatePartnerQuote",

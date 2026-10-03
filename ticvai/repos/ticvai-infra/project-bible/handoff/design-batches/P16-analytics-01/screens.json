@@ -192,7 +192,10 @@
     {
      "to": "ANL-019",
      "trigger": "AI Management Insights",
-     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher"
+     "provenance": "structural — ANL-001 is P16's home screen and its exits are its launcher",
+     "carries": [
+      "insightId"
+     ]
     }
    ]
   },
@@ -253,15 +256,9 @@
        "label": "Every alert",
        "bindsTo": "Alert",
        "columns": [
-        "Alert.id",
-        "Alert.ruleId",
         "Alert.raisedAt",
         "Alert.severity",
         "Alert.status",
-        "Alert.observedValue",
-        "Alert.threshold",
-        "Alert.scopePath",
-        "Alert.acknowledgedByPrincipalId",
         "Alert.acknowledgedAt",
         "Alert.resolvedAt",
         "Alert.escalatedAt"
@@ -291,8 +288,6 @@
        "label": "The selected alert",
        "bindsTo": "Alert",
        "columns": [
-        "Alert.id",
-        "Alert.ruleId",
         "Alert.ruleName",
         "Alert.metric",
         "Alert.raisedAt",
@@ -300,13 +295,7 @@
         "Alert.status",
         "Alert.observedValue",
         "Alert.threshold",
-        "Alert.scopePath",
-        "Alert.workstationId",
-        "Alert.shiftId",
-        "Alert.itemId",
-        "Alert.acknowledgedByPrincipalId",
-        "Alert.acknowledgedAt",
-        "Alert.acknowledgementNote"
+        "Alert.acknowledgedAt"
        ],
        "operation": "listAlerts",
        "provenance": "contract reporting.yaml GET /alerts"
@@ -450,7 +439,7 @@
    "note": "**Drawn as POS-6A in the client POS pack.** The pack's frame is the specification — it carries operations, states, entry params and exits, and it is better specified than anything derived from the screen file.",
    "derivedFrom": "wireframes/POS Board 6.dc.html#pos-6a"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "purposeNote": "Provide senior management with an immediate consolidated view of overall organizational performance.",
   "gaps": [
    {
@@ -669,7 +658,7 @@
    "note": "**Drawn as RET-6L in the client Retail pack.**",
    "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6l"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRunReport",
@@ -811,15 +800,9 @@
        "label": "Every alert",
        "bindsTo": "Alert",
        "columns": [
-        "Alert.id",
-        "Alert.ruleId",
         "Alert.raisedAt",
         "Alert.severity",
         "Alert.status",
-        "Alert.observedValue",
-        "Alert.threshold",
-        "Alert.scopePath",
-        "Alert.acknowledgedByPrincipalId",
         "Alert.acknowledgedAt",
         "Alert.resolvedAt",
         "Alert.escalatedAt"
@@ -832,18 +815,12 @@
        "label": "Every registered device",
        "bindsTo": "RegisteredDevice",
        "columns": [
-        "RegisteredDevice.id",
         "RegisteredDevice.kind",
         "RegisteredDevice.driver",
         "RegisteredDevice.identifier",
-        "RegisteredDevice.workstationId",
         "RegisteredDevice.model",
         "RegisteredDevice.pushToken",
-        "RegisteredDevice.pushPlatform",
-        "RegisteredDevice.pushFailureCount",
-        "RegisteredDevice.offlineScope",
-        "RegisteredDevice.firmwareVersion",
-        "RegisteredDevice.isRequired"
+        "RegisteredDevice.pushFailureCount"
        ],
        "operation": "listDevices",
        "provenance": "contract tenancy.yaml GET /devices"
@@ -853,14 +830,11 @@
        "label": "Every principal",
        "bindsTo": "Principal",
        "columns": [
-        "Principal.id",
         "Principal.username",
         "Principal.displayName",
         "Principal.isActive",
         "Principal.validFrom",
         "Principal.validTo",
-        "Principal.primaryRoleId",
-        "Principal.roles",
         "Principal.lastLoginAt"
        ],
        "operation": "listPrincipals",
@@ -888,8 +862,6 @@
        "label": "The selected alert",
        "bindsTo": "Alert",
        "columns": [
-        "Alert.id",
-        "Alert.ruleId",
         "Alert.ruleName",
         "Alert.metric",
         "Alert.raisedAt",
@@ -897,13 +869,7 @@
         "Alert.status",
         "Alert.observedValue",
         "Alert.threshold",
-        "Alert.scopePath",
-        "Alert.workstationId",
-        "Alert.shiftId",
-        "Alert.itemId",
-        "Alert.acknowledgedByPrincipalId",
-        "Alert.acknowledgedAt",
-        "Alert.acknowledgementNote"
+        "Alert.acknowledgedAt"
        ],
        "operation": "listAlerts",
        "provenance": "contract reporting.yaml GET /alerts"
@@ -1019,7 +985,7 @@
    "note": "**Drawn as POS-6B, POS-6C, POS-6D in the client POS pack.** The pack's frame is the specification — it carries operations, states, entry params and exits, and it is better specified than anything derived from the screen file.",
    "derivedFrom": "wireframes/POS Board 6.dc.html#pos-6b"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRunReport",
@@ -1153,16 +1119,10 @@
        "label": "Every product",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
         "Product.code",
         "Product.name",
         "Product.description",
         "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
         "Product.onSaleFrom",
         "Product.onSaleTo"
        ],
@@ -1191,22 +1151,14 @@
        "label": "The selected product",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
         "Product.code",
         "Product.name",
         "Product.description",
         "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
         "Product.onSaleFrom",
         "Product.onSaleTo",
-        "Product.categoryId",
         "Product.lifecycleState",
-        "Product.isSellable",
-        "Product.isStockTracked"
+        "Product.isSellable"
        ],
        "operation": "listProducts",
        "provenance": "contract catalogue.yaml GET /products"
@@ -1310,7 +1262,7 @@
    "note": "**Drawn as RET-6C in the client Retail pack.**",
    "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6c"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRunReport",
@@ -1531,7 +1483,7 @@
    "note": "**Drawn as RET-6F in the client Retail pack.**",
    "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6f"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRunReport",
@@ -1652,15 +1604,11 @@
        "label": "Every stock batch",
        "bindsTo": "StockBatch",
        "columns": [
-        "StockBatch.id",
-        "StockBatch.itemId",
-        "StockBatch.locationId",
         "StockBatch.batchCode",
         "StockBatch.lotNumber",
         "StockBatch.quantity",
         "StockBatch.receivedAt",
         "StockBatch.expiresAt",
-        "StockBatch.supplierId",
         "StockBatch.status"
        ],
        "operation": "listExpiringBatches",
@@ -1688,15 +1636,11 @@
        "label": "The selected stock batch",
        "bindsTo": "StockBatch",
        "columns": [
-        "StockBatch.id",
-        "StockBatch.itemId",
-        "StockBatch.locationId",
         "StockBatch.batchCode",
         "StockBatch.lotNumber",
         "StockBatch.quantity",
         "StockBatch.receivedAt",
         "StockBatch.expiresAt",
-        "StockBatch.supplierId",
         "StockBatch.status"
        ],
        "operation": "listExpiringBatches",
@@ -1831,7 +1775,7 @@
    "note": "**Drawn by Claude Design on `Retail Board 6.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing.",
    "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6d"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRunReport",
@@ -1952,11 +1896,7 @@
        "columns": [
         "Segment.name",
         "Segment.description",
-        "Segment.venueId",
         "Segment.match",
-        "Segment.criteria",
-        "Segment.excludeSegmentIds",
-        "Segment.id",
         "Segment.lastEvaluatedSize",
         "Segment.lastEvaluatedAt"
        ],
@@ -2111,7 +2051,9 @@
     },
     {
      "name": "segmentId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listSegments` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not. A segment opened from the list.",
@@ -2131,7 +2073,7 @@
    "note": "**Drawn as RET-6E in the client Retail pack.**",
    "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6e"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRunReport",
@@ -2348,7 +2290,7 @@
    "note": "**Drawn as RET-6G in the client Retail pack.**",
    "derivedFrom": "wireframes/Retail Board 6.dc.html#ret-6g"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formAskReportingQuestion",
@@ -2495,15 +2437,9 @@
        "label": "Waiting for a decision",
        "bindsTo": "Alert",
        "columns": [
-        "Alert.id",
-        "Alert.ruleId",
         "Alert.raisedAt",
         "Alert.severity",
         "Alert.status",
-        "Alert.observedValue",
-        "Alert.threshold",
-        "Alert.scopePath",
-        "Alert.acknowledgedByPrincipalId",
         "Alert.acknowledgedAt",
         "Alert.resolvedAt",
         "Alert.escalatedAt"
@@ -2516,14 +2452,10 @@
        "label": "Every order",
        "bindsTo": "OrderSummary",
        "columns": [
-        "OrderSummary.id",
         "OrderSummary.orderNumber",
         "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
         "OrderSummary.channel",
         "OrderSummary.lineCount",
-        "OrderSummary.principalId",
         "OrderSummary.holdLabel",
         "OrderSummary.heldUntil"
        ],
@@ -2535,17 +2467,11 @@
        "label": "Every proposed action",
        "bindsTo": "ProposedAction",
        "columns": [
-        "ProposedAction.id",
-        "ProposedAction.interactionId",
         "ProposedAction.kind",
         "ProposedAction.targetContract",
         "ProposedAction.targetOperation",
-        "ProposedAction.payload",
-        "ProposedAction.summary",
         "ProposedAction.status",
         "ProposedAction.approvalLevel",
-        "ProposedAction.decidedByPrincipalId",
-        "ProposedAction.decisionReason",
         "ProposedAction.proposedAt"
        ],
        "operation": "listProposedActions",
@@ -2731,11 +2657,15 @@
     },
     {
      "name": "actionId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProposedActions` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "planId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProposedActions` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A bookmarked dashboard is the normal way in** — a manager opens the same view every Monday. The domain and the window come from the link where it carries them, and from the last view where it does not. A proposed action opened from the queue or an alert.",
@@ -2755,7 +2685,7 @@
    "note": "**Drawn as POS-6E in the client POS pack.** The pack's frame is the specification — it carries operations, states, entry params and exits, and it is better specified than anything derived from the screen file.",
    "derivedFrom": "wireframes/POS Board 6.dc.html#pos-6e"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formAskReportingQuestion",
@@ -3062,7 +2992,7 @@
    "note": "**Drawn as POS-6F in the client POS pack.** The pack's frame is the specification — it carries operations, states, entry params and exits, and it is better specified than anything derived from the screen file.",
    "derivedFrom": "wireframes/POS Board 6.dc.html#pos-6f"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRecordSuggestionOutcome",

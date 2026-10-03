@@ -33,7 +33,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-035 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-035 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -188,7 +188,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-035"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formAddTip",
@@ -278,7 +278,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-036 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-036 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -311,10 +311,8 @@
        "columns": [
         "MediaEntitlements.mediaCode",
         "MediaEntitlements.mediaKind",
-        "MediaEntitlements.subjectId",
         "MediaEntitlements.isValid",
         "MediaEntitlements.invalidReason",
-        "MediaEntitlements.canAcceptMore",
         "MediaEntitlements.entitlements"
        ],
        "operation": "getMediaEntitlements",
@@ -325,22 +323,11 @@
        "label": "The media asset",
        "bindsTo": "MediaAssetDetail",
        "columns": [
-        "MediaAssetDetail.id",
-        "MediaAssetDetail.kind",
         "MediaAssetDetail.status",
         "MediaAssetDetail.filename",
-        "MediaAssetDetail.contentType",
-        "MediaAssetDetail.sizeBytes",
         "MediaAssetDetail.title",
         "MediaAssetDetail.description",
-        "MediaAssetDetail.altText",
-        "MediaAssetDetail.width",
-        "MediaAssetDetail.height",
-        "MediaAssetDetail.durationSeconds",
-        "MediaAssetDetail.customMetadata",
-        "MediaAssetDetail.sharedWithTenantIds",
-        "MediaAssetDetail.tags",
-        "MediaAssetDetail.venueId"
+        "MediaAssetDetail.durationSeconds"
        ],
        "operation": "getMediaAsset",
        "provenance": "contract assets.yaml GET /media/{mediaId}"
@@ -365,7 +352,7 @@
    "loading": "The issue media, read by `getMediaEntitlements`.",
    "error": "Could not load. Names which read failed and leaves the issue media untouched.",
    "emptyFirstRun": "No issue media yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires to show this screen, and names that permission (the screen's other reads need `ASSET_LIBRARY_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`.",
    "offline": "Issues from the local range allocated at shift start"
   },
   "apis": [
@@ -406,7 +393,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-036"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formAppendEntitlementToMedia",
@@ -480,7 +467,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-037 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-037 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -518,18 +505,10 @@
        "label": "Every announcement",
        "bindsTo": "Announcement",
        "columns": [
-        "Announcement.id",
         "Announcement.title",
         "Announcement.body",
-        "Announcement.kind",
-        "Announcement.venueIds",
-        "Announcement.departmentIds",
-        "Announcement.roleIds",
-        "Announcement.requiresAcknowledgement",
         "Announcement.expiresAt",
-        "Announcement.publishedByPrincipalId",
-        "Announcement.publishedAt",
-        "Announcement.locale"
+        "Announcement.publishedAt"
        ],
        "operation": "listAnnouncements",
        "provenance": "contract workforce.yaml GET /announcements"
@@ -551,18 +530,11 @@
        "label": "The selected announcement",
        "bindsTo": "Announcement",
        "columns": [
-        "Announcement.id",
         "Announcement.title",
         "Announcement.body",
         "Announcement.kind",
-        "Announcement.venueIds",
-        "Announcement.departmentIds",
-        "Announcement.roleIds",
-        "Announcement.requiresAcknowledgement",
         "Announcement.expiresAt",
-        "Announcement.publishedByPrincipalId",
-        "Announcement.publishedAt",
-        "Announcement.locale"
+        "Announcement.publishedAt"
        ],
        "operation": "listAnnouncements",
        "provenance": "contract workforce.yaml GET /announcements"
@@ -673,11 +645,15 @@
    "params": [
     {
      "name": "announcementId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAnnouncements` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "conversationId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listStaffConversations` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `announcementId`.",
@@ -694,7 +670,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-037"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "publishAnnouncement",
@@ -752,7 +728,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-039 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-039 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -790,18 +766,10 @@
        "label": "Every announcement",
        "bindsTo": "Announcement",
        "columns": [
-        "Announcement.id",
         "Announcement.title",
         "Announcement.body",
-        "Announcement.kind",
-        "Announcement.venueIds",
-        "Announcement.departmentIds",
-        "Announcement.roleIds",
-        "Announcement.requiresAcknowledgement",
         "Announcement.expiresAt",
-        "Announcement.publishedByPrincipalId",
-        "Announcement.publishedAt",
-        "Announcement.locale"
+        "Announcement.publishedAt"
        ],
        "operation": "listAnnouncements",
        "provenance": "contract workforce.yaml GET /announcements"
@@ -817,18 +785,11 @@
        "label": "The selected announcement",
        "bindsTo": "Announcement",
        "columns": [
-        "Announcement.id",
         "Announcement.title",
         "Announcement.body",
         "Announcement.kind",
-        "Announcement.venueIds",
-        "Announcement.departmentIds",
-        "Announcement.roleIds",
-        "Announcement.requiresAcknowledgement",
         "Announcement.expiresAt",
-        "Announcement.publishedByPrincipalId",
-        "Announcement.publishedAt",
-        "Announcement.locale"
+        "Announcement.publishedAt"
        ],
        "operation": "listAnnouncements",
        "provenance": "contract workforce.yaml GET /announcements"
@@ -884,7 +845,9 @@
    "params": [
     {
      "name": "announcementId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAnnouncements` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `announcementId`.",
@@ -901,7 +864,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-039"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "getAnnouncementReach",
@@ -966,7 +929,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-038 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-038 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1004,18 +967,10 @@
        "label": "Every announcement",
        "bindsTo": "Announcement",
        "columns": [
-        "Announcement.id",
         "Announcement.title",
         "Announcement.body",
-        "Announcement.kind",
-        "Announcement.venueIds",
-        "Announcement.departmentIds",
-        "Announcement.roleIds",
-        "Announcement.requiresAcknowledgement",
         "Announcement.expiresAt",
-        "Announcement.publishedByPrincipalId",
-        "Announcement.publishedAt",
-        "Announcement.locale"
+        "Announcement.publishedAt"
        ],
        "operation": "listAnnouncements",
        "provenance": "contract workforce.yaml GET /announcements"
@@ -1037,18 +992,11 @@
        "label": "The selected announcement",
        "bindsTo": "Announcement",
        "columns": [
-        "Announcement.id",
         "Announcement.title",
         "Announcement.body",
         "Announcement.kind",
-        "Announcement.venueIds",
-        "Announcement.departmentIds",
-        "Announcement.roleIds",
-        "Announcement.requiresAcknowledgement",
         "Announcement.expiresAt",
-        "Announcement.publishedByPrincipalId",
-        "Announcement.publishedAt",
-        "Announcement.locale"
+        "Announcement.publishedAt"
        ],
        "operation": "listAnnouncements",
        "provenance": "contract workforce.yaml GET /announcements"
@@ -1095,7 +1043,7 @@
    "error": "Could not load. Names which read failed and leaves the broadcast team untouched.",
    "emptyFirstRun": "No broadcast team yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on unacknowledgedOnly and the broadcast team are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `getAnnouncementReach` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `listAnnouncements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ANNOUNCEMENT_PUBLISH` for `publishAnnouncement`.",
    "offline": "Refused offline: a broadcast needs the network. The draft stays on the device and the screen says it has not gone."
   },
   "apis": [
@@ -1125,7 +1073,9 @@
    "params": [
     {
      "name": "announcementId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAnnouncements` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `announcementId`.",
@@ -1142,13 +1092,13 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-038"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formPublishAnnouncement",
     "component": "modal",
     "trigger": "Publish announcement",
-    "body": "**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`, `kind`, `publishedAt`. Optional: `id`, `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`, `expiresAt`, `publishedByPrincipalId`, `locale`. **An `emergency` kind requires ANNOUNCEMENT_EMERGENCY** (audit R091 (1)). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`, `kind`, `publishedAt`. Optional: `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`, `expiresAt`, `locale`. **An `emergency` kind requires ANNOUNCEMENT_EMERGENCY** (audit R091 (1)). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `publishedByPrincipalId` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "Announcement",
     "confirm": {
      "label": "Publish announcement",
@@ -1161,13 +1111,11 @@
       "body",
       "kind",
       "publishedAt",
-      "id",
       "venueIds",
       "departmentIds",
       "roleIds",
       "requiresAcknowledgement",
       "expiresAt",
-      "publishedByPrincipalId",
       "locale"
      ]
     },
@@ -1233,7 +1181,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-040 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-040 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1314,7 +1262,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-040"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -1364,7 +1312,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-041 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-041 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1395,14 +1343,10 @@
        "label": "Every training",
        "bindsTo": "TrainingRecord",
        "columns": [
-        "TrainingRecord.id",
-        "TrainingRecord.principalId",
         "TrainingRecord.courseName",
-        "TrainingRecord.required",
         "TrainingRecord.completedAt",
         "TrainingRecord.expiresAt",
-        "TrainingRecord.state",
-        "TrainingRecord.evidenceRef"
+        "TrainingRecord.state"
        ],
        "operation": "listTrainingRecords",
        "provenance": "contract workforce.yaml GET /training-records"
@@ -1418,14 +1362,11 @@
        "label": "The selected training",
        "bindsTo": "TrainingRecord",
        "columns": [
-        "TrainingRecord.id",
-        "TrainingRecord.principalId",
         "TrainingRecord.courseName",
         "TrainingRecord.required",
         "TrainingRecord.completedAt",
         "TrainingRecord.expiresAt",
-        "TrainingRecord.state",
-        "TrainingRecord.evidenceRef"
+        "TrainingRecord.state"
        ],
        "operation": "listTrainingRecords",
        "provenance": "contract workforce.yaml GET /training-records"
@@ -1451,7 +1392,7 @@
    "error": "Could not load. Names which read failed and leaves the training untouched.",
    "emptyFirstRun": "No training yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Never shown: `listTrainingRecords` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `listTrainingRecords` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `listTrainingRecords` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `semanticSearch`.",
    "offline": "Cached progress; completions queue"
   },
   "apis": [
@@ -1485,7 +1426,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-041"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSemanticSearch",
@@ -1556,7 +1497,10 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-042 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "carries": [
+      "providerId"
+     ],
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-042 holds providerId, so an edge into it carries them"
     },
     {
      "to": "EMP-002",
@@ -1596,9 +1540,6 @@
        "columns": [
         "MfaMethod.kind",
         "MfaMethod.label",
-        "MfaMethod.maskedTarget",
-        "MfaMethod.isActive",
-        "MfaMethod.isPrimary",
         "MfaMethod.enrolledAt",
         "MfaMethod.lastUsedAt"
        ],
@@ -1629,12 +1570,9 @@
        "label": "The selected MFA method",
        "bindsTo": "MfaMethod",
        "columns": [
-        "MfaMethod.id",
         "MfaMethod.kind",
         "MfaMethod.label",
         "MfaMethod.maskedTarget",
-        "MfaMethod.isActive",
-        "MfaMethod.isPrimary",
         "MfaMethod.enrolledAt",
         "MfaMethod.lastUsedAt"
        ],
@@ -1646,15 +1584,9 @@
        "label": "The session",
        "bindsTo": "Session",
        "columns": [
-        "Session.sessionId",
-        "Session.principalId",
-        "Session.roleId",
         "Session.displayName",
         "Session.scope",
         "Session.effectivePermissions",
-        "Session.permissionsByScope",
-        "Session.saleBoardId",
-        "Session.workstation",
         "Session.openedAt",
         "Session.expiresAt"
        ],
@@ -1754,7 +1686,9 @@
     },
     {
      "name": "methodId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMfaMethods` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
@@ -1771,7 +1705,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-042"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formEnrolMfaMethod",
@@ -1883,7 +1817,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-043 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-043 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1917,9 +1851,7 @@
         "RegisteredDevice.kind",
         "RegisteredDevice.identifier",
         "RegisteredDevice.model",
-        "RegisteredDevice.offlineScope",
-        "RegisteredDevice.firmwareVersion",
-        "RegisteredDevice.isRequired"
+        "RegisteredDevice.offlineScope"
        ],
        "operation": "listDevices",
        "provenance": "contract tenancy.yaml GET /devices"
@@ -1935,21 +1867,10 @@
        "label": "The selected registered device",
        "bindsTo": "RegisteredDevice",
        "columns": [
-        "RegisteredDevice.id",
         "RegisteredDevice.kind",
-        "RegisteredDevice.driver",
-        "RegisteredDevice.identifier",
-        "RegisteredDevice.workstationId",
-        "RegisteredDevice.model",
-        "RegisteredDevice.pushToken",
-        "RegisteredDevice.pushPlatform",
         "RegisteredDevice.pushFailureCount",
-        "RegisteredDevice.offlineScope",
-        "RegisteredDevice.firmwareVersion",
-        "RegisteredDevice.isRequired",
         "RegisteredDevice.status",
         "RegisteredDevice.batteryPercent",
-        "RegisteredDevice.lastCheckedAt",
         "RegisteredDevice.health"
        ],
        "operation": "listDevices",
@@ -1976,7 +1897,7 @@
    "error": "Could not load. Names which read failed and leaves the device settings untouched.",
    "emptyFirstRun": "No device settings yet. Offers Register device (`registerDevice`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on workstationId, kind and the device settings are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVICE_CONFIGURE` for `registerDevice`.",
    "offline": "**Fully offline** — device settings are local by definition"
   },
   "apis": [
@@ -2017,7 +1938,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-043"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRegisterDevice",
@@ -2039,16 +1960,8 @@
       "model",
       "pushToken",
       "pushPlatform",
-      "pushFailureCount",
       "offlineScope",
-      "firmwareVersion",
-      "isRequired",
-      "status",
-      "batteryPercent",
-      "lastCheckedAt",
-      "health",
-      "lastHeartbeatAt",
-      "capabilities"
+      "isRequired"
      ]
     },
     "provenance": "contract tenancy.yaml POST /devices"
@@ -2103,7 +2016,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-044 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-044 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -2150,7 +2063,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-044"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P06",
    "audience": "staff",

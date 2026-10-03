@@ -488,6 +488,18 @@ def main() -> int:
             ERRORS.append(f"{f.name}: key '{key}' defined at line {first} and redefined at "
                           f"{again} — YAML keeps the last and discards the first without a word")
 
+    # 18b. An escaped UTF-16 surrogate (a pair such as backslash-u D83D backslash-u DD34) in a double-quoted YAML string. PyYAML's pure
+    # loader takes it; libyaml (CSafeLoader), which the faster tools use, rejects the whole file.
+    # contracts/satellite/subscription.yaml carried one on 3 October (CHG-GTR-006): write the
+    # character itself, or words.
+    _surr = re.compile(r"\\u[dD][89a-fA-F][0-9a-fA-F]{2}")
+    for f in sorted(list(C.glob("*/*.yaml")) + [p for d in ("screens", "flows", "states", "events")
+                                                for p in (ROOT / d).rglob("*.yaml")]):
+        for n, line in enumerate(f.read_text(encoding="utf-8").splitlines(), 1):
+            if _surr.search(line):
+                ERRORS.append(f"{f.name}: line {n} holds an escaped UTF-16 surrogate, which libyaml "
+                              "(CSafeLoader) rejects; write the character itself (CHG-GTR-006)")
+
     # 19. A platform code is written with the name its own screens file declares. On 18 August
     # eight of twelve platforms were called something else in the contracts — P09 alone had two
     # wrong names, "Platform Admin Console" and "Platform Admin", against a declared "TICVAI Web".

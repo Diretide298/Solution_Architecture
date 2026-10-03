@@ -196,15 +196,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 **Where the user goes next**
 
 - → `BO-100` Venue Home: *Back to Venue Home*
-- → `BO-545` Voucher Scan & Reservation Retrieval: *Voucher Scan & Reservation Retrieval*
-- → `BO-546` Checkout Readiness Validation: *Checkout Readiness Validation*
-- → `BO-547` Equipment Assignment Workspace: *Equipment Assignment Workspace*
-- → `BO-548` Equipment Scan & Validation: *Equipment Scan & Validation*
-- → `BO-549` Pre-Rental Condition Inspection: *Pre-Rental Condition Inspection*
-- → `BO-550` Safety & Handover Checklist: *Safety & Handover Checklist*
-- → `BO-551` Deposit & Financial Handover Validation: *Deposit & Financial Handover Validation*
-- → `BO-552` Group & Multi-Item Checkout: *Group & Multi-Item Checkout*
-- → `BO-553` Checkout Confirmation & Rental Activation: *Checkout Confirmation & Rental Activation*
+- → `BO-545` Voucher Scan & Reservation Retrieval: *Voucher Scan & Reservation Retrieval*; carries `bookingId`
+- → `BO-546` Checkout Readiness Validation: *Checkout Readiness Validation*; carries `bookingId`
+- → `BO-547` Equipment Assignment Workspace: *Equipment Assignment Workspace*; carries `bookingId`
+- → `BO-548` Equipment Scan & Validation: *Equipment Scan & Validation*; carries `bookingId`
+- → `BO-549` Pre-Rental Condition Inspection: *Pre-Rental Condition Inspection*; carries `bookingId`
+- → `BO-550` Safety & Handover Checklist: *Safety & Handover Checklist*; carries `bookingId`
+- → `BO-551` Deposit & Financial Handover Validation: *Deposit & Financial Handover Validation*; carries `bookingId`
+- → `BO-552` Group & Multi-Item Checkout: *Group & Multi-Item Checkout*; carries `bookingId`
+- → `BO-553` Checkout Confirmation & Rental Activation: *Checkout Confirmation & Rental Activation*; carries `bookingId`
 
 #### States
 

@@ -127,9 +127,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-011` | Wallet Overview | A | 0 | 22 | 6 | 32 | 14 | 6 | guest | notStarted (designed) |
-| `GST-015` | Memberships | A | 10 | 42 | 6 | 53 | 7 | 0 | guest | notStarted (designed) |
-| `GST-036` | Loyalty & Rewards | A | 9 | 62 | 6 | 54 | 2 | 2 | guest | notStarted (designed) |
+| `GST-011` | Wallet Overview | A | 0 | 15 | 6 | 32 | 14 | 6 | guest | notStarted (designed) |
+| `GST-015` | Memberships | A | 10 | 26 | 6 | 53 | 7 | 0 | guest | notStarted (designed) |
+| `GST-036` | Loyalty & Rewards | A | 9 | 49 | 6 | 54 | 2 | 2 | guest | notStarted (designed) |
 
 ## Thin screens in this batch
 

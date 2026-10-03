@@ -122,16 +122,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SCN-001` | Sign in | B–D | 14 | 20 | 8 | 5 | 0 | 0 | — | notStarted (generated) |
-| `SCN-002` | Access point & direction | B–D | 4 | 26 | 6 | 6 | 0 | 0 | — | notStarted (generated) |
-| `SCN-003` | Ready to scan | B–D | 21 | 0 | 10 | 46 | 8 | 0 | — | notStarted (generated) |
-| `SCN-007` | Group admission | B–D | 6 | 8 | 6 | 13 | 2 | 0 | — | notStarted (generated) |
-| `SCN-008` | Manual entry | B–D | 8 | 8 | 6 | 47 | 1 | 0 | — | notStarted (generated) |
-| `SCN-009` | Ticket lookup | B–D | 7 | 35 | 6 | 15 | 4 | 0 | — | notStarted (generated) |
-| `SCN-011` | Delegated right | B–D | 4 | 16 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `SCN-013` | Offline journal | B–D | 31 | 8 | 6 | 53 | 2 | 0 | — | notStarted (generated) |
-| `SCN-014` | Sync & reconciliation | B–D | 35 | 40 | 6 | 60 | 3 | 0 | — | notStarted (generated) |
-| `SCN-015` | Offline package | B–D | 1 | 8 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
+| `SCN-001` | Sign in | A | 14 | 20 | 8 | 5 | 0 | 0 | — | notStarted (generated) |
+| `SCN-002` | Access point & direction | C | 4 | 9 | 6 | 6 | 0 | 0 | — | notStarted (generated) |
+| `SCN-003` | Ready to scan | A | 21 | 0 | 10 | 46 | 8 | 0 | — | notStarted (generated) |
+| `SCN-007` | Group admission | C | 6 | 5 | 6 | 13 | 2 | 0 | — | notStarted (generated) |
+| `SCN-008` | Manual entry | C | 8 | 5 | 6 | 47 | 1 | 0 | — | notStarted (generated) |
+| `SCN-009` | Ticket lookup | C | 7 | 12 | 6 | 15 | 4 | 0 | — | notStarted (generated) |
+| `SCN-011` | Delegated right | B | 4 | 5 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `SCN-013` | Offline journal | C | 31 | 5 | 6 | 53 | 2 | 0 | — | notStarted (generated) |
+| `SCN-014` | Sync & reconciliation | A | 35 | 16 | 6 | 60 | 3 | 0 | — | notStarted (generated) |
+| `SCN-015` | Offline package | C | 1 | 5 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -151,7 +151,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Staff · P07 Venue Scanner (handheld) |
 | Module | Access · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block A · task APP-SCANNER-SCN-001 |
 | Who uses it | venue; in the flows as gate operator |
 | Device and orientation | This is a rugged handheld, 360 x 720, very large pass and fail states, readable in sunlight. · LTR and RTL · light theme |
 | Pattern | form (comfortable density): PIN or badge on a gate scanner, then the role - a form, not a list. |
@@ -352,7 +352,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P07 Venue Scanner (handheld) |
 | Module | Access · wave 1 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-SCANNER-SCN-002 |
 | Who uses it | venue staff holding `SCOPE_VIEW`, `TURNSTILE_MODE_SET` (1 read, 1 operate); in the flows as gate operator |
 | Device and orientation | This is a rugged handheld, 360 x 720, very large pass and fail states, readable in sunlight. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listAccessPoints` reads the population and `getAccessPoint` reads one of them — list, select, act |
@@ -413,37 +413,20 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| External credential sources | list or chips (count when long) | BL-108. A hotel room card admitting a guest to a water park — externally issued, and the platform validates it without having sold it. |
-| Scan anomaly rules | list or chips (count when long) | BL-104. Rule-based scan anomalies, separated from the parked model-based engine — device sharing, simultaneous entries at two gates, an … |
-| Operating mode | chip: Normal, Free flow, Drop arm, Closed, Podium, Maintenance | Set by the podium with `setTurnstileMode`, and it wins (audit R221). BL-107 and BL-109. |
-| Vehicle location capture | yes / no (icon or chip) | BL-023. Nothing helped a guest find their vehicle. |
 | Mode | chip: Free rotation, Closed | Narrows `operatingMode` only: `freeRotation` or `closed` within `normal` or `podium`, null otherwise and whenever the turnstile validates … |
 | Direction | chip: Entry, Exit, Reentry, Crossover | Fixed per access point (audit R221): set in the back office by `createAccessPoint` and `updateAccessPoint`, never by the podium. |
-| Anti passback enabled | yes / no (icon or chip) | — |
 
 **The selected access point** (detail panel, from `getAccessPoint`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| External credential sources | list or chips (count when long) | BL-108. A hotel room card admitting a guest to a water park — externally issued, and the platform validates it without having sold it. |
-| Scan anomaly rules | list or chips (count when long) | BL-104. Rule-based scan anomalies, separated from the parked model-based engine — device sharing, simultaneous entries at two gates, an … |
 | Operating mode | chip: Normal, Free flow, Drop arm, Closed, Podium, Maintenance | Set by the podium with `setTurnstileMode`, and it wins (audit R221). BL-107 and BL-109. |
-| Vehicle location capture | yes / no (icon or chip) | BL-023. Nothing helped a guest find their vehicle. |
 | Mode | chip: Free rotation, Closed | Narrows `operatingMode` only: `freeRotation` or `closed` within `normal` or `podium`, null otherwise and whenever the turnstile validates … |
 | Direction | chip: Entry, Exit, Reentry, Crossover | Fixed per access point (audit R221): set in the back office by `createAccessPoint` and `updateAccessPoint`, never by the podium. |
-| Anti passback enabled | yes / no (icon or chip) | — |
-| Is active | yes / no (icon or chip) | — |
-| Last heartbeat at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -478,7 +461,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the access point direction untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No access point direction yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId and the access point direction are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SCOPE_VIEW`, which `listAccessPoints` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SCOPE_VIEW`, which `listAccessPoints` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TURNSTILE_MODE_SET` for `startPodiumShift`, `endPodiumShift`. |
 | Offline (`?state=offline`) | Fully offline. The access point list is in the bundle |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 `shift-ended`: the shift is already ended. |
 
@@ -509,7 +492,7 @@ session:
 - `startPodiumShift` → `TURNSTILE_MODE_SET` (operate) · staff
 - `endPodiumShift` → `TURNSTILE_MODE_SET` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `SCOPE_VIEW`, which `listAccessPoints` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `SCOPE_VIEW`, which `listAccessPoints` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TURNSTILE_MODE_SET` for `startPodiumShift`, `endPodiumShift`.
 
 #### Requirements it meets
 
@@ -544,7 +527,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (4), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SCN-002?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Start podium shift, End podium shift.
 - [ ] Every transition is wired: `SCN-015`, `SCN-001`, `SCN-003`, `SCN-016`.
@@ -564,7 +547,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P07 Venue Scanner (handheld) |
 | Module | Access · wave 1 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block A · task APP-SCANNER-SCN-003 |
 | Who uses it | venue staff holding `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `TICKET_LOOKUP` (3 operate); in the flows as contractor, gate operator, guest, partner |
 | Device and orientation | This is a rugged handheld, 360 x 720, very large pass and fail states, readable in sunlight. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listScans` reads the population and `getOfflinePackage` reads one of them — list, select, act |
@@ -828,7 +811,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P07 Venue Scanner (handheld) |
 | Module | Access · wave 1 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-SCANNER-SCN-007 |
 | Who uses it | venue staff holding `ACCESS_VALIDATE`, `TICKET_LOOKUP` (2 operate); in the flows as gate operator |
 | Device and orientation | This is a rugged handheld, 360 x 720, very large pass and fail states, readable in sunlight. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listScans` reads the population and `getOfflinePackage` reads one of them — list, select, act |
@@ -889,11 +872,8 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Generated at | 1 Oct 2026, 14:30 | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | — |
-| Access point | the name it points at, never the id | — |
 | Entitlements | list or chips (count when long) | Read from `access.entitlement` (SD-052). With `sinceVersion`, only the rows changed after it, including ones now void or used, so a device … |
 | Delegated rights | list or chips (count when long) | Redemption rights issued by other cells and valid at this access point. Included in the package so a cross-region entitlement still admits … |
-| Blacklist | list or chips (count when long) | Media codes to deny outright regardless of entitlement state. |
-| Admission rules | list or chips (count when long) | — |
 
 **Actions and what each produces**
 
@@ -927,7 +907,7 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the group admission untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No group admission yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the group admission are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP` for `lookupTicket`. |
 | Offline (`?state=offline`) | Fully offline. Admits what is valid and states the shortfall |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither mediaCode nor ticketId supplied; 409 Requested count exceeds the remaining group allowance |
 
@@ -958,7 +938,7 @@ group:
 - `getOfflinePackage` → `ACCESS_VALIDATE` (operate) · staff
 - `lookupTicket` → `TICKET_LOOKUP` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP` for `lookupTicket`.
 
 #### Requirements it meets
 
@@ -1004,7 +984,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SCN-007?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Validate group access, Lookup ticket.
 - [ ] Every transition is wired: `SCN-001`, `SCN-002`, `SCN-003`, `SCN-014`.
@@ -1023,7 +1003,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P07 Venue Scanner (handheld) |
 | Module | Access · wave 1 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-SCANNER-SCN-008 |
 | Who uses it | venue staff holding `ACCESS_VALIDATE`, `TICKET_LOOKUP` (2 operate); in the flows as gate operator |
 | Device and orientation | This is a rugged handheld, 360 x 720, very large pass and fail states, readable in sunlight. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listScans` reads the population and `getOfflinePackage` reads one of them — list, select, act |
@@ -1086,11 +1066,8 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Generated at | 1 Oct 2026, 14:30 | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | — |
-| Access point | the name it points at, never the id | — |
 | Entitlements | list or chips (count when long) | Read from `access.entitlement` (SD-052). With `sinceVersion`, only the rows changed after it, including ones now void or used, so a device … |
 | Delegated rights | list or chips (count when long) | Redemption rights issued by other cells and valid at this access point. Included in the package so a cross-region entitlement still admits … |
-| Blacklist | list or chips (count when long) | Media codes to deny outright regardless of entitlement state. |
-| Admission rules | list or chips (count when long) | — |
 
 **Actions and what each produces**
 
@@ -1120,7 +1097,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the manual entry untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No manual entry yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the manual entry are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP` for `lookupTicket`. |
 | Offline (`?state=offline`) | Searches the bundle only. A reference issued after the last sync will not be found, and the screen says so rather than denying |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither mediaCode nor ticketId supplied; 400 Validation failed |
 
@@ -1148,7 +1125,7 @@ entry:
 - `getOfflinePackage` → `ACCESS_VALIDATE` (operate) · staff
 - `validateAccess` → `ACCESS_VALIDATE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP` for `lookupTicket`.
 
 #### Requirements it meets
 
@@ -1191,7 +1168,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (8), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SCN-008?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Lookup ticket, Validate access.
 - [ ] Every transition is wired: `SCN-009`, `SCN-001`, `SCN-002`, `SCN-003`.
@@ -1210,7 +1187,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P07 Venue Scanner (handheld) |
 | Module | Access · wave 1 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-SCANNER-SCN-009 |
 | Who uses it | venue staff holding `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE`, `TICKET_LOOKUP` (3 operate); in the flows as gate operator |
 | Device and orientation | This is a rugged handheld, 360 x 720, very large pass and fail states, readable in sunlight. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listScans` reads the population and `getOfflinePackage` reads one of them — list, select, act |
@@ -1260,36 +1237,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The scan's client-generated UUIDv7, the key offline replay deduplicates on. |
-| Access point | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Ticket | the name it points at, never the id | The `Entitlement.id` scanned; null where the media resolved to nothing. |
 | Media code | text | — |
 | Outcome | chip: Admitted, Denied, Overridden | — |
-| Deny reason | chip: Not found, Not yet valid, Expired, Already used, Reentry limit reached, Exit … | Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a … |
-| Direction | chip: Entry, Exit, Reentry, Crossover | — |
-| Operator principal | the name it points at, never the id | — |
-| Device | the name it points at, never the id | — |
-| Overrides scan | the name it points at, never the id | Set only on an override row, naming the denied scan it admits against (decided 28 September, audit R228). |
 
 **The selected scan event** (detail panel, from `listScans`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The scan's client-generated UUIDv7, the key offline replay deduplicates on. |
-| Access point | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Ticket | the name it points at, never the id | The `Entitlement.id` scanned; null where the media resolved to nothing. |
 | Media code | text | — |
 | Outcome | chip: Admitted, Denied, Overridden | — |
 | Deny reason | chip: Not found, Not yet valid, Expired, Already used, Reentry limit reached, Exit … | Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a … |
-| Direction | chip: Entry, Exit, Reentry, Crossover | — |
-| Operator principal | the name it points at, never the id | — |
-| Device | the name it points at, never the id | — |
-| Overrides scan | the name it points at, never the id | Set only on an override row, naming the denied scan it admits against (decided 28 September, audit R228). |
-| Override reason | text | The supervisor's justification, on the override row only. The overriding principal is that row's `operatorPrincipalId`. |
 | Recorded at | 1 Oct 2026, 14:30 | — |
 | Synced at | 1 Oct 2026, 14:30 | Null while pending. Differs from recordedAt for offline scans. |
 
@@ -1300,11 +1257,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Generated at | 1 Oct 2026, 14:30 | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | — |
-| Access point | the name it points at, never the id | — |
 | Entitlements | list or chips (count when long) | Read from `access.entitlement` (SD-052). With `sinceVersion`, only the rows changed after it, including ones now void or used, so a device … |
 | Delegated rights | list or chips (count when long) | Redemption rights issued by other cells and valid at this access point. Included in the package so a cross-region entitlement still admits … |
-| Blacklist | list or chips (count when long) | Media codes to deny outright regardless of entitlement state. |
-| Admission rules | list or chips (count when long) | — |
 
 **Actions and what each produces**
 
@@ -1337,7 +1291,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the ticket lookup untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No ticket lookup yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the ticket lookup are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_VENUE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP` for `lookupTicket`. |
 | Offline (`?state=offline`) | Bundle only, and the bundle age is shown beside the results |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither mediaCode nor ticketId supplied |
 
@@ -1369,7 +1323,7 @@ ticket:
 - `getOfflinePackage` → `ACCESS_VALIDATE` (operate) · staff
 - `listScans` → `REPORT_VIEW_VENUE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_VENUE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP` for `lookupTicket`.
 
 #### Requirements it meets
 
@@ -1415,7 +1369,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (7), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (35 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SCN-009?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Lookup ticket.
 - [ ] Every transition is wired: `SCN-001`, `SCN-002`, `SCN-003`.
@@ -1434,7 +1388,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P07 Venue Scanner (handheld) |
 | Module | Access · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-SCANNER-SCN-011 |
 | Who uses it | venue staff holding `ACCESS_VALIDATE`, `TICKET_LOOKUP` (2 operate) |
 | Device and orientation | This is a rugged handheld, 360 x 720, very large pass and fail states, readable in sunlight. · LTR and RTL · light theme |
 | Pattern | statusTracker (comfortable density): `getCrossRegionEntitlement` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1471,22 +1425,11 @@ Errors to draw in the form: 409 Entries exhausted, or the right is revoked or ou
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
-| Right | the name it points at, never the id | — |
-| Ticket | text | — |
-| Guest link | text | — |
 | Issuing cell name | text | — |
 | Consuming cell name | text | — |
-| Media codes | list or chips (count when long) | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
-| Valid to | 1 Oct 2026, 14:30 | — |
-| Admission rules | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | Null where the right is valid at any venue in the consuming cell. |
-| Entries allowed | 1,234 | Null means unlimited. |
-| Entries consumed | 1,234 | — |
 | Status | chip: Active, Exhausted, Revoked, Expired | — |
 | Last consumed at | 1 Oct 2026, 14:30 | — |
-| Last reconciled at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -1513,7 +1456,7 @@ Errors to draw in the form: 409 Entries exhausted, or the right is revoked or ou
 | Loading (`?state=loading`) | The delegated right, read by `getCrossRegionEntitlement`. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the delegated right untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | Never a create action: a delegated right arrives by scan. With nothing scanned the screen says "Scan the ticket from the other venue". |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TICKET_LOOKUP`, which `getCrossRegionEntitlement` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TICKET_LOOKUP`, which `getCrossRegionEntitlement` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_VALIDATE` for `consumeCrossRegionEntitlement`. |
 | Offline (`?state=offline`) | **Not available offline.** A delegated right issued in another region cannot be verified from a local bundle, and admitting on trust is how a pass gets used twice in two countries |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Entries exhausted, or the right is revoked or outside its window |
 
@@ -1542,7 +1485,7 @@ right:
 - `getCrossRegionEntitlement` → `TICKET_LOOKUP` (operate) · staff
 - `consumeCrossRegionEntitlement` → `ACCESS_VALIDATE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `TICKET_LOOKUP`, which `getCrossRegionEntitlement` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `TICKET_LOOKUP`, which `getCrossRegionEntitlement` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_VALIDATE` for `consumeCrossRegionEntitlement`.
 
 #### Requirements it meets
 
@@ -1565,7 +1508,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (4), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SCN-011?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Consume cross region entitlement.
 - [ ] Every transition is wired: `SCN-001`, `SCN-002`, `SCN-003`.
@@ -1584,7 +1527,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P07 Venue Scanner (handheld) |
 | Module | Access · wave 1 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-SCANNER-SCN-013 |
 | Who uses it | venue staff holding `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `TICKET_LOOKUP` (3 operate); in the flows as gate operator |
 | Device and orientation | This is a rugged handheld, 360 x 720, very large pass and fail states, readable in sunlight. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listScans` reads the population and `getOfflinePackage` reads one of them — list, select, act |
@@ -1689,11 +1632,8 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Generated at | 1 Oct 2026, 14:30 | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | — |
-| Access point | the name it points at, never the id | — |
 | Entitlements | list or chips (count when long) | Read from `access.entitlement` (SD-052). With `sinceVersion`, only the rows changed after it, including ones now void or used, so a device … |
 | Delegated rights | list or chips (count when long) | Redemption rights issued by other cells and valid at this access point. Included in the package so a cross-region entitlement still admits … |
-| Blacklist | list or chips (count when long) | Media codes to deny outright regardless of entitlement state. |
-| Admission rules | list or chips (count when long) | — |
 
 **Actions and what each produces**
 
@@ -1734,7 +1674,7 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the offline journal untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No offline journal yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the offline journal are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_OVERRIDE` for `overrideAccess`; `TICKET_LOOKUP` for `lookupTicket`. |
 | Offline (`?state=offline`) | The journal is the offline record. It is why an offline admit is recoverable |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither mediaCode nor ticketId supplied; 400 Validation failed; 409 Requested count exceeds the remaining group allowance; 409 The scan was not a denial, or has already been overridden |
 
@@ -1766,7 +1706,7 @@ journal:
 - `validateAccess` → `ACCESS_VALIDATE` (operate) · staff
 - `validateGroupAccess` → `ACCESS_VALIDATE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_OVERRIDE` for `overrideAccess`; `TICKET_LOOKUP` for `lookupTicket`.
 
 #### Requirements it meets
 
@@ -1812,7 +1752,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (31), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SCN-013?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Lookup ticket, Override access, Sync scans, Validate access, Validate group access.
 - [ ] Every transition is wired: `SCN-014`, `SCN-001`, `SCN-002`, `SCN-003`.
@@ -1831,7 +1771,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P07 Venue Scanner (handheld) |
 | Module | Access · wave 1 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block A · task APP-SCANNER-SCN-014 |
 | Who uses it | venue staff holding `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `ORDER_VIEW`, `REPORT_VIEW_VENUE`, `TICKET_LOOKUP` (4 operate, 1 read); in the flows as gate operator, guest |
 | Device and orientation | This is a rugged handheld, 360 x 720, very large pass and fail states, readable in sunlight. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listSyncRejections` reads the population and `getOfflinePackage` reads one of them — list, select, act |
@@ -1942,48 +1882,27 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Workstation | the name it points at, never the id | — |
 | Kind | chip: Order, Payment, Refund, Void, Scan | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
 | Rejected at | 1 Oct 2026, 14:30 | — |
-| Problem | grouped details | RFC 9457 problem details. Every error response uses this shape. |
-| Payload | grouped details | Deliberately open: the journal entry exactly as the till sent it. Its shape is the request schema for `kind` — an `OfflineOrder` for … |
 | Resolved at | 1 Oct 2026, 14:30 | — |
-| Resolved by principal | the name it points at, never the id | — |
 
 **Every scan event** (data table, from `listScans`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The scan's client-generated UUIDv7, the key offline replay deduplicates on. |
-| Access point | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Ticket | the name it points at, never the id | The `Entitlement.id` scanned; null where the media resolved to nothing. |
 | Media code | text | — |
 | Outcome | chip: Admitted, Denied, Overridden | — |
-| Deny reason | chip: Not found, Not yet valid, Expired, Already used, Reentry limit reached, Exit … | Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a … |
-| Direction | chip: Entry, Exit, Reentry, Crossover | — |
-| Operator principal | the name it points at, never the id | — |
-| Device | the name it points at, never the id | — |
-| Overrides scan | the name it points at, never the id | Set only on an override row, naming the denied scan it admits against (decided 28 September, audit R228). |
 
 **The selected sync rejection** (detail panel, from `listSyncRejections`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Workstation | the name it points at, never the id | — |
 | Kind | chip: Order, Payment, Refund, Void, Scan | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
 | Rejected at | 1 Oct 2026, 14:30 | — |
 | Problem | grouped details | RFC 9457 problem details. Every error response uses this shape. |
-| Payload | grouped details | Deliberately open: the journal entry exactly as the till sent it. Its shape is the request schema for `kind` — an `OfflineOrder` for … |
 | Resolved at | 1 Oct 2026, 14:30 | — |
-| Resolved by principal | the name it points at, never the id | — |
-| Resolution | chip: Posted, Voided, Refunded | What `resolveSyncRejection` recorded. Null while the rejection waits. |
-| Resolved record | the name it points at, never the id | The order, void or refund the resolution produced — what stops the entry being posted twice. |
 
 **The offline package** (detail panel, from `getOfflinePackage`)
 
@@ -1992,11 +1911,8 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Generated at | 1 Oct 2026, 14:30 | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | — |
-| Access point | the name it points at, never the id | — |
 | Entitlements | list or chips (count when long) | Read from `access.entitlement` (SD-052). With `sinceVersion`, only the rows changed after it, including ones now void or used, so a device … |
 | Delegated rights | list or chips (count when long) | Redemption rights issued by other cells and valid at this access point. Included in the package so a cross-region entitlement still admits … |
-| Blacklist | list or chips (count when long) | Media codes to deny outright regardless of entitlement state. |
-| Admission rules | list or chips (count when long) | — |
 
 **Actions and what each produces**
 
@@ -2038,7 +1954,7 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the sync reconciliation untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No sync reconciliation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on workstationId, kind, resolved and the sync reconciliation are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission (the screen's other reads need `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_OVERRIDE` for `overrideAccess` … |
 | Offline (`?state=offline`) | Not applicable. This screen exists to end the offline period |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither mediaCode nor ticketId supplied; 400 Validation failed; 409 Requested count exceeds the remaining group allowance; 409 The scan was not a denial, or has already been overridden |
 
@@ -2074,7 +1990,7 @@ sync:
 - `validateAccess` → `ACCESS_VALIDATE` (operate) · staff
 - `validateGroupAccess` → `ACCESS_VALIDATE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission (the screen's other reads need `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_OVERRIDE` for `overrideAccess` …
 
 #### Requirements it meets
 
@@ -2126,7 +2042,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (35), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SCN-014?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Sync scans, Lookup ticket, Override access, Validate access, Validate group access.
 - [ ] Every transition is wired: `SCN-001`, `SCN-002`, `SCN-003`, `ADM-003`.
@@ -2145,7 +2061,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P07 Venue Scanner (handheld) |
 | Module | Access · wave 1 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-SCANNER-SCN-015 |
 | Who uses it | venue staff holding `ACCESS_VALIDATE`, `TICKET_LOOKUP` (2 operate); in the flows as gate operator |
 | Device and orientation | This is a rugged handheld, 360 x 720, very large pass and fail states, readable in sunlight. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listScans` reads the population and `getOfflinePackage` reads one of them — list, select, act |
@@ -2188,11 +2104,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Generated at | 1 Oct 2026, 14:30 | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | — |
-| Access point | the name it points at, never the id | — |
 | Entitlements | list or chips (count when long) | Read from `access.entitlement` (SD-052). With `sinceVersion`, only the rows changed after it, including ones now void or used, so a device … |
 | Delegated rights | list or chips (count when long) | Redemption rights issued by other cells and valid at this access point. Included in the package so a cross-region entitlement still admits … |
-| Blacklist | list or chips (count when long) | Media codes to deny outright regardless of entitlement state. |
-| Admission rules | list or chips (count when long) | — |
 
 **Actions and what each produces**
 
@@ -2225,7 +2138,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the offline package untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No offline package yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the offline package are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP` for `lookupTicket`. |
 | Offline (`?state=offline`) | Cannot refresh. The existing bundle continues to be used and its age is shown |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither mediaCode nor ticketId supplied |
 
@@ -2255,7 +2168,7 @@ package:
 - `getOfflinePackage` → `ACCESS_VALIDATE` (operate) · staff
 - `lookupTicket` → `TICKET_LOOKUP` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP` for `lookupTicket`.
 
 #### Requirements it meets
 
@@ -2293,7 +2206,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (1), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SCN-015?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Lookup ticket.
 - [ ] Every transition is wired: `SCN-013`, `SCN-001`, `SCN-002`, `SCN-003`.

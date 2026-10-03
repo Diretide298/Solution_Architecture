@@ -125,16 +125,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ANL-051` | AI Analytics Command Center | B–D | 0 | 40 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-052` | Ask TICVAI — Natural Language Analytics | B–D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `ANL-053` | AI-Generated Dashboard Studio | B–D | 0 | 0 | 6 | 18 | 1 | 0 | — | notStarted (—) |
-| `ANL-054` | AI Report Generator | B–D | 0 | 14 | 6 | 82 | 1 | 0 | — | notStarted (—) |
-| `ANL-055` | Anomaly Detection Center | B–D | 0 | 20 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `ANL-056` | Root-Cause Analysis Explorer | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `ANL-057` | Forecasting & Predictive Analytics Studio | B–D | 7 | 0 | 5 | 39 | 0 | 0 | — | notStarted (—) |
-| `ANL-058` | AI Recommendation & Next-Best-Action Center | B–D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `ANL-059` | AI Insight History, Evidence & Explainability | B–D | 5 | 40 | 5 | 8 | 0 | 0 | — | notStarted (—) |
-| `ANL-060` | AI Analytics Governance & Model Control | B–D | 0 | 26 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-051` | AI Analytics Command Center | D | 0 | 40 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-052` | Ask TICVAI — Natural Language Analytics | D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `ANL-053` | AI-Generated Dashboard Studio | D | 0 | 0 | 6 | 18 | 1 | 0 | — | notStarted (—) |
+| `ANL-054` | AI Report Generator | D | 0 | 14 | 6 | 82 | 1 | 0 | — | notStarted (—) |
+| `ANL-055` | Anomaly Detection Center | D | 0 | 20 | 6 | 4 | 0 | 0 | — | notStarted (—) |
+| `ANL-056` | Root-Cause Analysis Explorer | D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `ANL-057` | Forecasting & Predictive Analytics Studio | D | 7 | 0 | 5 | 39 | 0 | 0 | — | notStarted (—) |
+| `ANL-058` | AI Recommendation & Next-Best-Action Center | D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `ANL-059` | AI Insight History, Evidence & Explainability | D | 5 | 40 | 5 | 8 | 0 | 0 | — | notStarted (—) |
+| `ANL-060` | AI Analytics Governance & Model Control | D | 0 | 26 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

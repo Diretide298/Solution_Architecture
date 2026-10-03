@@ -49,7 +49,7 @@ screens:
   name: Tenant Workspace
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - getFeatureToggles
@@ -95,7 +95,7 @@ screens:
   name: Brand Kit
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - completeUpload
@@ -123,7 +123,7 @@ screens:
   name: Typography
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - getFonts
@@ -148,7 +148,7 @@ screens:
   name: Logo & Assets
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - getAppIcons
@@ -173,7 +173,7 @@ screens:
   name: Theme Editor
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - getTheme
@@ -199,7 +199,7 @@ screens:
   name: Component Preview
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createPreview
@@ -221,6 +221,7 @@ screens:
   - CMS-001
   - CMS-002
   - CMS-003
+  - CMS-014
   boardFrames: null
   wireframe: wireframes/P13 Venue CMS.dc.html#cms-006
   inFlows:
@@ -229,7 +230,7 @@ screens:
   name: Page Builder
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createContentBlock
@@ -253,6 +254,7 @@ screens:
   entryParams:
   - pageId<-navigation
   - actionId<-navigation
+  - blockId<-navigation
   goesTo:
   - CMS-001
   - CMS-002
@@ -266,7 +268,7 @@ screens:
   name: Content Blocks
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createBanner
@@ -301,7 +303,7 @@ screens:
   name: Navigation & Menus
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - buildDeepLink
@@ -328,7 +330,7 @@ screens:
   name: Media Library
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - completeUpload
@@ -363,7 +365,7 @@ screens:
   name: SEO & Metadata
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createUrlRedirect
@@ -387,7 +389,7 @@ screens:
   name: Translations
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - getTenantConfig
@@ -412,7 +414,7 @@ screens:
   name: RTL Preview
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createPreview
@@ -437,7 +439,7 @@ screens:
   name: Publishing Workflow
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createPreview
@@ -459,6 +461,7 @@ screens:
   entryParams:
   - venueId<-session
   - version<-navigation
+  - packageId<-navigation
   goesTo:
   - CMS-001
   - CMS-002
@@ -476,7 +479,7 @@ screens:
   name: Version History
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - diffConfigVersion
@@ -504,7 +507,7 @@ screens:
   name: Site Settings
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - getBookingFlowConfig
@@ -536,7 +539,7 @@ screens:
   name: Domain & Certificate
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - claimCustomDomain
@@ -567,7 +570,7 @@ screens:
   name: Consent & Legal
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createConsentQuestion
@@ -599,7 +602,7 @@ screens:
   name: User Access
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - listPrincipals
@@ -612,7 +615,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - principalId<-session
   goesTo:
   - CMS-001
   - CMS-002
@@ -724,7 +728,7 @@ screens:
   name: Cookie, Tracking & Digital Technology Registry
   module: Policy
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listCookieScanFindings
@@ -742,7 +746,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - scanRunId<-navigation
   goesTo:
   - CMS-021
   boardFrames: null
@@ -754,7 +759,7 @@ screens:
   name: Cookie Banner & Preference Center Designer
   module: Policy
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listCookieBannerPreference
@@ -2514,7 +2519,7 @@ screens:
   name: Help Me Choose
   module: White Label
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createGuidedChoice

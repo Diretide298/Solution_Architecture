@@ -74,6 +74,7 @@ screens:
   goesTo:
   - ACC-001
   - ACC-003
+  - ACC-007
   boardFrames: null
   wireframe: wireframes/P11 Accreditation Web.dc.html#acc-002
   inFlows:
@@ -176,6 +177,7 @@ screens:
   offlineState: false
   entryParams:
   - programmeId<-session
+  - applicationId<-navigation
   goesTo:
   - ACC-007
   - ACC-008
@@ -204,6 +206,7 @@ screens:
   - applicationId<-ACC-006
   - documentId<-navigation
   goesTo:
+  - ACC-005
   - ACC-006
   - ACC-008
   boardFrames: null

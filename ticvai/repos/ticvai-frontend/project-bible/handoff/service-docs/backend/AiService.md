@@ -34,22 +34,22 @@
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
 | actions | [`overrideAiDecision`](#overrideaidecision) | POST | `/decision-records/{decisionRecordId}/override` | core | 1 | ADM-533, ADM-536 |
-| ai | [`getTranslationProposals`](#gettranslationproposals) | GET | `/ai/translate/{translationJobId}` | core | 2 | CMS-011 |
+| ai | [`getTranslationProposals`](#gettranslationproposals) | GET | `/ai/translate/{translationJobId}` | core | 1 | CMS-011 |
 | ai | [`proposeTranslations`](#proposetranslations) | POST | `/ai/translate` | core | 1 | BO-785, BO-793 |
 | ai | [`proposeVenueLabels`](#proposevenuelabels) | POST | `/ai/venue-map/{mapId}/propose-labels` | core | 1 | BO-093 |
 | ai | [`requestSuggestion`](#requestsuggestion) | POST | `/ai/suggestions` | core | 1 | ADM-047, ADM-511, ANL-001, ANL-006, ANL-010, BO-005 … |
 | ai | [`setSuggestionProvider`](#setsuggestionprovider) | PUT | `/ai/suggestion-providers` | setup | 1 |  |
 | ai | [`testAiProvider`](#testaiprovider) | POST | `/ai-providers/{providerId}/test` | core | 1 | ADM-037 |
 | assist | [`createAiConversation`](#createaiconversation) | POST | `/conversations` | core | 1 | BO-928, BO-932, CMS-104, EMP-019, EMP-020, GST-031 … |
-| assist | [`listAiConversations`](#listaiconversations) | GET | `/conversations` | core | 2 | BO-932, EMP-019, EMP-020, GST-031, GST-068, WEB-044 |
+| assist | [`listAiConversations`](#listaiconversations) | GET | `/conversations` | core | 1 | BO-932, EMP-019, EMP-020, GST-031, GST-068, WEB-044 |
 | assist | [`sendAiMessage`](#sendaimessage) | POST | `/conversations/{conversationId}/messages` | core | 1 | ADM-533, BO-928, BO-929, BO-932, CMS-104, EMP-019 … |
 | config | [`getAiByokEnablement`](#getaibyokenablement) | GET | `/tenants/{tenantId}/byok` | core | 1 | ADM-037, BO-091 |
 | config | [`getAiPolicy`](#getaipolicy) | GET | `/policy` | core | 1 | BO-091 |
 | config | [`listAiProviders`](#listaiproviders) | GET | `/providers` | core | 1 | ADM-037 |
 | config | [`setAiByokEnablement`](#setaibyokenablement) | PUT | `/tenants/{tenantId}/byok` | setup | 1 | ADM-037 |
 | config | [`setAiPolicy`](#setaipolicy) | PUT | `/policy` | setup | 1 | BO-091 |
-| configure | [`getGuidedChoiceSuggestion`](#getguidedchoicesuggestion) | GET | `/guided-choice-suggestions/{suggestionId}` | core | 2 | CMS-101 |
-| configure | [`suggestGuidedChoice`](#suggestguidedchoice) | POST | `/venues/{venueId}/guided-choice-suggestions` | core | 2 | CMS-101 |
+| configure | [`getGuidedChoiceSuggestion`](#getguidedchoicesuggestion) | GET | `/guided-choice-suggestions/{suggestionId}` | core | 1 | CMS-101 |
+| configure | [`suggestGuidedChoice`](#suggestguidedchoice) | POST | `/venues/{venueId}/guided-choice-suggestions` | core | 1 | CMS-101 |
 | forecast | [`createForecastScenario`](#createforecastscenario) | POST | `/forecast-scenarios` | setup | 1 | ADM-507, ADM-517, ANL-057, BO-919, BO-931 |
 | forecast | [`decideOperationalRequirement`](#decideoperationalrequirement) | POST | `/operational-requirements/{requirementId}/decide` | setup | 1 | ADM-518, BO-927 |
 | forecast | [`getAiVenueSettings`](#getaivenuesettings) | GET | `/venues/{venueId}/ai-settings` | core | 1 | ADM-489, ANL-071, BO-927 |
@@ -64,22 +64,22 @@
 | forecast | [`runForecast`](#runforecast) | POST | `/forecast-definitions/{definitionKey}/runs` | setup | 1 | ADM-500, ADM-508 |
 | forecast | [`setAiVenueSettings`](#setaivenuesettings) | PUT | `/venues/{venueId}/ai-settings` | core | 1 | ADM-471, ADM-489, ANL-071, BO-927 |
 | forecast | [`setForecastDefinition`](#setforecastdefinition) | PUT | `/forecast-definitions/{definitionKey}` | setup | 1 | ADM-500, ADM-501 |
-| generate | [`proposeMarketingContent`](#proposemarketingcontent) | POST | `/ai/content-drafts` | core | 2 | BO-766, BO-772, BO-785, BO-786, BO-787, BO-789 … |
-| governance | [`createAiGovernancePolicyDraft`](#createaigovernancepolicydraft) | POST | `/governance/policy-drafts` | setup | 2 | ADM-523, ADM-524, ADM-525, ADM-530 |
-| governance | [`decideProposedAction`](#decideproposedaction) | POST | `/proposed-actions/{actionId}/decide` | core | 2 | ADM-492, ADM-531, ADM-532, ANL-009, BO-598, BO-762 … |
+| generate | [`proposeMarketingContent`](#proposemarketingcontent) | POST | `/ai/content-drafts` | core | 1 | BO-766, BO-772, BO-785, BO-786, BO-787, BO-789 … |
+| governance | [`createAiGovernancePolicyDraft`](#createaigovernancepolicydraft) | POST | `/governance/policy-drafts` | setup | 1 | ADM-523, ADM-524, ADM-525, ADM-530 |
+| governance | [`decideProposedAction`](#decideproposedaction) | POST | `/proposed-actions/{actionId}/decide` | core | 1 | ADM-492, ADM-531, ADM-532, ANL-009, BO-598, BO-762 … |
 | governance | [`evaluateAiGovernance`](#evaluateaigovernance) | POST | `/governance/evaluate` | core | 1 |  |
 | governance | [`getAiUsage`](#getaiusage) | GET | `/usage` | core | 1 | ADM-549, ANL-070, BO-091 |
 | governance | [`getEffectiveAiPolicy`](#geteffectiveaipolicy) | GET | `/governance/effective-policy` | core | 1 | ADM-489, ADM-522, ADM-525, ADM-526, ADM-528, ANL-060 … |
 | governance | [`listAiCapabilities`](#listaicapabilities) | GET | `/governance/capabilities` | core | 1 | ADM-519, ADM-520, ADM-521, ADM-522, ADM-536, ANL-060 … |
 | governance | [`listAiGovernancePolicyVersions`](#listaigovernancepolicyversions) | GET | `/governance/policy-versions` | core | 1 | ADM-523, ADM-524, ADM-526, ADM-527, ADM-528, ADM-530 |
 | governance | [`pauseAiCapability`](#pauseaicapability) | POST | `/governance/capabilities/{capabilityKey}/pause` | core | 1 | ADM-519, ADM-536, ADM-556, ADM-696 |
-| governance | [`publishAiGovernancePolicy`](#publishaigovernancepolicy) | POST | `/governance/policy-versions/{versionId}/publish` | setup | 2 | ADM-528 |
+| governance | [`publishAiGovernancePolicy`](#publishaigovernancepolicy) | POST | `/governance/policy-versions/{versionId}/publish` | setup | 1 | ADM-528 |
 | governance | [`revokeAiPolicyException`](#revokeaipolicyexception) | POST | `/governance/policy-exceptions/{exceptionId}/revoke` | core | 1 | ADM-526 |
-| governance | [`simulateAiGovernancePolicy`](#simulateaigovernancepolicy) | POST | `/governance/policy-versions/{versionId}/simulate` | setup | 2 | ADM-527, ADM-538 |
+| governance | [`simulateAiGovernancePolicy`](#simulateaigovernancepolicy) | POST | `/governance/policy-versions/{versionId}/simulate` | setup | 1 | ADM-527, ADM-538 |
 | insights | [`decideAiInsight`](#decideaiinsight) | POST | `/insights/{insightId}/decide` | setup | 1 | ANL-019, ANL-059, BO-772, BO-782 |
 | insights | [`explainMetricChange`](#explainmetricchange) | POST | `/insights/explain-metric-change` | setup | 1 | ADM-506, ANL-019, ANL-056 |
 | knowledge | [`configureAssistantProfile`](#configureassistantprofile) | PUT | `/assistant-profiles/{profileKey}` | setup | 1 | BO-091, SUP-018 |
-| knowledge | [`recordAnswerFeedback`](#recordanswerfeedback) | POST | `/messages/{messageId}/feedback` | core | 2 | EMP-020, GST-031, GST-032, GST-033, KSK-015, WEB-044 |
+| knowledge | [`recordAnswerFeedback`](#recordanswerfeedback) | POST | `/messages/{messageId}/feedback` | core | 1 | EMP-020, GST-031, GST-032, GST-033, KSK-015, WEB-044 |
 | models | [`listAiEvaluations`](#listaievaluations) | GET | `/evaluations` | core | 1 | ADM-554, ANL-060 |
 | models | [`listAiTrainingRuns`](#listaitrainingruns) | GET | `/training-runs` | core | 1 | ADM-554 |
 | models | [`promoteAiRelease`](#promoteairelease) | POST | `/releases/{releaseId}/promote` | setup | 1 | ADM-519, ADM-554 |
@@ -93,10 +93,10 @@
 | monitoring | [`openAiIncident`](#openaiincident) | POST | `/incidents` | core | 1 | ADM-555, ADM-556 |
 | recommend | [`decideRecommendations`](#deciderecommendations) | POST | `/recommendations/decide` | core | 1 | BO-102, BO-1048, BO-119, GST-001, GST-036, GST-048 … |
 | recommend | [`recordRecommendationEvents`](#recordrecommendationevents) | POST | `/recommendations/events` | core | 1 | GST-001, GST-036, GST-048, WEB-001, WEB-008, WEB-043 |
-| retrieval | [`createKnowledgeCollection`](#createknowledgecollection) | POST | `/collections` | setup | 2 |  |
+| retrieval | [`createKnowledgeCollection`](#createknowledgecollection) | POST | `/collections` | setup | 1 |  |
 | retrieval | [`ingestKnowledgeDocument`](#ingestknowledgedocument) | POST | `/collections/{collectionId}/documents` | setup | 1 | BO-798 |
 | retrieval | [`reindexSource`](#reindexsource) | POST | `/index-sources/{sourceId}/reindex` | setup | 1 |  |
-| retrieval | [`semanticSearch`](#semanticsearch) | POST | `/search` | core | 2 | CMS-010, CMS-062, EMP-040, EMP-041, SUP-006 |
+| retrieval | [`semanticSearch`](#semanticsearch) | POST | `/search` | core | 1 | CMS-010, CMS-062, EMP-040, EMP-041, SUP-006 |
 | retrieval | [`setIndexSource`](#setindexsource) | PUT | `/index-sources` | setup | 1 |  |
 
 ## Group: actions
@@ -173,7 +173,7 @@ The drafts a `proposeTranslations` job has written so far, and whether it has fi
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
@@ -509,6 +509,7 @@ Conversational assistance, grounded in the tenant's own data
 
 Scoped to a module and a role, because the same question means different things to a cashier and a finance controller (8.4.6). The scope is taken from the session, never from the request — an assistant that accepts the venue it should answer about is an assistant that can be asked about someone else's.
 **The role comes from the session as well, and is not stored on the conversation.** Each `sendAiMessage` answers under the caller's resolved grants at the time it is sent, so a conversation carries its `module` and `scopePath` and no role of its own — a role copied onto the thread would go on answering as a finance controller after the grant was withdrawn.
+**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-004; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own assistant conversations; another guest's conversation is refused exactly as one that does not exist, never returned. `AI_USE` is what a staff caller must hold to act for any guest (ADR-0025).
 
 |  |  |
 |---|---|
@@ -560,13 +561,14 @@ Scoped to a module and a role, because the same question means different things 
 **`GET /conversations`**: A principal's conversation history
 
 8.4.30. Retained because an assistant with no memory of yesterday is a search box, and because the governance requirements need the history to exist (8.3.59).
+**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-004; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own assistant conversations; another guest's conversation is refused exactly as one that does not exist, never returned. `AI_USE` is what a staff caller must hold to act for any guest (ADR-0025).
 
 |  |  |
 |---|---|
 | Permission | `AI_USE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -613,6 +615,8 @@ Retrieval runs **as the calling principal**. The assistant can see exactly what 
 Every response carries a trace id, the model and provider that produced it, token counts and its sources. Not for the user's benefit: for cost attribution and for the grounding audit that 8.3.70 requires.
 **Where the answer proposes an action, it is a draft.** The response carries a `proposedAction` the caller may apply through the owning contract, and applying it is a separate, permissioned, audited step (8.3.61–8.3.64).
 **Every message is scrubbed before it leaves the cell** (Chinmay, 2 October; ADR-0020 amended; CHG-CSA-003): the offline scrubber replaces personal data with reversible placeholders, the guard model checks the input and the reply, and the reply is re-filled in the cell (`AiPolicy.scrubbing`). It applies whatever the tenant's residency class. With the scrubber or the guard down the call is refused `503 scrubber-unavailable`, never sent raw; a message or reply the guard blocks is refused `422 guard-refused`.
+
+**The answer streams** (Chinmay, 3 October 2026, Block A business rules: "stream answers"; CHG-RUL-002). A client that sends `Accept: text/event-stream` gets server-sent events in this order: `token` events carrying the answer text as it is produced (`{delta}`), then one `sources` event (`AiSourceList`), then a `proposedAction` event only where the answer proposes one (`ProposedAction`, still a draft), then `done` carrying the stored `AiMessage`, the same body the JSON answer returns. **What is stored does not change**: the full message is written once, when the answer is complete, and `done` and the JSON answer are that row. Text reaches the client only after the cell has re-filled the scrubber's placeholders and the guard has passed it, so the stream is released in short checked runs rather than raw tokens; where the guard blocks the reply part-way, an `error` event (`Problem`, `guard-refused`) ends the stream, the client discards the partial text, and nothing is stored as the answer. Refusals found before the first token (429, 503, 422) are ordinary HTTP answers, never a stream. A client that sends `Accept: application/json` (or no `Accept`) gets the whole `AiMessage` as before; clients built at r1 are unchanged.
 
 |  |  |
 |---|---|
@@ -688,7 +692,7 @@ Every response carries a trace id, the model and provider that produced it, toke
 
 | Code | Shape | Meaning |
 |---|---|---|
-| 200 |  | Answered |
+| 200 |  | Answered. |
 | 429 |  | Usage limit reached (8.3.76). |
 | 503 |  | Every configured provider failed. |
 | 422 |  | The guard model blocked the message or the reply (guard-refused, CHG-CSA-003). |
@@ -1100,7 +1104,7 @@ The configuration assistant and Help me choose suggestions (design C7)
 | Permission | `AI_USE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
@@ -1161,7 +1165,7 @@ The configuration assistant and Help me choose suggestions (design C7)
 | Permission | `AI_USE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.guided_choice_suggestion`, `ai.policy`, `ai.prompt_template`, `cache:idempotency` |
@@ -2230,7 +2234,7 @@ Draft a configuration a person then reviews
 | Permission | `AI_USE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.capability`, `ai.governance_policy_version`, `ai.policy`, `ai.prompt_template`, `ai.provider`, `cache:idempotency`, `catalogue.event`, `catalogue.product`, `control.content_block`, `marketing.campaign`, `marketing.message_template`, `promotions.promotion`, `whitelabel.banner`, `whitelabel.content_page`, `whitelabel.homepage_section`, `whitelabel.promo_block` |
@@ -2300,7 +2304,7 @@ Logging, approval, explainability and cost
 | Permission | `AI_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `ai.governance_policy`, `ai.governance_policy_version` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -2391,7 +2395,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 | Permission | `AI_USE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.action_plan`, `ai.proposed_action`, `cache:idempotency` |
@@ -2511,7 +2515,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 8.1.7, 8.3.81–8.3.83. Tokens, cost and latency by tenant, venue, principal, provider and capability.
 **Cost attribution is the reason every response carries a token count.** An AI feature with no cost signal is a bill nobody predicted, and the first month is when it matters.
 **Grouped by agent, model and task too, with a month-end projection** (AI design 2.3, 4.5). The projection is returned in `forecast`, labelled a forecast, beside the actual spend and never mixed into it. Tokens on TICVAI-managed providers are re-billed per token through `subscription.settleAiUsage` (decision 2); on a tenant's own key they are metered for visibility.
-**Money in the tenant's selected currency, tokens alongside** (Chinmay, 2 October, workbook Q8; CHG-CSA-004). Every cost and the spend ceiling are reported in the tenant's selected currency (USD by default), with the token counts beside them, never instead of them.
+**Money in the tenant's selected currency, tokens alongside** (Chinmay, 2 October, workbook Q8; CHG-CSA-004). Every cost and the spend ceiling are reported in the tenant's selected currency (by default its billing currency, AED for a UAE tenant, not USD; CHG-RUL-017), with the token counts beside them, never instead of them.
 
 |  |  |
 |---|---|
@@ -2537,7 +2541,7 @@ A rejection carries a reason. It is the only signal that the assistant is propos
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| currency | string |  | The tenant's selected currency, USD by default (Chinmay, 2 October, workbook Q8; CHG-CSA-004). (min length 3; max length 3; read-only) |
+| currency | string |  | The tenant's selected currency, by default its billing currency (AED for a UAE tenant), not USD (CHG-RUL-017; Chinmay, 2 October, workbook Q8; CHG-CSA-004). (min length 3; max length 3; read-only) |
 | ceiling | object |  | The spend ceiling in force (getAiSpendCeiling), with the tokens it equals at the current blended rate and what is used so far (CHG-CSA-004). (read-only; nullable) |
 | ceiling.spend | Money |  | On the wire this is three fields; in the database it is one column. |
 | ceiling.spend.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -2865,7 +2869,7 @@ Every version of every governance policy at the scope, newest first (ADM-523, AD
 | Permission | `AI_APPROVE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `ai.governance_policy`, `ai.governance_policy_version` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -2990,7 +2994,7 @@ Moves an `active` exception to `revoked` with a reason (ADM-526); the effective 
 | Permission | `AI_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `ai.governance_policy_version` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.decision_record`, `ai.governance_policy_version`, `cache:idempotency` |
@@ -3273,7 +3277,7 @@ One label per message per person (AIC-062): helpful or not, and why. Guests can 
 | Permission | `AI_USE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | lastWriterWins |
 | Guest callable | True |
@@ -4232,7 +4236,7 @@ Approved enterprise knowledge sources (8.4.38) — operating procedures, policie
 | Permission | `AI_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `ai.knowledge_collection` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -4434,7 +4438,7 @@ Results are scoped to the principal, and each carries the collection it came fro
 | Permission | `AI_USE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -4544,7 +4548,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | origin | text | yes |  |
 | origin_ref | text | no |  |
 | summary | text | no |  |
@@ -4597,7 +4601,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | detector_key | text | yes |  |
 | source | text | no | What is watched (29 September, build): a semantic-layer KPI, a published forecast (8.2.20, 8.2.41), or device status events (8.9.9). |
 | metric_key | text | no | A metric of the semantic layer (Reporting KPI). |
@@ -4616,7 +4620,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | message_id | uuid | yes |  |
 | conversation_id | uuid | no |  |
 | rating | text | yes |  |
@@ -4632,7 +4636,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | profile_key | text | yes |  |
 | name | text | no |  |
 | audience | text | yes |  |
@@ -4651,7 +4655,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | tenant_id | uuid | yes |  |
 | is_enabled | boolean | yes |  |
 | coverage | text | no | Whether the tenant may supply a key per task or one key for everything. |
@@ -4667,7 +4671,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | capability_key | text | yes | Stable key, unique per tenant: assistant.guest, forecast.attendance, risk.transaction, config.assistant, recommend.checkout. |
 | family | text | yes |  |
 | name | text | no |  |
@@ -4690,7 +4694,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | capability_key | text | yes |  |
 | suggestion_kind | text | no |  |
 | forecast_definition_key | text | no |  |
@@ -4704,7 +4708,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | document_id | uuid | yes |  |
 | chunk_index | integer | yes |  |
 | parent_chunk_id | uuid | no | The parent section's own row, where the source uses parentChild chunking. |
@@ -4734,7 +4738,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | trace_id | text | yes |  |
 | capability_key | text | yes |  |
 | task | text | no |  |
@@ -4764,7 +4768,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | suite_id | uuid | yes |  |
 | release_id | uuid | no |  |
 | kind | text | yes |  |
@@ -4783,7 +4787,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | suite_key | text | yes |  |
 | capability_key | text | yes |  |
 | layer | text | yes |  |
@@ -4797,7 +4801,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | definition_id | uuid | yes |  |
 | version_id | uuid | no |  |
 | producer_ref | text | no |  |
@@ -4815,7 +4819,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | definition_key | text | yes |  |
 | name | text | no |  |
 | subject | text | yes |  |
@@ -4840,7 +4844,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | version_id | uuid | yes |  |
 | scenario_id | uuid | no | Set where the point belongs to a what-if scenario rather than the version itself. |
 | target_start | timestamptz | yes |  |
@@ -4857,7 +4861,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | name | text | no |  |
 | base_version_id | uuid | yes |  |
 | status | text | no |  |
@@ -4870,7 +4874,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | definition_id | uuid | yes |  |
 | version_number | integer | yes |  |
 | module | text | no | The module of the version's definition (AiForecastDefinition.module), copied when the version is produced; the module whose AI publish permission publishForecastVersion requires (CHG-FUP-004). |
@@ -4893,7 +4897,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | kind | text | yes |  |
 | severity | text | yes |  |
 | capability_key | text | no |  |
@@ -4912,7 +4916,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | policy_key | text | yes |  |
 | name | text | no |  |
 | kind | text | yes |  |
@@ -4926,7 +4930,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | policy_id | uuid | yes |  |
 | version | integer | yes |  |
 | status | text | yes |  |
@@ -4943,7 +4947,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | venue_id | uuid | yes |  |
 | trigger | text | yes |  |
 | status | text | yes |  |
@@ -4983,7 +4987,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | import_id | uuid | yes |  |
 | venue_id | uuid | yes |  |
 | data_kind | text | yes |  |
@@ -4998,7 +5002,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | reference | text | yes |  |
 | title | text | yes |  |
 | kind | text | no |  |
@@ -5048,7 +5052,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | table_name | text | yes | Schema-qualified, e.g. |
 | contract | text | no | Which contract owns it, for tracing back. |
 | text_fields | text[] | yes | The fields a person would read. |
@@ -5068,7 +5072,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | kind | text | yes |  |
 | detector_id | uuid | no |  |
 | metric_key | text | no |  |
@@ -5095,7 +5099,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | kind | text | yes |  |
 | target_kind | text | yes |  |
 | target_ref | text | yes |  |
@@ -5111,7 +5115,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | name | text | yes |  |
 | description | text | no |  |
 | scope_level | text | yes |  |
@@ -5128,7 +5132,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | collection_id | uuid | no |  |
 | title | text | yes |  |
 | source_asset_id | uuid | yes |  |
@@ -5144,7 +5148,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | question | text | yes | The normalised question. |
 | examples | text[] | no | Up to ten phrasings as asked, with personal data masked. |
 | occurrences | integer | no |  |
@@ -5182,7 +5186,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | layer | text | yes |  |
 | provider_kind | text | no |  |
 | vendor | text | no | Whose model this is (CHG-FUP-008): the provider company as AiProvider.vendor names it. |
@@ -5206,7 +5210,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | version_id | uuid | yes |  |
 | kind | text | yes |  |
 | target_contract | text | no | The owning module that applies it: workforce, fnb, inventory, resources, access. |
@@ -5228,7 +5232,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no | Added 20 August. |
+| id | uuid | yes | Added 20 August. |
 | scope_level | text | yes | Tenant sets the default; a venue may narrow it and never widen it. |
 | scope_path | text | yes | The node this row belongs to, and the key it is written under — the tenant's node where scopeLevel is tenant, a venue's where it is venue. |
 | enabled_capabilities | text[] | yes | Extended on 29 September to the fourteen capabilities of the AI design (section 1.1, AiCapabilityFamily). |
@@ -5264,7 +5268,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | policy_id | uuid | yes |  |
 | capability_key | text | no |  |
 | reason | text | yes |  |
@@ -5282,7 +5286,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | template_key | text | yes |  |
 | version | integer | yes |  |
 | layer | text | yes |  |
@@ -5323,7 +5327,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no | Assigned on create. |
+| id | uuid | yes | Assigned on create. |
 | kind | text | yes |  |
 | vendor | text | no | The provider company, any provider (Chinmay, 2 October, contract follow-ups: "As long as we get an API key it can be any model"; CHG-FUP-008), as a lower-case slug: mistral, cohere, core42, openai. |
 | capability | text | yes |  |
@@ -5354,7 +5358,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | placement | text | yes |  |
 | channel | text | no |  |
 | cart_id | uuid | no |  |
@@ -5378,7 +5382,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | subject_id | uuid | no |  |
 | session_ref | text | no |  |
 | product_id | uuid | no | The declined product. |
@@ -5393,7 +5397,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | decision_id | uuid | no |  |
 | tracking_id | uuid | yes |  |
 | event_type | text | yes |  |
@@ -5409,7 +5413,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | capability_key | text | yes |  |
 | artefact_kind | text | yes |  |
 | candidate_ref | text | yes |  |
@@ -5450,7 +5454,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | capability_key | text | yes |  |
 | suggestion_kind | text | no |  |
 | forecast_definition_key | text | no |  |
@@ -5472,7 +5476,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | venue_id | uuid | yes |  |
 | venue_type | text | yes |  |
 | is_outdoor | boolean | no | Outdoor venues take the summer-heat and weather effects. |

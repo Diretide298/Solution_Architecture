@@ -152,12 +152,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `KSK-011` | Collect a booking | B–D | 1 | 16 | 5 | 4 | 2 | 6 | guest | notStarted (generated) |
-| `KSK-012` | Booking found | B–D | 6 | 0 | 4 | 6 | 0 | 6 | guest | notStarted (generated) |
-| `KSK-013` | Call staff | B–D | 0 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-014` | Out of service | B–D | 0 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-016` | Order Food | B–D | 23 | 27 | 6 | 2 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-017` | Shop | B–D | 31 | 5 | 6 | 8 | 1 | 0 | guest | notStarted (generated) |
+| `KSK-011` | Collect a booking | C | 1 | 8 | 5 | 4 | 2 | 6 | guest | notStarted (generated) |
+| `KSK-012` | Booking found | C | 6 | 0 | 4 | 6 | 0 | 6 | guest | notStarted (generated) |
+| `KSK-013` | Call staff | D | 0 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-014` | Out of service | C | 0 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-016` | Order Food | C | 23 | 27 | 6 | 2 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-017` | Shop | C | 31 | 5 | 6 | 8 | 1 | 0 | guest | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -177,7 +177,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | Sell · wave 2 · needs the `retail` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-KIOSK-KSK-011 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (touchLarge density): `getOrder` reads one record and nothing reads a population — the screen is about that one thing |
@@ -214,22 +214,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The client UUIDv7 from `CreateOrderRequest.id`. |
 | Order number | text | The number a guest reads and a cashier types. Server-assigned: the venue prefix and a sequence per venue, for example `DXB1-000123` … |
 | Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
 | Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Net amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Total price variance | AED 1,234.50 | Sum across lines. Zero on a normal order. |
-| Lines | list or chips (count when long) | — |
-| Payments | list or chips (count when long) | — |
-| Principal | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
@@ -318,12 +310,13 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Wireframe frame: `wireframes/P05 Guest Kiosk.dc.html#ksk-011` · status **notStarted** · provenance generated · **Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed …
 - Derived from `wireframes/reference/Kiosk Board 2.dc.html`
 - Client design-board frames: `Kiosk Board 2.dc.html#KSK-011`
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0045 *Every order carries a proven contact, and the gate is the checkout page* (`docs/adr/0045-every-order-carries-a-proven-contact.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (1), with its required mark, default, format and its error state (400, 404).
-- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KSK-011?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Lookup shop and drop.
 - [ ] Every transition is wired: `KSK-012`.
@@ -343,7 +336,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | Sell · wave 2 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-KIOSK-KSK-012 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | configEditor (touchLarge density): the screen declares only writes (`transferOrderTickets`) and no read of a population — it is settings, not a list |
@@ -411,7 +404,7 @@ booking: YAS1-000123 · F. Al H••••• · Fri 2 Oct · 3 × 2 park ticke
 
 #### Permissions
 
-- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner
+- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner, device
 
 #### Requirements it meets
 
@@ -452,6 +445,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Wireframe frame: `wireframes/P05 Guest Kiosk.dc.html#ksk-012` · status **notStarted** · provenance generated · **Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed …
 - Derived from `wireframes/reference/Kiosk Board 2.dc.html`
 - Client design-board frames: `Kiosk Board 2.dc.html#KSK-012`
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -476,7 +470,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | Sell · wave 2 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-KIOSK-KSK-013 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | configEditor (touchLarge density): the screen declares only writes (`endKioskAssist`) and no read of a population — it is settings, not a list |
@@ -588,7 +582,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | Sell · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-KIOSK-KSK-014 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (touchLarge density): **the screen's operations choose no pattern** — no list, no get, no write that groups. It falls to the default, and the fallback is recorded rather than passed off as a decision |
@@ -684,7 +678,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | Sell · wave 2 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-KIOSK-KSK-016 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (touchLarge density): `getGuestMenu` reads one record and nothing reads a population — the screen is about that one thing |
@@ -909,7 +903,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | Sell · wave 2 · needs the `retail` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-KIOSK-KSK-017 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (touchLarge density): `listMerchandise` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

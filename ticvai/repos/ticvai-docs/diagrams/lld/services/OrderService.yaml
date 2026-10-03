@@ -1,10 +1,10 @@
 id: LLD-OrderService
-title: OrderService — 297 operations, 115 tables
+title: OrderService — 298 operations, 115 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 deployable: commerce
 index: diagrams/hld/02-services.yaml
-why: '**The transactional core.** 297 operations, 115 tables, and the highest write rate in the platform.
+why: '**The transactional core.** 298 operations, 115 tables, and the highest write rate in the platform.
   Separate because its scaling profile is unlike anything else — a Saturday evening is ten times a Tuesday
   morning.
 
@@ -28,7 +28,7 @@ why: '**The transactional core.** 297 operations, 115 tables, and the highest wr
 scale: Write-heavy, spiky, latency-critical. **The one that autoscales.**
 ifDown: '**Down means no sales.** Highest availability target in the platform.'
 coverage:
-  operations: 297
+  operations: 298
   inAFlow: 139
   percent: 47%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -46,7 +46,7 @@ schemas:
   largestTable: payments.payment_attempt
 operationsByContract:
 - contract: orders
-  count: 221
+  count: 222
   operations:
   - operation: abandonCart
     verb: DELETE
@@ -144,6 +144,14 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 2
+  - operation: cancelPaymentLink
+    verb: POST
+    path: /payment-links/{linkId}/cancel
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: cancelReservation
     verb: DELETE
     path: /reservations/{reservationId}

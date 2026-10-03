@@ -264,6 +264,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - … and 1 more flow steps (`flows/`)
 - Flow F294 branch at step 1 (expected): when Nothing has been set up on Funding Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F294 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1361,6 +1362,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS187 Wallet Configuration Backend Structure v1.0 Board 2.dc.html#bo-1100`
 - Workshop pack: Wallet_Configuration_Backend_Structure_v1.0.pdf board 2
 - Flow F294 *Wallet Configuration Backend Structure v1.0 board 2: Funding Command Center*, step 14: Works in Funding Reversal & Correction Management → Provide controlled correction of incorrectly funded wallet transactions without deleting financial history.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1647,6 +1649,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS187 Wallet Configuration Backend Structure v1.0 Board 2.dc.html#bo-1102`
 - Workshop pack: Wallet_Configuration_Backend_Structure_v1.0.pdf board 2
 - Flow F294 *Wallet Configuration Backend Structure v1.0 board 2: Funding Command Center*, step 18: Works in Funding Transaction Audit & Reconciliation → Provide a complete administrative record of every value entering a wallet. The source requires a complete audit trail for wallet top-ups, payments, refunds, transfers, adjustments, expirations …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 

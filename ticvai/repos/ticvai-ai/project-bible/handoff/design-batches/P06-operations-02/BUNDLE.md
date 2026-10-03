@@ -143,16 +143,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `EMP-014` | Ticket lookup | B–D | 11 | 53 | 6 | 27 | 2 | 0 | — | notStarted (generated) |
-| `EMP-015` | Group scan | B–D | 37 | 35 | 6 | 60 | 1 | 0 | — | notStarted (generated) |
-| `EMP-017` | Sync & reconciliation | B–D | 35 | 40 | 6 | 60 | 2 | 0 | — | notStarted (generated) |
-| `EMP-018` | Offline package | B–D | 3 | 26 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-019` | AI assistant — home | B–D | 4 | 16 | 6 | 16 | 1 | 0 | — | notStarted (generated) |
-| `EMP-020` | AI assistant — answer | B–D | 7 | 16 | 6 | 17 | 1 | 0 | — | notStarted (generated) |
-| `EMP-021` | Roster | B–D | 6 | 28 | 6 | 15 | 1 | 0 | — | notStarted (generated) |
-| `EMP-022` | My rota | B–D | 6 | 28 | 6 | 15 | 2 | 0 | — | notStarted (generated) |
-| `EMP-023` | Swap request | B–D | 6 | 36 | 6 | 15 | 2 | 0 | — | notStarted (generated) |
-| `EMP-024` | Clock in / out | B–D | 9 | 31 | 6 | 4 | 3 | 0 | — | notStarted (generated) |
+| `EMP-014` | Ticket lookup | C | 11 | 23 | 6 | 27 | 2 | 0 | — | notStarted (generated) |
+| `EMP-015` | Group scan | C | 37 | 12 | 6 | 60 | 1 | 0 | — | notStarted (generated) |
+| `EMP-017` | Sync & reconciliation | C | 35 | 16 | 6 | 60 | 2 | 0 | — | notStarted (generated) |
+| `EMP-018` | Offline package | B | 3 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-019` | AI assistant — home | D | 4 | 9 | 6 | 16 | 1 | 0 | — | notStarted (generated) |
+| `EMP-020` | AI assistant — answer | D | 7 | 9 | 6 | 17 | 1 | 0 | — | notStarted (generated) |
+| `EMP-021` | Roster | D | 6 | 9 | 6 | 15 | 1 | 0 | — | notStarted (generated) |
+| `EMP-022` | My rota | D | 6 | 9 | 6 | 15 | 2 | 0 | — | notStarted (generated) |
+| `EMP-023` | Swap request | D | 6 | 12 | 6 | 15 | 2 | 0 | — | notStarted (generated) |
+| `EMP-024` | Clock in / out | D | 9 | 14 | 6 | 4 | 3 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -168,7 +168,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-014 |
 | Who uses it | venue staff holding `ORDER_REPRINT`, `ORDER_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listOrders` reads the population and `getOrder` reads one of them — list, select, act |
@@ -227,11 +227,8 @@ Errors to draw in the form: 400 Validation failed
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Order number | text | — |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
-| Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | The same vocabulary as `Order.channel`, which this projects. |
 | Line count | 1,234 | — |
 
@@ -239,43 +236,27 @@ Errors to draw in the form: 400 Validation failed
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | — |
-| Batch | the name it points at, never the id | The `RefundBatch` that raised this refund, where `createBulkRefund` did. Null for a refund raised on its own. |
 | FX rate | text | The rate on the original payment, not today's (BL-087, CF-118). `Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the … |
-| Tax reversal entry | the name it points at, never the id | A refund reverses the tax entry it created, and this is where that is stated rather than implied. |
-| Settle to | chip: Original tender, Advance balance, Wire transfer, Store credit | BL-086. A refund could only go back the way it came. |
-| FX variance | AED 1,234.50 | Where the sale rate and the current rate differ, the difference is booked as an FX variance rather than hidden in the refund. |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Applied percentage | 1,234.5 | From the venue's time bands, or an approver override. |
 | Status | chip: Pending approval, Pending gateway, Completed, Declined, Failed | — |
-| Reason | text | — |
-| Requested by principal | the name it points at, never the id | — |
 
 **The selected order** (detail panel, from `listOrders`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Order number | text | — |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
 | Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | The same vocabulary as `Order.channel`, which this projects. |
-| Line count | 1,234 | — |
-| Principal | the name it points at, never the id | The cashier who raised it — what the held-orders list shows. |
 | Hold label | text | As `Order.holdLabel`. |
-| Held until | 1 Oct 2026, 14:30 | As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse. |
 
 **The order statement** (detail panel, from `getOrderStatement`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Order | the name it points at, never the id | — |
 | Order number | text | — |
 | Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Entries | list or chips (count when long) | Sequential. What an agent reads to a guest asking about a charge. |
 | Total paid | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Total refunded | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Current balance | AED 1,234.50 | Positive means the guest owes; negative means a refund is outstanding. |
@@ -284,22 +265,11 @@ Errors to draw in the form: 400 Validation failed
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The client UUIDv7 from `CreateOrderRequest.id`. |
 | Order number | text | The number a guest reads and a cashier types. Server-assigned: the venue prefix and a sequence per venue, for example `DXB1-000123` … |
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Net amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Total price variance | AED 1,234.50 | Sum across lines. Zero on a normal order. |
-| Lines | list or chips (count when long) | — |
-| Payments | list or chips (count when long) | — |
-| Principal | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
@@ -328,7 +298,7 @@ Errors to draw in the form: 400 Validation failed
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the ticket lookup untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No ticket lookup yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the ticket lookup are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_REPRINT` for `reprintOrder`. |
 | Offline (`?state=offline`) | Searches the bundle only. A ticket issued after the last sync will not be found, and the screen says so |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
@@ -350,9 +320,9 @@ ticket: YAS1-000123-02 · Day Pass Adult · Fri 2 Oct · scanned Main Gate 09:41
 - `getOrder` → `ORDER_VIEW` (read) · staff, guest, partner
 - `getOrderStatement` → `ORDER_VIEW` (read) · staff, partner
 - `listOrderRefunds` → `ORDER_VIEW` (read) · staff, partner
-- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner
+- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner, device
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_REPRINT` for `reprintOrder`.
 
 #### Requirements it meets
 
@@ -390,11 +360,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### References
 
 - Wireframe frame: `wireframes/P06 Venue Staff App.dc.html#emp-014` · status **notStarted** · provenance generated
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (11), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (53 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (23 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-014?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Reprint order.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`.
@@ -413,7 +384,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-015 |
 | Who uses it | venue staff holding `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE`, `TICKET_LOOKUP` (4 operate) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listScans` reads the population and `getOfflinePackage` reads one of them — list, select, act |
@@ -517,36 +488,16 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The scan's client-generated UUIDv7, the key offline replay deduplicates on. |
-| Access point | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Ticket | the name it points at, never the id | The `Entitlement.id` scanned; null where the media resolved to nothing. |
 | Media code | text | — |
 | Outcome | chip: Admitted, Denied, Overridden | — |
-| Deny reason | chip: Not found, Not yet valid, Expired, Already used, Reentry limit reached, Exit … | Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a … |
-| Direction | chip: Entry, Exit, Reentry, Crossover | — |
-| Operator principal | the name it points at, never the id | — |
-| Device | the name it points at, never the id | — |
-| Overrides scan | the name it points at, never the id | Set only on an override row, naming the denied scan it admits against (decided 28 September, audit R228). |
 
 **The selected scan event** (detail panel, from `listScans`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The scan's client-generated UUIDv7, the key offline replay deduplicates on. |
-| Access point | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Ticket | the name it points at, never the id | The `Entitlement.id` scanned; null where the media resolved to nothing. |
 | Media code | text | — |
 | Outcome | chip: Admitted, Denied, Overridden | — |
 | Deny reason | chip: Not found, Not yet valid, Expired, Already used, Reentry limit reached, Exit … | Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a … |
-| Direction | chip: Entry, Exit, Reentry, Crossover | — |
-| Operator principal | the name it points at, never the id | — |
-| Device | the name it points at, never the id | — |
-| Overrides scan | the name it points at, never the id | Set only on an override row, naming the denied scan it admits against (decided 28 September, audit R228). |
-| Override reason | text | The supervisor's justification, on the override row only. The overriding principal is that row's `operatorPrincipalId`. |
 | Recorded at | 1 Oct 2026, 14:30 | — |
 | Synced at | 1 Oct 2026, 14:30 | Null while pending. Differs from recordedAt for offline scans. |
 
@@ -557,11 +508,8 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Generated at | 1 Oct 2026, 14:30 | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | — |
-| Access point | the name it points at, never the id | — |
 | Entitlements | list or chips (count when long) | Read from `access.entitlement` (SD-052). With `sinceVersion`, only the rows changed after it, including ones now void or used, so a device … |
 | Delegated rights | list or chips (count when long) | Redemption rights issued by other cells and valid at this access point. Included in the package so a cross-region entitlement still admits … |
-| Blacklist | list or chips (count when long) | Media codes to deny outright regardless of entitlement state. |
-| Admission rules | list or chips (count when long) | — |
 
 **Actions and what each produces**
 
@@ -597,7 +545,7 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the group scan untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No group scan yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the group scan are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires to show this screen, and names that permission (the screen's other reads need `ACCESS_VALIDATE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_OVERRIDE` for `overrideAccess`; `TICKET_LOOKUP` for … |
 | Offline (`?state=offline`) | Fully offline. Admits what is valid and states the shortfall |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither mediaCode nor ticketId supplied; 400 Validation failed; 409 Requested count exceeds the remaining group allowance; 409 The scan was not a denial, or has already been overridden |
 
@@ -626,7 +574,7 @@ group:
 - `validateAccess` → `ACCESS_VALIDATE` (operate) · staff
 - `validateGroupAccess` → `ACCESS_VALIDATE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires to show this screen, and names that permission (the screen's other reads need `ACCESS_VALIDATE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_OVERRIDE` for `overrideAccess`; `TICKET_LOOKUP` for …
 
 #### Requirements it meets
 
@@ -668,7 +616,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (37), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (35 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-015?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Sync scans, Lookup ticket, Override access, Validate access, Validate group access.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`.
@@ -686,7 +634,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-017 |
 | Who uses it | venue staff holding `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `ORDER_VIEW`, `REPORT_VIEW_VENUE`, `TICKET_LOOKUP` (4 operate, 1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listSyncRejections` reads the population and `getOfflinePackage` reads one of them — list, select, act |
@@ -797,48 +745,27 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Workstation | the name it points at, never the id | — |
 | Kind | chip: Order, Payment, Refund, Void, Scan | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
 | Rejected at | 1 Oct 2026, 14:30 | — |
-| Problem | grouped details | RFC 9457 problem details. Every error response uses this shape. |
-| Payload | grouped details | Deliberately open: the journal entry exactly as the till sent it. Its shape is the request schema for `kind` — an `OfflineOrder` for … |
 | Resolved at | 1 Oct 2026, 14:30 | — |
-| Resolved by principal | the name it points at, never the id | — |
 
 **Every scan event** (data table, from `listScans`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The scan's client-generated UUIDv7, the key offline replay deduplicates on. |
-| Access point | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Ticket | the name it points at, never the id | The `Entitlement.id` scanned; null where the media resolved to nothing. |
 | Media code | text | — |
 | Outcome | chip: Admitted, Denied, Overridden | — |
-| Deny reason | chip: Not found, Not yet valid, Expired, Already used, Reentry limit reached, Exit … | Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a … |
-| Direction | chip: Entry, Exit, Reentry, Crossover | — |
-| Operator principal | the name it points at, never the id | — |
-| Device | the name it points at, never the id | — |
-| Overrides scan | the name it points at, never the id | Set only on an override row, naming the denied scan it admits against (decided 28 September, audit R228). |
 
 **The selected sync rejection** (detail panel, from `listSyncRejections`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Workstation | the name it points at, never the id | — |
 | Kind | chip: Order, Payment, Refund, Void, Scan | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
 | Rejected at | 1 Oct 2026, 14:30 | — |
 | Problem | grouped details | RFC 9457 problem details. Every error response uses this shape. |
-| Payload | grouped details | Deliberately open: the journal entry exactly as the till sent it. Its shape is the request schema for `kind` — an `OfflineOrder` for … |
 | Resolved at | 1 Oct 2026, 14:30 | — |
-| Resolved by principal | the name it points at, never the id | — |
-| Resolution | chip: Posted, Voided, Refunded | What `resolveSyncRejection` recorded. Null while the rejection waits. |
-| Resolved record | the name it points at, never the id | The order, void or refund the resolution produced — what stops the entry being posted twice. |
 
 **The offline package** (detail panel, from `getOfflinePackage`)
 
@@ -847,11 +774,8 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Generated at | 1 Oct 2026, 14:30 | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | — |
-| Access point | the name it points at, never the id | — |
 | Entitlements | list or chips (count when long) | Read from `access.entitlement` (SD-052). With `sinceVersion`, only the rows changed after it, including ones now void or used, so a device … |
 | Delegated rights | list or chips (count when long) | Redemption rights issued by other cells and valid at this access point. Included in the package so a cross-region entitlement still admits … |
-| Blacklist | list or chips (count when long) | Media codes to deny outright regardless of entitlement state. |
-| Admission rules | list or chips (count when long) | — |
 
 **Actions and what each produces**
 
@@ -893,7 +817,7 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the sync reconciliation untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No sync reconciliation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on workstationId, kind, resolved and the sync reconciliation are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission (the screen's other reads need `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_OVERRIDE` for `overrideAccess` … |
 | Offline (`?state=offline`) | Not applicable; this screen ends the offline period |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither mediaCode nor ticketId supplied; 400 Validation failed; 409 Requested count exceeds the remaining group allowance; 409 The scan was not a denial, or has already been overridden |
 
@@ -924,7 +848,7 @@ rejections:
 - `validateAccess` → `ACCESS_VALIDATE` (operate) · staff
 - `validateGroupAccess` → `ACCESS_VALIDATE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission (the screen's other reads need `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_OVERRIDE` for `overrideAccess` …
 
 #### Requirements it meets
 
@@ -969,7 +893,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (35), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-017?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Sync scans, Lookup ticket, Override access, Validate access, Validate group access.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`, `EMP-018`, `EMP-009`.
@@ -987,7 +911,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-STAFF-EMP-018 |
 | Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as technician |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listCatalogueBundles` reads the population and `getLatestBundle` reads one of them — list, select, act |
@@ -1025,40 +949,28 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| Venue | the name it points at, never the id | — |
 | Published at | 1 Oct 2026, 14:30 | — |
 | Published by | the name it points at, never the id | — |
-| Content hash | text | — |
-| Signature key | text | Key that signed this bundle. A terminal offline across a key rotation needs a grace window, or it cannot verify the next bundle. |
 | Stale after | 1 Oct 2026, 14:30 | — |
 | Size bytes | 1,234 | — |
-| Note | text | — |
-| Applied by workstations | 1,234 | — |
 
 **The selected bundle** (detail panel, from `listCatalogueBundles`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Venue | the name it points at, never the id | — |
 | Published at | 1 Oct 2026, 14:30 | — |
 | Published by | the name it points at, never the id | — |
-| Content hash | text | — |
-| Signature key | text | Key that signed this bundle. A terminal offline across a key rotation needs a grace window, or it cannot verify the next bundle. |
 | Stale after | 1 Oct 2026, 14:30 | — |
 | Size bytes | 1,234 | — |
 | Note | text | — |
-| Applied by workstations | 1,234 | — |
 
 **The catalogue bundle** (detail panel, from `getLatestBundle`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Venue | the name it points at, never the id | — |
 | Is delta | yes / no (icon or chip) | — |
 | Base version | text | Present when `isDelta`. The version this delta applies to. |
 | Signature | text | Detached signature over `contentHash`. The terminal verifies before applying and rolls back on failure — a half-applied catalogue is never … |
-| Signature key | text | — |
-| Content hash | text | — |
 | Stale after | 1 Oct 2026, 14:30 | — |
 | Payload | grouped details | Products, variants, price lists, prices, tax codes, events, performances, envelope definitions, data mask field definitions and the venue's … |
 
@@ -1130,11 +1042,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Flow F71 *A device is prepared, used and handed over*, step 2: It pulls its offline package. → **`reportBundleApplied` closes the loop.** A device that pulled a bundle and never confirmed it is a device the fleet view believes is current.
 - Flow F71 branch at step 2 (high): when The bundle is stale and the network is gone., **The device is not issued.** ADR-0013 makes the till and the scanner local-first, and local-first with a stale catalogue is worse than no device.
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (3), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-018?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Report bundle applied.
 - [ ] Every transition is wired: `EMP-049`, `EMP-001`, `EMP-002`, `EMP-003`.
@@ -1152,7 +1065,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `ai` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-019 |
 | Who uses it | venue staff holding `AI_USE` (1 operate); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listAiConversations` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1204,10 +1117,6 @@ Errors to draw in the form: 422 The guard model blocked the message or the reply
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
-| Scope path | text | — |
-| Module | text | — |
 | Locale | text | — |
 | Message count | 1,234 | — |
 | Started at | 1 Oct 2026, 14:30 | — |
@@ -1217,9 +1126,6 @@ Errors to draw in the form: 422 The guard model blocked the message or the reply
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
-| Scope path | text | — |
 | Module | text | — |
 | Locale | text | — |
 | Message count | 1,234 | — |
@@ -1248,7 +1154,7 @@ Errors to draw in the form: 422 The guard model blocked the message or the reply
 - → `EMP-001` Sign in: *Sign in*
 - → `EMP-002` Select venue & role: *Select venue & role*
 - → `EMP-003` Home — on duty: *Home — on duty*
-- → `EMP-020` AI assistant — answer: *AI assistant — answer*; carries `conversationId`
+- → `EMP-020` AI assistant — answer: *AI assistant — answer*; carries `conversationId`, `messageId`
 
 #### States
 
@@ -1330,12 +1236,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Wireframe frame: `wireframes/P06 Venue Staff App.dc.html#emp-019` · status **notStarted** · provenance generated
 - Flow F101 *A staff member asks the assistant and it answers from the venue*, step 1: AI assistant — home. → 2 operations, 2 of them previously unwalked.
 - Flow F101 branch at step 1 (medium): when The acting principal lacks the permission at this scope., **Refused at the first step, not the last.** ADR-0002 makes authorisation user-driven — a person who gets three steps in and then cannot finish has been told the wrong thing.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0020 *— Where AI runs, and what it is isolated from* (`docs/adr/0020-ai-isolation-boundary.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (4), with its required mark, default, format and its error state (422).
-- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-019?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create AI conversation, Send AI message.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`, `EMP-020`.
@@ -1355,7 +1262,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `ai` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-020 |
 | Who uses it | venue staff holding `AI_USE`, `REPORT_VIEW_VENUE` (2 operate); in the flows as supervisor, venue manager |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listAiConversations` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1415,10 +1322,6 @@ Errors to draw in the form: 400 Question could not be interpreted. (ReportQuesti
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
-| Scope path | text | — |
-| Module | text | — |
 | Locale | text | — |
 | Message count | 1,234 | — |
 | Started at | 1 Oct 2026, 14:30 | — |
@@ -1428,9 +1331,6 @@ Errors to draw in the form: 400 Question could not be interpreted. (ReportQuesti
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
-| Scope path | text | — |
 | Module | text | — |
 | Locale | text | — |
 | Message count | 1,234 | — |
@@ -1474,7 +1374,7 @@ Errors to draw in the form: 400 Question could not be interpreted. (ReportQuesti
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the assistant answer untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No assistant answer yet. Offers Create AI conversation (`createAiConversation`). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listAiConversations` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `AI_USE`, which `listAiConversations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `AI_USE`, which `listAiConversations` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REPORT_VIEW_VENUE` for `askReportingQuestion`. |
 | Offline (`?state=offline`) | Not available |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Question could not be interpreted. (ReportQuestionProblem); 422 The guard model blocked the message or the reply (`guard-refused`, CHG-CSA-003). |
 
@@ -1502,7 +1402,7 @@ followUp: Compare that to the same day last week
 - `recordAnswerFeedback` → `AI_USE` (operate) · staff, guest
 - `askReportingQuestion` → `REPORT_VIEW_VENUE` (operate) · staff, partner
 
-**A refused user sees:** Shown when the caller lacks `AI_USE`, which `listAiConversations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `AI_USE`, which `listAiConversations` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REPORT_VIEW_VENUE` for `askReportingQuestion`.
 
 #### Requirements it meets
 
@@ -1544,6 +1444,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Flow F20 branch at step 2 (recoverable): when Nothing relevant was retrieved, **Says so rather than answering from general knowledge.** A confident answer about a venue the model has never seen is the failure that stops people trusting it.
 - Flow F20 branch at step 2 (requiresStaff): when The answer proposes a change, A `proposedAction`, not an applied one. Pricing and financial proposals need approval before execution.
 - Flow F20 branch at step 2 (recoverable): when Every provider is unavailable, Reported rather than retried indefinitely. **An assistant that hangs is worse than one that says no.**
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0020 *— Where AI runs, and what it is isolated from* (`docs/adr/0020-ai-isolation-boundary.md`)
 - ADR-0054 *Natural-language analytics goes through the semantic layer* (`docs/adr/0054-natural-language-analytics-goes-through-the-semantic-layer.md`)
 - ADR-0059 *AI phasing against the six-month plan* (`docs/adr/0059-ai-phasing-against-the-six-month-plan.md`)
@@ -1551,7 +1452,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (7), with its required mark, default, format and its error state (400, 403, 404, 422).
-- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-020?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Send AI message, Create AI conversation, Ask a number.
 - [ ] Every transition is wired: `EMP-040`, `EMP-001`, `EMP-002`, `EMP-003`, `BO-058`.
@@ -1571,7 +1472,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-021 |
 | Who uses it | venue staff holding `WORKFORCE_VIEW` (1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listRotaAssignments` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1633,35 +1534,16 @@ Errors to draw in the form: 409 The swap is not like for like (audit R129 (6)): 
 |---|---|---|
 | Overtime minutes | 1,234 | BL-044, 1.2.83. UAE labour law limits working hours and mandates rest periods, and nothing in the package counted either. |
 | Rest period before | 1,234 | Minutes since the previous shift ended. The check that stops a closing shift followed by an opening one, which is legal in most places and … |
-| Breaches working hour limit | yes / no (icon or chip) | Flagged at assignment, not discovered at payroll. A rota that breaches a statutory limit is a rota somebody has to redo, and finding out a … |
 | Labour cost | AED 1,234.50 | Cost at the point of scheduling. A manager building a rota without seeing its cost is a manager who finds out from finance. |
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
 | Display name | text | — |
-| Venue | the name it points at, never the id | — |
-| Department | the name it points at, never the id | — |
-| Position | text | What they are rostered to do — gate steward, cashier, lifeguard, technician. Most positions never touch a till, which is why a rota … |
-| Required role | the name it points at, never the id | Checked on assignment. A rota naming someone unqualified is a rota that gets overridden. |
-| Workstation | the name it points at, never the id | Where the position needs a till. The link between a rota and a cash session, without merging the two. |
 
 **The selected rota assignment** (detail panel, from `listRotaAssignments`)
 
 | Shows | Format | Notes |
 |---|---|---|
 | Overtime minutes | 1,234 | BL-044, 1.2.83. UAE labour law limits working hours and mandates rest periods, and nothing in the package counted either. |
-| Rest period before | 1,234 | Minutes since the previous shift ended. The check that stops a closing shift followed by an opening one, which is legal in most places and … |
-| Breaches working hour limit | yes / no (icon or chip) | Flagged at assignment, not discovered at payroll. A rota that breaches a statutory limit is a rota somebody has to redo, and finding out a … |
 | Labour cost | AED 1,234.50 | Cost at the point of scheduling. A manager building a rota without seeing its cost is a manager who finds out from finance. |
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
 | Display name | text | — |
-| Venue | the name it points at, never the id | — |
-| Department | the name it points at, never the id | — |
-| Position | text | What they are rostered to do — gate steward, cashier, lifeguard, technician. Most positions never touch a till, which is why a rota … |
-| Required role | the name it points at, never the id | Checked on assignment. A rota naming someone unqualified is a rota that gets overridden. |
-| Workstation | the name it points at, never the id | Where the position needs a till. The link between a rota and a cash session, without merging the two. |
-| Starts at | 1 Oct 2026, 14:30 | — |
-| Ends at | 1 Oct 2026, 14:30 | — |
 | Status | chip: Planned, Published, Confirmed, Swap pending, Cancelled, Completed… | — |
 | Break minutes | 1,234 | — |
 
@@ -1794,7 +1676,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (6), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-021?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Request shift swap.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`, `EMP-022`.
@@ -1815,7 +1697,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-022 |
 | Who uses it | venue staff holding `WORKFORCE_VIEW` (1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listRotaAssignments` reads the population and `getCurrentShift` reads one of them — list, select, act |
@@ -1879,35 +1761,16 @@ Errors to draw in the form: 409 The swap is not like for like (audit R129 (6)): 
 |---|---|---|
 | Overtime minutes | 1,234 | BL-044, 1.2.83. UAE labour law limits working hours and mandates rest periods, and nothing in the package counted either. |
 | Rest period before | 1,234 | Minutes since the previous shift ended. The check that stops a closing shift followed by an opening one, which is legal in most places and … |
-| Breaches working hour limit | yes / no (icon or chip) | Flagged at assignment, not discovered at payroll. A rota that breaches a statutory limit is a rota somebody has to redo, and finding out a … |
 | Labour cost | AED 1,234.50 | Cost at the point of scheduling. A manager building a rota without seeing its cost is a manager who finds out from finance. |
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
 | Display name | text | — |
-| Venue | the name it points at, never the id | — |
-| Department | the name it points at, never the id | — |
-| Position | text | What they are rostered to do — gate steward, cashier, lifeguard, technician. Most positions never touch a till, which is why a rota … |
-| Required role | the name it points at, never the id | Checked on assignment. A rota naming someone unqualified is a rota that gets overridden. |
-| Workstation | the name it points at, never the id | Where the position needs a till. The link between a rota and a cash session, without merging the two. |
 
 **The selected rota assignment** (detail panel, from `listRotaAssignments`)
 
 | Shows | Format | Notes |
 |---|---|---|
 | Overtime minutes | 1,234 | BL-044, 1.2.83. UAE labour law limits working hours and mandates rest periods, and nothing in the package counted either. |
-| Rest period before | 1,234 | Minutes since the previous shift ended. The check that stops a closing shift followed by an opening one, which is legal in most places and … |
-| Breaches working hour limit | yes / no (icon or chip) | Flagged at assignment, not discovered at payroll. A rota that breaches a statutory limit is a rota somebody has to redo, and finding out a … |
 | Labour cost | AED 1,234.50 | Cost at the point of scheduling. A manager building a rota without seeing its cost is a manager who finds out from finance. |
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
 | Display name | text | — |
-| Venue | the name it points at, never the id | — |
-| Department | the name it points at, never the id | — |
-| Position | text | What they are rostered to do — gate steward, cashier, lifeguard, technician. Most positions never touch a till, which is why a rota … |
-| Required role | the name it points at, never the id | Checked on assignment. A rota naming someone unqualified is a rota that gets overridden. |
-| Workstation | the name it points at, never the id | Where the position needs a till. The link between a rota and a cash session, without merging the two. |
-| Starts at | 1 Oct 2026, 14:30 | — |
-| Ends at | 1 Oct 2026, 14:30 | — |
 | Status | chip: Planned, Published, Confirmed, Swap pending, Cancelled, Completed… | — |
 | Break minutes | 1,234 | — |
 
@@ -2033,7 +1896,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (6), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-022?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Request shift swap.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`, `EMP-023`.
@@ -2054,7 +1917,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-023 |
 | Who uses it | venue staff holding `WORKFORCE_VIEW` (1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listRotaAssignments` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2118,27 +1981,14 @@ Errors to draw in the form: 409 The swap is not like for like (audit R129 (6)): 
 |---|---|---|
 | Overtime minutes | 1,234 | BL-044, 1.2.83. UAE labour law limits working hours and mandates rest periods, and nothing in the package counted either. |
 | Rest period before | 1,234 | Minutes since the previous shift ended. The check that stops a closing shift followed by an opening one, which is legal in most places and … |
-| Breaches working hour limit | yes / no (icon or chip) | Flagged at assignment, not discovered at payroll. A rota that breaches a statutory limit is a rota somebody has to redo, and finding out a … |
 | Labour cost | AED 1,234.50 | Cost at the point of scheduling. A manager building a rota without seeing its cost is a manager who finds out from finance. |
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
 | Display name | text | — |
-| Venue | the name it points at, never the id | — |
-| Department | the name it points at, never the id | — |
-| Position | text | What they are rostered to do — gate steward, cashier, lifeguard, technician. Most positions never touch a till, which is why a rota … |
-| Required role | the name it points at, never the id | Checked on assignment. A rota naming someone unqualified is a rota that gets overridden. |
-| Workstation | the name it points at, never the id | Where the position needs a till. The link between a rota and a cash session, without merging the two. |
 
 **Every shift swap** (data table, from `listShiftSwapRequests`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Assignment | the name it points at, never the id | — |
-| From principal | the name it points at, never the id | — |
-| To principal | the name it points at, never the id | — |
 | Status | chip: Awaiting peer, Awaiting approval, Approved, Rejected, Withdrawn | Both parties before the supervisor. A swap approved against someone who never agreed is a gap in the rota nobody notices until the shift … |
-| Approval request | text | Routed through `approvals` rather than a second mechanism here. |
 | Reason | text | — |
 | Requested at | 1 Oct 2026, 14:30 | — |
 
@@ -2147,19 +1997,8 @@ Errors to draw in the form: 409 The swap is not like for like (audit R129 (6)): 
 | Shows | Format | Notes |
 |---|---|---|
 | Overtime minutes | 1,234 | BL-044, 1.2.83. UAE labour law limits working hours and mandates rest periods, and nothing in the package counted either. |
-| Rest period before | 1,234 | Minutes since the previous shift ended. The check that stops a closing shift followed by an opening one, which is legal in most places and … |
-| Breaches working hour limit | yes / no (icon or chip) | Flagged at assignment, not discovered at payroll. A rota that breaches a statutory limit is a rota somebody has to redo, and finding out a … |
 | Labour cost | AED 1,234.50 | Cost at the point of scheduling. A manager building a rota without seeing its cost is a manager who finds out from finance. |
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
 | Display name | text | — |
-| Venue | the name it points at, never the id | — |
-| Department | the name it points at, never the id | — |
-| Position | text | What they are rostered to do — gate steward, cashier, lifeguard, technician. Most positions never touch a till, which is why a rota … |
-| Required role | the name it points at, never the id | Checked on assignment. A rota naming someone unqualified is a rota that gets overridden. |
-| Workstation | the name it points at, never the id | Where the position needs a till. The link between a rota and a cash session, without merging the two. |
-| Starts at | 1 Oct 2026, 14:30 | — |
-| Ends at | 1 Oct 2026, 14:30 | — |
 | Status | chip: Planned, Published, Confirmed, Swap pending, Cancelled, Completed… | — |
 | Break minutes | 1,234 | — |
 
@@ -2279,7 +2118,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (6), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (36 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-023?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Request shift swap.
 - [ ] Every transition is wired: `EMP-024`, `EMP-001`, `EMP-002`, `EMP-003`.
@@ -2300,7 +2139,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-024 |
 | Who uses it | venue staff holding `ATTENDANCE_RECORD`, `WORKFORCE_VIEW` (1 operate, 1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listAttendance` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2367,37 +2206,20 @@ Errors to draw in the form: 409 Out of sequence — a clock-out with no clock-in
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
-| Assignment | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
 | Kind | chip: Clock in, Clock out, Break start, Break end | — |
 | Occurred at | 1 Oct 2026, 14:30 | Device time — when it happened. |
 | Recorded at | 1 Oct 2026, 14:30 | When the server received it. Both are kept: a steward clocking in offline at a gate is not late because the sync was. |
-| Access point | the name it points at, never the id | — |
 | Latitude | 1,234.5 | — |
-| Longitude | 1,234.5 | — |
-| Is amended | yes / no (icon or chip) | — |
-| Amended by principal | the name it points at, never the id | Who made the latest amendment. The full history is `amendments` (audit R129 (7)). |
 
 **The selected attendance** (detail panel, from `listAttendance`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
-| Assignment | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
 | Kind | chip: Clock in, Clock out, Break start, Break end | — |
 | Occurred at | 1 Oct 2026, 14:30 | Device time — when it happened. |
 | Recorded at | 1 Oct 2026, 14:30 | When the server received it. Both are kept: a steward clocking in offline at a gate is not late because the sync was. |
-| Access point | the name it points at, never the id | — |
-| Latitude | 1,234.5 | — |
-| Longitude | 1,234.5 | — |
-| Is amended | yes / no (icon or chip) | — |
 | Original occurred at | 1 Oct 2026, 14:30 | The original is never overwritten. Attendance feeds pay, and a record that can be quietly rewritten is not evidence. |
 | Original occurred at | 1 Oct 2026, 14:30 | The original is never overwritten. Attendance feeds pay, and a record that can be quietly rewritten is not evidence. |
-| Exception | chip: Late, Early leave, Missing clock out, No show, Out of geofence, Unscheduled | Computed against the rota. Null where the record matches what was expected. |
 
 **Corrections** (timeline, from `listAttendance`): **Every correction, oldest first** — who, when, the time before and after, and why — rather than only the last amender and reason (decided 28 September, audit R129 (7)).
 
@@ -2443,7 +2265,7 @@ Errors to draw in the form: 409 Out of sequence — a clock-out with no clock-in
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the clock out untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No clock out yet. Offers Record attendance (`recordAttendance`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on date, principalId, exceptionsOnly and the clock out are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORKFORCE_VIEW`, which `listAttendance` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORKFORCE_VIEW`, which `listAttendance` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ATTENDANCE_RECORD` for `recordAttendance`. |
 | Offline (`?state=offline`) | **Device time is recorded and both are kept.** A steward clocking in at a gate with no signal is not late because the sync was |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Out of sequence — a clock-out with no clock-in, or a second clock-in. Reported rather than silently corrected. |
 
@@ -2483,7 +2305,7 @@ today:
 - `recordAttendance` → `ATTENDANCE_RECORD` (operate) · staff
 - `listAttendance` → `WORKFORCE_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `WORKFORCE_VIEW`, which `listAttendance` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `WORKFORCE_VIEW`, which `listAttendance` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ATTENDANCE_RECORD` for `recordAttendance`.
 
 #### Requirements it meets
 
@@ -2519,7 +2341,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (9), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (31 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-024?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Record attendance.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`, `EMP-025`.

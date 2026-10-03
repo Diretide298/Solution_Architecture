@@ -156,14 +156,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-017` | Capacity Management | B–D | 24 | 30 | 6 | 14 | 7 | 0 | — | notStarted (generated) |
-| `BO-018` | Allocation & Holds | B–D | 4 | 26 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-019` | Closures & Blackouts | B–D | 44 | 40 | 6 | 38 | 1 | 0 | — | notStarted (generated) |
-| `BO-037` | Offline Package Status | B–D | 52 | 49 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
+| `BO-017` | Capacity Management | B–D | 24 | 20 | 6 | 14 | 7 | 0 | — | notStarted (generated) |
+| `BO-018` | Allocation & Holds | B–D | 4 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-019` | Closures & Blackouts | B–D | 44 | 31 | 6 | 38 | 1 | 0 | — | notStarted (generated) |
+| `BO-037` | Offline Package Status | B–D | 52 | 32 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
 | `BO-063` | Opening Hours & Calendar | B–D | 16 | 9 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
-| `BO-102` | Sell | B–D | 2 | 51 | 6 | 57 | 0 | 0 | — | notStarted (generated) |
+| `BO-102` | Sell | B–D | 2 | 37 | 6 | 57 | 0 | 0 | — | notStarted (generated) |
 | `BO-109` | Menu Builder & POS Layout Designer | B–D | 49 | 7 | 6 | 8 | 2 | 2 | — | notStarted (generated) |
-| `BO-110` | Recipe & BOM Management | A | 0 | 0 | 6 | 0 | 2 | 2 | — | notStarted (generated) |
+| `BO-110` | Recipe & BOM Management | B | 0 | 0 | 6 | 0 | 2 | 2 | — | notStarted (generated) |
 | `BO-111` | Ingredient Substitution, Allergen & Nutrition | B–D | 21 | 29 | 5 | 6 | 1 | 0 | — | notStarted (generated) |
 | `BO-112` | Production Planning & Production Sheets | B–D | 35 | 18 | 5 | 17 | 1 | 0 | — | notStarted (generated) |
 
@@ -282,27 +282,18 @@ Errors to draw in the form: 409 Capacity reduced below units already sold plus u
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Performance | the name it points at, never the id | — |
 | Name | text | — |
-| Seat category | the name it points at, never the id | — |
 | Oversell allowance | 1,234 | BL-046, 1.3.13. The guard existed in one direction — an envelope could be raised freely and refused reduction below what had sold. |
 | Oversell basis | chip: Fixed count, Historic no show rate, Percentage | — |
 | Capacity | 1,234 | — |
 | Sold | 1,234 | Units sold. Maintained on write (decided 29 September, SD-023): raised by `convertInventoryHold` in the order transaction and by … |
-| Leased | 1,234 | Units in `active` holds, not yet sold. Raised at acquire, lowered at conversion, release, force-release and expiry (SD-023). |
 | Remaining | 1,234 | What can still be held. Decremented at the hold with a guarded statement (`remaining >= n`) under the row lock, never at the sale, so two … |
-| Has channel allocations | yes / no (icon or chip) | True where capacity is divided across channels. Leases then draw from a channel allocation rather than from raw capacity. |
-| Is seated | yes / no (icon or chip) | Seated envelopes cannot be leased and are blocked offline. A seat map is not a count. |
 
 **The selected channel capacity** (detail panel, from `listChannelCapacities`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Performance | the name it points at, never the id | — |
 | Name | text | — |
-| Seat category | the name it points at, never the id | — |
 | Oversell allowance | 1,234 | BL-046, 1.3.13. The guard existed in one direction — an envelope could be raised freely and refused reduction below what had sold. |
 | Oversell basis | chip: Fixed count, Historic no show rate, Percentage | — |
 | Capacity | 1,234 | — |
@@ -310,7 +301,6 @@ Errors to draw in the form: 409 Capacity reduced below units already sold plus u
 | Leased | 1,234 | Units in `active` holds, not yet sold. Raised at acquire, lowered at conversion, release, force-release and expiry (SD-023). |
 | Remaining | 1,234 | What can still be held. Decremented at the hold with a guarded statement (`remaining >= n`) under the row lock, never at the sale, so two … |
 | Has channel allocations | yes / no (icon or chip) | True where capacity is divided across channels. Leases then draw from a channel allocation rather than from raw capacity. |
-| Is seated | yes / no (icon or chip) | Seated envelopes cannot be leased and are blocked offline. A seat map is not a count. |
 
 **The channel allocation set** (detail panel, from `getChannelAllocations`)
 
@@ -352,7 +342,7 @@ Errors to draw in the form: 409 Capacity reduced below units already sold plus u
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the capacity untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No capacity yet. Offers Create channel capacity (`createChannelCapacity`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on performanceId and the capacity are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE` for `createChannelCapacity`, `relinquishChannelAllocation`, `setChannelAllocations`, `updateChannelCapacity` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Allocations exceed the channel capacity in total, or a channel appears twice; 409 An allocation is below what that channel has already sold plus its leased units (audit R101); 409 Capacity reduced below units already sold plus units under an unexpired lease (audit R101) |
 
@@ -388,7 +378,7 @@ waitlist:
 - `listWaitlistEntries` → `PRODUCT_VIEW` (read) · staff
 - `offerWaitlistCapacity` → `PRODUCT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE` for `createChannelCapacity`, `relinquishChannelAllocation`, `setChannelAllocations`, `updateChannelCapacity` …
 
 #### Requirements it meets
 
@@ -436,7 +426,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (24), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-017?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create channel capacity, Release channel allocation, Save channel allocations, Save channel capacity.
 - [ ] Every transition is wired: `BO-007`, `BO-009`.
@@ -494,14 +484,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | text | — |
-| Channel capacity | the name it points at, never the id | — |
-| Holder workstation | the name it points at, never the id | The holding workstation when `holderKind` is `workstation`; null on a cart hold, because a browser has none (SD-023, 29 September). |
-| Parent lease | text | Present when sub-leased from a venue edge node. |
 | Requested units | 1,234 | — |
 | Channel | chip: POS, Kiosk, Web, Mobile, B2B, Ota… | Allocation this lease draws from. |
-| Granted units | 1,234 | May be less than requested — a partial grant is not an error. Constrained by the channel's remaining allocation plus the general pool … |
-| Consumed units | 1,234 | — |
 | Status | chip: Active, Expired, Released, Force released, Converted | `states/lease.yaml`. `expired` is set by that model's timer transition when `expiresAt` passes without a renewal, not by any operation in … |
 | Acquired at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
@@ -511,10 +495,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | text | — |
-| Channel capacity | the name it points at, never the id | — |
-| Holder workstation | the name it points at, never the id | The holding workstation when `holderKind` is `workstation`; null on a cart hold, because a browser has none (SD-023, 29 September). |
-| Parent lease | text | Present when sub-leased from a venue edge node. |
 | Requested units | 1,234 | — |
 | Channel | chip: POS, Kiosk, Web, Mobile, B2B, Ota… | Allocation this lease draws from. |
 | Granted units | 1,234 | May be less than requested — a partial grant is not an error. Constrained by the channel's remaining allocation plus the general pool … |
@@ -523,8 +503,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Acquired at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 | Released at | 1 Oct 2026, 14:30 | — |
-| Force released by principal | the name it points at, never the id | — |
-| Force release reason | text | — |
 
 **Actions and what each produces**
 
@@ -560,7 +538,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the allocation holds untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No allocation holds yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on channelCapacityId, holderWorkstationId, status and the allocation holds are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listInventoryHolds` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listInventoryHolds` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE` for `forceReleaseInventoryHold`. |
 | Offline (`?state=offline`) | online only |
 
 #### Sample data for the mock-up
@@ -585,7 +563,7 @@ holds:
 - `listInventoryHolds` → `PRODUCT_VIEW` (read) · staff
 - `forceReleaseInventoryHold` → `CAPACITY_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listInventoryHolds` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listInventoryHolds` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE` for `forceReleaseInventoryHold`.
 
 #### Requirements it meets
 
@@ -613,7 +591,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (4), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-018?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Force release inventory hold.
 - [ ] Every transition is wired: `BO-007`, `BO-009`.
@@ -776,26 +754,17 @@ Errors to draw in the form: 400 Validation failed; 409 Closing this strands a po
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Event | the name it points at, never the id | — |
 | Starts at | 1 Oct 2026, 14:30 | — |
 | Ends at | 1 Oct 2026, 14:30 | — |
-| Approval request | the name it points at, never the id | BL-048. The approval chain and the occurrence lifecycle sat on different entities, so neither was complete: `states/performance.yaml` … |
 | Requires approval to cancel | yes / no (icon or chip) | Cancelling a sold performance is the one transition that needs a name against it. |
 | Status | chip: Scheduled, On sale, Sold out, Suspended, Cancelled, Completed | — |
-| Admission rules | the name it points at, never the id | — |
-| Seat map | the name it points at, never the id | — |
 
 **Every event** (data table, from `listEvents`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Parent event | the name it points at, never the id | For grouped events. |
 | Performance count | 1,234 | How many performances the event has. Counted by the server; never sent by a client. |
 | Is active | yes / no (icon or chip) | — |
 
@@ -869,7 +838,7 @@ Errors to draw in the form: 400 Validation failed; 409 Closing this strands a po
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the closures blackouts untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No closures blackouts yet. Offers Create event (`createEvent`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on from, to and the closures blackouts are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listPerformances` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getPerformance` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `EVENT_CONFIGURE` for `createEvent`, `updateEvent`; `PERFORMANCE_CONFIGURE` for `cancelPerformance`, `createPerformances`, `updatePerformance` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 A timing change on a performance with sold tickets, or a `status` move the state model does not allow.; 409 Closing this strands a point, and the response names which in `strandedPoints`. *"Cannot close"* on … |
 
@@ -907,7 +876,7 @@ closures:
 - `updatePerformance` → `PERFORMANCE_CONFIGURE` (configure) · staff
 - `setPathClosure` → `VENUE_MAP_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listPerformances` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getPerformance` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `EVENT_CONFIGURE` for `createEvent`, `updateEvent`; `PERFORMANCE_CONFIGURE` for `cancelPerformance`, `createPerformances`, `updatePerformance` …
 
 #### Requirements it meets
 
@@ -946,11 +915,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-019` · status **notStarted** · provenance generated · **Drawn by Claude Design on `Seat Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once …
 - Derived from `wireframes/reference/Seat Board 2.dc.html`
 - Client design-board frames: `Seat Board 2.dc.html#seat-2d`
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (44), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (31 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-019?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Cancel performance, Create event, Create performances, Recommend seats, Save event, Save performance, Save path closure.
 - [ ] Every transition is wired: `BO-007`, `BO-009`.
@@ -1025,7 +995,7 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 
 **Form: Save offline policy** (modal, opened by *Save offline policy*; *Save offline policy* calls `setOfflinePolicy`, *Cancel* sends nothing)
 
-**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional: `id`, `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional: `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1093,11 +1063,8 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 
 | Shows | Format | Notes |
 |---|---|---|
-| Venue | the name it points at, never the id | — |
 | Published at | 1 Oct 2026, 14:30 | — |
 | Published by | the name it points at, never the id | — |
-| Content hash | text | — |
-| Signature key | text | Key that signed this bundle. A terminal offline across a key rotation needs a grace window, or it cannot verify the next bundle. |
 | Stale after | 1 Oct 2026, 14:30 | — |
 | Size bytes | 1,234 | — |
 | Note | text | — |
@@ -1107,32 +1074,18 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Workstation | the name it points at, never the id | — |
 | Kind | chip: Order, Payment, Refund, Void, Scan | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
 | Rejected at | 1 Oct 2026, 14:30 | — |
-| Problem | grouped details | RFC 9457 problem details. Every error response uses this shape. |
-| Payload | grouped details | Deliberately open: the journal entry exactly as the till sent it. Its shape is the request schema for `kind` — an `OfflineOrder` for … |
 | Resolved at | 1 Oct 2026, 14:30 | — |
-| Resolved by principal | the name it points at, never the id | — |
 | Resolution | chip: Posted, Voided, Refunded | What `resolveSyncRejection` recorded. Null while the rejection waits. |
-| Resolved record | the name it points at, never the id | The order, void or refund the resolution produced — what stops the entry being posted twice. |
 
 **Every workstation** (data table, from `listWorkstations`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Region | the name it points at, never the id | — |
-| Department | the name it points at, never the id | — |
-| Scope path | text | — |
-| Sale board | grouped details | Determines which front end loads. Bound to the workstation, not the role — the F&B terminal opens the F&B board. |
-| Access point | the name it points at, never the id | Inherited from the workstation, never selected by the operator. Null where the workstation is not at an access point. |
-| Devices | list or chips (count when long) | — |
 | Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 
@@ -1194,7 +1147,7 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the offline package status untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No offline package status yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listCatalogueBundles` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listCatalogueBundles` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listCatalogueBundles` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW`, `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `syncOrders` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 A publish is already in progress for this venue |
 
@@ -1230,7 +1183,7 @@ devices:
 - `setOfflinePolicy` → `TENANT_CONFIGURE` (configure) · staff
 - `syncOrders` → `ORDER_CREATE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listCatalogueBundles` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listCatalogueBundles` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW`, `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `syncOrders` …
 
 #### Requirements it meets
 
@@ -1261,11 +1214,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Flow F89 *Offline policy is set, cached, monitored and reconciled*, step 3: Each device's cached package is checked. → **What each device is enforcing right now**, not what was configured.
 - Flow F89 *Offline policy is set, cached, monitored and reconciled*, step 5: What the tills did offline is reconciled. → **Every rejected offline sale is seen by a person.** A rejection nobody reads is money nobody collects.
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (52), with its required mark, default, format and its error state (403, 404, 409).
-- [ ] Every output is drawn (49 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (32 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-037?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Publish bundle, Report bundle applied, Save offline policy, Sync orders, What publishing changes.
 - [ ] Every transition is wired: `BO-007`, `BO-009`, `BO-128`.
@@ -1289,7 +1243,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPerformances` reads the population and `getPerformance` reads one of them — list, select, act |
 | Offline | online only |
-| Opens with | `venueId` (session), `outletId` (deepLink) · cold entry: An outlet opened from the directory. |
+| Opens with | `venueId` (session), `outletId` (session) · cold entry: An outlet opened from the directory. |
 | Route | `/venue-operations/opening-hours-calendar` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Improved 20 August against the client design board**, answering 2 board screen(s): Operating Hours & Service Periods; Operating Hours & Sales Periods. **The id, flows and navigation are unchanged** — a board specifies a screen further; it does not replace it. **Drawn 26 August** — `Seat Board 1.dc.html` frame `seat-1c`. **The frame names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes the guess entirely.**
@@ -1372,7 +1326,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the opening hours calendar untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No opening hours calendar yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on from, to and the opening hours calendar are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettings` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettings` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REGION_CONFIGURE` for `updateOutlet`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 422 As `createOutlet`: a missing required local-language name (`local-name-required`), a window that ends before it starts (`window-ends-before-start`), or a … |
 
@@ -1396,7 +1350,7 @@ hours:
 - `getVenueSettings` → `TENANT_VIEW` (read) · staff
 - `updateOutlet` → `REGION_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettings` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettings` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REGION_CONFIGURE` for `updateOutlet`.
 
 #### Requirements it meets
 
@@ -1495,18 +1449,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
-| Placement | chip: Product detail, Cart, Checkout, Post purchase, At gate, In venue | — |
-| Trigger variants | list or chips (count when long) | — |
-| Trigger categorys | list or chips (count when long) | — |
-| Suggested variants | list or chips (count when long) | — |
-| Suggested bundle | the name it points at, never the id | — |
-| Channels | list or chips (count when long) | Empty applies to every channel. Restriction is opt-in — a rule that fires on the website but not at a counter is a guest experience … |
 | Priority | 1,234 | — |
 | Max suggestions | 1,234 | — |
 | Is active | yes / no (icon or chip) | — |
-| Region | the name it points at, never the id | The region that owns the rule. Upsell rules are owned at region and read at venue (decided 28 September, audit R183); set from the caller's … |
 
 **Card list** (card list): 14 screens, each with what needs attention.
 
@@ -1514,18 +1460,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
 | Placement | chip: Product detail, Cart, Checkout, Post purchase, At gate, In venue | — |
-| Trigger variants | list or chips (count when long) | — |
-| Trigger categorys | list or chips (count when long) | — |
-| Suggested variants | list or chips (count when long) | — |
-| Suggested bundle | the name it points at, never the id | — |
 | Channels | list or chips (count when long) | Empty applies to every channel. Restriction is opt-in — a rule that fires on the website but not at a counter is a guest experience … |
 | Priority | 1,234 | — |
 | Max suggestions | 1,234 | — |
 | Is active | yes / no (icon or chip) | — |
-| Region | the name it points at, never the id | The region that owns the rule. Upsell rules are owned at region and read at venue (decided 28 September, audit R183); set from the caller's … |
 
 **The upsell suggestion** (detail panel, from `decideRecommendations`): The slot preview, as on WEB-008: `decideRecommendations` with `previewOnly` (ADR-0052).
 
@@ -1598,7 +1538,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - → `BO-116` Merchandising & Product Presentation: *Merchandising & Product Presentation*
 - → `BO-117` Product Import, Governance & AI Configuration Assistant: *Product Import, Governance & AI Configuration Assistant*
 - → `BO-118` Campaign & Audience Management: *Campaign & Audience Management*
-- → `BO-119` Cross-Sell, Upsell & Recommendation Rules: *Cross-Sell, Upsell & Recommendation Rules*
+- → `BO-119` Cross-Sell, Upsell & Recommendation Rules: *Cross-Sell, Upsell & Recommendation Rules*; carries `ruleId`
 - → `BO-120` Omnichannel Commerce & Journey Configuration: *Omnichannel Commerce & Journey Configuration*
 - → `BO-121` Personalized Offers & Guest Engagement: *Personalized Offers & Guest Engagement*
 - → `BO-122` POS Experience Dashboard: *POS Experience Dashboard*
@@ -1696,7 +1636,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (2), with its required mark, default, format and its error state (403, 404).
-- [ ] Every output is drawn (51 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (37 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-102?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-007`, `BO-009`, `BO-010`, `BO-011`, `BO-012`, `BO-013`, `BO-014`, `BO-015`, `BO-016`, `BO-017`, `BO-018`, `BO-019`, `BO-037`, `BO-063`, `BO-109`, `BO-110`, `BO-111`, `BO-112`, `BO-113`, `BO-114`, `BO-115`, `BO-116`, `BO-117`, `BO-118`, `BO-119`, `BO-120`, `BO-121`, `BO-122`, `BO-123`, `BO-124`, `BO-125`, `BO-126`, `BO-142`, `BO-143`, `BO-1190`.
@@ -1713,7 +1653,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Sell · wave 2 · needs the `fnb` module |
+| Module | Sell · wave 1 · needs the `fnb` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `SCOPE_VIEW`, `WORKSTATION_CONFIGURE` (2 configure, 2 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
@@ -1888,7 +1828,7 @@ Errors to draw in the form: 400 A tile references an unknown or unsellable varia
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the menu pos layout untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | The picked menu has no sections yet: the canvas opens empty and Save menu sections (`setMenuSections`) saves the first arrangement; a new outlet layout starts with New sale board. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: the canvas does not filter. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listMenus` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getMenu` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setMenuSections`; `WORKSTATION_CONFIGURE` for … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A tile references an unknown or unsellable variant |
 
@@ -1946,7 +1886,7 @@ unassigned:
 - `getMenu` → `PRODUCT_VIEW` (read) · staff
 - `listSaleBoards` → `SCOPE_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listMenus` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getMenu` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setMenuSections`; `WORKSTATION_CONFIGURE` for …
 
 #### Requirements it meets
 
@@ -2007,7 +1947,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `fnb` module |
-| Block | Block A · ticket #20701 (APP-SETUP-BO-110) |
+| Block | Block B · task APP-SETUP-BO-110 |
 | Who uses it | venue |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listRecipes` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2161,7 +2101,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Sell · wave 2 · needs the `fnb` module |
+| Module | Sell · wave 1 · needs the `fnb` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
@@ -2336,7 +2276,7 @@ Errors to draw in the form: 412 The row changed since the `If-Match` version was
 | Loading (`?state=loading`) | The saved ingredient substitution allergen. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the ingredient substitution allergen untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No ingredient substitution allergen configured. The form opens empty and `setRecipe` saves the first one; it says what the platform does in the meantime. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_CONFIGURE`, which `setRecipe` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getAllergenVerification` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setRecipe`, `setSubstitutionRules`, `setIngredientSubstitutes`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
@@ -2388,7 +2328,7 @@ declared:
 - `getAllergenVerification` → `PRODUCT_VIEW` (read) · staff
 - `listRecipes` → `PRODUCT_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_CONFIGURE`, which `setRecipe` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getAllergenVerification` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setRecipe`, `setSubstitutionRules`, `setIngredientSubstitutes`.
 
 #### Requirements it meets
 
@@ -2447,7 +2387,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Sell · wave 2 · needs the `fnb` module |
+| Module | Sell · wave 1 · needs the `fnb` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as supervisor |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
@@ -2636,7 +2576,7 @@ Errors to draw in the form: 409 Insufficient stock at the source
 | Loading (`?state=loading`) | The saved production planning production. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the production planning production untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No production planning production configured. The form opens empty and `planProductionRun` saves the first one; it says what the platform does in the meantime. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_CONFIGURE`, which `planProductionRun` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listProductionRuns` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `planProductionRun`, `buildProductionPlan`, `releaseProductionPlan`, `completeProductionRun` and 1 more. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Insufficient stock at the source; 409 The plan is not released yet (`plan-not-released`); a draft plan prints only to the browser.; 409 The run is not `inProgress` (states/production-run.yaml). Names its current status. |
 
@@ -2688,7 +2628,7 @@ lines:
 - `createStockTransfer` → `PRODUCT_CONFIGURE` (configure) · staff
 - `getProductionRun` → `PRODUCT_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_CONFIGURE`, which `planProductionRun` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listProductionRuns` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `planProductionRun`, `buildProductionPlan`, `releaseProductionPlan`, `completeProductionRun` and 1 more.
 
 #### Requirements it meets
 

@@ -32,7 +32,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-022 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-022 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -246,7 +246,7 @@
    "error": "Could not load. Names which read failed and leaves the release version untouched.",
    "emptyFirstRun": "No release version yet. Offers Create release (`createRelease`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on status, environment and the release version are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listReleases` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listReleases` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_MANAGE` for `createRelease`, `withdrawRelease`; `PLATFORM_RELEASE_PROMOTE` for `promoteRelease`, `rejectRelease`."
   },
   "apis": [
    {
@@ -308,7 +308,9 @@
    "params": [
     {
      "name": "releaseId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listReleases` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `releaseId`.",
@@ -325,7 +327,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-022"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generator template (\"Find release & version management for this venue\"); releases are platform-wide (design-notes correction platform-foundation ADM-022).",
   "_platform": {
    "code": "P09",
@@ -380,7 +382,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-023 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-023 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -560,7 +562,7 @@
    "error": "Could not load. Names which read failed and leaves the staging promotion approval untouched.",
    "emptyFirstRun": "No staging promotion approval yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on status, environment and the staging promotion approval are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `getReleaseReadiness` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listReleases` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_PROMOTE` for `promoteRelease`, `rejectRelease`."
   },
   "apis": [
    {
@@ -601,7 +603,9 @@
    "params": [
     {
      "name": "releaseId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listReleases` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `releaseId`.",
@@ -618,7 +622,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-023"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "createRelease",
@@ -684,7 +688,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-024 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-024 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -805,7 +809,7 @@
    "error": "Could not load. Names which read failed and leaves the release notification composer untouched.",
    "emptyFirstRun": "No release notification composer yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Never shown: `listSupportNotices` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_MANAGE` for `publishSupportNotice`."
   },
   "apis": [
    {
@@ -841,13 +845,13 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-024"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formPublishSupportNotice",
     "component": "modal",
     "trigger": "Publish support notice",
-    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "SupportNotice",
     "confirm": {
      "label": "Publish support notice",
@@ -858,7 +862,6 @@
      "discards": [
       "supportEndsAt",
       "message",
-      "affectedTenantIds",
       "publishedByPrincipalId",
       "scopePath"
      ]
@@ -917,7 +920,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-025 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-025 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -1000,7 +1003,7 @@
    "error": "Could not load. Names which read failed and leaves the tenant upgrade scheduler untouched.",
    "emptyFirstRun": "No tenant upgrade scheduler yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Never shown: `listUpgradeSchedules` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listUpgradeSchedules` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listUpgradeSchedules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_MANAGE` for `scheduleTenantUpgrade`."
   },
   "apis": [
    {
@@ -1030,7 +1033,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-025"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formScheduleTenantUpgrade",
@@ -1108,7 +1111,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-026 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-026 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -1241,7 +1244,7 @@
    "error": "Could not load. Names which read failed and leaves the end-of-support notice untouched.",
    "emptyFirstRun": "No end-of-support notice yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Never shown: `listSupportNotices` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVELOPER_ADMIN` for `deprecateApiVersion`; `PLATFORM_RELEASE_MANAGE` for `publishSupportNotice`; `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`, `openPlatformStaffGrant`.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `DEVELOPER_ADMIN`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
@@ -1295,7 +1298,9 @@
    "params": [
     {
      "name": "version",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listSupportNotices` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "tenantId",
@@ -1317,13 +1322,13 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-026"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formPublishSupportNotice",
     "component": "modal",
     "trigger": "Publish support notice",
-    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "SupportNotice",
     "confirm": {
      "label": "Publish support notice",
@@ -1334,7 +1339,6 @@
      "discards": [
       "supportEndsAt",
       "message",
-      "affectedTenantIds",
       "publishedByPrincipalId",
       "scopePath"
      ]
@@ -1441,7 +1445,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-027 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-027 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -1486,11 +1490,8 @@
        "columns": [
         "Migration.module",
         "Migration.description",
-        "Migration.isReversible",
         "Migration.rollbackTestedAt",
         "Migration.checksum",
-        "Migration.estimatedLockMs",
-        "Migration.touchesPartitionedTable",
         "Migration.appliedCellCount",
         "Migration.pendingCellCount"
        ],
@@ -1526,22 +1527,14 @@
        "label": "The migration run",
        "bindsTo": "MigrationRun",
        "columns": [
-        "MigrationRun.id",
-        "MigrationRun.planId",
         "MigrationRun.status",
-        "MigrationRun.canaryCellId",
-        "MigrationRun.canaryTenantId",
         "MigrationRun.tenantsTotal",
         "MigrationRun.tenantsComplete",
         "MigrationRun.tenantsFailed",
         "MigrationRun.cellsTotal",
-        "MigrationRun.cellsComplete",
-        "MigrationRun.cellsFailed",
-        "MigrationRun.startedByPrincipalId",
         "MigrationRun.startedAt",
         "MigrationRun.completedAt",
-        "MigrationRun.cells",
-        "MigrationRun.tenants"
+        "MigrationRun.cells"
        ],
        "operation": "getMigrationRun",
        "provenance": "contract platform-ops.yaml GET /migrations/runs/{runId}"
@@ -1591,7 +1584,7 @@
    "error": "Could not load. Names which read failed and leaves the database migration console untouched.",
    "emptyFirstRun": "No database migration console yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on appliedTo, pendingOnly and the database migration console are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_MIGRATION_VIEW`, which `listMigrations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_MIGRATION_VIEW`, which `listMigrations` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_MIGRATION_APPLY` for `applyMigration`, `rollbackMigrationRun`."
   },
   "apis": [
    {
@@ -1655,7 +1648,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-027"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formPlanMigration",
@@ -1768,7 +1761,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-028 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-028 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -1856,7 +1849,7 @@
    "error": "Could not load. Names which read failed and leaves the environment registry untouched.",
    "emptyFirstRun": "No environment registry yet. Offers Register environment (`registerEnvironment`).",
    "emptyNoResults": "Never shown: `listEnvironments` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listEnvironments` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listEnvironments` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_MANAGE` for `registerEnvironment`."
   },
   "apis": [
    {
@@ -1886,7 +1879,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-028"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRegisterEnvironment",
@@ -2211,7 +2204,9 @@
     },
     {
      "name": "challengeId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`; a link or an edge that holds one opens it instead."
     }
    ],
    "coldEntry": "Opened cold, it starts at Export package; with a package id it opens that package."

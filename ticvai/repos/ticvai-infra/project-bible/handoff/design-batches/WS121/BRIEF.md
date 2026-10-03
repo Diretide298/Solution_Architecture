@@ -95,14 +95,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-519` | AI Governance Command Center | B–D | 6 | 10 | 7 | 2 | 0 | 0 | — | notStarted (—) |
-| `ADM-520` | AI Capability Registry & Ownership | A | 20 | 21 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-521` | AI Risk Classification & Assessment | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-522` | AI Autonomy Level Configuration | B–D | 15 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-519` | AI Governance Command Center | D | 6 | 10 | 7 | 2 | 0 | 0 | — | notStarted (—) |
+| `ADM-520` | AI Capability Registry & Ownership | D | 20 | 21 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-521` | AI Risk Classification & Assessment | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-522` | AI Autonomy Level Configuration | D | 15 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-523` | AI Action & Permission Policy Builder | A | 23 | 14 | 7 | 1 | 0 | 5 | — | notStarted (—) |
-| `ADM-524` | AI Data Access & Usage Policy | B–D | 6 | 6 | 7 | 2 | 0 | 0 | — | notStarted (—) |
-| `ADM-525` | Environment, Tenant & Scope Governance | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-526` | AI Policy Conflict, Exception & Override Management | A | 13 | 33 | 7 | 1 | 2 | 0 | — | notStarted (—) |
+| `ADM-524` | AI Data Access & Usage Policy | D | 6 | 6 | 7 | 2 | 0 | 0 | — | notStarted (—) |
+| `ADM-525` | Environment, Tenant & Scope Governance | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-526` | AI Policy Conflict, Exception & Override Management | D | 13 | 33 | 7 | 1 | 2 | 0 | — | notStarted (—) |
 | `ADM-527` | AI Policy Testing & Governance Simulation | A | 9 | 11 | 7 | 1 | 1 | 0 | — | notStarted (—) |
 | `ADM-528` | AI Governance Policy Publication & Effective Policy Map | A | 6 | 22 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 

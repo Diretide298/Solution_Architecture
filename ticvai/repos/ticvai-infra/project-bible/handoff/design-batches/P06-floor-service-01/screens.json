@@ -52,18 +52,10 @@
        "label": "Every table reservation",
        "bindsTo": "TableReservation",
        "columns": [
-        "TableReservation.id",
-        "TableReservation.outletId",
-        "TableReservation.subjectId",
         "TableReservation.guestName",
-        "TableReservation.contactPoint",
-        "TableReservation.partySize",
         "TableReservation.startsAt",
         "TableReservation.durationMinutes",
-        "TableReservation.tables[].tableId",
-        "TableReservation.status",
-        "TableReservation.groupId",
-        "TableReservation.notes"
+        "TableReservation.status"
        ],
        "operation": "listTableReservations",
        "provenance": "contract fnb.yaml GET /table-reservations"
@@ -73,17 +65,9 @@
        "label": "Every F&B order",
        "bindsTo": "FnbOrder",
        "columns": [
-        "FnbOrder.id",
         "FnbOrder.orderNumber",
-        "FnbOrder.outletId",
-        "FnbOrder.serviceMode",
-        "FnbOrder.tableVisitId",
         "FnbOrder.status",
-        "FnbOrder.lines",
-        "FnbOrder.salesOrderId",
         "FnbOrder.grossAmount",
-        "FnbOrder.taxAmount",
-        "FnbOrder.kitchenTicketId",
         "FnbOrder.estimatedReadyAt"
        ],
        "operation": "listFnbOrders",
@@ -115,20 +99,11 @@
        "label": "The selected table reservation",
        "bindsTo": "TableReservation",
        "columns": [
-        "TableReservation.id",
-        "TableReservation.outletId",
-        "TableReservation.subjectId",
         "TableReservation.guestName",
         "TableReservation.contactPoint",
-        "TableReservation.partySize",
         "TableReservation.startsAt",
         "TableReservation.durationMinutes",
-        "TableReservation.tables",
-        "TableReservation.status",
-        "TableReservation.groupId",
-        "TableReservation.notes",
-        "TableReservation.actualPartySize",
-        "TableReservation.tableVisitId"
+        "TableReservation.status"
        ],
        "operation": "listTableReservations",
        "provenance": "contract fnb.yaml GET /table-reservations"
@@ -185,7 +160,9 @@
     },
     {
      "name": "outletId",
-     "from": "EMP-003"
+     "from": "EMP-003",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listTableReservations` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to.",
@@ -204,7 +181,7 @@
    "derivedFrom": "wireframes/reference/FnB Board 4.dc.html",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -320,7 +297,8 @@
     },
     {
      "name": "outletId",
-     "from": "EMP-003"
+     "from": "session",
+     "notes": "From the session (3 October 2026, CHG-SPF-004): a staff screen works in the outlet its sign-in or device is scoped to; nothing navigates to it (the venue-scope rule)."
     }
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to."
@@ -332,7 +310,7 @@
    "derivedFrom": "wireframes/reference/FnB Board 4.dc.html",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "setTableLayout",
@@ -506,7 +484,8 @@
     },
     {
      "name": "outletId",
-     "from": "EMP-003"
+     "from": "session",
+     "notes": "From the session (3 October 2026, CHG-SPF-004): a staff screen works in the outlet its sign-in or device is scoped to; nothing navigates to it (the venue-scope rule)."
     }
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to."
@@ -518,7 +497,7 @@
    "derivedFrom": "wireframes/reference/FnB Board 4.dc.html",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetTableCombinations",
@@ -630,18 +609,10 @@
        "label": "Every table reservation",
        "bindsTo": "TableReservation",
        "columns": [
-        "TableReservation.id",
-        "TableReservation.outletId",
-        "TableReservation.subjectId",
         "TableReservation.guestName",
-        "TableReservation.contactPoint",
-        "TableReservation.partySize",
         "TableReservation.startsAt",
         "TableReservation.durationMinutes",
-        "TableReservation.tables[].tableId",
-        "TableReservation.status",
-        "TableReservation.groupId",
-        "TableReservation.notes"
+        "TableReservation.status"
        ],
        "operation": "listTableReservations",
        "provenance": "contract fnb.yaml GET /table-reservations"
@@ -678,20 +649,11 @@
        "label": "The selected table reservation",
        "bindsTo": "TableReservation",
        "columns": [
-        "TableReservation.id",
-        "TableReservation.outletId",
-        "TableReservation.subjectId",
         "TableReservation.guestName",
         "TableReservation.contactPoint",
-        "TableReservation.partySize",
         "TableReservation.startsAt",
         "TableReservation.durationMinutes",
-        "TableReservation.tables[].tableId",
-        "TableReservation.status",
-        "TableReservation.groupId",
-        "TableReservation.notes",
-        "TableReservation.actualPartySize",
-        "TableReservation.tableVisitId"
+        "TableReservation.status"
        ],
        "operation": "listTableReservations",
        "provenance": "contract fnb.yaml GET /table-reservations"
@@ -746,7 +708,7 @@
    "derivedFrom": "wireframes/reference/FnB Board 4.dc.html",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -927,7 +889,7 @@
    "loading": "The saved create edit reservation.",
    "error": "Could not load. Names which read failed and leaves the create edit reservation untouched.",
    "emptyFirstRun": "No create edit reservation configured. The form opens empty; it says what the platform does in the meantime.",
-   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `matchGuest` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getFnbReservationPolicy` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_VIEW` for `matchGuest`; `ORDER_CREATE` for `createTableReservationForGuest`; `ORDER_MODIFY` for `sendBookingConfirmation`.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -967,12 +929,15 @@
     },
     {
      "name": "reservationId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createTableReservationForGuest`; a link or an edge that holds one opens it instead."
     },
     {
      "name": "outletId",
      "from": "navigation",
-     "notes": "The outlet the reservation is for, picked on the way in (CHG-CLN-016)."
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getFnbReservationPolicy`; an edge that holds one may still carry it to open on that record.",
+     "optional": true
     }
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to."
@@ -984,7 +949,7 @@
    "derivedFrom": "wireframes/reference/FnB Board 4.dc.html",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formMatchGuest",
@@ -1225,7 +1190,9 @@
     },
     {
      "name": "entryId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `leaveRestaurantWaitlist`, `quoteWaitTime`, `notifyWaitlistParty` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to."
@@ -1237,7 +1204,7 @@
    "derivedFrom": "wireframes/reference/FnB Board 4.dc.html",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "confirmLeaveRestaurantWaitlist",
@@ -1369,11 +1336,8 @@
        "label": "Every order",
        "bindsTo": "OrderSummary",
        "columns": [
-        "OrderSummary.id",
         "OrderSummary.orderNumber",
         "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
         "OrderSummary.channel",
         "OrderSummary.lineCount"
        ],
@@ -1430,16 +1394,11 @@
        "label": "The selected order",
        "bindsTo": "OrderSummary",
        "columns": [
-        "OrderSummary.id",
         "OrderSummary.orderNumber",
         "OrderSummary.status",
         "OrderSummary.grossAmount",
         "OrderSummary.refundedAmount",
-        "OrderSummary.channel",
-        "OrderSummary.lineCount",
-        "OrderSummary.principalId",
-        "OrderSummary.holdLabel",
-        "OrderSummary.heldUntil"
+        "OrderSummary.holdLabel"
        ],
        "operation": "listOrders",
        "provenance": "contract orders.yaml GET /orders"
@@ -1461,22 +1420,11 @@
        "label": "The guest profile",
        "bindsTo": "GuestProfileDetail",
        "columns": [
-        "GuestProfileDetail.id",
-        "GuestProfileDetail.subjectId",
         "GuestProfileDetail.displayName",
-        "GuestProfileDetail.email",
-        "GuestProfileDetail.phone",
-        "GuestProfileDetail.preferredLanguage",
         "GuestProfileDetail.preferredChannel",
-        "GuestProfileDetail.guestLinkId",
-        "GuestProfileDetail.tags",
         "GuestProfileDetail.engagementScore",
-        "GuestProfileDetail.engagementTier",
         "GuestProfileDetail.lifetimeValue",
-        "GuestProfileDetail.visitCount",
-        "GuestProfileDetail.lastVisitAt",
-        "GuestProfileDetail.isActive",
-        "GuestProfileDetail.mergedIntoSubjectId"
+        "GuestProfileDetail.visitCount"
        ],
        "operation": "getGuestProfile",
        "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}"
@@ -1508,7 +1456,7 @@
    "error": "Could not load. Names which read failed and leaves the guest profile dining untouched.",
    "emptyFirstRun": "No guest profile dining yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the guest profile dining are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `getGuestProfile` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `getGuestProfile` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_MANAGE` for `mergeGuests`, `addGuestNote`.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -1571,7 +1519,7 @@
    "derivedFrom": "wireframes/reference/FnB Board 4.dc.html",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formMatchGuest",
@@ -1626,7 +1574,7 @@
   "name": "Live Table & Service Management",
   "module": "Floor Service",
   "requiresModule": "fnb",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/live-table-service-management",
@@ -1693,19 +1641,9 @@
        "label": "The table visit",
        "bindsTo": "TableVisit",
        "columns": [
-        "TableVisit.id",
-        "TableVisit.tableId",
         "TableVisit.tableLabel",
-        "TableVisit.outletId",
-        "TableVisit.covers",
         "TableVisit.status",
-        "TableVisit.serverPrincipalId",
-        "TableVisit.subjectId",
-        "TableVisit.orders",
-        "TableVisit.mergedIntoVisitId",
-        "TableVisit.mergedFromVisitIds",
         "TableVisit.runningTotal",
-        "TableVisit.gratuity",
         "TableVisit.openedAt",
         "TableVisit.closedAt"
        ],
@@ -2088,7 +2026,9 @@
     },
     {
      "name": "reservationId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `seatTableReservation` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "outletId",
@@ -2111,7 +2051,7 @@
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 16 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "joinRestaurantWaitlist",
@@ -2170,7 +2110,7 @@
   "name": "Table Order, Bill & Payment Management",
   "module": "Floor Service",
   "requiresModule": "fnb",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/table-order-bill-payment-management",
@@ -2191,6 +2131,7 @@
      "provenance": "flow F80 step 1→2",
      "operation": "transferOrderItems",
      "carries": [
+      "ticketId",
       "visitId"
      ]
     },
@@ -2202,6 +2143,7 @@
      "crossesDevice": true,
      "back": false,
      "carries": [
+      "ticketId",
       "visitId"
      ]
     }
@@ -2227,11 +2169,8 @@
        "label": "The bill",
        "bindsTo": "Bill",
        "columns": [
-        "Bill.visitId",
         "Bill.covers",
-        "Bill.lines",
         "Bill.subtotal",
-        "Bill.serviceCharge",
         "Bill.taxAmount",
         "Bill.discountAmount",
         "Bill.total"
@@ -2448,7 +2387,7 @@
    "loading": "The table order bill, read by `getBill`.",
    "error": "Could not load. Names which read failed and leaves the table order bill untouched.",
    "emptyFirstRun": "No table order bill yet. Offers Create payment (`createPayment`).",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getBill` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getBill` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `closeTableVisit`, `createPayment`, `createFnbOrder`; `ORDER_MODIFY` for `splitBill`, `compItem`, `transferOrderItems`, `requestBill`.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -2526,7 +2465,7 @@
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -2620,18 +2559,10 @@
        "label": "Every table reservation",
        "bindsTo": "TableReservation",
        "columns": [
-        "TableReservation.id",
-        "TableReservation.outletId",
-        "TableReservation.subjectId",
         "TableReservation.guestName",
-        "TableReservation.contactPoint",
-        "TableReservation.partySize",
         "TableReservation.startsAt",
         "TableReservation.durationMinutes",
-        "TableReservation.tables[].tableId",
-        "TableReservation.status",
-        "TableReservation.groupId",
-        "TableReservation.notes"
+        "TableReservation.status"
        ],
        "operation": "listTableReservations",
        "provenance": "contract fnb.yaml GET /table-reservations"
@@ -2662,20 +2593,11 @@
        "label": "The selected table reservation",
        "bindsTo": "TableReservation",
        "columns": [
-        "TableReservation.id",
-        "TableReservation.outletId",
-        "TableReservation.subjectId",
         "TableReservation.guestName",
         "TableReservation.contactPoint",
-        "TableReservation.partySize",
         "TableReservation.startsAt",
         "TableReservation.durationMinutes",
-        "TableReservation.tables",
-        "TableReservation.status",
-        "TableReservation.groupId",
-        "TableReservation.notes",
-        "TableReservation.actualPartySize",
-        "TableReservation.tableVisitId"
+        "TableReservation.status"
        ],
        "operation": "listTableReservations",
        "provenance": "contract fnb.yaml GET /table-reservations"
@@ -2752,7 +2674,7 @@
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P06",
    "audience": "staff",

@@ -106,11 +106,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-278` | Resale Marketplace Command Center | B–D | 2 | 48 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
+| `ADM-278` | Resale Marketplace Command Center | B–D | 2 | 40 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
 | `ADM-279` | Resale Eligibility Rule Configuration | B–D | 13 | 0 | 5 | 0 | 2 | 5 | — | notStarted (generated) |
-| `ADM-280` | Resale Policy & Marketplace Settings | B–D | 54 | 16 | 5 | 0 | 0 | 5 | — | notStarted (generated) |
+| `ADM-280` | Resale Policy & Marketplace Settings | B–D | 54 | 8 | 5 | 0 | 0 | 5 | — | notStarted (generated) |
 | `ADM-281` | Listing Creation & Seller Configuration | B–D | 17 | 20 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-282` | Resale Pricing & Price Guardrails | B–D | 48 | 16 | 5 | 0 | 1 | 5 | — | notStarted (generated) |
+| `ADM-282` | Resale Pricing & Price Guardrails | B–D | 48 | 8 | 5 | 0 | 1 | 5 | — | notStarted (generated) |
 | `ADM-283` | Resale Fees, Commission & Seller Proceeds | B–D | 8 | 0 | 5 | 0 | 2 | 5 | — | notStarted (generated) |
 | `ADM-284` | Listing Approval & Moderation | B–D | 0 | 40 | 6 | 0 | 1 | 3 | — | notStarted (generated) |
 | `ADM-285` | Resale Inventory & Availability Management | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
@@ -183,22 +183,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Marketplace name | text | — |
 | Pricing mode | chip: Face value only, Fixed price, Seller selected price, Capped price, Operator … | — |
 | Maximum discount percent | 1,234.5 | The floor below face value, beside `ResaleFeePolicy.priceCapPercent` above it. |
 | Seller can edit price | yes / no (icon or chip) | — |
 | Maximum price changes | 1,234 | — |
 | Minimum minutes between price changes | 1,234 | — |
-| Moderation mode | chip: Automatic, Risk based, Manual | `reviewTriggers` sends a listing to `pendingReview` when `moderationMode` is `riskBased`; `manual` reviews every listing. |
-| Review triggers | list or chips (count when long) | — |
-| Expiry rule | chip: X minutes before event, X hours before event, At event start, At configured date | — |
-| Expiry offset | 1,234 | Minutes or hours, per `expiryRule`. |
-| Withdrawal policy | chip: Seller can withdraw anytime, Seller cannot withdraw while reserved | — |
-| Maximum withdrawals | 1,234 | — |
 | Cancellation fee | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Checkout hold minutes | 1,234 | How long a listing stays `reserved` for one buyer in checkout. |
-| Buyer identity verification required | yes / no (icon or chip) | — |
 
 **Active Listings** (metric tile)
 
@@ -358,7 +350,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (2), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (48 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-278?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `ADM-279`, `ADM-280`, `ADM-281`, `ADM-282`, `ADM-283`, `ADM-284`, `ADM-285`, `ADM-286`, `ADM-287`.
@@ -563,7 +555,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Form: Save resale marketplace config** (modal, opened by *Save resale marketplace config*; *Save resale marketplace config* calls `setResaleMarketplaceConfig`, *Cancel* sends nothing)
 
-**Collects what `setResaleMarketplaceConfig` sends before it is called.** Required: `id`, `marketplaceName`, `pricingMode`, `moderationMode`, `isActive`. Optional: `maximumDiscountPercent`, `sellerCanEditPrice`, `maximumPriceChanges`, `minimumMinutesBetweenPriceChanges`, `reviewTriggers`, `expiryRule`, `expiryOffset`, `withdrawalPolicy`, `maximumWithdrawals`, `cancellationFee`, `checkoutHoldMinutes`, `buyerIdentityVerificationRequired` and 16 more. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setResaleMarketplaceConfig` sends before it is called.** Required: `marketplaceName`, `pricingMode`, `moderationMode`, `isActive`. Optional: `maximumDiscountPercent`, `sellerCanEditPrice`, `maximumPriceChanges`, `minimumMinutesBetweenPriceChanges`, `reviewTriggers`, `expiryRule`, `expiryOffset`, `withdrawalPolicy`, `maximumWithdrawals`, `cancellationFee`, `checkoutHoldMinutes`, `buyerIdentityVerificationRequired` and 16 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -613,22 +605,14 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Marketplace name | text | — |
 | Pricing mode | chip: Face value only, Fixed price, Seller selected price, Capped price, Operator … | — |
 | Maximum discount percent | 1,234.5 | The floor below face value, beside `ResaleFeePolicy.priceCapPercent` above it. |
 | Seller can edit price | yes / no (icon or chip) | — |
 | Maximum price changes | 1,234 | — |
 | Minimum minutes between price changes | 1,234 | — |
-| Moderation mode | chip: Automatic, Risk based, Manual | `reviewTriggers` sends a listing to `pendingReview` when `moderationMode` is `riskBased`; `manual` reviews every listing. |
-| Review triggers | list or chips (count when long) | — |
-| Expiry rule | chip: X minutes before event, X hours before event, At event start, At configured date | — |
-| Expiry offset | 1,234 | Minutes or hours, per `expiryRule`. |
-| Withdrawal policy | chip: Seller can withdraw anytime, Seller cannot withdraw while reserved | — |
-| Maximum withdrawals | 1,234 | — |
 | Cancellation fee | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Checkout hold minutes | 1,234 | How long a listing stays `reserved` for one buyer in checkout. |
-| Buyer identity verification required | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -700,7 +684,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (54), with its required mark, default, format and its error state (400, 403, 412).
-- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-280?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save resale marketplace config.
 - [ ] Every transition is wired: `ADM-278`.
@@ -921,7 +905,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save resale marketplace config** (modal, opened by *Save resale marketplace config*; *Save resale marketplace config* calls `setResaleMarketplaceConfig`, *Cancel* sends nothing)
 
-**Collects what `setResaleMarketplaceConfig` sends before it is called.** Required: `id`, `marketplaceName`, `pricingMode`, `moderationMode`, `isActive`. Optional: `maximumDiscountPercent`, `sellerCanEditPrice`, `maximumPriceChanges`, `minimumMinutesBetweenPriceChanges`, `reviewTriggers`, `expiryRule`, `expiryOffset`, `withdrawalPolicy`, `maximumWithdrawals`, `cancellationFee`, `checkoutHoldMinutes`, `buyerIdentityVerificationRequired` and 16 more. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setResaleMarketplaceConfig` sends before it is called.** Required: `marketplaceName`, `pricingMode`, `moderationMode`, `isActive`. Optional: `maximumDiscountPercent`, `sellerCanEditPrice`, `maximumPriceChanges`, `minimumMinutesBetweenPriceChanges`, `reviewTriggers`, `expiryRule`, `expiryOffset`, `withdrawalPolicy`, `maximumWithdrawals`, `cancellationFee`, `checkoutHoldMinutes`, `buyerIdentityVerificationRequired` and 16 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -971,22 +955,14 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Marketplace name | text | — |
 | Pricing mode | chip: Face value only, Fixed price, Seller selected price, Capped price, Operator … | — |
 | Maximum discount percent | 1,234.5 | The floor below face value, beside `ResaleFeePolicy.priceCapPercent` above it. |
 | Seller can edit price | yes / no (icon or chip) | — |
 | Maximum price changes | 1,234 | — |
 | Minimum minutes between price changes | 1,234 | — |
-| Moderation mode | chip: Automatic, Risk based, Manual | `reviewTriggers` sends a listing to `pendingReview` when `moderationMode` is `riskBased`; `manual` reviews every listing. |
-| Review triggers | list or chips (count when long) | — |
-| Expiry rule | chip: X minutes before event, X hours before event, At event start, At configured date | — |
-| Expiry offset | 1,234 | Minutes or hours, per `expiryRule`. |
-| Withdrawal policy | chip: Seller can withdraw anytime, Seller cannot withdraw while reserved | — |
-| Maximum withdrawals | 1,234 | — |
 | Cancellation fee | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Checkout hold minutes | 1,234 | How long a listing stays `reserved` for one buyer in checkout. |
-| Buyer identity verification required | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -1061,7 +1037,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (48), with its required mark, default, format and its error state (400, 403, 412).
-- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-282?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save resale marketplace config.
 - [ ] Every transition is wired: `ADM-278`.

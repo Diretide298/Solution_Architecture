@@ -165,8 +165,8 @@ screens:
     - to: PTR-019
       trigger: API Credentials & Integration
       provenance: 'derived — PTR-019 declares entryState.params clientId and PTR-001 holds none of them.
-        The edge carries nothing: PTR-019 finds clientId (listApiClients) itself, and PTR-019 opens on
-        its own'
+        The edge carries nothing: clientId only pre-selects (deep link or optional), and PTR-019 opens
+        on its own'
     - to: PTR-020
       trigger: Sub-Agent Management
       provenance: 'derived — PTR-020 declares entryState.params delegatedAccessId and PTR-001 holds none

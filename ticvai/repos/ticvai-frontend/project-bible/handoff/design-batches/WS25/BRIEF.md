@@ -126,16 +126,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SUP-009` | Customer Service Command Center | B–D | 0 | 44 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `SUP-010` | Customer 360° Service Profile | B–D | 0 | 38 | 6 | 0 | 4 | 0 | — | notStarted (generated) |
-| `SUP-011` | Unified Interaction & Communication History | B–D | 11 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `SUP-012` | Case Creation, Classification & Intelligent Routing | B–D | 30 | 7 | 5 | 8 | 2 | 0 | — | notStarted (generated) |
-| `SUP-013` | Case Investigation & Resolution Workspace | B–D | 32 | 42 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
-| `SUP-014` | Order, Booking & Ticket Service Workspace | B–D | 2 | 37 | 6 | 5 | 2 | 6 | — | notStarted (generated) |
-| `SUP-015` | Refund, Compensation & Service Exception Workspace | B–D | 0 | 16 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
-| `SUP-016` | Escalation, Collaboration & Internal Resolution | B–D | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `SUP-017` | Case Resolution, Closure & Customer Feedback | B–D | 27 | 0 | 5 | 1 | 1 | 0 | — | notStarted (generated) |
-| `SUP-018` | AI Customer Service Copilot & Knowledge Workspace | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `SUP-009` | Customer Service Command Center | D | 0 | 44 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `SUP-010` | Customer 360° Service Profile | D | 0 | 38 | 6 | 0 | 4 | 0 | — | notStarted (generated) |
+| `SUP-011` | Unified Interaction & Communication History | D | 11 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `SUP-012` | Case Creation, Classification & Intelligent Routing | D | 30 | 7 | 5 | 8 | 2 | 0 | — | notStarted (generated) |
+| `SUP-013` | Case Investigation & Resolution Workspace | D | 32 | 42 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
+| `SUP-014` | Order, Booking & Ticket Service Workspace | D | 2 | 37 | 6 | 5 | 2 | 6 | — | notStarted (generated) |
+| `SUP-015` | Refund, Compensation & Service Exception Workspace | D | 0 | 16 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
+| `SUP-016` | Escalation, Collaboration & Internal Resolution | D | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `SUP-017` | Case Resolution, Closure & Customer Feedback | D | 27 | 0 | 5 | 1 | 1 | 0 | — | notStarted (generated) |
+| `SUP-018` | AI Customer Service Copilot & Knowledge Workspace | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

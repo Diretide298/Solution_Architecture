@@ -4,7 +4,7 @@
   "name": "Offers & Promotions",
   "module": "Promotions",
   "requiresModule": "ticketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C86",
   "implementation": {
    "app": "guest-app",
@@ -56,9 +56,7 @@
         "Promotion.code",
         "Promotion.name",
         "Promotion.description",
-        "Promotion.discount",
-        "Promotion.validFrom",
-        "Promotion.validTo"
+        "Promotion.validFrom"
        ],
        "operation": "listPromotions",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
@@ -79,9 +77,7 @@
         "Promotion.name",
         "Promotion.description",
         "Promotion.discount",
-        "Promotion.validFrom",
-        "Promotion.validTo",
-        "Promotion.maxRedemptionsPerGuest"
+        "Promotion.validFrom"
        ],
        "operation": "getPromotion",
        "provenance": "contract promotions.yaml GET /promotions/{promotionId}"
@@ -95,10 +91,7 @@
         "CouponCode.status",
         "CouponCode.redemptionCount",
         "CouponCode.discount",
-        "CouponCode.invalidReason",
-        "CouponCode.validFrom",
-        "CouponCode.validTo",
-        "CouponCode.redeemedAt"
+        "CouponCode.validFrom"
        ],
        "operation": "getCouponCode",
        "provenance": "contract promotions.yaml GET /coupon-codes/{code}"
@@ -139,11 +132,15 @@
    "params": [
     {
      "name": "promotionId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPromotions` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "code",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPromotions` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `promotionId`.",
@@ -168,7 +165,7 @@
     "differences": "Promo code entry is here in the prototype; the YAML puts applyCartPromoCode on GST-041. **Codes are applied in the basket (GST-041), not here**: one place to apply a code (CHG-SGU-020)."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",

@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-02",
+ "generated": "2026-10-03",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 103,
@@ -15,18 +15,18 @@
   "contracts": 8,
   "modules": 3,
   "undrawn": 0,
-  "operationsWithNoScreen": 103
+  "operationsWithNoScreen": 104
  },
  "waves": {
-  "wave1": 3,
-  "wave2": 20,
-  "wave3": 80
+  "wave1": 25,
+  "wave3": 78
  },
  "modules": [
   {
    "module": "Policy",
    "screens": 40,
    "waves": [
+    1,
     3
    ]
   },
@@ -41,8 +41,7 @@
    "module": "White Label",
    "screens": 23,
    "waves": [
-    1,
-    2
+    1
    ]
   }
  ],
@@ -85,7 +84,7 @@
    "id": "CMS-001",
    "name": "Tenant Workspace",
    "module": "White Label",
-   "wave": 2,
+   "wave": 1,
    "route": "/white-label/tenant-workspace",
    "operations": 7,
    "drawn": true
@@ -94,7 +93,7 @@
    "id": "CMS-002",
    "name": "Brand Kit",
    "module": "White Label",
-   "wave": 2,
+   "wave": 1,
    "route": "/white-label/brand-kit",
    "operations": 4,
    "drawn": true
@@ -103,7 +102,7 @@
    "id": "CMS-003",
    "name": "Typography",
    "module": "White Label",
-   "wave": 2,
+   "wave": 1,
    "route": "/white-label/typography",
    "operations": 2,
    "drawn": true
@@ -112,7 +111,7 @@
    "id": "CMS-004",
    "name": "Logo & Assets",
    "module": "White Label",
-   "wave": 2,
+   "wave": 1,
    "route": "/white-label/logo-assets",
    "operations": 4,
    "drawn": true
@@ -121,7 +120,7 @@
    "id": "CMS-005",
    "name": "Theme Editor",
    "module": "White Label",
-   "wave": 2,
+   "wave": 1,
    "route": "/white-label/theme-editor",
    "operations": 2,
    "drawn": true
@@ -130,7 +129,7 @@
    "id": "CMS-006",
    "name": "Component Preview",
    "module": "White Label",
-   "wave": 2,
+   "wave": 1,
    "route": "/white-label/component-preview",
    "operations": 6,
    "drawn": true
@@ -139,7 +138,7 @@
    "id": "CMS-007",
    "name": "Page Builder",
    "module": "White Label",
-   "wave": 2,
+   "wave": 1,
    "route": "/white-label/page-builder",
    "operations": 12,
    "drawn": true
@@ -148,7 +147,7 @@
    "id": "CMS-008",
    "name": "Content Blocks",
    "module": "White Label",
-   "wave": 2,
+   "wave": 1,
    "route": "/white-label/content-blocks",
    "operations": 10,
    "drawn": true
@@ -157,7 +156,7 @@
    "id": "CMS-009",
    "name": "Navigation & Menus",
    "module": "White Label",
-   "wave": 2,
+   "wave": 1,
    "route": "/white-label/navigation-menus",
    "operations": 6,
    "drawn": true
@@ -166,7 +165,7 @@
    "id": "CMS-010",
    "name": "Media Library",
    "module": "White Label",
-   "wave": 2,
+   "wave": 1,
    "route": "/white-label/media-library",
    "operations": 11,
    "drawn": true
@@ -175,7 +174,7 @@
    "id": "CMS-011",
    "name": "Translations",
    "module": "White Label",
-   "wave": 2,
+   "wave": 1,
    "route": "/white-label/translations",
    "operations": 3,
    "drawn": true
@@ -184,7 +183,7 @@
    "id": "CMS-012",
    "name": "RTL Preview",
    "module": "White Label",
-   "wave": 2,
+   "wave": 1,
    "route": "/white-label/rtl-preview",
    "operations": 2,
    "drawn": true
@@ -193,7 +192,7 @@
    "id": "CMS-013",
    "name": "SEO & Metadata",
    "module": "White Label",
-   "wave": 2,
+   "wave": 1,
    "route": "/white-label/seo-metadata",
    "operations": 3,
    "drawn": true
@@ -202,7 +201,7 @@
    "id": "CMS-014",
    "name": "Publishing Workflow",
    "module": "White Label",
-   "wave": 2,
+   "wave": 1,
    "route": "/white-label/publishing-workflow",
    "operations": 10,
    "drawn": true
@@ -211,7 +210,7 @@
    "id": "CMS-015",
    "name": "Version History",
    "module": "White Label",
-   "wave": 2,
+   "wave": 1,
    "route": "/white-label/version-history",
    "operations": 3,
    "drawn": true
@@ -220,7 +219,7 @@
    "id": "CMS-016",
    "name": "Site Settings",
    "module": "White Label",
-   "wave": 2,
+   "wave": 1,
    "route": "/white-label/site-settings",
    "operations": 5,
    "drawn": true
@@ -229,7 +228,7 @@
    "id": "CMS-017",
    "name": "Domain & Certificate",
    "module": "White Label",
-   "wave": 2,
+   "wave": 1,
    "route": "/white-label/domain-certificate",
    "operations": 7,
    "drawn": true
@@ -238,7 +237,7 @@
    "id": "CMS-018",
    "name": "Consent & Legal",
    "module": "White Label",
-   "wave": 2,
+   "wave": 1,
    "route": "/white-label/consent-legal",
    "operations": 8,
    "drawn": true
@@ -247,7 +246,7 @@
    "id": "CMS-019",
    "name": "User Access",
    "module": "White Label",
-   "wave": 2,
+   "wave": 1,
    "route": "/white-label/user-access",
    "operations": 3,
    "drawn": true
@@ -292,7 +291,7 @@
    "id": "CMS-025",
    "name": "Cookie, Tracking & Digital Technology Registry",
    "module": "Policy",
-   "wave": 3,
+   "wave": 1,
    "route": "/policy/cookie-tracking-digital-technology-registry-cms-025",
    "operations": 8,
    "drawn": true
@@ -301,7 +300,7 @@
    "id": "CMS-026",
    "name": "Cookie Banner & Preference Center Designer",
    "module": "Policy",
-   "wave": 3,
+   "wave": 1,
    "route": "/policy/cookie-banner-preference-center-designer-cms-026",
    "operations": 2,
    "drawn": true
@@ -976,7 +975,7 @@
    "id": "CMS-101",
    "name": "Help Me Choose",
    "module": "White Label",
-   "wave": 2,
+   "wave": 1,
    "route": "/white-label/help-me-choose",
    "operations": 12,
    "drawn": true
@@ -1480,6 +1479,12 @@
     "summary": "Store a guest photo, ID or signed document"
    },
    {
+    "operation": "cancelPaymentLink",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Cancel a live payment link"
+   },
+   {
     "operation": "convertToTermProduct",
     "contract": "orders",
     "verb": "POST",
@@ -1632,10 +1637,10 @@
   ],
   "modulesSplitAcrossWaves": [
    {
-    "module": "White Label",
+    "module": "Policy",
     "waves": [
      1,
-     2
+     3
     ]
    }
   ],

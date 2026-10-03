@@ -103,16 +103,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `CMS-021` | Privacy & Consent Configuration Command Center | B–D | 13 | 0 | 6 | 0 | 1 | 4 | — | notStarted (generated) |
-| `CMS-022` | Data Processing Purpose & Lawful Basis Registry | B–D | 21 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `CMS-023` | Consent Purpose & Consent Type Builder | B–D | 17 | 0 | 5 | 1 | 0 | 4 | — | notStarted (generated) |
-| `CMS-024` | Communication Preference & Marketing Permission Configuration | B–D | 17 | 0 | 5 | 0 | 0 | 5 | — | notStarted (generated) |
+| `CMS-021` | Privacy & Consent Configuration Command Center | D | 13 | 0 | 6 | 0 | 1 | 4 | — | notStarted (generated) |
+| `CMS-022` | Data Processing Purpose & Lawful Basis Registry | D | 21 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `CMS-023` | Consent Purpose & Consent Type Builder | D | 17 | 0 | 5 | 1 | 0 | 4 | — | notStarted (generated) |
+| `CMS-024` | Communication Preference & Marketing Permission Configuration | D | 17 | 0 | 5 | 0 | 0 | 5 | — | notStarted (generated) |
 | `CMS-025` | Cookie, Tracking & Digital Technology Registry | A | 44 | 67 | 6 | 3 | 1 | 4 | — | notStarted (generated) |
 | `CMS-026` | Cookie Banner & Preference Center Designer | A | 31 | 0 | 5 | 1 | 2 | 4 | configures | notStarted (generated) |
-| `CMS-027` | Consent Capture Point & Customer Journey Configuration | B–D | 28 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
-| `CMS-028` | Privacy Notice, Policy & Terms Version Management | B–D | 9 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
-| `CMS-029` | Minor, Guardian & Age-Based Privacy Configuration | B–D | 8 | 0 | 5 | 0 | 0 | 4 | — | notStarted (generated) |
-| `CMS-030` | Privacy Configuration Testing, Approval & Publication | B–D | 39 | 0 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
+| `CMS-027` | Consent Capture Point & Customer Journey Configuration | D | 28 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
+| `CMS-028` | Privacy Notice, Policy & Terms Version Management | D | 9 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `CMS-029` | Minor, Guardian & Age-Based Privacy Configuration | D | 8 | 0 | 5 | 0 | 0 | 4 | — | notStarted (generated) |
+| `CMS-030` | Privacy Configuration Testing, Approval & Publication | D | 39 | 0 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

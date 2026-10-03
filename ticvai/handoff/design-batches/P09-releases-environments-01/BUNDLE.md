@@ -96,14 +96,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-022` | Release & Version Management | B–D | 17 | 25 | 6 | 1 | 2 | 0 | — | notStarted (generated) |
-| `ADM-023` | Staging Promotion & Approval | B–D | 7 | 23 | 6 | 1 | 2 | 5 | — | notStarted (generated) |
-| `ADM-024` | Release Notification Composer | B–D | 7 | 21 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
-| `ADM-025` | Tenant Upgrade Scheduler | B–D | 8 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-026` | End-of-Support Notice Management | B–D | 16 | 16 | 7 | 1 | 1 | 0 | — | notStarted (generated) |
-| `ADM-027` | Database Migration Console | B–D | 14 | 37 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-028` | Environment Registry | B–D | 8 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-700` | Configuration Promotion | B–D | 11 | 13 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
+| `ADM-022` | Release & Version Management | B | 17 | 25 | 6 | 1 | 2 | 0 | — | notStarted (generated) |
+| `ADM-023` | Staging Promotion & Approval | B | 7 | 23 | 6 | 1 | 2 | 5 | — | notStarted (generated) |
+| `ADM-024` | Release Notification Composer | B | 7 | 21 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
+| `ADM-025` | Tenant Upgrade Scheduler | B | 8 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-026` | End-of-Support Notice Management | B | 16 | 16 | 7 | 1 | 1 | 0 | — | notStarted (generated) |
+| `ADM-027` | Database Migration Console | B | 14 | 26 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-028` | Environment Registry | B | 8 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-700` | Configuration Promotion | B | 11 | 13 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -123,7 +123,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Releases & Environments · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-022 |
 | Who uses it | ticvai staff holding `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_PROMOTE`, `PLATFORM_RELEASE_VIEW` (1 configure, 1 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listReleases` reads the population and `getRelease` reads one of them — list, select, act |
@@ -285,7 +285,7 @@ Errors to draw in the form: 403 Approver is the requester, or the step-up token 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the release version untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No release version yet. Offers Create release (`createRelease`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status, environment and the release version are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listReleases` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listReleases` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_MANAGE` for `createRelease`, `withdrawRelease`; `PLATFORM_RELEASE_PROMOTE` for `promoteRelease`, `rejectRelease`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A required migration is absent, or a component version does not exist in the registry.; 409 Environment skipped, prior environment unhealthy, or the release has unapplied migrations in the target. (PromotionBlockedProblem); 409 Not in a state that permits this |
 
@@ -323,7 +323,7 @@ releases:
 - `rejectRelease` → `PLATFORM_RELEASE_PROMOTE` (operate) · staff
 - `withdrawRelease` → `PLATFORM_RELEASE_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listReleases` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listReleases` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_MANAGE` for `createRelease`, `withdrawRelease`; `PLATFORM_RELEASE_PROMOTE` for `promoteRelease`, `rejectRelease`.
 
 #### Requirements it meets
 
@@ -373,7 +373,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Releases & Environments · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-023 |
 | Who uses it | ticvai staff holding `PLATFORM_RELEASE_PROMOTE`, `PLATFORM_RELEASE_VIEW` (1 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listReleases` reads the population and `getReleaseReadiness` reads one of them — list, select, act |
@@ -505,7 +505,7 @@ Errors to draw in the form: 403 Approver is the requester, or the step-up token 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the staging promotion approval untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No staging promotion approval yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status, environment and the staging promotion approval are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `getReleaseReadiness` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listReleases` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_PROMOTE` for `promoteRelease`, `rejectRelease`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Environment skipped, prior environment unhealthy, or the release has unapplied migrations in the target. (PromotionBlockedProblem); 409 Not in a state that permits this |
 
@@ -545,7 +545,7 @@ Every release:
 - `listReleases` → `PLATFORM_RELEASE_VIEW` (read) · staff
 - `rejectRelease` → `PLATFORM_RELEASE_PROMOTE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `getReleaseReadiness` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listReleases` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_PROMOTE` for `promoteRelease`, `rejectRelease`.
 
 #### Requirements it meets
 
@@ -600,7 +600,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Releases & Environments · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-024 |
 | Who uses it | ticvai staff holding `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listSupportNotices` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -627,7 +627,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 
 **Form: Publish support notice** (modal, opened by *Publish support notice*; *Publish support notice* calls `publishSupportNotice`, *Cancel* sends nothing)
 
-**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -711,7 +711,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the release notification composer untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No release notification composer yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listSupportNotices` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_MANAGE` for `publishSupportNotice`. |
 | Offline (`?state=offline`) | online only |
 
 #### Edge cases to draw
@@ -738,7 +738,7 @@ Every support notice:
 - `listSupportNotices` → `PLATFORM_RELEASE_VIEW` (read) · staff
 - `listReleases` → `PLATFORM_RELEASE_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_MANAGE` for `publishSupportNotice`.
 
 #### Requirements it meets
 
@@ -786,7 +786,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Releases & Environments · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-025 |
 | Who uses it | ticvai staff holding `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listUpgradeSchedules` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -870,7 +870,7 @@ Errors to draw in the form: 400 Deferral exceeds the maximum permitted window
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the tenant upgrade scheduler untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No tenant upgrade scheduler yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listUpgradeSchedules` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listUpgradeSchedules` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listUpgradeSchedules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_MANAGE` for `scheduleTenantUpgrade`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Deferral exceeds the maximum permitted window |
 
@@ -900,7 +900,7 @@ schedules:
 - `listUpgradeSchedules` → `PLATFORM_RELEASE_VIEW` (read) · staff
 - `scheduleTenantUpgrade` → `PLATFORM_RELEASE_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listUpgradeSchedules` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listUpgradeSchedules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_MANAGE` for `scheduleTenantUpgrade`.
 
 #### Requirements it meets
 
@@ -944,7 +944,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Releases & Environments · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-026 |
 | Who uses it | ticvai staff holding `DEVELOPER_ADMIN`, `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 configure, 2 read, 1 operate) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listSupportNotices` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -977,7 +977,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Publish support notice** (modal, opened by *Publish support notice*; *Publish support notice* calls `publishSupportNotice`, *Cancel* sends nothing)
 
-**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `affectedTenantIds`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `publishSupportNotice` sends before it is called.** Required: `supportEndsAt`. Optional: `message`, `publishedByPrincipalId`, `scopePath`. **Not asked:** `id` is a client UUIDv7 generated silently; `publishedAt` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `affectedTenantIds` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1077,7 +1077,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the end-of-support notice untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No end-of-support notice yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listSupportNotices` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVELOPER_ADMIN` for `deprecateApiVersion` … |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `DEVELOPER_ADMIN`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
@@ -1109,7 +1109,7 @@ Every support notice:
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
-**A refused user sees:** Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listSupportNotices` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVELOPER_ADMIN` for `deprecateApiVersion` …
 
 #### Requirements it meets
 
@@ -1157,7 +1157,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Releases & Environments · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-027 |
 | Who uses it | ticvai staff holding `PLATFORM_MIGRATION_APPLY`, `PLATFORM_MIGRATION_VIEW` (1 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listMigrations` reads the population and `getVersionSkew` reads one of them — list, select, act |
@@ -1235,11 +1235,8 @@ Errors to draw in the form: 409 A migration in this run is irreversible (Irrever
 |---|---|---|
 | Module | text | — |
 | Description | text | — |
-| Is reversible | yes / no (icon or chip) | A rollback section exists and CI has executed it against a restored snapshot. A rollback nobody has run is a comment, not a rollback. |
 | Rollback tested at | 1 Oct 2026, 14:30 | — |
 | Checksum | text | Compared on apply. A migration edited after it was applied somewhere is a defect the register catches, not a mystery to debug later. |
-| Estimated lock ms | 1,234 | — |
-| Touches partitioned table | yes / no (icon or chip) | — |
 | Applied cell count | 1,234 | — |
 | Pending cell count | 1,234 | — |
 
@@ -1261,22 +1258,14 @@ Errors to draw in the form: 409 A migration in this run is irreversible (Irrever
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Plan | the name it points at, never the id | — |
 | Status | chip: Queued, Canary, Running, Paused, Complete, Failed… | — |
-| Canary cell | the name it points at, never the id | Which region the canary tenant is in. The canary itself is a tenant — a first cell holding two hundred databases is not a cheap failure … |
-| Canary tenant | the name it points at, never the id | — |
 | Tenants total | 1,234 | — |
 | Tenants complete | 1,234 | — |
 | Tenants failed | 1,234 | — |
 | Cells total | 1,234 | — |
-| Cells complete | 1,234 | — |
-| Cells failed | 1,234 | — |
-| Started by principal | the name it points at, never the id | — |
 | Started at | 1 Oct 2026, 14:30 | — |
 | Completed at | 1 Oct 2026, 14:30 | — |
 | Cells | list or chips (count when long) | — |
-| Tenants | list or chips (count when long) | — |
 
 **The version skew report** (detail panel, from `getVersionSkew`)
 
@@ -1314,7 +1303,7 @@ Errors to draw in the form: 409 A migration in this run is irreversible (Irrever
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the database migration console untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No database migration console yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on appliedTo, pendingOnly and the database migration console are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_MIGRATION_VIEW`, which `listMigrations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_MIGRATION_VIEW`, which `listMigrations` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_MIGRATION_APPLY` for `applyMigration`, `rollbackMigrationRun`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Target version unknown, or the path between versions is not contiguous; 409 A migration in this run is irreversible (IrreversibleProblem); 409 The plan is stale — cell state changed since it was computed. Re-plan and review before applying. |
 
@@ -1347,7 +1336,7 @@ migrations:
 - `getMigrationRun` → `PLATFORM_MIGRATION_VIEW` (read) · staff
 - `rollbackMigrationRun` → `PLATFORM_MIGRATION_APPLY` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `PLATFORM_MIGRATION_VIEW`, which `listMigrations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_MIGRATION_VIEW`, which `listMigrations` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_MIGRATION_APPLY` for `applyMigration`, `rollbackMigrationRun`.
 
 #### Requirements it meets
 
@@ -1374,7 +1363,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (14), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (37 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-027?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Plan migration, Apply migration, Rollback migration run.
 - [ ] Every transition is wired: `ADM-023`, `ADM-001`, `ADM-002`.
@@ -1393,7 +1382,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Releases & Environments · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-028 |
 | Who uses it | ticvai staff holding `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listEnvironments` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1476,7 +1465,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the environment registry untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No environment registry yet. Offers Register environment (`registerEnvironment`). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listEnvironments` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listEnvironments` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listEnvironments` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_MANAGE` for `registerEnvironment`. |
 | Offline (`?state=offline`) | online only |
 
 #### Edge cases to draw
@@ -1505,7 +1494,7 @@ Every environment:
 - `listEnvironments` → `PLATFORM_RELEASE_VIEW` (read) · staff
 - `registerEnvironment` → `PLATFORM_RELEASE_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listEnvironments` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_RELEASE_VIEW`, which `listEnvironments` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_MANAGE` for `registerEnvironment`.
 
 #### Requirements it meets
 
@@ -1547,7 +1536,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Releases & Environments · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-700 |
 | Who uses it | ticvai staff holding `PLATFORM_MIGRATION_APPLY`, `PLATFORM_RELEASE_MANAGE`, `PLATFORM_RELEASE_VIEW` (1 operate, 1 configure, 1 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | statusTracker (compact density): One package moving through export, diff, approval and apply; each step shows its result before the next. |

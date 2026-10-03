@@ -7,45 +7,39 @@
  "audience": "guest",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-02",
+ "generated": "2026-10-03",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 50,
-  "operations": 211,
+  "operations": 210,
   "contracts": 19,
   "modules": 14,
   "undrawn": 0,
-  "operationsWithNoScreen": 17
+  "operationsWithNoScreen": 18
  },
  "waves": {
-  "wave1": 22,
-  "wave2": 21,
-  "wave3": 7
+  "wave1": 50
  },
  "modules": [
   {
    "module": "Booking & Selection",
    "screens": 7,
    "waves": [
-    1,
-    2,
-    3
+    1
    ]
   },
   {
    "module": "Engagement & Support",
    "screens": 6,
    "waves": [
-    1,
-    2,
-    3
+    1
    ]
   },
   {
    "module": "In-venue Services",
    "screens": 6,
    "waves": [
-    2
+    1
    ]
   },
   {
@@ -73,38 +67,35 @@
    "module": "Membership, Loyalty & Value",
    "screens": 5,
    "waves": [
-    2,
-    3
+    1
    ]
   },
   {
    "module": "Ticketing",
    "screens": 3,
    "waves": [
-    1,
-    2
+    1
    ]
   },
   {
    "module": "Retail",
    "screens": 2,
    "waves": [
-    2
+    1
    ]
   },
   {
    "module": "Support",
    "screens": 2,
    "waves": [
-    2,
-    3
+    1
    ]
   },
   {
    "module": "High-Demand Access",
    "screens": 1,
    "waves": [
-    2
+    1
    ]
   },
   {
@@ -118,14 +109,14 @@
    "module": "Promotions",
    "screens": 1,
    "waves": [
-    2
+    1
    ]
   },
   {
    "module": "Transport",
    "screens": 1,
    "waves": [
-    3
+    1
    ]
   }
  ],
@@ -159,11 +150,11 @@
    "operations": 9
   },
   {
-   "contract": "white-label",
-   "operations": 9
+   "contract": "wallet",
+   "operations": 8
   },
   {
-   "contract": "wallet",
+   "contract": "white-label",
    "operations": 8
   },
   {
@@ -183,11 +174,11 @@
    "operations": 6
   },
   {
-   "contract": "queue",
+   "contract": "promotions",
    "operations": 5
   },
   {
-   "contract": "promotions",
+   "contract": "queue",
    "operations": 5
   },
   {
@@ -214,7 +205,7 @@
    "module": "Discovery & Browse",
    "wave": 1,
    "route": "/discovery-and-browse/home-landing",
-   "operations": 10,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -266,7 +257,7 @@
    "id": "WEB-007",
    "name": "Interactive Seat Selection",
    "module": "Booking & Selection",
-   "wave": 2,
+   "wave": 1,
    "route": "/booking-and-selection/seat-map-selection",
    "operations": 6,
    "drawn": true
@@ -275,7 +266,7 @@
    "id": "WEB-008",
    "name": "Add-ons & Upsell",
    "module": "Booking & Selection",
-   "wave": 2,
+   "wave": 1,
    "route": "/booking-and-selection/add-ons-and-upsell",
    "operations": 5,
    "drawn": true
@@ -284,7 +275,7 @@
    "id": "WEB-009",
    "name": "Wishlist",
    "module": "Booking & Selection",
-   "wave": 3,
+   "wave": 1,
    "route": "/booking-and-selection/wishlist",
    "operations": 3,
    "drawn": true
@@ -338,7 +329,7 @@
    "id": "WEB-015",
    "name": "Branded Queue / Waiting Room",
    "module": "High-Demand Access",
-   "wave": 2,
+   "wave": 1,
    "route": "/high-demand-access/virtual-waiting-room",
    "operations": 2,
    "drawn": true
@@ -392,7 +383,7 @@
    "id": "WEB-021",
    "name": "Wallet & Gift Cards",
    "module": "Membership, Loyalty & Value",
-   "wave": 2,
+   "wave": 1,
    "route": "/membership-loyalty-and-value/wallet-and-gift-cards",
    "operations": 11,
    "drawn": true
@@ -401,7 +392,7 @@
    "id": "WEB-022",
    "name": "Membership Plans",
    "module": "Membership, Loyalty & Value",
-   "wave": 2,
+   "wave": 1,
    "route": "/membership-loyalty-and-value/membership-plans",
    "operations": 3,
    "drawn": true
@@ -410,7 +401,7 @@
    "id": "WEB-023",
    "name": "Membership Management",
    "module": "Membership, Loyalty & Value",
-   "wave": 2,
+   "wave": 1,
    "route": "/membership-loyalty-and-value/membership-management",
    "operations": 7,
    "drawn": true
@@ -419,8 +410,8 @@
    "id": "WEB-024",
    "name": "Devices, Wishlist & Consent",
    "module": "Membership, Loyalty & Value",
-   "wave": 3,
-   "route": "/membership-loyalty-and-value/loyalty-and-rewards",
+   "wave": 1,
+   "route": "/membership-loyalty-and-value/devices-wishlist-consent",
    "operations": 20,
    "drawn": true
   },
@@ -437,7 +428,7 @@
    "id": "WEB-026",
    "name": "Survey & Feedback",
    "module": "Engagement & Support",
-   "wave": 3,
+   "wave": 1,
    "route": "/engagement-and-support/survey-and-feedback",
    "operations": 5,
    "drawn": true
@@ -446,7 +437,7 @@
    "id": "WEB-027",
    "name": "Newsletter Subscription",
    "module": "Engagement & Support",
-   "wave": 2,
+   "wave": 1,
    "route": "/engagement-and-support/newsletter-subscription",
    "operations": 5,
    "drawn": true
@@ -482,7 +473,7 @@
    "id": "WEB-031",
    "name": "My Reservations",
    "module": "Ticketing",
-   "wave": 2,
+   "wave": 1,
    "route": "/my-reservations",
    "operations": 9,
    "drawn": true
@@ -491,7 +482,7 @@
    "id": "WEB-032",
    "name": "Offers & Promotions",
    "module": "Promotions",
-   "wave": 2,
+   "wave": 1,
    "route": "/offers-promotions",
    "operations": 2,
    "drawn": true
@@ -500,7 +491,7 @@
    "id": "WEB-033",
    "name": "Shop",
    "module": "Retail",
-   "wave": 2,
+   "wave": 1,
    "route": "/shop",
    "operations": 5,
    "drawn": true
@@ -509,7 +500,7 @@
    "id": "WEB-034",
    "name": "Lost & Found",
    "module": "Support",
-   "wave": 3,
+   "wave": 1,
    "route": "/lost-found",
    "operations": 4,
    "drawn": true
@@ -527,7 +518,7 @@
    "id": "WEB-036",
    "name": "F&B \u2013 Browse & Order",
    "module": "In-venue Services",
-   "wave": 2,
+   "wave": 1,
    "route": "/fandb--browse-and-order",
    "operations": 13,
    "drawn": true
@@ -536,7 +527,7 @@
    "id": "WEB-037",
    "name": "Menu Item Detail",
    "module": "In-venue Services",
-   "wave": 2,
+   "wave": 1,
    "route": "/menu-item-detail",
    "operations": 1,
    "drawn": true
@@ -545,7 +536,7 @@
    "id": "WEB-038",
    "name": "F&B \u2013 Order Tracking",
    "module": "In-venue Services",
-   "wave": 2,
+   "wave": 1,
    "route": "/fandb--order-tracking",
    "operations": 2,
    "drawn": true
@@ -554,7 +545,7 @@
    "id": "WEB-039",
    "name": "Venue Map & Wait Times",
    "module": "In-venue Services",
-   "wave": 2,
+   "wave": 1,
    "route": "/venue-map-and-wait-times",
    "operations": 4,
    "drawn": true
@@ -563,7 +554,7 @@
    "id": "WEB-040",
    "name": "Virtual Queue",
    "module": "In-venue Services",
-   "wave": 2,
+   "wave": 1,
    "route": "/virtual-queue",
    "operations": 4,
    "drawn": true
@@ -572,7 +563,7 @@
    "id": "WEB-041",
    "name": "Parking \u2013 Reserve & Pay",
    "module": "In-venue Services",
-   "wave": 2,
+   "wave": 1,
    "route": "/parking--reserve-and-pay",
    "operations": 3,
    "drawn": true
@@ -581,7 +572,7 @@
    "id": "WEB-042",
    "name": "Retail & Shop and Drop",
    "module": "Retail",
-   "wave": 2,
+   "wave": 1,
    "route": "/retail-and-shop-and-drop",
    "operations": 3,
    "drawn": true
@@ -590,7 +581,7 @@
    "id": "WEB-043",
    "name": "Loyalty & Rewards",
    "module": "Membership, Loyalty & Value",
-   "wave": 2,
+   "wave": 1,
    "route": "/loyalty-and-rewards",
    "operations": 11,
    "drawn": true
@@ -599,7 +590,7 @@
    "id": "WEB-044",
    "name": "AI Concierge \u2013 Home",
    "module": "Engagement & Support",
-   "wave": 2,
+   "wave": 1,
    "route": "/ai-concierge",
    "operations": 8,
    "drawn": true
@@ -608,7 +599,7 @@
    "id": "WEB-045",
    "name": "Help Centre & Accessibility",
    "module": "Support",
-   "wave": 2,
+   "wave": 1,
    "route": "/help-centre-and-accessibility",
    "operations": 4,
    "drawn": true
@@ -617,7 +608,7 @@
    "id": "WEB-046",
    "name": "In-Venue Notifications",
    "module": "Engagement & Support",
-   "wave": 2,
+   "wave": 1,
    "route": "/in-venue-notifications",
    "operations": 2,
    "drawn": true
@@ -626,7 +617,7 @@
    "id": "WEB-047",
    "name": "Map Booking \u2014 Cabanas & Spots",
    "module": "Booking & Selection",
-   "wave": 3,
+   "wave": 1,
    "route": "/booking-and-selection/map-booking",
    "operations": 8,
    "drawn": true
@@ -635,7 +626,7 @@
    "id": "WEB-048",
    "name": "Book a Space by the Hour",
    "module": "Booking & Selection",
-   "wave": 3,
+   "wave": 1,
    "route": "/booking-and-selection/space-by-the-hour",
    "operations": 4,
    "drawn": true
@@ -644,7 +635,7 @@
    "id": "WEB-049",
    "name": "Transport \u2014 Route & Schedule",
    "module": "Transport",
-   "wave": 3,
+   "wave": 1,
    "route": "/transport/route-and-schedule",
    "operations": 13,
    "drawn": true
@@ -728,6 +719,12 @@
     "summary": "Use the existing profile or keep this booking separate"
    },
    {
+    "operation": "getGuestConversation",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "The guest's own handed-over conversation, with the agent's replies and the queue position"
+   },
+   {
     "operation": "uploadGuestDocument",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -764,45 +761,7 @@
     "summary": "The caller's own queue entries"
    }
   ],
-  "modulesSplitAcrossWaves": [
-   {
-    "module": "Booking & Selection",
-    "waves": [
-     1,
-     2,
-     3
-    ]
-   },
-   {
-    "module": "Engagement & Support",
-    "waves": [
-     1,
-     2,
-     3
-    ]
-   },
-   {
-    "module": "Membership, Loyalty & Value",
-    "waves": [
-     2,
-     3
-    ]
-   },
-   {
-    "module": "Support",
-    "waves": [
-     2,
-     3
-    ]
-   },
-   {
-    "module": "Ticketing",
-    "waves": [
-     1,
-     2
-    ]
-   }
-  ],
+  "modulesSplitAcrossWaves": [],
   "screensNotDrawn": [],
   "flowsNamingAMissingScreen": []
  }

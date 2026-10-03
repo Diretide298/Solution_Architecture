@@ -11,8 +11,8 @@ scale: Analytical. Runs against the replica and the analytical store.
 ifDown: Down stops dashboards. **Nothing operational depends on it.**
 coverage:
   operations: 51
-  inAFlow: 17
-  percent: 33%
+  inAFlow: 18
+  percent: 35%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -802,6 +802,7 @@ flows:
 - F106 A security dashboard surfaces something and it is investigated
 - F107 A report is defined, scheduled and delivered
 - F20 A manager asks a question and gets an answer
+- 'F303 TICVAI Finance Backend Structure Reference v1.0 board 1: Finance Dashboard'
 - F33 A till goes offline and comes back
 - F74 A shift closes and the day is reported
 - F77 A promotion is built, bundled, published and measured

@@ -252,7 +252,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - → `BO-100` Venue Home: *Back to Venue Home*
 - → `BO-1124` Gift Card Product Configuration: *Gift Card Product Configuration*
-- → `BO-1125` Gift Card Issuance, Activation & Distribution: *Gift Card Issuance, Activation & Distribution*
+- → `BO-1125` Gift Card Issuance, Activation & Distribution: *Gift Card Issuance, Activation & Distribution*; carries `cardCode`
 - → `BO-1126` Voucher & Coupon Type Configuration: *Voucher & Coupon Type Configuration*
 - → `BO-1127` Voucher Eligibility & Redemption Rule Studio: *Voucher Eligibility & Redemption Rule Studio*
 - → `BO-1128` Membership Benefits & Entitlement Mapping: *Membership Benefits & Entitlement Mapping*
@@ -337,6 +337,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - … and 1 more flow steps (`flows/`)
 - Flow F297 branch at step 1 (expected): when Nothing has been set up on Gift Card & Digital Benefit Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F297 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -686,6 +687,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - Client workshop board: `wireframes/WS190 Wallet Configuration Backend Structure v1.0 Board 5.dc.html#bo-1125`
 - Workshop pack: Wallet_Configuration_Backend_Structure_v1.0.pdf board 5
 - Flow F297 *Wallet Configuration Backend Structure v1.0 board 5: Gift Card & Digital …*, step 4: Works in Gift Card Issuance, Activation & Distribution → Configure how gift cards are created, sold, activated and delivered. Issuance Sources B2C Website Mobile App POS Kiosk Customer Service Corporate Portal B2B/Reseller Campaign Administrative issuance …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 

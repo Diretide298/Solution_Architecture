@@ -42,7 +42,7 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: ReportingService
-  operationCalls: 122
+  operationCalls: 123
 - service: AiService
   operationCalls: 40
 - service: TenancyService
@@ -61,7 +61,7 @@ servicesCalled:
   operationCalls: 1
 coverage:
   screens: 71
-  inAFlow: 64
+  inAFlow: 65
   drawn: 71
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
@@ -701,9 +701,10 @@ screens:
   name: Drag-and-Drop Dashboard Canvas
   module: Analytics
   requiresModule: analytics
-  wave: 3
+  wave: 1
   density: compact
   operations:
+  - createDashboard
   - deleteDashboard
   - getDashboard
   - getReport
@@ -719,6 +720,7 @@ screens:
   offlineState: false
   entryParams:
   - dashboardId<-navigation
+  - reportId<-navigation
   goesTo:
   - ANL-021
   boardFrames: null
@@ -751,7 +753,7 @@ screens:
   name: KPI Builder
   module: Analytics
   requiresModule: analytics
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - createKpi
@@ -1289,7 +1291,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - policyId<-navigation
   goesTo:
   - ANL-041
   boardFrames: null
@@ -1749,7 +1752,7 @@ screens:
   name: Semantic Model & Business Data Catalogue
   module: Analytics
   requiresModule: analytics
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - getSemanticModel
@@ -1917,4 +1920,5 @@ screens:
   - ANL-021
   boardFrames: null
   wireframe: wireframes/P16 Venue Analytics.dc.html#anl-072
-  inFlows: null
+  inFlows:
+  - 'F303 TICVAI Finance Backend Structure Reference v1.0 board 1: Finance Dashboard'

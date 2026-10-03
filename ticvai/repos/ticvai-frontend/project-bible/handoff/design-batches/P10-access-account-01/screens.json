@@ -4,7 +4,7 @@
   "name": "Partner Login / MFA",
   "module": "Access & Account",
   "requiresModule": "partner",
-  "wave": 2,
+  "wave": 1,
   "capability": "C35",
   "implementation": {
    "app": "partner-web",
@@ -125,7 +125,7 @@
     {
      "to": "PTR-019",
      "trigger": "API Credentials & Integration",
-     "provenance": "derived — PTR-019 declares entryState.params clientId and PTR-001 holds none of them. The edge carries nothing: PTR-019 finds clientId (listApiClients) itself, and PTR-019 opens on its own"
+     "provenance": "derived — PTR-019 declares entryState.params clientId and PTR-001 holds none of them. The edge carries nothing: clientId only pre-selects (deep link or optional), and PTR-019 opens on its own"
     },
     {
      "to": "PTR-020",
@@ -543,13 +543,11 @@
        "label": "The selected principal",
        "bindsTo": "Principal",
        "columns": [
-        "Principal.id",
         "Principal.username",
         "Principal.displayName",
         "Principal.isActive",
         "Principal.validFrom",
         "Principal.validTo",
-        "Principal.primaryRoleId",
         "Principal.roles",
         "Principal.lastLoginAt"
        ],
@@ -638,7 +636,7 @@
    "provenance": "generated",
    "board": "wireframes/P10 Partner Web.dc.html#ptr-003"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreatePrincipal",
@@ -795,7 +793,7 @@
    "loading": "The notifications, read by `getMessageStatus`.",
    "error": "Could not load. Names which read failed and leaves the notifications untouched.",
    "emptyFirstRun": "No notifications yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `getMessageStatus` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `GUEST_VIEW`, which `getMessageStatus` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_SEND` for `sendTransactionalMessage`."
   },
   "apis": [
    {
@@ -815,7 +813,9 @@
    "params": [
     {
      "name": "messageId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `sendTransactionalMessage`; a link or an edge that holds one opens it instead."
     }
    ],
    "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `messageId`."
@@ -825,7 +825,7 @@
    "provenance": "generated",
    "board": "wireframes/P10 Partner Web.dc.html#ptr-004"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSendTransactionalMessage",
@@ -1086,7 +1086,7 @@
    "error": "Could not load",
    "emptyFirstRun": "Not found — it may have been deleted or moved out of scope",
    "emptyNoResults": "Never shown: `listApiClients` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `DEVELOPER_VIEW`, which `listApiClients` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `DEVELOPER_VIEW`, which `listApiScopes` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVELOPER_MANAGE` for `requestProductionAccess`, `createApiClient`, `rotateApiCredential`, `revokeApiCredential`."
   },
   "apis": [
    {
@@ -1148,7 +1148,9 @@
    "params": [
     {
      "name": "clientId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listApiClients` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**Rotation and revocation act on one client**, which arrives from the row the partner chose. Opened cold the screen lists clients rather than offering an action with no subject — revoking the wrong key is not recoverable by the person who did it.",
@@ -1165,7 +1167,7 @@
    "provenance": "generated",
    "board": "wireframes/P10 Partner Web.dc.html#ptr-019"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -1278,21 +1280,14 @@
        "label": "The selected delegated access",
        "bindsTo": "DelegatedAccess",
        "columns": [
-        "DelegatedAccess.id",
-        "DelegatedAccess.principalId",
-        "DelegatedAccess.roleId",
         "DelegatedAccess.permission",
-        "DelegatedAccess.subjectId",
-        "DelegatedAccess.overSubjectId",
         "DelegatedAccess.overObjectRef",
         "DelegatedAccess.delegationKind",
         "DelegatedAccess.quota",
         "DelegatedAccess.isRevocableBySubject",
-        "DelegatedAccess.scopePath",
         "DelegatedAccess.effect",
         "DelegatedAccess.validFrom",
-        "DelegatedAccess.validTo",
-        "DelegatedAccess.createdByPrincipalId"
+        "DelegatedAccess.validTo"
        ],
        "operation": "listDelegatedAccess",
        "provenance": "contract identity.yaml GET /delegated-access"
@@ -1357,7 +1352,7 @@
    "error": "Could not load. Names which read failed and leaves the sub-agent untouched.",
    "emptyFirstRun": "No sub-agent yet. Offers Create delegated access (`createDelegatedAccess`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on principalId, roleId and the sub-agent are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PERMISSION_VIEW`, which `listDelegatedAccess` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PERMISSION_VIEW`, which `listDelegatedAccess` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PERMISSION_GRANT` for `createDelegatedAccess`, `deleteDelegatedAccess`."
   },
   "apis": [
    {
@@ -1386,7 +1381,9 @@
    "params": [
     {
      "name": "delegatedAccessId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listDelegatedAccess` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `delegatedAccessId`.",
@@ -1403,7 +1400,7 @@
    "provenance": "generated",
    "board": "wireframes/P10 Partner Web.dc.html#ptr-020"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose (\"Add sub-agent management for this venue\") was the generic template; sub-agents belong to the partner, not a venue (design-notes correction platform-foundation PTR-020).",
   "_platform": {
    "code": "P10",

@@ -102,7 +102,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-020` | F&B Order Management | B–D | 25 | 25 | 6 | 15 | 0 | 1 | — | notStarted (generated) |
 | `BO-021` | Order Search | B–D | 5 | 40 | 5 | 1 | 0 | 0 | — | notStarted (generated) |
 | `BO-045` | Menu Management | A | 68 | 75 | 6 | 15 | 3 | 2 | — | notStarted (generated) |
-| `BO-046` | Kitchen Display | B–D | 8 | 27 | 6 | 7 | 0 | 3 | — | notStarted (generated) |
+| `BO-046` | Kitchen Display | B–D | 8 | 14 | 6 | 7 | 0 | 3 | — | notStarted (generated) |
 | `BO-104` | Food & Beverage | B–D | 1 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-134` | Kitchen & Preparation Stations | B–D | 15 | 16 | 6 | 1 | 1 | 6 | — | notStarted (generated) |
 | `BO-135` | Order Routing & KDS/Printer Rules | B–D | 7 | 7 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
@@ -132,7 +132,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Pattern | listDetail (compact density): `listFnbOrders` reads the population and `getFnbOrder` reads one of them — list, select, act |
 | Offline | online only |
 | Opens with | `venueId` (session), `orderId` (deepLink), `ticketId` (deepLink) · cold entry: An order opened from a list or a link. A kitchen ticket opened from the rail. |
-| Route | `/fnb/bo-020` |
+| Route | `/fnb/fnb-order-management` |
 
 **What the spec says about it.** Restored 20 August when the P15 build was rolled back. **Named `Timed Entry Rules` and carrying eleven F&B order operations.** Timed entry is an admission profile; this is the order desk. The client board calls it *Active Order Management & Fulfilment Journey*. **Purpose corrected 24 August.** The screen was renamed *F&B Order Management* and its purpose still read *"Control how early and how late a ticket admits"* — **timed entry, on a screen whose every operation is `fnb`.** A rename that moves the label and leaves the sentence is worse than no rename: the name is what a reader scans and the purpose is what they trust.
 
@@ -472,7 +472,7 @@ Also apply: 2 for P08 · Food & Beverage, 24 for all of P08, 29 for every app (s
 | Pattern | statusTracker (compact density): `getGuestOrderStatus` reads one record and nothing reads a population — the screen is about that one thing |
 | Offline | online only |
 | Opens with | `venueId` (session), `orderId` (deepLink) · cold entry: An order opened from a list or a link. |
-| Route | `/fnb/bo-021` |
+| Route | `/fnb/order-search` |
 
 **What the spec says about it.** Restored 20 August when the P15 build was rolled back. **Board frame RET-3A removed 2 October 2026** (CHG-SBO-008): Retail Board 3 RET-3A is the Retail Sales & POS Command Center, a cross-store dashboard, not this order search; the designer must not draw it here.
 
@@ -598,7 +598,7 @@ Errors to draw in the form: 409 Order is not ready, or already closed; 422 The o
 | Loading (`?state=loading`) | The order search, read by `listFnbOrders`. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the order search untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No order search yet. Offers Record order handover (`recordOrderHandover`). |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_MODIFY`, which `recordOrderHandover` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listFnbOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `recordOrderHandover`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 None of the three identifiers was sent; 409 Order is not ready, or already closed; 422 The outcome does not close this order's service mode, or a delivery names no location (audit R125 (1)). |
 
@@ -641,7 +641,7 @@ handover:
 - `listFnbOrders` → `ORDER_VIEW` (read) · staff
 - `lookupRetailSale` → `ORDER_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `ORDER_MODIFY`, which `recordOrderHandover` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listFnbOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `recordOrderHandover`.
 
 #### Requirements it meets
 
@@ -692,13 +692,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Food & Beverage · wave 1 · needs the `fnb` module |
-| Block | Block A · ticket #20699 (APP-SETUP-BO-045) |
+| Block | Block A · task APP-SETUP-BO-045 |
 | Who uses it | venue staff holding `APPROVAL_REQUEST`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `SCOPE_VIEW` (1 operate, 1 configure, 2 read); in the flows as supervisor, venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listMenus` reads the population and `getMenu` reads one of them — list, select, act |
 | Offline | online only |
 | Opens with | `venueId` (session), `menuId` (deepLink), `menuItemId` (deepLink) · cold entry: A menu opened from the list. An item opened from the menu. **Allergen verification is per item** — a menu-wide check is a job, not a screen. |
-| Route | `/fnb/bo-045` |
+| Route | `/fnb/menu-management` |
 
 **What the spec says about it.** Restored 20 August when the P15 build was rolled back. **Operations from the 24 August F&B build wired here** — the contract grew and the screens had not caught up, which is how 92 operations reached 49% of screens. **BO-045 is the menu home; BO-109 is its arranging canvas (2 October 2026, CHG-SBO-008; Chinmay: duplicate screens merged as proposed).** Menu list, versions, publish, schedule, rollback, modifiers, bulk changes and allergen verdicts live here (frames fnb-2a, 2e, 2j, 2k); "Open in builder" opens BO-109 on the picked menu, which has no menu list of its own. **F&B owns its prices (decided 2 October 2026 by Chinmay, DEC-034; CHG-CSA-009):** `MenuItem.price` is F&B's own catalogue price, set per outlet, so ticketing scales on its own; the central catalogue prices tickets and single-price booths only. This screen reads F&B's catalogue, never the central one.
 
@@ -850,7 +850,7 @@ Errors to draw in the form: 409 A schedule already exists for that date. Names i
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
 | ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `createApprovalRequest` body |
-| Kind `kind` | select | required | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; Each is an existing kind … | — | 11.1.7 and 11.1.30–11.1.37. The first four already exist as bespoke implementations and this contract is what they collapse into. | `createApprovalRequest` body |
+| Kind `kind` | select | required | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; - Publishing white-label … | — | 11.1.7 and 11.1.30–11.1.37. The first four already exist as bespoke implementations and this contract is what they collapse into. | `createApprovalRequest` body |
 | Subject contract `subjectContract` | text field | required | — | — | — | Which contract owns the thing being approved. | `createApprovalRequest` body |
 | Subject type `subjectType` | text field | required | — | — | — | — | `createApprovalRequest` body |
 | Subject `subjectId` | text field | required | — | — | — | A reference, never a copy. A copy goes stale between raising and deciding, and an approver reading a stale copy approves something that no longer exists. | `createApprovalRequest` body |
@@ -1043,7 +1043,7 @@ Errors to draw in the form: 409 An open request already exists for this subject.
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the menu untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No menu yet. Offers Create menu (`createMenu`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on outletId, activeAt and the menu are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listMenus` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listMenus` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_REQUEST` for `createApprovalRequest`; `PRODUCT_CONFIGURE` for … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Constraints are unsatisfiable — minimum exceeds available options. Told apart from the shared validation 400 by `refusedReason`.; 400 Validation failed; 409 A schedule already exists for that date. Names it in `existingScheduleId`.; 409 An open request already exists for this subject. Two approvals for one refund is how a refund gets paid twice. (ApprovalStateProblem) |
 
@@ -1126,7 +1126,7 @@ modifierGroup:
 - `createApprovalRequest` → `APPROVAL_REQUEST` (operate) · staff
 - `listOutlets` → `SCOPE_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listMenus` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listMenus` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_REQUEST` for `createApprovalRequest`; `PRODUCT_CONFIGURE` for …
 
 #### Requirements it meets
 
@@ -1209,7 +1209,7 @@ Also apply: 2 for P08 · Food & Beverage, 24 for all of P08, 29 for every app (s
 | Pattern | listDetail (compact density): `listKitchenTickets` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
 | Offline | online only |
 | Opens with | `venueId` (session), `ticketId` (deepLink) · cold entry: A kitchen ticket opened from the rail. |
-| Route | `/fnb/bo-046` |
+| Route | `/fnb/kitchen-display` |
 
 **What the spec says about it.** Restored 20 August when the P15 build was rolled back. **Retained in P08 on 20 August when the P15 build was rolled back**, and P15 now owns the kitchen display for the venue floor. **This is the back-office view of the same tickets** — a manager watching the pass from a desk, not a screen at the pass.
 
@@ -1284,36 +1284,23 @@ Errors to draw in the form: 409 The move is not one of the four above. Names the
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | The F&B order the ticket was created from on acceptance (`FnbOrder.id`). |
 | Order number | text | — |
-| Outlet | the name it points at, never the id | — |
 | Table label | text | — |
 | Service mode | chip: Quick service, Table service, Room service, Collection, Delivery | — |
-| Coursing | chip: Fire and forget, Hold and fire, Phased, Timed, Delayed | BL-131. Starters before mains is the entire job of a kitchen pass, and the model fired everything at once. |
 | Buzzer code | text | BL-128. The pager number handed to a guest at a counter. |
 | Status | chip: Received, Preparing, Ready, Served, Recalled, Cancelled | — |
 | Priority | 1,234 | Higher fires sooner. Raised by Fast Pass or supervisor override. |
-| Prioritised by principal | the name it points at, never the id | — |
-| Prioritise reason | text | — |
 
 **The selected kitchen ticket** (detail panel, from `listKitchenTickets`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | The F&B order the ticket was created from on acceptance (`FnbOrder.id`). |
 | Order number | text | — |
-| Outlet | the name it points at, never the id | — |
 | Table label | text | — |
 | Service mode | chip: Quick service, Table service, Room service, Collection, Delivery | — |
-| Coursing | chip: Fire and forget, Hold and fire, Phased, Timed, Delayed | BL-131. Starters before mains is the entire job of a kitchen pass, and the model fired everything at once. |
 | Buzzer code | text | BL-128. The pager number handed to a guest at a counter. |
 | Status | chip: Received, Preparing, Ready, Served, Recalled, Cancelled | — |
 | Priority | 1,234 | Higher fires sooner. Raised by Fast Pass or supervisor override. |
-| Prioritised by principal | the name it points at, never the id | — |
-| Prioritise reason | text | — |
-| Lines | list or chips (count when long) | — |
 | Target ready at | 1 Oct 2026, 14:30 | — |
 | Elapsed seconds | 1,234 | — |
 
@@ -1350,7 +1337,7 @@ Errors to draw in the form: 409 The move is not one of the four above. Names the
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the kitchen display untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No kitchen display yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on stationId, status and the kitchen display are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listKitchenTickets` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listKitchenTickets` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `setKitchenTicketStatus`, `prioritiseKitchenTicket`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The move is not one of the four above. Names the ticket's current status. |
 
@@ -1404,7 +1391,7 @@ tickets:
 - `setKitchenTicketStatus` → `ORDER_MODIFY` (operate) · staff
 - `prioritiseKitchenTicket` → `ORDER_MODIFY` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listKitchenTickets` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listKitchenTickets` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `setKitchenTicketStatus`, `prioritiseKitchenTicket`.
 
 #### Requirements it meets
 
@@ -1439,7 +1426,7 @@ Also apply: 2 for P08 · Food & Beverage, 24 for all of P08, 29 for every app (s
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (8), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-046?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save kitchen ticket status, Prioritise kitchen ticket.
 - [ ] Every transition is wired: `BO-104`.
@@ -1461,7 +1448,7 @@ Also apply: 2 for P08 · Food & Beverage, 24 for all of P08, 29 for every app (s
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Food & Beverage · wave 1 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `REPORT_VIEW_OWN`, `REPORT_VIEW_VENUE` (1 ?, 1 operate) |
+| Who uses it | venue staff holding `REPORT_VIEW_OWN`, `REPORT_VIEW_VENUE` (2 operate) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listMenus` reads the population and `getVenueSettings` reads one of them — list, select, act |
 | Offline | online only |
@@ -1608,7 +1595,7 @@ cards:
 #### Permissions
 
 - `getKpiValues` → `REPORT_VIEW_VENUE` (operate) · staff
-- `getServiceSummary` → `REPORT_VIEW_OWN` (tier not set) · staff
+- `getServiceSummary` → `REPORT_VIEW_OWN` (operate) · staff
 
 **A refused user sees:** You do not have permission for food & beverage. **Said plainly** — an empty section reads as broken.
 
@@ -1798,7 +1785,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the kitchen preparation stations untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No kitchen preparation stations yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on outletId and the kitchen preparation stations are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listKitchenStations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listKitchenStations` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setKitchenStations`, `setKitchenSla`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A workstation is assigned to more than one station (`displayWorkstationIds`, audit R277), or the body fails validation.; 409 The plan is not released yet (`plan-not-released`); a draft plan prints only to the browser. |
 
@@ -1867,7 +1854,7 @@ weights:
 - `listOutlets` → `SCOPE_VIEW` (read) · staff
 - `printPrepSheet` → `PRODUCT_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listKitchenStations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listKitchenStations` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setKitchenStations`, `setKitchenSla`.
 
 #### Requirements it meets
 
@@ -2108,13 +2095,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Food & Beverage · wave 2 · needs the `fnb` module |
-| Block | Block A · ticket #20702 (APP-SETUP-BO-136) |
+| Module | Food & Beverage · wave 1 · needs the `fnb` module |
+| Block | Block A · task APP-SETUP-BO-136 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `TENANT_CONFIGURE`, `TENANT_VIEW` (2 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listProductionRuns` reads the population and `getVenueSettings` reads one of them — list, select, act |
 | Offline | online only |
-| Opens with | `venueId` (session), `outletId` (navigation) · cold entry: Resolves from the session. A principal with more than one venue is asked which first. A plan opened from the list. |
+| Opens with | `venueId` (session), `outletId` (session) · cold entry: Resolves from the session. A principal with more than one venue is asked which first. A plan opened from the list. |
 | Route | `/food-beverage/f-b-global-settings-controls` |
 
 **What the spec says about it.** **Added 20 August from the client design board.** The operations existed and no screen called them. **Named in the board contents and not written up in it** — the operations are real, the layout is not.
@@ -2259,7 +2246,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the global settings controls untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No global settings controls yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status, locationKind, from and the global settings controls are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TENANT_CONFIGURE`, which `getVenueSettings` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettings` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setCourseRules`; `TENANT_CONFIGURE` for `setVenueSettings`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 422 An enable the venue cannot evidence. Biometrics switched on without a DPIA reference and a consent-notice acknowledgement, or device-assisted gender … |
 
@@ -2303,7 +2290,7 @@ approvals:
 - `setVenueSettings` → `TENANT_CONFIGURE` (configure) · staff
 - `setCourseRules` → `PRODUCT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `TENANT_CONFIGURE`, which `getVenueSettings` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettings` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setCourseRules`; `TENANT_CONFIGURE` for `setVenueSettings`.
 
 #### Requirements it meets
 
@@ -2507,7 +2494,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AllergenCode": {"type":"string","description":"**The fourteen declarable allergens, as one closed list.** Every allergen field in this contract uses it — the menu claim, the ticket line, a substitution's delta, a modifier option, the label on a bag — so a declared set and an actual set compare without anybody normalising case or synonyms. It was the `Allergen.contains` enum; the other fields were free text.\n","enum":["gluten","crustaceans","eggs","fish","peanuts","soybeans","milk","nuts","celery","mustard","sesame","sulphites","lupin","molluscs"]},
 "AllergenVerdict": {"x-ticvai-persistence":"fnb.allergen_verdict","type":"object","description":"One allergen check of one dish (decided 28 September, audit R241). Written by the server on every automatic run and by `verifyAllergens` on a manual re-check; `getAllergenVerification` reads the latest.\n","required":["menuItemId","matches","checkedAt","trigger"],"properties":{"menuItemId":{"type":"string","format":"uuid"},"matches":{"type":"boolean"},"declared":{"type":"array","items":{"type":"string"}},"actual":{"type":"array","items":{"type":"string"}},"undeclared":{"type":"array","description":"**Present in the dish and absent from the label.** The dangerous direction, and the response leads with it.\n","items":{"type":"object","properties":{"allergen":{"type":"string"},"via":{"type":"string","enum":["ingredient","substitution","modifier","sharedEquipment"]},"sourceRef":{"type":"string"}}}},"overDeclared":{"type":"array","description":"Labelled and no longer present. **Safe, and still worth fixing** — a menu that over-declares teaches guests the labels are guesses.\n","items":{"type":"string"}},"checkedAt":{"type":"string","format":"date-time","readOnly":true},"trigger":{"type":"string","readOnly":true,"description":"What ran the check. `manual` is the Verify button; the others are the automatic run after that change (audit R241).","enum":["manual","recipeChanged","substitutionChanged","modifierChanged"]}}},
 "ApprovalDecision": {"type":"object","x-ticvai-persistence":"approvals.decision","required":["level","principalId","decision","decidedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"level":{"type":"integer"},"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"},"delegatedFrom":{"type":"string","format":"uuid","nullable":true},"decision":{"type":"string","enum":["approve","reject"]},"comment":{"type":"string","nullable":true},"reason":{"type":"string","nullable":true},"usedMfa":{"type":"boolean"},"signatureRef":{"type":"string","nullable":true},"decidedAt":{"type":"string","format":"date-time"}}},
-"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
+"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
 "ApprovalMode": {"type":"string","description":"11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once, **consensus** needs all of them, **majority** needs more than half.\nParallel and consensus differ in when it completes: parallel completes on the first approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a one-eye rule.\n","enum":["sequential","parallel","consensus","majority"]},
 "ApprovalRequest": {"type":"object","x-ticvai-persistence":"approvals.request","required":["id","kind","status","requestedByPrincipalId","requestedAt"],"properties":{"id":{"type":"string"},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"rerouteOnNoApprover":{"type":"boolean","default":true,"description":"BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"},"outOfOfficeDelegateId":{"type":"string","format":"uuid","nullable":true},"allowEmailApproval":{"type":"boolean","default":false,"description":"**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"},"reopenedFrom":{"type":"string","format":"uuid","nullable":true,"description":"**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"},"status":{"$ref":"#/components/schemas/ApprovalStatus"},"subjectContract":{"type":"string"},"subjectType":{"type":"string"},"subjectId":{"type":"string"},"scopePath":{"type":"string"},"summary":{"type":"string"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"justification":{"type":"string","nullable":true},"requestedByPrincipalId":{"type":"string","format":"uuid"},"matrixVersion":{"type":"integer"},"mode":{"$ref":"#/components/schemas/ApprovalMode"},"currentLevel":{"type":"integer"},"totalLevels":{"type":"integer"},"pendingApprovers":{"type":"array","items":{"type":"object","properties":{"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"}}}},"decisions":{"type":"array","description":"Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n","items":{"$ref":"#/components/schemas/ApprovalDecision"}},"escalations":{"type":"array","description":"11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n","items":{"type":"object","properties":{"at":{"type":"string","format":"date-time"},"reason":{"type":"string"},"fromLevel":{"type":"integer"},"toLevel":{"type":"integer"},"wasAutomatic":{"type":"boolean"}}}},"resubmittedFromId":{"type":"string","nullable":true},"reopenedFromId":{"type":"string","nullable":true},"slaDueAt":{"type":"string","format":"date-time","nullable":true},"slaBreached":{"type":"boolean"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"Who claimed or was assigned the request in a shared queue (`assignApprovalRequest`; DI-723; CHG-CSP-042). Null while it sits in the queue."},"assignedToDepartmentId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042)."},"assignedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"requestedAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"aiAssessment":{"type":"object","nullable":true,"readOnly":true,"description":"**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.","properties":{"riskScore":{"type":"integer","minimum":0,"maximum":100},"riskBand":{"type":"string","enum":["low","medium","high","critical"]},"priorityScore":{"type":"integer","minimum":0,"maximum":100},"escalationSuggestion":{"type":"object","description":"A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.","properties":{"action":{"type":"string","enum":["escalate","addBackupApprover","none"]},"reason":{"type":"string","nullable":true}}},"signals":{"type":"array","maxItems":10,"description":"The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.","items":{"type":"object","properties":{"code":{"type":"string"},"contribution":{"type":"number"},"detail":{"type":"string","nullable":true}}}},"scoreId":{"type":"string","format":"uuid","description":"The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."},"decisionRecordId":{"type":"string","description":"The ai decision record, for the audit of what the AI said and why."},"assessedAt":{"type":"string","format":"date-time"}}}}},
 "ApprovalStatus": {"type":"string","enum":["draft","pending","escalated","returned","informationRequested","approved","rejected","withdrawn","expired","cancelled"]},

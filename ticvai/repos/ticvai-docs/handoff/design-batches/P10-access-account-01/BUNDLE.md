@@ -127,11 +127,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-001` | Partner Login / MFA | B–D | 16 | 51 | 10 | 6 | 2 | 0 | — | notStarted (generated) |
-| `PTR-003` | Profile & Company Details | B–D | 12 | 16 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
-| `PTR-004` | Notifications | B–D | 4 | 10 | 5 | 10 | 0 | 0 | — | notStarted (generated) |
-| `PTR-019` | API Credentials & Integration | B–D | 15 | 33 | 6 | 17 | 4 | 0 | — | notStarted (generated) |
-| `PTR-020` | Sub-Agent Management | B–D | 9 | 21 | 6 | 56 | 2 | 0 | — | notStarted (generated) |
+| `PTR-001` | Partner Login / MFA | A | 16 | 51 | 10 | 6 | 2 | 0 | — | notStarted (generated) |
+| `PTR-003` | Profile & Company Details | B | 12 | 14 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
+| `PTR-004` | Notifications | D | 4 | 10 | 5 | 10 | 0 | 0 | — | notStarted (generated) |
+| `PTR-019` | API Credentials & Integration | B | 15 | 33 | 6 | 17 | 4 | 0 | — | notStarted (generated) |
+| `PTR-020` | Sub-Agent Management | B | 9 | 14 | 6 | 56 | 2 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -150,8 +150,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
-| Module | Access & Account · wave 2 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Access & Account · wave 1 · needs the `partner` module |
+| Block | Block A · task APP-PARTNER-PTR-001 |
 | Who uses it | partner; in the flows as platform admin |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | form (compact density): A sign-in: two fields, the organisation's SSO where configured, and the second-factor and role steps in place - a form, not a list to browse. |
@@ -442,7 +442,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Access & Account · wave 2 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-PARTNER-PTR-003 |
 | Who uses it | partner staff holding `USER_MANAGE` (1 configure) |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listPrincipals` reads the population and `getPrincipal` reads one of them — list, select, act |
@@ -511,13 +511,11 @@ Errors to draw in the form: 400 Validation failed; 409 Username already in use w
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Username | text | — |
 | Display name | text | — |
 | Is active | yes / no (icon or chip) | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | Past this, resolution returns DENY regardless of grants. |
-| Primary role | the name it points at, never the id | Determines the landing screen when the principal holds several roles and picks one at login. |
 | Roles | list or chips (count when long) | — |
 | Last login at | 1 Oct 2026, 14:30 | — |
 
@@ -611,7 +609,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (12), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-003?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create principal, Save principal.
 - [ ] Every transition is wired: `PTR-001`, `PTR-004`.
@@ -630,7 +628,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Access & Account · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-PARTNER-PTR-004 |
 | Who uses it | partner staff holding `GUEST_VIEW`, `MARKETING_SEND` (1 read, 1 operate) |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | statusTracker (compact density): `getMessageStatus` reads one record and nothing reads a population — the screen is about that one thing |
@@ -702,7 +700,7 @@ Errors to draw in the form: 409 Address suppressed, or the guest has no address 
 | Loading (`?state=loading`) | The notifications, read by `getMessageStatus`. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the notifications untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No notifications yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `GUEST_VIEW`, which `getMessageStatus` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `GUEST_VIEW`, which `getMessageStatus` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_SEND` for `sendTransactionalMessage`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Address suppressed, or the guest has no address for that channel |
 
@@ -719,7 +717,7 @@ message: Booking confirmation - Desert Tours LLC group of 24 - WhatsApp - delive
 - `sendTransactionalMessage` → `MARKETING_SEND` (operate) · service, partner
 - `getMessageStatus` → `GUEST_VIEW` (read) · staff, partner
 
-**A refused user sees:** Shown when the caller lacks `GUEST_VIEW`, which `getMessageStatus` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `GUEST_VIEW`, which `getMessageStatus` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_SEND` for `sendTransactionalMessage`.
 
 #### Requirements it meets
 
@@ -773,7 +771,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Access & Account · wave 3 · needs the `developerApi` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-PARTNER-PTR-019 |
 | Who uses it | partner staff holding `DEVELOPER_MANAGE`, `DEVELOPER_VIEW` (1 configure, 1 read) |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listApiClients` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -923,7 +921,7 @@ Errors to draw in the form: 409 A `production` client without a current certific
 | Error (`?state=error`) | Could not load |
 | Empty, first run (`?state=emptyFirstRun`) | Not found — it may have been deleted or moved out of scope |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listApiClients` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `DEVELOPER_VIEW`, which `listApiClients` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `DEVELOPER_VIEW`, which `listApiScopes` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVELOPER_MANAGE` for `requestProductionAccess`, `createApiClient`, `rotateApiCredential`, `revokeApiCredential`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 A `production` client without a current certification, or asked for by a developer rather than issued by TICVAI (`certification-required`, M17-06).; 409 The listing is not certified, or its certification has lapsed (`certification-required`); or the client is not a sandbox client, or a request for it is already …; 422 A `production` client with an empty `ipAllowList` … |
 
@@ -966,7 +964,7 @@ Every API client:
 - `rotateApiCredential` → `DEVELOPER_MANAGE` (configure) · staff, partner
 - `revokeApiCredential` → `DEVELOPER_MANAGE` (configure) · staff, partner
 
-**A refused user sees:** Shown when the caller lacks `DEVELOPER_VIEW`, which `listApiClients` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `DEVELOPER_VIEW`, which `listApiScopes` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVELOPER_MANAGE` for `requestProductionAccess`, `createApiClient`, `rotateApiCredential`, `revokeApiCredential`.
 
 #### Requirements it meets
 
@@ -1029,7 +1027,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Access & Account · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-PARTNER-PTR-020 |
 | Who uses it | partner staff holding `PERMISSION_GRANT`, `PERMISSION_VIEW` (1 configure, 1 read); in the flows as platform admin |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listDelegatedAccess` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1087,21 +1085,14 @@ Errors to draw in the form: 400 Wildcard on an ALLOW, or scope outside the calle
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
-| Role | the name it points at, never the id | — |
 | Permission | text | From the permission enum. `*` permitted on DENY only. |
-| Subject | the name it points at, never the id | CF-132, CL-05. A grant held by a guest rather than a staff principal. |
-| Over subject | the name it points at, never the id | Whose behalf. Null for a staff grant, which is the existing behaviour — every grant written before 18 August means exactly what it meant … |
 | Over object ref | text | Where the authority is over a thing rather than a scope — a wallet, an entitlement, a booking. |
 | Delegation kind | chip: Primary holder, Family member, Group leader, Attendee, Corporate admin, Corporate … | What kind of relationship this expresses, for display and for reporting. The mechanism does not branch on it — a family member and a group … |
 | Quota | 1,234 | 2.14.15 and 4.3.11. How many the holder may assign. |
 | Is revocable by subject | yes / no (icon or chip) | Whether the person it is over can end it. A guest who linked a family member should be able to unlink them; a corporate member should not … |
-| Scope path | text | — |
 | Effect | chip: ALLOW, DENY | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | — |
-| Created by principal | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
@@ -1129,7 +1120,7 @@ Errors to draw in the form: 400 Wildcard on an ALLOW, or scope outside the calle
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the sub-agent untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No sub-agent yet. Offers Create delegated access (`createDelegatedAccess`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on principalId, roleId and the sub-agent are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PERMISSION_VIEW`, which `listDelegatedAccess` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PERMISSION_VIEW`, which `listDelegatedAccess` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PERMISSION_GRANT` for `createDelegatedAccess`, `deleteDelegatedAccess`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Wildcard on an ALLOW, or scope outside the caller's own grants |
 
@@ -1163,7 +1154,7 @@ listDelegatedAccess (DelegatedAccess):
 - `deleteDelegatedAccess` → `PERMISSION_GRANT` (configure) · staff, partner
 - `listDelegatedAccess` → `PERMISSION_VIEW` (read) · staff, partner
 
-**A refused user sees:** Shown when the caller lacks `PERMISSION_VIEW`, which `listDelegatedAccess` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PERMISSION_VIEW`, which `listDelegatedAccess` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PERMISSION_GRANT` for `createDelegatedAccess`, `deleteDelegatedAccess`.
 
 #### Requirements it meets
 
@@ -1206,7 +1197,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 404).
-- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-020?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create delegated access, Delete delegated access.
 - [ ] Every transition is wired: `PTR-001`, `PTR-003`.

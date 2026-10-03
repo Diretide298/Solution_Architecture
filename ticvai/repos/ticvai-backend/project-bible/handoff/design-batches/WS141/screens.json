@@ -419,7 +419,9 @@
     },
     {
      "name": "guestId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getGuestTimeline` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -558,7 +560,7 @@
   "name": "Intent & Knowledge Management",
   "module": "Engagement & Support",
   "requiresModule": "marketing",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "7",
@@ -708,7 +710,9 @@
    "params": [
     {
      "name": "collectionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listKnowledgeCollections` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1110,7 +1114,7 @@
     "id": "formSetServiceQueueDefinition",
     "component": "modal",
     "trigger": "Save service queue definition",
-    "body": "**Collects what `setServiceQueueDefinition` sends before it is called.** Required: `id`, `code`, `name`, `isActive`. Optional: `overflowWaitSeconds`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setServiceQueueDefinition` sends before it is called.** Required: `code`, `name`, `isActive`. Optional: `overflowWaitSeconds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "ServiceQueue",
     "confirm": {
      "label": "Save service queue definition",
@@ -1119,12 +1123,10 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "code",
       "name",
       "isActive",
-      "overflowWaitSeconds",
-      "scopePath"
+      "overflowWaitSeconds"
      ]
     },
     "provenance": "contract marketing-crm.yaml PUT /service-queues"

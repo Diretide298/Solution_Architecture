@@ -143,16 +143,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `EMP-014` | Ticket lookup | B–D | 11 | 53 | 6 | 27 | 2 | 0 | — | notStarted (generated) |
-| `EMP-015` | Group scan | B–D | 37 | 35 | 6 | 60 | 1 | 0 | — | notStarted (generated) |
-| `EMP-017` | Sync & reconciliation | B–D | 35 | 40 | 6 | 60 | 2 | 0 | — | notStarted (generated) |
-| `EMP-018` | Offline package | B–D | 3 | 26 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-019` | AI assistant — home | B–D | 4 | 16 | 6 | 16 | 1 | 0 | — | notStarted (generated) |
-| `EMP-020` | AI assistant — answer | B–D | 7 | 16 | 6 | 17 | 1 | 0 | — | notStarted (generated) |
-| `EMP-021` | Roster | B–D | 6 | 28 | 6 | 15 | 1 | 0 | — | notStarted (generated) |
-| `EMP-022` | My rota | B–D | 6 | 28 | 6 | 15 | 2 | 0 | — | notStarted (generated) |
-| `EMP-023` | Swap request | B–D | 6 | 36 | 6 | 15 | 2 | 0 | — | notStarted (generated) |
-| `EMP-024` | Clock in / out | B–D | 9 | 31 | 6 | 4 | 3 | 0 | — | notStarted (generated) |
+| `EMP-014` | Ticket lookup | C | 11 | 23 | 6 | 27 | 2 | 0 | — | notStarted (generated) |
+| `EMP-015` | Group scan | C | 37 | 12 | 6 | 60 | 1 | 0 | — | notStarted (generated) |
+| `EMP-017` | Sync & reconciliation | C | 35 | 16 | 6 | 60 | 2 | 0 | — | notStarted (generated) |
+| `EMP-018` | Offline package | B | 3 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-019` | AI assistant — home | D | 4 | 9 | 6 | 16 | 1 | 0 | — | notStarted (generated) |
+| `EMP-020` | AI assistant — answer | D | 7 | 9 | 6 | 17 | 1 | 0 | — | notStarted (generated) |
+| `EMP-021` | Roster | D | 6 | 9 | 6 | 15 | 1 | 0 | — | notStarted (generated) |
+| `EMP-022` | My rota | D | 6 | 9 | 6 | 15 | 2 | 0 | — | notStarted (generated) |
+| `EMP-023` | Swap request | D | 6 | 12 | 6 | 15 | 2 | 0 | — | notStarted (generated) |
+| `EMP-024` | Clock in / out | D | 9 | 14 | 6 | 4 | 3 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

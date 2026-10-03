@@ -419,7 +419,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/pricing-rules/price-list-master-configuration-adm-049",
    "component": "apps/venue-management-web/src/routes/venue-operations/PricingRulesDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-009"
   },
   "navigation": {
    "entryFrom": [
@@ -755,7 +756,7 @@
     "id": "formSetPriceCategoryRateType",
     "component": "modal",
     "trigger": "Save price category rate type",
-    "body": "**Collects what `setPriceCategoryRateType` sends before it is called.** Required: `id`, `scopePath`, `entryKind`, `code`, `name`, `isActive`. Optional: `description`, `categoryFamily`, `displayName`, `localizedDisplayNames`, `iconLabel`, `parentId`, `isStandard`, `sortOrder`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setPriceCategoryRateType` sends before it is called.** Required: `entryKind`, `code`, `name`, `isActive`. Optional: `description`, `categoryFamily`, `displayName`, `localizedDisplayNames`, `iconLabel`, `parentId`, `isStandard`, `sortOrder`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "PriceCategory",
     "confirm": {
      "label": "Save price category rate type",
@@ -764,8 +765,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "entryKind",
       "code",
       "name",
@@ -822,7 +821,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/pricing-rules/rate-structure-builder-adm-051",
    "component": "apps/venue-management-web/src/routes/venue-operations/PricingRulesDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-009"
   },
   "navigation": {
    "entryFrom": [
@@ -1007,7 +1007,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/pricing-rules/product-service-price-assignment-adm-052",
    "component": "apps/venue-management-web/src/routes/venue-operations/PricingRulesDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-009"
   },
   "navigation": {
    "entryFrom": [
@@ -1188,7 +1189,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/packages-bundles/package-bundle-add-on-pricing-adm-053",
    "component": "apps/venue-management-web/src/routes/venue-operations/PackagesBundlesDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-011"
   },
   "navigation": {
    "entryFrom": [
@@ -1348,7 +1350,7 @@
     "id": "formSetPackagePricingDefinition",
     "component": "modal",
     "trigger": "Save package pricing definition",
-    "body": "**Collects what `setPackagePricingDefinition` sends before it is called.** Required: `id`, `scopePath`, `productId`, `recordKind`, `pricingModel`, `status`. Optional: `name`, `priceListId`, `addOnType`, `packagePrice`, `components`, `componentPriceVisibility`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setPackagePricingDefinition` sends before it is called.** Required: `productId`, `recordKind`, `pricingModel`, `status`. Optional: `name`, `priceListId`, `addOnType`, `packagePrice`, `components`, `componentPriceVisibility`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "PackagePricing",
     "confirm": {
      "label": "Save package pricing definition",
@@ -1357,8 +1359,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "productId",
       "recordKind",
       "pricingModel",
@@ -1539,7 +1539,7 @@
     "id": "formSetMarketPricingConfiguration",
     "component": "modal",
     "trigger": "Save market pricing configuration",
-    "body": "**Collects what `setMarketPricingConfiguration` sends before it is called.** Required: `id`, `scopePath`, `hierarchyLevel`. Optional: `parentId`, `countryCode`, `marketCode`, `region`, `venueId`, `brand`, `legalEntityId`, `baseCurrency`, `sellingCurrency`, `roundingProfileId`, `displayFormat`, `priceListId` and 2 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setMarketPricingConfiguration` sends before it is called.** Required: `hierarchyLevel`. Optional: `parentId`, `countryCode`, `marketCode`, `region`, `venueId`, `brand`, `legalEntityId`, `baseCurrency`, `sellingCurrency`, `roundingProfileId`, `displayFormat`, `priceListId` and 2 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "PricingMarket",
     "confirm": {
      "label": "Save market pricing configuration",
@@ -1548,8 +1548,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "hierarchyLevel",
       "parentId",
       "countryCode",
@@ -1917,7 +1915,7 @@
     "id": "formSetConfigurationTemplate",
     "component": "modal",
     "trigger": "Save configuration template",
-    "body": "**Collects what `setConfigurationTemplate` sends before it is called.** Required: `id`, `scopePath`, `subject`, `name`, `status`. Optional: `description`, `templateKind`, `productKind`, `venueId`, `sourceProductId`, `sourcePriceListId`, `includedComponents`, `reviewFields`, `isAiDrafted`, `ownerPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setConfigurationTemplate` sends before it is called.** Required: `subject`, `name`, `status`. Optional: `description`, `templateKind`, `productKind`, `venueId`, `sourceProductId`, `sourcePriceListId`, `includedComponents`, `reviewFields`, `isAiDrafted`, `ownerPrincipalId`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "ConfigurationTemplate",
     "confirm": {
      "label": "Save configuration template",
@@ -1926,8 +1924,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "subject",
       "name",
       "status",

@@ -98,7 +98,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SCN-016` | Gate mode | B–D | 9 | 26 | 6 | 9 | 1 | 0 | — | notStarted (generated) |
+| `SCN-016` | Gate mode | C | 9 | 9 | 6 | 9 | 1 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

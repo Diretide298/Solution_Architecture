@@ -141,7 +141,7 @@
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the pasted board placeholder \"POS Experience Dashboard — from the client design board, 20 August\" (design-notes correction platform-foundation BO-122).",
   "gaps": [
    {
@@ -290,7 +290,7 @@
    "error": "Could not load. Names which read failed and leaves the pos profile untouched.",
    "emptyFirstRun": "No pos profile yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on venueId, kind and the pos profile are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listSaleBoards` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listSaleBoards` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_CONFIGURE` for `setConfigurationProfile`."
   },
   "apis": [
    {
@@ -330,13 +330,13 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-123"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetConfigurationProfile",
     "component": "modal",
     "trigger": "Save configuration profile",
-    "body": "**Collects what `setConfigurationProfile` sends before it is called.** Required: `name`, `venueKindScope`. Optional: `scopePath`, `settings`, `deployedCount`, `publishedAt`. **Not asked:** `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setConfigurationProfile` sends before it is called.** Required: `name`, `venueKindScope`. Optional: `scopePath`, `settings`. **Not asked:** `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `deployedCount`, `publishedAt` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "ConfigurationProfile",
     "confirm": {
      "label": "Save configuration profile",
@@ -348,9 +348,7 @@
       "name",
       "venueKindScope",
       "scopePath",
-      "settings",
-      "deployedCount",
-      "publishedAt"
+      "settings"
      ]
     },
     "provenance": "contract tenancy.yaml PUT /configuration-profiles"
@@ -517,7 +515,7 @@
    "error": "Could not load. Names which read failed and leaves the layout journey untouched.",
    "emptyFirstRun": "No layout journey yet. Offers Create sale board (`createSaleBoard`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on orgUnitId, principalId, workstationId, action, subjectRef, from and the layout journey are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_CONFIGURE` for `deployConfigurationProfile`; `WORKSTATION_CONFIGURE` for `updateSaleBoard`, `createSaleBoard`."
   },
   "apis": [
    {
@@ -560,7 +558,9 @@
     },
     {
      "name": "saleBoardId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listSaleBoards` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "deviceId",
@@ -581,13 +581,13 @@
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formUpdateSaleBoard",
     "component": "modal",
     "trigger": "Save sale board",
-    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "SaleBoard",
     "confirm": {
      "label": "Save sale board",
@@ -610,7 +610,7 @@
     "id": "formCreateSaleBoard",
     "component": "modal",
     "trigger": "Create sale board",
-    "body": "**Collects what `createSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "SaleBoard",
     "confirm": {
      "label": "Create sale board",
@@ -830,7 +830,7 @@
    "error": "Could not load. Names which read failed and leaves the product category button untouched.",
    "emptyFirstRun": "No product category button yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, kind, isSellable and the product category button are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WORKSTATION_CONFIGURE` for `updateSaleBoard`."
   },
   "apis": [
    {
@@ -870,13 +870,13 @@
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formUpdateSaleBoard",
     "component": "modal",
     "trigger": "Save sale board",
-    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "SaleBoard",
     "confirm": {
      "label": "Save sale board",
@@ -1040,7 +1040,7 @@
    "loading": "The deployment preview audit figures; each tile loads on its own.",
    "error": "Could not load. Names which read failed and leaves the deployment preview audit untouched.",
    "emptyFirstRun": "**Nothing to show yet**: the figures fill as activity is recorded. Offers no create action — a monitor creates nothing — and says so rather than showing empty tiles.",
-   "emptyNoAccess": "Shown when the caller lacks `AUDIT_VIEW`, which `listAuditRecords` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `AUDIT_VIEW`, which `listAuditRecords` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_CONFIGURE` for `deployConfigurationProfile`; `WORKSTATION_CONFIGURE` for `updateSaleBoard`."
   },
   "apis": [
    {
@@ -1105,13 +1105,13 @@
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formDeployConfigurationProfile",
     "component": "modal",
     "trigger": "Deploy configuration profile",
-    "body": "**Collects what `deployConfigurationProfile` sends before it is called.** Required: `profileId`. Optional: `targetWorkstationIds`, `targetFilter`, `strategy`, `succeededCount`, `failedCount`, `failureReasons`, `startedAt`, `completedAt`. **Not asked:** `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `deployConfigurationProfile` sends before it is called.** Nothing in the body is required. Optional: `targetWorkstationIds`, `targetFilter`, `strategy`. **Not asked:** is a client UUIDv7 generated silently; is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `completedAt`, `failedCount`, `failureReasons`, `id`, `profileId`, `startedAt`, `status`, `succeededCount` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "ProfileDeployment",
     "confirm": {
      "label": "Deploy configuration profile",
@@ -1120,15 +1120,9 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "profileId",
       "targetWorkstationIds",
       "targetFilter",
-      "strategy",
-      "succeededCount",
-      "failedCount",
-      "failureReasons",
-      "startedAt",
-      "completedAt"
+      "strategy"
      ]
     },
     "provenance": "contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy"
@@ -1137,7 +1131,7 @@
     "id": "formUpdateSaleBoard",
     "component": "modal",
     "trigger": "Save sale board",
-    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "SaleBoard",
     "confirm": {
      "label": "Save sale board",
@@ -1244,15 +1238,11 @@
        "label": "Every store rule",
        "bindsTo": "StoreRule",
        "columns": [
-        "StoreRule.id",
-        "StoreRule.venueId",
-        "StoreRule.outletId",
         "StoreRule.kind",
         "StoreRule.thresholdAmount",
         "StoreRule.minimumAgeYears",
         "StoreRule.requiresPermission",
-        "StoreRule.enabled",
-        "StoreRule.updatedByPrincipalId"
+        "StoreRule.enabled"
        ],
        "operation": "listStoreRules",
        "provenance": "contract retail.yaml GET /store-rules"
@@ -1288,7 +1278,7 @@
    "error": "Could not load. Names which read failed and leaves the store rules controls untouched.",
    "emptyFirstRun": "No store rules controls yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listStoreRules` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listStoreRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setStoreRules`."
   },
   "apis": [
    {
@@ -1327,7 +1317,7 @@
    "derivedFrom": "wireframes/reference/Retail Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Retail Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetStoreRules",
@@ -1467,7 +1457,7 @@
    "loading": "The retail global settings, read by `getReturnPolicy`.",
    "error": "Could not load. Names which read failed and leaves the retail global settings untouched.",
    "emptyFirstRun": "No retail global settings yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getReturnPolicy` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getReturnPolicy` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `disposeShopAndDrop`; `REGION_CONFIGURE` for `setReturnPolicy`."
   },
   "apis": [
    {
@@ -1510,11 +1500,14 @@
     },
     {
      "name": "dropId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `disposeShopAndDrop` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "outletId",
-     "from": "navigation"
+     "from": "session",
+     "notes": "From the session (3 October 2026, CHG-SPF-004): a staff screen works in the outlet its sign-in or device is scoped to; nothing navigates to it (the venue-scope rule)."
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first."
@@ -1526,7 +1519,7 @@
    "derivedFrom": "wireframes/reference/Retail Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Retail Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetReturnPolicy",

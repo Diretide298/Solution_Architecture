@@ -105,7 +105,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-390` | Escalation Policy Builder | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-391` | Live Escalation Operations Center | B–D | 9 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-392` | SLA & Escalation Performance Analytics | B–D | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-393` | AI SLA & Escalation Advisor | B–D | 2 | 20 | 6 | 9 | 0 | 0 | — | notStarted (—) |
+| `BO-393` | AI SLA & Escalation Advisor | B–D | 2 | 16 | 6 | 9 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

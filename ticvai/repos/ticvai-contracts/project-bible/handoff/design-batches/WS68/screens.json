@@ -778,7 +778,9 @@
    "params": [
     {
      "name": "reportId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updateReport` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -937,7 +939,9 @@
    "params": [
     {
      "name": "reportId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updateReport` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1081,7 +1085,9 @@
    "params": [
     {
      "name": "reportId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updateReport` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1250,7 +1256,9 @@
    "params": [
     {
      "name": "reportId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updateReport` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1419,11 +1427,15 @@
    "params": [
     {
      "name": "executionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `runReport`; a link or an edge that holds one opens it instead."
     },
     {
      "name": "reportId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getReportExecution`; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1632,11 +1644,15 @@
    "params": [
     {
      "name": "executionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `runReport`; a link or an edge that holds one opens it instead."
     },
     {
      "name": "reportId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `runReport` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

@@ -522,7 +522,7 @@
     "id": "formSetChannelConnectionConfiguration",
     "component": "modal",
     "trigger": "Save channel connection configuration",
-    "body": "**Collects what `setChannelConnectionConfiguration` sends before it is called.** Required: `id`, `scopePath`, `salesChannelId`, `connectorName`, `environment`, `connectionType`. Optional: `partner`, `direction`, `endpoint`, `apiVersion`, `authenticationType`, `credentialsReference`, `certificateReference`, `certificateExpiresAt`, `timeoutMs`, `rateLimitPerMinute`, `ipRestrictions`, `retryPolicy` and 3 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setChannelConnectionConfiguration` sends before it is called.** Required: `salesChannelId`, `connectorName`, `environment`, `connectionType`. Optional: `partner`, `direction`, `endpoint`, `apiVersion`, `authenticationType`, `credentialsReference`, `certificateReference`, `certificateExpiresAt`, `timeoutMs`, `rateLimitPerMinute`, `ipRestrictions`, `retryPolicy` and 3 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "ChannelConnection",
     "confirm": {
      "label": "Save channel connection configuration",
@@ -531,8 +531,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "salesChannelId",
       "connectorName",
       "environment",
@@ -575,7 +573,9 @@
    "params": [
     {
      "name": "connectionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `testChannelConnection` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -802,7 +802,7 @@
     "id": "formSetChannelSyncSetting",
     "component": "modal",
     "trigger": "Save channel sync setting",
-    "body": "**Collects what `setChannelSyncSetting` sends before it is called.** Required: `id`, `scopePath`, `salesChannelId`, `domain`. Optional: `channelConnectionId`, `direction`, `frequency`, `isPaused`, `lastSuccessfulSyncAt`, `nextSyncAt`, `recordsProcessed`, `successful`, `failed`, `pending`, `warnings`, `durationMs` and 1 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setChannelSyncSetting` sends before it is called.** Required: `salesChannelId`, `domain`. Optional: `channelConnectionId`, `direction`, `frequency`, `isPaused` and 1 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `durationMs`, `failed`, `id`, `lastSuccessfulSyncAt`, `mismatchCount`, `nextSyncAt`, `pending`, `recordsProcessed`, `scopePath`, `successful`, `warnings` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "ChannelSync",
     "confirm": {
      "label": "Save channel sync setting",
@@ -811,23 +811,12 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "salesChannelId",
       "domain",
       "channelConnectionId",
       "direction",
       "frequency",
-      "isPaused",
-      "lastSuccessfulSyncAt",
-      "nextSyncAt",
-      "recordsProcessed",
-      "successful",
-      "failed",
-      "pending",
-      "warnings",
-      "durationMs",
-      "mismatchCount"
+      "isPaused"
      ]
     },
     "provenance": "contract catalogue.yaml PUT /channel-syncs"
@@ -1155,7 +1144,9 @@
    "params": [
     {
      "name": "channelCapacityId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `setChannelAllocations` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

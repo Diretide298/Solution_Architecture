@@ -95,16 +95,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-539` | AI Explainability & Audit Command Center | B–D | 8 | 6 | 7 | 5 | 0 | 0 | — | notStarted (—) |
-| `ADM-540` | AI Decision Explorer & Search | B–D | 9 | 6 | 7 | 5 | 2 | 0 | — | notStarted (—) |
-| `ADM-541` | AI Decision Explanation Workspace | B–D | 6 | 6 | 7 | 1 | 1 | 0 | — | notStarted (—) |
-| `ADM-542` | Data, Feature & Evidence Provenance | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-543` | Candidate, Rule & Decision Path Trace | B–D | 6 | 18 | 7 | 2 | 1 | 0 | — | notStarted (—) |
-| `ADM-544` | Model, Provider & AI Runtime Trace | B–D | 6 | 50 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-545` | Governance, Approval & Human Decision Trace | B–D | 6 | 6 | 7 | 1 | 1 | 3 | — | notStarted (—) |
-| `ADM-546` | Execution & Business Outcome Trace | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-547` | AI Audit Record & Evidence Package | B–D | 6 | 6 | 7 | 5 | 0 | 0 | — | notStarted (—) |
-| `ADM-548` | AI Trace Investigation & Replay Simulator | B–D | 6 | 18 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-539` | AI Explainability & Audit Command Center | B | 8 | 6 | 7 | 5 | 0 | 0 | — | notStarted (—) |
+| `ADM-540` | AI Decision Explorer & Search | D | 9 | 6 | 7 | 5 | 2 | 0 | — | notStarted (—) |
+| `ADM-541` | AI Decision Explanation Workspace | B | 6 | 6 | 7 | 1 | 1 | 0 | — | notStarted (—) |
+| `ADM-542` | Data, Feature & Evidence Provenance | B | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-543` | Candidate, Rule & Decision Path Trace | D | 6 | 18 | 7 | 2 | 1 | 0 | — | notStarted (—) |
+| `ADM-544` | Model, Provider & AI Runtime Trace | D | 6 | 50 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-545` | Governance, Approval & Human Decision Trace | B | 6 | 6 | 7 | 1 | 1 | 3 | — | notStarted (—) |
+| `ADM-546` | Execution & Business Outcome Trace | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-547` | AI Audit Record & Evidence Package | D | 6 | 6 | 7 | 5 | 0 | 0 | — | notStarted (—) |
+| `ADM-548` | AI Trace Investigation & Replay Simulator | D | 6 | 18 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 
 ---
 
@@ -120,7 +120,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-539 |
 | Who uses it | ticvai staff holding `AI_AUDIT_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Header KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -326,7 +326,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CONSOLE-ADM-540 |
 | Who uses it | ticvai staff holding `AI_AUDIT_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -504,7 +504,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-541 |
 | Who uses it | ticvai staff holding `AI_AUDIT_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -660,7 +660,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-542 |
 | Who uses it | ticvai staff holding `AI_AUDIT_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -819,7 +819,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CONSOLE-ADM-543 |
 | Who uses it | ticvai staff holding `AI_AUDIT_VIEW`, `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 read, 2 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -1005,7 +1005,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CONSOLE-ADM-544 |
 | Who uses it | ticvai staff holding `AI_AUDIT_VIEW`, `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 read, 2 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -1220,7 +1220,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-545 |
 | Who uses it | ticvai staff holding `AI_AUDIT_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1380,7 +1380,7 @@ Also apply: 1 for P09 · Platform, 9 for all of P09, 29 for every app (section *
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CONSOLE-ADM-546 |
 | Who uses it | ticvai staff holding `AI_AUDIT_VIEW`, `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 read, 2 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1538,7 +1538,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CONSOLE-ADM-547 |
 | Who uses it | ticvai staff holding `AI_AUDIT_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1716,7 +1716,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CONSOLE-ADM-548 |
 | Who uses it | ticvai staff holding `AI_AUDIT_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Compare) and no metric row |

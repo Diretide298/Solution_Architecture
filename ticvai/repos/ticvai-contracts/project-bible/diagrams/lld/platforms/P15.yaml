@@ -41,7 +41,7 @@ modulesUsed:
   screens: 10
 servicesCalled:
 - service: FnbService
-  operationCalls: 34
+  operationCalls: 33
 - service: ReportingService
   operationCalls: 3
 coverage:
@@ -55,7 +55,7 @@ screens:
   name: Kitchen Operations Command Center
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: touchLarge
   operations:
   - listFnbOrders
@@ -92,7 +92,7 @@ screens:
   name: Kitchen Display System (KDS)
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: touchLarge
   operations:
   - listKitchenTickets
@@ -128,7 +128,7 @@ screens:
   name: Order Firing & Course Management
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: touchLarge
   operations:
   - fireCourse
@@ -162,7 +162,7 @@ screens:
   name: Active Order Management & Fulfilment Journey
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: touchLarge
   operations:
   - getFnbOrder
@@ -192,7 +192,7 @@ screens:
   name: Kitchen Station Workload & Dynamic Routing
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: touchLarge
   operations:
   - listKitchenStations
@@ -219,7 +219,7 @@ screens:
   name: Expeditor & Order Assembly
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: touchLarge
   operations:
   - chaseStation
@@ -253,11 +253,10 @@ screens:
   name: Guest Collection, Buzzer & Digital Notification
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: touchLarge
   operations:
   - listKitchenTickets
-  - recordOrderHandover
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -269,7 +268,6 @@ screens:
   entryParams:
   - venueId<-session
   - stationId<-session
-  - orderId<-KIT-002
   goesTo:
   - KIT-001
   boardFrames:
@@ -280,7 +278,7 @@ screens:
   name: Exceptions, Re-Fire & Unavailable Items
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: touchLarge
   operations:
   - getHaccpStatus
@@ -313,7 +311,7 @@ screens:
   name: SLA, Priority & Service Rules
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: touchLarge
   operations:
   - getCourseRules
@@ -340,7 +338,7 @@ screens:
   name: Kitchen Performance, AI & Operational Optimization
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: touchLarge
   operations:
   - askReportingQuestion

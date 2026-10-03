@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-148` | Promotion Rule Builder | A | 0 | 0 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
+| `ADM-148` | Promotion Rule Builder | B–D | 0 | 0 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
 | `ADM-149` | Percentage & Fixed Discount Configurator | B–D | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-150` | Cart & Transaction Threshold Rules | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 | `ADM-151` | Volume, Bulk & Tier Discount Configurator | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |

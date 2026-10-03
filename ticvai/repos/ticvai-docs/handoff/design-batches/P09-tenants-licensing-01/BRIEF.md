@@ -96,15 +96,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-005` | Tenant Directory | A | 57 | 73 | 7 | 17 | 0 | 0 | — | notStarted (generated) |
-| `ADM-006` | Tenant Hierarchy Explorer | B–D | 16 | 67 | 7 | 15 | 0 | 0 | — | notStarted (generated) |
-| `ADM-007` | Module & Feature Entitlement | B–D | 12 | 65 | 6 | 14 | 0 | 0 | — | notStarted (generated) |
-| `ADM-008` | Subscription & Plan Management | A | 83 | 86 | 6 | 24 | 0 | 0 | — | notStarted (generated) |
-| `ADM-009` | Tenant Billing & Invoicing | B–D | 4 | 67 | 6 | 11 | 0 | 0 | — | notStarted (generated) |
-| `ADM-010` | Usage Metering | B–D | 0 | 59 | 6 | 16 | 0 | 0 | — | notStarted (generated) |
-| `ADM-011` | Licence & Seat Management | B–D | 17 | 65 | 6 | 16 | 0 | 6 | — | notStarted (generated) |
-| `ADM-012` | Tenant Isolation & Resource Pool | B–D | 6 | 63 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
-| `ADM-015` | API Rate Limit & Quota Management | B–D | 24 | 63 | 7 | 33 | 2 | 0 | — | notStarted (generated) |
+| `ADM-005` | Tenant Directory | A | 57 | 48 | 7 | 17 | 0 | 0 | — | notStarted (generated) |
+| `ADM-006` | Tenant Hierarchy Explorer | B | 16 | 45 | 7 | 15 | 0 | 0 | — | notStarted (generated) |
+| `ADM-007` | Module & Feature Entitlement | B | 12 | 42 | 6 | 14 | 0 | 0 | — | notStarted (generated) |
+| `ADM-008` | Subscription & Plan Management | A | 83 | 57 | 6 | 24 | 0 | 0 | — | notStarted (generated) |
+| `ADM-009` | Tenant Billing & Invoicing | B | 4 | 42 | 6 | 11 | 0 | 0 | — | notStarted (generated) |
+| `ADM-010` | Usage Metering | B | 0 | 36 | 6 | 16 | 0 | 0 | — | notStarted (generated) |
+| `ADM-011` | Licence & Seat Management | B | 17 | 42 | 6 | 16 | 0 | 6 | — | notStarted (generated) |
+| `ADM-012` | Tenant Isolation & Resource Pool | B | 6 | 40 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
+| `ADM-015` | API Rate Limit & Quota Management | B | 24 | 50 | 7 | 33 | 2 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

@@ -96,9 +96,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-009` | Review & Payment | A | 14 | 80 | 5 | 31 | 23 | 0 | guest | notStarted (designed) |
-| `GST-010` | Booking Confirmation | A | 7 | 10 | 5 | 11 | 4 | 6 | guest | notStarted (client-verified) |
-| `GST-041` | Checkout Entry | A | 13 | 35 | 6 | 23 | 14 | 6 | guest | notStarted (client-verified) |
+| `GST-009` | Review & Payment | A | 14 | 74 | 5 | 31 | 23 | 0 | guest | notStarted (designed) |
+| `GST-010` | Booking Confirmation | A | 7 | 5 | 5 | 11 | 4 | 6 | guest | notStarted (client-verified) |
+| `GST-041` | Checkout Entry | A | 13 | 29 | 6 | 23 | 14 | 6 | guest | notStarted (client-verified) |
 
 ## Design inputs from the client meetings
 

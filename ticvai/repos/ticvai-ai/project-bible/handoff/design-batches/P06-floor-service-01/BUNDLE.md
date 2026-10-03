@@ -131,16 +131,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `EMP-051` | Restaurant Service Command Center | B–D | 3 | 41 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
-| `EMP-052` | Floor Plan & Table Map | B–D | 1 | 3 | 5 | 1 | 6 | 1 | — | notStarted (generated) |
-| `EMP-053` | Table & Seating Configuration | B–D | 21 | 0 | 5 | 1 | 1 | 6 | — | notStarted (generated) |
-| `EMP-054` | Reservation Calendar & Timeline | B–D | 3 | 53 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-055` | Create / Edit Reservation | B–D | 33 | 11 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `EMP-056` | Walk-In & Waitlist Management | B–D | 23 | 0 | 5 | 7 | 1 | 0 | — | notStarted (generated) |
-| `EMP-057` | Guest Profile & Dining History | B–D | 13 | 33 | 6 | 8 | 2 | 0 | — | notStarted (generated) |
-| `EMP-058` | Live Table & Service Management | B–D | 51 | 15 | 5 | 10 | 4 | 1 | — | notStarted (generated) |
-| `EMP-059` | Table Order, Bill & Payment Management | B–D | 51 | 8 | 5 | 16 | 2 | 1 | — | notStarted (generated) |
-| `EMP-060` | Reservation & Table Performance | B–D | 3 | 43 | 6 | 1 | 0 | 1 | — | notStarted (generated) |
+| `EMP-051` | Restaurant Service Command Center | C | 3 | 16 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
+| `EMP-052` | Floor Plan & Table Map | C | 1 | 3 | 5 | 1 | 6 | 1 | — | notStarted (generated) |
+| `EMP-053` | Table & Seating Configuration | C | 21 | 0 | 5 | 1 | 1 | 6 | — | notStarted (generated) |
+| `EMP-054` | Reservation Calendar & Timeline | C | 3 | 36 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-055` | Create / Edit Reservation | C | 33 | 11 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `EMP-056` | Walk-In & Waitlist Management | C | 23 | 0 | 5 | 7 | 1 | 0 | — | notStarted (generated) |
+| `EMP-057` | Guest Profile & Dining History | D | 13 | 14 | 6 | 8 | 2 | 0 | — | notStarted (generated) |
+| `EMP-058` | Live Table & Service Management | A | 51 | 5 | 5 | 10 | 4 | 1 | — | notStarted (generated) |
+| `EMP-059` | Table Order, Bill & Payment Management | A | 51 | 5 | 5 | 16 | 2 | 1 | — | notStarted (generated) |
+| `EMP-060` | Reservation & Table Performance | C | 3 | 26 | 6 | 1 | 0 | 1 | — | notStarted (generated) |
 
 ---
 
@@ -156,7 +156,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Floor Service · wave 2 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-051 |
 | Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listTableReservations` reads the population and `getTableMap` reads one of them — list, select, act |
@@ -205,34 +205,18 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Outlet | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | — |
-| Contact point | text | — |
-| Party size | 1,234 | — |
 | Starts at | 1 Oct 2026, 14:30 | — |
 | Duration minutes | 1,234 | How long the cover is held. An outlet turning tables twice an evening needs this to be real, or the second sitting cannot be booked. |
-| Table | the name it points at, never the id | — |
 | Status | chip: Awaiting deposit, Booked, Confirmed, Seated, Completed, Cancelled… | `awaitingDeposit` only where the venue's dining deposit applies (decided 29 September, rev 3 REV3-8b); a booking with no deposit starts … |
-| Group | the name it points at, never the id | 5.1.2. Several bookings managed as one party across adjacent tables. |
-| Notes | text | Allergies, accessibility needs and other requests, as the guest wrote them. |
 
 **Every F&B order** (data table, from `listFnbOrders`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Order number | text | — |
-| Outlet | the name it points at, never the id | — |
-| Service mode | chip: Quick service, Table service, Room service, Collection, Delivery | — |
-| Table visit | the name it points at, never the id | — |
 | Status | chip: Ordered, Accepted, In preparation, Ready, Served, Collected… | The full lifecycle from 4.6.35. Nine states, not six — the earlier enum collapsed `accepted` into `placed` and had no `collected` or … |
-| Lines | list or chips (count when long) | — |
-| Sales order | the name it points at, never the id | Retyped 29 September (SD-046), and `format: uuid` since ADR-0056 (30 September): every id is a uuid, so this joins `orders.sales_order.id`. |
 | Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Kitchen ticket | the name it points at, never the id | — |
 | Estimated ready at | 1 Oct 2026, 14:30 | — |
 
 **Card list** (card list): **Cards rather than a table.** One thumb, arm’s length, and a person who is walking.
@@ -241,20 +225,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Outlet | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | — |
 | Contact point | text | — |
-| Party size | 1,234 | — |
 | Starts at | 1 Oct 2026, 14:30 | — |
 | Duration minutes | 1,234 | How long the cover is held. An outlet turning tables twice an evening needs this to be real, or the second sitting cannot be booked. |
-| Tables | list or chips (count when long) | The dining tables assigned to this reservation, one row each. Usually empty until seating. |
 | Status | chip: Awaiting deposit, Booked, Confirmed, Seated, Completed, Cancelled… | `awaitingDeposit` only where the venue's dining deposit applies (decided 29 September, rev 3 REV3-8b); a booking with no deposit starts … |
-| Group | the name it points at, never the id | 5.1.2. Several bookings managed as one party across adjacent tables. |
-| Notes | text | Allergies, accessibility needs and other requests, as the guest wrote them. |
-| Actual party size | 1,234 | — |
-| Table visit | the name it points at, never the id | — |
 
 **The table map** (detail panel, from `getTableMap`)
 
@@ -347,7 +322,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (3), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (41 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-051?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm.
 - [ ] No transition is declared; back returns where the user came from.
@@ -366,12 +341,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Floor Service · wave 2 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-052 |
 | Who uses it | venue staff holding `ORDER_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | statusTracker (comfortable density): `getTableMap` reads one record and nothing reads a population — the screen is about that one thing |
 | Offline | **Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice. |
-| Opens with | `venueId` (session), `outletId` (EMP-003) · cold entry: **Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to. |
+| Opens with | `venueId` (session), `outletId` (session) · cold entry: **Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to. |
 | Route | `/operations/floor-plan-table-map` |
 
 **What the spec says about it.** **Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4b`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Floor Plan &amp; Table Map* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.
@@ -573,12 +548,12 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Floor Service · wave 2 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-053 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | configEditor (comfortable density): the screen declares only writes (`setTableLayout`) and no read of a population — it is settings, not a list |
 | Offline | **Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice. |
-| Opens with | `venueId` (session), `outletId` (EMP-003) · cold entry: **Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to. |
+| Opens with | `venueId` (session), `outletId` (session) · cold entry: **Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to. |
 | Route | `/operations/table-seating-configuration` |
 
 **What the spec says about it.** **Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Named in the board contents and not written up in it.** **Drawn 31 August** — `FnB Board 4.dc.html` frame `fnb-4c`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Table &amp; Seating Configuration* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.
@@ -789,7 +764,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Floor Service · wave 2 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-054 |
 | Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listTableReservations` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -865,18 +840,10 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Outlet | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | — |
-| Contact point | text | — |
-| Party size | 1,234 | — |
 | Starts at | 1 Oct 2026, 14:30 | — |
 | Duration minutes | 1,234 | How long the cover is held. An outlet turning tables twice an evening needs this to be real, or the second sitting cannot be booked. |
-| Table | the name it points at, never the id | — |
 | Status | chip: Awaiting deposit, Booked, Confirmed, Seated, Completed, Cancelled… | `awaitingDeposit` only where the venue's dining deposit applies (decided 29 September, rev 3 REV3-8b); a booking with no deposit starts … |
-| Group | the name it points at, never the id | 5.1.2. Several bookings managed as one party across adjacent tables. |
-| Notes | text | Allergies, accessibility needs and other requests, as the guest wrote them. |
 
 **Card list** (card list): **Cards rather than a table.** One thumb, arm’s length, and a person who is walking.
 
@@ -896,20 +863,11 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Outlet | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | — |
 | Contact point | text | — |
-| Party size | 1,234 | — |
 | Starts at | 1 Oct 2026, 14:30 | — |
 | Duration minutes | 1,234 | How long the cover is held. An outlet turning tables twice an evening needs this to be real, or the second sitting cannot be booked. |
-| Table | the name it points at, never the id | — |
 | Status | chip: Awaiting deposit, Booked, Confirmed, Seated, Completed, Cancelled… | `awaitingDeposit` only where the venue's dining deposit applies (decided 29 September, rev 3 REV3-8b); a booking with no deposit starts … |
-| Group | the name it points at, never the id | 5.1.2. Several bookings managed as one party across adjacent tables. |
-| Notes | text | Allergies, accessibility needs and other requests, as the guest wrote them. |
-| Actual party size | 1,234 | — |
-| Table visit | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
@@ -1012,7 +970,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (3), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (53 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (36 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-054?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm.
 - [ ] No transition is declared; back returns where the user came from.
@@ -1032,7 +990,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Floor Service · wave 2 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-055 |
 | Who uses it | venue staff holding `GUEST_VIEW`, `ORDER_CREATE`, `ORDER_MODIFY`, `PRODUCT_VIEW` (2 read, 2 operate) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | configEditor (comfortable density): the screen declares only writes (`createTableReservation`) and no read of a population — it is settings, not a list |
@@ -1184,7 +1142,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Loading (`?state=loading`) | The saved create edit reservation. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the create edit reservation untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No create edit reservation configured. The form opens empty; it says what the platform does in the meantime. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `GUEST_VIEW`, which `matchGuest` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getFnbReservationPolicy` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_VIEW` for `matchGuest`; `ORDER_CREATE` for `createTableReservationForGuest`; `ORDER_MODIFY` for `sendBookingConfirmation`. |
 | Offline (`?state=offline`) | **Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 No cover is free at that time for that party size (`no-availability`). |
 
@@ -1226,7 +1184,7 @@ depositWhenOn:
 - `sendBookingConfirmation` → `ORDER_MODIFY` (operate) · staff
 - `createTableReservationForGuest` → `ORDER_CREATE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `GUEST_VIEW`, which `matchGuest` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getFnbReservationPolicy` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_VIEW` for `matchGuest`; `ORDER_CREATE` for `createTableReservationForGuest`; `ORDER_MODIFY` for `sendBookingConfirmation`.
 
 #### Requirements it meets
 
@@ -1275,7 +1233,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Floor Service · wave 2 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-056 |
 | Who uses it | venue staff holding `ORDER_MODIFY` (1 operate) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | configEditor (comfortable density): the screen declares only writes (`joinRestaurantWaitlist`) and no read of a population — it is settings, not a list |
@@ -1484,7 +1442,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Floor Service · wave 2 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-057 |
 | Who uses it | venue staff holding `GUEST_MANAGE`, `GUEST_VIEW`, `ORDER_VIEW` (1 configure, 2 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listOrders` reads the population and `getGuestProfile` reads one of them — list, select, act |
@@ -1552,11 +1510,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Order number | text | — |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
-| Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | The same vocabulary as `Order.channel`, which this projects. |
 | Line count | 1,234 | — |
 
@@ -1570,16 +1525,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Order number | text | — |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
 | Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | The same vocabulary as `Order.channel`, which this projects. |
-| Line count | 1,234 | — |
-| Principal | the name it points at, never the id | The cashier who raised it — what the held-orders list shows. |
 | Hold label | text | As `Order.holdLabel`. |
-| Held until | 1 Oct 2026, 14:30 | As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse. |
 
 **Possible duplicates of this guest** (duplicate match): Candidates from `matchGuest`, each with the rule that matched it.
 
@@ -1587,22 +1537,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
-| Subject | the name it points at, never the id | Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger. |
 | Display name | text | — |
-| Email | text | — |
-| Phone | +971 50 123 4567 | — |
-| Preferred language | text | — |
 | Preferred channel | chip: Email, SMS, Whatsapp, Push, In app, Post | — |
-| Guest link | text | Present where the guest is linked across cells. Marketing acts locally. |
-| Tags | list or chips (count when long) | — |
 | Engagement score | 1,234 | 22.2.20 and 22.2.21. `lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not. |
-| Engagement tier | chip: New, Active, Occasional, Lapsing, Lapsed, Dormant | 5.3.19. Automatic classification, computed rather than assigned. |
 | Lifetime value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Visit count | 1,234 | — |
-| Last visit at | 1 Oct 2026, 14:30 | — |
-| Is active | yes / no (icon or chip) | — |
-| Merged into subject | the name it points at, never the id | Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`, which retain it as a redirect rather than deleting it. |
 
 **Actions and what each produces**
 
@@ -1638,7 +1577,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the guest profile dining untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No guest profile dining yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the guest profile dining are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `GUEST_VIEW`, which `getGuestProfile` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `GUEST_VIEW`, which `getGuestProfile` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_MANAGE` for `mergeGuests`, `addGuestNote`. |
 | Offline (`?state=offline`) | **Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 A record in `mergeSubjectIds` is already merged (`alreadyMerged`), or `keepSubjectId` is among them (`sameProfile`) (MergeRefusedProblem) |
 
@@ -1668,7 +1607,7 @@ duplicate: Priya N. - +971 55 210 9981 - same email
 - `mergeGuests` → `GUEST_MANAGE` (configure) · staff
 - `addGuestNote` → `GUEST_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `GUEST_VIEW`, which `getGuestProfile` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `GUEST_VIEW`, which `getGuestProfile` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_MANAGE` for `mergeGuests`, `addGuestNote`.
 
 #### Requirements it meets
 
@@ -1707,7 +1646,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (13), with its required mark, default, format and its error state (403, 404, 409).
-- [ ] Every output is drawn (33 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-057?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Merge these two records, Confirm, Merge these two records, Merge these two records, Find matches for guest, Merge guests.
 - [ ] No transition is declared; back returns where the user came from.
@@ -1725,8 +1664,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
-| Module | Floor Service · wave 2 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Floor Service · wave 1 · needs the `fnb` module |
+| Block | Block A · task APP-STAFF-EMP-058 |
 | Who uses it | venue staff holding `ORDER_CREATE`, `ORDER_MODIFY`, `ORDER_VIEW` (2 operate, 1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | configEditor (comfortable density): the screen declares only writes (`openTableVisit`, `updateTableVisit`, `mergeTableVisits`) and no read of a population — it is settings, not a list |
@@ -1912,19 +1851,9 @@ Errors to draw in the form: 400 Validation failed
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Table | the name it points at, never the id | — |
 | Table label | text | — |
-| Outlet | the name it points at, never the id | — |
-| Covers | 1,234 | — |
 | Status | chip: Open, Bill requested, Settled, Merged, Cancelled | — |
-| Server principal | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
-| Orders | list or chips (count when long) | — |
-| Merged into visit | the name it points at, never the id | — |
-| Merged from visits | list or chips (count when long) | — |
 | Running total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Gratuity | AED 1,234.50 | The gratuity taken at `closeTableVisit`. Not the service charge, which is revenue (`FnbServiceChargePolicy`); this is the guest's tip, and … |
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Closed at | 1 Oct 2026, 14:30 | — |
 
@@ -2080,7 +2009,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (51), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-058?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Open table visit, Change covers, Merge table visits, Change server, Seat table reservation, Save service stage, Transfer table, Reassign server, Create F&B order, Fire course, Hold course.
 - [ ] Every transition is wired: `EMP-059`, `EMP-060`, `KIT-002`.
@@ -2099,8 +2028,8 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 | | |
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
-| Module | Floor Service · wave 2 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Floor Service · wave 1 · needs the `fnb` module |
+| Block | Block A · task APP-STAFF-EMP-059 |
 | Who uses it | venue staff holding `ORDER_CREATE`, `ORDER_MODIFY`, `ORDER_VIEW` (2 operate, 1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | statusTracker (comfortable density): `getBill` reads one record and nothing reads a population — the screen is about that one thing |
@@ -2228,8 +2157,8 @@ Errors to draw in the form: 400 Validation failed
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| Payments `payments` | repeatable rows | required | — | at least 1 | — | — | `closeTableVisit` body |
-| Sub bill `payments[].subBillId` | text field | required | — | — | — | — | `closeTableVisit` body |
+| Payments `payments` | repeatable rows | required | — | at least 0 | — | Empty only at a `payFirst` outlet with nothing left to pay (CHG-RUL-001). | `closeTableVisit` body |
+| Sub bill `payments[].subBillId` | text field | optional | — | — | — | The sub-bill this payment settles. Omitted on a bill that was never split, which closes as one sub-bill (CHG-RUL-001); required once the bill is split. | `closeTableVisit` body |
 | Tender `payments[].tender` | text field | required | — | — | — | — | `closeTableVisit` body |
 | Amount `payments[].amount` | money field | required | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `closeTableVisit` body |
 | Gratuity `gratuity` | money field | optional | — | A jsonb price cannot be summed in SQL. | AED, 2 decimals shown (up to 4 accepted), currency from the … | On the wire this is three fields; in the database it is one column. 24 August. | `closeTableVisit` body |
@@ -2248,11 +2177,8 @@ Errors to draw in the form: 400 Validation failed
 
 | Shows | Format | Notes |
 |---|---|---|
-| Visit | text | — |
 | Covers | 1,234 | — |
-| Lines | list or chips (count when long) | — |
 | Subtotal | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Service charge | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Discount amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
@@ -2287,8 +2213,8 @@ Errors to draw in the form: 400 Validation failed
 
 **Where the user goes next**
 
-- → `EMP-058` Live Table & Service Management: *Live Table & Service Management*; carries `visitId`; calls `transferOrderItems`
-- → `KIT-002` Kitchen Display System (KDS): *The kitchen makes the starters and bumps them*; carries `visitId`; calls `createFnbOrder`
+- → `EMP-058` Live Table & Service Management: *Live Table & Service Management*; carries `ticketId`, `visitId`; calls `transferOrderItems`
+- → `KIT-002` Kitchen Display System (KDS): *The kitchen makes the starters and bumps them*; carries `ticketId`, `visitId`; calls `createFnbOrder`
 
 **What opens over it**
 
@@ -2301,7 +2227,7 @@ Errors to draw in the form: 400 Validation failed
 | Loading (`?state=loading`) | The table order bill, read by `getBill`. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the table order bill untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No table order bill yet. Offers Create payment (`createPayment`). |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `getBill` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `getBill` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `closeTableVisit`, `createPayment`, `createFnbOrder`; `ORDER_MODIFY` for `splitBill`, `compItem`, `transferOrderItems`, `requestBill`. |
 | Offline (`?state=offline`) | **Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Split does not sum to the bill total, or a line is assigned twice.; 400 Validation failed; 409 An item is unavailable, modifier constraints are unmet, a tracked item was ordered offline, or a line's `redeemEntitlementId` cannot be redeemed here …; 409 Payments do not cover the bill, or lines remain unserved (named in `lineIds`). |
 
@@ -2368,7 +2294,7 @@ orderNumbers:
 - `transferOrderItems` → `ORDER_MODIFY` (operate) · staff
 - `requestBill` → `ORDER_MODIFY` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `getBill` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `getBill` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `closeTableVisit`, `createPayment`, `createFnbOrder`; `ORDER_MODIFY` for `splitBill`, `compItem`, `transferOrderItems`, `requestBill`.
 
 #### Requirements it meets
 
@@ -2416,11 +2342,12 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 - Flow F80 *A table is configured, reserved, seated and billed*, step 1: Table Order, Bill & Payment Management. → **Drawn by the client as FNB-4J.** 1 operations on this step.
 - Flow F29 branch at step 8 (low): when A guest moves from the bar and their drinks should follow., `transferOrderItems` moves lines between bills. **The kitchen is not re-fired** — food already made does not get made again because the bill moved.
 - Flow F80 branch at step 1 (medium): when A step in the chain is not licensed for this tenant., **The chain stops at the module boundary.** `requiresModule` on each screen decides — a tenant without the retail licence does not see the retail half, and the journey is shorter rather than broken.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (51), with its required mark, default, format and its error state (400, 402, 404, 409).
-- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-059?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Close table visit, Create payment, Create F&B order, Split bill, Comp item, Transfer order items, Request bill.
 - [ ] Every transition is wired: `EMP-058`, `KIT-002`.
@@ -2440,7 +2367,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Floor Service · wave 2 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-060 |
 | Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW`, `REPORT_VIEW_VENUE` (2 operate, 1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listTableReservations` reads the population and `getTableMap` reads one of them — list, select, act |
@@ -2516,18 +2443,10 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Outlet | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | — |
-| Contact point | text | — |
-| Party size | 1,234 | — |
 | Starts at | 1 Oct 2026, 14:30 | — |
 | Duration minutes | 1,234 | How long the cover is held. An outlet turning tables twice an evening needs this to be real, or the second sitting cannot be booked. |
-| Table | the name it points at, never the id | — |
 | Status | chip: Awaiting deposit, Booked, Confirmed, Seated, Completed, Cancelled… | `awaitingDeposit` only where the venue's dining deposit applies (decided 29 September, rev 3 REV3-8b); a booking with no deposit starts … |
-| Group | the name it points at, never the id | 5.1.2. Several bookings managed as one party across adjacent tables. |
-| Notes | text | Allergies, accessibility needs and other requests, as the guest wrote them. |
 
 **Card list** (card list): **Cards rather than a table.** One thumb, arm’s length, and a person who is walking.
 
@@ -2535,20 +2454,11 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Outlet | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | — |
 | Contact point | text | — |
-| Party size | 1,234 | — |
 | Starts at | 1 Oct 2026, 14:30 | — |
 | Duration minutes | 1,234 | How long the cover is held. An outlet turning tables twice an evening needs this to be real, or the second sitting cannot be booked. |
-| Tables | list or chips (count when long) | The dining tables assigned to this reservation, one row each. Usually empty until seating. |
 | Status | chip: Awaiting deposit, Booked, Confirmed, Seated, Completed, Cancelled… | `awaitingDeposit` only where the venue's dining deposit applies (decided 29 September, rev 3 REV3-8b); a booking with no deposit starts … |
-| Group | the name it points at, never the id | 5.1.2. Several bookings managed as one party across adjacent tables. |
-| Notes | text | Allergies, accessibility needs and other requests, as the guest wrote them. |
-| Actual party size | 1,234 | — |
-| Table visit | the name it points at, never the id | — |
 
 **The table map** (detail panel, from `getTableMap`)
 
@@ -2647,7 +2557,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (3), with its required mark, default, format and its error state (400, 404).
-- [ ] Every output is drawn (43 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-060?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm.
 - [ ] Every transition is wired: `EMP-061`.

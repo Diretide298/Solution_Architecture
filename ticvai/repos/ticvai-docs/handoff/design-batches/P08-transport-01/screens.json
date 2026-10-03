@@ -454,7 +454,7 @@
    "error": "Could not load. Names which read failed and leaves the routes untouched.",
    "emptyFirstRun": "**No routes yet.** Offers New route (needs at least two stations, BO-1183) and Import stations, routes and timetables (BO-1189).",
    "emptyNoResults": "The status or station filter matched nothing and the routes are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `TRANSPORT_VIEW`, which `listTransportTimetables` and the setup screens require, and names that permission. **Never an empty table**.",
+   "emptyNoAccess": "Shown when the caller lacks `TRANSPORT_MANAGE`, which `createTransportRoute` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "validation": "`422` on fewer than two stops, a station repeated, a station inactive or not at this venue, or offsets that do not start at 0 and strictly increase, each marked on the stop row; `409` on a code already used; `409` on a stop change under a published timetable; `409` on a status change the route cannot make (no fare table, or retiring with sold seats), naming what is missing."
   },
   "apis": [
@@ -745,7 +745,7 @@
    "error": "Could not load. Names which read failed and leaves the fare table untouched.",
    "emptyNoResults": "A route picked with no fare table opens the empty form, named as the first-run state for that route.",
    "emptyFirstRun": "**This route has no fares yet, so it cannot be activated or sold.** The form opens empty with the fare models explained.",
-   "emptyNoAccess": "Shown when the caller lacks `TRANSPORT_PRICE`, which `setTransportFareTable` requires, and names that permission; a `TRANSPORT_VIEW` holder sees the table read-only.",
+   "emptyNoAccess": "Shown when the caller lacks `TRANSPORT_PRICE`, which `setTransportFareTable` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
    "validation": "`422` on a matrix missing a station pair, a passenger type code repeated, no default type or a multiplier outside 0 to 1, each marked on its row."
   },
   "apis": [
@@ -916,11 +916,8 @@
         "Timetable.status",
         "Timetable.validFrom",
         "Timetable.validTo",
-        "Timetable.releaseHorizonDays",
         "Timetable.seatCapacity",
-        "Timetable.publishedAt",
-        "Timetable.releasedThrough",
-        "Timetable.supersededById"
+        "Timetable.publishedAt"
        ],
        "operation": "listTransportTimetables",
        "provenance": "contract transport.yaml GET /transport/routes/{routeId}/timetables"
@@ -997,7 +994,7 @@
    "error": "Could not load. Names which read failed and leaves the timetables untouched.",
    "emptyFirstRun": "**No timetable on this route, so nothing is on sale.** Offers New timetable and Import stations, routes and timetables (BO-1189).",
    "emptyNoResults": "The status filter matched nothing and the route's other timetables are still there. Names the filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `TRANSPORT_VIEW`, which `listTransportTimetables` requires, and names that permission. **Never an empty table**.",
+   "emptyNoAccess": "Shown when the caller lacks `TRANSPORT_VIEW`, which `listTransportTimetables` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TRANSPORT_MANAGE` for `createTransportTimetable`, `updateTransportTimetable`, `publishTransportTimetable`, `withdrawTransportTimetable`.",
    "validation": "`400` on a missing name, start date, capacity or run, or a run time out of order, marked on the field; `409` on editing a published timetable, on publishing against an inactive route or one with no fare table, and on withdrawing with sold seats, each naming the cause."
   },
   "apis": [
@@ -1062,7 +1059,9 @@
     },
     {
      "name": "timetableId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listTransportTimetables` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "Opens on the route picker when no route is carried."
@@ -1291,7 +1290,7 @@
    "error": "Could not load. Names which read failed and leaves the departures untouched.",
    "emptyFirstRun": "**No departures on this route**, because no timetable is published. Offers Timetables (BO-1186).",
    "emptyNoResults": "The date range or status matched nothing and the route's other departures are still there. Names the filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `TRANSPORT_VIEW`, which `listTransportRouteDepartures` requires, and names that permission. **Never an empty table**.",
+   "emptyNoAccess": "Shown when the caller lacks `TRANSPORT_VIEW`, which `listTransportRouteDepartures` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PERFORMANCE_CONFIGURE` for `cancelPerformance`; `TRANSPORT_MANAGE` for `updateTransportDeparture`.",
    "validation": "`422` on a capacity below the seats sold, naming the count; a cancellation follows the performance cancel rules (reason required, supervisor step-up for a real run)."
   },
   "apis": [
@@ -1338,11 +1337,15 @@
     },
     {
      "name": "departureId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listTransportRouteDepartures` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "performanceId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listTransportRouteDepartures` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "Opens on the route picker when no route is carried."
@@ -1435,7 +1438,10 @@
      "to": "BO-1184",
      "trigger": "Routes and stops",
      "provenance": "authored 29 September, rev 3 REV3-21",
-     "back": true
+     "back": true,
+     "carries": [
+      "routeId"
+     ]
     }
    ]
   },
@@ -1461,10 +1467,7 @@
         "PassType.kind",
         "PassType.trips",
         "PassType.fareMultiplier",
-        "PassType.referenceTrips",
-        "PassType.validityDays",
-        "PassType.routeIds",
-        "PassType.active"
+        "PassType.referenceTrips"
        ],
        "operation": "listTransportPassTypes",
        "notes": "Shows each pass's saving against single fares (fare multiplier against reference trips).",
@@ -1582,7 +1585,9 @@
     },
     {
      "name": "passTypeId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listTransportPassTypes` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "Resolves the venue from the session; a cold arrival is the ordinary case."
@@ -1807,11 +1812,15 @@
     },
     {
      "name": "importId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `importTransportNetwork`; a link or an edge that holds one opens it instead."
     },
     {
      "name": "uploadId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createUpload`; a link or an edge that holds one opens it instead."
     }
    ],
    "coldEntry": "**A link to an import opened cold shows where it stands**: still validating, ready for review, failed, applied, or expired and needing a new upload."

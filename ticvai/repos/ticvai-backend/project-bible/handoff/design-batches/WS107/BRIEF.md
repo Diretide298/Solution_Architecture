@@ -96,16 +96,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-459` | Billing & Commercial Command Center | B–D | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-460` | Billing Calculation & Charge Breakdown | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `ADM-461` | Consumption Reconciliation & Billing Approval | B–D | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
-| `ADM-462` | Invoice & Payment Management | B–D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `ADM-463` | Subscription & Commercial Change Management | B–D | 0 | 12 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `ADM-464` | Renewal Management Center | B–D | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-465` | AI Upgrade, Downgrade & Commercial Right-Sizing | B–D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `ADM-466` | Commercial Scenario Simulator | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-467` | Discount, Credit & Commercial Override Management | B–D | 10 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-468` | Renewal Approval, Activation & Commercial Handoff | B–D | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
+| `ADM-459` | Billing & Commercial Command Center | B | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-460` | Billing Calculation & Charge Breakdown | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `ADM-461` | Consumption Reconciliation & Billing Approval | B | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
+| `ADM-462` | Invoice & Payment Management | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `ADM-463` | Subscription & Commercial Change Management | B | 0 | 12 | 6 | 4 | 0 | 0 | — | notStarted (—) |
+| `ADM-464` | Renewal Management Center | B | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-465` | AI Upgrade, Downgrade & Commercial Right-Sizing | B | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `ADM-466` | Commercial Scenario Simulator | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-467` | Discount, Credit & Commercial Override Management | B | 10 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-468` | Renewal Approval, Activation & Commercial Handoff | B | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

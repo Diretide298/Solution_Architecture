@@ -127,7 +127,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-088` | Approval Analytics | B–D | 0 | 4 | 6 | 0 | 0 | 3 | — | notStarted (generated) |
-| `BO-106` | People & Access Rights | B–D | 1 | 33 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
+| `BO-106` | People & Access Rights | B–D | 1 | 30 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

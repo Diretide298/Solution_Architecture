@@ -95,8 +95,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ANL-071` | AI Maturity & Learning | B–D | 20 | 42 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ANL-072` | Finance Dashboard | B–D | 4 | 97 | 6 | 7 | 0 | 0 | — | notStarted (—) |
+| `ANL-071` | AI Maturity & Learning | D | 20 | 42 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ANL-072` | Finance Dashboard | C | 4 | 97 | 6 | 7 | 0 | 0 | — | notStarted (—) |
 
 ## Design inputs from the client meetings
 

@@ -126,8 +126,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SUP-006` | Knowledge Base Search | B–D | 3 | 5 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
-| `SUP-007` | Canned Response Management | B–D | 10 | 18 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
+| `SUP-006` | Knowledge Base Search | D | 3 | 5 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
+| `SUP-007` | Canned Response Management | D | 10 | 12 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -147,7 +147,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
 | Module | Knowledge & Responses · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-SUPPORT-SUP-006 |
 | Who uses it | venue staff holding `AI_USE`, `TENANT_CONFIGURE` (1 operate, 1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listKnowledgeCollections` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -294,7 +294,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
 | Module | Knowledge & Responses · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-SUPPORT-SUP-007 |
 | Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listMessageTemplates` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -320,7 +320,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Create message template** (modal, opened by *Create message template*; *Create message template* calls `createMessageTemplate`, *Cancel* sends nothing)
 
-**Collects what `createMessageTemplate` sends before it is called.** Required: `id`, `code`, `name`, `channel`, `bodies`. Optional: `subjects`, `mergeFields`, `missingLanguages`, `providerTemplateId`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `createMessageTemplate` sends before it is called.** Required: `code`, `name`, `channel`, `bodies`. Optional: `subjects`, `mergeFields`, `providerTemplateId`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `missingLanguages` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -348,15 +348,9 @@ Errors to draw in the form: 400 Unknown merge field, or a required language is m
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | — |
-| Subjects | grouped details | Per language. Email only. |
-| Bodies | grouped details | Per language, keyed by ISO 639-1 code. |
-| Merge fields | list or chips (count when long) | — |
-| Missing languages | list or chips (count when long) | Enabled languages without a body. Flagged rather than silently falling back — a guest receiving English when they chose Arabic is a defect. |
-| Provider template | text | Required for WhatsApp, where templates are pre-approved by the provider. |
 
 **The selected message template** (detail panel, from `listMessageTemplates`)
 
@@ -392,7 +386,7 @@ Errors to draw in the form: 400 Unknown merge field, or a required language is m
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the canned response untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No canned response yet. Offers Create message template (`createMessageTemplate`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on channel and the canned response are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `listMessageTemplates` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `listMessageTemplates` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createMessageTemplate`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Unknown merge field, or a required language is missing |
 
@@ -411,7 +405,7 @@ responses:
 - `listMessageTemplates` → `MARKETING_VIEW` (read) · staff
 - `createMessageTemplate` → `MARKETING_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `listMessageTemplates` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `listMessageTemplates` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createMessageTemplate`.
 
 #### Requirements it meets
 
@@ -444,7 +438,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (10), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SUP-007?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create message template.
 - [ ] Every transition is wired: `SUP-001`.

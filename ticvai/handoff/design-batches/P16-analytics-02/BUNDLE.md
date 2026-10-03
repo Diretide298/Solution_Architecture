@@ -95,8 +95,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ANL-071` | AI Maturity & Learning | B–D | 20 | 42 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ANL-072` | Finance Dashboard | B–D | 4 | 97 | 6 | 7 | 0 | 0 | — | notStarted (—) |
+| `ANL-071` | AI Maturity & Learning | D | 20 | 42 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ANL-072` | Finance Dashboard | C | 4 | 97 | 6 | 7 | 0 | 0 | — | notStarted (—) |
 
 ---
 
@@ -112,7 +112,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `ai` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-071 |
 | Who uses it | venue staff holding `AI_CONFIGURE`, `AI_USE` (1 configure, 1 operate) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAiCapabilityMaturity` reads a population (one row per question the AI answers) and the detail is the row |
@@ -386,7 +386,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-ANALYTICS-ANL-072 |
 | Who uses it | venue staff holding `LEDGER_VIEW`, `REPORT_VIEW_VENUE` (1 read, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the Finance standard dashboard of the reporting area (DI-721): seeded finance measures over a period, not a population the screen lists |

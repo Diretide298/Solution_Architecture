@@ -1,6 +1,6 @@
 # P05-sell-01 — P05 · Sell (1 of 2)
 
-**10 screens · 13 operations · 47 schemas · 5 permissions**
+**10 screens · 13 operations · 48 schemas · 5 permissions**
 
 Platform P05 Guest Kiosk · ships as **guest** ·
 guest audience · kiosk ·
@@ -122,16 +122,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `KSK-001` | Attract Loop | B–D | 0 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-002` | Language Select | B–D | 1 | 20 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-003` | What are you buying | B–D | 0 | 4 | 6 | 12 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-004` | Choose tickets | B–D | 0 | 17 | 6 | 14 | 2 | 0 | guest | notStarted (generated) |
-| `KSK-005` | Choose a performance | B–D | 0 | 35 | 5 | 9 | 1 | 0 | guest | notStarted (generated) |
-| `KSK-006` | Review | B–D | 11 | 29 | 5 | 29 | 1 | 0 | guest | notStarted (generated) |
-| `KSK-007` | Payment | B–D | 0 | 20 | 5 | 9 | 2 | 0 | guest | notStarted (generated) |
-| `KSK-008` | Payment unresolved | B–D | 0 | 0 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-009` | Ticket issued | B–D | 5 | 10 | 5 | 10 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-010` | Print failure | B–D | 6 | 0 | 4 | 6 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-001` | Attract Loop | C | 0 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-002` | Language Select | B | 1 | 20 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-003` | What are you buying | B | 0 | 4 | 6 | 12 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-004` | Choose tickets | B | 0 | 17 | 6 | 14 | 2 | 0 | guest | notStarted (generated) |
+| `KSK-005` | Choose a performance | C | 0 | 35 | 5 | 9 | 1 | 0 | guest | notStarted (generated) |
+| `KSK-006` | Review | C | 11 | 29 | 5 | 29 | 1 | 0 | guest | notStarted (generated) |
+| `KSK-007` | Payment | C | 0 | 20 | 5 | 9 | 2 | 0 | guest | notStarted (generated) |
+| `KSK-008` | Payment unresolved | C | 0 | 0 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-009` | Ticket issued | C | 5 | 10 | 5 | 10 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-010` | Print failure | C | 6 | 0 | 4 | 6 | 0 | 0 | guest | notStarted (generated) |
 
 ## Thin screens in this batch
 

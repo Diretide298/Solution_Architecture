@@ -96,16 +96,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-369` | Commercial Command Center | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-370` | Customer Subscription & Commercial Portfolio | B–D | 2 | 34 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-371` | Customer Commercial 360° | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-372` | Operational Profile, VSI & Commercial Model Intelligence | B–D | 0 | 0 | 6 | 2 | 2 | 0 | — | notStarted (—) |
-| `ADM-373` | Revenue & Commercial Model Analytics | B–D | 0 | 10 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `ADM-374` | Trial & Conversion Monitor | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `ADM-375` | Renewal & Retention Center | B–D | 0 | 22 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-376` | Commercial Optimization & Expansion Opportunities | B–D | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-377` | Subscription Exceptions & Commercial Alerts | B–D | 0 | 12 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-378` | Executive AI Commercial Intelligence | B–D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
+| `ADM-369` | Commercial Command Center | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-370` | Customer Subscription & Commercial Portfolio | B | 2 | 34 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-371` | Customer Commercial 360° | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-372` | Operational Profile, VSI & Commercial Model Intelligence | B | 0 | 0 | 6 | 2 | 2 | 0 | — | notStarted (—) |
+| `ADM-373` | Revenue & Commercial Model Analytics | B | 0 | 10 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ADM-374` | Trial & Conversion Monitor | B | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ADM-375` | Renewal & Retention Center | B | 0 | 22 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-376` | Commercial Optimization & Expansion Opportunities | B | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-377` | Subscription Exceptions & Commercial Alerts | B | 0 | 12 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-378` | Executive AI Commercial Intelligence | B | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

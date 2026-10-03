@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-274` | Group Booking Operations Command Center | B–D | 0 | 52 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
+| `BO-274` | Group Booking Operations Command Center | B–D | 0 | 14 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
 | `BO-275` | Group Operational Planning & Task Workspace | B–D | 18 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-276` | Participants, Guest Lists & Group Structure | B–D | 8 | 6 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-277` | Group Payment, Deposit & Balance Management | B–D | 5 | 16 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
@@ -161,63 +161,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| Upcoming groups | 1,234 | Upcoming Groups |
-| Groups today | text | Groups Today |
-| Expected guests today | text | Expected Guests Today |
-| Groups awaiting deposit | AED 1,234.50 | Groups Awaiting Deposit |
-| Guest lists pending | 1,234 | Guest Lists Pending |
-| Tickets pending | 1,234 | Tickets Pending |
-| Resources pending | 1,234 | Resources Pending |
-| Groups ready | text | Groups Ready |
-| Groups with issues | 1,234 | Groups With Issues |
-| Outstanding payments | 1,234 | Outstanding Payments |
-| Check ins today | text | Check-Ins Today |
-| Completed groups | 1,234 | Completed Groups |
-| Group booking | text | Group Booking ID |
-| Organization | text | Organization |
-| Group type | text | Group Type |
-| Venue event | text | Venue/Event |
-| Visit date | 1 Oct 2026, 14:30 | Visit Date |
-| Arrival time | 1 Oct 2026, 14:30 | Arrival Time |
-| Guests | 1,234 | Guests |
 | Booking value | text | Booking Value |
 | Payment status | 1,234 | Payment Status |
 | Guest list status | 1,234 | Guest List Status |
 | Ticket status | 1,234 | Ticket Status |
 | Resource status | 1,234 | Resource Status |
 | Readiness | 1,234.5 | Readiness % |
-| Operational owner | text | Operational Owner |
 
 **The selected group booking operations** (detail panel): The pack groups this record's detail under its own headings: “Use”.
 
 | Shows | Format | Notes |
 |---|---|---|
-| Upcoming groups | 1,234 | Upcoming Groups |
-| Groups today | text | Groups Today |
-| Expected guests today | text | Expected Guests Today |
-| Groups awaiting deposit | AED 1,234.50 | Groups Awaiting Deposit |
-| Guest lists pending | 1,234 | Guest Lists Pending |
-| Tickets pending | 1,234 | Tickets Pending |
-| Resources pending | 1,234 | Resources Pending |
-| Groups ready | text | Groups Ready |
-| Groups with issues | 1,234 | Groups With Issues |
-| Outstanding payments | 1,234 | Outstanding Payments |
-| Check ins today | text | Check-Ins Today |
-| Completed groups | 1,234 | Completed Groups |
-| Group booking | text | Group Booking ID |
-| Organization | text | Organization |
 | Group type | text | Group Type |
-| Venue event | text | Venue/Event |
 | Visit date | 1 Oct 2026, 14:30 | Visit Date |
-| Arrival time | 1 Oct 2026, 14:30 | Arrival Time |
-| Guests | 1,234 | Guests |
 | Booking value | text | Booking Value |
 | Payment status | 1,234 | Payment Status |
 | Guest list status | 1,234 | Guest List Status |
 | Ticket status | 1,234 | Ticket Status |
 | Resource status | 1,234 | Resource Status |
 | Readiness | 1,234.5 | Readiness % |
-| Operational owner | text | Operational Owner |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -310,7 +272,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (52 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-274?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-275`, `BO-282`, `BO-283`, `BO-276`, `BO-277`, `BO-278`, `BO-279`, `BO-280`, `BO-281`.

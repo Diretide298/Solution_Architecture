@@ -1,6 +1,6 @@
 # P02-discovery-browse-01 — P02 · Discovery & Browse
 
-**7 screens · 23 operations · 65 schemas · 6 permissions**
+**7 screens · 22 operations · 65 schemas · 5 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 6 permissions apply here:
-  `AI_USE, GUEST_VIEW, ORDER_VIEW, PRODUCT_VIEW, TENANT_CONFIGURE, VENUE_MAP_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 5 permissions apply here:
+  `AI_USE, GUEST_VIEW, ORDER_VIEW, PRODUCT_VIEW, VENUE_MAP_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **14 of these operations work offline**: getBundle, getPerformance, getProduct, getPublishedGuidedChoice, getPublishedTenantConfig, getTenantAppStatus, getVenueMap, getWaitTimes
   — and the rest do not. A surface that looks the same online and off is lying.
@@ -124,12 +124,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-001` | Home | A | 2 | 111 | 7 | 62 | 6 | 0 | guest | notStarted (client-verified) |
+| `GST-001` | Home | A | 2 | 109 | 7 | 62 | 6 | 0 | guest | notStarted (client-verified) |
 | `GST-002` | Explore | A | 1 | 44 | 6 | 15 | 4 | 0 | guest | notStarted (client-verified) |
-| `GST-003` | Buy Tickets | A | 1 | 53 | 6 | 24 | 10 | 0 | guest | notStarted (client-verified) |
-| `GST-004` | Item Detail | A | 1 | 103 | 8 | 29 | 11 | 0 | guest | notStarted (client-verified) |
+| `GST-003` | Buy Tickets | A | 1 | 51 | 6 | 24 | 10 | 0 | guest | notStarted (client-verified) |
+| `GST-004` | Item Detail | A | 1 | 94 | 8 | 29 | 11 | 0 | guest | notStarted (client-verified) |
 | `GST-005` | What's On | A | 2 | 10 | 6 | 17 | 0 | 0 | guest | notStarted (client-verified) |
-| `GST-006` | Item Detail – Event / Exhibition | A | 0 | 25 | 5 | 11 | 2 | 0 | guest | notStarted (client-verified) |
+| `GST-006` | Item Detail – Event / Exhibition | A | 0 | 7 | 5 | 11 | 2 | 0 | guest | notStarted (client-verified) |
 | `GST-057` | Accessibility Information | A | 0 | 4 | 6 | 0 | 2 | 0 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch

@@ -1,16 +1,16 @@
 {
  "scope": "platform",
- "generated": "2026-10-02",
+ "generated": "2026-10-03",
  "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
  "counts": {
-  "operations": 2731,
+  "operations": 2738,
   "contracts": 33,
-  "tables": 1112,
+  "tables": 1113,
   "stores": 10,
   "foreignKeys": 796,
   "indexes": 2825,
   "tablesWritten": 1093,
-  "relationships": 3062,
+  "relationships": 3065,
   "states": 207,
   "events": 77,
   "flows": 97,
@@ -26,15 +26,15 @@
   "design": [
    {
     "name": "API data lineage resolved",
-    "done": 2696,
-    "total": 2731,
+    "done": 2700,
+    "total": 2738,
     "percent": 99,
     "note": "Every operation maps to the tables it reads and writes."
    },
    {
     "name": "Operations declaring an auth model",
-    "done": 2731,
-    "total": 2731,
+    "done": 2738,
+    "total": 2738,
     "percent": 100,
     "note": "A permission, an auth mode, or a declared audience. None may be silent."
    },
@@ -69,14 +69,14 @@
    {
     "name": "State models",
     "done": 207,
-    "total": 388,
+    "total": 389,
     "percent": 53,
     "note": "The denominator is status enums in contracts. Some models describe behaviour with no enum, so this can exceed 100%."
    },
    {
     "name": "Tables with a relationship",
-    "done": 1023,
-    "total": 1126,
+    "done": 1024,
+    "total": 1127,
     "percent": 91,
     "note": "The remainder are partitions, platform-written tables and caches, each stating why."
    },
@@ -103,8 +103,8 @@
    },
    {
     "name": "Operations reaching a screen",
-    "done": 2486,
-    "total": 2731,
+    "done": 2489,
+    "total": 2738,
     "percent": 91,
     "note": "Not a defect on its own \u2014 sync, webhook and job operations have no screen."
    },
@@ -127,7 +127,7 @@
    {
     "name": "Tables written",
     "done": 1093,
-    "total": 1112,
+    "total": 1113,
     "percent": 98,
     "note": "Counted from backend/. ADR-0024 said DDL waits for the design to settle; ADR-0038 and ADR-0039 settled it."
    },
@@ -176,9 +176,9 @@
   "build": 33
  },
  "waves": {
-  "wave1": 189,
-  "wave2": 269,
-  "wave3": 1992
+  "wave1": 400,
+  "wave2": 142,
+  "wave3": 1908
  },
  "platformBreakdown": [
   {

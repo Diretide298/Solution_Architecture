@@ -48,7 +48,10 @@
     {
      "to": "BO-746",
      "trigger": "Duplicate Review & Merge",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "candidateId"
+     ]
     },
     {
      "to": "BO-747",
@@ -489,7 +492,9 @@
    "params": [
     {
      "name": "candidateId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listDuplicateCandidates` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -841,7 +846,9 @@
    "params": [
     {
      "name": "subjectId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `recordConsent` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -982,7 +989,9 @@
    "params": [
     {
      "name": "subjectId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getGuestConsents` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1305,7 +1314,9 @@
    "params": [
     {
      "name": "dataClass",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listDataRetentionSettings` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

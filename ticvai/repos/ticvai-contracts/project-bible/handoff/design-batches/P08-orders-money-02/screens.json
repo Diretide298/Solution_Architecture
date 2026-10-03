@@ -32,16 +32,11 @@
        "label": "Waiting for a decision",
        "bindsTo": "CashMovement",
        "columns": [
-        "CashMovement.id",
         "CashMovement.kind",
         "CashMovement.amount",
-        "CashMovement.denominations",
         "CashMovement.reference",
         "CashMovement.reason",
         "CashMovement.recordedAt",
-        "CashMovement.shiftId",
-        "CashMovement.authorisedByPrincipalId",
-        "CashMovement.sequence",
         "CashMovement.syncedAt"
        ],
        "operation": "listCashMovements",
@@ -52,13 +47,7 @@
        "label": "Every shift",
        "bindsTo": "Shift",
        "columns": [
-        "Shift.id",
-        "Shift.workstationId",
-        "Shift.venueId",
-        "Shift.scopePath",
-        "Shift.principalId",
         "Shift.principalDisplayName",
-        "Shift.incidents",
         "Shift.status",
         "Shift.currency",
         "Shift.currencyScale",
@@ -79,19 +68,13 @@
        "label": "The selected cash movement",
        "bindsTo": "CashMovement",
        "columns": [
-        "CashMovement.id",
         "CashMovement.kind",
         "CashMovement.amount",
         "CashMovement.denominations",
         "CashMovement.reference",
         "CashMovement.reason",
         "CashMovement.recordedAt",
-        "CashMovement.shiftId",
-        "CashMovement.depositBoxId",
-        "CashMovement.witnessPrincipalId",
         "CashMovement.withdrawalReason",
-        "CashMovement.authorisedByPrincipalId",
-        "CashMovement.sequence",
         "CashMovement.syncedAt"
        ],
        "operation": "listCashMovements",
@@ -102,19 +85,11 @@
        "label": "The shift",
        "bindsTo": "Shift",
        "columns": [
-        "Shift.id",
-        "Shift.workstationId",
-        "Shift.venueId",
-        "Shift.scopePath",
-        "Shift.principalId",
         "Shift.principalDisplayName",
         "Shift.incidents",
         "Shift.status",
-        "Shift.currency",
-        "Shift.currencyScale",
         "Shift.depositBoxCode",
         "Shift.bagNumber",
-        "Shift.openingFloat",
         "Shift.salesTotal",
         "Shift.refundsTotal",
         "Shift.liftsTotal"
@@ -169,7 +144,7 @@
    "error": "Could not load. Names which read failed and leaves the cash movements untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
    "emptyNoResults": "Never shown: `listCashMovements` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listCashMovements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listCashMovements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `createCashMovement`."
   },
   "apis": [
    {
@@ -221,7 +196,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-041"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares (5 after the 28 September split from BO-042, audit R276), not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares (5 after the 28 September split from BO-042, audit R276), not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "recordNoSale",
@@ -382,7 +357,7 @@
    "error": "Could not load. Names which read failed and leaves the banking safe untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
    "emptyNoResults": "Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires to show this screen, and names that permission (the screen's other reads need `TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `withdrawFromDepositBox`, `createCashMovement`."
   },
   "apis": [
    {
@@ -419,7 +394,9 @@
    "params": [
     {
      "name": "boxId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listDepositBoxes` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "shiftId",
@@ -445,7 +422,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-042"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares (split from BO-041 on 28 September, audit R276), not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 13 operations this screen declares (split from BO-041 on 28 September, audit R276), not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "getShift",
@@ -569,18 +546,12 @@
        "label": "Every settlement",
        "bindsTo": "Settlement",
        "columns": [
-        "Settlement.id",
         "Settlement.providerName",
-        "Settlement.periodStart",
-        "Settlement.periodEnd",
         "Settlement.status",
         "Settlement.lineCount",
         "Settlement.matchedCount",
         "Settlement.exceptionCount",
-        "Settlement.providerGross",
-        "Settlement.providerFees",
-        "Settlement.providerNet",
-        "Settlement.ledgerGross"
+        "Settlement.providerFees"
        ],
        "operation": "listSettlements",
        "provenance": "contract finance.yaml GET /settlements"
@@ -590,16 +561,7 @@
        "label": "Every posting",
        "bindsTo": "Posting",
        "columns": [
-        "Posting.id",
-        "Posting.journalEntryId",
-        "Posting.accountId",
         "Posting.accountCode",
-        "Posting.debit",
-        "Posting.credit",
-        "Posting.venueId",
-        "Posting.costCenterId",
-        "Posting.source",
-        "Posting.sourceId",
         "Posting.description",
         "Posting.postedAt"
        ],
@@ -611,16 +573,11 @@
        "label": "Every settlement exception",
        "bindsTo": "SettlementException",
        "columns": [
-        "SettlementException.id",
-        "SettlementException.settlementId",
         "SettlementException.kind",
         "SettlementException.providerReference",
-        "SettlementException.paymentId",
         "SettlementException.amount",
         "SettlementException.expectedAmount",
         "SettlementException.resolution",
-        "SettlementException.note",
-        "SettlementException.resolvedByPrincipalId",
         "SettlementException.resolvedAt"
        ],
        "operation": "listSettlementExceptions",
@@ -645,22 +602,14 @@
        "label": "The selected settlement",
        "bindsTo": "Settlement",
        "columns": [
-        "Settlement.id",
         "Settlement.currencyCode",
         "Settlement.providerName",
-        "Settlement.periodStart",
-        "Settlement.periodEnd",
         "Settlement.fileReference",
-        "Settlement.format",
         "Settlement.status",
         "Settlement.lineCount",
         "Settlement.matchedCount",
         "Settlement.exceptionCount",
-        "Settlement.providerGross",
-        "Settlement.providerFees",
-        "Settlement.providerNet",
-        "Settlement.ledgerGross",
-        "Settlement.difference"
+        "Settlement.providerFees"
        ],
        "operation": "getSettlement",
        "provenance": "contract finance.yaml GET /settlements/{settlementId}"
@@ -734,7 +683,7 @@
    "error": "Could not load. Names which read failed and leaves the daily reconciliation untouched.",
    "emptyFirstRun": "No daily reconciliation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on providerName, status and the daily reconciliation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `getTrialBalance` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `getTrialBalance` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_WORKSTATION`, `SETTLEMENT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT` for `acceptShiftVariance`, `rejectShiftVariance`; `SETTLEMENT_RECONCILE` for `ingestSettlementFile`, `resolveSettlementException`; `SHIFT_CLOSE` for `closeShift`."
   },
   "apis": [
    {
@@ -846,7 +795,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-043"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formIngestSettlementFile",
@@ -1073,18 +1022,12 @@
        "label": "Every refund",
        "bindsTo": "Refund",
        "columns": [
-        "Refund.id",
-        "Refund.orderId",
-        "Refund.batchId",
         "Refund.fxRate",
-        "Refund.taxReversalEntryId",
         "Refund.settleTo",
         "Refund.fxVariance",
         "Refund.amount",
         "Refund.appliedPercentage",
-        "Refund.status",
-        "Refund.reason",
-        "Refund.requestedByPrincipalId"
+        "Refund.status"
        ],
        "operation": "listOrderRefunds",
        "provenance": "contract orders.yaml GET /orders/{orderId}/refunds"
@@ -1143,22 +1086,14 @@
        "label": "The order",
        "bindsTo": "Order",
        "columns": [
-        "Order.id",
         "Order.orderNumber",
         "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
         "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
         "Order.grossAmount",
         "Order.taxAmount",
         "Order.netAmount",
         "Order.refundedAmount",
-        "Order.totalPriceVariance",
-        "Order.lines",
-        "Order.payments",
-        "Order.principalId"
+        "Order.totalPriceVariance"
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
@@ -1429,7 +1364,7 @@
    "error": "Could not load. Names which read failed and leaves the order untouched.",
    "emptyFirstRun": "No order yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the order are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createOrder`; `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_MODIFY` for `holdOrder`, `modifyOrder`, `resumeOrder`; `ORDER_REFUND` for `createRefund`; `ORDER_REPRINT` for `reprintOrder`."
   },
   "apis": [
    {
@@ -1551,7 +1486,9 @@
    "params": [
     {
      "name": "orderId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listOrders` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
@@ -1568,7 +1505,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-047"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "nameNote": "**Renamed 9 September 2026.** It was called *F&B Order Management*, which is BO-020's job and shares not one of this screen's fourteen operations. Its own purpose — fix an order that has gone wrong — is what it is called now.",
   "_platform": {
    "code": "P08",
@@ -1598,7 +1535,7 @@
   "name": "Retail Products",
   "module": "Orders & Money",
   "requiresModule": "retail",
-  "wave": 2,
+  "wave": 1,
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -1735,7 +1672,7 @@
    "error": "Could not load. Names which read failed and leaves the retail products untouched.",
    "emptyFirstRun": "No retail products yet. Offers Create merchandise (`createMerchandise`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on outletId, categoryId, inStockOnly, search and the retail products are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createMerchandise`, `updateMerchandise`."
   },
   "apis": [
    {
@@ -1791,7 +1728,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-048"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateMerchandise",
@@ -1939,14 +1876,7 @@
         "ReportDefinition.name",
         "ReportDefinition.description",
         "ReportDefinition.category",
-        "ReportDefinition.dataSource",
-        "ReportDefinition.columns",
-        "ReportDefinition.filters",
-        "ReportDefinition.groupBy",
-        "ReportDefinition.parameters",
-        "ReportDefinition.requiredPermission",
         "ReportDefinition.maxDateRangeDays",
-        "ReportDefinition.id",
         "ReportDefinition.isSystem"
        ],
        "operation": "listReports",
@@ -1976,15 +1906,7 @@
         "ReportDefinition.dataSource",
         "ReportDefinition.columns",
         "ReportDefinition.filters",
-        "ReportDefinition.groupBy",
-        "ReportDefinition.parameters",
-        "ReportDefinition.requiredPermission",
-        "ReportDefinition.maxDateRangeDays",
-        "ReportDefinition.id",
-        "ReportDefinition.isSystem",
-        "ReportDefinition.isRetired",
         "ReportDefinition.estimatedCost",
-        "ReportDefinition.createdByPrincipalId",
         "ReportDefinition.lastRunAt"
        ],
        "operation": "getReport",
@@ -2180,7 +2102,7 @@
    "error": "Could not load. Names which read failed and leaves the sales reports untouched.",
    "emptyFirstRun": "No sales reports yet. Offers Create report (`createReport`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on category, search and the sales reports are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REPORT_MANAGE` for `createReport`, `deleteReport`, `saveNaturalLanguageQuery`, `updateReport`."
   },
   "apis": [
    {
@@ -2260,11 +2182,15 @@
    "params": [
     {
      "name": "conversationId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `askReportingQuestion`; a link or an edge that holds one opens it instead."
     },
     {
      "name": "reportId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listReports` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
@@ -2281,7 +2207,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-059"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -2361,10 +2287,6 @@
        "bindsTo": "ReportSchedule",
        "columns": [
         "ReportSchedule.name",
-        "ReportSchedule.reportId",
-        "ReportSchedule.cadence",
-        "ReportSchedule.recipients",
-        "ReportSchedule.format",
         "ReportSchedule.isPaused",
         "ReportSchedule.lastRunAt",
         "ReportSchedule.lastRunStatus",
@@ -2483,7 +2405,7 @@
    "error": "Could not load. Names which read failed and leaves the schedules untouched.",
    "emptyFirstRun": "No report schedules yet. Offers Create report schedule (`createReportSchedule`).",
    "emptyNoResults": "Never shown: `listReportSchedules` takes no filter here, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listReportSchedules` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listReportSchedules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REPORT_SCHEDULE` for `createReportSchedule`, `updateReportSchedule`, `deleteReportSchedule`."
   },
   "apis": [
    {
@@ -2622,8 +2544,6 @@
        "label": "The refund policy",
        "bindsTo": "RefundPolicy",
        "columns": [
-        "RefundPolicy.id",
-        "RefundPolicy.venueId",
         "RefundPolicy.selfAuthoriseLimit",
         "RefundPolicy.requiresSecondUserAbove",
         "RefundPolicy.requiresApprovalAbove",
@@ -2656,7 +2576,7 @@
    "error": "Could not load. Names which read failed and leaves the venue profile untouched.",
    "emptyFirstRun": "No venue profile yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on openNow, orderingMethod and the venue profile are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getRefundPolicy` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getRefundPolicy` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REGION_CONFIGURE` for `setRefundPolicy`."
   },
   "apis": [
    {
@@ -2693,13 +2613,13 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-062"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetRefundPolicy",
     "component": "modal",
     "trigger": "Save refund policy",
-    "body": "**Collects what `setRefundPolicy` sends before it is called.** Required: `venueId`, `selfAuthoriseLimit`, `requiresApprovalAbove`. Optional: `id`, `requiresSecondUserAbove`, `timeBands`, `allowPartial`, `refundWindowDays`, `varianceThreshold`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setRefundPolicy` sends before it is called.** Required: `selfAuthoriseLimit`, `requiresApprovalAbove`. Optional: `requiresSecondUserAbove`, `timeBands`, `allowPartial`, `refundWindowDays`, `varianceThreshold`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `venueId` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "RefundPolicy",
     "confirm": {
      "label": "Save refund policy",
@@ -2708,10 +2628,8 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "venueId",
       "selfAuthoriseLimit",
       "requiresApprovalAbove",
-      "id",
       "requiresSecondUserAbove",
       "timeBands",
       "allowPartial",
@@ -2797,8 +2715,6 @@
        "label": "The refund policy",
        "bindsTo": "RefundPolicy",
        "columns": [
-        "RefundPolicy.id",
-        "RefundPolicy.venueId",
         "RefundPolicy.selfAuthoriseLimit",
         "RefundPolicy.requiresSecondUserAbove",
         "RefundPolicy.requiresApprovalAbove",
@@ -2866,7 +2782,7 @@
    "error": "Could not load. Names which read failed and leaves the venue untouched.",
    "emptyFirstRun": "No venue yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on openNow, orderingMethod and the venue are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getRefundPolicy` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `getRefundPolicy` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW`, `TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setDeliveryLocationOutletMapping`, `createDeliveryLocation`, `updateDeliveryLocation`; `REGION_CONFIGURE` for `setRefundPolicy`; `TENANT_CONFIGURE` for `setVenueSettings`; `WORKSTATION_CONFIGURE` for `setTillShiftPolicy`."
   },
   "apis": [
    {
@@ -2937,7 +2853,9 @@
     },
     {
      "name": "locationId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createDeliveryLocation`; a link or an edge that holds one opens it instead."
     }
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
@@ -2954,13 +2872,13 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-065"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetRefundPolicy",
     "component": "modal",
     "trigger": "Save refund policy",
-    "body": "**Collects what `setRefundPolicy` sends before it is called.** Required: `venueId`, `selfAuthoriseLimit`, `requiresApprovalAbove`. Optional: `id`, `requiresSecondUserAbove`, `timeBands`, `allowPartial`, `refundWindowDays`, `varianceThreshold`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setRefundPolicy` sends before it is called.** Required: `selfAuthoriseLimit`, `requiresApprovalAbove`. Optional: `requiresSecondUserAbove`, `timeBands`, `allowPartial`, `refundWindowDays`, `varianceThreshold`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `venueId` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "RefundPolicy",
     "confirm": {
      "label": "Save refund policy",
@@ -2969,10 +2887,8 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "venueId",
       "selfAuthoriseLimit",
       "requiresApprovalAbove",
-      "id",
       "requiresSecondUserAbove",
       "timeBands",
       "allowPartial",
@@ -2986,7 +2902,7 @@
     "id": "formSetVenueSettings",
     "component": "modal",
     "trigger": "Save venue settings",
-    "body": "**Collects what `setVenueSettings` sends before it is called, in sections, not property names.** Nothing in the body is required. **Day and hours**: calendar day start, support hours, quiet hours. **Money**: display and charge currencies (the guest selects among them, CHG-FIN-001), cash drawer limit (warns and offers a cash lift, DEC-179), shift variance threshold. **Carts and resale**: cart lease, extensions, resale, exchange and reschedule cut-offs. **F&B limits**: recall window, comp escalation, table reserved lead, food-safety lead. **Biometrics** (master switch, consent form, minors) and **segregated access**. **Alerting**: channel, acknowledgement, escalation. Currency code and scale are read-only (ADR-0008). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setVenueSettings` sends before it is called, in sections, not property names.** Nothing in the body is required. **Day and hours**: calendar day start, support hours, quiet hours. **Money**: display and charge currencies (the guest selects among them, CHG-FIN-001), cash drawer limit (warns and offers a cash lift, DEC-179), shift variance threshold. **Carts and resale**: cart lease, extensions, resale, exchange and reschedule cut-offs. **F&B limits**: recall window, comp escalation, table reserved lead, food-safety lead. **Biometrics** (master switch, consent form, minors) and **segregated access**. **Alerting**: channel, acknowledgement, escalation. Currency code and scale are read-only (ADR-0008). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `currencyCode`, `currencyScale`, `id`, `venueId` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "VenueSettings",
     "confirm": {
      "label": "Save venue settings",
@@ -2995,10 +2911,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "venueId",
-      "currencyCode",
-      "currencyScale",
       "supportHours",
       "quietHours",
       "biometrics",
@@ -3121,7 +3033,7 @@
     "BO-043"
    ]
   },
-  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. Pulled to Wave 1 (CF-101). **F16 says it itself** — no chart of accounts blocks the first sale, so it cannot be Wave 2 while venue provisioning is Wave 1.",
+  "notes": "Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. Pulled to Wave 1 (CF-101). **F16 says it itself** — no chart of accounts blocks the first sale, so it cannot be built after venue provisioning.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listAccounts` reads the population and `getAccount` reads one of them — list, select, act",
@@ -3164,18 +3076,12 @@
        "label": "Every account",
        "bindsTo": "Account",
        "columns": [
-        "Account.id",
         "Account.code",
         "Account.externalCode",
-        "Account.isSuspense",
         "Account.subType",
-        "Account.tags",
         "Account.notes",
         "Account.name",
-        "Account.type",
-        "Account.parentId",
-        "Account.legalEntityId",
-        "Account.currency"
+        "Account.type"
        ],
        "operation": "listAccounts",
        "provenance": "contract finance.yaml GET /accounts"
@@ -3200,17 +3106,12 @@
        "label": "Every legal entity",
        "bindsTo": "LegalEntity",
        "columns": [
-        "LegalEntity.id",
         "LegalEntity.code",
         "LegalEntity.name",
         "LegalEntity.countryCode",
         "LegalEntity.currency",
         "LegalEntity.currencyScale",
-        "LegalEntity.taxRegistrationNumber",
-        "LegalEntity.fiscalYearStartMonth",
-        "LegalEntity.regionIds",
-        "LegalEntity.isActive",
-        "LegalEntity.scopePath"
+        "LegalEntity.taxRegistrationNumber"
        ],
        "operation": "listLegalEntities",
        "provenance": "contract finance.yaml GET /legal-entities"
@@ -3226,20 +3127,13 @@
        "label": "The selected account",
        "bindsTo": "Account",
        "columns": [
-        "Account.id",
         "Account.code",
         "Account.externalCode",
-        "Account.isSuspense",
         "Account.subType",
         "Account.tags",
         "Account.notes",
         "Account.name",
         "Account.type",
-        "Account.parentId",
-        "Account.legalEntityId",
-        "Account.currency",
-        "Account.isPostable",
-        "Account.isActive",
         "Account.balance"
        ],
        "operation": "getAccount",
@@ -3284,7 +3178,7 @@
    "error": "Could not load. Names which read failed and leaves the chart accounts untouched.",
    "emptyFirstRun": "No chart accounts yet. Offers Create account (`createAccount`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on legalEntityId, type, isPostable and the chart accounts are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listAccounts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listAccounts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCOUNT_CONFIGURE` for `createAccount`, `updateAccount`, `createCostCenter`, `createLegalEntity`."
   },
   "apis": [
    {
@@ -3369,7 +3263,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-074"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateAccount",
@@ -3447,7 +3341,7 @@
     "id": "formCreateLegalEntity",
     "component": "modal",
     "trigger": "Create legal entity",
-    "body": "**Collects what `createLegalEntity` sends before it is called.** Required: `id`, `code`, `name`, `countryCode`, `currency`, `currencyScale`, `fiscalYearStartMonth`. Optional: `taxRegistrationNumber`, `regionIds`, `isActive`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createLegalEntity` sends before it is called.** Required: `code`, `name`, `countryCode`, `currency`, `currencyScale`, `fiscalYearStartMonth`. Optional: `taxRegistrationNumber`, `regionIds`, `isActive`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "LegalEntity",
     "confirm": {
      "label": "Create legal entity",
@@ -3456,7 +3350,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "code",
       "name",
       "countryCode",
@@ -3465,8 +3358,7 @@
       "fiscalYearStartMonth",
       "taxRegistrationNumber",
       "regionIds",
-      "isActive",
-      "scopePath"
+      "isActive"
      ]
     },
     "provenance": "contract finance.yaml POST /legal-entities"

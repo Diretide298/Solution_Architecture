@@ -127,16 +127,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ANL-061` | BI & Analytics Administration Command Center | B–D | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ANL-062` | Enterprise KPI Library | B–D | 0 | 28 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ANL-063` | KPI Targets, Thresholds & Scorecards | B–D | 8 | 0 | 5 | 0 | 2 | 0 | — | notStarted (—) |
-| `ANL-064` | Benchmark & Comparative Analytics Configuration | B–D | 12 | 8 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ANL-065` | Data Source & Integration Registry | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-061` | BI & Analytics Administration Command Center | D | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-062` | Enterprise KPI Library | D | 0 | 28 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-063` | KPI Targets, Thresholds & Scorecards | D | 8 | 0 | 5 | 0 | 2 | 0 | — | notStarted (—) |
+| `ANL-064` | Benchmark & Comparative Analytics Configuration | D | 12 | 6 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-065` | Data Source & Integration Registry | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ANL-066` | Semantic Model & Business Data Catalogue | A | 14 | 19 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-067` | Data Refresh, Pipeline & Data Health Monitor | B–D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-068` | Embedded BI, Workspace & Tenant Administration | B–D | 7 | 0 | 5 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-069` | Analytics Performance, Usage & Cost Monitor | B–D | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-070` | Analytics Governance, Security & Audit Center | B–D | 20 | 91 | 6 | 6 | 0 | 0 | — | notStarted (—) |
+| `ANL-067` | Data Refresh, Pipeline & Data Health Monitor | D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-068` | Embedded BI, Workspace & Tenant Administration | D | 7 | 0 | 5 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-069` | Analytics Performance, Usage & Cost Monitor | D | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-070` | Analytics Governance, Security & Audit Center | D | 20 | 91 | 6 | 6 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -156,7 +156,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-061 |
 | Who uses it | venue staff holding `REPORT_VIEW_TENANT` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each component shall show) — counts over a population, then the population |
@@ -348,7 +348,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-062 |
 | Who uses it | venue staff holding `REPORT_MANAGE`, `REPORT_VIEW_TENANT` (1 configure, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§KPI Categories; KPI Status) and no metric row |
@@ -544,7 +544,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-063 |
 | Who uses it | venue staff holding `REPORT_MANAGE`, `REPORT_VIEW_VENUE` (1 configure, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Targets may be configured by) and no display directory — it is settings, not a population |
@@ -713,7 +713,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-064 |
 | Who uses it | venue staff holding `REPORT_MANAGE`, `REPORT_VIEW_TENANT` (1 configure, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Support metrics such as) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant … |
@@ -800,8 +800,6 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Scope path | text | The site (venue scope) the basis applies to. |
 | Period start | 1 Oct 2026 | — |
 | Period end | 1 Oct 2026 | — |
 | Visitors | 1,234 | `perVisitor`. |
@@ -914,7 +912,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (12), with its required mark, default, format and its error state (403, 422).
-- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-064?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save site normalisation basis.
 - [ ] Every transition is wired: `ANL-061`.
@@ -935,7 +933,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-065 |
 | Who uses it | venue staff holding `REPORT_VIEW_TENANT` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1094,8 +1092,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
-| Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | Block A · ticket #20784 (APP-SETUP-ANL-066) |
+| Module | Analytics · wave 1 · needs the `analytics` module |
+| Block | Block A · task APP-SETUP-ANL-066 |
 | Who uses it | venue staff holding `REPORT_MANAGE`, `REPORT_VIEW_TENANT` (1 configure, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `getSemanticModel` reads the model as a tree; the selection is a domain, dataset or field (CHG-SOT-012). |
@@ -1209,7 +1207,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the model untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No model published yet. Offers Publish model (`setSemanticModel`); until then reports read the seeded catalogue. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing in the model matches the search. Names it and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_TENANT`, which `getSemanticModel` requires, and names that permission. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_TENANT`, which `getSemanticModel` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REPORT_MANAGE` for `setSemanticModel`. |
 | Offline (`?state=offline`) | online only |
 
 #### Edge cases to draw
@@ -1239,7 +1237,7 @@ domains:
 - `getSemanticModel` → `REPORT_VIEW_TENANT` (operate) · staff
 - `setSemanticModel` → `REPORT_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_TENANT`, which `getSemanticModel` requires, and names that permission.
+**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_TENANT`, which `getSemanticModel` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REPORT_MANAGE` for `setSemanticModel`.
 
 Screen guard: `REPORT_VIEW_TENANT`
 
@@ -1286,7 +1284,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-067 |
 | Who uses it | venue staff holding `REPORT_VIEW_TENANT` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Monitor) — counts over a population, then the population |
@@ -1452,7 +1450,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-068 |
 | Who uses it | venue staff holding `REPORT_VIEW_VENUE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -1589,7 +1587,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-069 |
 | Who uses it | venue staff holding `REPORT_VIEW_TENANT` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Usage KPIs; Performance KPIs) and a per-row directory (§Identify) — counts over a population, then the population |
@@ -1780,8 +1778,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `AI_AUDIT_VIEW`, `AUDIT_VIEW`, `REPORT_GOVERNANCE_MANAGE`, `REPORT_VIEW_TENANT` (2 read, 1 ?, 1 operate); in the flows as venue manager |
+| Block | Block D · task APP-ANALYTICS-ANL-070 |
+| Who uses it | venue staff holding `AI_AUDIT_VIEW`, `AUDIT_VIEW`, `REPORT_GOVERNANCE_MANAGE`, `REPORT_VIEW_TENANT` (2 read, 1 configure, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Monitor; Show) and no metric row |
 | Offline | online only |
@@ -1910,7 +1908,7 @@ Errors to draw in the form: 400 Validation failed
 
 | Shows | Format | Notes |
 |---|---|---|
-| Currency | text | The tenant's selected currency, USD by default (Chinmay, 2 October, workbook Q8; CHG-CSA-004). |
+| Currency | text | The tenant's selected currency, by default its billing currency (AED for a UAE tenant), not USD (CHG-RUL-017; Chinmay, 2 October, workbook … |
 | Ceiling | grouped details | The spend ceiling in force (`getAiSpendCeiling`), with the tokens it equals at the current blended rate and what is used so far … |
 | Spend | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tokens | 1,234 | — |
@@ -2073,7 +2071,7 @@ ai:
 - `getAiUsage` → `AI_AUDIT_VIEW` (read) · staff
 - `listAiInteractions` → `AI_AUDIT_VIEW` (read) · staff
 - `getAnalyticsGovernancePolicy` → `REPORT_VIEW_TENANT` (operate) · staff
-- `setAnalyticsGovernancePolicy` → `REPORT_GOVERNANCE_MANAGE` (tier not set) · staff
+- `setAnalyticsGovernancePolicy` → `REPORT_GOVERNANCE_MANAGE` (configure) · staff
 
 **A refused user sees:** Names the missing permission: reading the audit trail and the governance policy needs `REPORT_VIEW_TENANT`, and changing the policy needs `REPORT_GOVERNANCE_MANAGE` (CHG-FUP-007); without it the policy shows read-only and says who can change it. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -2236,7 +2234,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AiInteraction": {"type":"object","x-ticvai-persistence":"ai.activity","required":["id","principalId","capability","outcome","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"conversationId":{"type":"string","format":"uuid","nullable":true},"principalId":{"type":"string","format":"uuid"},"audience":{"type":"string","enum":["staff","guest"],"description":"**Billing divides on this.** Staff usage is bounded by headcount; guest usage is bounded by footfall and curiosity, and a venue cannot stop guests asking questions.\n"},"subjectId":{"type":"string","format":"uuid","nullable":true,"description":"The guest, where the audience is `guest`. `principalId` is null in that case — **a guest is not a principal**, and attributing their tokens to a staff member would be wrong twice.\n"},"billableToTenantId":{"type":"string","format":"uuid","description":"Resolved from `scopePath` at write time, not derived later. **Billing must not depend on walking a scope tree that has since been reorganised.**\n"},"scopePath":{"type":"string"},"capability":{"type":"string"},"prompt":{"type":"string"},"response":{"type":"string"},"sources":{"$ref":"#/components/schemas/AiSourceList"},"outcome":{"type":"string","enum":["answered","refused","applied","rejected","failed"]},"refusalReason":{"type":"string","nullable":true},"provider":{"$ref":"#/components/schemas/AiProviderKind"},"model":{"type":"string"},"promptTokens":{"type":"integer"},"completionTokens":{"type":"integer"},"cost":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"x-ticvai-column":"cost_amount","description":"What the call cost at the provider. **Money like every other amount** (naming-and-style 5.1) — it replaces an integer `costMinor` that carried no currency or scale, which AED and OMR read differently.\n"},"latencyMs":{"type":"integer"},"maskedFieldCount":{"type":"integer","description":"How many fields were redacted. Zero on a prompt touching guest data is a defect."},"traceId":{"type":"string"},"decisionRecordId":{"type":"string","format":"uuid","nullable":true,"description":"The `ai.decision_record` this call belongs to, where it was part of a governed decision (AI design 2.3, 3.9). Null for a call audited by this row alone."},"cacheLayer":{"type":"string","nullable":true,"enum":["guardrail","semantic","exact","negative","analytics"],"description":"Which cache answered, where one did (AI design 3.6). Null for a model call."},"createdAt":{"type":"string","format":"date-time"}}},
 "AiProviderKind": {"type":"string","enum":["openai","gemini","anthropic","azureOpenai","localLlm","openaiCompatible"],"description":"`openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development (AIC-009). Any other protocol needs an adapter.\n**Core42 Compass is reached through `openaiCompatible`** (Chinmay, 2 October: the AI residency decision, amending AI-D02; CHG-CSA-002). Compass is the provider of the `uaeOnly` residency class (common `AiResidencyClass`): Small tier Compass GPT-4.1 mini (or Seraj), Strong tier Compass GPT-5, with OpenAI UAE and then the in-cell open-weights model as the fallback chain. OpenAI UAE is `openai` with a UAE `endpoint`; the in-cell model is `localLlm`.\n**A kind is a protocol, not a vendor** (Chinmay, 2 October, contract follow-ups: BYOK accepts any provider; CHG-FUP-008). Any vendor is accepted, named in `AiProvider.vendor`: Mistral, Cohere or any other is reached through `openaiCompatible` where its API speaks it, which the compatibility test confirms before activation (`AiProviderCompatibility`). A new native adapter is a new value here, a breaking change for a client built earlier that goes out with an approval (`docs/active/breaking-changes.yaml`); until then a vendor without either protocol is refused `422 provider-protocol-unsupported`.\n"},
 "AiSourceList": {"type":"array","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"jsonb","description":"**The sources an answer was grounded in, stored with the answer** (8.3.70). One `jsonb` column on the row that carries it — `ai.message.sources` and `ai.activity.sources` — because the grounding audit reads the list as it was when the answer was given, and a source is never queried on its own.\n","items":{"$ref":"#/components/schemas/AiSource"}},
-"AiUsageReport": {"type":"object","x-ticvai-persistence":"none — aggregated from ai.activity","properties":{"currency":{"type":"string","minLength":3,"maxLength":3,"readOnly":true,"description":"**The tenant's selected currency, USD by default** (Chinmay, 2 October, workbook Q8; CHG-CSA-004). Every `cost` here is in it; token counts sit beside each cost."},"ceiling":{"type":"object","nullable":true,"readOnly":true,"description":"The spend ceiling in force (`getAiSpendCeiling`), with the tokens it equals at the current blended rate and what is used so far (CHG-CSA-004).","properties":{"spend":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"tokens":{"type":"integer","nullable":true},"usedSpend":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"usedTokens":{"type":"integer"}}},"from":{"type":"string","format":"date"},"to":{"type":"string","format":"date"},"groupBy":{"type":"string"},"rows":{"type":"array","items":{"type":"object","properties":{"key":{"type":"string"},"interactions":{"type":"integer"},"promptTokens":{"type":"integer"},"completionTokens":{"type":"integer"},"cost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"p95LatencyMs":{"type":"integer"},"refusalRate":{"type":"number"},"rejectionRate":{"type":"number","description":"Proposals a person refused. **The number that says whether the assistant is worth having**, and the one nobody thinks to measure.\n"}}}},"forecast":{"type":"object","nullable":true,"description":"**A month-end projection, labelled a forecast** (AI design 2.3, 4.5). Present where `to` is inside the current month. Never added into `rows`.\n","properties":{"label":{"type":"string","enum":["forecast"]},"periodEnd":{"type":"string","format":"date"},"projectedTokens":{"type":"integer"},"projectedCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"basis":{"type":"string","description":"How it was projected, e.g. the run rate of the last 7 days."}}}}},
+"AiUsageReport": {"type":"object","x-ticvai-persistence":"none — aggregated from ai.activity","properties":{"currency":{"type":"string","minLength":3,"maxLength":3,"readOnly":true,"description":"**The tenant's selected currency, by default its billing currency (AED for a UAE tenant), not USD** (CHG-RUL-017; Chinmay, 2 October, workbook Q8; CHG-CSA-004). Every `cost` here is in it; token counts sit beside each cost."},"ceiling":{"type":"object","nullable":true,"readOnly":true,"description":"The spend ceiling in force (`getAiSpendCeiling`), with the tokens it equals at the current blended rate and what is used so far (CHG-CSA-004).","properties":{"spend":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"tokens":{"type":"integer","nullable":true},"usedSpend":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"usedTokens":{"type":"integer"}}},"from":{"type":"string","format":"date"},"to":{"type":"string","format":"date"},"groupBy":{"type":"string"},"rows":{"type":"array","items":{"type":"object","properties":{"key":{"type":"string"},"interactions":{"type":"integer"},"promptTokens":{"type":"integer"},"completionTokens":{"type":"integer"},"cost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"p95LatencyMs":{"type":"integer"},"refusalRate":{"type":"number"},"rejectionRate":{"type":"number","description":"Proposals a person refused. **The number that says whether the assistant is worth having**, and the one nobody thinks to measure.\n"}}}},"forecast":{"type":"object","nullable":true,"description":"**A month-end projection, labelled a forecast** (AI design 2.3, 4.5). Present where `to` is inside the current month. Never added into `rows`.\n","properties":{"label":{"type":"string","enum":["forecast"]},"periodEnd":{"type":"string","format":"date"},"projectedTokens":{"type":"integer"},"projectedCost":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"basis":{"type":"string","description":"How it was projected, e.g. the run rate of the last 7 days."}}}}},
 "AnalyticsGovernancePolicy": {"type":"object","x-ticvai-persistence":"reporting.analytics_governance_policy","description":"**What analytics may show and where it may go** (Chinmay, 2 October, workbook Q225; CHG-CSA-021). One row per tenant.","properties":{"masking":{"type":"object","description":"Masked fields, as `schema.table.column`, and who may see them unmasked.","properties":{"maskedFields":{"type":"array","items":{"type":"string"}},"unmaskedForPermissions":{"type":"array","items":{"type":"string"}}}},"export":{"type":"object","properties":{"allowedFormats":{"type":"array","items":{"type":"string"}},"personalDataNeedsPermission":{"type":"boolean","default":true,"description":"An export carrying personal data needs `REPORT_EXPORT_PII`."},"maxRows":{"type":"integer","nullable":true}}},"retention":{"type":"object","properties":{"resultDays":{"type":"integer","minimum":1,"nullable":true,"description":"How long report results and exports are kept."}}},"sharing":{"type":"object","properties":{"externalLinks":{"type":"boolean","default":false},"allowedDomains":{"type":"array","items":{"type":"string"}}}},"aiAndApiAccess":{"type":"object","properties":{"aiAssistant":{"type":"boolean","default":true,"description":"The AI assistant may answer analytics questions through the semantic layer (ADR-0054)."},"publicApi":{"type":"boolean","default":false}}},"scopePath":{"type":"string","readOnly":true,"description":"The partition key (ADR-0005). Written at `tenant` scope."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "AnalyticsPipeline": {"type":"object","x-ticvai-persistence":"reporting.pipeline","description":"BI board 10.7. **Freshness decides whether a dashboard can be trusted.**","properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"sourceKind":{"type":"string"},"datasets":{"type":"array","items":{"type":"string"}},"schedule":{"type":"string","nullable":true},"lastRunAt":{"type":"string","format":"date-time","nullable":true},"lastSuccessAt":{"type":"string","format":"date-time","nullable":true},"freshnessMinutes":{"type":"integer","nullable":true},"expectedFreshnessMinutes":{"type":"integer","nullable":true},"status":{"type":"string","enum":["healthy","degraded","stale","failed","paused"]},"lastError":{"type":"string","nullable":true},"rowsLastRun":{"type":"integer","nullable":true},"scopePath":{"type":"string"}}},
 "AnalyticsUsageRow": {"type":"object","description":"BI board 10.9. **The number that lets a BI estate be pruned.**","properties":{"key":{"type":"string"},"label":{"type":"string"},"opens":{"type":"integer"},"distinctUsers":{"type":"integer"},"lastOpenedAt":{"type":"string","format":"date-time","nullable":true},"averageRuntimeMs":{"type":"integer","nullable":true},"rowsScanned":{"type":"integer","nullable":true},"neverOpened":{"type":"boolean"}}},

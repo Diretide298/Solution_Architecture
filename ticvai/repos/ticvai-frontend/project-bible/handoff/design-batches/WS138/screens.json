@@ -48,7 +48,10 @@
     {
      "to": "BO-766",
      "trigger": "Campaign Builder",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "carries": [
+      "campaignId"
+     ]
     },
     {
      "to": "BO-767",
@@ -310,7 +313,7 @@
   "name": "Campaign Builder",
   "module": "Engagement & Support",
   "requiresModule": "marketing",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "4",
@@ -489,7 +492,9 @@
    "params": [
     {
      "name": "campaignId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listCampaigns` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1209,7 +1214,7 @@
   "name": "A/B & AI Optimization",
   "module": "Engagement & Support",
   "requiresModule": "marketing",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "4",
@@ -1354,7 +1359,9 @@
     },
     {
      "name": "insightId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMarketingRecommendations` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

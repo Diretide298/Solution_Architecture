@@ -390,7 +390,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/promotion-stacking-rule-builder-adm-210",
    "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-010"
   },
   "navigation": {
    "entryFrom": [

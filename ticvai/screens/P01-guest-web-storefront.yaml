@@ -161,8 +161,9 @@ screens:
       provenance: structural — WEB-001 is P01's home screen and its exits are its launcher
     - to: WEB-008
       trigger: Add-ons & Upsell
-      provenance: derived — WEB-008 declares entryState.params bundleId and WEB-001 holds none of them,
-        so the edge carries nothing and WEB-008 opens cold
+      provenance: 'derived — WEB-008 declares entryState.params bundleId and WEB-001 holds none of them.
+        The edge carries nothing: bundleId only pre-selects (deep link or optional), and WEB-008 opens
+        on its own'
     - to: WEB-009
       trigger: Wishlist
       provenance: 'derived — WEB-009 declares entryState.params itemId and WEB-001 holds none of them.
@@ -183,14 +184,13 @@ screens:
     - to: WEB-019
       trigger: Order History
       provenance: 'derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-001
-        holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional);
-        WEB-019 finds invoiceId (listTaxInvoices) itself; WEB-019 opens on listMyOrders, and documentId
-        has no source on WEB-019 yet (a gap in WEB-019, not in this edge)'
+        holds none of them. The edge carries nothing: orderId, documentId, invoiceId only pre-select (deep
+        link or optional), and WEB-019 opens on its own'
     - to: WEB-021
       trigger: Wallet & Gift Cards
       provenance: 'derived — WEB-021 declares entryState.params cardCode, walletId and WEB-001 holds none
-        of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); WEB-021
-        finds walletId (getWallet) itself, and WEB-021 opens on its own'
+        of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional),
+        and WEB-021 opens on its own'
     - to: WEB-022
       trigger: Membership Plans
       carries:
@@ -200,15 +200,13 @@ screens:
     - to: WEB-023
       trigger: Membership Management
       provenance: 'derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-001
-        holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional);
-        WEB-023 finds statementId (listBillingStatements) itself; WEB-023 opens on listBillingStatements,
-        and caseId has no source on WEB-023 yet (a gap in WEB-023, not in this edge)'
+        holds none of them. The edge carries nothing: orderId, caseId, statementId only pre-select (deep
+        link or optional), and WEB-023 opens on its own'
     - to: WEB-024
       trigger: Devices, Wishlist & Consent
       provenance: 'derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId
-        and WEB-001 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep
-        link or optional); WEB-024 finds methodId (enrolMfaMethod) itself; WEB-024 opens on getWishlist,
-        and enrolmentId has no source on WEB-024 yet (a gap in WEB-024, not in this edge)'
+        and WEB-001 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId
+        only pre-select (deep link or optional), and WEB-024 opens on its own'
     - to: WEB-027
       trigger: Newsletter Subscription
       provenance: 'derived — WEB-027 declares entryState.params unsubscribeToken and WEB-001 holds none
@@ -1108,8 +1106,9 @@ screens:
         holds eventId, so an edge into it carries them
     - to: WEB-008
       trigger: Add-ons & Upsell
-      provenance: derived — WEB-008 declares entryState.params bundleId and WEB-005 holds none of them,
-        so the edge carries nothing and WEB-008 opens cold
+      provenance: 'derived — WEB-008 declares entryState.params bundleId and WEB-005 holds none of them.
+        The edge carries nothing: bundleId only pre-selects (deep link or optional), and WEB-008 opens
+        on its own'
     - to: WEB-010
       trigger: Shopping Cart
       carries:
@@ -1399,8 +1398,9 @@ screens:
       - performanceId
     - to: WEB-008
       trigger: Add-ons & Upsell
-      provenance: derived — WEB-008 declares entryState.params bundleId and WEB-006 holds none of them,
-        so the edge carries nothing and WEB-008 opens cold
+      provenance: 'derived — WEB-008 declares entryState.params bundleId and WEB-006 holds none of them.
+        The edge carries nothing: bundleId only pre-selects (deep link or optional), and WEB-008 opens
+        on its own'
     - to: WEB-010
       trigger: Reviews the cart and may enter a promotion code
       provenance: flow F01 step 4→5
@@ -1710,8 +1710,9 @@ screens:
         its own'
     - to: WEB-008
       trigger: Add-ons & Upsell
-      provenance: derived — WEB-008 declares entryState.params bundleId and WEB-007 holds none of them,
-        so the edge carries nothing and WEB-008 opens cold
+      provenance: 'derived — WEB-008 declares entryState.params bundleId and WEB-007 holds none of them.
+        The edge carries nothing: bundleId only pre-selects (deep link or optional), and WEB-008 opens
+        on its own'
     - to: WEB-006
       trigger: Date & Performance Selection
       carries:
@@ -1994,9 +1995,10 @@ screens:
       carries:
       - cartId
       - code
+      - lineId
       - performanceId
       provenance: derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId
-        and WEB-008 holds cartId, code, performanceId, so an edge into it carries them
+        and WEB-008 holds cartId, code, lineId, performanceId, so an edge into it carries them
     - to: WEB-016
       trigger: Continue — sign in or use a guest code (when sign-in is asked after add-ons)
       carries:
@@ -2708,6 +2710,7 @@ screens:
       provenance: flow F55 step 2→3
       carries:
       - cartId
+      - lineId
       - performanceId
   notes: '**Wired 24 August from review**: updateMyProfile. **The operations existed and this screen could
     not call them** — reviewers reported them as missing APIs, which is what an unreachable operation
@@ -2929,9 +2932,10 @@ screens:
     - to: WEB-010
       trigger: Shopping Cart
       carries:
+      - lineId
       - performanceId
       provenance: derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId
-        and WEB-012 holds performanceId, so an edge into it carries them
+        and WEB-012 holds lineId, performanceId, so an edge into it carries them
     - to: WEB-011
       trigger: Guest Details & Attendee Forms
       provenance: 'derived — WEB-011 declares entryState.params  and WEB-012 holds none of them. The edge
@@ -3619,9 +3623,8 @@ screens:
     - to: WEB-019
       trigger: Order History
       provenance: 'derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-016
-        holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional);
-        WEB-019 finds invoiceId (listTaxInvoices) itself; WEB-019 opens on listMyOrders, and documentId
-        has no source on WEB-019 yet (a gap in WEB-019, not in this edge)'
+        holds none of them. The edge carries nothing: orderId, documentId, invoiceId only pre-select (deep
+        link or optional), and WEB-019 opens on its own'
     - to: WEB-010
       trigger: Signed in and verified — back to the cart
       precondition: arrived from the cart
@@ -5038,9 +5041,8 @@ screens:
     - to: WEB-024
       trigger: Devices, Wishlist & Consent
       provenance: 'derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId
-        and WEB-021 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep
-        link or optional); WEB-024 finds methodId (enrolMfaMethod) itself; WEB-024 opens on getWishlist,
-        and enrolmentId has no source on WEB-024 yet (a gap in WEB-024, not in this edge)'
+        and WEB-021 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId
+        only pre-select (deep link or optional), and WEB-024 opens on its own'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: listDetail
@@ -5296,20 +5298,18 @@ screens:
     - to: WEB-021
       trigger: Wallet & Gift Cards
       provenance: 'derived — WEB-021 declares entryState.params cardCode, walletId and WEB-022 holds none
-        of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); WEB-021
-        finds walletId (getWallet) itself, and WEB-021 opens on its own'
+        of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional),
+        and WEB-021 opens on its own'
     - to: WEB-023
       trigger: Membership Management
       provenance: 'derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-022
-        holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional);
-        WEB-023 finds statementId (listBillingStatements) itself; WEB-023 opens on listBillingStatements,
-        and caseId has no source on WEB-023 yet (a gap in WEB-023, not in this edge)'
+        holds none of them. The edge carries nothing: orderId, caseId, statementId only pre-select (deep
+        link or optional), and WEB-023 opens on its own'
     - to: WEB-024
       trigger: Devices, Wishlist & Consent
       provenance: 'derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId
-        and WEB-022 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep
-        link or optional); WEB-024 finds methodId (enrolMfaMethod) itself; WEB-024 opens on getWishlist,
-        and enrolmentId has no source on WEB-024 yet (a gap in WEB-024, not in this edge)'
+        and WEB-022 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId
+        only pre-select (deep link or optional), and WEB-024 opens on its own'
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Wired 24 August**: getMyMemberships, listGuestMemberships. **The web surface drew the screen and
     could not fetch what it shows** — the app had these and the browser did not, and there is no reason
@@ -5453,8 +5453,8 @@ screens:
     - to: WEB-021
       trigger: Wallet & Gift Cards
       provenance: 'derived — WEB-021 declares entryState.params cardCode, walletId and WEB-023 holds none
-        of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); WEB-021
-        finds walletId (getWallet) itself, and WEB-021 opens on its own'
+        of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional),
+        and WEB-021 opens on its own'
     - to: WEB-022
       trigger: Membership Plans
       carries:
@@ -5464,9 +5464,8 @@ screens:
     - to: WEB-024
       trigger: Devices, Wishlist & Consent
       provenance: 'derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId
-        and WEB-023 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep
-        link or optional); WEB-024 finds methodId (enrolMfaMethod) itself; WEB-024 opens on getWishlist,
-        and enrolmentId has no source on WEB-024 yet (a gap in WEB-024, not in this edge)'
+        and WEB-023 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId
+        only pre-select (deep link or optional), and WEB-024 opens on its own'
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Wired 24 August**: getMyMemberships, listGuestMemberships. **The web surface drew the screen and
     could not fetch what it shows** — the app had these and the browser did not, and there is no reason
@@ -5696,8 +5695,8 @@ screens:
     - to: WEB-021
       trigger: Wallet & Gift Cards
       provenance: 'derived — WEB-021 declares entryState.params cardCode, walletId and WEB-024 holds none
-        of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); WEB-021
-        finds walletId (getWallet) itself, and WEB-021 opens on its own'
+        of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional),
+        and WEB-021 opens on its own'
     - to: WEB-022
       trigger: Membership Plans
       provenance: 'derived — WEB-022 declares entryState.params productId and WEB-024 holds none of them.
@@ -5706,9 +5705,8 @@ screens:
     - to: WEB-023
       trigger: Membership Management
       provenance: 'derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-024
-        holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional);
-        WEB-023 finds statementId (listBillingStatements) itself; WEB-023 opens on listBillingStatements,
-        and caseId has no source on WEB-023 yet (a gap in WEB-023, not in this edge)'
+        holds none of them. The edge carries nothing: orderId, caseId, statementId only pre-select (deep
+        link or optional), and WEB-023 opens on its own'
     - to: GST-037
       trigger: Offers are shown against what they hold
       provenance: flow F53 step 2→3
@@ -6281,6 +6279,12 @@ screens:
       provenance: 'derived — WEB-027 declares entryState.params unsubscribeToken and WEB-026 holds none
         of them. The edge carries nothing: unsubscribeToken only pre-selects (deep link or optional),
         and WEB-027 opens on its own'
+    - to: WEB-025
+      trigger: Help Centre / FAQ
+      carries:
+      - caseId
+      provenance: derived — WEB-025 declares entryState.params caseId and WEB-026 holds caseId, so an
+        edge into it carries them
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: configEditor
@@ -6432,6 +6436,11 @@ screens:
       trigger: Survey & Feedback
       provenance: 'derived — WEB-026 declares entryState.params formId and WEB-027 holds none of them.
         The edge carries nothing: formId only pre-selects (deep link or optional), and WEB-026 opens on
+        its own'
+    - to: WEB-025
+      trigger: Help Centre / FAQ
+      provenance: 'derived — WEB-025 declares entryState.params caseId and WEB-027 holds none of them.
+        The edge carries nothing: caseId only pre-selects (deep link or optional), and WEB-025 opens on
         its own'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
@@ -6588,6 +6597,11 @@ screens:
       trigger: Survey & Feedback
       provenance: 'derived — WEB-026 declares entryState.params formId and WEB-028 holds none of them.
         The edge carries nothing: formId only pre-selects (deep link or optional), and WEB-026 opens on
+        its own'
+    - to: WEB-025
+      trigger: Help Centre / FAQ
+      provenance: 'derived — WEB-025 declares entryState.params caseId and WEB-028 holds none of them.
+        The edge carries nothing: caseId only pre-selects (deep link or optional), and WEB-025 opens on
         its own'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Contact bound 28 September** to `getTenantAppStatus.contact` (decided 28 September, audit R073 (f)).
@@ -6772,10 +6786,9 @@ screens:
     - to: WEB-031
       trigger: My Reservations
       provenance: 'derived — WEB-031 declares entryState.params groupBookingId, productId, reservationId,
-        resourceId and WEB-030 holds none of them. The edge carries nothing: reservationId only pre-selects
-        (deep link or optional); WEB-031 finds groupBookingId (requestGroupBooking), productId (listGroupPackages)
-        itself; WEB-031 opens on listGroupPackages, and resourceId has no source on WEB-031 yet (a gap
-        in WEB-031, not in this edge)'
+        resourceId and WEB-030 holds none of them. The edge carries nothing: reservationId, groupBookingId,
+        resourceId only pre-select (deep link or optional); WEB-031 finds productId (listGroupPackages)
+        itself, and WEB-031 opens on its own'
     - to: GST-014
       trigger: The friend claims it in the app
       provenance: flow F55 step 4→5

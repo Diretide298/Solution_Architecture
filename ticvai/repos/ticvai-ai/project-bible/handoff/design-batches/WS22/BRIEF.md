@@ -96,12 +96,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-032` | Commercial Agreement Command Center | B–D | 2 | 30 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `PTR-033` | Agreement & Contract Terms Builder | B–D | 26 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `PTR-034` | Partner Rate & Net Pricing Configuration | B–D | 10 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `PTR-038` | Payment Terms, Billing & Account Configuration | B–D | 1 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `PTR-040` | Booking Limits, Commercial Exceptions & Approval | B–D | 22 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
-| `PTR-041` | Commercial Agreement 360°, Health & AI Review | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-032` | Commercial Agreement Command Center | B | 2 | 30 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `PTR-033` | Agreement & Contract Terms Builder | B | 26 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-034` | Partner Rate & Net Pricing Configuration | B | 10 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-038` | Payment Terms, Billing & Account Configuration | B | 1 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-040` | Booking Limits, Commercial Exceptions & Approval | B | 22 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
+| `PTR-041` | Commercial Agreement 360°, Health & AI Review | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

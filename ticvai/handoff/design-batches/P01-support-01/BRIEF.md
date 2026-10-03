@@ -132,7 +132,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `WEB-034` | Lost & Found | A | 11 | 28 | 6 | 1 | 1 | 0 | guest | review (client-verified) |
+| `WEB-034` | Lost & Found | A | 11 | 9 | 6 | 1 | 1 | 0 | guest | review (client-verified) |
 | `WEB-045` | Help Centre & Accessibility | A | 0 | 27 | 6 | 0 | 3 | 0 | guest | review (client-verified) |
 
 ## Design inputs from the client meetings

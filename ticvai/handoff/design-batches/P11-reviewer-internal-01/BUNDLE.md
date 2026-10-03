@@ -97,9 +97,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ACC-006` | Reviewer Queue | B–D | 8 | 4 | 6 | 8 | 0 | 6 | — | notStarted (generated) |
-| `ACC-007` | Reviewer Application Detail | B–D | 0 | 0 | 6 | 10 | 1 | 0 | — | notStarted (generated) |
-| `ACC-008` | Credential Register | B–D | 2 | 12 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
+| `ACC-006` | Reviewer Queue | D | 8 | 4 | 6 | 8 | 0 | 6 | — | notStarted (generated) |
+| `ACC-007` | Reviewer Application Detail | D | 0 | 0 | 6 | 10 | 1 | 0 | — | notStarted (generated) |
+| `ACC-008` | Credential Register | D | 2 | 12 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -115,7 +115,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P11 Accreditation Web (web) |
 | Module | Reviewer (Internal) · wave 3 · needs the `accreditation` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ACCRED-ACC-006 |
 | Who uses it | public staff holding `ACCREDITATION_APPROVE`, `ACCREDITATION_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is a public web form flow, 1440 desktop and 390 phone widths; reviewer screens as a desktop back office. · LTR and RTL · light theme |
 | Pattern | approvalInbox (compact density):  |
@@ -330,7 +330,7 @@ Also apply: 8 for all of P11, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Control · P11 Accreditation Web (web) |
 | Module | Reviewer (Internal) · wave 3 · needs the `accreditation` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ACCRED-ACC-007 |
 | Who uses it | public staff holding `ACCREDITATION_APPROVE`, `ACCREDITATION_VIEW` (1 operate, 1 read); in the flows as contractor |
 | Device and orientation | This is a public web form flow, 1440 desktop and 390 phone widths; reviewer screens as a desktop back office. · LTR and RTL · light theme |
 | Pattern | approvalInbox (compact density):  |
@@ -415,7 +415,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Where the user goes next**
 
-- → `ACC-006` Reviewer Queue: *Reviewer Queue*
+- → `ACC-006` Reviewer Queue: *Reviewer Queue*; carries `applicationId`
 - → `ACC-008` Credential Register: *Credential Register*
 - → `ACC-005` Accreditation Badge: *The badge is issued*; carries `holderId`
 
@@ -536,7 +536,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P11 Accreditation Web (web) |
 | Module | Reviewer (Internal) · wave 3 · needs the `accreditation` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ACCRED-ACC-008 |
 | Who uses it | public staff holding `ACCREDITATION_VIEW` (1 read) |
 | Device and orientation | This is a public web form flow, 1440 desktop and 390 phone widths; reviewer screens as a desktop back office. · LTR and RTL · light theme |
 | Pattern | listDetail (compact density):  |

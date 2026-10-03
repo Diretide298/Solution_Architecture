@@ -485,7 +485,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | `venueId` (navigation) · cold entry: **Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that … |
+| Opens with | `venueId` (session) · cold entry: **Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that … |
 | Route | `/commercial/refund-policy-rule-configuration-t118-adm-611` |
 
 **What the spec says about it.** **Merged into BO-1146 Refund-to-Wallet Policy Configuration** (decided 2 October 2026, Chinmay: DEC-100 and the pre-apply round, "duplicate screens: merge as proposed"; CHG-MOV-002). On one platform it declared the same operations as BO-1146 (check-screen-wiring S-DUP-SCREEN). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-1146, and nothing on it is built separately. **Moved to Venue Management (P08) on 2 October 2026** (Chinmay, DEC-100: "they are venue screens"; CHG-MOV-001). It configures a record the venue owns, so the venue's own staff use it here, inside the tenant's cell; TICVAI staff reach it only under a platform-staff grant into the tenant (R098), never from the console directly. The id is kept, so its tickets keep their keys.
@@ -1135,6 +1135,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS92 Payment Payment Orchestration Board 6.dc.html#adm-615`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 6
 - Flow F261 *Payment Payment Orchestration board 6: Refund & Payment Adjustment Command …*, step 12: Works in Refund Processing, Provider Status & Recovery Center\t122 → Track refund execution through the appropriate provider and recover failed or uncertain operations.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 

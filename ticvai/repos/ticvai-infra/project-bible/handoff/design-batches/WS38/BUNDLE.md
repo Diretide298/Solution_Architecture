@@ -106,14 +106,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-088` | Dynamic Pricing Strategy Command Center | B–D | 2 | 26 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-088` | Dynamic Pricing Strategy Command Center | B–D | 2 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-089` | Dynamic Pricing Strategy Builder | B–D | 24 | 20 | 5 | 2 | 1 | 0 | — | notStarted (generated) |
-| `ADM-090` | Demand, Occupancy & Availability Rule Builder | A | 0 | 20 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
-| `ADM-091` | Booking Velocity & Time-to-Event Rule Builder | A | 0 | 20 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
+| `ADM-090` | Demand, Occupancy & Availability Rule Builder | B | 0 | 20 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
+| `ADM-091` | Booking Velocity & Time-to-Event Rule Builder | B | 0 | 20 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
 | `ADM-092` | Seasonal, Calendar, Day & Timeslot Dynamic Rules | B–D | 26 | 20 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `ADM-093` | Channel, Customer Segment & Location Dynamic Rules | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 | `ADM-094` | Dynamic Price Bands, Ladders & Adjustment Matrix | B–D | 24 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ADM-095` | Dynamic Pricing Guardrails & Commercial Protection | A | 47 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
+| `ADM-095` | Dynamic Pricing Guardrails & Commercial Protection | B | 47 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
 | `ADM-096` | Dynamic Pricing Automation Policy & Control | B–D | 50 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
 | `ADM-097` | Rule Priority, Conflict Resolution & Dynamic Pricing Test Console | B–D | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
@@ -208,37 +208,25 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | Shows | Format | Notes |
 |---|---|---|
-| Strategy | text | Strategy ID |
 | Strategy name | text | Strategy Name |
 | Strategy type | chip: Demand based, Occupancy based, Availability based, Inventory based, Booking … | Strategy Type (pack pp.75-76) |
-| Product event | text | Product or event the strategy controls |
 | Venue | text | Venue |
 | Base price source | text | Base price source: the Board 1 price list and rate the strategy moves from, e.g. |
 | Current price | AED 1,234.50 | Current resolved dynamic price (for a single-price scope) |
-| Adjustment range | grouped details | Adjustment range allowed by the strategy |
-| Rule count | 1,234 | Rule Count |
-| Effective period | grouped details | Effective period |
-| Automation mode | chip: Monitor, Recommend, Prepare change, Auto execute within guardrails | Automation mode from the automation policy (listDynamicPricingAutomation); recommend by default |
 | Status | text | Status: draft, testing, ready, scheduled, active, paused, frozen, expired or retired |
-| Owner | text | Owner |
 
 **The selected dynamic pricing strategy** (detail panel)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Strategy | text | Strategy ID |
 | Strategy name | text | Strategy Name |
 | Strategy type | chip: Demand based, Occupancy based, Availability based, Inventory based, Booking … | Strategy Type (pack pp.75-76) |
-| Product event | text | Product or event the strategy controls |
 | Venue | text | Venue |
 | Base price source | text | Base price source: the Board 1 price list and rate the strategy moves from, e.g. |
 | Current price | AED 1,234.50 | Current resolved dynamic price (for a single-price scope) |
-| Adjustment range | grouped details | Adjustment range allowed by the strategy |
 | Rule count | 1,234 | Rule Count |
-| Effective period | grouped details | Effective period |
 | Automation mode | chip: Monitor, Recommend, Prepare change, Auto execute within guardrails | Automation mode from the automation policy (listDynamicPricingAutomation); recommend by default |
 | Status | text | Status: draft, testing, ready, scheduled, active, paused, frozen, expired or retired |
-| Owner | text | Owner |
 
 **Actions and what each produces**
 
@@ -270,9 +258,9 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 - → `ADM-095` Dynamic Pricing Guardrails & Commercial Protection: *Works in Dynamic Pricing Guardrails & Commercial Protection*; calls `listDynamicPricingStrategy`
 - → `ADM-096` Dynamic Pricing Automation Policy & Control: *Works in Dynamic Pricing Automation Policy & Control*; calls `listDynamicPricingStrategy`
 - → `ADM-097` Rule Priority, Conflict Resolution & Dynamic Pricing Test Console: *Works in Rule Priority, Conflict Resolution & Dynamic Pricing Test Console*; calls `listDynamicPricingStrategy`
+- → `BO-441` Price Priority & Conflict Rules: *Works in Rule Priority, Conflict Resolution & Dynamic Pricing Test Console*; calls `listDynamicPricingStrategy`
 - → `ADM-089` Dynamic Pricing Strategy Builder: *Works in Dynamic Pricing Strategy Builder*; carries `strategyId`; calls `listDynamicPricingStrategy`
 - → `ADM-094` Dynamic Price Bands, Ladders & Adjustment Matrix: *Works in Dynamic Price Bands, Ladders & Adjustment Matrix*; carries `strategyId`; calls `listDynamicPricingStrategy`
-- → `BO-441` Price Priority & Conflict Rules: *Works in Rule Priority, Conflict Resolution & Dynamic Pricing Test Console*; calls `listDynamicPricingStrategy`
 
 #### States
 
@@ -341,10 +329,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (2), with its required mark, default, format and its error state (404, 409, 422).
-- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-088?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Demand Based, Inventory Based, Booking Velocity, Timeslot, Channel, Create Strategy, Duplicate, Open, Transition dynamic pricing strategy.
-- [ ] Every transition is wired: `BO-100`, `ADM-090`, `ADM-091`, `ADM-092`, `ADM-093`, `ADM-095`, `ADM-096`, `ADM-097`, `ADM-089`, `ADM-094`, `BO-441`.
+- [ ] Every transition is wired: `BO-100`, `ADM-090`, `ADM-091`, `ADM-092`, `ADM-093`, `ADM-095`, `ADM-096`, `ADM-097`, `BO-441`, `ADM-089`, `ADM-094`.
 - [ ] Every gated control is gated: `PRICE_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -554,7 +542,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block A · ticket #20644 (APP-SETUP-ADM-090) |
+| Block | Block B · task APP-SETUP-ADM-090 |
 | Who uses it | venue staff holding `PRICE_VIEW`, `PRODUCT_CONFIGURE` (1 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -711,7 +699,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block A · ticket #20645 (APP-SETUP-ADM-091) |
+| Block | Block B · task APP-SETUP-ADM-091 |
 | Who uses it | venue staff holding `PRICE_VIEW`, `PRODUCT_CONFIGURE` (1 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -907,7 +895,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Form: Save demand signal configuration** (modal, opened by *Save demand signal configuration*; *Save demand signal configuration* calls `setDemandSignalConfiguration`, *Cancel* sends nothing)
 
-**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`, `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1221,7 +1209,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Form: Save price ladder matrix** (modal, opened by *Save price ladder matrix*; *Save price ladder matrix* calls `setPriceLadderMatrix`, *Cancel* sends nothing)
 
-**Collects what `setPriceLadderMatrix` sends before it is called.** Required: `id`, `scopePath`, `dynamicPricingStrategyId`, `adjustmentModel`. Optional: `basePriceSource`, `bands`, `baseBandCode`, `stepAmount`, `minimumPrice`, `basePrice`, `maximumPrice`, `allowUpward`, `allowDownward`, `maxIncreasePercentPerAdjustment`, `maxDecreasePercentPerAdjustment`, `maximumBandsPerMovement` and 4 more. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setPriceLadderMatrix` sends before it is called.** Required: `dynamicPricingStrategyId`, `adjustmentModel`. Optional: `basePriceSource`, `bands`, `baseBandCode`, `stepAmount`, `minimumPrice`, `basePrice`, `maximumPrice`, `allowUpward`, `allowDownward`, `maxIncreasePercentPerAdjustment`, `maxDecreasePercentPerAdjustment`, `maximumBandsPerMovement` and 4 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1345,7 +1333,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block A · ticket #20629 (APP-SETUP-ADM-095) |
+| Block | Block B · task APP-SETUP-ADM-095 |
 | Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -1385,7 +1373,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save dynamic pricing guardrail policy** (modal, opened by *Save dynamic pricing guardrail policy*; *Save dynamic pricing guardrail policy* calls `setDynamicPricingGuardrailPolicy`, *Cancel* sends nothing)
 
-**Collects what `setDynamicPricingGuardrailPolicy` sends before it is called.** Required: `id`, `scopePath`, `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`, `absoluteMaximumPrice`, `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`, `maximumSingleChangePercent`, `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`, `maximumChangesPerDay`, `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setDynamicPricingGuardrailPolicy` sends before it is called.** Required: `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`, `absoluteMaximumPrice`, `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`, `maximumSingleChangePercent`, `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`, `maximumChangesPerDay`, `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1576,7 +1564,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save dynamic pricing guardrail policy** (modal, opened by *Save dynamic pricing guardrail policy*; *Save dynamic pricing guardrail policy* calls `setDynamicPricingGuardrailPolicy`, *Cancel* sends nothing)
 
-**Collects what `setDynamicPricingGuardrailPolicy` sends before it is called.** Required: `id`, `scopePath`, `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`, `absoluteMaximumPrice`, `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`, `maximumSingleChangePercent`, `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`, `maximumChangesPerDay`, `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setDynamicPricingGuardrailPolicy` sends before it is called.** Required: `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`, `absoluteMaximumPrice`, `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`, `maximumSingleChangePercent`, `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`, `maximumChangesPerDay`, `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

@@ -130,16 +130,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-379` | Welcome & Start Your TICVAI Journey | B–D | 4 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `ADM-380` | Customer & Organization Registration | B–D | 5 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-381` | Venue Type & Business Profile | B–D | 1 | 12 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `ADM-382` | Visitor, Capacity & Operational Scale | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `ADM-383` | Sales Channel Assessment | B–D | 11 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `ADM-384` | Ticketing & Product Requirements | B–D | 15 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `ADM-385` | Access, Queue & Visitor Experience Assessment | B–D | 0 | 0 | 6 | 2 | 1 | 6 | — | notStarted (—) |
-| `ADM-386` | Additional Business Module Assessment | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `ADM-387` | Integration, Payment & Technical Readiness | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `ADM-388` | AI Assessment Summary & Handoff | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `ADM-379` | Welcome & Start Your TICVAI Journey | B | 4 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `ADM-380` | Customer & Organization Registration | B | 5 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-381` | Venue Type & Business Profile | B | 1 | 12 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `ADM-382` | Visitor, Capacity & Operational Scale | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `ADM-383` | Sales Channel Assessment | B | 11 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `ADM-384` | Ticketing & Product Requirements | B | 15 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `ADM-385` | Access, Queue & Visitor Experience Assessment | B | 0 | 0 | 6 | 2 | 1 | 6 | — | notStarted (—) |
+| `ADM-386` | Additional Business Module Assessment | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `ADM-387` | Integration, Payment & Technical Readiness | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `ADM-388` | AI Assessment Summary & Handoff | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

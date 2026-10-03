@@ -398,6 +398,8 @@ audit_guard release_baseline ddl_forward                           # imported by
 sprint_plan                                                        # imported by build-service-docs, derive-block-a-schedule and build-plan-deck, no main (1 October)
 design_spec                                                        # imported by export-design-batch and build-white-label-map, no main (1 October)
 typed_props                                                        # imported by check-audience-match, check-preauth-session and check-subject, no main (2 October)
+screen_patterns                                                    # imported by check-screen-patterns, derive-entrystate-params and generate-screens-from-contracts, no main (3 October, CHG-GTR-004)
+ticket_done                                                        # imported by build-service-docs and op-release (one done-when for the plan row and the pointer), no main (3 October, CHG-GTR-002)
 build-tracker-index                                                # intake: reads the two task-tracker workbooks at the repository root, outside git, once per tracker drop (1 October)
 push-openproject op-release op-retire op-check op-assign-sync op-order-sync op-bulk-links op-created-merge op-recent op-review adam-links   # distribution: run per release (docs/active/release-runbook.md), never on a rebuild
 release-notes                                                      # per release, between two tags

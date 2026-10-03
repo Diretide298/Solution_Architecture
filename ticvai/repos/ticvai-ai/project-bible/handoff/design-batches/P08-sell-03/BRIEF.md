@@ -189,15 +189,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-113` | Central Kitchen & Commissary Management | B–D | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (generated) |
-| `BO-114` | Variants, Attributes, Barcode & RFID Management | B–D | 3 | 18 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-115` | Category, Brand & Merchandise Hierarchy | B–D | 14 | 20 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
-| `BO-116` | Merchandising & Product Presentation | A | 30 | 62 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
+| `BO-114` | Variants, Attributes, Barcode & RFID Management | B–D | 3 | 8 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-115` | Category, Brand & Merchandise Hierarchy | B–D | 14 | 15 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
+| `BO-116` | Merchandising & Product Presentation | B | 30 | 62 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
 | `BO-117` | Product Import, Governance & AI Configuration Assistant | A | 7 | 0 | 6 | 32 | 5 | 0 | — | notStarted (generated) |
-| `BO-118` | Campaign & Audience Management | B–D | 47 | 52 | 6 | 14 | 0 | 6 | — | notStarted (generated) |
-| `BO-119` | Cross-Sell, Upsell & Recommendation Rules | B–D | 1 | 27 | 5 | 54 | 4 | 0 | — | notStarted (generated) |
-| `BO-120` | Omnichannel Commerce & Journey Configuration | B–D | 28 | 20 | 6 | 9 | 1 | 6 | — | notStarted (generated) |
-| `BO-121` | Personalized Offers & Guest Engagement | B–D | 42 | 18 | 6 | 8 | 1 | 0 | — | notStarted (generated) |
-| `BO-1190` | Donation Campaigns | B–D | 27 | 22 | 7 | 5 | 2 | 6 | — | notStarted (generated) |
+| `BO-118` | Campaign & Audience Management | B–D | 47 | 45 | 6 | 14 | 0 | 6 | — | notStarted (generated) |
+| `BO-119` | Cross-Sell, Upsell & Recommendation Rules | B–D | 1 | 24 | 5 | 54 | 4 | 0 | — | notStarted (generated) |
+| `BO-120` | Omnichannel Commerce & Journey Configuration | B–D | 28 | 14 | 6 | 9 | 1 | 6 | — | notStarted (generated) |
+| `BO-121` | Personalized Offers & Guest Engagement | B–D | 42 | 14 | 6 | 8 | 1 | 0 | — | notStarted (generated) |
+| `BO-1190` | Donation Campaigns | B–D | 27 | 16 | 7 | 5 | 2 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

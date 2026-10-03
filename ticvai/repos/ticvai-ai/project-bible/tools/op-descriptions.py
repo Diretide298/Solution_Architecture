@@ -12,8 +12,8 @@ done, and where it sits in the plan (build order, week, checker, what it follows
                              where it leads; the sub-task says which of build / connect / tests it is
   epic / feature             its existing summary and what sits under it
 
-Writes handoff/service-docs/op-descriptions.json ({work package id: markdown}), applied on the OpenProject server
-by tools/op-descriptions.rb.
+Writes handoff/service-docs/op-descriptions.json ({work package id: markdown}, and {plan key: markdown} for a
+ticket not pushed yet), applied on the OpenProject server by tools/op-descriptions.rb (ids only).
 
   python3 tools/op-descriptions.py --schedule <schedule.json> [--show KEY ...]
 """
@@ -539,8 +539,15 @@ def main() -> int:
     ap.add_argument("--show", nargs="*", default=[], help="print these keys' descriptions")
     a = ap.parse_args()
     mp = json.loads((DOCS / "pms-map.json").read_text(encoding="utf-8"))
-    texts = build(a.schedule, [k for k in mp if not k.startswith(("_", "VERSION"))])
-    out = {str(mp[k]): t for k, t in texts.items()}
+    # **Every plan ticket, pushed or not** (fresh start, Chinmay, 3 October, CHG-GTR-001). A pushed ticket is keyed by
+    # its OpenProject id, as op-descriptions.rb applies it; a ticket not pushed yet by its plan key. With r1 going into
+    # a new project pms-map.json is empty, and keying by id alone wrote {} -- check-ticket-text, check-ddl-conventions
+    # and check-starter-fit read this file, and every one of them would have passed on nothing.
+    plan = [r["key"] for r in csv.DictReader((DOCS / "tasks.csv").open(encoding="utf-8"))]
+    keys = [k for k in mp if not k.startswith(("_", "VERSION"))]
+    keys += [k for k in plan if k not in mp]
+    texts = build(a.schedule, keys)
+    out = {str(mp[k]) if k in mp else k: t for k, t in texts.items()}
     (DOCS / "op-descriptions.json").write_text(json.dumps(out, indent=0, ensure_ascii=False), encoding="utf-8")
     print(f"{len(out)} descriptions written to {DOCS / 'op-descriptions.json'}")
     for k in a.show:

@@ -97,10 +97,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-164` | Digital Credential Security Command Center | A | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-164` | Digital Credential Security Command Center | C | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-165` | Dynamic QR Security Profile Builder | B–D | 13 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-166` | Credential Activation & Display Rules | A | 6 | 4 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-167` | Device Binding & Session Security | B–D | 5 | 18 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-167` | Device Binding & Session Security | A | 5 | 18 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-168` | BLE Beacon & Geofence Configuration | A | 21 | 13 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-169` | Credential Transfer & Rebinding | B–D | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-170` | Credential Revocation & Lifecycle Events | B–D | 7 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |

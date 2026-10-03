@@ -109,13 +109,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-188` | Dynamic Bundle Operations Command Center | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-189` | Component Inventory & Availability Matrix | B–D | 0 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
 | `ADM-190` | Bundle Sellability & Dependency Rule Engine | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-191` | Capacity Pool & Reservation Manager | B–D | 19 | 12 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-191` | Capacity Pool & Reservation Manager | B–D | 19 | 6 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-192` | Dynamic Component Substitution Engine | B–D | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-193` | Dynamic Bundle Rule & Composition Engine | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-194` | Real-Time Availability & Checkout Validation | B–D | 1 | 0 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
-| `ADM-195` | Bundle Availability by Channel, Venue & Partner | B–D | 17 | 12 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-195` | Bundle Availability by Channel, Venue & Partner | B–D | 17 | 6 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-196` | Bundle Availability Forecast, Alerts & Recovery | B–D | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-197` | Dynamic Bundle Simulation & AI Optimization | B–D | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-197` | Dynamic Bundle Simulation & AI Optimization | B–D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

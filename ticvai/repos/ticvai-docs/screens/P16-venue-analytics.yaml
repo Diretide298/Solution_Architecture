@@ -199,6 +199,8 @@ screens:
     - to: ANL-019
       trigger: AI Management Insights
       provenance: structural — ANL-001 is P16's home screen and its exits are its launcher
+      carries:
+      - insightId
   notes: '**Built 20 August. Answers 3 board screens**: F&B Executive Command Center; Retail Executive
     Command Center; Enterprise Frontline Operations Dashboard. **Three board screens, one screen with
     a domain selector.** F&B, Retail and POS each drew an executive command centre and they differ only
@@ -266,15 +268,9 @@ screens:
         label: Every alert
         bindsTo: Alert
         columns:
-        - Alert.id
-        - Alert.ruleId
         - Alert.raisedAt
         - Alert.severity
         - Alert.status
-        - Alert.observedValue
-        - Alert.threshold
-        - Alert.scopePath
-        - Alert.acknowledgedByPrincipalId
         - Alert.acknowledgedAt
         - Alert.resolvedAt
         - Alert.escalatedAt
@@ -297,8 +293,6 @@ screens:
         label: The selected alert
         bindsTo: Alert
         columns:
-        - Alert.id
-        - Alert.ruleId
         - Alert.ruleName
         - Alert.metric
         - Alert.raisedAt
@@ -306,13 +300,7 @@ screens:
         - Alert.status
         - Alert.observedValue
         - Alert.threshold
-        - Alert.scopePath
-        - Alert.workstationId
-        - Alert.shiftId
-        - Alert.itemId
-        - Alert.acknowledgedByPrincipalId
         - Alert.acknowledgedAt
-        - Alert.acknowledgementNote
         operation: listAlerts
         provenance: contract reporting.yaml GET /alerts
       - kind: detailPanel
@@ -416,9 +404,9 @@ screens:
       operations, states, entry params and exits, and it is better specified than anything derived from
       the screen file.'
     derivedFrom: wireframes/POS Board 6.dc.html#pos-6a
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   purposeNote: Provide senior management with an immediate consolidated view of overall organizational
     performance.
   gaps:
@@ -582,9 +570,9 @@ screens:
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6L in the client Retail pack.**'
     derivedFrom: wireframes/Retail Board 6.dc.html#ret-6l
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRunReport
     component: modal
@@ -691,15 +679,9 @@ screens:
         label: Every alert
         bindsTo: Alert
         columns:
-        - Alert.id
-        - Alert.ruleId
         - Alert.raisedAt
         - Alert.severity
         - Alert.status
-        - Alert.observedValue
-        - Alert.threshold
-        - Alert.scopePath
-        - Alert.acknowledgedByPrincipalId
         - Alert.acknowledgedAt
         - Alert.resolvedAt
         - Alert.escalatedAt
@@ -709,32 +691,23 @@ screens:
         label: Every registered device
         bindsTo: RegisteredDevice
         columns:
-        - RegisteredDevice.id
         - RegisteredDevice.kind
         - RegisteredDevice.driver
         - RegisteredDevice.identifier
-        - RegisteredDevice.workstationId
         - RegisteredDevice.model
         - RegisteredDevice.pushToken
-        - RegisteredDevice.pushPlatform
         - RegisteredDevice.pushFailureCount
-        - RegisteredDevice.offlineScope
-        - RegisteredDevice.firmwareVersion
-        - RegisteredDevice.isRequired
         operation: listDevices
         provenance: contract tenancy.yaml GET /devices
       - kind: dataTable
         label: Every principal
         bindsTo: Principal
         columns:
-        - Principal.id
         - Principal.username
         - Principal.displayName
         - Principal.isActive
         - Principal.validFrom
         - Principal.validTo
-        - Principal.primaryRoleId
-        - Principal.roles
         - Principal.lastLoginAt
         operation: listPrincipals
         provenance: contract identity.yaml GET /principals
@@ -755,8 +728,6 @@ screens:
         label: The selected alert
         bindsTo: Alert
         columns:
-        - Alert.id
-        - Alert.ruleId
         - Alert.ruleName
         - Alert.metric
         - Alert.raisedAt
@@ -764,13 +735,7 @@ screens:
         - Alert.status
         - Alert.observedValue
         - Alert.threshold
-        - Alert.scopePath
-        - Alert.workstationId
-        - Alert.shiftId
-        - Alert.itemId
-        - Alert.acknowledgedByPrincipalId
         - Alert.acknowledgedAt
-        - Alert.acknowledgementNote
         operation: listAlerts
         provenance: contract reporting.yaml GET /alerts
       - kind: detailPanel
@@ -854,9 +819,9 @@ screens:
       — it carries operations, states, entry params and exits, and it is better specified than anything
       derived from the screen file.'
     derivedFrom: wireframes/POS Board 6.dc.html#pos-6b
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRunReport
     component: modal
@@ -961,16 +926,10 @@ screens:
         label: Every product
         bindsTo: Product
         columns:
-        - Product.id
         - Product.code
         - Product.name
         - Product.description
         - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
         - Product.onSaleFrom
         - Product.onSaleTo
         operation: listProducts
@@ -992,22 +951,14 @@ screens:
         label: The selected product
         bindsTo: Product
         columns:
-        - Product.id
         - Product.code
         - Product.name
         - Product.description
         - Product.kind
-        - Product.venueId
-        - Product.scopePath
-        - Product.createdByPrincipalId
-        - Product.approvedByPrincipalId
-        - Product.responsibleDepartmentId
         - Product.onSaleFrom
         - Product.onSaleTo
-        - Product.categoryId
         - Product.lifecycleState
         - Product.isSellable
-        - Product.isStockTracked
         operation: listProducts
         provenance: contract catalogue.yaml GET /products
       - kind: detailPanel
@@ -1081,9 +1032,9 @@ screens:
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6C in the client Retail pack.**'
     derivedFrom: wireframes/Retail Board 6.dc.html#ret-6c
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRunReport
     component: modal
@@ -1251,9 +1202,9 @@ screens:
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6F in the client Retail pack.**'
     derivedFrom: wireframes/Retail Board 6.dc.html#ret-6f
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRunReport
     component: modal
@@ -1345,15 +1296,11 @@ screens:
         label: Every stock batch
         bindsTo: StockBatch
         columns:
-        - StockBatch.id
-        - StockBatch.itemId
-        - StockBatch.locationId
         - StockBatch.batchCode
         - StockBatch.lotNumber
         - StockBatch.quantity
         - StockBatch.receivedAt
         - StockBatch.expiresAt
-        - StockBatch.supplierId
         - StockBatch.status
         operation: listExpiringBatches
         provenance: contract inventory.yaml GET /stock-batches/expiring
@@ -1374,15 +1321,11 @@ screens:
         label: The selected stock batch
         bindsTo: StockBatch
         columns:
-        - StockBatch.id
-        - StockBatch.itemId
-        - StockBatch.locationId
         - StockBatch.batchCode
         - StockBatch.lotNumber
         - StockBatch.quantity
         - StockBatch.receivedAt
         - StockBatch.expiresAt
-        - StockBatch.supplierId
         - StockBatch.status
         operation: listExpiringBatches
         provenance: contract inventory.yaml GET /stock-batches/expiring
@@ -1480,9 +1423,9 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     derivedFrom: wireframes/Retail Board 6.dc.html#ret-6d
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRunReport
     component: modal
@@ -1571,11 +1514,7 @@ screens:
         columns:
         - Segment.name
         - Segment.description
-        - Segment.venueId
         - Segment.match
-        - Segment.criteria
-        - Segment.excludeSegmentIds
-        - Segment.id
         - Segment.lastEvaluatedSize
         - Segment.lastEvaluatedAt
         operation: listSegments
@@ -1685,6 +1624,9 @@ screens:
       from: deepLink
     - name: segmentId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listSegments`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
       Monday. The domain and the window come from the link where it carries them, and from the last view
       where it does not. A segment opened from the list.'
@@ -1701,9 +1643,9 @@ screens:
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6E in the client Retail pack.**'
     derivedFrom: wireframes/Retail Board 6.dc.html#ret-6e
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRunReport
     component: modal
@@ -1865,9 +1807,9 @@ screens:
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6G in the client Retail pack.**'
     derivedFrom: wireframes/Retail Board 6.dc.html#ret-6g
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formAskReportingQuestion
     component: modal
@@ -1976,15 +1918,9 @@ screens:
         label: Waiting for a decision
         bindsTo: Alert
         columns:
-        - Alert.id
-        - Alert.ruleId
         - Alert.raisedAt
         - Alert.severity
         - Alert.status
-        - Alert.observedValue
-        - Alert.threshold
-        - Alert.scopePath
-        - Alert.acknowledgedByPrincipalId
         - Alert.acknowledgedAt
         - Alert.resolvedAt
         - Alert.escalatedAt
@@ -1994,14 +1930,10 @@ screens:
         label: Every order
         bindsTo: OrderSummary
         columns:
-        - OrderSummary.id
         - OrderSummary.orderNumber
         - OrderSummary.status
-        - OrderSummary.grossAmount
-        - OrderSummary.refundedAmount
         - OrderSummary.channel
         - OrderSummary.lineCount
-        - OrderSummary.principalId
         - OrderSummary.holdLabel
         - OrderSummary.heldUntil
         operation: listOrders
@@ -2010,17 +1942,11 @@ screens:
         label: Every proposed action
         bindsTo: ProposedAction
         columns:
-        - ProposedAction.id
-        - ProposedAction.interactionId
         - ProposedAction.kind
         - ProposedAction.targetContract
         - ProposedAction.targetOperation
-        - ProposedAction.payload
-        - ProposedAction.summary
         - ProposedAction.status
         - ProposedAction.approvalLevel
-        - ProposedAction.decidedByPrincipalId
-        - ProposedAction.decisionReason
         - ProposedAction.proposedAt
         operation: listProposedActions
         notes: '**What a caller sees follows who may decide** (decided 28 September, audit R213 (3)):
@@ -2158,8 +2084,14 @@ screens:
       from: deepLink
     - name: actionId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProposedActions`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: planId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProposedActions`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A bookmarked dashboard is the normal way in** — a manager opens the same view every
       Monday. The domain and the window come from the link where it carries them, and from the last view
       where it does not. A proposed action opened from the queue or an alert.'
@@ -2178,9 +2110,9 @@ screens:
       operations, states, entry params and exits, and it is better specified than anything derived from
       the screen file.'
     derivedFrom: wireframes/POS Board 6.dc.html#pos-6e
-  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formAskReportingQuestion
     component: modal
@@ -2421,9 +2353,9 @@ screens:
       operations, states, entry params and exits, and it is better specified than anything derived from
       the screen file.'
     derivedFrom: wireframes/POS Board 6.dc.html#pos-6f
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRecordSuggestionOutcome
     component: modal
@@ -3482,8 +3414,6 @@ screens:
         - AiInsight.title
         - AiInsight.kind
         - AiInsight.priority
-        - AiInsight.metricKey
-        - AiInsight.magnitude
         - AiInsight.status
         - AiInsight.detectedAt
         operation: listAiInsights
@@ -3525,7 +3455,6 @@ screens:
         - AiMetricChangeExplanation.drivers
         - AiMetricChangeExplanation.narrative
         - AiMetricChangeExplanation.reliability
-        - AiMetricChangeExplanation.dataAsOf
         operation: explainMetricChange
         notes: The drivers in order of contribution and how reliable the explanation is (grounded, partial,
           conflicting sources, insufficient evidence).
@@ -3557,8 +3486,9 @@ screens:
       ask panel stays available.'
     emptyNoResults: Nothing matches the kind, priority or status filter, and the insights are still there.
       Names the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `AI_USE`, which `listAiInsights` requires, and names that
-      permission. **Never an empty list.**
+    emptyNoAccess: 'Shown when the caller lacks `AI_USE`, which `listAiInsights` requires, and names that
+      permission. **Never an empty list.** A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `REPORT_VIEW_VENUE` for `askReportingQuestion`.'
   apis:
   - operationId: askReportingQuestion
     contract: reporting
@@ -3592,6 +3522,9 @@ screens:
     params:
     - name: insightId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiInsights`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
   overlays:
   - id: formDecideAiInsight
     component: modal
@@ -3772,8 +3705,6 @@ screens:
         label: Every site normalisation basis
         bindsTo: SiteNormalisationBasis
         columns:
-        - SiteNormalisationBasis.id
-        - SiteNormalisationBasis.scopePath
         - SiteNormalisationBasis.periodStart
         - SiteNormalisationBasis.periodEnd
         - SiteNormalisationBasis.visitors
@@ -4165,7 +4096,7 @@ screens:
     purpose: Create one
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id004
+    invalidates: &id002
     - listDashboards
   wireframe:
     status: notStarted
@@ -4179,7 +4110,7 @@ screens:
   name: Drag-and-Drop Dashboard Canvas
   module: Analytics
   requiresModule: analytics
-  wave: 3
+  wave: 1
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -4225,9 +4156,11 @@ screens:
       - kind: primaryButton
         label: Save dashboard
         operation: updateDashboard
-        notes: Saves the whole dashboard (tiles replace tiles); the confirmation names tiles that will
-          be removed. Refused 422 `tile-encoding-missing` for a tile whose report lacks a well its mark
-          requires, naming the tile and the well.
+        notes: '**The first Save creates the dashboard (`createDashboard`), every later Save updates it
+          (`updateDashboard`)** (decided by Chinmay, 3 October 2026 (CHG-SPF-011)); the refresh budget
+          is checked on both. Saves the whole dashboard (tiles replace tiles); the confirmation names
+          tiles that will be removed. Refused 422 `tile-encoding-missing` for a tile whose report lacks
+          a well its mark requires, naming the tile and the well.'
         provenance: contract reporting.yaml PUT /dashboards/{dashboardId}
       - kind: iconButton
         label: Undo
@@ -4342,15 +4275,17 @@ screens:
     emptyFirstRun: A new dashboard with no tiles yet. The gallery is open and says "Drag a visual onto
       the grid"; nothing is created until Save dashboard.
     emptyNoResults: The report search matched nothing. Names the search and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_MANAGE`, which saving requires; the dashboard opens
-      read-only and names that permission.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listReports` requires to show
+      this screen, and names that permission. A caller without `REPORT_MANAGE` sees the dashboard read-only:
+      Save (`createDashboard`, `updateDashboard`) and Archive (`deleteDashboard`) are disabled and name
+      that permission (decided by Chinmay, 3 October 2026 (CHG-SPF-011)).'
   apis:
   - operationId: updateDashboard
     contract: reporting
     purpose: Lay it out
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id001
+    invalidates:
     - getDashboard
     - listDashboards
   - operationId: getDashboard
@@ -4378,6 +4313,13 @@ screens:
     purpose: A report's columns and their encodings, for the field wells
     trigger: onAction
     provenance: '2 October 2026 (CHG-SOT-010): the wells come from ReportColumn (CHG-FIN-007)'
+  - operationId: createDashboard
+    contract: reporting
+    purpose: The first Save of a new dashboard; later saves update it
+    trigger: onAction
+    invalidates:
+    - getDashboard
+    provenance: decided by Chinmay, 3 October 2026 (CHG-SPF-011)
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-023
@@ -4390,8 +4332,14 @@ screens:
     params:
     - name: dashboardId
       from: navigation
+      optional: true
+      notes: 'Optional (decided by Chinmay, 3 October 2026 (CHG-SPF-011)): opened without one, the canvas
+        is a new dashboard and its first Save creates it.'
     - name: reportId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listReports`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
   notes: '**The nine new marks bind** (decided 2 October 2026, Chinmay; CHG-FIN-007). The canvas offers
     all twenty marks of `DashboardTile.visualisation` and, for each, field wells filled from the report''s
     columns (`ReportColumn.role`, `encoding`, `axis`, `seriesType`, `hierarchyLevel`, `unitLabel`): combo
@@ -4427,6 +4375,19 @@ screens:
       label: Cancel
       discards: []
     provenance: contract reporting.yaml DELETE /dashboards/{dashboardId}
+  - id: formCreateDashboard
+    component: modal
+    trigger: Save dashboard
+    body: '**The first Save of a new dashboard** (decided by Chinmay, 3 October 2026 (CHG-SPF-011)): names
+      it and creates it with `createDashboard`, tiles and all; every later Save goes straight to `updateDashboard`.
+      The refresh budget is checked here too. Dismissing sends nothing; the canvas keeps its tiles.'
+    confirm:
+      label: Create dashboard
+      operation: createDashboard
+    dismiss:
+      label: Keep editing
+      discards: []
+    provenance: decided by Chinmay, 3 October 2026 (CHG-SPF-011)
 - id: ANL-024
   name: Widget & Visualization Library
   module: Analytics
@@ -4533,7 +4494,7 @@ screens:
   name: KPI Builder
   module: Analytics
   requiresModule: analytics
-  wave: 3
+  wave: 1
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -4652,8 +4613,9 @@ screens:
     error: Could not load. Names which read failed and leaves the form untouched.
     emptyFirstRun: Only the seeded KPIs exist (takings, admissions and the finance measures). Offers Create
       KPI (`createKpi`) for the tenant's first own KPI.
-    emptyNoAccess: Shown when the caller lacks `REPORT_MANAGE`, which `createKpi` requires; the KPI list
-      stays readable and the form names that permission.
+    emptyNoAccess: Without `REPORT_VIEW_TENANT`, which `listKpis` requires, the screen does not load and
+      this state names that permission. Shown when the caller lacks `REPORT_MANAGE`, which `createKpi`
+      requires; the KPI list stays readable and the form names that permission.
   apis:
   - operationId: listKpis
     contract: reporting
@@ -4665,7 +4627,7 @@ screens:
     purpose: Define one, for everywhere
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id006
+    invalidates:
     - listKpis
     - getKpiValues
   wireframe:
@@ -4793,7 +4755,7 @@ screens:
     purpose: Targets and thresholds
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id007
+    invalidates:
     - getKpiValues
   - operationId: listKpis
     contract: reporting
@@ -4811,6 +4773,9 @@ screens:
     params:
     - name: kpiId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listKpis`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-026
@@ -4947,7 +4912,9 @@ screens:
     purpose: Save the filters
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id001
+    invalidates:
+    - getDashboard
+    - listDashboards
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-027
@@ -5045,7 +5012,9 @@ screens:
     purpose: Drill-down behaviour
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id001
+    invalidates:
+    - getDashboard
+    - listDashboards
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-028
@@ -5146,7 +5115,9 @@ screens:
     purpose: Publish and version
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id001
+    invalidates:
+    - getDashboard
+    - listDashboards
   entryState:
     preloaded:
     - Version Number
@@ -5538,7 +5509,7 @@ screens:
     purpose: Create a report
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id005
+    invalidates: &id003
     - listReports
   wireframe:
     status: notStarted
@@ -5838,7 +5809,7 @@ screens:
     purpose: Filters and parameters
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id002
+    invalidates:
     - getReport
     - listReports
   wireframe:
@@ -5853,6 +5824,9 @@ screens:
     params:
     - name: reportId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updateReport` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
 - id: ANL-036
   name: Grouping, Aggregation & Calculation Builder
   module: Analytics
@@ -5950,7 +5924,9 @@ screens:
     purpose: Grouping and calculations
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id002
+    invalidates:
+    - getReport
+    - listReports
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-036
@@ -5963,6 +5939,9 @@ screens:
     params:
     - name: reportId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updateReport` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
 - id: ANL-037
   name: Cross-Domain Report Composer
   module: Analytics
@@ -6048,7 +6027,9 @@ screens:
     purpose: Compose across them
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id002
+    invalidates:
+    - getReport
+    - listReports
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-037
@@ -6061,6 +6042,9 @@ screens:
     params:
     - name: reportId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updateReport` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
 - id: ANL-038
   name: Report Layout & Formatting Designer
   module: Analytics
@@ -6153,7 +6137,9 @@ screens:
     purpose: Layout and formatting
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id002
+    invalidates:
+    - getReport
+    - listReports
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-038
@@ -6166,6 +6152,9 @@ screens:
     params:
     - name: reportId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updateReport` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
 - id: ANL-039
   name: Report Preview, Test & Validation
   module: Analytics
@@ -6277,8 +6266,14 @@ screens:
     params:
     - name: executionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `runReport`;
+        a link or an edge that holds one opens it instead.'
     - name: reportId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getReportExecution`;
+        an edge that holds one may still carry it to open on that record.'
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-039
@@ -6426,8 +6421,14 @@ screens:
     params:
     - name: executionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `runReport`;
+        a link or an edge that holds one opens it instead.'
     - name: reportId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `runReport` takes the
+        id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
 - id: ANL-041
   name: Reporting Governance Command Center
   module: Analytics
@@ -6829,7 +6830,7 @@ screens:
     purpose: Add a recipient
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id003
+    invalidates: &id001
     - listReportSubscriptions
   wireframe:
     status: notStarted
@@ -6957,7 +6958,7 @@ screens:
     purpose: Channel, format and recipients
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id003
+    invalidates: *id001
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-044
@@ -7079,8 +7080,14 @@ screens:
     params:
     - name: executionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getReportExport`;
+        an edge that holds one may still carry it to open on that record.'
     - name: exportId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getReportExport` takes
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-045
@@ -7272,15 +7279,9 @@ screens:
         - AuthorisationPolicy.description
         - AuthorisationPolicy.effect
         - AuthorisationPolicy.permissions
-        - AuthorisationPolicy.conditions
-        - AuthorisationPolicy.combining
         - AuthorisationPolicy.priority
-        - AuthorisationPolicy.appliesToRoleIds
-        - AuthorisationPolicy.scopePath
         - AuthorisationPolicy.status
-        - AuthorisationPolicy.version
         - AuthorisationPolicy.effectiveFrom
-        - AuthorisationPolicy.effectiveTo
         operation: listAuthorisationPolicies
         provenance: contract identity.yaml GET /authorisation-policies
       - kind: detailPanel
@@ -7317,8 +7318,12 @@ screens:
       operating area or user; distinct from a filter that matched nothing.'
     emptyNoResults: Nothing matches the status filter, and the access policies are still there. Names
       the active filter and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `PERMISSION_VIEW`, which `listAuthorisationPolicies` requires,
-      and names that permission. **Never an empty table** — that reads as *there is no data*.
+    emptyNoAccess: 'Shown when the caller lacks `PERMISSION_VIEW`, which `listAuthorisationPolicies` requires
+      to show this screen, and names that permission (the screen''s other reads need `REPORT_VIEW_TENANT`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `PERMISSION_MANAGE` for `createAuthorisationPolicy`,
+      `updateAuthorisationPolicy`.'
   apis:
   - operationId: listAuthorisationPolicies
     contract: identity
@@ -7359,8 +7364,9 @@ screens:
     body: '**Collects what `createAuthorisationPolicy` sends.** Required: `code`, `name`, `effect` (permit
       or deny; deny wins). Optional: `description`, `permissions` (the reporting permissions it speaks
       to), `conditions`, `combining`, `priority`, `scopePath` (the operating area), `appliesToRoleIds`
-      (the groups), `effectiveFrom`, `effectiveTo`. Never `id`, `status` or `version`: the server sets
-      them. Dismissing sends nothing.'
+      (the groups), `effectiveFrom`, `effectiveTo`. Never or: the server sets them. Dismissing sends nothing.
+      Not asked, because the server sets them (readOnly in the contract): `id`, `status`, `version` (3
+      October 2026, CHG-SPF-001).'
     bindsTo: AuthorisationPolicy
     confirm:
       label: Create access policy
@@ -7410,6 +7416,9 @@ screens:
     params:
     - name: policyId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAuthorisationPolicies`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
 - id: ANL-048
   name: Delivery Monitoring & Failure Management
   module: Analytics
@@ -7799,6 +7808,9 @@ screens:
     params:
     - name: dataClass
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listDataRetentionSettings`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
   gaps:
   - operation: setApprovalRetentionPolicy
     removed: true
@@ -8061,6 +8073,9 @@ screens:
     params:
     - name: conversationId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `askReportingQuestion`;
+        a link or an edge that holds one opens it instead.'
 - id: ANL-053
   name: AI-Generated Dashboard Studio
   module: Analytics
@@ -8139,7 +8154,7 @@ screens:
     purpose: Accept a generated dashboard
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id004
+    invalidates: *id002
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-053
@@ -8236,7 +8251,7 @@ screens:
     purpose: Accept a generated report
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id003
   entryState:
     preloaded:
     - Selected Dataset
@@ -8376,6 +8391,9 @@ screens:
     params:
     - name: detectorKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAnomalyDetectors`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-055
@@ -8633,6 +8651,9 @@ screens:
     params:
     - name: versionId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getForecast`;
+        an edge that holds one may still carry it to open on that record.'
   notes: '**Measure names, not "Revenue"** (decided 2 October 2026, Chinmay; CHG-FIN-002; BOARDREQ MOM-2758..2761).
     Takings (money taken less money paid back, a cash-control figure), Gross sales (before discounts,
     excluding VAT), Net revenue (gross sales less discounts and refunds), Recognised revenue and Deferred
@@ -8825,6 +8846,9 @@ screens:
     params:
     - name: insightId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiInsights`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
 - id: ANL-060
   name: AI Analytics Governance & Model Control
   module: Analytics
@@ -8980,8 +9004,14 @@ screens:
     params:
     - name: capabilityKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiCapabilities`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: templateKey
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPromptTemplates`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-060
@@ -9264,7 +9294,9 @@ screens:
     purpose: Add a KPI
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id006
+    invalidates:
+    - listKpis
+    - getKpiValues
   entryState:
     preloaded:
     - Executive
@@ -9362,7 +9394,8 @@ screens:
     purpose: Targets and scorecards
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id007
+    invalidates:
+    - getKpiValues
   - operationId: getKpiValues
     contract: reporting
     purpose: Where they stand
@@ -9380,6 +9413,9 @@ screens:
     params:
     - name: kpiId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getKpiValues`;
+        an edge that holds one may still carry it to open on that record.'
 - id: ANL-064
   name: Benchmark & Comparative Analytics Configuration
   module: Analytics
@@ -9464,8 +9500,6 @@ screens:
         label: Every site normalisation basis
         bindsTo: SiteNormalisationBasis
         columns:
-        - SiteNormalisationBasis.id
-        - SiteNormalisationBasis.scopePath
         - SiteNormalisationBasis.periodStart
         - SiteNormalisationBasis.periodEnd
         - SiteNormalisationBasis.visitors
@@ -9653,7 +9687,7 @@ screens:
   name: Semantic Model & Business Data Catalogue
   module: Analytics
   requiresModule: analytics
-  wave: 3
+  wave: 1
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'
@@ -9738,8 +9772,11 @@ screens:
     emptyFirstRun: No model published yet. Offers Publish model (`setSemanticModel`); until then reports
       read the seeded catalogue.
     emptyNoResults: Nothing in the model matches the search. Names it and offers to clear it.
-    emptyNoAccess: Shown when the caller lacks `REPORT_VIEW_TENANT`, which `getSemanticModel` requires,
-      and names that permission.
+    emptyNoAccess: 'Shown when the caller lacks `REPORT_VIEW_TENANT`, which `getSemanticModel` requires
+      to show this screen, and names that permission. **Never an empty table** — that reads as *there
+      is no data* and sends somebody to support with the wrong question. A caller who can see the screen
+      but lacks what an action needs sees that action disabled, naming its permission: `REPORT_MANAGE`
+      for `setSemanticModel`.'
   apis:
   - operationId: getSemanticModel
     contract: reporting

@@ -114,8 +114,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | Promotions · wave 2 · needs the `ticketing` module |
-| Block | Block A · ticket #18205 (APP-WEB-WEB-032) |
+| Module | Promotions · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-WEB-WEB-032 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listPromotions` reads the population and `getPromotion` reads one of them — list, select, act |

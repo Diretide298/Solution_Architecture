@@ -287,7 +287,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listMyAccreditationCredentials · issueMyAccreditationWalletPass · renewAccreditation</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyNoResults · error · offline · emptyFirstRun</span></div>
           <div><b>ARRIVES WITH</b> &middot; applicationRef&larr;ACC-004, credentialId&larr;navigation, holderId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#acc-004">ACC-004</a>  &mdash; <i>Application Status Tracking</i> <span class="car">applicationRef</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#acc-004">ACC-004</a>  &mdash; <i>Application Status Tracking</i> <span class="car">applicationId · applicationRef</span></div>
           
           
         </div>
@@ -350,7 +350,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; decideAccreditationApplication · getAccreditationApplication · listAccreditationDocuments · verifyAccreditationDocument</div>
           <div><b>STATES</b> &middot; <span class="">loading · error · emptyNoAccess · emptyNoResults · emptyFirstRun</span></div>
           <div><b>ARRIVES WITH</b> &middot; applicationId&larr;ACC-006, documentId&larr;navigation</div>
-          <div><b>GOES TO</b> &middot; <a href="#acc-005">ACC-005</a>  &mdash; <i>The badge is issued</i> <span class="car">holderId</span><br><a href="#acc-006">ACC-006</a>  &mdash; <i>Reviewer Queue</i><br><a href="#acc-008">ACC-008</a>  &mdash; <i>Credential Register</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#acc-005">ACC-005</a>  &mdash; <i>The badge is issued</i> <span class="car">holderId</span><br><a href="#acc-006">ACC-006</a>  &mdash; <i>Reviewer Queue</i> <span class="car">applicationId</span><br><a href="#acc-008">ACC-008</a>  &mdash; <i>Credential Register</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>confirmDialog</b> refuse &middot; <i>Refuse</i></div><div class="ov"><b>drawer</b> approveWithConditions &middot; <i>Approve</i></div></div>
         </div>

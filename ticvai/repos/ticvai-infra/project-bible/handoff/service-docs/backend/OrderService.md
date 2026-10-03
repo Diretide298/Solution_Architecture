@@ -7,7 +7,7 @@
 | Tier | commerce: The sale path. Highest availability, highest write rate. |
 | Contracts | `orders`, `shift`, `payments` |
 | Schemas owned | `orders`, `payments` |
-| Operations in the slice | 93 of 297 |
+| Operations in the slice | 93 of 298 |
 | Scale | Write-heavy, spiky, latency-critical. The one that autoscales. |
 | If it is down | Down means no sales. Highest availability target in the platform. |
 
@@ -50,53 +50,53 @@
 | cash | [`createCashMovement`](#createcashmovement) | POST | `/shifts/{shiftId}/cash-movements` | core | 1 | BO-041, BO-042, POS-017, POS-018 |
 | cash | [`listCashMovements`](#listcashmovements) | GET | `/shifts/{shiftId}/cash-movements` | core | 1 | BO-039, BO-040, BO-041, EMP-008, EMP-009, POS-007 … |
 | drafted | [`listGroupArrivalCheck`](#listgrouparrivalcheck) | GET | `/group-arrival-check` | core | 1 | BO-280, POS-031 |
-| dunning | [`listMyPaymentIssues`](#listmypaymentissues) | GET | `/guests/me/payment-issues` | core | 2 | GST-015, WEB-023 |
-| dunning | [`retryMyDunningPayment`](#retrymydunningpayment) | POST | `/dunning-cases/{caseId}/retry` | core | 2 | GST-015, WEB-023 |
+| dunning | [`listMyPaymentIssues`](#listmypaymentissues) | GET | `/guests/me/payment-issues` | core | 1 | GST-015, WEB-023 |
+| dunning | [`retryMyDunningPayment`](#retrymydunningpayment) | POST | `/dunning-cases/{caseId}/retry` | core | 1 | GST-015, WEB-023 |
 | order | [`appendEntitlementToMedia`](#appendentitlementtomedia) | POST | `/media/{mediaCode}/entitlements` | core | 1 | BO-027, EMP-036, POS-010 |
 | order | [`applyManualDiscount`](#applymanualdiscount) | POST | `/orders/{orderId}/discounts` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-034, POS-002 … |
-| order | [`claimTicketTransfer`](#claimtickettransfer) | POST | `/ticket-transfers/{transferId}/claim` | core | 2 | GST-014 |
+| order | [`claimTicketTransfer`](#claimtickettransfer) | POST | `/ticket-transfers/{transferId}/claim` | core | 1 | GST-014 |
 | order | [`createOrder`](#createorder) | POST | `/orders` | core | 1 | BO-022, BO-026, BO-047, EMP-034, GST-009, POS-002 … |
 | order | [`exchangeOrderLines`](#exchangeorderlines) | POST | `/orders/{orderId}/exchanges` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-315, EMP-034 … |
 | order | [`getMediaEntitlements`](#getmediaentitlements) | GET | `/media/{mediaCode}/entitlements` | core | 1 | BO-027, EMP-036, POS-010 |
 | order | [`getOrder`](#getorder) | GET | `/orders/{orderId}` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-1147, BO-305 … |
-| order | [`getOrderCalendarEvent`](#getordercalendarevent) | GET | `/orders/{orderId}/calendar-event` | core | 3 | GST-018 |
+| order | [`getOrderCalendarEvent`](#getordercalendarevent) | GET | `/orders/{orderId}/calendar-event` | core | 1 | GST-018 |
 | order | [`getOrderStatement`](#getorderstatement) | GET | `/orders/{orderId}/statement` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-305, EMP-014 … |
-| order | [`getVisitReminder`](#getvisitreminder) | GET | `/orders/{orderId}/reminder` | core | 3 | GST-018 |
+| order | [`getVisitReminder`](#getvisitreminder) | GET | `/orders/{orderId}/reminder` | core | 1 | GST-018 |
 | order | [`holdOrder`](#holdorder) | POST | `/orders/{orderId}/hold` | core | 1 | BO-022, BO-026, BO-047, EMP-034, POS-002, POS-006 … |
 | order | [`listOrders`](#listorders) | GET | `/orders` | core | 1 | ANL-009, BO-022, BO-023, BO-026, BO-047, BO-101 … |
 | order | [`modifyOrder`](#modifyorder) | POST | `/orders/{orderId}/modify` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-281, BO-315 … |
 | order | [`reprintOrder`](#reprintorder) | POST | `/orders/{orderId}/reprints` | core | 1 | BO-022, BO-023, BO-026, BO-047, EMP-014, EMP-034 … |
 | order | [`rescheduleOrder`](#rescheduleorder) | POST | `/orders/{orderId}/reschedule` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-281, BO-315 … |
 | order | [`resumeOrder`](#resumeorder) | POST | `/orders/{orderId}/resume` | core | 1 | BO-022, BO-026, BO-047, EMP-034, POS-002, POS-006 … |
-| order | [`setVisitReminder`](#setvisitreminder) | PUT | `/orders/{orderId}/reminder` | core | 3 | GST-018 |
+| order | [`setVisitReminder`](#setvisitreminder) | PUT | `/orders/{orderId}/reminder` | core | 1 | GST-018 |
 | order | [`transferOrderTickets`](#transferordertickets) | POST | `/orders/{orderId}/transfer` | core | 1 | GST-012, GST-013, GST-014, GST-045, WEB-018, WEB-030 |
 | order | [`voidOrder`](#voidorder) | POST | `/orders/{orderId}/voids` | core | 1 | BO-022, BO-023, BO-026, BO-047, BO-319, EMP-034 … |
 | orders | [`createResaleListing`](#createresalelisting) | POST | `/resale-listings` | core | 1 | GST-067, WEB-030 |
 | orders | [`createTicketTemplate`](#createtickettemplate) | POST | `/ticket-templates` | setup | 1 | BO-346 |
-| orders | [`getBillingStatement`](#getbillingstatement) | GET | `/billing-statements/{statementId}` | core | 2 | GST-015, WEB-023 |
+| orders | [`getBillingStatement`](#getbillingstatement) | GET | `/billing-statements/{statementId}` | core | 1 | GST-015, WEB-023 |
 | orders | [`getGroupBooking`](#getgroupbooking) | GET | `/group-bookings/{groupBookingId}` | core | 1 | BO-026, BO-273, GST-072, POS-031, WEB-031 |
 | orders | [`getPaymentLink`](#getpaymentlink) | GET | `/payment-links/{token}` | core | 1 | ADM-593, GST-009, WEB-014 |
 | orders | [`issueWalletPass`](#issuewalletpass) | POST | `/wallet-passes` | core | 1 | GST-018, WEB-018 |
-| orders | [`listBillingStatements`](#listbillingstatements) | GET | `/billing-statements` | core | 2 | GST-015, WEB-023 |
+| orders | [`listBillingStatements`](#listbillingstatements) | GET | `/billing-statements` | core | 1 | GST-015, WEB-023 |
 | orders | [`listMyOrders`](#listmyorders) | GET | `/my/orders` | core | 1 | GST-014, GST-019, GST-035, WEB-017, WEB-019, WEB-026 … |
-| orders | [`listPaymentTokens`](#listpaymenttokens) | GET | `/payment-tokens` | core | 2 | GST-071, WEB-021 |
+| orders | [`listPaymentTokens`](#listpaymenttokens) | GET | `/payment-tokens` | core | 1 | GST-071, WEB-021 |
 | orders | [`payByLink`](#paybylink) | POST | `/payment-links/{token}/pay` | core | 1 | GST-009, WEB-014 |
-| orders | [`previewProductTickets`](#previewproducttickets) | GET | `/products/{productId}/ticket-previews` | core | 2 | BO-008, CMS-006 |
+| orders | [`previewProductTickets`](#previewproducttickets) | GET | `/products/{productId}/ticket-previews` | core | 1 | BO-008, CMS-006 |
 | orders | [`recordGroupCheckIn`](#recordgroupcheckin) | POST | `/group-bookings/{groupBookingId}/check-in` | core | 1 | BO-280, POS-031 |
 | orders | [`reissueEntitlement`](#reissueentitlement) | POST | `/entitlements/{entitlementId}/reissue` | core | 1 | POS-026 |
-| orders | [`requestGroupBooking`](#requestgroupbooking) | POST | `/group-booking-requests` | core | 2 | GST-072, WEB-031 |
+| orders | [`requestGroupBooking`](#requestgroupbooking) | POST | `/group-booking-requests` | core | 1 | GST-072, WEB-031 |
 | orders | [`setPaymentProvider`](#setpaymentprovider) | PUT | `/payment-providers` | setup | 1 | ADM-412, SGN-021 |
 | orders | [`shareEntitlement`](#shareentitlement) | POST | `/entitlements/{entitlementId}/share` | core | 1 | GST-072, WEB-018 |
-| orders | [`storePaymentToken`](#storepaymenttoken) | POST | `/payment-tokens` | core | 2 | GST-071, WEB-021 |
+| orders | [`storePaymentToken`](#storepaymenttoken) | POST | `/payment-tokens` | core | 1 | GST-071, WEB-021 |
 | orders | [`updateTicketTemplate`](#updatetickettemplate) | PATCH | `/ticket-templates/{templateId}` | setup | 1 | BO-346 |
 | payment | [`addTip`](#addtip) | POST | `/payments/{paymentId}/tip` | core | 1 | EMP-035, POS-005 |
 | payment | [`capturePayment`](#capturepayment) | POST | `/payments/{paymentId}/capture` | core | 1 | BO-024, EMP-035, POS-005, PTR-012 |
 | payment | [`createPayment`](#createpayment) | POST | `/payments` | core | 1 | EMP-035, EMP-059, GST-009, KSK-007, POS-002, POS-004 … |
 | payment | [`inquirePaymentStatus`](#inquirepaymentstatus) | POST | `/payments/{paymentId}/inquiry` | core | 1 | ADM-595, ADM-597, ADM-615, BO-024, EMP-035, GST-009 … |
-| payments | [`createInstalmentPlan`](#createinstalmentplan) | POST | `/instalment-plans` | core | 2 | BO-324, GST-015, WEB-023 |
+| payments | [`createInstalmentPlan`](#createinstalmentplan) | POST | `/instalment-plans` | core | 1 | BO-324, GST-015, WEB-023 |
 | payments | [`createPaymentProviderConnection`](#createpaymentproviderconnection) | POST | `/payment-providers` | setup | 1 | ADM-570, ADM-571 |
-| payments | [`listInstalmentPlans`](#listinstalmentplans) | GET | `/instalment-plans` | core | 2 | BO-324, GST-015, WEB-023 |
-| payments | [`setInstalmentPolicy`](#setinstalmentpolicy) | PUT | `/instalment-policy` | setup | 2 | ADM-603 |
+| payments | [`listInstalmentPlans`](#listinstalmentplans) | GET | `/instalment-plans` | core | 1 | BO-324, GST-015, WEB-023 |
+| payments | [`setInstalmentPolicy`](#setinstalmentpolicy) | PUT | `/instalment-policy` | setup | 1 | ADM-603 |
 | policy | [`setRefundPolicy`](#setrefundpolicy) | PUT | `/venues/{venueId}/refund-policy` | setup | 1 | BO-062, BO-065, BO-1146, BO-318 |
 | refund | [`createRefund`](#createrefund) | POST | `/orders/{orderId}/refunds` | core | 1 | ADM-610, ADM-616, BO-022, BO-023, BO-026, BO-047 … |
 | refund | [`createRefundRequest`](#createrefundrequest) | POST | `/refund-requests` | core | 1 | GST-067, WEB-019 |
@@ -1633,7 +1633,7 @@ A lift removes cash from an open float mid-shift without closing it — the supe
 | Permission | `None` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -1691,7 +1691,7 @@ Charges the case's amount again, on a different saved card if one is given. **A 
 | Permission | `None` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `payments.dunning_case` |
@@ -2117,7 +2117,7 @@ Posts to a discount account, never as a price change. A line sold at a reduced p
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `access.entitlement`, `cache:idempotency`, `orders.ticket_transfer` |
@@ -2174,6 +2174,7 @@ Where they differ the order is still accepted at the quoted price and `priceVari
 **Seat limits** (decided 29 September, rev 3 REV3-7): on a guest channel the seats of one performance may not exceed `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50); on staff and POS channels, 10 per sale (audit R080 (c)). Over the limit is 422 `seatLimitExceeded` (problem type `seat-limit-exceeded`, as `seating.createSeatHold`), no longer 400.
 Offline-capable. The client writes to its local journal, acknowledges the cashier, and replays through `/sync/orders` on reconnect.
 **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id. **When it prices the order it also writes `promotions.promotion_evaluation_trace`**: which promotions were evaluated, which applied and why the others did not, so a disputed discount can be explained later (decided 29 September, writers pass).
+**A guest does this within their own session** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-003; `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to do it for a guest at a till or in the back office (ADR-0025).
 
 |  |  |
 |---|---|
@@ -2183,6 +2184,7 @@ Offline-capable. The client writes to its local journal, acknowledges the cashie
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
+| Guest callable | True |
 | Reads | `cache:idempotency`, `orders.order_line`, `orders.order_line_discount`, `orders.order_line_eligibility`, `orders.payment`, `orders.sales_order` |
 | Writes | `cache:idempotency`, `orders.order_event`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `promotions.promotion_evaluation_trace` |
 | Called by | BO-022, BO-026, BO-047, EMP-034, GST-009, POS-002, POS-004, POS-005, POS-006, POS-013, PTR-002, PTR-008, PTR-015, WEB-012 |
@@ -2545,6 +2547,8 @@ Scanned at a counter before adding something. Shows what the guest holds so a ca
 
 **`GET /orders/{orderId}`**: Read an order
 
+**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for an order they placed; another guest's order is refused exactly as one that does not exist, never returned. `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
+
 |  |  |
 |---|---|
 | Permission | `ORDER_VIEW` |
@@ -2727,7 +2731,7 @@ Returns an iCalendar (RFC 5545) event per dated line: the venue, the session sta
 | Permission | `ORDER_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -2830,7 +2834,7 @@ Returns the reminder, or one with `enabled` false when the guest has never set o
 | Permission | `ORDER_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3311,6 +3315,8 @@ Lines whose entitlement has been redeemed cannot be removed. The guest has used 
 
 Reprint count is recorded per line (`OrderLine.reprintCount`). Repeated reprints on one order is a signal worth surfacing — usually a printer fault, occasionally something else.
 Offline-capable, so it carries `recordedAt`: the moment the till reprinted, kept apart from when the server heard about it.
+**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-004; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for an order they placed (resend or reprint); another guest's order is refused exactly as one that does not exist, never returned. `ORDER_REPRINT` is what a staff caller must hold to act for any guest (ADR-0025).
+**A kiosk reprints as a registered device** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-004): the kiosk (P05) calls this with its device credential (`apiKeyAuth`, audience `device`) and holds no permission; it reprints only an order the guest at it has identified (KSK-012 booking found, KSK-009 ticket issued, KSK-010 print failure), and each reprint is recorded against the device.
 
 |  |  |
 |---|---|
@@ -3592,7 +3598,7 @@ Prices are re-evaluated. Where a price, a promotion or an availability has moved
 | Permission | `ORDER_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
@@ -4045,7 +4051,7 @@ BL-100. **The lines are the point.** A total with no breakdown is what a guest r
 | Permission | `ORDER_VIEW` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -4350,7 +4356,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | Permission | `ORDER_VIEW` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -4561,7 +4567,7 @@ BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF
 | Permission | `ORDER_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -4662,7 +4668,7 @@ BL-072. **Payment against the link, by somebody with no account.**
 | Permission | `PRODUCT_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -4831,7 +4837,7 @@ Voids the old, issues the new. **The reason is recorded and the original is trac
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `catalogue.group_package`, `catalogue.product`, `orders.group_booking` |
@@ -5068,7 +5074,7 @@ BL-116. **The keystone.** Recurring membership billing, wallet auto-reload, one-
 | Permission | `ORDER_CREATE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
@@ -5359,6 +5365,7 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 **A guest-selected currency is what the provider is asked for** (decided 2 October 2026, Chinmay; CHG-FIN-001). Where the order has a `chargeCurrency`, a card or wallet payment from the guest web, app or kiosk is sent to the provider in that currency for `Order.chargeTotal`; the server sets `tenderCurrency`, `tenderAmount` and `fxRate` from the order's locked quote and ignores different values from the client. `amount` stays the base-currency amount, and that is what the ledger posts. Foreign cash handed over at a till is unchanged: recorded at its base equivalent, change in base.
 
 **No cash on a handheld; cash goes to a till** (decided 2 October 2026, Chinmay, batch 6 #200, EMP-009: "No cash on handhelds; cash goes to a till"; DEC-200; CHG-CSP-039; DI-805). A server taking payment at the table on a staff handheld (EMP-059) offers card, wallet, gift card and voucher only; a `cash` tender from a session with no till (the staff app, a handheld, a browser) is refused `409 cashNotOnHandheld`, and the guest pays cash at a till, where a drawer and a person reconcile it. So a server's End shift (EMP-009) has no cash count; the till holder's shift does.
+**A guest does this within their own session** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-003; `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to do it for a guest at a till or in the back office (ADR-0025).
 
 |  |  |
 |---|---|
@@ -5368,6 +5375,7 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
+| Guest callable | True |
 | Reads | `catalogue.inventory_hold`, `ledger.fx_rate`, `orders.order_line`, `orders.payment`, `orders.sales_order`, `payments.provider_connection` |
 | Writes | `cache:idempotency`, `catalogue.channel_capacity`, `catalogue.inventory_hold`, `ledger.journal_entry`, `ledger.journal_line`, `orders.order_event`, `orders.payment`, `payments.payment_attempt`, `platform.idempotency_record`, `platform.outbox` |
 | Called by | EMP-035, EMP-059, GST-009, KSK-007, POS-002, POS-004, POS-005, PTR-012, WEB-012, WEB-033 |
@@ -5454,6 +5462,7 @@ A card payment returns `pendingConfirmation` when the terminal has been instruct
 The recovery path (12 Aug §12). A terminal charged the card and the response never arrived — the guest has been charged and the order shows unpaid.
 This queries the provider directly and reconciles. A background reconciler runs the same operation for payments left unconfirmed past a threshold, so recovery does not depend on an operator noticing.
 **The reconciler threshold is the provider's own recommended status-poll interval** (Stripe and Network International each publish one), held per provider in the adapter configuration and never shorter than that interval. Proposed, client to correct (decided 28 September, audit R065).
+**A guest does this within their own session** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-003; `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to do it for a guest at a till or in the back office (ADR-0025).
 
 |  |  |
 |---|---|
@@ -5463,6 +5472,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
+| Guest callable | True |
 | Reads | `cache:idempotency`, `orders.payment` |
 | Writes | `cache:idempotency`, `orders.payment`, `platform.outbox` |
 | Called by | ADM-595, ADM-597, ADM-615, BO-024, EMP-035, GST-009, KSK-008, POS-005, PTR-012, WEB-012 |
@@ -5534,7 +5544,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | Permission | `ORDER_CREATE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `orders.payment`, `orders.sales_order`, `payments.instalment`, `payments.instalment_plan`, `payments.instalment_policy`, `payments.token` |
@@ -5691,7 +5701,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | Permission | `PAYMENT_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -5759,7 +5769,7 @@ This queries the provider directly and reconciles. A background reconciler runs 
 | Permission | `PAYMENT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `payments.instalment_policy` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -6142,6 +6152,7 @@ An unknown order, or one outside the caller's scope, is the shared 404; an order
 
 Releases held capacity immediately rather than waiting for expiry. A guest cancels only a reservation held for them.
 **Appends to `orders.order_event`** (the order and reservation lifecycle log) one row per state change it makes, with the previous and new state, the actor and the correlation id (decided 29 September, writers pass).
+**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own reservations; another guest's reservation is refused exactly as one that does not exist, never returned. `ORDER_CANCEL` is what a staff caller must hold to act for any guest (ADR-0025).
 
 |  |  |
 |---|---|
@@ -6532,6 +6543,7 @@ Bounded by the venue's maximum, so a reservation cannot be renewed indefinitely 
 **`GET /reservations/{reservationId}`**: Read a reservation
 
 A guest reads only a reservation held for them; another guest's is the shared 404.
+**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own reservations; another guest's reservation is refused exactly as one that does not exist, never returned. `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
 
 |  |  |
 |---|---|
@@ -6603,6 +6615,7 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 **`GET /reservations`**: List reservations
 
 **Who sees what.** Staff see the reservations of every venue their grants reach. **A guest sees only reservations held for them** (`Reservation.subjectId` equal to the caller): a guest token never widens to another subject (`guestAuth`), so the venue scope narrows further to the caller for a guest session, and no parameter can widen it.
+**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own reservations; another guest's reservation is refused exactly as one that does not exist, never returned. `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
 
 |  |  |
 |---|---|
@@ -6673,6 +6686,7 @@ A guest reads only a reservation held for them; another guest's is the shared 40
 **The single mechanism for a shift variance above the threshold** (decided 28 September, audit R080 (e)). A supervisor holding OVERSHORT_ACCEPT accepts it **on the till**, with a supervisor PIN step-up on the same device, after `closeShift` has left the shift in `pendingVariance`. The two other paths the package described are removed: no Duty Manager PIN holds the close before it is submitted, and no approval request (`approvals.createApprovalRequest`) is raised for a shift variance. BO-040 lists the shifts waiting here; it does not approve them by another route.
 Moves the shift to `closed` and each of its deposit boxes from `closed` to `reconciled` (`states/shift.yaml`, `states/deposit-box.yaml`).
 **Any till at the venue, and the daily cash reconciliation, with the supervisor's PIN** (decided 2 October 2026, Chinmay, batch 6 #174, BO-040: "Any till, with supervisor PIN"; batch 3 #1 and #173: the cashier signs out, the shift waits as "Under review", the next cashier starts, and the daily cash reconciliation goes through each shift; DEC-059, DEC-173; CHG-CSP-012). The till the shift was counted on may already be another cashier's, so the supervisor accepts from whichever till they are at, or from BO-043. The PIN step-up stays: still one mechanism, still a supervisor in person. The alternative is `rejectShiftVariance`: send it back for a recount (DEC-175).
+**The step-up travels in the body** (Chinmay, 3 October 2026, defaults taken; CHG-RUL-019), as on `reopenShift` and `rejectShiftVariance`: `supervisorStepUp` carries the principal and PIN of the supervisor accepting the variance (who must not be the cashier), entered on the device making this call, verified as `common.yaml` `SupervisorStepUp` says. Optional in the schema so a client built at r1 still validates, **refused without it** (`403 supervisor-step-up-refused`).
 
 |  |  |
 |---|---|
@@ -6700,6 +6714,9 @@ Moves the shift to `closed` and each of its deposit boxes from `closed` to `reco
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | reason | string | yes | Retained for audit. (min length 3; max length 500) |
+| supervisorStepUp | object |  | The supervisor accepting, signing on this device (CHG-RUL-019). |
+| supervisorStepUp.principalId | string (uuid) | yes | The supervisor signing. |
+| supervisorStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
 
 **Response**: `Shift`
 
@@ -7046,6 +7063,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 **The cashier never sees the expected cash** (decided 2 October 2026, Chinmay; CHG-FIN-003). This response carries `expectedCash` and `variance`, so it is the **supervisor and back-office close** (BO-039, BO-040: closing a shift on a cashier's behalf). A cashier counting their own drawer at the till or on the staff app submits the count with `submitShiftCount`, which returns neither figure. A caller closing a shift they opened themselves, without OVERSHORT_ACCEPT, is refused 403 `blind-count-required`. Retail practice and the client's reason are in docs/active/research-uae-vat-and-blind-close-2-october.md (MoM 9 Sep 2026 4.18, DI-271, DI-806).
 **Online only** (F32, 26 September pull audit R257). Closing needs the server's total — a variance computed against a stale local journal is not a variance — and POS-007 and `states/shift.yaml` (`pendingClosure` is not offline-reachable) already said so.
 **The supervisor's close: on POS-007 with a supervisor PIN, at any till, and in the daily cash reconciliation** (decided 2 October 2026, Chinmay, pre-apply round: "closeShift is declared on POS-007 (supervisor PIN, any till) and in the daily cash reconciliation"; batch 3 #1 and batch 6 #174; DEC-059, DEC-173; CHG-CSP-012). A supervisor closes a cashier's shift at the till the cashier left (POS-007), at any other till of the venue, or from the daily cash reconciliation (BO-043), which lists every shift of the day and resolves them one by one: a shift still open is closed here, a counted shift waiting for review is accepted (`acceptShiftVariance`) or sent back for a recount (`rejectShiftVariance`). The supervisor presents their own PIN on the device in use; the cashier's own count stays `submitShiftCount`.
+**The step-up travels in the body** (Chinmay, 3 October 2026, defaults taken; CHG-RUL-019), as on `reopenShift` and `rejectShiftVariance`: `supervisorStepUp` carries the principal and PIN of the supervisor closing the shift, entered on the device making this call, verified as `common.yaml` `SupervisorStepUp` says. Optional in the schema so a client built at r1 still validates, **refused without it** (`403 supervisor-step-up-refused`).
 
 |  |  |
 |---|---|
@@ -7068,7 +7086,7 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | shiftId | path | yes | string (uuid) |  |
 | Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
 
-**Request body**: `CloseShiftRequest`
+**Request body**
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
@@ -7089,6 +7107,9 @@ Where the venue requires approval on close, the shift waits in `pendingClosure` 
 | cashierReason | enum (tillError, unrecordedRefund, miscount, other) |  | Anything the cashier knows went wrong in the shift (DI-803: till error, unrecorded refund, miscount, other). (nullable) |
 | releaseHeldLeases | boolean |  | Return unsold inventory leases held by this workstation (ADR-0013 C103). (default True) |
 | recordedAt | string (date-time) | yes |  |
+| supervisorStepUp | object |  | The supervisor closing the shift, signing on this device (CHG-RUL-019). |
+| supervisorStepUp.principalId | string (uuid) | yes | The supervisor signing. |
+| supervisorStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
 
 **Response**: `ShiftCloseResult`
 
@@ -7913,6 +7934,7 @@ Change for a guest, a dropped coin, correcting a float. Legitimate and routine.
 
 **A supervisor rejects the variance and the cashier recounts and resubmits** (decided 2 October 2026, Chinmay, batch 6 #175, BO-040: "Add Reject + recount (DI-804)"; DEC-175; CHG-CSP-013; MoM 9 September 4.18, DI-804). Until 2 October the only way back was `reopenShift` on BO-039, which reopens a closed shift for trading; a recount is narrower and happens before anything is accepted.
 From `pendingVariance` only. The shift **stays `pendingVariance`** with `recountRequestedAt`, `recountRequestedByPrincipalId` and `recountReason` set (`states/shift.yaml`: the recount transition; no new status, so clients built at r1 keep the values they switch on). The cashier whose shift it is sees "Recount requested" rather than "Under review", recounts the box at any till of the venue and submits with `submitShiftCount`; the new lines point at the ones they replace (`CashCountLine.recountOf`), the latest count is the one measured, and the request flags clear. Still blind: the rejection carries the supervisor's reason and never the expected figure or the variance (CHG-FIN-003).
+**The supervisor's step-up travels in the body, as on `reopenShift`** (Chinmay, 3 October 2026, Block A business rules; CHG-RUL-014). `supervisorStepUp` carries the supervisor's principal and PIN, entered on the till or the BO-043 browser making this call. The rule is `SupervisorStepUp` in `common.yaml`: the PIN is verified against the principal, who must hold `OVERSHORT_ACCEPT` at this venue and must not be the cashier whose shift it is; otherwise a `403` and nothing is written.
 
 |  |  |
 |---|---|
@@ -7939,6 +7961,9 @@ From `pendingVariance` only. The shift **stays `pendingVariance`** with `recount
 | Field | Type | Required | Notes |
 |---|---|---|---|
 | reason | string | yes | Why a recount is needed, shown to the cashier. (min length 3; max length 500) |
+| supervisorStepUp | object |  | The supervisor sending the shift back, signing on this device (CHG-RUL-014, as reopenShift). |
+| supervisorStepUp.principalId | string (uuid) | yes | The supervisor signing. |
+| supervisorStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
 
 **Response**: `Shift`
 
@@ -8013,7 +8038,7 @@ From `pendingVariance` only. The shift **stays `pendingVariance`** with `recount
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Sent back for a recount; the shift waits for the cashier's new count |
-| 403 |  | The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is (approver-is-cashier). |
+| 403 |  | The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is (approver-is-cashier); or the supervisor step-up is missing or failed: no supervisorStepUp, the PIN did not verify… |
 | 409 |  | Shift is not pendingVariance (shift-not-pending-variance), or a recount is already requested and not yet submitted (recount-already-requested). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -8562,6 +8587,7 @@ Two people sign: the supervisor taking it and the cashier it came from.
 **The cashier signs as witness with their own PIN on the same device** (decided 2 October 2026, Chinmay, batch 6 #178, BO-042: "PIN on the same device"; DEC-178; CHG-CSP-015). Until then the witness was a name the supervisor typed (`witnessPrincipalId` with no credential). The step-up below is answered by the witness, not the caller: the PIN must be that of `witnessPrincipalId`, or the call is refused `403 witness-not-verified`, and the supervisor may not witness their own withdrawal (`403 witness-is-caller`).
 **Recorded as one `CashMovement` of kind `lift`** (F32 step 4: a safe drop "is recorded as a movement so the settlement adds up"; 26 September, pull audit R099/R104). The row carries this box's `depositBoxId` and `shiftId`, the caller as `authorisedByPrincipalId`, the witness, `withdrawalReason` from `reason`, and `note` as its `reason` text. It is the box-level form of the same lift `createCashMovement` records — **one withdrawal is one movement**, so the expected close figure falls once, and `withdrawnTotal` is the sum of the box's lifts.
 **`recordedAt` is the device's time** (offline-and-sync: offline data keeps both `recorded_at` and `synced_at`), and `id` is the client UUIDv7 that doubles as the idempotency key.
+**The step-up travels in the body** (Chinmay, 3 October 2026, defaults taken; CHG-RUL-019), as on `reopenShift` and `rejectShiftVariance`: `witnessStepUp` carries the principal and PIN of the cashier the cash came from (`witnessPrincipalId`), who countersigns, entered on the device making this call, verified as `common.yaml` `SupervisorStepUp` says. Optional in the schema so a client built at r1 still validates, **refused without it** (`403 supervisor-step-up-refused`). The step-up's principal must be `witnessPrincipalId`; it is the witness's PIN, not a supervisor's, so the field is named for the witness.
 
 |  |  |
 |---|---|
@@ -8597,6 +8623,9 @@ Two people sign: the supervisor taking it and the cashier it came from.
 | reason | WithdrawalReason: enum (banking, safeDrop, changeOrder, other) |  | Why a supervisor took cash out of a box. |
 | note | string |  | (max length 300) |
 | recordedAt | string (date-time) | yes |  |
+| witnessStepUp | object |  | The witnessing cashier's countersignature on this device (CHG-RUL-019): principalId is witnessPrincipalId, credential their PIN. |
+| witnessStepUp.principalId | string (uuid) | yes | The supervisor signing. |
+| witnessStepUp.credential | string | yes | The supervisor's staff PIN, as they sign in at a till with it. (max length 512) |
 
 **Response**: `DepositBox`
 
@@ -8661,7 +8690,7 @@ Two people sign: the supervisor taking it and the cashier it came from.
 |---|---|---|
 | 201 |  | Withdrawn, and the expected close figure reduced |
 | 400 | BadRequest | Validation failed |
-| 403 | Forbidden | Authenticated but not permitted at the requested scope |
+| 403 |  | The caller lacks CASH_LIFT, or the witness's step-up is missing, failed, or is not witnessPrincipalId (supervisor-step-up-refused; CHG-RUL-019). |
 | 409 |  | The box is being counted or has been counted — closing, closed or reconciled (problem type deposit-box-not-open). |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
@@ -8890,7 +8919,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | shift_id | uuid | yes | A UUIDv7, as Shift.id and orders.pos_shift.id are. |
 | deposit_box_id | uuid | no |  |
 | count_kind | text | no | Which count this line belongs to — the opening float (openShift), the close (closeShift) or a lift or add (createCashMovement). |
@@ -8924,7 +8953,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | cashier_principal_id | uuid | yes |  |
 | cashier_name | text | no |  |
 | venue_id | uuid | yes |  |
@@ -9261,7 +9290,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no | Added 20 August. |
+| id | uuid | yes | Added 20 August. |
 | venue_id | uuid | yes | The venue in the path. |
 | self_authorise_limit | numeric(18,4) | yes | Up to this, a holder of ORDER_REFUND refunds alone. |
 | requires_second_user_above | numeric(18,4) | no | Above this, a second user — cashier OR supervisor — names themselves as audit control. |
@@ -9405,7 +9434,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | venue_id | uuid | yes |  |
 | scope_path | text | no |  |
 | require_open_approval | boolean | no | Every shift opens pendingApproval and waits for approveShiftOpen (SHIFT_APPROVE_OPEN). |
@@ -9421,7 +9450,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | order_id | uuid | no |  |
 | subject_id | uuid | no | The guest who set it. |
 | is_enabled | boolean | yes |  |
@@ -9511,7 +9540,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | payment_id | uuid | no | The orders.payment this attempt produced or belongs to. |
 | order_id | uuid | no | The order being paid for, so an abandoned attempt still counts against the order's conversion. |
 | provider_connection_id | uuid | yes |  |
@@ -9555,7 +9584,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | code | text | yes |  |
 | name | text | no |  |
 | provider_kind | text | yes |  |
@@ -9573,7 +9602,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | provider_id | uuid | yes |  |
 | fallback_provider_id | uuid | no | Where this provider declines or is unreachable. |
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | code | text | yes |  |
 | priority | integer | no |  |
 | conditions | jsonb | no |  |
@@ -9597,7 +9626,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-204 operations, added to this service in later releases without changing any of the above.
+205 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -9605,7 +9634,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | cart | `listAbandonedCarts` |
 | drafted | `approveExceptionServiceRecovery`, `approveGroupDiscountException`, `approveListingModeration`, `createListingSeller`, `createOrderSourceChannel`, `createUpgradeCredentialRegeneration`, `listAmendmentAfterSale`, `listAmendmentAfterSale2`, `listBulkGroupAssisted`, `listBuyerCheckoutInventory`, `listBuyerPurchaseResale`, `listCapacityInventoryReconciliation`, `listCapacityReservationInventory`, `listCreateListingResale`, `listCredentialRevocationRegeneration`, `listDepositPartialPayment`, `listExternalPaymentPartner`, `listFeeSellerProceed`, `listFinancialTraceability`, `listGroupAmendmentCancellation`, `listGroupBooking`, `listGroupBookingReconciliation`, `listGroupCustomerOrganization`, `listGroupEnquiryOpportunity`, `listGroupPaymentDeposit`, `listGroupRequirementAvailability`, `listGroupSale`, `listGroupSale2`, `listGroupTicketFulfillment`, `listGroupTicketSeat`, `listListingLifecycleExpiry`, `listOfficialResaleMarketplace`, `listOrderFinancialReconciliation`, `listOrderLifecycleTimeline`, `listOrderLineProduct`, `listOrderPaymentDetail`, `listOrderReservation`, `listOrderSplitMerge`, `listParticipantGuestList`, `listPaymentOrderFinancial`, `listPaymentReconciliationException`, `listPersonTypeProduct`, `listQuoteBookingConversion`, `listQuoteRevisionNegotiation`, `listRefundDisputeResale`, `listRelatedOrderTransaction`, `listResale`, `listResale2`, `listResaleConfirmationOwnership`, `listResaleEligibilityTicket`, `listResaleFeeCommission`, `listResaleFraudDuplicate`, `listResaleInventoryAvailability`, `listResaleListingSeller`, `listResaleMarketplace`, `listResaleOwnership`, `listResalePolicyMarketplace`, `listResalePricingPrice`, `listResaleTicketDetail`, `listReservationConfirmationExpiry`, `listSellerSettlementPayout`, `listTicketOwnershipTransfer`, `listTicketReissueFulfillment`, `listTicketResaleMarketplace`, `listUpgradeConversion`, `listUpgradeEligibilityQualification`, `listUpgradeException`, `listUpgradeFinancialTreatment`, `listUpgradeTimingUsage`, `listVoidReversalSame`, `listWhiteLabelMarketplace`, `setAfterSaleFinancial`, `setAmendmentEligibilityPolicy`, `setCancellationPartialPolicy`, `setCustomerGuestAccount`, `setGroupBookingHandover`, `setGroupOperationalPlanning`, `setGroupPackageExperience`, `setGroupQuotationProposal`, `setMultiPaymentSplit`, `setOrderAmendment`, `setOrderDetailTransaction`, `setOrderReservationStatus`, `setProRataResidual`, `setResaleEligibilityRule`, `setResaleMarketplaceRecommendation`, `setReservationHoldPolicy`, `setUpgradeConversionPath` |
 | order | `getDepositPolicy`, `listTicketTransfers`, `setDepositPolicy` |
-| orders | `assignChargeback`, `authoriseStoredValue`, `captureStoredValue`, `cleanupFailedPayment`, `cloneTicketTemplate`, `convertToTermProduct`, `createGroupBooking`, `createGroupEnquiry`, `createMemberException`, `createPaymentLink`, `getChargebackAnalytics`, `getResaleFeePolicy`, `getResaleMarketplaceConfig`, `holdResaleSettlement`, `importTicketTemplate`, `issueInvitation`, `listChargebacks`, `listDeposits`, `listExternalReferenceMappings`, `listFraudRules`, `listInvitationAllowances`, `listMembershipRenewals`, `listOrderDiscounts`, `listOrderFees`, `listPaymentAllocationRules`, `listPaymentProviders`, `listTicketTemplates`, `listUpgrades`, `mergeOrders`, `migrateMembership`, `openGuestCreditAccount`, `printTicketProof`, `pushWalletPassUpdate`, `quoteUpgrade`, `recordChargeback`, `recordChargebackOutcome`, `recordExternalReference`, `releaseResaleSettlementHold`, `relinquishStoredValue`, `renewMembership`, `resendPaymentLink`, `resolveMembershipActivation`, `respondToChargeback`, `revokeEntitlementShare`, `setFraudRules`, `setGroupCustomerOrganization`, `setGroupPaymentSchedule`, `setGroupTicketAllocation`, `setGroupTicketFulfillment`, `setParticipantGuestList`, `setResaleFeePolicy`, `setResaleMarketplaceConfig`, `splitOrder`, `updateGroupBooking`, `voidEntitlement`, `voidPayment` |
+| orders | `assignChargeback`, `authoriseStoredValue`, `cancelPaymentLink`, `captureStoredValue`, `cleanupFailedPayment`, `cloneTicketTemplate`, `convertToTermProduct`, `createGroupBooking`, `createGroupEnquiry`, `createMemberException`, `createPaymentLink`, `getChargebackAnalytics`, `getResaleFeePolicy`, `getResaleMarketplaceConfig`, `holdResaleSettlement`, `importTicketTemplate`, `issueInvitation`, `listChargebacks`, `listDeposits`, `listExternalReferenceMappings`, `listFraudRules`, `listInvitationAllowances`, `listMembershipRenewals`, `listOrderDiscounts`, `listOrderFees`, `listPaymentAllocationRules`, `listPaymentProviders`, `listTicketTemplates`, `listUpgrades`, `mergeOrders`, `migrateMembership`, `openGuestCreditAccount`, `printTicketProof`, `pushWalletPassUpdate`, `quoteUpgrade`, `recordChargeback`, `recordChargebackOutcome`, `recordExternalReference`, `releaseResaleSettlementHold`, `relinquishStoredValue`, `renewMembership`, `resendPaymentLink`, `resolveMembershipActivation`, `respondToChargeback`, `revokeEntitlementShare`, `setFraudRules`, `setGroupCustomerOrganization`, `setGroupPaymentSchedule`, `setGroupTicketAllocation`, `setGroupTicketFulfillment`, `setParticipantGuestList`, `setResaleFeePolicy`, `setResaleMarketplaceConfig`, `splitOrder`, `updateGroupBooking`, `voidEntitlement`, `voidPayment` |
 | payments | `createB2bCreditAccount`, `createPaymentMethod`, `getB2bPaymentTerms`, `getDunningPolicy`, `getInstalmentPolicy`, `getMixedTenderRules`, `getPaymentPerformance`, `getPaymentProviderEconomics`, `getPaymentProviderHealth`, `getPaymentRules`, `listB2bCreditAccounts`, `listDepositActivity`, `listDunningCases`, `listMerchantAccounts`, `listPaymentMethods`, `listPaymentProviderConnections`, `listPaymentRoutingRules`, `listPaymentTerminalCertifications`, `listPaymentTerminals`, `listReconciliationSources`, `listStoredForwardTransactions`, `receivePaymentProviderWebhook`, `recordDepositActivity`, `recordPaymentTerminalCertification`, `resolveDunningCase`, `setB2bPaymentTerms`, `setDunningPolicy`, `setHostedCheckoutConfiguration`, `setMerchantAccount`, `setMixedTenderRules`, `setPaymentAuthenticationPolicy`, `setPaymentFailoverPolicy`, `setPaymentRiskRules`, `setPaymentRoutingRules`, `setPaymentRules`, `setPaymentTerminalConfiguration`, `setReconciliationMatchingRules`, `setReconciliationSource`, `simulatePaymentConfiguration`, `simulatePaymentRouting`, `submitChargebackEvidence`, `testPaymentProviderConnection`, `updatePaymentMethod` |
 | policy | `getRefundPolicy`, `setRefundCalculationPolicy` |
 | refund | `approveRefund`, `createBulkRefund`, `simulateRefund` |

@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 1661 |
-| Operations | 1839 |
+| Operations | 1837 |
 | Contracts | 31 |
 | Modules | 19 |
 | Undrawn | 0 |
-| Operations with no screen | 195 |
-| Waves | wave1 61 · wave2 85 · wave3 1515 |
+| Operations with no screen | 198 |
+| Waves | wave1 125 · wave2 64 · wave3 1472 |
 
 ## Gaps
 
-### 195 operations with no screen here
+### 198 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,17 +60,22 @@
 | `listSeatPricingRules` | catalogue | GET | Seat-level dynamic pricing rules |
 | `relinquishInventoryHold` | catalogue | DELETE | Return unsold units |
 | `renewInventoryHold` | catalogue | POST | Extend a lease TTL |
-| … | | | 155 more |
+| … | | | 158 more |
 
-### 8 modules split across waves
+### 13 modules split across waves
 
 **A platform that sells in one wave and cannot refund until a later one can take money and not give it back.** Not always wrong — worth a look each time.
 
 - **Access & Venue** — waves 1, 2, 3
+- **Commercial** — waves 1, 3
+- **Engagement & Support** — waves 1, 3
 - **Food & Beverage** — waves 1, 2
+- **Games & Rides** — waves 1, 3
 - **Guests & Marketing** — waves 1, 2
 - **Orders & Money** — waves 1, 2, 3
 - **People & Access Rights** — waves 1, 2, 3
+- **Platform** — waves 1, 3
+- **Rentals** — waves 1, 3
 - **Sell** — waves 1, 2, 3
 - **Stock & Supply** — waves 1, 2
 - **Venue Operations** — waves 1, 2, 3
@@ -80,13 +85,13 @@
 | Module | Screens | Waves |
 |---|---|---|
 | Access & Venue | 380 | 1, 2, 3 |
-| Commercial | 368 | 3 |
-| Rentals | 199 | 3 |
+| Commercial | 368 | 1, 3 |
+| Rentals | 199 | 1, 3 |
 | Orders & Money | 157 | 1, 2, 3 |
-| Engagement & Support | 120 | 3 |
+| Engagement & Support | 120 | 1, 3 |
 | Sell | 111 | 1, 2, 3 |
-| Games & Rides | 98 | 3 |
-| Platform | 79 | 3 |
+| Games & Rides | 98 | 1, 3 |
+| Platform | 79 | 1, 3 |
 | Venue Operations | 45 | 1, 2, 3 |
 | Setup & Go-Live | 21 | 3 |
 | Catalogue | 20 | 3 |
@@ -133,7 +138,7 @@
 | `ADM-065` | Effective Date, Season & Day-Based Pricing Rules | Commercial | 3 | 1 | yes |
 | `ADM-066` | Timeslot, Performance & Time-of-Day Pricing Rules | Commercial | 3 | 1 | yes |
 | `ADM-067` | Pricing Rule Priority, Conflict Resolution & Testing | Commercial | 3 | 3 | yes |
-| `ADM-069` | Tax Profile & Jurisdiction Configuration | Commercial | 3 | 5 | yes |
+| `ADM-069` | Tax Profile & Jurisdiction Configuration | Commercial | 1 | 5 | yes |
 | `ADM-070` | Tax Rule & Treatment Builder | Commercial | 3 | 1 | yes |
 | `ADM-071` | Fee & Surcharge Library | Commercial | 3 | 2 | yes |
 | `ADM-072` | Fee Applicability & Charging Rule Builder | Commercial | 3 | 1 | yes |
@@ -141,7 +146,7 @@
 | `ADM-074` | Price Calculation Sequence & Formula Engine | Commercial | 3 | 2 | yes |
 | `ADM-075` | Currency Precision, Rounding & Monetary Rules | Commercial | 3 | 2 | yes |
 | `ADM-076` | Price Breakdown, Calculation Simulation & Explainability | Commercial | 3 | 1 | yes |
-| `ADM-077` | Calculation Validation, Reconciliation & Service Interface | Commercial | 3 | 4 | yes |
+| `ADM-077` | Calculation Validation, Reconciliation & Service Interface | Commercial | 1 | 4 | yes |
 | `ADM-078` | Pricing Governance Command Center | Commercial | 3 | 2 | yes |
 | `ADM-079` | Pricing Change Request & Workspace | Commercial | 3 | 3 | yes |
 | `ADM-080` | Bulk Pricing Update, Import & Mass Maintenance | Commercial | 3 | 1 | yes |
@@ -228,7 +233,7 @@
 | `ADM-161` | Code Eligibility & Restriction Manager | Commercial | 3 | 1 | yes |
 | `ADM-162` | Usage, Capacity & Frequency Control | Commercial | 3 | 1 | yes |
 | `ADM-163` | Validity, Date & Time Control | Commercial | 3 | 1 | yes |
-| `ADM-164` | Code Distribution & Assignment Manager | Commercial | 3 | 2 | yes |
+| `ADM-164` | Code Distribution & Assignment Manager | Commercial | 1 | 2 | yes |
 | `ADM-165` | Redemption Monitor & Code Lookup | Commercial | 3 | 1 | yes |
 | `ADM-166` | Code Security, Fraud & Exception Center | Commercial | 3 | 1 | yes |
 | `ADM-167` | Redemption Analytics, Audit & AI Optimization | Commercial | 3 | 1 | yes |
@@ -307,7 +312,7 @@
 | `ADM-240` | Conditions, Decision Logic & Decision Tables | Platform | 3 | 1 | yes |
 | `ADM-241` | Visual Workflow Designer | Platform | 3 | 1 | yes |
 | `ADM-242` | Approval Matrix & Multi-Level Approval Configuration | Platform | 3 | 0 | yes |
-| `ADM-243` | Roles, Authority, Delegation & Approval Limits | Platform | 3 | 3 | yes |
+| `ADM-243` | Roles, Authority, Delegation & Approval Limits | Platform | 1 | 3 | yes |
 | `ADM-244` | SLA, Escalation, Reminder & Timeout Rules | Platform | 3 | 2 | yes |
 | `ADM-245` | Trigger, Action & Cross-Module Orchestration Configuration | Platform | 3 | 1 | yes |
 | `ADM-246` | Workflow Testing, Simulation & Impact Analysis | Platform | 3 | 1 | yes |
@@ -404,7 +409,7 @@
 | `ADM-339` | Governance & Compliance Command Center | Platform | 3 | 2 | yes |
 | `ADM-340` | Segregation of Duties Policy Manager | Platform | 3 | 1 | yes |
 | `ADM-341` | Four-Eyes & Dual-Control Policy | Platform | 3 | 2 | yes |
-| `ADM-342` | Authentication & MFA Policy Manager | Platform | 3 | 7 | yes |
+| `ADM-342` | Authentication & MFA Policy Manager | Platform | 1 | 7 | yes |
 | `ADM-343` | Sensitive Action Confirmation | Platform | 3 | 2 | yes |
 | `ADM-344` | Digital Signature Management | Platform | 3 | 0 | yes |
 | `ADM-345` | Immutable Approval Record & Tamper Detection | Platform | 3 | 1 | yes |
@@ -416,7 +421,7 @@
 | `ADM-351` | Approval API Management | Platform | 3 | 3 | yes |
 | `ADM-352` | Workflow Event Framework | Platform | 3 | 2 | yes |
 | `ADM-353` | Webhook Configuration & Subscription Manager | Platform | 3 | 0 | yes |
-| `ADM-354` | External Workflow System Integration | Platform | 3 | 3 | yes |
+| `ADM-354` | External Workflow System Integration | Platform | 1 | 3 | yes |
 | `ADM-355` | Data & Workflow Mapping Studio | Platform | 3 | 1 | yes |
 | `ADM-356` | Integration Security & Access Control | Platform | 3 | 3 | yes |
 | `ADM-357` | Integration Monitoring, Error & Retry Center | Platform | 3 | 2 | yes |
@@ -442,7 +447,7 @@
 | `ADM-567` | Payment Policy, Governance & Approval Manager | Commercial | 3 | 4 | yes |
 | `ADM-568` | Payment Configuration Simulator & Validation Center | Commercial | 3 | 2 | yes |
 | `ADM-569` | Payment Orchestration Command Center | Commercial | 3 | 2 | yes |
-| `ADM-570` | Gateway, PSP & Acquirer Directory | Commercial | 3 | 2 | yes |
+| `ADM-570` | Gateway, PSP & Acquirer Directory | Commercial | 1 | 2 | yes |
 | `ADM-571` | Provider Connection & Adapter Configuration | Commercial | 3 | 3 | yes |
 | `ADM-572` | Gateway Capability & Payment Method Mapping | Commercial | 3 | 1 | yes |
 | `ADM-573` | Payment Routing Rule Builder | Commercial | 3 | 2 | yes |
@@ -475,7 +480,7 @@
 | `ADM-600` | Mixed Tender Rule & Combination Builder | Commercial | 3 | 2 | yes |
 | `ADM-601` | Split Payment & Tender Allocation Manager | Commercial | 3 | 3 | yes |
 | `ADM-602` | B2B Credit Account & Limit Manager | Commercial | 3 | 2 | yes |
-| `ADM-603` | B2B Invoice, On-Account & Payment Terms Configuration | Commercial | 3 | 4 | yes |
+| `ADM-603` | B2B Invoice, On-Account & Payment Terms Configuration | Commercial | 1 | 4 | yes |
 | `ADM-604` | Stored Value, Gift Card & Voucher Tender Controls | Commercial | 3 | 2 | yes |
 | `ADM-605` | Advanced Payment Eligibility, Sequence & Restriction Rules | Commercial | 3 | 2 | yes |
 | `ADM-606` | Partial Payment, Failure & Recovery Manager | Commercial | 3 | 5 | yes |
@@ -575,14 +580,14 @@
 | `BO-003` | Queue Integration Setup | Access & Venue | 1 | 4 | yes |
 | `BO-004` | Manual Wait Time Entry | Access & Venue | 1 | 6 | yes |
 | `BO-005` | Queue Monitor | Access & Venue | 1 | 11 | yes |
-| `BO-006` | Parking Configuration | Access & Venue | 2 | 2 | yes |
+| `BO-006` | Parking Configuration | Access & Venue | 1 | 2 | yes |
 | `BO-007` | Product Directory | Sell | 1 | 15 | yes |
 | `BO-008` | Product Detail & Variants | Sell | 1 | 13 | yes |
 | `BO-009` | Pricing Rules | Sell | 1 | 11 | yes |
-| `BO-010` | Promotions & Coupons | Sell | 2 | 26 | yes |
-| `BO-011` | Packages & Bundles | Sell | 2 | 11 | yes |
-| `BO-012` | Membership Products | Sell | 2 | 12 | yes |
-| `BO-013` | Channel & Distribution | Sell | 2 | 10 | yes |
+| `BO-010` | Promotions & Coupons | Sell | 1 | 26 | yes |
+| `BO-011` | Packages & Bundles | Sell | 1 | 11 | yes |
+| `BO-012` | Membership Products | Sell | 1 | 12 | yes |
+| `BO-013` | Channel & Distribution | Sell | 1 | 10 | yes |
 | `BO-014` | Catalogue Publishing | Sell | 1 | 5 | yes |
 | `BO-015` | Performance Calendar | Sell | 1 | 11 | yes |
 | `BO-016` | Performance Template | Sell | 1 | 2 | yes |
@@ -598,7 +603,7 @@
 | `BO-026` | Group Bookings | Orders & Money | 2 | 17 | yes |
 | `BO-027` | Reissue & Media Replacement | Orders & Money | 2 | 5 | yes |
 | `BO-028` | Refund Approval Queue | Orders & Money | 1 | 1 | yes |
-| `BO-029` | Report Builder | Orders & Money | 2 | 8 | yes |
+| `BO-029` | Report Builder | Orders & Money | 1 | 8 | yes |
 | `BO-030` | Work Order Verification | Access & Venue | 1 | 3 | yes |
 | `BO-031` | Asset Register | Access & Venue | 1 | 0 | yes |
 | `BO-032` | Admission Profiles | Access & Venue | 1 | 4 | yes |
@@ -613,19 +618,19 @@
 | `BO-041` | Cash Movements | Orders & Money | 2 | 4 | yes |
 | `BO-042` | Banking & Safe | Orders & Money | 2 | 4 | yes |
 | `BO-043` | Daily Reconciliation | Orders & Money | 1 | 12 | yes |
-| `BO-044` | F&B Outlets | Venue Operations | 2 | 15 | yes |
+| `BO-044` | F&B Outlets | Venue Operations | 1 | 15 | yes |
 | `BO-045` | Menu Management | Food & Beverage | 1 | 18 | yes |
 | `BO-046` | Kitchen Display | Food & Beverage | 1 | 3 | yes |
 | `BO-047` | Order Corrections & Exceptions | Orders & Money | 2 | 14 | yes |
-| `BO-048` | Retail Products | Orders & Money | 2 | 4 | yes |
+| `BO-048` | Retail Products | Orders & Money | 1 | 4 | yes |
 | `BO-049` | Stock Levels | Stock & Supply | 2 | 5 | yes |
 | `BO-050` | Stock Position & Valuation | Stock & Supply | 2 | 2 | yes |
 | `BO-051` | Purchase Orders | Stock & Supply | 2 | 7 | yes |
 | `BO-052` | Goods Receipt | Stock & Supply | 2 | 5 | yes |
 | `BO-053` | Staff Directory | People & Access Rights | 1 | 15 | yes |
 | `BO-054` | Role Assignment | People & Access Rights | 1 | 11 | yes |
-| `BO-055` | Rota & Scheduling | People & Access Rights | 2 | 5 | yes |
-| `BO-056` | Time & Attendance | People & Access Rights | 2 | 3 | yes |
+| `BO-055` | Rota & Scheduling | People & Access Rights | 1 | 5 | yes |
+| `BO-056` | Time & Attendance | People & Access Rights | 2 | 2 | yes |
 | `BO-057` | Training & Certification | People & Access Rights | 3 | 2 | yes |
 | `BO-058` | Reporting Home | Venue Operations | 1 | 11 | yes |
 | `BO-059` | Sales Reports | Orders & Money | 1 | 9 | yes |
@@ -638,7 +643,7 @@
 | `BO-066` | Notification Settings | People & Access Rights | 2 | 3 | yes |
 | `BO-067` | Integrations | Venue Operations | 2 | 4 | yes |
 | `BO-068` | Audit Log | Guests & Marketing | 2 | 4 | yes |
-| `BO-069` | Asset Register | Access & Venue | 2 | 7 | yes |
+| `BO-069` | Asset Register | Access & Venue | 1 | 7 | yes |
 | `BO-070` | Work Orders | Venue Operations | 2 | 13 | yes |
 | `BO-071` | Planned Maintenance | Access & Venue | 3 | 4 | yes |
 | `BO-072` | Incident Log | Access & Venue | 2 | 5 | yes |
@@ -647,10 +652,10 @@
 | `BO-075` | Account Mapping | Orders & Money | 1 | 8 | yes |
 | `BO-076` | Revenue Recognition | Orders & Money | 2 | 5 | yes |
 | `BO-077` | FX Rates & Variances | Orders & Money | 1 | 5 | yes |
-| `BO-078` | Requisitions | Stock & Supply | 1 | 10 | yes |
+| `BO-078` | Requisitions | Stock & Supply | 1 | 8 | yes |
 | `BO-079` | Stock Count | Stock & Supply | 1 | 9 | yes |
 | `BO-080` | Stock Transfers | Stock & Supply | 2 | 5 | yes |
-| `BO-081` | Inventory Items | Stock & Supply | 2 | 9 | yes |
+| `BO-081` | Inventory Items | Stock & Supply | 1 | 9 | yes |
 | `BO-082` | Stock Movements | Stock & Supply | 1 | 4 | yes |
 | `BO-083` | Suppliers | Stock & Supply | 2 | 8 | yes |
 | `BO-084` | Approval Inbox | People & Access Rights | 1 | 4 | yes |
@@ -661,12 +666,12 @@
 | `BO-089` | Journal Entries | Orders & Money | 1 | 6 | yes |
 | `BO-090` | Period Close | Orders & Money | 1 | 7 | yes |
 | `BO-091` | AI Policy & Spend | Guests & Marketing | 1 | 11 | yes |
-| `BO-092` | Venue Maps | Access & Venue | 2 | 2 | yes |
-| `BO-093` | Map Import & Labelling | Access & Venue | 2 | 5 | yes |
-| `BO-094` | Map Editor & Publish | Access & Venue | 2 | 10 | yes |
+| `BO-092` | Venue Maps | Access & Venue | 1 | 2 | yes |
+| `BO-093` | Map Import & Labelling | Access & Venue | 1 | 5 | yes |
+| `BO-094` | Map Editor & Publish | Access & Venue | 1 | 10 | yes |
 | `BO-095` | Resources | Access & Venue | 2 | 2 | yes |
-| `BO-096` | Resource Calendar | Access & Venue | 2 | 2 | yes |
-| `BO-097` | Check Out & Check In | Access & Venue | 2 | 6 | yes |
+| `BO-096` | Resource Calendar | Access & Venue | 1 | 2 | yes |
+| `BO-097` | Check Out & Check In | Access & Venue | 1 | 6 | yes |
 | `BO-098` | Qualifications | Access & Venue | 2 | 2 | yes |
 | `BO-099` | Performance Manifest | Access & Venue | 2 | 2 | yes |
 | `BO-100` | Venue Home | Venue Operations | 1 | 3 | yes |
@@ -768,7 +773,7 @@
 | `BO-1087` | Wallet Currency & Monetary Configuration | Orders & Money | 3 | 2 | yes |
 | `BO-1088` | Credit & Balance Type Configuration | Orders & Money | 3 | 3 | yes |
 | `BO-1089` | Wallet Feature Profile | Orders & Money | 3 | 2 | yes |
-| `BO-109` | Menu Builder & POS Layout Designer | Sell | 2 | 5 | yes |
+| `BO-109` | Menu Builder & POS Layout Designer | Sell | 1 | 5 | yes |
 | `BO-1090` | Wallet Lifecycle Configuration | Orders & Money | 3 | 2 | yes |
 | `BO-1091` | Wallet Numbering, Identity & Digital Credentials | Orders & Money | 3 | 3 | yes |
 | `BO-1092` | Wallet Configuration Preview, Validation & Publication | Orders & Money | 3 | 2 | yes |
@@ -790,7 +795,7 @@
 | `BO-1107` | Consumption Priority Engine | Orders & Money | 3 | 2 | yes |
 | `BO-1108` | Expiry & Validity Policy Configuration | Orders & Money | 3 | 2 | yes |
 | `BO-1109` | FEFO & Credit Lot Management | Orders & Money | 3 | 1 | yes |
-| `BO-111` | Ingredient Substitution, Allergen & Nutrition | Sell | 2 | 6 | yes |
+| `BO-111` | Ingredient Substitution, Allergen & Nutrition | Sell | 1 | 6 | yes |
 | `BO-1110` | Split Tender & Multi-Credit Consumption | Orders & Money | 3 | 3 | yes |
 | `BO-1111` | Credit Expiry, Extension & Forfeiture Operations | Orders & Money | 3 | 2 | yes |
 | `BO-1112` | Consumption Simulator, Validation & Rule Publication | Orders & Money | 3 | 3 | yes |
@@ -801,7 +806,7 @@
 | `BO-1117` | Allowance & Budget Allocation Engine | Orders & Money | 3 | 2 | yes |
 | `BO-1118` | Member Spending Controls & Permissions | Orders & Money | 3 | 2 | yes |
 | `BO-1119` | Corporate Wallet & Organizational Hierarchy | Orders & Money | 3 | 2 | yes |
-| `BO-112` | Production Planning & Production Sheets | Sell | 2 | 8 | yes |
+| `BO-112` | Production Planning & Production Sheets | Sell | 1 | 8 | yes |
 | `BO-1120` | Corporate Budget, Policy & Approval Rules | Orders & Money | 3 | 4 | yes |
 | `BO-1121` | Shared Wallet Transfers & Balance Reallocation | Orders & Money | 3 | 2 | yes |
 | `BO-1122` | Shared Wallet Simulator, Monitoring & Audit | Orders & Money | 3 | 2 | yes |
@@ -856,7 +861,7 @@
 | `BO-1167` | Reconciliation Exception & Resolution Workbench | Orders & Money | 3 | 2 | yes |
 | `BO-1168` | Gift Card Liability Management | Orders & Money | 3 | 1 | yes |
 | `BO-1169` | Breakage & Revenue Recognition Policy | Orders & Money | 3 | 1 | yes |
-| `BO-117` | Product Import, Governance & AI Configuration Assistant | Sell | 2 | 3 | yes |
+| `BO-117` | Product Import, Governance & AI Configuration Assistant | Sell | 1 | 3 | yes |
 | `BO-1170` | Wallet Financial Period & Closing Controls | Orders & Money | 3 | 4 | yes |
 | `BO-1171` | Wallet Analytics & Management Reporting | Orders & Money | 3 | 1 | yes |
 | `BO-1172` | Finance Validation, Reporting & Audit Center | Orders & Money | 3 | 6 | yes |
@@ -895,7 +900,7 @@
 | `BO-133` | Offline Alerts, Limits & Audit | Venue Operations | 1 | 7 | yes |
 | `BO-134` | Kitchen & Preparation Stations | Food & Beverage | 2 | 5 | yes |
 | `BO-135` | Order Routing & KDS/Printer Rules | Food & Beverage | 2 | 2 | yes |
-| `BO-136` | F&B Global Settings & Controls | Food & Beverage | 2 | 3 | yes |
+| `BO-136` | F&B Global Settings & Controls | Food & Beverage | 1 | 3 | yes |
 | `BO-137` | Recipe Consumption & Theoretical Inventory | Stock & Supply | 2 | 4 | yes |
 | `BO-138` | Production Execution & Batch Management | Stock & Supply | 2 | 0 | yes |
 | `BO-139` | Wastage, Spoilage, Returns & Write-Off | Stock & Supply | 2 | 4 | yes |
@@ -910,24 +915,24 @@
 | `BO-148` | Access Point Directory | Access & Venue | 3 | 3 | yes |
 | `BO-149` | Gate & Lane Configuration | Access & Venue | 3 | 1 | yes |
 | `BO-150` | Access Control Graphical Map Designer | Access & Venue | 3 | 1 | yes |
-| `BO-151` | Access Location Grouping | Access & Venue | 3 | 3 | yes |
+| `BO-151` | Access Location Grouping | Access & Venue | 1 | 3 | yes |
 | `BO-152` | Operating Calendar & Special Access Days | Access & Venue | 3 | 3 | yes |
 | `BO-153` | Topology Validation & Publication | Access & Venue | 3 | 2 | yes |
 | `BO-154` | Access Rule Command Center | Access & Venue | 3 | 3 | yes |
-| `BO-155` | Visual Access Rule Builder | Access & Venue | 3 | 2 | yes |
+| `BO-155` | Visual Access Rule Builder | Access & Venue | 1 | 2 | yes |
 | `BO-156` | Entry, Exit & Re-entry Rules | Access & Venue | 3 | 2 | yes |
 | `BO-157` | Anti-Passback & Journey Sequence | Access & Venue | 3 | 3 | yes |
 | `BO-158` | Access Validity & Time Rules | Access & Venue | 3 | 3 | yes |
 | `BO-159` | Entitlement Consumption Engine | Access & Venue | 3 | 2 | yes |
 | `BO-160` | Multi-Park & Crossover Rules | Access & Venue | 3 | 2 | yes |
-| `BO-161` | Guest, Companion & Eligibility Rules | Access & Venue | 3 | 3 | yes |
+| `BO-161` | Guest, Companion & Eligibility Rules | Access & Venue | 1 | 3 | yes |
 | `BO-162` | Group Admission & Quantity Validation | Access & Venue | 3 | 1 | yes |
 | `BO-163` | Rule Simulation, Conflict Check & Publication | Access & Venue | 3 | 2 | yes |
 | `BO-164` | Digital Credential Security Command Center | Access & Venue | 3 | 2 | yes |
 | `BO-165` | Dynamic QR Security Profile Builder | Access & Venue | 3 | 1 | yes |
-| `BO-166` | Credential Activation & Display Rules | Access & Venue | 3 | 2 | yes |
-| `BO-167` | Device Binding & Session Security | Access & Venue | 3 | 3 | yes |
-| `BO-168` | BLE Beacon & Geofence Configuration | Access & Venue | 3 | 1 | yes |
+| `BO-166` | Credential Activation & Display Rules | Access & Venue | 1 | 2 | yes |
+| `BO-167` | Device Binding & Session Security | Access & Venue | 1 | 3 | yes |
+| `BO-168` | BLE Beacon & Geofence Configuration | Access & Venue | 1 | 1 | yes |
 | `BO-169` | Credential Transfer & Rebinding | Access & Venue | 3 | 1 | yes |
 | `BO-170` | Credential Revocation & Lifecycle Events | Access & Venue | 3 | 2 | yes |
 | `BO-171` | Offline Cryptographic Validation Profile | Access & Venue | 3 | 2 | yes |
@@ -944,11 +949,11 @@
 | `BO-182` | Hotel, Wallet & External Media Integration | Access & Venue | 3 | 2 | yes |
 | `BO-183` | Media Compatibility, Testing & Publication | Access & Venue | 3 | 1 | yes |
 | `BO-184` | Biometric Access Command Center | Access & Venue | 3 | 1 | yes |
-| `BO-185` | Biometric Verification Profile Builder | Access & Venue | 3 | 1 | yes |
-| `BO-186` | Face Pass Enrollment Configuration | Access & Venue | 3 | 1 | yes |
+| `BO-185` | Biometric Verification Profile Builder | Access & Venue | 1 | 1 | yes |
+| `BO-186` | Face Pass Enrollment Configuration | Access & Venue | 1 | 1 | yes |
 | `BO-187` | Biometric Consent & Guardian Management | Access & Venue | 3 | 3 | yes |
-| `BO-188` | Face Tag Temporary Enrollment | Access & Venue | 3 | 2 | yes |
-| `BO-189` | Face Matching & Verification Thresholds | Access & Venue | 3 | 2 | yes |
+| `BO-188` | Face Tag Temporary Enrollment | Access & Venue | 1 | 2 | yes |
+| `BO-189` | Face Matching & Verification Thresholds | Access & Venue | 1 | 2 | yes |
 | `BO-190` | Face Change, Re-enrollment & Identity Protection | Access & Venue | 3 | 3 | yes |
 | `BO-191` | Biometric Validation at Gate | Access & Venue | 3 | 1 | yes |
 | `BO-192` | Biometric Lifecycle, Retention & Deletion | Access & Venue | 3 | 3 | yes |
@@ -960,7 +965,7 @@
 | `BO-198` | Validation Outcome & Guest Feedback Designer | Access & Venue | 3 | 1 | yes |
 | `BO-199` | Reader, Scanner & Peripheral Configuration | Access & Venue | 3 | 1 | yes |
 | `BO-200` | Handheld & Mobile Access Device Configuration | Access & Venue | 3 | 1 | yes |
-| `BO-201` | Gate Modes, Free Spin & Emergency Controls | Access & Venue | 3 | 2 | yes |
+| `BO-201` | Gate Modes, Free Spin & Emergency Controls | Access & Venue | 1 | 2 | yes |
 | `BO-202` | Device Software, Content & Remote Configuration | Access & Venue | 3 | 1 | yes |
 | `BO-203` | Hardware Compatibility, Health, Testing & Deployment | Access & Venue | 3 | 3 | yes |
 | `BO-204` | Offline & Edge Operations Command Center | Access & Venue | 3 | 1 | yes |
@@ -989,7 +994,7 @@
 | `BO-227` | Validation Exception & Reason Code Manager | Access & Venue | 3 | 3 | yes |
 | `BO-228` | Manual Override & Supervisor Approval | Access & Venue | 3 | 1 | yes |
 | `BO-229` | Credential Disable, Blacklist & Whitelist Operations | Access & Venue | 3 | 3 | yes |
-| `BO-230` | Live Gate Mode & Lane Control | Access & Venue | 3 | 5 | yes |
+| `BO-230` | Live Gate Mode & Lane Control | Access & Venue | 1 | 5 | yes |
 | `BO-231` | Queue, Throughput & Lane Optimization | Access & Venue | 3 | 1 | yes |
 | `BO-232` | Operational Incident & Exception Workspace | Access & Venue | 3 | 1 | yes |
 | `BO-233` | Operations Audit, Shift Handover & Control Summary | Access & Venue | 3 | 2 | yes |
@@ -1093,7 +1098,7 @@
 | `BO-332` | Financial Traceability, Control & Audit Explorer | Orders & Money | 3 | 1 | yes |
 | `BO-333` | Order Financial Analytics & AI Reconciliation Intelligence | Orders & Money | 3 | 1 | yes |
 | `BO-334` | Virtual Ticket Command Center | Access & Venue | 3 | 1 | yes |
-| `BO-335` | Virtual Ticket Identity & Master Record Configuration | Access & Venue | 3 | 1 | yes |
+| `BO-335` | Virtual Ticket Identity & Master Record Configuration | Access & Venue | 1 | 1 | yes |
 | `BO-336` | Virtual Ticket Status & Lifecycle Model | Access & Venue | 3 | 2 | yes |
 | `BO-337` | Media Type & Credential Technology Registry | Access & Venue | 3 | 2 | yes |
 | `BO-338` | Multi-Media Binding & Association Rules | Access & Venue | 3 | 3 | yes |
@@ -1104,7 +1109,7 @@
 | `BO-343` | Virtual Ticket Architecture Testing, Governance & Audit | Access & Venue | 3 | 1 | yes |
 | `BO-344` | Media Design Studio Command Center | Access & Venue | 3 | 5 | yes |
 | `BO-345` | Digital QR & Barcode Ticket Designer | Access & Venue | 3 | 1 | yes |
-| `BO-346` | PDF, Printable & POS Ticket Designer | Access & Venue | 3 | 5 | yes |
+| `BO-346` | PDF, Printable & POS Ticket Designer | Access & Venue | 1 | 5 | yes |
 | `BO-347` | Apple Wallet Pass Designer | Access & Venue | 3 | 1 | yes |
 | `BO-348` | Google Wallet Pass Designer | Access & Venue | 3 | 1 | yes |
 | `BO-349` | RFID, NFC, Card & Wristband Media Designer | Access & Venue | 3 | 1 | yes |
@@ -1153,7 +1158,7 @@
 | `BO-392` | SLA & Escalation Performance Analytics | Venue Operations | 3 | 1 | yes |
 | `BO-393` | AI SLA & Escalation Advisor | Venue Operations | 3 | 3 | yes |
 | `BO-394` | Game & Ride Operations Dashboard | Games & Rides | 3 | 5 | yes |
-| `BO-395` | Game & Ride Directory | Games & Rides | 3 | 4 | yes |
+| `BO-395` | Game & Ride Directory | Games & Rides | 1 | 4 | yes |
 | `BO-396` | Attraction Profile | Games & Rides | 3 | 3 | yes |
 | `BO-397` | Attraction Type Configuration | Games & Rides | 3 | 2 | yes |
 | `BO-398` | Game & Ride Operational Configuration | Games & Rides | 3 | 2 | yes |
@@ -1375,7 +1380,7 @@
 | `BO-615` | Accreditation Command Center | Access & Venue | 3 | 5 | yes |
 | `BO-616` | Accreditation Application Directory | Access & Venue | 3 | 2 | yes |
 | `BO-617` | New Accreditation Application | Access & Venue | 3 | 3 | yes |
-| `BO-618` | Accreditation Form Builder | Access & Venue | 3 | 4 | yes |
+| `BO-618` | Accreditation Form Builder | Access & Venue | 1 | 4 | yes |
 | `BO-619` | Accreditation Category Management | Access & Venue | 3 | 2 | yes |
 | `BO-620` | Accreditation Program Setup | Access & Venue | 3 | 4 | yes |
 | `BO-621` | Applicant Type Configuration | Access & Venue | 3 | 1 | yes |
@@ -1452,7 +1457,7 @@
 | `BO-693` | Integration & Data Exchange Monitor | Access & Venue | 3 | 1 | yes |
 | `BO-694` | Event Catalogue Command Center | Sell | 3 | 1 | yes |
 | `BO-695` | Event Type & Behaviour Configuration | Sell | 3 | 2 | yes |
-| `BO-696` | Event Duplication & Clone Configuration | Sell | 3 | 2 | yes |
+| `BO-696` | Event Duplication & Clone Configuration | Sell | 1 | 2 | yes |
 | `BO-697` | Event Schedule Command Center | Sell | 3 | 2 | yes |
 | `BO-698` | Dynamic Performance Duration Configuration | Sell | 3 | 2 | yes |
 | `BO-699` | Schedule Change & Rescheduling Configuration | Sell | 3 | 2 | yes |
@@ -1472,7 +1477,7 @@
 | `BO-713` | Contractor & External Workforce Configuration | Sell | 3 | 2 | yes |
 | `BO-714` | Event Shift & Roster Configuration | Sell | 3 | 4 | yes |
 | `BO-715` | Resource Location & Deployment Configuration | Sell | 3 | 2 | yes |
-| `BO-716` | Event Lifecycle & Change Command Center | Sell | 3 | 2 | yes |
+| `BO-716` | Event Lifecycle & Change Command Center | Sell | 1 | 2 | yes |
 | `BO-717` | Lifecycle Transition Configuration | Sell | 3 | 2 | yes |
 | `BO-718` | Event Change Request Configuration | Sell | 3 | 1 | yes |
 | `BO-719` | Event Cancellation Workflow Configuration | Sell | 3 | 2 | yes |
@@ -1511,7 +1516,7 @@
 | `BO-752` | Privacy & AI Governance | Engagement & Support | 3 | 2 | yes |
 | `BO-753` | Compliance Audit Dashboard | Engagement & Support | 3 | 1 | yes |
 | `BO-754` | Audience Intelligence | Engagement & Support | 3 | 2 | yes |
-| `BO-755` | Dynamic Segment Builder | Engagement & Support | 3 | 3 | yes |
+| `BO-755` | Dynamic Segment Builder | Engagement & Support | 1 | 3 | yes |
 | `BO-756` | Static Lists & Imports | Engagement & Support | 3 | 2 | yes |
 | `BO-757` | Behavioral Segmentation | Engagement & Support | 3 | 3 | yes |
 | `BO-758` | Membership & Loyalty Segments | Engagement & Support | 3 | 2 | yes |
@@ -1522,13 +1527,13 @@
 | `BO-763` | Activation & Governance | Engagement & Support | 3 | 2 | yes |
 | `BO-764` | Campaign Command Center | Engagement & Support | 3 | 2 | yes |
 | `BO-765` | Campaign Library & Calendar | Engagement & Support | 3 | 1 | yes |
-| `BO-766` | Campaign Builder | Engagement & Support | 3 | 5 | yes |
+| `BO-766` | Campaign Builder | Engagement & Support | 1 | 5 | yes |
 | `BO-767` | Audience & Offer Selection | Engagement & Support | 3 | 2 | yes |
 | `BO-768` | Multichannel Composer | Engagement & Support | 3 | 2 | yes |
 | `BO-769` | Schedule & Trigger Rules | Engagement & Support | 3 | 2 | yes |
 | `BO-770` | Campaign Approval Workflow | Engagement & Support | 3 | 1 | yes |
 | `BO-771` | Budget, Goals & Forecast | Engagement & Support | 3 | 2 | yes |
-| `BO-772` | A/B & AI Optimization | Engagement & Support | 3 | 6 | yes |
+| `BO-772` | A/B & AI Optimization | Engagement & Support | 1 | 6 | yes |
 | `BO-773` | Attribution & Audit | Engagement & Support | 3 | 1 | yes |
 | `BO-774` | Journey Automation Center | Engagement & Support | 3 | 2 | yes |
 | `BO-775` | Visual Journey Builder | Engagement & Support | 3 | 2 | yes |
@@ -1541,7 +1546,7 @@
 | `BO-782` | AI Journey Optimization | Engagement & Support | 3 | 4 | yes |
 | `BO-783` | Journey Analytics & Audit | Engagement & Support | 3 | 2 | yes |
 | `BO-784` | Communications Center | Engagement & Support | 3 | 1 | yes |
-| `BO-785` | Template Library | Engagement & Support | 3 | 4 | yes |
+| `BO-785` | Template Library | Engagement & Support | 1 | 4 | yes |
 | `BO-786` | Newsletter Builder | Engagement & Support | 3 | 2 | yes |
 | `BO-787` | Content Blocks & Product Feed | Engagement & Support | 3 | 2 | yes |
 | `BO-788` | Subscriptions & Preferences | Engagement & Support | 3 | 1 | yes |
@@ -1554,7 +1559,7 @@
 | `BO-795` | Unified Inbox | Engagement & Support | 3 | 2 | yes |
 | `BO-796` | Guest Conversation 360 | Engagement & Support | 3 | 2 | yes |
 | `BO-797` | AI Chatbot Configuration | Engagement & Support | 3 | 0 | yes |
-| `BO-798` | Intent & Knowledge Management | Engagement & Support | 3 | 4 | yes |
+| `BO-798` | Intent & Knowledge Management | Engagement & Support | 1 | 4 | yes |
 | `BO-799` | Agent Workspace | Engagement & Support | 3 | 4 | yes |
 | `BO-800` | Routing & Queue Management | Engagement & Support | 3 | 5 | yes |
 | `BO-801` | Sales & Service Actions | Engagement & Support | 3 | 1 | yes |
@@ -1581,10 +1586,10 @@
 | `BO-822` | Service Recovery Automation | Engagement & Support | 3 | 0 | yes |
 | `BO-823` | VOC Analytics & Audit | Engagement & Support | 3 | 1 | yes |
 | `BO-824` | Gamification Command Center | Engagement & Support | 3 | 0 | yes |
-| `BO-825` | Challenge Builder | Engagement & Support | 3 | 4 | yes |
-| `BO-826` | Achievement & Badge Engine | Engagement & Support | 3 | 3 | yes |
-| `BO-827` | Points & Activity Rules | Engagement & Support | 3 | 3 | yes |
-| `BO-828` | Milestones & Reward Rules | Engagement & Support | 3 | 2 | yes |
+| `BO-825` | Challenge Builder | Engagement & Support | 1 | 4 | yes |
+| `BO-826` | Achievement & Badge Engine | Engagement & Support | 1 | 3 | yes |
+| `BO-827` | Points & Activity Rules | Engagement & Support | 1 | 3 | yes |
+| `BO-828` | Milestones & Reward Rules | Engagement & Support | 1 | 2 | yes |
 | `BO-829` | Family, Team & Event Challenges | Engagement & Support | 3 | 1 | yes |
 | `BO-830` | Referral & Streak Management | Engagement & Support | 3 | 1 | yes |
 | `BO-831` | Progress, Leaderboards & Hub | Engagement & Support | 3 | 1 | yes |
@@ -1613,27 +1618,27 @@
 | `BO-854` | Resource Management Command Center | Rentals | 3 | 3 | yes |
 | `BO-855` | Resource Type Configuration | Rentals | 3 | 3 | yes |
 | `BO-856` | Resource Category Management | Rentals | 3 | 3 | yes |
-| `BO-857` | Resource Creation & Profile | Rentals | 3 | 7 | yes |
+| `BO-857` | Resource Creation & Profile | Rentals | 1 | 7 | yes |
 | `BO-858` | Configurable Attribute Builder | Rentals | 3 | 2 | yes |
 | `BO-859` | Resource Hierarchy & Parent–Child Relationships | Rentals | 3 | 2 | yes |
 | `BO-860` | Resource Dependency Rules | Rentals | 3 | 2 | yes |
-| `BO-861` | Resource Package & Bundle Configuration | Rentals | 3 | 3 | yes |
+| `BO-861` | Resource Package & Bundle Configuration | Rentals | 1 | 3 | yes |
 | `BO-862` | Multi-Venue Resource Assignment | Rentals | 3 | 2 | yes |
 | `BO-863` | Resource Lifecycle, Governance & Audit | Rentals | 3 | 4 | yes |
 | `BO-864` | Resource Calendar Command Center | Rentals | 3 | 3 | yes |
 | `BO-865` | Calendar Filters, Search & Smart Discovery | Rentals | 3 | 2 | yes |
-| `BO-866` | Resource Availability Schedule Configuration | Rentals | 3 | 4 | yes |
+| `BO-866` | Resource Availability Schedule Configuration | Rentals | 1 | 4 | yes |
 | `BO-867` | Resource Time-Slot Configuration | Rentals | 3 | 2 | yes |
 | `BO-868` | Advance Reservation Management | Rentals | 3 | 3 | yes |
 | `BO-869` | Recurring Reservation Configuration | Rentals | 3 | 2 | yes |
-| `BO-870` | Operational Time & Resource Blocking | Rentals | 3 | 3 | yes |
+| `BO-870` | Operational Time & Resource Blocking | Rentals | 1 | 3 | yes |
 | `BO-871` | Multi-Event Resource Planning | Rentals | 3 | 2 | yes |
 | `BO-872` | Smart Assignment & Drag-and-Drop Reallocation | Rentals | 3 | 2 | yes |
 | `BO-873` | Staff Resource Directory | Rentals | 3 | 3 | yes |
 | `BO-874` | Staff Resource Profile | Rentals | 3 | 4 | yes |
 | `BO-875` | Skills & Competency Management | Rentals | 3 | 2 | yes |
 | `BO-876` | Certification & Expiry Management | Rentals | 3 | 2 | yes |
-| `BO-877` | Qualification & Assignment Rule Engine | Rentals | 3 | 2 | yes |
+| `BO-877` | Qualification & Assignment Rule Engine | Rentals | 1 | 2 | yes |
 | `BO-878` | Staff Availability & Working Pattern | Rentals | 3 | 4 | yes |
 | `BO-879` | Shift Template & Assignment Configuration | Rentals | 3 | 4 | yes |
 | `BO-880` | Break, Leave & Absence Configuration | Rentals | 3 | 6 | yes |
@@ -1667,7 +1672,7 @@
 | `BO-908` | Rental Duration, Extension & Return Management | Rentals | 3 | 2 | yes |
 | `BO-909` | Deposit & Rental Financial Control | Rentals | 3 | 2 | yes |
 | `BO-910` | Maintenance & Resource Blocking | Rentals | 3 | 5 | yes |
-| `BO-911` | Inspection, Condition & Compliance Management | Rentals | 3 | 4 | yes |
+| `BO-911` | Inspection, Condition & Compliance Management | Rentals | 1 | 4 | yes |
 | `BO-912` | Asset Lifecycle, Depreciation & Retirement | Rentals | 3 | 4 | yes |
 | `BO-913` | Event Resource Planning Command Center | Rentals | 3 | 1 | yes |
 | `BO-914` | Event Resource Requirement Builder | Rentals | 3 | 2 | yes |
@@ -1675,7 +1680,7 @@
 | `BO-916` | Equipment & Asset Allocation | Rentals | 3 | 1 | yes |
 | `BO-917` | Event Staff & Personnel Allocation | Rentals | 3 | 1 | yes |
 | `BO-918` | Event Resource Template Library | Rentals | 3 | 3 | yes |
-| `BO-919` | AI Event Resource Forecasting | Rentals | 3 | 3 | yes |
+| `BO-919` | AI Event Resource Forecasting | Rentals | 1 | 3 | yes |
 | `BO-920` | Event Resource Cost Estimator | Rentals | 3 | 2 | yes |
 | `BO-921` | Multi-Event Allocation & Conflict Optimizer | Rentals | 3 | 1 | yes |
 | `BO-922` | Event Resource Approval & Readiness Gate | Rentals | 3 | 2 | yes |
@@ -1683,7 +1688,7 @@
 | `BO-924` | Optimal Resource Recommendation Engine | Rentals | 3 | 1 | yes |
 | `BO-925` | AI Staff Recommendation & Workforce Matching | Rentals | 3 | 2 | yes |
 | `BO-926` | Resource Demand Forecasting | Rentals | 3 | 2 | yes |
-| `BO-927` | AI Staffing Requirement Forecast | Rentals | 3 | 6 | yes |
+| `BO-927` | AI Staffing Requirement Forecast | Rentals | 1 | 6 | yes |
 | `BO-928` | AI Conflict Resolution Assistant | Rentals | 3 | 4 | yes |
 | `BO-929` | Automatic Schedule Optimization | Rentals | 3 | 3 | yes |
 | `BO-930` | Alternative & Replacement Resource | Rentals | 3 | 1 | yes |

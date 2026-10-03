@@ -140,7 +140,7 @@
    "error": "Could not load. Names which read failed and leaves the account mapping untouched.",
    "emptyFirstRun": "No account mapping yet. Offers Create tax code (`createTaxCode`).",
    "emptyNoResults": "Never shown: `listAccountMappings` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listAccountMappings` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listAccountMappings` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCOUNT_CONFIGURE` for `setAccountMappings`; `TAX_CONFIGURE` for `createTaxCode`, `updateTaxCode`, `createTaxExemption`, `verifyTaxExemption`."
   },
   "apis": [
    {
@@ -208,11 +208,15 @@
    "params": [
     {
      "name": "taxCodeId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listTaxCodes` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "exemptionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listTaxExemptions` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `taxCodeId`."
@@ -222,7 +226,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-075"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateTaxCode",
@@ -365,7 +369,7 @@
     {
      "to": "BO-075",
      "trigger": "Account Mapping",
-     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-076 holds none of them. The edge carries nothing: taxCodeId only pre-selects (deep link or optional); BO-075 finds exemptionId (listTaxExemptions) itself, and BO-075 opens on its own"
+     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-076 holds none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (deep link or optional), and BO-075 opens on its own"
     },
     {
      "to": "BO-077",
@@ -391,18 +395,12 @@
        "label": "Every recognition schedule",
        "bindsTo": "RecognitionSchedule",
        "columns": [
-        "RecognitionSchedule.id",
         "RecognitionSchedule.name",
         "RecognitionSchedule.method",
         "RecognitionSchedule.priority",
         "RecognitionSchedule.recognitionSite",
         "RecognitionSchedule.frequency",
-        "RecognitionSchedule.revalidateOnValidityChange",
-        "RecognitionSchedule.productKinds",
-        "RecognitionSchedule.deferredAccountId",
-        "RecognitionSchedule.recognisedAccountId",
-        "RecognitionSchedule.breakageAccountId",
-        "RecognitionSchedule.noShowTrigger"
+        "RecognitionSchedule.revalidateOnValidityChange"
        ],
        "operation": "listRecognitionSchedules",
        "provenance": "contract finance.yaml GET /recognition-schedules"
@@ -418,7 +416,6 @@
        "label": "The selected recognition schedule",
        "bindsTo": "RecognitionSchedule",
        "columns": [
-        "RecognitionSchedule.id",
         "RecognitionSchedule.name",
         "RecognitionSchedule.method",
         "RecognitionSchedule.priority",
@@ -426,13 +423,7 @@
         "RecognitionSchedule.frequency",
         "RecognitionSchedule.revalidateOnValidityChange",
         "RecognitionSchedule.productKinds",
-        "RecognitionSchedule.deferredAccountId",
-        "RecognitionSchedule.recognisedAccountId",
-        "RecognitionSchedule.breakageAccountId",
-        "RecognitionSchedule.noShowTrigger",
-        "RecognitionSchedule.noShowAccountId",
-        "RecognitionSchedule.breakageAfterDays",
-        "RecognitionSchedule.isActive"
+        "RecognitionSchedule.noShowTrigger"
        ],
        "operation": "listRecognitionSchedules",
        "provenance": "contract finance.yaml GET /recognition-schedules"
@@ -483,7 +474,7 @@
    "error": "Could not load. Names which read failed and leaves the revenue recognition untouched.",
    "emptyFirstRun": "No revenue recognition yet. Offers Create recognition schedule (`createRecognitionSchedule`).",
    "emptyNoResults": "Never shown: `listRecognitionSchedules` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `getDeferredRevenue` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `getDeferredRevenue` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCOUNT_CONFIGURE` for `createRecognitionSchedule`; `LEDGER_POST` for `runRecognition`."
   },
   "apis": [
    {
@@ -536,7 +527,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-076"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRunRecognition",
@@ -560,7 +551,7 @@
     "id": "formCreateRecognitionSchedule",
     "component": "modal",
     "trigger": "Create recognition schedule",
-    "body": "**Collects what `createRecognitionSchedule` sends before it is called.** Required: `id`, `name`, `method`, `productKinds`. Optional: `priority`, `recognitionSite`, `frequency`, `revalidateOnValidityChange`, `deferredAccountId`, `recognisedAccountId`, `breakageAccountId`, `noShowTrigger`, `noShowAccountId`, `breakageAfterDays`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createRecognitionSchedule` sends before it is called.** Required: `name`, `method`, `productKinds`. Optional: `priority`, `recognitionSite`, `frequency`, `revalidateOnValidityChange`, `deferredAccountId`, `recognisedAccountId`, `breakageAccountId`, `noShowTrigger`, `noShowAccountId`, `breakageAfterDays`, `isActive`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "RecognitionSchedule",
     "confirm": {
      "label": "Create recognition schedule",
@@ -569,7 +560,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "name",
       "method",
       "productKinds",
@@ -641,7 +631,7 @@
     {
      "to": "BO-075",
      "trigger": "Account Mapping",
-     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-077 holds none of them. The edge carries nothing: taxCodeId only pre-selects (deep link or optional); BO-075 finds exemptionId (listTaxExemptions) itself, and BO-075 opens on its own"
+     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-077 holds none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (deep link or optional), and BO-075 opens on its own"
     }
    ]
   },
@@ -676,15 +666,10 @@
        "label": "Rates in force",
        "bindsTo": "FxRate",
        "columns": [
-        "FxRate.id",
         "FxRate.fromCurrency",
         "FxRate.toCurrency",
         "FxRate.rate",
-        "FxRate.purpose",
-        "FxRate.source",
         "FxRate.effectiveFrom",
-        "FxRate.effectiveTo",
-        "FxRate.setByPrincipalId",
         "FxRate.providerReference",
         "FxRate.fetchedAt"
        ],
@@ -768,7 +753,7 @@
    "error": "Could not load. Names which read failed and leaves the rates variances untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
    "emptyNoResults": "Nothing matches the filter on asAt, purpose and the rates variances are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listFxRates` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listFxRates` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_APPROVE` for `setFxRate`, `reviewPriceVariance`, `ingestFxRates`."
   },
   "apis": [
    {
@@ -816,7 +801,9 @@
    "params": [
     {
      "name": "varianceId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPriceVariances` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `varianceId`.",
@@ -833,7 +820,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-077"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formIngestFxRates",
@@ -877,7 +864,7 @@
     "id": "formSetFxRate",
     "component": "modal",
     "trigger": "Save FX rate",
-    "body": "**Collects what `setFxRate` sends before it is called.** Required: `fromCurrency`, `toCurrency`, `rate`, `purpose`, `effectiveFrom`. Optional: `effectiveTo`, `note`. **The note is required for a manual rate** and the call is refused without it (R127); `source`, set-by, provider reference and fetched-at are the server's. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setFxRate` sends before it is called.** Required: `fromCurrency`, `toCurrency`, `rate`, `purpose`, `effectiveFrom`. Optional: `effectiveTo`, `note`. **The note is required for a manual rate** and the call is refused without it (R127); set-by, provider reference and fetched-at are the server's. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `source` (3 October 2026, CHG-SPF-001).",
     "confirm": {
      "label": "Save FX rate",
      "operation": "setFxRate"
@@ -959,7 +946,7 @@
     {
      "to": "BO-075",
      "trigger": "Account Mapping",
-     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-089 holds none of them. The edge carries nothing: taxCodeId only pre-selects (deep link or optional); BO-075 finds exemptionId (listTaxExemptions) itself, and BO-075 opens on its own"
+     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-089 holds none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (deep link or optional), and BO-075 opens on its own"
     }
    ]
   },
@@ -1001,18 +988,12 @@
        "label": "Journal entries",
        "bindsTo": "JournalEntry",
        "columns": [
-        "JournalEntry.id",
         "JournalEntry.entryNumber",
-        "JournalEntry.fiscalPeriodId",
         "JournalEntry.status",
-        "JournalEntry.source",
-        "JournalEntry.sourceId",
         "JournalEntry.description",
         "JournalEntry.reference",
-        "JournalEntry.lines",
         "JournalEntry.totalDebit",
-        "JournalEntry.totalCredit",
-        "JournalEntry.postedByPrincipalId"
+        "JournalEntry.totalCredit"
        ],
        "operation": "listJournalEntries",
        "provenance": "contract finance.yaml GET /journal-entries",
@@ -1029,21 +1010,13 @@
        "label": "The selected journal entry",
        "bindsTo": "JournalEntry",
        "columns": [
-        "JournalEntry.id",
         "JournalEntry.entryNumber",
-        "JournalEntry.fiscalPeriodId",
         "JournalEntry.status",
         "JournalEntry.source",
-        "JournalEntry.sourceId",
         "JournalEntry.description",
         "JournalEntry.reference",
-        "JournalEntry.lines",
         "JournalEntry.totalDebit",
         "JournalEntry.totalCredit",
-        "JournalEntry.postedByPrincipalId",
-        "JournalEntry.approvedByPrincipalId",
-        "JournalEntry.reversalOfEntryId",
-        "JournalEntry.reversedByEntryId",
         "JournalEntry.postedAt"
        ],
        "operation": "getJournalEntry",
@@ -1144,7 +1117,7 @@
    "error": "Could not load. Names which read failed and leaves the journal entries untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
    "emptyNoResults": "Nothing matches the filter on fiscalPeriodId, status, source and the journal entries are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listJournalEntries` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listJournalEntries` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_APPROVE` for `approveJournalEntry`, `rejectJournal`, `reverseJournalEntry`; `LEDGER_POST` for `createJournalEntry`."
   },
   "apis": [
    {
@@ -1200,7 +1173,9 @@
    "params": [
     {
      "name": "entryId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listJournalEntries` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `entryId`.",
@@ -1217,7 +1192,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-089"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1280,7 +1255,7 @@
     {
      "to": "BO-075",
      "trigger": "Account Mapping",
-     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-090 holds none of them. The edge carries nothing: taxCodeId only pre-selects (deep link or optional); BO-075 finds exemptionId (listTaxExemptions) itself, and BO-075 opens on its own"
+     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-090 holds none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (deep link or optional), and BO-075 opens on its own"
     }
    ]
   },
@@ -1437,7 +1412,7 @@
    "error": "Could not load. Names which read failed and leaves the period close untouched.",
    "emptyFirstRun": "No period close yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on legalEntityId, status and the period close are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listFiscalPeriods` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `LEDGER_VIEW`, which `listFiscalPeriods` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_APPROVE` for `beginPeriodClose`, `closeFiscalPeriod`, `abandonPeriodClose`, `reopenPeriod`."
   },
   "apis": [
    {
@@ -1500,7 +1475,9 @@
    "params": [
     {
      "name": "periodId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listFiscalPeriods` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `periodId`.",
@@ -1517,7 +1494,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-090"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1594,12 +1571,12 @@
     {
      "to": "BO-022",
      "trigger": "Order Detail",
-     "provenance": "derived — BO-022 declares entryState.params documentId, invoiceId, orderId and BO-101 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional); BO-022 finds invoiceId (listTaxInvoices) itself; BO-022 opens on listOrders, and documentId has no source on BO-022 yet (a gap in BO-022, not in this edge)"
+     "provenance": "derived — BO-022 declares entryState.params documentId, invoiceId, orderId and BO-101 holds none of them. The edge carries nothing: orderId, documentId, invoiceId only pre-select (deep link or optional), and BO-022 opens on its own"
     },
     {
      "to": "BO-023",
      "trigger": "Refunds & Exchanges",
-     "provenance": "derived — BO-023 declares entryState.params documentId, invoiceId, orderId and BO-101 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional); BO-023 opens on listOrders, and documentId, invoiceId have no source on BO-023 yet (a gap in BO-023, not in this edge)"
+     "provenance": "derived — BO-023 declares entryState.params documentId, invoiceId, orderId and BO-101 holds none of them. The edge carries nothing: orderId, documentId, invoiceId only pre-select (deep link or optional), and BO-023 opens on its own"
     },
     {
      "to": "BO-024",
@@ -1617,12 +1594,12 @@
     {
      "to": "BO-026",
      "trigger": "Group Bookings",
-     "provenance": "derived — BO-026 declares entryState.params groupBookingId, orderId and BO-101 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional); BO-026 finds groupBookingId (createGroupBooking) itself, and BO-026 opens on its own"
+     "provenance": "derived — BO-026 declares entryState.params groupBookingId, orderId and BO-101 holds none of them. The edge carries nothing: orderId, groupBookingId only pre-select (deep link or optional), and BO-026 opens on its own"
     },
     {
      "to": "BO-027",
      "trigger": "Reissue & Media Replacement",
-     "provenance": "derived — BO-027 declares entryState.params credentialId, mediaCode, mediaId and BO-101 holds none of them. The edge carries nothing: mediaCode, mediaId only pre-select (deep link or optional); BO-027 opens on listTicketReissueFulfillment, and credentialId has no source on BO-027 yet (a gap in BO-027, not in this edge)"
+     "provenance": "derived — BO-027 declares entryState.params credentialId, mediaCode, mediaId and BO-101 holds none of them. The edge carries nothing: mediaCode, mediaId, credentialId only pre-select (deep link or optional), and BO-027 opens on its own"
     },
     {
      "to": "BO-029",
@@ -1647,7 +1624,7 @@
     {
      "to": "BO-042",
      "trigger": "Banking & Safe",
-     "provenance": "derived — BO-042 declares entryState.params boxId, shiftId and BO-101 holds none of them. The edge carries nothing: shiftId only pre-selects (deep link or optional); BO-042 finds boxId (listDepositBoxes) itself, and BO-042 opens on its own"
+     "provenance": "derived — BO-042 declares entryState.params boxId, shiftId and BO-101 holds none of them. The edge carries nothing: boxId, shiftId only pre-select (deep link or optional), and BO-042 opens on its own"
     },
     {
      "to": "BO-043",
@@ -1675,7 +1652,7 @@
     {
      "to": "BO-061",
      "trigger": "Scheduled Reports",
-     "provenance": "derived — BO-061 declares entryState.params reportId, scheduleId and BO-101 holds none of them. The edge carries nothing: reportId only pre-selects (deep link or optional); BO-061 finds scheduleId (listReportExecutions) itself, and BO-061 opens on its own"
+     "provenance": "derived — BO-061 declares entryState.params reportId, scheduleId and BO-101 holds none of them. The edge carries nothing: reportId only pre-selects (deep link or optional); BO-061 finds scheduleId (listReportSchedules) itself, and BO-061 opens on its own"
     },
     {
      "to": "BO-062",
@@ -1685,7 +1662,7 @@
     {
      "to": "BO-065",
      "trigger": "Venue Configuration",
-     "provenance": "derived — BO-065 declares entryState.params locationId and BO-101 holds none of them. The edge carries nothing: BO-065 finds locationId (createDeliveryLocation) itself, and BO-065 opens on its own"
+     "provenance": "derived — BO-065 declares entryState.params locationId and BO-101 holds none of them. The edge carries nothing: locationId only pre-selects (deep link or optional), and BO-065 opens on its own"
     },
     {
      "to": "BO-074",
@@ -1695,7 +1672,7 @@
     {
      "to": "BO-075",
      "trigger": "Account Mapping",
-     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-101 holds none of them. The edge carries nothing: taxCodeId only pre-selects (deep link or optional); BO-075 finds exemptionId (listTaxExemptions) itself, and BO-075 opens on its own"
+     "provenance": "derived — BO-075 declares entryState.params exemptionId, taxCodeId and BO-101 holds none of them. The edge carries nothing: taxCodeId, exemptionId only pre-select (deep link or optional), and BO-075 opens on its own"
     },
     {
      "to": "BO-077",
@@ -1715,7 +1692,7 @@
     {
      "to": "BO-028",
      "trigger": "Refund Approval Queue",
-     "provenance": "derived — BO-028 declares entryState.params refundId and BO-101 holds none of them. The edge carries nothing: BO-101 is the Orders & Money hub and this is its menu entry; BO-028 has no source yet for refundId"
+     "provenance": "derived — BO-028 declares entryState.params refundId and BO-101 holds none of them. The edge carries nothing: refundId only pre-selects (deep link or optional), and BO-028 opens on its own"
     }
    ]
   },
@@ -1795,15 +1772,10 @@
        "columns": [
         "Settlement.currencyCode",
         "Settlement.providerName",
-        "Settlement.periodStart",
-        "Settlement.periodEnd",
         "Settlement.fileReference",
-        "Settlement.format",
-        "Settlement.status",
         "Settlement.lineCount",
         "Settlement.matchedCount",
-        "Settlement.exceptionCount",
-        "Settlement.providerGross"
+        "Settlement.exceptionCount"
        ],
        "operation": "listSettlements",
        "provenance": "contract finance.yaml GET /settlements"
@@ -1890,7 +1862,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-101"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "getVenueSettings",

@@ -107,7 +107,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-228` | Promotion Performance Command Center | B–D | 2 | 0 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
-| `ADM-229` | Campaign & Promotion Performance Explorer | B–D | 4 | 10 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-229` | Campaign & Promotion Performance Explorer | B–D | 4 | 5 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 | `ADM-230` | Redemption, Conversion & Funnel Analytics | B–D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-231` | Discount, Margin & Profitability Analytics | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-232` | Bundle, BOGO & Advanced Offer Analytics | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
@@ -377,16 +377,11 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Owner principal | the name it points at, never the id | The campaign (and budget) owner. |
-| Legal entity | the name it points at, never the id | The business entity that funds and books the campaign. |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | — |
-| Budgets | list or chips (count when long) | The rows of `promotions.campaign_budget`, one per budget line. |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process; these refine the tables above and win where they differ)
 
@@ -458,7 +453,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (4), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-229?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-228`.

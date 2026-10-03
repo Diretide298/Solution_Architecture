@@ -85,12 +85,9 @@
        "label": "My tickets",
        "bindsTo": "Entitlement",
        "columns": [
-        "Entitlement.productId",
         "Entitlement.validFrom",
         "Entitlement.validTo",
         "Entitlement.lifecycleLabel",
-        "Entitlement.entriesUsed",
-        "Entitlement.entriesAllowed",
         "Entitlement.holderName"
        ],
        "operation": "listMyEntitlements",
@@ -109,12 +106,9 @@
        "label": "Past",
        "bindsTo": "Entitlement",
        "columns": [
-        "Entitlement.productId",
         "Entitlement.validFrom",
         "Entitlement.validTo",
         "Entitlement.lifecycleLabel",
-        "Entitlement.entriesUsed",
-        "Entitlement.entriesAllowed",
         "Entitlement.holderName"
        ],
        "operation": "listEntitlements",
@@ -132,21 +126,10 @@
        "label": "The selected entitlement",
        "bindsTo": "Entitlement",
        "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
         "Entitlement.mediaCode",
         "Entitlement.status",
         "Entitlement.statusNote",
         "Entitlement.validFrom",
-        "Entitlement.validTo",
-        "Entitlement.entriesUsed",
-        "Entitlement.entriesAllowed",
         "Entitlement.lastEntryAt"
        ],
        "operation": "getEntitlement",
@@ -260,7 +243,7 @@
     "view": "Tickets tab"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formTransferOrderTickets",
@@ -384,21 +367,10 @@
        "label": "The entitlement",
        "bindsTo": "Entitlement",
        "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
         "Entitlement.mediaCode",
         "Entitlement.status",
         "Entitlement.statusNote",
         "Entitlement.validFrom",
-        "Entitlement.validTo",
-        "Entitlement.entriesUsed",
-        "Entitlement.entriesAllowed",
         "Entitlement.lastEntryAt"
        ],
        "operation": "getEntitlement",
@@ -520,7 +492,7 @@
     "differences": "The YAML states come from an availability template (\"Sold out is a real answer\") and do not fit a ticket-detail screen."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formTransferOrderTickets",
@@ -600,7 +572,7 @@
   "name": "Add to Calendar / Reminders",
   "module": "Account & Self-Service",
   "requiresModule": "ticketing",
-  "wave": 3,
+  "wave": 1,
   "capability": "C02",
   "implementation": {
    "app": "guest-app",
@@ -656,15 +628,10 @@
        "bindsTo": "Order",
        "columns": [
         "Order.orderNumber",
-        "Order.channel",
         "Order.status",
-        "Order.currency",
         "Order.grossAmount",
         "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount",
-        "Order.lines",
-        "Order.payments"
+        "Order.netAmount"
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
@@ -766,7 +733,7 @@
     "view": "Account → All screens → Wave 3 → Add to calendar / reminders"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetVisitReminder",
@@ -851,7 +818,7 @@
   "name": "Order History",
   "module": "Account & Self-Service",
   "requiresModule": "ticketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C21",
   "implementation": {
    "app": "guest-app",
@@ -905,9 +872,7 @@
         "Order.orderNumber",
         "Order.status",
         "Order.grossAmount",
-        "Order.currency",
-        "Order.lines",
-        "Order.createdAt"
+        "Order.currency"
        ],
        "operation": "listMyOrders",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
@@ -953,18 +918,10 @@
        "bindsTo": "Order",
        "columns": [
         "Order.orderNumber",
-        "Order.channel",
         "Order.status",
         "Order.currency",
-        "Order.grossAmount",
-        "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount",
         "Order.lines",
-        "Order.payments",
-        "Order.chargeCurrency",
-        "Order.chargeTotal",
-        "Order.chargeFxRate"
+        "Order.payments"
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}",
@@ -1040,7 +997,7 @@
     "operationId": "getTaxDocumentRendition",
     "contract": "finance",
     "purpose": "Download the invoice / credit memo PDF",
-    "trigger": "onLoad",
+    "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    }
   ],
@@ -1056,11 +1013,15 @@
     },
     {
      "name": "documentId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getTaxDocumentRendition` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "invoiceId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listTaxInvoices` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
@@ -1085,7 +1046,7 @@
    "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "listOrders",
@@ -1152,7 +1113,7 @@
   "name": "Saved Items / Wishlist",
   "module": "Account & Self-Service",
   "requiresModule": "marketing",
-  "wave": 3,
+  "wave": 1,
   "capability": "C58",
   "implementation": {
    "app": "guest-app",
@@ -1269,7 +1230,9 @@
    "params": [
     {
      "name": "itemId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getWishlist`; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "subjectId",
@@ -1290,7 +1253,7 @@
     "view": "Account → All screens → Wave 3 → Saved items / wishlist"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -1368,12 +1331,12 @@
     {
      "to": "GST-071",
      "trigger": "Payment Methods",
-     "provenance": "derived — GST-071 declares entryState.params cardCode, walletId and GST-039 holds none of them. The edge carries nothing: walletId only pre-selects (deep link or optional); GST-071 opens on listPaymentTokens, and cardCode has no source on GST-071 yet (a gap in GST-071, not in this edge)"
+     "provenance": "derived — GST-071 declares entryState.params cardCode, walletId and GST-039 holds none of them. The edge carries nothing: walletId, cardCode only pre-select (deep link or optional), and GST-071 opens on its own"
     },
     {
      "to": "GST-073",
      "trigger": "Security & Sign-in",
-     "provenance": "derived — GST-073 declares entryState.params challengeId, methodId and GST-039 holds none of them. The edge carries nothing: GST-073 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and GST-073 opens on its own"
+     "provenance": "derived — GST-073 declares entryState.params challengeId, methodId and GST-039 holds none of them. The edge carries nothing: challengeId, methodId only pre-select (deep link or optional), and GST-073 opens on its own"
     }
    ]
   },
@@ -1503,7 +1466,7 @@
    "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formUpdateMyProfile",
@@ -1704,7 +1667,6 @@
        "label": "Who is signed in on this device",
        "bindsTo": "GuestSession",
        "columns": [
-        "GuestSession.subjectId",
         "GuestSession.displayName",
         "GuestSession.isVerified",
         "GuestSession.identityProviders",
@@ -1949,7 +1911,9 @@
     },
     {
      "name": "challengeId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`; a link or an edge that holds one opens it instead."
     },
     {
      "name": "subjectId",
@@ -1971,7 +1935,7 @@
    "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 18 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 18 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -2008,7 +1972,7 @@
   "name": "Ticket Delivery & Sharing",
   "module": "Account & Self-Service",
   "requiresModule": "ticketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C02",
   "implementation": {
    "app": "guest-app",
@@ -2117,7 +2081,7 @@
     "differences": "No screen of its own; it shares GST-014’s screen until the client confirms."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -2217,14 +2181,6 @@
        "label": "Every entitlement",
        "bindsTo": "Entitlement",
        "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
         "Entitlement.mediaCode",
         "Entitlement.status",
         "Entitlement.statusNote",
@@ -2237,7 +2193,7 @@
        "kind": "credentialDisplay",
        "label": "Your code",
        "operation": "getEntitlementCredential",
-       "notes": "**The code rotates every 30 seconds by default, the venue's setting** (decided by Chinmay, 2 October 2026; DEC-136; `DynamicQrSecurityProfile.refreshIntervalSeconds`: 15, 30, 45, 60 or a custom value of at least 5 seconds, matching BO-165). A countdown shows the seconds to the next code; the seed's time step is that one setting, never a value of its own (CHG-SGU-003).",
+       "notes": "**The code rotates every 30 seconds by default, the venue's setting** (decided by Chinmay, 2 October 2026; DEC-136; `DynamicQrSecurityProfile.refreshIntervalSeconds`: 15, 30, 45, 60 or a custom value of at least 5 seconds, matching BO-165). A countdown shows the seconds to the next code; the seed's time step is that one setting, never a value of its own (CHG-SGU-003).\n\n**Every 30 seconds** (decided by Chinmay, 3 October 2026 (CHG-SPF-012): GST-055's admission QR rotates every 30 seconds; the answer named GST-069 and meant this screen): the default above, which the venue may change.",
        "provenance": "corrected 2 October 2026 (CHG-SGU-003, decided by Chinmay 2 October 2026, DEC-136)"
       },
       {
@@ -2245,21 +2201,10 @@
        "label": "The entitlement",
        "bindsTo": "Entitlement",
        "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
         "Entitlement.mediaCode",
         "Entitlement.status",
         "Entitlement.statusNote",
         "Entitlement.validFrom",
-        "Entitlement.validTo",
-        "Entitlement.entriesUsed",
-        "Entitlement.entriesAllowed",
         "Entitlement.lastEntryAt"
        ],
        "operation": "getEntitlement",
@@ -2340,7 +2285,7 @@
     "differences": "The Scan overlay also scans table codes and lockers (\"Scan a table code or locker with the same button\"), which the YAML does not cover."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formBindCredentialDevice",
@@ -2401,7 +2346,7 @@
   "name": "Privacy & My Data",
   "module": "Account & Self-Service",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "read-write",
   "implementation": {
    "app": "guest-app",
@@ -2597,7 +2542,7 @@
    "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",

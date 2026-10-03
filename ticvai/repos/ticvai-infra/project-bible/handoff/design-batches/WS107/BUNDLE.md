@@ -96,16 +96,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-459` | Billing & Commercial Command Center | B–D | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-460` | Billing Calculation & Charge Breakdown | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `ADM-461` | Consumption Reconciliation & Billing Approval | B–D | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
-| `ADM-462` | Invoice & Payment Management | B–D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `ADM-463` | Subscription & Commercial Change Management | B–D | 0 | 12 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `ADM-464` | Renewal Management Center | B–D | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-465` | AI Upgrade, Downgrade & Commercial Right-Sizing | B–D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
-| `ADM-466` | Commercial Scenario Simulator | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-467` | Discount, Credit & Commercial Override Management | B–D | 10 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-468` | Renewal Approval, Activation & Commercial Handoff | B–D | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
+| `ADM-459` | Billing & Commercial Command Center | B | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-460` | Billing Calculation & Charge Breakdown | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `ADM-461` | Consumption Reconciliation & Billing Approval | B | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
+| `ADM-462` | Invoice & Payment Management | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `ADM-463` | Subscription & Commercial Change Management | B | 0 | 12 | 6 | 4 | 0 | 0 | — | notStarted (—) |
+| `ADM-464` | Renewal Management Center | B | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-465` | AI Upgrade, Downgrade & Commercial Right-Sizing | B | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `ADM-466` | Commercial Scenario Simulator | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-467` | Discount, Credit & Commercial Override Management | B | 10 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-468` | Renewal Approval, Activation & Commercial Handoff | B | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -125,7 +125,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-459 |
 | Who uses it | ticvai staff holding `PLATFORM_BILLING_VIEW` (1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Financial KPIs) and a per-row directory (§Show) — counts over a population, then the population |
@@ -216,12 +216,12 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `ADM-002` Platform Dashboard: *Back to Platform Dashboard*
 - → `ADM-460` Billing Calculation & Charge Breakdown: *Billing Calculation & Charge Breakdown*
 - → `ADM-461` Consumption Reconciliation & Billing Approval: *Consumption Reconciliation & Billing Approval*
-- → `ADM-462` Invoice & Payment Management: *Invoice & Payment Management*
+- → `ADM-462` Invoice & Payment Management: *Invoice & Payment Management*; carries `invoiceId`
 - → `ADM-463` Subscription & Commercial Change Management: *Subscription & Commercial Change Management*
 - → `ADM-464` Renewal Management Center: *Renewal Management Center*
 - → `ADM-465` AI Upgrade, Downgrade & Commercial Right-Sizing: *AI Upgrade, Downgrade & Commercial Right-Sizing*
 - → `ADM-466` Commercial Scenario Simulator: *Commercial Scenario Simulator*
-- → `ADM-467` Discount, Credit & Commercial Override Management: *Discount, Credit & Commercial Override Management*
+- → `ADM-467` Discount, Credit & Commercial Override Management: *Discount, Credit & Commercial Override Management*; carries `invoiceId`
 - → `ADM-468` Renewal Approval, Activation & Commercial Handoff: *Renewal Approval, Activation & Commercial Handoff*
 
 #### States
@@ -338,7 +338,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-460 |
 | Who uses it | ticvai staff holding `PLATFORM_BILLING_MANAGE` (1 configure); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -453,7 +453,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-461 |
 | Who uses it | ticvai staff holding `PLATFORM_BILLING_MANAGE`, `PLATFORM_BILLING_VIEW` (1 configure, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -571,7 +571,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-462 |
 | Who uses it | ticvai staff holding `PLATFORM_BILLING_MANAGE`, `PLATFORM_BILLING_VIEW` (1 configure, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -716,7 +716,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-463 |
 | Who uses it | ticvai staff holding `PLATFORM_TENANT_MANAGE`, `PLATFORM_TENANT_VIEW` (1 configure, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -870,7 +870,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-464 |
 | Who uses it | ticvai; in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Renewal KPIs) and a per-row directory (§Analyze) — counts over a population, then the population |
@@ -1048,7 +1048,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-465 |
 | Who uses it | ticvai staff holding `PLATFORM_BILLING_VIEW`, `PLATFORM_PLAN_MANAGE` (1 read, 1 configure); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1169,7 +1169,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-466 |
 | Who uses it | ticvai staff holding `PLATFORM_PLAN_MANAGE` (1 configure); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Comparison Metrics) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant … |
@@ -1287,7 +1287,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-467 |
 | Who uses it | ticvai staff holding `PLATFORM_BILLING_MANAGE`, `PLATFORM_BILLING_VIEW` (1 configure, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Required Fields) and no display directory — it is settings, not a population |
@@ -1422,7 +1422,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-468 |
 | Who uses it | ticvai staff holding `PLATFORM_BILLING_VIEW` (1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

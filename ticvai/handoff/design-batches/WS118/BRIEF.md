@@ -95,16 +95,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-489` | AI Configuration Readiness Center | B–D | 20 | 14 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-490` | Configuration Validation Results | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-491` | AI Recommendations & Best-Practice Review | B–D | 6 | 20 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-492` | Configuration Approval Workflow | B–D | 6 | 6 | 7 | 2 | 0 | 3 | — | notStarted (—) |
-| `ADM-493` | AI Configuration Execution Center | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-494` | Execution Progress & Dependency Monitor | B–D | 6 | 48 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-495` | Configuration Results & Object Mapping | B–D | 6 | 22 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-496` | Configuration Change & Modification Assistant | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-497` | Configuration History, Versions & Rollback | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-498` | AI Configuration Audit & Governance | B–D | 8 | 16 | 7 | 5 | 1 | 0 | — | notStarted (—) |
+| `ADM-489` | AI Configuration Readiness Center | D | 20 | 14 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-490` | Configuration Validation Results | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-491` | AI Recommendations & Best-Practice Review | D | 6 | 20 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-492` | Configuration Approval Workflow | D | 6 | 6 | 7 | 2 | 0 | 3 | — | notStarted (—) |
+| `ADM-493` | AI Configuration Execution Center | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-494` | Execution Progress & Dependency Monitor | D | 6 | 48 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-495` | Configuration Results & Object Mapping | D | 6 | 22 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-496` | Configuration Change & Modification Assistant | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-497` | Configuration History, Versions & Rollback | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-498` | AI Configuration Audit & Governance | D | 8 | 16 | 7 | 5 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

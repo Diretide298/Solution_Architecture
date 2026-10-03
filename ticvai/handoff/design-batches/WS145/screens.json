@@ -213,9 +213,6 @@
        "label": "The selected property",
        "bindsTo": "TenantConfig",
        "columns": [
-        "TenantConfig.tenantId",
-        "TenantConfig.version",
-        "TenantConfig.isDraft",
         "TenantConfig.brand",
         "TenantConfig.theme",
         "TenantConfig.header",
@@ -223,11 +220,7 @@
         "TenantConfig.homepage",
         "TenantConfig.languages",
         "TenantConfig.modules",
-        "TenantConfig.features",
-        "TenantConfig.enabledPaymentMethods",
-        "TenantConfig.isInMaintenance",
-        "TenantConfig.maintenanceMessage",
-        "TenantConfig.updatedAt"
+        "TenantConfig.features"
        ],
        "operation": "getTenantConfig",
        "provenance": "contract white-label.yaml GET /tenant-config"

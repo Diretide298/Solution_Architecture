@@ -109,9 +109,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1183` | Transport Stations | B–D | 13 | 13 | 7 | 0 | 0 | 6 | — | notStarted (generated) |
 | `BO-1184` | Transport Routes & Stops | B–D | 27 | 18 | 7 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-1185` | Transport Fares & Passenger Types | B–D | 22 | 44 | 7 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-1186` | Transport Timetables | B–D | 21 | 17 | 7 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-1186` | Transport Timetables | B–D | 21 | 14 | 7 | 0 | 0 | 6 | — | notStarted (generated) |
 | `BO-1187` | Transport Departure Board | B–D | 14 | 17 | 7 | 4 | 0 | 6 | — | notStarted (generated) |
-| `BO-1188` | Transport Pass Types | B–D | 19 | 21 | 7 | 0 | 0 | 6 | — | notStarted (generated) |
+| `BO-1188` | Transport Pass Types | B–D | 19 | 18 | 7 | 0 | 0 | 6 | — | notStarted (generated) |
 | `BO-1189` | Transport Network Import | B–D | 6 | 27 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
 
 ---
@@ -491,7 +491,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the routes untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | **No routes yet.** Offers New route (needs at least two stations, BO-1183) and Import stations, routes and timetables (BO-1189). |
 | Empty, no results (`?state=emptyNoResults`) | The status or station filter matched nothing and the routes are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TRANSPORT_VIEW`, which `listTransportTimetables` and the setup screens require, and names that permission. **Never an empty table**. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TRANSPORT_MANAGE`, which `createTransportRoute` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Validation (`?state=validation`) | `422` on fewer than two stops, a station repeated, a station inactive or not at this venue, or offsets that do not start at 0 and strictly increase, each marked on the stop row; `409` on a code already used; `409` on a stop change under a published timetable; `409` on a status change the route cannot make (no fare table, or retiring with sold seats), naming what is missing. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 Stops changed while a published timetable covers a future date.; 409 The transition is not allowed from the current status, the route has no fare table, or retiring a route with sold seats on a departure … |
@@ -538,7 +538,7 @@ routes:
 - `updateTransportRoute` → `TRANSPORT_MANAGE` (configure) · staff
 - `setTransportRouteStatus` → `TRANSPORT_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `TRANSPORT_VIEW`, which `listTransportTimetables` and the setup screens require, and names that permission. **Never an empty table**.
+**A refused user sees:** Shown when the caller lacks `TRANSPORT_MANAGE`, which `createTransportRoute` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
@@ -623,6 +623,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | From station | picker: choose a from station | — | — | `listTransportRoutes` ?fromStationId |
 | To station | picker: choose a to station | — | — | `listTransportRoutes` ?toStationId |
 | Status | radio group | — | Draft · Active · Suspended · Retired | `listTransportRoutes` ?status |
+| At | date and time picker | — | — | `getTransportFareTable` ?at |
 
 **Form: Save fare table** (confirmDialog, opened by *Save fare table*; *Save fares* calls `setTransportFareTable`, *Cancel* sends nothing)
 
@@ -744,7 +745,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the fare table untouched. |
 | Empty, no results (`?state=emptyNoResults`) | A route picked with no fare table opens the empty form, named as the first-run state for that route. |
 | Empty, first run (`?state=emptyFirstRun`) | **This route has no fares yet, so it cannot be activated or sold.** The form opens empty with the fare models explained. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TRANSPORT_PRICE`, which `setTransportFareTable` requires, and names that permission; a `TRANSPORT_VIEW` holder sees the table read-only. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TRANSPORT_PRICE`, which `setTransportFareTable` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Validation (`?state=validation`) | `422` on a matrix missing a station pair, a passenger type code repeated, no default type or a multiplier outside 0 to 1, each marked on its row. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 A `matrix` model missing a station pair the route serves, a passenger type code repeated, no passenger type with `isDefault`, or a multiplier outside 0 to 1.; 422 Stations not on the route or in the wrong order, an unknown passenger type, no passengers, or a pass type not offered on this route. |
@@ -783,7 +784,7 @@ preview:
 - `setTransportFareTable` → `TRANSPORT_PRICE` (operate) · staff
 - `quoteTransportFare` → no permission · guest, public, service
 
-**A refused user sees:** Shown when the caller lacks `TRANSPORT_PRICE`, which `setTransportFareTable` requires, and names that permission; a `TRANSPORT_VIEW` holder sees the table read-only.
+**A refused user sees:** Shown when the caller lacks `TRANSPORT_PRICE`, which `setTransportFareTable` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
 #### Requirements it meets
 
@@ -932,11 +933,8 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Status | chip: Draft, Published, Superseded, Withdrawn | — |
 | Valid from | 1 Oct 2026 | — |
 | Valid to | 1 Oct 2026 | — |
-| Release horizon days | 1,234 | How many days ahead departures go on sale. Proposed default 30, from the prototype, client to correct (rev 3 REV3-21). |
 | Seat capacity | 1,234 | Seats per departure, unless a departure overrides it. |
 | Published at | 1 Oct 2026, 14:30 | — |
-| Released through | 1 Oct 2026 | The last date whose departures have been generated. |
-| Superseded by | the name it points at, never the id | — |
 
 **The selected timetable** (detail panel, from `listTransportTimetables`): `runs`: departure times by day of week, shown as a week grid.
 
@@ -981,7 +979,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the timetables untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | **No timetable on this route, so nothing is on sale.** Offers New timetable and Import stations, routes and timetables (BO-1189). |
 | Empty, no results (`?state=emptyNoResults`) | The status filter matched nothing and the route's other timetables are still there. Names the filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TRANSPORT_VIEW`, which `listTransportTimetables` requires, and names that permission. **Never an empty table**. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TRANSPORT_VIEW`, which `listTransportTimetables` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TRANSPORT_MANAGE` for `createTransportTimetable`, `updateTransportTimetable`, `publishTransportTimetable`, `withdrawTransportTimetable`. |
 | Validation (`?state=validation`) | `400` on a missing name, start date, capacity or run, or a run time out of order, marked on the field; `409` on editing a published timetable, on publishing against an inactive route or one with no fare table, and on withdrawing with sold seats, each naming the cause. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Not a draft, the route is not active or has no fare table, or a superseded timetable has departures with sold seats on or after this `validFrom`.; 409 Not published, or a future departure has sold seats.; 409 The timetable is not a draft. |
@@ -1026,7 +1024,7 @@ timetable:
 - `publishTransportTimetable` → `TRANSPORT_MANAGE` (configure) · staff
 - `withdrawTransportTimetable` → `TRANSPORT_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `TRANSPORT_VIEW`, which `listTransportTimetables` requires, and names that permission. **Never an empty table**.
+**A refused user sees:** Shown when the caller lacks `TRANSPORT_VIEW`, which `listTransportTimetables` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TRANSPORT_MANAGE` for `createTransportTimetable`, `updateTransportTimetable`, `publishTransportTimetable`, `withdrawTransportTimetable`.
 
 #### Requirements it meets
 
@@ -1054,7 +1052,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (21), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (17 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1186?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, validation, offline.
 - [ ] Every action is wired with its success and its failure: What publishing puts on sale, New timetable, Save draft, Publish, Withdraw.
 - [ ] Every transition is wired: `BO-1184`, `BO-1187`.
@@ -1193,7 +1191,7 @@ Errors to draw in the form: 403 The supervisor step-up is missing or failed (aud
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the departures untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | **No departures on this route**, because no timetable is published. Offers Timetables (BO-1186). |
 | Empty, no results (`?state=emptyNoResults`) | The date range or status matched nothing and the route's other departures are still there. Names the filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TRANSPORT_VIEW`, which `listTransportRouteDepartures` requires, and names that permission. **Never an empty table**. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TRANSPORT_VIEW`, which `listTransportRouteDepartures` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PERFORMANCE_CONFIGURE` for `cancelPerformance`; `TRANSPORT_MANAGE` for `updateTransportDeparture`. |
 | Validation (`?state=validation`) | `422` on a capacity below the seats sold, naming the count; a cancellation follows the performance cancel rules (reason required, supervisor step-up for a real run). |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The performance is `cancelled`, `completed` or `soldOut`. `states/performance.yaml` cancels only from `scheduled`, `onSale` and `suspended`.; 422 Capacity below seats sold. |
@@ -1222,7 +1220,7 @@ departures:
 - `updateTransportDeparture` → `TRANSPORT_MANAGE` (configure) · staff
 - `cancelPerformance` → `PERFORMANCE_CONFIGURE` (configure) · staff · step-up pin
 
-**A refused user sees:** Shown when the caller lacks `TRANSPORT_VIEW`, which `listTransportRouteDepartures` requires, and names that permission. **Never an empty table**.
+**A refused user sees:** Shown when the caller lacks `TRANSPORT_VIEW`, which `listTransportRouteDepartures` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PERFORMANCE_CONFIGURE` for `cancelPerformance`; `TRANSPORT_MANAGE` for `updateTransportDeparture`.
 
 #### Requirements it meets
 
@@ -1342,9 +1340,6 @@ Errors to draw in the form: 400 Validation failed; 409 A business code the reque
 | Trips | 1,234 | Journeys included. Required for `multiTrip`; null for `unlimited`. |
 | Fare multiplier | 1,234.5 | The pass price as a multiple of the single adult fare between its two stations. |
 | Reference trips | 1,234 | The single trips the saving is measured against — `trips` for a multi-trip card, an number the venue sets for unlimited (14 a week, 60 a … |
-| Validity days | 1,234 | — |
-| Routes | list or chips (count when long) | Routes it is sold on. Empty means every active route in the venue. |
-| Active | yes / no (icon or chip) | — |
 
 **The selected pass type** (detail panel, from `listTransportPassTypes`)
 
@@ -1376,7 +1371,7 @@ Errors to draw in the form: 400 Validation failed; 409 A business code the reque
 
 **Where the user goes next**
 
-- → `BO-1184` Transport Routes & Stops: *Routes and stops*
+- → `BO-1184` Transport Routes & Stops: *Routes and stops*; carries `routeId`
 
 #### States
 
@@ -1451,7 +1446,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (19), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1188?state=<state>`: loading, error, emptyNoResults, emptyFirstRun, emptyNoAccess, validation, offline.
 - [ ] Every action is wired with its success and its failure: New pass type, Save pass type, Resume selling, Stop selling.
 - [ ] Every transition is wired: `BO-1184`.
@@ -1756,7 +1751,7 @@ Method, path, parameters, request and response for every operation these screens
 "createTransportStation": {"method":"POST","path":"/transport/stations","contract":"transport","summary":"Add a station","permission":"TRANSPORT_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateStationRequest","responds":"Station"},
 "createTransportTimetable": {"method":"POST","path":"/transport/routes/{routeId}/timetables","contract":"transport","summary":"Draft a timetable for a route","permission":"TRANSPORT_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateTimetableRequest","responds":"Timetable"},
 "createUpload": {"method":"POST","path":"/media/uploads","contract":"assets","summary":"Request a signed upload URL","permission":"ASSET_LIBRARY_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"UploadTicket"},
-"getTransportFareTable": {"method":"GET","path":"/transport/routes/{routeId}/fare-table","contract":"transport","summary":"A route's fares and passenger types","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"FareTable"},
+"getTransportFareTable": {"method":"GET","path":"/transport/routes/{routeId}/fare-table","contract":"transport","summary":"A route's fares and passenger types","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"at","in":"query","required":false}],"requestBody":null,"responds":"FareTable"},
 "getTransportNetworkImport": {"method":"GET","path":"/transport/network-imports/{importId}","contract":"transport","summary":"An import's status, preview counts and findings","permission":"TRANSPORT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"TransportNetworkImport"},
 "getTransportRoute": {"method":"GET","path":"/transport/routes/{routeId}","contract":"transport","summary":"A route with its stops","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"TransportRoute"},
 "importTransportNetwork": {"method":"POST","path":"/transport/network-imports","contract":"transport","summary":"Read a network file into a preview","permission":"TRANSPORT_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ImportTransportNetworkRequest","responds":null},
@@ -1791,8 +1786,8 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "Departure": {"x-ticvai-persistence":"transport.departure","type":"object","required":["id","routeId","timetableId","performanceId","serviceDate","departsAt","status","seatCapacity"],"properties":{"id":{"$ref":"../shared/common.yaml#/components/schemas/Id"},"routeId":{"$ref":"../shared/common.yaml#/components/schemas/Id"},"timetableId":{"$ref":"../shared/common.yaml#/components/schemas/Id"},"performanceId":{"type":"string","format":"uuid","description":"The catalogue performance this departure is sold as. Cart lines carry it."},"serviceDate":{"type":"string","format":"date"},"departsAt":{"type":"string","format":"date-time","description":"At the route's first stop."},"status":{"$ref":"#/components/schemas/TransportDepartureStatus"},"seatCapacity":{"type":"integer","minimum":1},"seatsSold":{"type":"integer","readOnly":true,"x-ticvai-persisted":false,"description":"From catalogue availability on read; not stored here."},"vehicleResourceId":{"type":"string","format":"uuid","nullable":true},"note":{"type":"string","nullable":true}}},
 "FareModel": {"type":"string","description":"`stopCount`: base plus an amount per stop travelled — the prototype's rule. `matrix`: a fare for each pair of stops, for a network whose fares are zonal or negotiated. Which one a route uses is the venue's choice in `setTransportFareTable` (rev 3 REV3-21).\n","enum":["stopCount","matrix"]},
 "FareQuote": {"x-ticvai-persistence":"none — computed","type":"object","required":["routeId","stopsTravelled","adultFare","total"],"properties":{"routeId":{"$ref":"../shared/common.yaml#/components/schemas/Id"},"stopsTravelled":{"type":"integer","minimum":1},"adultFare":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"lines":{"type":"array","items":{"type":"object","required":["code","count","unitPrice","lineTotal"],"properties":{"code":{"type":"string"},"catalogueVariantId":{"type":"string","format":"uuid"},"count":{"type":"integer"},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"lineTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}},"passTypeId":{"$ref":"../shared/common.yaml#/components/schemas/Id"},"saving":{"$ref":"../shared/common.yaml#/components/schemas/Money","description":"With `passTypeId`, single adult fare × `referenceTrips` minus the pass price."},"total":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}},
-"FareQuoteRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["fromStationId","toStationId"],"properties":{"routeId":{"$ref":"../shared/common.yaml#/components/schemas/Id","description":"Omitted, the active route serving the two stations in this order."},"fromStationId":{"$ref":"../shared/common.yaml#/components/schemas/Id"},"toStationId":{"$ref":"../shared/common.yaml#/components/schemas/Id"},"passengers":{"type":"array","maxItems":10,"description":"Omitted, one of the default type. Ignored with `passTypeId`.","items":{"type":"object","required":["code","count"],"properties":{"code":{"type":"string"},"count":{"type":"integer","minimum":0,"maximum":99}}}},"passTypeId":{"$ref":"../shared/common.yaml#/components/schemas/Id"},"at":{"type":"string","format":"date-time","description":"The sale instant the fare table is read at. Default now."}}},
-"FareTable": {"x-ticvai-persistence":"transport.fare_table + transport.fare_passenger_type + transport.fare_matrix_cell","allOf":[{"$ref":"#/components/schemas/SetFareTableRequest"},{"type":"object","required":["id","routeId"],"properties":{"id":{"$ref":"../shared/common.yaml#/components/schemas/Id"},"routeId":{"$ref":"../shared/common.yaml#/components/schemas/Id"}}}]},
+"FareQuoteRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["fromStationId","toStationId"],"properties":{"routeId":{"$ref":"../shared/common.yaml#/components/schemas/Id","description":"Omitted, the active route serving the two stations in this order."},"fromStationId":{"$ref":"../shared/common.yaml#/components/schemas/Id"},"toStationId":{"$ref":"../shared/common.yaml#/components/schemas/Id"},"passengers":{"type":"array","maxItems":10,"description":"Omitted, one of the default type. Ignored with `passTypeId`.","items":{"type":"object","required":["code","count"],"properties":{"code":{"type":"string"},"count":{"type":"integer","minimum":0,"maximum":99}}}},"passTypeId":{"$ref":"../shared/common.yaml#/components/schemas/Id"},"travelAt":{"type":"string","format":"date-time","description":"**When the trip is travelled** (the departure's time; for a pass, its first valid day). The fare table in force at this instant prices the quote (CHG-RUL-012). Default `at`, else now.\n"},"at":{"type":"string","format":"date-time","deprecated":true,"description":"Deprecated on 3 October (CHG-RUL-012): quotes price at travel time, so send `travelAt`. Kept for clients built at r1; read as `travelAt` when `travelAt` is absent.\n"}}},
+"FareTable": {"x-ticvai-persistence":"transport.fare_table + transport.fare_passenger_type + transport.fare_matrix_cell","allOf":[{"$ref":"#/components/schemas/SetFareTableRequest"},{"type":"object","required":["id","routeId"],"properties":{"id":{"$ref":"../shared/common.yaml#/components/schemas/Id"},"routeId":{"$ref":"../shared/common.yaml#/components/schemas/Id"},"effectiveTo":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When the next version takes over; null when none is set (CHG-RUL-012). Versions of a route never overlap: one table is in force at any instant.\n"},"upcoming":{"type":"object","nullable":true,"readOnly":true,"x-ticvai-persisted":false,"description":"The next version, set and not yet in force (CHG-RUL-012); null when none.","properties":{"id":{"$ref":"../shared/common.yaml#/components/schemas/Id"},"effectiveFrom":{"type":"string","format":"date-time"}}}}}]},
 "ImportTransportNetworkRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["format","sourceRef"],"properties":{"format":{"type":"string","enum":["csvBundle","gtfs"],"description":"A zip of the four CSV files described on `importTransportNetwork`, or a GTFS static feed."},"sourceRef":{"type":"string","format":"uuid","description":"The uploaded file, as the `MediaAsset.id` from `assets.completeUpload`. Never a URL.","x-ticvai-references":"assets.MediaAsset"},"include":{"type":"array","uniqueItems":true,"description":"Which parts of the file to read. Absent reads all three.","items":{"type":"string","enum":["stations","routes","timetables"]}}}},
 "LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},
 "MediaAsset": {"x-ticvai-persistence":"assets.media_asset","type":"object","required":["id","kind","status","filename","contentType","sizeBytes","referenceCount","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/MediaKind"},"status":{"$ref":"#/components/schemas/MediaStatus"},"filename":{"type":"string"},"contentType":{"type":"string"},"sizeBytes":{"type":"integer"},"title":{"$ref":"#/components/schemas/LocalisedText"},"description":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored.\n"},"altText":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"description":"Required before use in a guest-facing surface. WCAG 2.2 AA."},"width":{"type":"integer","nullable":true},"height":{"type":"integer","nullable":true},"durationSeconds":{"type":"number","nullable":true},"customMetadata":{"type":"object","nullable":true,"additionalProperties":true,"description":"BL-178. **`assets` is a strong contract and its metadata was fixed** — kind, title, alt text, dimensions, rights. A venue photographing four thousand products wants its own fields: shoot date, photographer, model release, season.\n**Free-form and searchable, not a schema.** Every venue would want a different one, and a fixed set would be wrong for all of them.\n"},"sharedWithTenantIds":{"type":"array","items":{"type":"string","format":"uuid"},"description":"BL-178. **Cross-tenant sharing, and it is refused by default for a reason.** A brand operating three venues wants one logo library; two unrelated tenants sharing an asset store is the isolation breach ADR-0011 exists to prevent.\n**Only within one tenant's own scope tree.** A share naming a tenant outside it is refused rather than warned about — this is the one place where a permissive default would be a cross-tenant data leak.\n"},"tags":{"type":"array","items":{"type":"string"}},"categoryId":{"type":"string","format":"uuid","nullable":true,"description":"The asset's category, one of `MediaTaxonomy.categories[].id`; null while unclassified. Set by `bulkUpdateMediaAssets` (`setCategoryId`) (decided 29 September, data model DM4).\n"},"venueId":{"type":"string","format":"uuid","nullable":true},"url":{"type":"string","description":"Signed and expiring for private assets; stable CDN URL for public ones."},"thumbnailUrl":{"type":"string","nullable":true},"referenceCount":{"type":"integer","description":"How many surfaces reference this asset. Non-zero refuses deletion.\n"},"rights":{"$ref":"#/components/schemas/MediaRights"},"isRightsExpired":{"type":"boolean"},"version":{"type":"integer"},"uploadedByPrincipalId":{"type":"string","format":"uuid"},"createdAt":{"type":"string","format":"date-time"}}},

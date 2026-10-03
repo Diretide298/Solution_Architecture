@@ -27,7 +27,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-014 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-014 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -100,11 +100,8 @@
        "label": "Every order",
        "bindsTo": "OrderSummary",
        "columns": [
-        "OrderSummary.id",
         "OrderSummary.orderNumber",
         "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
         "OrderSummary.channel",
         "OrderSummary.lineCount"
        ],
@@ -116,18 +113,10 @@
        "label": "Every refund",
        "bindsTo": "Refund",
        "columns": [
-        "Refund.id",
-        "Refund.orderId",
-        "Refund.batchId",
         "Refund.fxRate",
-        "Refund.taxReversalEntryId",
-        "Refund.settleTo",
-        "Refund.fxVariance",
         "Refund.amount",
         "Refund.appliedPercentage",
-        "Refund.status",
-        "Refund.reason",
-        "Refund.requestedByPrincipalId"
+        "Refund.status"
        ],
        "operation": "listOrderRefunds",
        "provenance": "contract orders.yaml GET /orders/{orderId}/refunds"
@@ -150,16 +139,11 @@
        "label": "The selected order",
        "bindsTo": "OrderSummary",
        "columns": [
-        "OrderSummary.id",
         "OrderSummary.orderNumber",
         "OrderSummary.status",
         "OrderSummary.grossAmount",
         "OrderSummary.refundedAmount",
-        "OrderSummary.channel",
-        "OrderSummary.lineCount",
-        "OrderSummary.principalId",
-        "OrderSummary.holdLabel",
-        "OrderSummary.heldUntil"
+        "OrderSummary.holdLabel"
        ],
        "operation": "listOrders",
        "provenance": "contract orders.yaml GET /orders"
@@ -169,11 +153,8 @@
        "label": "The order statement",
        "bindsTo": "OrderStatement",
        "columns": [
-        "OrderStatement.orderId",
         "OrderStatement.orderNumber",
         "OrderStatement.currency",
-        "OrderStatement.currencyScale",
-        "OrderStatement.entries",
         "OrderStatement.totalPaid",
         "OrderStatement.totalRefunded",
         "OrderStatement.currentBalance"
@@ -186,22 +167,11 @@
        "label": "The order",
        "bindsTo": "Order",
        "columns": [
-        "Order.id",
         "Order.orderNumber",
-        "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
         "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
         "Order.grossAmount",
         "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount",
-        "Order.totalPriceVariance",
-        "Order.lines",
-        "Order.payments",
-        "Order.principalId"
+        "Order.netAmount"
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
@@ -250,7 +220,7 @@
    "error": "Could not load. Names which read failed and leaves the ticket lookup untouched.",
    "emptyFirstRun": "No ticket lookup yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the ticket lookup are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_REPRINT` for `reprintOrder`.",
    "offline": "Searches the bundle only. A ticket issued after the last sync will not be found, and the screen says so"
   },
   "apis": [
@@ -292,7 +262,9 @@
    "params": [
     {
      "name": "orderId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listOrders` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
@@ -309,7 +281,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-014"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "applyManualDiscount",
@@ -415,7 +387,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-015 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-015 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -481,18 +453,8 @@
        "label": "Every scan event",
        "bindsTo": "ScanEvent",
        "columns": [
-        "ScanEvent.id",
-        "ScanEvent.accessPointId",
-        "ScanEvent.venueId",
-        "ScanEvent.scopePath",
-        "ScanEvent.ticketId",
         "ScanEvent.mediaCode",
-        "ScanEvent.outcome",
-        "ScanEvent.denyReason",
-        "ScanEvent.direction",
-        "ScanEvent.operatorPrincipalId",
-        "ScanEvent.deviceId",
-        "ScanEvent.overridesScanId"
+        "ScanEvent.outcome"
        ],
        "operation": "listScans",
        "provenance": "contract access.yaml GET /access/scans"
@@ -523,19 +485,9 @@
        "label": "The selected scan event",
        "bindsTo": "ScanEvent",
        "columns": [
-        "ScanEvent.id",
-        "ScanEvent.accessPointId",
-        "ScanEvent.venueId",
-        "ScanEvent.scopePath",
-        "ScanEvent.ticketId",
         "ScanEvent.mediaCode",
         "ScanEvent.outcome",
         "ScanEvent.denyReason",
-        "ScanEvent.direction",
-        "ScanEvent.operatorPrincipalId",
-        "ScanEvent.deviceId",
-        "ScanEvent.overridesScanId",
-        "ScanEvent.overrideReason",
         "ScanEvent.recordedAt",
         "ScanEvent.syncedAt"
        ],
@@ -550,11 +502,8 @@
         "OfflinePackage.generatedAt",
         "OfflinePackage.validFrom",
         "OfflinePackage.validTo",
-        "OfflinePackage.accessPointId",
         "OfflinePackage.entitlements",
-        "OfflinePackage.delegatedRights",
-        "OfflinePackage.blacklist",
-        "OfflinePackage.admissionRules"
+        "OfflinePackage.delegatedRights"
        ],
        "operation": "getOfflinePackage",
        "provenance": "contract access.yaml GET /access/offline-package"
@@ -676,7 +625,7 @@
    "error": "Could not load. Names which read failed and leaves the group scan untouched.",
    "emptyFirstRun": "No group scan yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the group scan are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires to show this screen, and names that permission (the screen's other reads need `ACCESS_VALIDATE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_OVERRIDE` for `overrideAccess`; `TICKET_LOOKUP` for `lookupTicket`.",
    "offline": "Fully offline. Admits what is valid and states the shortfall"
   },
   "apis": [
@@ -749,7 +698,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-015"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -802,7 +751,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-017 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-017 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -864,15 +813,10 @@
        "label": "Every sync rejection",
        "bindsTo": "SyncRejection",
        "columns": [
-        "SyncRejection.id",
-        "SyncRejection.workstationId",
         "SyncRejection.kind",
         "SyncRejection.recordedAt",
         "SyncRejection.rejectedAt",
-        "SyncRejection.problem",
-        "SyncRejection.payload",
-        "SyncRejection.resolvedAt",
-        "SyncRejection.resolvedByPrincipalId"
+        "SyncRejection.resolvedAt"
        ],
        "operation": "listSyncRejections",
        "provenance": "contract orders.yaml GET /sync/rejections"
@@ -882,18 +826,8 @@
        "label": "Every scan event",
        "bindsTo": "ScanEvent",
        "columns": [
-        "ScanEvent.id",
-        "ScanEvent.accessPointId",
-        "ScanEvent.venueId",
-        "ScanEvent.scopePath",
-        "ScanEvent.ticketId",
         "ScanEvent.mediaCode",
-        "ScanEvent.outcome",
-        "ScanEvent.denyReason",
-        "ScanEvent.direction",
-        "ScanEvent.operatorPrincipalId",
-        "ScanEvent.deviceId",
-        "ScanEvent.overridesScanId"
+        "ScanEvent.outcome"
        ],
        "operation": "listScans",
        "provenance": "contract access.yaml GET /access/scans"
@@ -924,17 +858,11 @@
        "label": "The selected sync rejection",
        "bindsTo": "SyncRejection",
        "columns": [
-        "SyncRejection.id",
-        "SyncRejection.workstationId",
         "SyncRejection.kind",
         "SyncRejection.recordedAt",
         "SyncRejection.rejectedAt",
         "SyncRejection.problem",
-        "SyncRejection.payload",
-        "SyncRejection.resolvedAt",
-        "SyncRejection.resolvedByPrincipalId",
-        "SyncRejection.resolution",
-        "SyncRejection.resolvedRecordId"
+        "SyncRejection.resolvedAt"
        ],
        "operation": "listSyncRejections",
        "provenance": "contract orders.yaml GET /sync/rejections"
@@ -947,11 +875,8 @@
         "OfflinePackage.generatedAt",
         "OfflinePackage.validFrom",
         "OfflinePackage.validTo",
-        "OfflinePackage.accessPointId",
         "OfflinePackage.entitlements",
-        "OfflinePackage.delegatedRights",
-        "OfflinePackage.blacklist",
-        "OfflinePackage.admissionRules"
+        "OfflinePackage.delegatedRights"
        ],
        "operation": "getOfflinePackage",
        "provenance": "contract access.yaml GET /access/offline-package"
@@ -1073,7 +998,7 @@
    "error": "Could not load. Names which read failed and leaves the sync reconciliation untouched.",
    "emptyFirstRun": "No sync reconciliation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on workstationId, kind, resolved and the sync reconciliation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission (the screen's other reads need `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_OVERRIDE` for `overrideAccess`; `TICKET_LOOKUP` for `lookupTicket`.",
    "offline": "Not applicable; this screen ends the offline period"
   },
   "apis": [
@@ -1152,7 +1077,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-017"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "syncOrders",
@@ -1217,7 +1142,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-018 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-018 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1248,15 +1173,10 @@
        "label": "Every bundle",
        "bindsTo": "BundleSummary",
        "columns": [
-        "BundleSummary.venueId",
         "BundleSummary.publishedAt",
         "BundleSummary.publishedBy",
-        "BundleSummary.contentHash",
-        "BundleSummary.signatureKeyId",
         "BundleSummary.staleAfter",
-        "BundleSummary.sizeBytes",
-        "BundleSummary.note",
-        "BundleSummary.appliedByWorkstations"
+        "BundleSummary.sizeBytes"
        ],
        "operation": "listCatalogueBundles",
        "provenance": "contract catalogue.yaml GET /catalogue/bundles"
@@ -1272,15 +1192,11 @@
        "label": "The selected bundle",
        "bindsTo": "BundleSummary",
        "columns": [
-        "BundleSummary.venueId",
         "BundleSummary.publishedAt",
         "BundleSummary.publishedBy",
-        "BundleSummary.contentHash",
-        "BundleSummary.signatureKeyId",
         "BundleSummary.staleAfter",
         "BundleSummary.sizeBytes",
-        "BundleSummary.note",
-        "BundleSummary.appliedByWorkstations"
+        "BundleSummary.note"
        ],
        "operation": "listCatalogueBundles",
        "provenance": "contract catalogue.yaml GET /catalogue/bundles"
@@ -1290,12 +1206,9 @@
        "label": "The catalogue bundle",
        "bindsTo": "CatalogueBundle",
        "columns": [
-        "CatalogueBundle.venueId",
         "CatalogueBundle.isDelta",
         "CatalogueBundle.baseVersion",
         "CatalogueBundle.signature",
-        "CatalogueBundle.signatureKeyId",
-        "CatalogueBundle.contentHash",
         "CatalogueBundle.staleAfter",
         "CatalogueBundle.payload"
        ],
@@ -1353,7 +1266,9 @@
    "params": [
     {
      "name": "version",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listCatalogueBundles` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is not current, and links to the one that is. **An old version is history, not an error.** Arrives with `version`.",
@@ -1370,7 +1285,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-018"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formReportBundleApplied",
@@ -1442,7 +1357,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-019 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-019 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1459,7 +1374,8 @@
      "trigger": "AI assistant — answer",
      "provenance": "flow F101 step 1→2",
      "carries": [
-      "conversationId"
+      "conversationId",
+      "messageId"
      ]
     }
    ]
@@ -1481,10 +1397,6 @@
        "label": "Every AI conversation",
        "bindsTo": "AiConversation",
        "columns": [
-        "AiConversation.id",
-        "AiConversation.principalId",
-        "AiConversation.scopePath",
-        "AiConversation.module",
         "AiConversation.locale",
         "AiConversation.messageCount",
         "AiConversation.startedAt",
@@ -1504,9 +1416,6 @@
        "label": "The selected AI conversation",
        "bindsTo": "AiConversation",
        "columns": [
-        "AiConversation.id",
-        "AiConversation.principalId",
-        "AiConversation.scopePath",
         "AiConversation.module",
         "AiConversation.locale",
         "AiConversation.messageCount",
@@ -1576,7 +1485,9 @@
    "params": [
     {
      "name": "conversationId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiConversations` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
@@ -1593,7 +1504,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-019"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateAiConversation",
@@ -1689,7 +1600,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-020 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-020 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -1731,10 +1642,6 @@
        "label": "Every AI conversation",
        "bindsTo": "AiConversation",
        "columns": [
-        "AiConversation.id",
-        "AiConversation.principalId",
-        "AiConversation.scopePath",
-        "AiConversation.module",
         "AiConversation.locale",
         "AiConversation.messageCount",
         "AiConversation.startedAt",
@@ -1754,9 +1661,6 @@
        "label": "The selected AI conversation",
        "bindsTo": "AiConversation",
        "columns": [
-        "AiConversation.id",
-        "AiConversation.principalId",
-        "AiConversation.scopePath",
         "AiConversation.module",
         "AiConversation.locale",
         "AiConversation.messageCount",
@@ -1799,7 +1703,7 @@
    "error": "Could not load. Names which read failed and leaves the assistant answer untouched.",
    "emptyFirstRun": "No assistant answer yet. Offers Create AI conversation (`createAiConversation`).",
    "emptyNoResults": "Never shown: `listAiConversations` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `listAiConversations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `AI_USE`, which `listAiConversations` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REPORT_VIEW_VENUE` for `askReportingQuestion`.",
    "offline": "Not available"
   },
   "apis": [
@@ -1850,7 +1754,9 @@
     },
     {
      "name": "messageId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `sendAiMessage`; a link or an edge that holds one opens it instead."
     }
    ],
    "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
@@ -1867,7 +1773,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-020"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSendAiMessage",
@@ -1970,7 +1876,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-021 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-021 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -2040,16 +1946,8 @@
        "columns": [
         "RotaAssignment.overtimeMinutes",
         "RotaAssignment.restPeriodBefore",
-        "RotaAssignment.breachesWorkingHourLimit",
         "RotaAssignment.labourCost",
-        "RotaAssignment.id",
-        "RotaAssignment.principalId",
-        "RotaAssignment.displayName",
-        "RotaAssignment.venueId",
-        "RotaAssignment.departmentId",
-        "RotaAssignment.position",
-        "RotaAssignment.requiredRoleId",
-        "RotaAssignment.workstationId"
+        "RotaAssignment.displayName"
        ],
        "operation": "listRotaAssignments",
        "provenance": "contract workforce.yaml GET /rota-assignments"
@@ -2066,19 +1964,8 @@
        "bindsTo": "RotaAssignment",
        "columns": [
         "RotaAssignment.overtimeMinutes",
-        "RotaAssignment.restPeriodBefore",
-        "RotaAssignment.breachesWorkingHourLimit",
         "RotaAssignment.labourCost",
-        "RotaAssignment.id",
-        "RotaAssignment.principalId",
         "RotaAssignment.displayName",
-        "RotaAssignment.venueId",
-        "RotaAssignment.departmentId",
-        "RotaAssignment.position",
-        "RotaAssignment.requiredRoleId",
-        "RotaAssignment.workstationId",
-        "RotaAssignment.startsAt",
-        "RotaAssignment.endsAt",
         "RotaAssignment.status",
         "RotaAssignment.breakMinutes"
        ],
@@ -2130,7 +2017,9 @@
    "params": [
     {
      "name": "assignmentId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRotaAssignments` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `assignmentId`.",
@@ -2147,7 +2036,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-021"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRequestShiftSwap",
@@ -2219,7 +2108,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-022 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-022 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -2289,16 +2178,8 @@
        "columns": [
         "RotaAssignment.overtimeMinutes",
         "RotaAssignment.restPeriodBefore",
-        "RotaAssignment.breachesWorkingHourLimit",
         "RotaAssignment.labourCost",
-        "RotaAssignment.id",
-        "RotaAssignment.principalId",
-        "RotaAssignment.displayName",
-        "RotaAssignment.venueId",
-        "RotaAssignment.departmentId",
-        "RotaAssignment.position",
-        "RotaAssignment.requiredRoleId",
-        "RotaAssignment.workstationId"
+        "RotaAssignment.displayName"
        ],
        "operation": "listRotaAssignments",
        "provenance": "contract workforce.yaml GET /rota-assignments"
@@ -2315,19 +2196,8 @@
        "bindsTo": "RotaAssignment",
        "columns": [
         "RotaAssignment.overtimeMinutes",
-        "RotaAssignment.restPeriodBefore",
-        "RotaAssignment.breachesWorkingHourLimit",
         "RotaAssignment.labourCost",
-        "RotaAssignment.id",
-        "RotaAssignment.principalId",
         "RotaAssignment.displayName",
-        "RotaAssignment.venueId",
-        "RotaAssignment.departmentId",
-        "RotaAssignment.position",
-        "RotaAssignment.requiredRoleId",
-        "RotaAssignment.workstationId",
-        "RotaAssignment.startsAt",
-        "RotaAssignment.endsAt",
         "RotaAssignment.status",
         "RotaAssignment.breakMinutes"
        ],
@@ -2396,7 +2266,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-022"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRequestShiftSwap",
@@ -2481,7 +2351,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-023 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-023 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -2542,16 +2412,8 @@
        "columns": [
         "RotaAssignment.overtimeMinutes",
         "RotaAssignment.restPeriodBefore",
-        "RotaAssignment.breachesWorkingHourLimit",
         "RotaAssignment.labourCost",
-        "RotaAssignment.id",
-        "RotaAssignment.principalId",
-        "RotaAssignment.displayName",
-        "RotaAssignment.venueId",
-        "RotaAssignment.departmentId",
-        "RotaAssignment.position",
-        "RotaAssignment.requiredRoleId",
-        "RotaAssignment.workstationId"
+        "RotaAssignment.displayName"
        ],
        "operation": "listRotaAssignments",
        "provenance": "contract workforce.yaml GET /rota-assignments"
@@ -2561,12 +2423,7 @@
        "label": "Every shift swap",
        "bindsTo": "ShiftSwap",
        "columns": [
-        "ShiftSwap.id",
-        "ShiftSwap.assignmentId",
-        "ShiftSwap.fromPrincipalId",
-        "ShiftSwap.toPrincipalId",
         "ShiftSwap.status",
-        "ShiftSwap.approvalRequestId",
         "ShiftSwap.reason",
         "ShiftSwap.requestedAt"
        ],
@@ -2585,19 +2442,8 @@
        "bindsTo": "RotaAssignment",
        "columns": [
         "RotaAssignment.overtimeMinutes",
-        "RotaAssignment.restPeriodBefore",
-        "RotaAssignment.breachesWorkingHourLimit",
         "RotaAssignment.labourCost",
-        "RotaAssignment.id",
-        "RotaAssignment.principalId",
         "RotaAssignment.displayName",
-        "RotaAssignment.venueId",
-        "RotaAssignment.departmentId",
-        "RotaAssignment.position",
-        "RotaAssignment.requiredRoleId",
-        "RotaAssignment.workstationId",
-        "RotaAssignment.startsAt",
-        "RotaAssignment.endsAt",
         "RotaAssignment.status",
         "RotaAssignment.breakMinutes"
        ],
@@ -2672,7 +2518,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-023"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRequestShiftSwap",
@@ -2744,7 +2590,7 @@
     {
      "to": "EMP-001",
      "trigger": "Sign in",
-     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-024 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); EMP-001 finds challengeId (createMfaChallenge) itself, and EMP-001 opens on its own"
+     "provenance": "derived — EMP-001 declares entryState.params challengeId, providerId and EMP-024 holds none of them. The edge carries nothing: challengeId, providerId only pre-select (deep link or optional), and EMP-001 opens on its own"
     },
     {
      "to": "EMP-002",
@@ -2804,18 +2650,10 @@
        "label": "Every attendance",
        "bindsTo": "AttendanceRecord",
        "columns": [
-        "AttendanceRecord.id",
-        "AttendanceRecord.principalId",
-        "AttendanceRecord.assignmentId",
-        "AttendanceRecord.venueId",
         "AttendanceRecord.kind",
         "AttendanceRecord.occurredAt",
         "AttendanceRecord.recordedAt",
-        "AttendanceRecord.accessPointId",
-        "AttendanceRecord.latitude",
-        "AttendanceRecord.longitude",
-        "AttendanceRecord.isAmended",
-        "AttendanceRecord.amendedByPrincipalId"
+        "AttendanceRecord.latitude"
        ],
        "operation": "listAttendance",
        "provenance": "contract workforce.yaml GET /attendance"
@@ -2831,20 +2669,11 @@
        "label": "The selected attendance",
        "bindsTo": "AttendanceRecord",
        "columns": [
-        "AttendanceRecord.id",
-        "AttendanceRecord.principalId",
-        "AttendanceRecord.assignmentId",
-        "AttendanceRecord.venueId",
         "AttendanceRecord.kind",
         "AttendanceRecord.occurredAt",
         "AttendanceRecord.recordedAt",
-        "AttendanceRecord.accessPointId",
-        "AttendanceRecord.latitude",
-        "AttendanceRecord.longitude",
-        "AttendanceRecord.isAmended",
         "AttendanceRecord.originalOccurredAt",
-        "AttendanceRecord.originalOccurredAt",
-        "AttendanceRecord.exception"
+        "AttendanceRecord.originalOccurredAt"
        ],
        "operation": "listAttendance",
        "provenance": "contract workforce.yaml GET /attendance"
@@ -2885,7 +2714,7 @@
    "error": "Could not load. Names which read failed and leaves the clock out untouched.",
    "emptyFirstRun": "No clock out yet. Offers Record attendance (`recordAttendance`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on date, principalId, exceptionsOnly and the clock out are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `listAttendance` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `listAttendance` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ATTENDANCE_RECORD` for `recordAttendance`.",
    "offline": "**Device time is recorded and both are kept.** A steward clocking in at a gate with no signal is not late because the sync was"
   },
   "apis": [
@@ -2909,7 +2738,9 @@
    "params": [
     {
      "name": "recordId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAttendance` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `recordId`.",
@@ -2926,7 +2757,7 @@
    "provenance": "generated",
    "board": "wireframes/P06 Venue Staff App.dc.html#emp-024"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRecordAttendance",

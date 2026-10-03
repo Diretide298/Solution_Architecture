@@ -1,7 +1,7 @@
 $id: ticvai/roles-by-app.yaml
 title: Permissions each shipped app requires
 generatedBy: tools/derive-app-roles.py
-generated: '2026-10-02'
+generated: '2026-10-03'
 description: '**Derived from what each app''s screens call, not decided here.** For every app, the permissions
   its operations declare in `x-ticvai-permission`, tiered by what the key permits. Role names, headcounts
   and the approval hierarchy are deliberately absent: who at a venue may configure pricing is the client''s
@@ -10,7 +10,7 @@ theTwoVocabularies:
   onOperations: 174
   inRolesYaml: 43
   shared: 0
-  note: '**Zero shared keys.** The contracts carry 174 permission keys across 2575 operations; `roles.yaml`
+  note: '**Zero shared keys.** The contracts carry 174 permission keys across 2578 operations; `roles.yaml`
     grants 43, all of them POS. `check-screens` validates a screen''s `guard` against `roles.yaml`, so
     the only guards anyone could write were POS ones — and that is what the package shows: venue-pos declares
     every guard in it and the other four apps declare none. **Joining these two is the work; this file
@@ -30,8 +30,8 @@ apps:
     - P02
     - P05
     screens: 144
-    operations: 222
-    permissions: 25
+    operations: 223
+    permissions: 24
     tiers:
       read:
       - GUEST_VIEW
@@ -60,7 +60,6 @@ apps:
       - GUEST_MANAGE
       - MARKETING_MANAGE
       - PARKING_CONFIGURE
-      - TENANT_CONFIGURE
     operationsWithNoPermission:
     - abandonCart
     - addCartLine
@@ -102,7 +101,7 @@ apps:
     - getTenantAppStatus
     - getTransportFareTable
     - getTransportRoute
-    operationsWithNoPermissionCount: 105
+    operationsWithNoPermissionCount: 108
   ticvai-control:
     name: TICVAI Control
     platforms:
@@ -213,7 +212,7 @@ apps:
     - P13
     - P16
     screens: 1863
-    operations: 2046
+    operations: 2044
     permissions: 149
     tiers:
       read:
@@ -464,7 +463,7 @@ apps:
     - P06
     - P07
     screens: 107
-    operations: 226
+    operations: 229
     permissions: 57
     tiers:
       read:

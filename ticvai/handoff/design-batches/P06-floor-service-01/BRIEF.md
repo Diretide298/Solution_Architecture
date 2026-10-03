@@ -131,16 +131,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `EMP-051` | Restaurant Service Command Center | B–D | 3 | 41 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
-| `EMP-052` | Floor Plan & Table Map | B–D | 1 | 3 | 5 | 1 | 6 | 1 | — | notStarted (generated) |
-| `EMP-053` | Table & Seating Configuration | B–D | 21 | 0 | 5 | 1 | 1 | 6 | — | notStarted (generated) |
-| `EMP-054` | Reservation Calendar & Timeline | B–D | 3 | 53 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-055` | Create / Edit Reservation | B–D | 33 | 11 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `EMP-056` | Walk-In & Waitlist Management | B–D | 23 | 0 | 5 | 7 | 1 | 0 | — | notStarted (generated) |
-| `EMP-057` | Guest Profile & Dining History | B–D | 13 | 33 | 6 | 8 | 2 | 0 | — | notStarted (generated) |
-| `EMP-058` | Live Table & Service Management | B–D | 51 | 15 | 5 | 10 | 4 | 1 | — | notStarted (generated) |
-| `EMP-059` | Table Order, Bill & Payment Management | B–D | 51 | 8 | 5 | 16 | 2 | 1 | — | notStarted (generated) |
-| `EMP-060` | Reservation & Table Performance | B–D | 3 | 43 | 6 | 1 | 0 | 1 | — | notStarted (generated) |
+| `EMP-051` | Restaurant Service Command Center | C | 3 | 16 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
+| `EMP-052` | Floor Plan & Table Map | C | 1 | 3 | 5 | 1 | 6 | 1 | — | notStarted (generated) |
+| `EMP-053` | Table & Seating Configuration | C | 21 | 0 | 5 | 1 | 1 | 6 | — | notStarted (generated) |
+| `EMP-054` | Reservation Calendar & Timeline | C | 3 | 36 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-055` | Create / Edit Reservation | C | 33 | 11 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `EMP-056` | Walk-In & Waitlist Management | C | 23 | 0 | 5 | 7 | 1 | 0 | — | notStarted (generated) |
+| `EMP-057` | Guest Profile & Dining History | D | 13 | 14 | 6 | 8 | 2 | 0 | — | notStarted (generated) |
+| `EMP-058` | Live Table & Service Management | A | 51 | 5 | 5 | 10 | 4 | 1 | — | notStarted (generated) |
+| `EMP-059` | Table Order, Bill & Payment Management | A | 51 | 5 | 5 | 16 | 2 | 1 | — | notStarted (generated) |
+| `EMP-060` | Reservation & Table Performance | C | 3 | 26 | 6 | 1 | 0 | 1 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

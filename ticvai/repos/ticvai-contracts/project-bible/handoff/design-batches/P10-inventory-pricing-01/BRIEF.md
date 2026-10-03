@@ -94,9 +94,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-005` | Inventory & Allocation View | B–D | 8 | 76 | 6 | 30 | 3 | 4 | — | notStarted (generated) |
-| `PTR-006` | Product Catalog (B2B Pricing) | B–D | 3 | 66 | 6 | 24 | 2 | 0 | — | notStarted (generated) |
-| `PTR-007` | Availability Search | B–D | 0 | 15 | 5 | 5 | 0 | 0 | — | notStarted (generated) |
+| `PTR-005` | Inventory & Allocation View | C | 8 | 48 | 6 | 30 | 3 | 4 | — | notStarted (generated) |
+| `PTR-006` | Product Catalog (B2B Pricing) | B | 3 | 48 | 6 | 24 | 2 | 0 | — | notStarted (generated) |
+| `PTR-007` | Availability Search | B | 0 | 15 | 5 | 5 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

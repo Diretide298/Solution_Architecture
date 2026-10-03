@@ -4,7 +4,7 @@
   "name": "Wallet Overview",
   "module": "Membership, Loyalty & Value",
   "requiresModule": "retail",
-  "wave": 2,
+  "wave": 1,
   "capability": "C37",
   "implementation": {
    "app": "guest-app",
@@ -83,13 +83,10 @@
        "bindsTo": "Wallet",
        "columns": [
         "Wallet.balance",
-        "Wallet.credits",
         "Wallet.bonusBalance",
-        "Wallet.currency",
         "Wallet.status",
         "Wallet.homeCellName",
-        "Wallet.expiresAt",
-        "Wallet.lastActivityAt"
+        "Wallet.expiresAt"
        ],
        "operation": "getWallet",
        "provenance": "contract wallet.yaml GET /wallets/{subjectId}"
@@ -101,13 +98,9 @@
        "columns": [
         "GameCard.cardCode",
         "GameCard.kind",
-        "GameCard.credits",
-        "GameCard.bonusCredits",
         "GameCard.points",
         "GameCard.status",
-        "GameCard.blockedReason",
-        "GameCard.lastPlayedAt",
-        "GameCard.expiresAt"
+        "GameCard.lastPlayedAt"
        ],
        "operation": "getGameCard",
        "notes": "An arcade card's balance, read by its code, as the web wallet WEB-021 shows it (flow F18 step 2; CHG-CLN-006).",
@@ -211,7 +204,7 @@
    "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -248,7 +241,7 @@
   "name": "Memberships",
   "module": "Membership, Loyalty & Value",
   "requiresModule": "ticketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C03",
   "implementation": {
    "app": "guest-app",
@@ -298,14 +291,10 @@
        "label": "Family and who may use it",
        "bindsTo": "DelegatedAccess",
        "columns": [
-        "DelegatedAccess.roleId",
         "DelegatedAccess.permission",
-        "DelegatedAccess.overSubjectId",
         "DelegatedAccess.overObjectRef",
         "DelegatedAccess.delegationKind",
-        "DelegatedAccess.quota",
-        "DelegatedAccess.isRevocableBySubject",
-        "DelegatedAccess.effect"
+        "DelegatedAccess.isRevocableBySubject"
        ],
        "operation": "listDelegations",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
@@ -345,16 +334,10 @@
        "label": "Payments that need you",
        "bindsTo": "DunningCase",
        "columns": [
-        "DunningCase.orderId",
-        "DunningCase.amount",
         "DunningCase.state",
-        "DunningCase.declineClass",
-        "DunningCase.attemptsMade",
         "DunningCase.nextAttemptAt",
         "DunningCase.firstFailedAt",
-        "DunningCase.resolvedAt",
-        "DunningCase.resolution",
-        "DunningCase.resolutionNote"
+        "DunningCase.resolvedAt"
        ],
        "operation": "listMyPaymentIssues",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
@@ -398,17 +381,11 @@
        "label": "Your membership",
        "bindsTo": "GuestMembership",
        "columns": [
-        "GuestMembership.entitlementId",
-        "GuestMembership.productId",
         "GuestMembership.name",
         "GuestMembership.tier",
         "GuestMembership.status",
         "GuestMembership.validFrom",
-        "GuestMembership.validTo",
-        "GuestMembership.frozenDays",
-        "GuestMembership.benefits",
-        "GuestMembership.renewsOn",
-        "GuestMembership.previousTerms"
+        "GuestMembership.renewsOn"
        ],
        "operation": "getMyMemberships",
        "provenance": "contract catalogue.yaml GET /guests/me/memberships"
@@ -514,7 +491,9 @@
    "params": [
     {
      "name": "guestLinkId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that carries it only pre-selects the record."
     },
     {
      "name": "subjectId",
@@ -522,11 +501,15 @@
     },
     {
      "name": "caseId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMyPaymentIssues` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "statementId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listBillingStatements` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `guestLinkId`.",
@@ -551,7 +534,7 @@
    "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRetryMyDunningPayment",
@@ -639,7 +622,7 @@
   "name": "Loyalty & Rewards",
   "module": "Membership, Loyalty & Value",
   "requiresModule": "marketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C64",
   "implementation": {
    "app": "guest-app",
@@ -695,13 +678,8 @@
        "label": "Every loyalty programme",
        "bindsTo": "LoyaltyProgramme",
        "columns": [
-        "LoyaltyProgramme.id",
         "LoyaltyProgramme.code",
         "LoyaltyProgramme.name",
-        "LoyaltyProgramme.venueId",
-        "LoyaltyProgramme.pointsLiabilityAccountId",
-        "LoyaltyProgramme.earnRules",
-        "LoyaltyProgramme.tiers",
         "LoyaltyProgramme.pointsExpireAfterMonths",
         "LoyaltyProgramme.isActive"
        ],
@@ -716,15 +694,7 @@
         "Promotion.code",
         "Promotion.name",
         "Promotion.description",
-        "Promotion.venueId",
-        "Promotion.discount",
-        "Promotion.conditions",
-        "Promotion.stackingMode",
-        "Promotion.stackingGroup",
-        "Promotion.precedence",
-        "Promotion.validFrom",
-        "Promotion.validTo",
-        "Promotion.maxRedemptions"
+        "Promotion.validFrom"
        ],
        "operation": "listPromotions",
        "provenance": "contract promotions.yaml GET /promotions"
@@ -882,7 +852,7 @@
    "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the operations this screen declares (4 then; evaluatePromotions removed 27 September), not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the operations this screen declares (4 then; evaluatePromotions removed 27 September), not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "entryState": {
    "params": [
     {

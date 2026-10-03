@@ -1,6 +1,6 @@
 # P08-people-access-rights-01 — P08 · People & Access Rights (1 of 2)
 
-**10 screens · 47 operations · 41 schemas · 13 permissions**
+**10 screens · 46 operations · 42 schemas · 12 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 13 permissions apply here:
-  `ANNOUNCEMENT_PUBLISH, APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_REQUEST, APPROVAL_VIEW, ATTENDANCE_RECORD, PERMISSION_VIEW, ROLE_MANAGE, SCOPE_VIEW, SESSION_FORCE_LOGOUT, USER_MANAGE, WORKFORCE_MANAGE`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 12 permissions apply here:
+  `ANNOUNCEMENT_PUBLISH, APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_REQUEST, APPROVAL_VIEW, PERMISSION_VIEW, ROLE_MANAGE, SCOPE_VIEW, SESSION_FORCE_LOGOUT, USER_MANAGE, WORKFORCE_MANAGE, WORKFORCE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -121,16 +121,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-053` | Staff Directory | A | 24 | 23 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
+| `BO-053` | Staff Directory | B | 28 | 21 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
 | `BO-054` | Role Assignment | A | 16 | 16 | 6 | 6 | 1 | 5 | — | notStarted (generated) |
-| `BO-055` | Rota & Scheduling | B–D | 32 | 33 | 6 | 21 | 0 | 0 | — | notStarted (generated) |
-| `BO-056` | Time & Attendance | B–D | 11 | 33 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
-| `BO-057` | Training & Certification | B–D | 2 | 24 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-066` | Notification Settings | B–D | 12 | 29 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
-| `BO-084` | Approval Inbox | B–D | 11 | 19 | 6 | 22 | 0 | 3 | — | notStarted (generated) |
+| `BO-055` | Rota & Scheduling | B–D | 32 | 19 | 6 | 21 | 0 | 0 | — | notStarted (generated) |
+| `BO-056` | Time & Attendance | B–D | 5 | 19 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
+| `BO-057` | Training & Certification | B–D | 2 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-066` | Notification Settings | B–D | 12 | 23 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
+| `BO-084` | Approval Inbox | B–D | 11 | 11 | 6 | 22 | 0 | 3 | — | notStarted (generated) |
 | `BO-085` | Approval Request | B–D | 8 | 8 | 6 | 24 | 0 | 3 | — | notStarted (generated) |
 | `BO-086` | Approval Matrix | B–D | 24 | 10 | 6 | 49 | 0 | 3 | — | notStarted (generated) |
-| `BO-087` | Approval Delegations | A | 8 | 16 | 6 | 2 | 0 | 3 | — | notStarted (generated) |
+| `BO-087` | Approval Delegations | B | 8 | 12 | 6 | 2 | 0 | 3 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

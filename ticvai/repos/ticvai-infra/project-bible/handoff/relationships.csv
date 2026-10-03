@@ -1732,6 +1732,9 @@ maintenance.incident_investigation_note,written_by_principal_id,identity.princip
 maintenance.incident_involved_party,incident_id,maintenance.incident,child,convention,,
 maintenance.incident_involved_party,principal_id,identity.principal,reference,convention,yes,
 maintenance.incident_involved_party,subject_id,pii.subject,reference,convention,yes,
+maintenance.incident_media,asset_ref,assets.media_asset,reference,declared,yes,
+maintenance.incident_media,incident_id,maintenance.incident,child,convention,,
+maintenance.incident_media,uploaded_by_principal_id,identity.principal,reference,convention,yes,
 maintenance.inspection,asset_id,maintenance.asset,reference,declared,,
 maintenance.inspection,performed_by_principal_id,identity.principal,reference,declared,yes,yes
 maintenance.inspection,template_id,maintenance.inspection_template,reference,convention,,

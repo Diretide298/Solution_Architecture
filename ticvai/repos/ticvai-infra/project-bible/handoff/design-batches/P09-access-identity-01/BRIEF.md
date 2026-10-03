@@ -96,10 +96,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-001` | Platform Login / MFA | B–D | 16 | 51 | 10 | 6 | 0 | 0 | — | notStarted (generated) |
-| `ADM-020` | Platform User Directory | B–D | 18 | 22 | 7 | 2 | 0 | 0 | — | notStarted (generated) |
-| `ADM-021` | Platform Role Management | B–D | 11 | 22 | 7 | 1 | 1 | 5 | — | notStarted (generated) |
-| `ADM-699` | My Account & Security | B–D | 10 | 16 | 7 | 1 | 0 | 0 | — | notStarted (generated) |
+| `ADM-001` | Platform Login / MFA | A | 16 | 51 | 10 | 6 | 0 | 0 | — | notStarted (generated) |
+| `ADM-020` | Platform User Directory | B | 18 | 20 | 7 | 2 | 0 | 0 | — | notStarted (generated) |
+| `ADM-021` | Platform Role Management | B | 11 | 22 | 7 | 1 | 1 | 5 | — | notStarted (generated) |
+| `ADM-699` | My Account & Security | B | 10 | 16 | 7 | 1 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

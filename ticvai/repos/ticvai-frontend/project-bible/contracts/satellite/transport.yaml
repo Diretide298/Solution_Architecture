@@ -611,6 +611,11 @@ paths:
       description: >
         The passenger picker reads its types from here (adult, child, student, person of
         determination), with the proof each asks for. 404 when the route has none yet.
+
+        **Versioned by `effectiveFrom`** (Chinmay, 3 October 2026, Block A business rules;
+        CHG-RUL-012). Returns the table in force at `at` (default now), with `effectiveTo` (when
+        the next version takes over, null if none) and `upcoming` (the next version, if one is
+        set), so BO-1185 shows the current table and the future one beside it.
       tags: [fare]
       x-ticvai-permission: null   # guest/public read of published network data
       x-ticvai-scope-level: venue
@@ -622,6 +627,12 @@ paths:
       - {}
       - guestAuth: []
       - bearerAuth: []
+      parameters:
+        - name: at
+          in: query
+          required: false
+          schema: { type: string, format: date-time }
+          description: The instant whose table is returned (the travel time for a guest). Default now (CHG-RUL-012).
       responses:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
@@ -651,6 +662,16 @@ paths:
         student card), person of determination ×0 (Sanad card).
 
         **PUT semantics.** Creates the table if the route has none; otherwise replaces it.
+
+        **Fare tables are versioned by `effectiveFrom`** (Chinmay, 3 October 2026, Block A business
+        rules; CHG-RUL-012). Each PUT sets the version that starts at its `effectiveFrom`: a later
+        date adds a **future table beside the current one**, which takes over at that instant; the
+        same `effectiveFrom` as a version not yet in force replaces that version. **A version
+        already in force is never edited**: an `effectiveFrom` in the past, or equal to the
+        current version's, is refused 422 `fare-version-in-force` (set a new version from now
+        instead). A ticket already sold keeps its price. **Quotes use the table in force at
+        travel time** (`quoteTransportFare.travelAt`), not at the time of sale, so a trip booked
+        today for next month is priced by next month's table.
       tags: [fare]
       x-ticvai-permission: TRANSPORT_PRICE
       x-ticvai-scope-level: venue
@@ -677,7 +698,7 @@ paths:
           description: >
             A `matrix` model missing a station pair the route serves, a passenger type code
             repeated, no passenger type with `isDefault`, or a multiplier outside 0 to 1.
-          x-ticvai-problem-types: [fare-table-invalid]
+          x-ticvai-problem-types: [fare-table-invalid, fare-version-in-force]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -703,6 +724,10 @@ paths:
         departure card and the price on the cart line come from one rule.
 
         Fare: `stopCount` is `baseFare + perStopFare × stops travelled`; `matrix` reads the pair.
+
+        **Priced by the fare table in force at travel time** (Chinmay, 3 October 2026, Block A
+        business rules; CHG-RUL-012): `travelAt`, the departure the guest is buying, else now. A
+        future fare table applies to trips from its `effectiveFrom`, whenever they are sold.
         Per passenger, fare × multiplier, rounded to the currency's minor unit. A pass is
         `round(fare × pass.fareMultiplier)`; its saving is `fare × referenceTrips − price`.
       tags: [fare]
@@ -2086,6 +2111,23 @@ components:
           properties:
             id: { $ref: '../shared/common.yaml#/components/schemas/Id' }
             routeId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
+            effectiveTo:
+              type: string
+              format: date-time
+              nullable: true
+              readOnly: true
+              description: >
+                When the next version takes over; null when none is set (CHG-RUL-012). Versions of a route
+                never overlap: one table is in force at any instant.
+            upcoming:
+              type: object
+              nullable: true
+              readOnly: true
+              x-ticvai-persisted: false
+              description: The next version, set and not yet in force (CHG-RUL-012); null when none.
+              properties:
+                id: { $ref: '../shared/common.yaml#/components/schemas/Id' }
+                effectiveFrom: { type: string, format: date-time }
 
     FareQuoteRequest:
       x-ticvai-persistence: "none — request only"
@@ -2108,10 +2150,19 @@ components:
               code: { type: string }
               count: { type: integer, minimum: 0, maximum: 99 }
         passTypeId: { $ref: '../shared/common.yaml#/components/schemas/Id' }
+        travelAt:
+          type: string
+          format: date-time
+          description: >
+            **When the trip is travelled** (the departure's time; for a pass, its first valid day).
+            The fare table in force at this instant prices the quote (CHG-RUL-012). Default `at`, else now.
         at:
           type: string
           format: date-time
-          description: The sale instant the fare table is read at. Default now.
+          deprecated: true
+          description: >
+            Deprecated on 3 October (CHG-RUL-012): quotes price at travel time, so send `travelAt`.
+            Kept for clients built at r1; read as `travelAt` when `travelAt` is absent.
 
     FareQuote:
       x-ticvai-persistence: "none — computed"

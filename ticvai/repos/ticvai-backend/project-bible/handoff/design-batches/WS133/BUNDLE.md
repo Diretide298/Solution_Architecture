@@ -253,6 +253,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Flow F242 *Event Management Configuration Backend Structure v1.0 board 9: Performance …*, step 1: Opens Performance Operations Command Center → Provide management with a consolidated backend view of the financial, commercial, sponsorship, attendance and operational performance of events.
 - Flow F242 branch at step 1 (expected): when Nothing has been set up on Performance Operations Command Center yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F242 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -385,6 +386,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS56 Event Management Configuration Backend Structure v1.0 Board 9.dc.html#bo-726`
 - Workshop pack: Event_Management_Configuration_Backend_Structure_v1.0.pdf board 9
 - Flow F242 *Event Management Configuration Backend Structure v1.0 board 9: Performance …*, step 2: Works in Participant Photo & Video Assignment → Provide detailed analytics for individual participant activity, especially for minute-based and flight/activity businesses.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 

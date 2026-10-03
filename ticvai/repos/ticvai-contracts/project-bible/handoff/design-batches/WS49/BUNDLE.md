@@ -107,13 +107,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-178` | Bundle & Combo Command Center | B–D | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-179` | Bundle Definition & Setup | A | 15 | 10 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-180` | Bundle Component Builder | A | 5 | 20 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-181` | Guest Choice & Build-Your-Own Bundle Designer | A | 3 | 20 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-179` | Bundle Definition & Setup | B–D | 15 | 5 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-180` | Bundle Component Builder | B–D | 5 | 20 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-181` | Guest Choice & Build-Your-Own Bundle Designer | B–D | 3 | 20 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-182` | Bundle Pricing & Commercial Model | B–D | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-183` | Bundle Availability, Capacity & Validation | B–D | 0 | 4 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-184` | Bundle Validity, Scheduling & Redemption Rules | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-185` | Partner & External Product Bundle Manager | B–D | 13 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-185` | Partner & External Product Bundle Manager | B–D | 13 | 8 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-186` | Revenue Allocation, Cost & Settlement Rules | B–D | 8 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-187` | Bundle Preview, Simulation & AI Recommendation | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
@@ -317,7 +317,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block A · ticket #20654 (APP-SETUP-ADM-179) |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Configure whether the bundle) and no display directory — it is settings, not a population |
@@ -366,16 +366,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Owner principal | the name it points at, never the id | The campaign (and budget) owner. |
-| Legal entity | the name it points at, never the id | The business entity that funds and books the campaign. |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | — |
-| Budgets | list or chips (count when long) | The rows of `promotions.campaign_budget`, one per budget line. |
 
 **Actions and what each produces**
 
@@ -450,7 +445,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (15), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-179?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save changes.
 - [ ] Every transition is wired: `ADM-178`, `BO-011`.
@@ -468,7 +463,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block A · ticket #20655 (APP-SETUP-ADM-180) |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -602,6 +597,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-180`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 5
 - Flow F158 *Promotions Bundles Management board 5: Bundle & Combo Command Center*, step 4: Works in Bundle Component Builder, a section of BO-011, which saves the record with createBundle (setBundleComponent … → Define exactly what products and services make up the bundle.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -625,7 +621,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block A · ticket #20656 (APP-SETUP-ADM-181) |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Choose 1 F&B Option) and no display directory — it is settings, not a population |
@@ -760,6 +756,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-181`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 5
 - Flow F158 *Promotions Bundles Management board 5: Bundle & Combo Command Center*, step 6: Works in Guest Choice & Build-Your-Own Bundle Designer, a section of BO-011, which saves the record with createBundle … → Configure bundles where the guest chooses products from predefined groups. The matrix specifically requires the guest to be able to choose attractions, experiences, F&B, retail products, or services …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1189,18 +1186,12 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Bundle component | the name it points at, never the id | — |
-| Partner | the name it points at, never the id | — |
-| External product | text | — |
 | Product name | text | — |
 | API source | text | The partner integration the product comes through. |
 | Availability source | chip: Partner API, Allocation, On request | Where availability is checked. |
 | External price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Selling price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Commission | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Settlement rule | text | — |
-| Cancellation rule | text | — |
 
 **The selected partner external product** (detail panel): The pack groups this record's detail under its own headings: “Dubai Weekend Package”.
 
@@ -1275,7 +1266,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (13), with its required mark, default, format and its error state (404, 422).
-- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-185?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save bundle partner product mappings.
 - [ ] Every transition is wired: `ADM-178`.
@@ -1535,6 +1526,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS110 Promotions   Bundles Management Board 5.dc.html#adm-187`
 - Workshop pack: Promotions___Bundles_Management_Reference.pdf board 5
 - Flow F158 *Promotions Bundles Management board 5: Bundle & Combo Command Center*, step 18: Works in Bundle Preview, Simulation & AI Recommendation → Allow administrators to test promotional rules before activating them. This is critical because the matrix requires simulation of redemption, discount exposure, revenue impact, margin impact and …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 

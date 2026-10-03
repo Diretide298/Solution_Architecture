@@ -127,8 +127,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SUP-001` | Venue Management Sign In | B–D | 16 | 51 | 10 | 6 | 1 | 0 | — | notStarted (generated) |
-| `SUP-003` | Availability & Routing Settings | B–D | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `SUP-001` | Venue Management Sign In | A | 16 | 51 | 10 | 6 | 1 | 0 | — | notStarted (generated) |
+| `SUP-003` | Availability & Routing Settings | D | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -143,14 +143,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
-| Module | Access & Availability · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Access & Availability · wave 1 · needs the `core` module |
+| Block | Block A · task APP-SUPPORT-SUP-001 |
 | Who uses it | venue; in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | form (compact density): A sign-in: two fields, the organisation's SSO where configured, and the second-factor and role steps in place - a form, not a list to browse. |
 | Offline | Not available, and the offline banner says why: signing in needs a connection. |
 | Opens with | `challengeId` (navigation), `providerId` (deepLink), `methodId` (navigation) · cold entry: **Needs nothing; that is what makes it the door.** No workstation travels with a browser sign-in (CHG-DOOR-001). `providerId` arrives only on the identity … |
-| Route | `/general/agent-login` |
+| Route | `/general/venue-management-sign-in` |
 
 **What the spec says about it.** **Rebuilt as a sign-in form on 2 October 2026 (CHG-DOOR-002/003; Chinmay, 2 October 2026: fix the Block A blockers now).** It was generated as a list over active sessions, MFA methods and SSO providers with Force logout and Revoke all sessions on the door, which a person who is not yet signed in can never use (platform-foundation process notes). The sequence is the same on every staff and partner door: credentials (or the organisation's SSO) -> the authentication code only when a permission demands it (R135) -> the role prompt when several roles are held (ADR-0003) -> the landing. Managing sessions moved to the staff directory (BO-053); managing MFA methods stays on each app's own security or profile screen. **Block A** (CHG-DOOR-004): Block A's Venue Management screens (BO-084, BO-085, BO-124 and the setup screens) cannot be tested end to end without this door, so the plan's Block A closure now takes the door of every app it touches. **Generalised on 10 September 2026 from `Agent Login`**: it is the only door of an application of over 1,300 screens (P08, P12, P13, P16), and `implementation.app` stays `venue-support-web`, the build unit `check-frontend` validates against.
 
@@ -436,7 +436,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
 | Module | Access & Availability · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-SUPPORT-SUP-003 |
 | Who uses it | venue staff holding `CASE_MANAGE` (1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`setAgentAvailability`) and no read of a population — it is settings, not a list |

@@ -96,12 +96,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-032` | Commercial Agreement Command Center | B–D | 2 | 30 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `PTR-033` | Agreement & Contract Terms Builder | B–D | 26 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `PTR-034` | Partner Rate & Net Pricing Configuration | B–D | 10 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `PTR-038` | Payment Terms, Billing & Account Configuration | B–D | 1 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `PTR-040` | Booking Limits, Commercial Exceptions & Approval | B–D | 22 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
-| `PTR-041` | Commercial Agreement 360°, Health & AI Review | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-032` | Commercial Agreement Command Center | B | 2 | 30 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `PTR-033` | Agreement & Contract Terms Builder | B | 26 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-034` | Partner Rate & Net Pricing Configuration | B | 10 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-038` | Payment Terms, Billing & Account Configuration | B | 1 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-040` | Booking Limits, Commercial Exceptions & Approval | B | 22 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
+| `PTR-041` | Commercial Agreement 360°, Health & AI Review | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -121,7 +121,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-PARTNER-PTR-032 |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each agreement should show) — counts over a population, then the population |
@@ -338,7 +338,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-PARTNER-PTR-033 |
 | Who uses it | partner staff holding `PLATFORM_CELL_MANAGE` (1 configure); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Configure/reference) and no display directory — it is settings, not a population |
@@ -481,7 +481,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-PARTNER-PTR-034 |
 | Who uses it | partner staff holding `PLATFORM_CELL_MANAGE` (1 configure); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure by) and no display directory — it is settings, not a population |
@@ -604,7 +604,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-PARTNER-PTR-038 |
 | Who uses it | partner staff holding `PLATFORM_CELL_MANAGE` (1 configure); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -736,7 +736,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-PARTNER-PTR-040 |
 | Who uses it | partner staff holding `PLATFORM_CELL_MANAGE` (1 configure); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Capture) and no display directory — it is settings, not a population |
@@ -893,7 +893,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-PARTNER-PTR-041 |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

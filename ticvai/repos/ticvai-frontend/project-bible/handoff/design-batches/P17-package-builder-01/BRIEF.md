@@ -96,13 +96,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SGN-011` | Recommended Package Overview | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `SGN-012` | Commercial Model & Tier Selection | B–D | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
-| `SGN-013` | Module Marketplace | B–D | 0 | 18 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `SGN-014` | AI Module & Package Recommendations | B–D | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `SGN-015` | Module Detail & Commercial Treatment | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `SGN-016` | Module Dependency & Compatibility Manager | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `SGN-017` | Add-Ons, Capacity & Commercial Options | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `SGN-011` | Recommended Package Overview | B | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `SGN-012` | Commercial Model & Tier Selection | B | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
+| `SGN-013` | Module Marketplace | B | 0 | 18 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `SGN-014` | AI Module & Package Recommendations | B | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `SGN-015` | Module Detail & Commercial Treatment | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `SGN-016` | Module Dependency & Compatibility Manager | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `SGN-017` | Add-Ons, Capacity & Commercial Options | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

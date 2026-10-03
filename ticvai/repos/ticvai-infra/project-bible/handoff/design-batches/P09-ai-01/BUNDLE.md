@@ -95,7 +95,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-037` | AI Provider & Credentials | A | 60 | 90 | 7 | 13 | 4 | 0 | — | notStarted (generated) |
+| `ADM-037` | AI Provider & Credentials | A | 60 | 74 | 7 | 13 | 4 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -111,7 +111,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | AI · wave 1 · needs the `core` module |
-| Block | Block A · ticket #18094 (APP-SETUP-ADM-037) |
+| Block | Block A · task APP-SETUP-ADM-037 |
 | Who uses it | ticvai staff holding `AI_APPROVE`, `AI_CONFIGURE`, `AI_USE`, `PLATFORM_AI_MANAGE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_MANAGE`… (3 operate, 3 configure, 2 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAiProviders` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -172,7 +172,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 **Form: Save AI provider** (modal, opened by *Save AI provider*; *Save AI provider* calls `setAiProvider`, *Cancel* sends nothing)
 
-**Collects what `setAiProvider` sends before it is called.** Required: `kind`, `capability`, `priority`, `isActive`. Optional: `id`, `model`, `failoverProviderId`, `degradeGracefully`, `scopeLevel`, `scopePath`, `credentialRef`, `credentialRotatedAt`, `credentialExpiresAt`, `lastVerifiedAt`, `endpoint`, `residency` and 1 more. **Set for the picked tenant**; a `residency` outside what the tenant's region allows is refused `409 residency-refused` and shown against that field (decided 28 September, audit R203). Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setAiProvider` sends before it is called.** Required: `kind`, `capability`, `priority`, `isActive`. Optional: `id`, `model`, `failoverProviderId`, `degradeGracefully`, `scopeLevel`, `scopePath`, `credentialRef`, `credentialExpiresAt`, `endpoint`, `residency` and 1 more. **Set for the picked tenant**; a `residency` outside what the tenant's region allows is refused `409 residency-refused` and shown against that field (decided 28 September, audit R203). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `credentialRotatedAt`, `lastVerifiedAt` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -316,17 +316,11 @@ Errors to draw in the form: 403 No platform-staff grant into this tenant is open
 | Shows | Format | Notes |
 |---|---|---|
 | Kind | chip: Openai, Gemini, Anthropic, Azure openai, Local llm, Openai compatible | `openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development … |
-| Capability | chip: Chat, Embedding, Vision, Rerank, Speech to text, Text to speech | What a capability needs, not which provider serves it. This indirection is what makes "no provider SDK in capability code" enforceable. |
 | Model | text | — |
-| Failover provider | the name it points at, never the id | BL-151. A provider outage with no fallback is every AI surface going dark at once, and the surfaces most likely to be noticed are the … |
-| Degrade gracefully | yes / no (icon or chip) | Where no fallback answers, the surface degrades rather than errors. Semantic search falls back to keyword, the concierge offers a human, a … |
 | Priority | 1,234 | Failover order (8.4.26). Lower is tried first. |
 | Scope level | chip: Platform, Tenant, Venue | Where this provider configuration applies, and therefore whose token pays for it. |
 | Credential rotated at | 1 Oct 2026, 14:30 | — |
 | Credential expires at | 1 Oct 2026, 14:30 | Where the provider issues expiring keys. A key that lapses silently takes the assistant down without an error anyone reads — the expiry is … |
-| Vendor | text | The provider company, any provider (Chinmay, 2 October, contract follow-ups: "As long as we get an API key it can be any model" … |
-| Credential hint | text | The last four characters of the stored key, so an operator can tell two keys apart. |
-| Compatibility | grouped details | The last compatibility test of this provider (`testAiProvider`). A tenant-managed provider is activated only once its `status` is `passed` … |
 
 **Curated models per task** (data table, from `listAiModels`): **The curated range (decided 2 October 2026 by Chinmay, DEC-001, DEC-002; CHG-CSA-001)**: for every AI task TICVAI keeps a best-suited model and 3-4 alternatives, by tier, not by name (`curatedRange`: task, tier, rank, BYOK-eligible). Read-only to the tenant; platform staff maintain it with Save model.
 
@@ -343,24 +337,14 @@ Errors to draw in the form: 403 No platform-staff grant into this tenant is open
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Assigned on create. Sent to `setAiProvider` to replace that provider; left out to create one. |
 | Kind | chip: Openai, Gemini, Anthropic, Azure openai, Local llm, Openai compatible | `openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development … |
-| Capability | chip: Chat, Embedding, Vision, Rerank, Speech to text, Text to speech | What a capability needs, not which provider serves it. This indirection is what makes "no provider SDK in capability code" enforceable. |
 | Model | text | — |
-| Failover provider | the name it points at, never the id | BL-151. A provider outage with no fallback is every AI surface going dark at once, and the surfaces most likely to be noticed are the … |
-| Degrade gracefully | yes / no (icon or chip) | Where no fallback answers, the surface degrades rather than errors. Semantic search falls back to keyword, the concierge offers a human, a … |
 | Priority | 1,234 | Failover order (8.4.26). Lower is tried first. |
 | Scope level | chip: Platform, Tenant, Venue | Where this provider configuration applies, and therefore whose token pays for it. |
 | Credential rotated at | 1 Oct 2026, 14:30 | — |
 | Credential expires at | 1 Oct 2026, 14:30 | Where the provider issues expiring keys. A key that lapses silently takes the assistant down without an error anyone reads — the expiry is … |
 | Last verified at | 1 Oct 2026, 14:30 | When `testAiProvider` last confirmed the key works. |
-| Endpoint | text | — |
 | Residency | text | Where inference physically happens. A prompt reaching a provider hosted elsewhere is a cross-border transfer (ADR-0009), and this field is … |
-| Max tokens | 1,234 | — |
-| Vendor | text | The provider company, any provider (Chinmay, 2 October, contract follow-ups: "As long as we get an API key it can be any model" … |
-| Residency classes | list or chips (count when long) | The tenant residency classes this provider may serve (Chinmay, 2 October: the AI residency decision; CHG-CSA-002). |
-| Credential hint | text | The last four characters of the stored key, so an operator can tell two keys apart. |
-| Compatibility | grouped details | The last compatibility test of this provider (`testAiProvider`). A tenant-managed provider is activated only once its `status` is `passed` … |
 
 **Tasks and model fit** (detail panel, from `listAiProviders`): **TICVAI curates the model for every task (decided 2 October 2026 by Chinmay, DEC-002, CHG-CSA-001; overturns AI-D18 "warns, never blocks").** `taskKeys` binds a provider to named agent tasks; a model outside the curated range for a task is refused by `setAiProvider` and `setAiModel` with 422 `model-not-curated`, shown against the model field. A client cannot pick a cheaper model per agent. …
 
@@ -445,7 +429,7 @@ Errors to draw in the form: 403 No platform-staff grant into this tenant is open
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the provider credentials untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No AI provider for this tenant yet; the managed default (TICVAI curated, UAE-only through Core42 Compass unless the tenant is Global-allowed) answers meanwhile. Offers Save AI provider (`setAiProvider`, `id` optional, so it creates one); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listAiProviders` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `AI_CONFIGURE`, which `listAiProviders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `AI_CONFIGURE`, which `listAiProviders` requires to show this screen, and names that permission (the screen's other reads need `AI_USE`, `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_APPROVE` for `publishPromptTemplate` … |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so the provider list and every action are disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098, R203). |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The provider is TICVAI-managed; its key is provisioned by the platform (`provider-managed-by-ticvai`).; 409 The provider's `residency` is not in the tenant's region's `allowedAiResidencies` (`residency-refused`, audit R203), or it is tenant-managed (`managedBy` is …; 422 The `modelId` is outside TICVAI's curated range for a task in `taskKeys` (`model-not-curated` … |
@@ -517,7 +501,7 @@ warning: gpt-4o-mini is underpowered for the configuration assistant (fitness 0.
 - `setAiByokEnablement` → `PLATFORM_AI_MANAGE` (configure) · staff
 - `getAiByokEnablement` → `AI_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `AI_CONFIGURE`, which `listAiProviders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `AI_CONFIGURE`, which `listAiProviders` requires to show this screen, and names that permission (the screen's other reads need `AI_USE`, `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_APPROVE` for `publishPromptTemplate` …
 
 #### Requirements it meets
 
@@ -565,7 +549,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (60), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (90 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (74 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-037?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: , Open access grant, Save AI provider, Save AI credential, Test AI provider, Save model, Save BYOK enablement.
 - [ ] Every transition is wired: `ADM-001`, `BO-091`.

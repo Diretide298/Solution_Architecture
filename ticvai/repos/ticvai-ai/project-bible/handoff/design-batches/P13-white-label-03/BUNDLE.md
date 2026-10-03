@@ -118,7 +118,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | White Label · wave 1 · needs the `core` module |
-| Block | Block A · ticket #20612 (APP-WL-CMS-102) |
+| Block | Block A · task APP-WL-CMS-102 |
 | Who uses it | venue staff holding `TENANT_CONFIGURE` (1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | multiStepForm (compact density): `getSiteSetupProgress` holds the seven steps and their state, and `setSiteSetupProgress` saves each one — progress, fields per step, review, submit |
@@ -416,7 +416,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | White Label · wave 1 · needs the `core` module |
-| Block | Block A · ticket #20763 (APP-WL-CMS-103) |
+| Block | Block A · task APP-WL-CMS-103 |
 | Who uses it | venue staff holding `GUEST_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `TENANT_CONFIGURE`, `TENANT_PUBLISH` (2 read, 3 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listBookingFlows` reads the venue's flows and `getBookingFlow` reads one of them to compose — list, select, act |
@@ -682,7 +682,7 @@ Errors to draw in the form: 409 Validation failed. (ConfigValidationProblem)
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the flows untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | **No flows at this venue yet.** Guests book through each type's default order until one is picked. Offers the flow-type cards and, from the Site Builder, the preset's flows in one step. |
 | Empty, no results (`?state=emptyNoResults`) | The flow-type filter matched nothing and the venue's other flows are still there. Names the filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires, and names that permission. **Never an empty table** — that reads as *there are no flows*. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires to show this screen, and names that permission (the screen's other reads need `GUEST_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `updateProduct`, `setProductCategories` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 400 A step the type does not have, or a step given twice; 400 An unknown flow type, a step the type does not have, or a step given twice; 400 The body contains a cycle — a category that is its own ancestor — or a `parentId` that names no … |
 
@@ -735,7 +735,7 @@ invalidDrop: 'Payment can''t move above Review: payment is always last.'
 - `listProductCategories` → `PRODUCT_VIEW` (read) · staff, guest
 - `setProductCategories` → `PRODUCT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires, and names that permission. **Never an empty table** — that reads as *there are no flows*.
+**A refused user sees:** Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires to show this screen, and names that permission (the screen's other reads need `GUEST_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `updateProduct`, `setProductCategories` …
 
 #### Requirements it meets
 
@@ -827,6 +827,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 
 - Wireframe frame: `wireframes/P13 Venue CMS.dc.html#cms-103` · status **notStarted** · provenance generated
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -851,7 +852,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | White Label · wave 1 · needs the `core` module |
-| Block | Block A · ticket #20738 (APP-WL-CMS-104) |
+| Block | Block A · task APP-WL-CMS-104 |
 | Who uses it | venue staff holding `AI_USE`, `TENANT_CONFIGURE`, `TENANT_PUBLISH` (1 operate, 2 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listAppBuilds` reads the builds and `getAppBuild` reads one — list, select, act; the checklist sits above the list |
@@ -1033,7 +1034,7 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Error (`?state=error`) | Could not load. Names which read failed. |
 | Empty, first run (`?state=emptyFirstRun`) | **No build yet.** Shows the checklist first: nothing can be built until the client's store account for the platform is recorded and a version is published. |
 | Empty, no results (`?state=emptyNoResults`) | No build for the platform picked. Names it and offers the other. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TENANT_CONFIGURE`, which `listAppBuilds` requires, and names that permission. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TENANT_CONFIGURE`, which `getStoreAccounts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `createAiConversation`, `sendAiMessage`; `TENANT_PUBLISH` for `requestAppBuild`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 An Apple account without a nine-digit D-U-N-S number, a store given twice, or a listing text missing a tenant language; 400 An asset is larger than 2 MB, or is not PNG or SVG (audit R270); 409 No store account for the platform, nothing published yet, or a build for the platform already running; the problem says which; 422 The guard model blocked the message or the reply (`guard-refused` … |
 
@@ -1080,7 +1081,7 @@ build:
 - `getBrandIdentity` → `TENANT_CONFIGURE` (configure) · staff
 - `setBrandIdentity` → `TENANT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `TENANT_CONFIGURE`, which `listAppBuilds` requires, and names that permission.
+**A refused user sees:** Shown when the caller lacks `TENANT_CONFIGURE`, which `getStoreAccounts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `createAiConversation`, `sendAiMessage`; `TENANT_PUBLISH` for `requestAppBuild`.
 
 #### Requirements it meets
 
@@ -1165,6 +1166,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 #### References
 
 - Wireframe frame: `wireframes/P13 Venue CMS.dc.html#cms-104` · status **notStarted** · provenance generated
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0020 *— Where AI runs, and what it is isolated from* (`docs/adr/0020-ai-isolation-boundary.md`)
 
 #### Acceptance for the design

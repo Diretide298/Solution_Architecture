@@ -105,7 +105,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-744` | Data Governance Center | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `BO-745` | Identity Resolution Rules | B–D | 2 | 3 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-746` | Duplicate Review & Merge | B–D | 0 | 0 | 6 | 0 | 4 | 2 | — | notStarted (—) |
+| `BO-746` | Duplicate Review & Merge | D | 0 | 0 | 6 | 0 | 4 | 2 | — | notStarted (—) |
 | `BO-747` | Consent Policy Configuration | B–D | 24 | 20 | 6 | 76 | 1 | 4 | — | notStarted (—) |
 | `BO-748` | Consent Capture & Versions | B–D | 0 | 7 | 6 | 10 | 0 | 4 | — | notStarted (—) |
 | `BO-749` | Guest Preference Center | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
@@ -181,7 +181,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 - → `BO-100` Venue Home: *Back to Venue Home*
 - → `BO-745` Identity Resolution Rules: *Identity Resolution Rules*
-- → `BO-746` Duplicate Review & Merge: *Duplicate Review & Merge*
+- → `BO-746` Duplicate Review & Merge: *Duplicate Review & Merge*; carries `candidateId`
 - → `BO-747` Consent Policy Configuration: *Consent Policy Configuration*
 - → `BO-748` Consent Capture & Versions: *Consent Capture & Versions*
 - → `BO-749` Guest Preference Center: *Guest Preference Center*
@@ -423,7 +423,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-SETUP-BO-746 |
 | Who uses it | venue staff holding `GUEST_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -756,6 +756,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS71 Marketing CRM Configuration Reference v1.0 Board 2.dc.html#bo-747`
 - Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 2
 - Flow F245 *Marketing CRM Configuration Reference v1.0 board 2: Data Governance Center*, step 6: Works in Consent Policy Configuration → Define the legal and operational rules governing consent. Configure consent purposes, marketing categories, processing purposes and channel-specific permission for email, SMS, WhatsApp, push and …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1030,6 +1031,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS71 Marketing CRM Configuration Reference v1.0 Board 2.dc.html#bo-749`
 - Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 2
 - Flow F245 *Marketing CRM Configuration Reference v1.0 board 2: Data Governance Center*, step 10: Works in Guest Preference Center → Configure the guest-facing center for communication choices and privacy preferences. Expose subscription categories, topics, preferred channels, contact frequency, quiet hours and global or …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 

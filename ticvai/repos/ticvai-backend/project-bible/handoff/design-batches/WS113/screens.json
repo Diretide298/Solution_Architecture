@@ -43,7 +43,10 @@
     {
      "to": "BO-665",
      "trigger": "Accreditation Status Workflow",
-     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "carries": [
+      "holderId"
+     ]
     },
     {
      "to": "BO-666",
@@ -71,22 +74,34 @@
     {
      "to": "BO-670",
      "trigger": "Suspension & Reactivation Management",
-     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "carries": [
+      "holderId"
+     ]
     },
     {
      "to": "BO-671",
      "trigger": "Accreditation Revocation Management",
-     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "carries": [
+      "holderId"
+     ]
     },
     {
      "to": "BO-672",
      "trigger": "Expiry Monitor & Expiration Rules",
-     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "carries": [
+      "holderId"
+     ]
     },
     {
      "to": "BO-673",
      "trigger": "Accreditation Renewal Workspace",
-     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "carries": [
+      "holderId"
+     ]
     }
    ]
   },
@@ -281,7 +296,9 @@
    "params": [
     {
      "name": "holderId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `setAccreditationStatus` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -965,7 +982,9 @@
    "params": [
     {
      "name": "holderId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `setAccreditationStatus` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1096,7 +1115,9 @@
    "params": [
     {
      "name": "holderId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `setAccreditationStatus` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1248,7 +1269,9 @@
    "params": [
     {
      "name": "holderId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAccreditationHolders` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1393,7 +1416,9 @@
    "params": [
     {
      "name": "holderId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAccreditationHolders` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

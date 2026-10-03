@@ -870,7 +870,9 @@
    "params": [
     {
      "name": "subjectId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `listWalletTransactions` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ],
    "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that list — never an empty form that looks configurable."
@@ -1178,16 +1180,12 @@
        "label": "The selected reader",
        "bindsTo": "ReaderSyncStatus",
        "columns": [
-        "ReaderSyncStatus.readerId",
         "ReaderSyncStatus.readerName",
         "ReaderSyncStatus.status",
         "ReaderSyncStatus.lastSyncAt",
         "ReaderSyncStatus.oldestPendingAt",
         "ReaderSyncStatus.pendingTransactions",
         "ReaderSyncStatus.pendingValue",
-        "ReaderSyncStatus.edgePackageVersion",
-        "ReaderSyncStatus.edgePackageStale",
-        "Offline operation allowed",
         "Maximum offline duration",
         "Maximum offline transaction value"
        ],

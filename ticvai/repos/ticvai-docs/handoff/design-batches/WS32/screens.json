@@ -44,16 +44,7 @@
     {
      "to": "BO-318",
      "trigger": "Refund Policy & Refund Calculation Configuration",
-     "provenance": "derived — BO-318 declares entryState.params venueId and BO-314 holds none of them, so the edge carries nothing and BO-318 opens cold"
-    },
-    {
-     "to": "BO-315",
-     "trigger": "Works in Order Amendment Workspace",
-     "provenance": "flow F141 step 1→2",
-     "operation": "listAmendmentAfterSale",
-     "carries": [
-      "orderId"
-     ]
+     "provenance": "derived — BO-318 declares entryState.params  and BO-314 holds none of them. The edge carries nothing: BO-318 needs nothing to open"
     },
     {
      "to": "BO-316",
@@ -90,6 +81,15 @@
      "trigger": "Works in Reissue & Media Replacement (Ticket Reissue & Fulfillment Regeneration, merged into it on 28…",
      "provenance": "flow F141 step 11→12",
      "operation": "listAmendmentAfterSale"
+    },
+    {
+     "to": "BO-315",
+     "trigger": "Works in Order Amendment Workspace",
+     "provenance": "flow F141 step 1→2",
+     "operation": "listAmendmentAfterSale",
+     "carries": [
+      "orderId"
+     ]
     },
     {
      "to": "BO-319",
@@ -1166,7 +1166,8 @@
    "params": [
     {
      "name": "venueId",
-     "from": "navigation"
+     "from": "session",
+     "notes": "From the session (3 October 2026, CHG-SPF-004): a staff screen works in the venue its sign-in or device is scoped to; nothing navigates to it (the venue-scope rule)."
     }
    ],
    "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that list — never an empty form that looks configurable."
@@ -1375,11 +1376,15 @@
     },
     {
      "name": "paymentId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `voidPayment`, `cleanupFailedPayment` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "entitlementId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `voidEntitlement` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ],
    "coldEntry": "Opened from BO-314 with the order picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says plainly if the order no longer exists."

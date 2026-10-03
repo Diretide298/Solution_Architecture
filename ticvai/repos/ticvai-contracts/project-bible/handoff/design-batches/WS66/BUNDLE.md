@@ -147,15 +147,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ANL-012` | Live Operations Dashboard | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ANL-013` | Revenue Pulse | B–D | 0 | 36 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-014` | Attendance & Footfall Intelligence | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ANL-015` | Capacity & Utilization Monitor | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `ANL-016` | Sales & Channel Performance | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `ANL-017` | Customer, Membership & Loyalty Pulse | B–D | 2 | 30 | 6 | 0 | 2 | 2 | — | notStarted (—) |
-| `ANL-018` | Alerts & Exception Center | B–D | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-019` | AI Management Insights | A | 11 | 44 | 6 | 3 | 2 | 0 | — | notStarted (—) |
-| `ANL-020` | Multi-Site & Performance Comparison | B–D | 3 | 8 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-012` | Live Operations Dashboard | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-013` | Revenue Pulse | D | 0 | 36 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-014` | Attendance & Footfall Intelligence | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-015` | Capacity & Utilization Monitor | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ANL-016` | Sales & Channel Performance | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ANL-017` | Customer, Membership & Loyalty Pulse | D | 2 | 30 | 6 | 0 | 2 | 2 | — | notStarted (—) |
+| `ANL-018` | Alerts & Exception Center | C | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-019` | AI Management Insights | D | 11 | 41 | 6 | 3 | 2 | 0 | — | notStarted (—) |
+| `ANL-020` | Multi-Site & Performance Comparison | D | 3 | 6 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -175,7 +175,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-012 |
 | Who uses it | venue staff holding `REPORT_VIEW_VENUE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Display) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -368,7 +368,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-013 |
 | Who uses it | venue staff holding `REPORT_VIEW_VENUE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Display) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -618,7 +618,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-014 |
 | Who uses it | venue staff holding `REPORT_VIEW_VENUE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Display) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -797,7 +797,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-015 |
 | Who uses it | venue staff holding `REPORT_VIEW_VENUE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -963,7 +963,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-016 |
 | Who uses it | venue staff holding `REPORT_VIEW_VENUE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -1141,7 +1141,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-017 |
 | Who uses it | venue staff holding `REPORT_VIEW_VENUE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1338,7 +1338,7 @@ Also apply: 1 for P16 · Analytics, 14 for all of P16, 29 for every app (section
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-ANALYTICS-ANL-018 |
 | Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Each Alert Shall Display) and no metric row |
@@ -1469,7 +1469,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | Block A · ticket #20757 (APP-SETUP-ANL-019) |
+| Block | Block D · task APP-SETUP-ANL-019 |
 | Who uses it | venue staff holding `AI_USE`, `REPORT_VIEW_VENUE` (2 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAiInsights` reads the population and the selected insight is decided or explained — list, select, act (CHG-SOT-011). |
@@ -1548,8 +1548,6 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Title | text | — |
 | Kind | chip: Anomaly, Forecast deviation, Trend, Opportunity, Executive summary, Root cause… | — |
 | Priority | chip: Low, Medium, High, Critical | — |
-| Metric key | text | — |
-| Magnitude | 1,234.5 | — |
 | Status | chip: New, Reviewed, Accepted, Rejected, Actioned, Measured | — |
 | Detected at | 1 Oct 2026, 14:30 | — |
 
@@ -1603,7 +1601,6 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Drivers | list or chips (count when long) | — |
 | Narrative | text | — |
 | Reliability | chip: Grounded, Partial, Conflicting sources, Insufficient evidence | — |
-| Data as of | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -1640,7 +1637,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the insights untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No insights yet: nothing has moved enough to report. Good news, not a failure; the ask panel stays available. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the kind, priority or status filter, and the insights are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `AI_USE`, which `listAiInsights` requires, and names that permission. **Never an empty list.** |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `AI_USE`, which `listAiInsights` requires, and names that permission. **Never an empty list.** A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REPORT_VIEW_VENUE` for `askReportingQuestion`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Question could not be interpreted. (ReportQuestionProblem); 409 The move is not allowed from the insight's state. |
 
@@ -1682,7 +1679,7 @@ insight:
 - `decideAiInsight` → `AI_USE` (operate) · staff
 - `explainMetricChange` → `AI_USE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `AI_USE`, which `listAiInsights` requires, and names that permission. **Never an empty list.**
+**A refused user sees:** Shown when the caller lacks `AI_USE`, which `listAiInsights` requires, and names that permission. **Never an empty list.** A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REPORT_VIEW_VENUE` for `askReportingQuestion`.
 
 Screen guard: `AI_USE`
 
@@ -1722,7 +1719,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (11), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (41 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-019?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Accept, Mark actioned, Reject, Why did this change?.
 - [ ] Every transition is wired: `ANL-020`, `ANL-001`.
@@ -1741,7 +1738,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-020 |
 | Who uses it | venue staff holding `REPORT_VIEW_TENANT` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Comparison KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -1826,8 +1823,6 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Scope path | text | The site (venue scope) the basis applies to. |
 | Period start | 1 Oct 2026 | — |
 | Period end | 1 Oct 2026 | — |
 | Visitors | 1,234 | `perVisitor`. |
@@ -1932,7 +1927,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (3), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-020?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ANL-001`, `ANL-012`, `ANL-013`, `ANL-014`, `ANL-015`, `ANL-016`, `ANL-017`, `ANL-018`, `ANL-019`.

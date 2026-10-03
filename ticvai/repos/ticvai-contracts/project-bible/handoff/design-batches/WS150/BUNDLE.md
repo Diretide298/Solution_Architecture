@@ -650,6 +650,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Empty, no results (`?state=emptyNoResults`) | **Nothing matched.** The filter or the scope narrowed it — naming which is what stops somebody concluding the record does not exist |
 | Offline (`?state=offline`) | online only |
+| Validation and conflict | the form keeps what was entered and marks the problem: 409 The order is already paid (`order-already-paid`; CHG-RUL-005). No link is created. |
 
 #### Sample data for the mock-up
 
@@ -698,7 +699,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (13), with its required mark, default, format and its error state.
+- [ ] Every input above is drawn (13), with its required mark, default, format and its error state (409).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-592?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -1100,6 +1101,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-595`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 4
 - Flow F259 *Payment Payment Orchestration board 4: Digital Payments Command Center\t71*, step 12: Works in Digital Payment Session & Transaction Monitor\t76 → Provide operational teams with real-time visibility into digital payment sessions.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1374,6 +1376,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS90 Payment Payment Orchestration Board 4.dc.html#adm-597`
 - Workshop pack: Payment_Payment_Orchestration.pdf board 4
 - Flow F259 *Payment Payment Orchestration board 4: Digital Payments Command Center\t71*, step 16: Works in Digital Payment Exception, Recovery & Expiry Center\t79 → Centralize operational handling of incomplete or abnormal digital-payment journeys.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 

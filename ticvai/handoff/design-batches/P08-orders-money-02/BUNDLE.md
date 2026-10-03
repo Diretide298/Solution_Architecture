@@ -1,6 +1,6 @@
 # P08-orders-money-02 — P08 · Orders & Money (2 of 3)
 
-**10 screens · 66 operations · 87 schemas · 28 permissions**
+**10 screens · 66 operations · 88 schemas · 28 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -163,16 +163,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-041` | Cash Movements | B–D | 18 | 53 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
-| `BO-042` | Banking & Safe | B–D | 24 | 26 | 6 | 18 | 0 | 0 | — | notStarted (generated) |
-| `BO-043` | Daily Reconciliation | B–D | 25 | 94 | 6 | 24 | 3 | 0 | — | notStarted (generated) |
-| `BO-047` | Order Corrections & Exceptions | B–D | 127 | 53 | 6 | 70 | 0 | 0 | — | notStarted (generated) |
+| `BO-041` | Cash Movements | B–D | 18 | 28 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
+| `BO-042` | Banking & Safe | B–D | 27 | 26 | 6 | 18 | 0 | 0 | — | notStarted (generated) |
+| `BO-043` | Daily Reconciliation | B–D | 34 | 66 | 6 | 24 | 3 | 0 | — | notStarted (generated) |
+| `BO-047` | Order Corrections & Exceptions | B–D | 127 | 39 | 6 | 70 | 0 | 0 | — | notStarted (generated) |
 | `BO-048` | Retail Products | B–D | 26 | 19 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
-| `BO-059` | Sales Reports | B–D | 76 | 35 | 6 | 93 | 3 | 0 | — | notStarted (generated) |
-| `BO-061` | Scheduled Reports | B–D | 26 | 16 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
-| `BO-062` | Venue Profile | B–D | 9 | 9 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-065` | Venue Configuration | A | 98 | 18 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
-| `BO-074` | Chart of Accounts | A | 35 | 44 | 6 | 39 | 2 | 0 | — | notStarted (generated) |
+| `BO-059` | Sales Reports | B–D | 76 | 20 | 6 | 93 | 3 | 0 | — | notStarted (generated) |
+| `BO-061` | Scheduled Reports | B–D | 26 | 12 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
+| `BO-062` | Venue Profile | B–D | 9 | 7 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-065` | Venue Configuration | A | 98 | 16 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
+| `BO-074` | Chart of Accounts | A | 35 | 26 | 6 | 39 | 2 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -272,29 +272,18 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. |
 | Kind | chip: Opening float, Lift, Add | `openingFloat` is written by `openShift`; `lift` by `createCashMovement` and by `withdrawFromDepositBox`, which is a lift from one … |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Denominations | list or chips (count when long) | Stored as `orders.cash_count_line` rows with `countKind: movement` and this movement's `cashMovementId`, not as a column. |
 | Reference | text | Safe drop reference or bag number. |
 | Reason | text | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
-| Shift | the name it points at, never the id | — |
-| Authorised by principal | the name it points at, never the id | The principal who authorised the movement, recorded for audit. |
-| Sequence | 1,234 | Monotonic within the shift. Preserves order across an offline batch. |
 | Synced at | 1 Oct 2026, 14:30 | — |
 
 **Every shift** (data table, from `listShifts`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. Also the idempotency key. |
-| Workstation | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Principal | the name it points at, never the id | Who opened it. Cash reconciles to a person and a drawer. |
 | Principal display name | text | — |
-| Incidents | list or chips (count when long) | BL-097. A till has exceptions and there was nowhere to write them — a no-sale, a drawer opened without a transaction, a manager override, a … |
 | Status | chip: Pending approval, Open, Suspended, Pending variance, Pending closure, Closed… | — |
 | Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
@@ -305,38 +294,24 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. |
 | Kind | chip: Opening float, Lift, Add | `openingFloat` is written by `openShift`; `lift` by `createCashMovement` and by `withdrawFromDepositBox`, which is a lift from one … |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Denominations | list or chips (count when long) | Stored as `orders.cash_count_line` rows with `countKind: movement` and this movement's `cashMovementId`, not as a column. |
 | Reference | text | Safe drop reference or bag number. |
 | Reason | text | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
-| Shift | the name it points at, never the id | — |
-| Deposit box | the name it points at, never the id | The box the cash moved in or out of. Set on every lift `withdrawFromDepositBox` records (26 September, pull audit R099). |
-| Witness principal | the name it points at, never the id | The cashier who countersigned a withdrawal. Null on other movements. |
 | Withdrawal reason | chip: Banking, Safe drop, Change order, Other | Why a supervisor took cash out of a box. Set only on lifts `withdrawFromDepositBox` records. |
-| Authorised by principal | the name it points at, never the id | The principal who authorised the movement, recorded for audit. |
-| Sequence | 1,234 | Monotonic within the shift. Preserves order across an offline batch. |
 | Synced at | 1 Oct 2026, 14:30 | — |
 
 **The shift** (detail panel, from `getShift`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. Also the idempotency key. |
-| Workstation | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Principal | the name it points at, never the id | Who opened it. Cash reconciles to a person and a drawer. |
 | Principal display name | text | — |
 | Incidents | list or chips (count when long) | BL-097. A till has exceptions and there was nowhere to write them — a no-sale, a drawer opened without a transaction, a manager override, a … |
 | Status | chip: Pending approval, Open, Suspended, Pending variance, Pending closure, Closed… | — |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Deposit box code | text | — |
 | Bag number | text | — |
-| Opening float | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Sales total | AED 1,234.50 | What the till took in sales, as the guest paid it — tax included: the shift's takings, not Gross sales (CHG-FIN-002, CHG-FIN-010). |
 | Refunds total | AED 1,234.50 | What the till paid back, as the guest was refunded it — tax included. |
 | Lifts total | AED 1,234.50 | Cash taken out mid-shift by lifts and withdrawals. Cash, so neither gross nor net. |
@@ -367,7 +342,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the cash movements untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | **Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listCashMovements` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listCashMovements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listCashMovements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `createCashMovement`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Shift is not open (problem type `shift-not-open`), or the lift exceeds the float counted at the last count less lifts since (`lift-exceeds-float`, audit R123 … |
 
@@ -425,7 +400,7 @@ no_sales:
 - `getShift` → `REPORT_VIEW_WORKSTATION` (operate) · staff
 - `listShifts` → `REPORT_VIEW_WORKSTATION` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listCashMovements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listCashMovements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `createCashMovement`.
 
 #### Requirements it meets
 
@@ -457,7 +432,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (18), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (53 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-041?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create cash movement.
 - [ ] No transition is declared; back returns where the user came from.
@@ -526,8 +501,11 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Reason `reason` | radio group | optional | — | Banking · Safe drop · Change order · Other | — | Why a supervisor took cash out of a box. Set only on lifts `withdrawFromDepositBox` records. | `withdrawFromDepositBox` body |
 | Note `note` | text area | optional | — | max length 300 | — | — | `withdrawFromDepositBox` body |
 | Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `withdrawFromDepositBox` body |
+| Witness step up `witnessStepUp` | group | optional | — | — | — | The witnessing cashier's countersignature on this device (CHG-RUL-019): `principalId` is `witnessPrincipalId`, `credential` their PIN. | `withdrawFromDepositBox` body |
+| Principal `witnessStepUp.principalId` | picker: choose a principal | required | — | — | shows names, sends the id | The supervisor signing. Recorded against the act. | `withdrawFromDepositBox` body |
+| Credential `witnessStepUp.credential` | text area | required | — | max length 512 | — | The supervisor's staff PIN, as they sign in at a till with it. A PIN, never a password (audit R123 (7)). | `withdrawFromDepositBox` body |
 
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 The box is being counted or has been counted — `closing`, `closed` or `reconciled` (problem type `deposit-box-not-open`).
+Errors to draw in the form: 400 Validation failed; 403 The caller lacks CASH_LIFT, or the witness's step-up is missing, failed, or is not `witnessPrincipalId` (`supervisor-step-up-refused`; CHG-RUL-019).; 409 The box is being counted or has been counted — `closing`, `closed` or `reconciled` (problem type `deposit-box-not-open`).
 
 **Form: Record a cash lift** (modal, opened by *Record a cash lift*; *Record a cash lift* calls `createCashMovement`, *Cancel* sends nothing)
 
@@ -606,7 +584,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Bank or safe-drop cash (primary button) | `withdrawFromDepositBox` POST `/deposit-boxes/{boxId}/withdraw` | inline | DepositBox | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 The box is being counted or has been counted — `closing`, `closed` or `reconciled` (problem type `deposit-box-not-open`). | step-up: pin (The cashier the cash came from countersigns the withdrawal with their own PIN on the same device (DEC-178; CHG-CSP-015).); opens modal first |
+| Bank or safe-drop cash (primary button) | `withdrawFromDepositBox` POST `/deposit-boxes/{boxId}/withdraw` | inline | DepositBox | 400 Validation failed; 403 The caller lacks CASH_LIFT, or the witness's step-up is missing, failed, or is not `witnessPrincipalId` (`supervisor-step-up-refused`; CHG-RUL-019).; 409 The box is being counted or has been … | step-up: pin (The cashier the cash came from countersigns the withdrawal with their own PIN on the same device (DEC-178; CHG-CSP-015).); opens modal first |
 | Record a cash lift (secondary button) | `createCashMovement` POST `/shifts/{shiftId}/cash-movements` | CreateCashMovementRequest | CashMovement | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 Shift is not open (problem type `shift-not-open`), or the lift exceeds the float counted at the last count less lifts since … | opens modal first |
 
 **Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
@@ -629,7 +607,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the banking safe untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | **Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires to show this screen, and names that permission (the screen's other reads need `TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `withdrawFromDepositBox`, `createCashMovement`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Shift is not open (problem type `shift-not-open`), or the lift exceeds the float counted at the last count less lifts since (`lift-exceeds-float`, audit R123 …; 409 The box is being counted or has been counted — `closing`, `closed` or `reconciled` (problem type `deposit-box-not-open`). |
 
@@ -677,7 +655,7 @@ withdrawal:
 - `getVenueSettings` → `TENANT_VIEW` (read) · staff
 - `createCashMovement` → `CASH_LIFT` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires to show this screen, and names that permission (the screen's other reads need `TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `withdrawFromDepositBox`, `createCashMovement`.
 
 #### Requirements it meets
 
@@ -715,7 +693,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (24), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every input above is drawn (27), with its required mark, default, format and its error state (400, 403, 404, 409).
 - [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-042?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Bank or safe-drop cash, Record a cash lift.
@@ -833,6 +811,9 @@ Errors to draw in the form: 400 `matchedManually` without a `matchedPaymentId`, 
 | Cashier reason `cashierReason` | radio group | optional | — | Till error · Unrecorded refund · Miscount · Other | — | Anything the cashier knows went wrong in the shift (DI-803: till error, unrecorded refund, miscount, other). | `closeShift` body |
 | Release held leases `releaseHeldLeases` | toggle | optional | on | — | — | Return unsold inventory leases held by this workstation (ADR-0013 C103). Closing without releasing strands capacity until TTL expiry, which is visible at a gate during peak. | `closeShift` body |
 | Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `closeShift` body |
+| Supervisor step up `supervisorStepUp` | group | optional | — | — | — | The supervisor closing the shift, signing on this device (CHG-RUL-019). Refused without it (`403 supervisor-step-up-refused`). | `closeShift` body |
+| Principal `supervisorStepUp.principalId` | picker: choose a principal | required | — | — | shows names, sends the id | The supervisor signing. Recorded against the act. | `closeShift` body |
+| Credential `supervisorStepUp.credential` | text area | required | — | max length 512 | — | The supervisor's staff PIN, as they sign in at a till with it. A PIN, never a password (audit R123 (7)). | `closeShift` body |
 
 Errors to draw in the form: 400 Validation failed; 403 The caller is the cashier whose shift it is and does not hold OVERSHORT_ACCEPT (problem type `blind-count-required`): their count goes through …; 409 Shift is not `open` or `suspended` — already closing or closed (problem type `shift-not-open`) — or open orders remain (`open-orders-remain`); 422 A counted line names an unknown or inactive denomination (`unknown-denomination`), repeats one (`duplicate-denomination`), or sends a `total` that disagrees …
 
@@ -843,6 +824,9 @@ Errors to draw in the form: 400 Validation failed; 403 The caller is the cashier
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
 | Reason `reason` | text area | required | — | min length 3; max length 500 | — | Retained for audit. The accepting principal is recorded. | `acceptShiftVariance` body |
+| Supervisor step up `supervisorStepUp` | group | optional | — | — | — | The supervisor accepting, signing on this device (CHG-RUL-019). Refused without it (`403 supervisor-step-up-refused`). | `acceptShiftVariance` body |
+| Principal `supervisorStepUp.principalId` | picker: choose a principal | required | — | — | shows names, sends the id | The supervisor signing. Recorded against the act. | `acceptShiftVariance` body |
+| Credential `supervisorStepUp.credential` | text area | required | — | max length 512 | — | The supervisor's staff PIN, as they sign in at a till with it. A PIN, never a password (audit R123 (7)). | `acceptShiftVariance` body |
 
 Errors to draw in the form: 403 The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is (problem type `approver-is-cashier`) — a cashier signing off their own …; 409 Shift is not `pendingVariance` (problem type `shift-not-pending-variance`) — within tolerance, still open, or already accepted.
 
@@ -853,8 +837,11 @@ Errors to draw in the form: 403 The caller lacks OVERSHORT_ACCEPT at this venue,
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
 | Reason `reason` | text area | required | — | min length 3; max length 500 | — | Why a recount is needed, shown to the cashier. Never the amount: "Count the AED 100 notes again", not "you are AED 100 short". | `rejectShiftVariance` body |
+| Supervisor step up `supervisorStepUp` | group | optional | — | — | — | The supervisor sending the shift back, signing on this device (CHG-RUL-014, as `reopenShift`). | `rejectShiftVariance` body |
+| Principal `supervisorStepUp.principalId` | picker: choose a principal | required | — | — | shows names, sends the id | The supervisor signing. Recorded against the act. | `rejectShiftVariance` body |
+| Credential `supervisorStepUp.credential` | text area | required | — | max length 512 | — | The supervisor's staff PIN, as they sign in at a till with it. A PIN, never a password (audit R123 (7)). | `rejectShiftVariance` body |
 
-Errors to draw in the form: 403 The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is (`approver-is-cashier`).; 409 Shift is not `pendingVariance` (`shift-not-pending-variance`), or a recount is already requested and not yet submitted (`recount-already-requested`).
+Errors to draw in the form: 403 The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is (`approver-is-cashier`); or the supervisor step-up is missing or failed …; 409 Shift is not `pendingVariance` (`shift-not-pending-variance`), or a recount is already requested and not yet submitted (`recount-already-requested`).
 
 **Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
 
@@ -879,33 +866,18 @@ Errors to draw in the form: 403 The caller lacks OVERSHORT_ACCEPT at this venue,
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Provider name | text | — |
-| Period start | 1 Oct 2026 | A day in the region's time zone, local midnight to local midnight. |
-| Period end | 1 Oct 2026 | A day in the region's time zone, local midnight to local midnight. |
 | Status | chip: Ingesting, Parsing, Matching, Matched, Has exceptions, Resolved… | — |
 | Line count | 1,234 | — |
 | Matched count | 1,234 | — |
 | Exception count | 1,234 | — |
-| Provider gross | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Provider fees | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Provider net | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Ledger gross | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **Every posting** (data table, from `listLedgerEntries`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | text | — |
-| Journal entry | the name it points at, never the id | — |
-| Account | the name it points at, never the id | — |
 | Account code | text | — |
-| Debit | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Credit | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Venue | the name it points at, never the id | — |
-| Cost center | the name it points at, never the id | — |
-| Source | chip: Manual, Order, Refund, Void, Shift, Recognition… | — |
-| Source | text | — |
 | Description | text | — |
 | Posted at | 1 Oct 2026, 14:30 | — |
 
@@ -913,16 +885,11 @@ Errors to draw in the form: 403 The caller lacks OVERSHORT_ACCEPT at this venue,
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Server-created when parsing finds the exception, so a UUID (naming-and-style 4). |
-| Settlement | the name it points at, never the id | — |
 | Kind | chip: Unmatched in provider, Unmatched in ledger, Amount mismatch, Duplicate in provider … | — |
 | Provider reference | text | — |
-| Payment | the name it points at, never the id | — |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Expected amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Resolution | chip: Matched manually, Write off, Dispute raised, Provider error, Timing difference | Null while the exception is open. |
-| Note | text | The `note` given to `resolveSettlementException`, stored with the resolution. |
-| Resolved by principal | the name it points at, never the id | — |
 | Resolved at | 1 Oct 2026, 14:30 | — |
 
 **Month view** (calendar view, from `listSettlements`): **Daily per venue (CHG-FIN-009), plus a month view listing the days (decided 2 October 2026 by Chinmay, DEC-215).**
@@ -954,22 +921,14 @@ Errors to draw in the form: 403 The caller lacks OVERSHORT_ACCEPT at this venue,
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Currency code | text | A settlement has no account, so nothing else denominates it. A posting takes its currency from `ledger.account.currency` and a payment from … |
 | Provider name | text | — |
-| Period start | 1 Oct 2026 | A day in the region's time zone, local midnight to local midnight. |
-| Period end | 1 Oct 2026 | A day in the region's time zone, local midnight to local midnight. |
 | File reference | the name it points at, never the id | The `MediaAsset` holding the provider file, as given to `ingestSettlementFile`. Kept on the row because parsing is asynchronous: the job … |
-| Format | chip: Csv, Fixed width, Xml, Json | The file format given at ingest. Null when none was given. |
 | Status | chip: Ingesting, Parsing, Matching, Matched, Has exceptions, Resolved… | — |
 | Line count | 1,234 | — |
 | Matched count | 1,234 | — |
 | Exception count | 1,234 | — |
-| Provider gross | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Provider fees | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Provider net | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Ledger gross | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Difference | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **The trial balance** (detail panel, from `getTrialBalance`)
 
@@ -1008,7 +967,7 @@ Errors to draw in the form: 403 The caller lacks OVERSHORT_ACCEPT at this venue,
 | Resolve settlement exception (secondary button) | `resolveSettlementException` POST `/settlements/{settlementId}/exceptions` | inline | SettlementException | 400 `matchedManually` without a `matchedPaymentId`, or one that names no payment. `errors[]` names the field.; 404 The settlement, or an exception with this `exceptionId` under it, does not exist or is outside the … | opens modal first |
 | Close shift (secondary button) | `closeShift` POST `/shifts/{shiftId}/close` | CloseShiftRequest | ShiftCloseResult | 400 Validation failed; 403 The caller is the cashier whose shift it is and does not hold OVERSHORT_ACCEPT (problem type `blind-count-required`): their count goes through …; 409 Shift is not `open` or `suspended` — … | step-up: pin (A supervisor closes a cashier's shift and sees the expected cash and the variance (CHG-FIN-003); their own PIN on the …); opens modal first |
 | Accept variance (secondary button) | `acceptShiftVariance` POST `/shifts/{shiftId}/accept-variance` | inline | Shift | 403 The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is (problem type `approver-is-cashier`) — a cashier signing off their own …; 409 Shift is not `pendingVariance` (problem type … | step-up: pin (A supervisor signs off a cashier's over/short in person, with their own PIN on the device they use (audit R080 (e); any …); opens modal first |
-| Reject and recount (secondary button) | `rejectShiftVariance` POST `/shifts/{shiftId}/reject-variance` | inline | Shift | 403 The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is (`approver-is-cashier`).; 409 Shift is not `pendingVariance` (`shift-not-pending-variance`), or a recount is already requested and … | step-up: pin (The same supervisor act as accepting a variance, in person with their own PIN (audit R080 (e); DEC-175).); opens modal first |
+| Reject and recount (secondary button) | `rejectShiftVariance` POST `/shifts/{shiftId}/reject-variance` | inline | Shift | 403 The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is (`approver-is-cashier`); or the supervisor step-up is missing or failed …; 409 Shift is not `pendingVariance` … | step-up: pin (The same supervisor act as accepting a variance, in person with their own PIN (audit R080 (e); DEC-175).); opens modal first |
 
 **Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
 
@@ -1038,7 +997,7 @@ Errors to draw in the form: 403 The caller lacks OVERSHORT_ACCEPT at this venue,
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the daily reconciliation untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No daily reconciliation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on providerName, status and the daily reconciliation are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `getTrialBalance` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `getTrialBalance` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_WORKSTATION`, `SETTLEMENT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT` for … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 400 `fileReference` names no completed upload in the caller's scope, or the period is not a single day (`settlement-period-not-a-day`, audit R110 (b)).; 400 `matchedManually` without a `matchedPaymentId`, or one that names no payment. `errors[]` names the field.; 409 Shift is not `open` or `suspended` — already closing or closed (problem type `shift-not-open`) — or open … |
 
@@ -1084,7 +1043,7 @@ exception: Amount differs · ref NI-88231907 · AED 449.00 against AED 499.00
 - `acceptShiftVariance` → `OVERSHORT_ACCEPT` (operate) · staff · step-up pin
 - `rejectShiftVariance` → `OVERSHORT_ACCEPT` (operate) · staff · step-up pin
 
-**A refused user sees:** Shown when the caller lacks `LEDGER_VIEW`, which `getTrialBalance` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `LEDGER_VIEW`, which `getTrialBalance` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_WORKSTATION`, `SETTLEMENT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT` for …
 
 #### Requirements it meets
 
@@ -1131,8 +1090,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (25), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (94 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (34), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
+- [ ] Every output is drawn (66 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-043?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Ingest settlement file, Resolve settlement exception, Close shift, Accept variance, Reject and recount.
 - [ ] Every transition is wired: `BO-008`, `BO-074`.
@@ -1404,18 +1363,12 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | — |
-| Batch | the name it points at, never the id | The `RefundBatch` that raised this refund, where `createBulkRefund` did. Null for a refund raised on its own. |
 | FX rate | text | The rate on the original payment, not today's (BL-087, CF-118). `Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the … |
-| Tax reversal entry | the name it points at, never the id | A refund reverses the tax entry it created, and this is where that is stated rather than implied. |
 | Settle to | chip: Original tender, Advance balance, Wire transfer, Store credit | BL-086. A refund could only go back the way it came. |
 | FX variance | AED 1,234.50 | Where the sale rate and the current rate differ, the difference is booked as an FX variance rather than hidden in the refund. |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Applied percentage | 1,234.5 | From the venue's time bands, or an approver override. |
 | Status | chip: Pending approval, Pending gateway, Completed, Declined, Failed | — |
-| Reason | text | — |
-| Requested by principal | the name it points at, never the id | — |
 
 **The selected order** (detail panel, from `listOrders`)
 
@@ -1449,22 +1402,14 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The client UUIDv7 from `CreateOrderRequest.id`. |
 | Order number | text | The number a guest reads and a cashier types. Server-assigned: the venue prefix and a sequence per venue, for example `DXB1-000123` … |
 | Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Net amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Total price variance | AED 1,234.50 | Sum across lines. Zero on a normal order. |
-| Lines | list or chips (count when long) | — |
-| Payments | list or chips (count when long) | — |
-| Principal | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
@@ -1504,7 +1449,7 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the order untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No order yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the order are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createOrder`; `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_MODIFY` for `holdOrder` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A lease covering a line has expired (`leaseExpired`), capacity is exhausted (`capacityExhausted`), or the catalogue bundle the client priced from is beyond its … (OrderRefusedProblem); 409 A targeted line's entitlement has been redeemed (`lineRedeemed`, naming it in `lineIds`), or the order is voided (`orderVoided`). (OrderRefusedProblem); 409 Held order expired … |
 
@@ -1535,12 +1480,12 @@ correction:
 - `holdOrder` → `ORDER_MODIFY` (operate) · staff, partner
 - `listOrderRefunds` → `ORDER_VIEW` (read) · staff, partner
 - `modifyOrder` → `ORDER_MODIFY` (operate) · staff, partner
-- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner
+- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner, device
 - `rescheduleOrder` → `ORDER_RESCHEDULE` (operate) · staff, partner
 - `resumeOrder` → `ORDER_MODIFY` (operate) · staff, partner
 - `voidOrder` → `ORDER_VOID` (operate) · staff, partner
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createOrder`; `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_MODIFY` for `holdOrder` …
 
 #### Requirements it meets
 
@@ -1575,11 +1520,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### References
 
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-047` · status **notStarted** · provenance generated
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (127), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (53 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (39 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-047?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Create order, Apply manual discount, Create refund, Exchange order lines, Hold order, Modify order, Reprint order, Reschedule order, Resume order, Void order.
 - [ ] Every transition is wired: `BO-008`.
@@ -1596,7 +1542,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Orders & Money · wave 2 · needs the `retail` module |
+| Module | Orders & Money · wave 1 · needs the `retail` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `SCOPE_VIEW` (1 configure, 2 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
@@ -1753,7 +1699,7 @@ Errors to draw in the form: 409 The new barcode is already in use in this venue.
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the retail products untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No retail products yet. Offers Create merchandise (`createMerchandise`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on outletId, categoryId, inStockOnly, search and the retail products are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createMerchandise`, `updateMerchandise`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Barcode already in use in this venue. `refusedReason` is `barcodeInUse`. (MerchandiseConflictProblem); 409 The new barcode is already in use in this venue. `refusedReason` is `barcodeInUse`. (MerchandiseConflictProblem) |
 
@@ -1804,7 +1750,7 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `updateMerchandise` → `PRODUCT_CONFIGURE` (configure) · staff
 - `listOutlets` → `SCOPE_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createMerchandise`, `updateMerchandise`.
 
 #### Requirements it meets
 
@@ -1833,6 +1779,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### References
 
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-048` · status **notStarted** · provenance generated
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -2030,14 +1977,7 @@ Errors to draw in the form: 409 The report is a system report, which is clone-on
 | Name | text | — |
 | Description | text | — |
 | Category | chip: Sales, Admission, Financial, Inventory, Guest, Operations… | — |
-| Data source | chip: Orders, Order lines, Payments, Refunds, Shifts, Scan events… | What a report may be built over. A closed set, and that is the point — a builder that accepts any table will happily produce a report over … |
-| Columns | list or chips (count when long) | — |
-| Filters | list or chips (count when long) | — |
-| Group by | list or chips (count when long) | — |
-| Parameters | list or chips (count when long) | — |
-| Required permission | chip: SESSION FORCE LOGOUT, USER MANAGE, ROLE MANAGE, PERMISSION GRANT, PERMISSION VIEW … | Permission needed to run this report, from the shared `Permission` vocabulary. The author cannot assign one they do not hold — otherwise a … |
 | Max date range days | 1,234 | Guards against a query spanning years of scan events. When a report sets none, 366 days applies (decided 28 September, audit R158), so … |
-| ID | the name it points at, never the id | — |
 | Is system | yes / no (icon or chip) | Shipped with the platform — seeded at provisioning (BL-053, `SeededReport`). Clone-only (decided 28 September, audit R096): `updateReport` … |
 
 **The selected report definition** (detail panel, from `getReport`)
@@ -2050,15 +1990,7 @@ Errors to draw in the form: 409 The report is a system report, which is clone-on
 | Data source | chip: Orders, Order lines, Payments, Refunds, Shifts, Scan events… | What a report may be built over. A closed set, and that is the point — a builder that accepts any table will happily produce a report over … |
 | Columns | list or chips (count when long) | — |
 | Filters | list or chips (count when long) | — |
-| Group by | list or chips (count when long) | — |
-| Parameters | list or chips (count when long) | — |
-| Required permission | chip: SESSION FORCE LOGOUT, USER MANAGE, ROLE MANAGE, PERMISSION GRANT, PERMISSION VIEW … | Permission needed to run this report, from the shared `Permission` vocabulary. The author cannot assign one they do not hold — otherwise a … |
-| Max date range days | 1,234 | Guards against a query spanning years of scan events. When a report sets none, 366 days applies (decided 28 September, audit R158), so … |
-| ID | the name it points at, never the id | — |
-| Is system | yes / no (icon or chip) | Shipped with the platform — seeded at provisioning (BL-053, `SeededReport`). Clone-only (decided 28 September, audit R096): `updateReport` … |
-| Is retired | yes / no (icon or chip) | — |
 | Estimated cost | chip: Low, Medium, High | Informs whether it may run inline or must be queued. |
-| Created by principal | the name it points at, never the id | — |
 | Last run at | 1 Oct 2026, 14:30 | — |
 
 **The financial report** (detail panel, from `getFinancialReport`)
@@ -2113,7 +2045,7 @@ Errors to draw in the form: 409 The report is a system report, which is clone-on
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the sales reports untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No sales reports yet. Offers Create report (`createReport`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on category, search and the sales reports are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REPORT_MANAGE` for `createReport`, `deleteReport`, `saveNaturalLanguageQuery`, `updateReport`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Question could not be interpreted. (ReportQuestionProblem); 400 Required parameter missing, or the date range exceeds `maxDateRangeDays` (366 days when the definition sets none, audit R158); 400 Unknown field, invalid filter, or estimated cost beyond the limit; 409 Active schedules reference this report (`report-scheduled`), or it is a system report, which is clone-only (`system-report` … |
 
@@ -2150,7 +2082,7 @@ rows:
 - `saveNaturalLanguageQuery` → `REPORT_MANAGE` (configure) · staff, partner
 - `updateReport` → `REPORT_MANAGE` (configure) · staff, partner
 
-**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REPORT_MANAGE` for `createReport`, `deleteReport`, `saveNaturalLanguageQuery`, `updateReport`.
 
 #### Requirements it meets
 
@@ -2195,7 +2127,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (76), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (35 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-059?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Create report, Ask reporting question, Delete report, Run report, Save natural language query, Save report.
 - [ ] Every transition is wired: `BO-008`.
@@ -2294,10 +2226,6 @@ Errors to draw in the form: 400 Invalid cadence (a field its frequency needs is 
 | Shows | Format | Notes |
 |---|---|---|
 | Name | text | — |
-| Report | the name it points at, never the id | — |
-| Cadence | grouped details | What each frequency needs (decided 28 September, audit R158). `daily`: `timeOfDay`. |
-| Recipients | list or chips (count when long) | — |
-| Format | chip: Csv, Xlsx, Pdf, Json | — |
 | Is paused | yes / no (icon or chip) | — |
 | Last run at | 1 Oct 2026, 14:30 | — |
 | Last run status | chip: Queued, Running, Completed, Failed, Cancelled, Expired | — |
@@ -2352,7 +2280,7 @@ Errors to draw in the form: 400 Invalid cadence (a field its frequency needs is 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the schedules untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No report schedules yet. Offers Create report schedule (`createReportSchedule`). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listReportSchedules` takes no filter here, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listReportSchedules` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listReportSchedules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REPORT_SCHEDULE` for `createReportSchedule`, `updateReportSchedule`, `deleteReportSchedule`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Invalid cadence (a field its frequency needs is missing, or one it does not take is sent, audit R158), or no recipients |
 
@@ -2385,7 +2313,7 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `deleteReportSchedule` → `REPORT_SCHEDULE` (operate) · staff
 - `listReportExecutions` → `REPORT_VIEW_VENUE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listReportSchedules` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listReportSchedules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REPORT_SCHEDULE` for `createReportSchedule`, `updateReportSchedule`, `deleteReportSchedule`.
 
 #### Requirements it meets
 
@@ -2420,7 +2348,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (26), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-061?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create report schedule, Save report schedule, Delete report schedule.
 - [ ] Every transition is wired: `BO-008`, `BO-060`.
@@ -2458,7 +2386,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save refund policy** (modal, opened by *Save refund policy*; *Save refund policy* calls `setRefundPolicy`, *Cancel* sends nothing)
 
-**Collects what `setRefundPolicy` sends before it is called.** Required: `venueId`, `selfAuthoriseLimit`, `requiresApprovalAbove`. Optional: `id`, `requiresSecondUserAbove`, `timeBands`, `allowPartial`, `refundWindowDays`, `varianceThreshold`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setRefundPolicy` sends before it is called.** Required: `selfAuthoriseLimit`, `requiresApprovalAbove`. Optional: `requiresSecondUserAbove`, `timeBands`, `allowPartial`, `refundWindowDays`, `varianceThreshold`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `venueId` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -2482,8 +2410,6 @@ Errors to draw in the form: 412 The row changed since the `If-Match` version was
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
-| Venue | the name it points at, never the id | The venue in the path. Not taken from a `setRefundPolicy` body. |
 | Self authorise limit | AED 1,234.50 | Up to this, a holder of ORDER_REFUND refunds alone. Zero means every refund needs a second authoriser. |
 | Requires second user above | AED 1,234.50 | Above this, a second user — cashier OR supervisor — names themselves as audit control. |
 | Requires approval above | AED 1,234.50 | Above this, an ORDER_REFUND_APPROVE holder must approve. |
@@ -2516,7 +2442,7 @@ Errors to draw in the form: 412 The row changed since the `If-Match` version was
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the venue profile untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No venue profile yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on openNow, orderingMethod and the venue profile are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `getRefundPolicy` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `getRefundPolicy` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REGION_CONFIGURE` for `setRefundPolicy`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 The thresholds do not ascend: `selfAuthoriseLimit` above `requiresSecondUserAbove`, or either above `requiresApprovalAbove` (`refund-thresholds-not-ascending` … |
 
@@ -2536,7 +2462,7 @@ venue:
 - `getRefundPolicy` → `ORDER_VIEW` (read) · staff
 - `setRefundPolicy` → `REGION_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `getRefundPolicy` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `getRefundPolicy` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REGION_CONFIGURE` for `setRefundPolicy`.
 
 #### Requirements it meets
 
@@ -2559,7 +2485,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (9), with its required mark, default, format and its error state (404, 412, 422).
-- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (7 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-062?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save refund policy.
 - [ ] Every transition is wired: `BO-008`.
@@ -2577,7 +2503,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 1 · needs the `core` module |
-| Block | Block A · ticket #20700 (APP-SETUP-BO-065) |
+| Block | Block A · task APP-SETUP-BO-065 |
 | Who uses it | venue staff holding `ORDER_VIEW`, `PRODUCT_CONFIGURE`, `REGION_CONFIGURE`, `SCOPE_VIEW`, `TENANT_CONFIGURE`, `TENANT_VIEW`… (3 read, 4 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listDiningOutlets` reads the population and `getRefundPolicy` reads one of them — list, select, act |
@@ -2611,7 +2537,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Form: Save refund policy** (modal, opened by *Save refund policy*; *Save refund policy* calls `setRefundPolicy`, *Cancel* sends nothing)
 
-**Collects what `setRefundPolicy` sends before it is called.** Required: `venueId`, `selfAuthoriseLimit`, `requiresApprovalAbove`. Optional: `id`, `requiresSecondUserAbove`, `timeBands`, `allowPartial`, `refundWindowDays`, `varianceThreshold`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setRefundPolicy` sends before it is called.** Required: `selfAuthoriseLimit`, `requiresApprovalAbove`. Optional: `requiresSecondUserAbove`, `timeBands`, `allowPartial`, `refundWindowDays`, `varianceThreshold`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `venueId` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -2719,8 +2645,6 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
-| Venue | the name it points at, never the id | The venue in the path. Not taken from a `setRefundPolicy` body. |
 | Self authorise limit | AED 1,234.50 | Up to this, a holder of ORDER_REFUND refunds alone. Zero means every refund needs a second authoriser. |
 | Requires second user above | AED 1,234.50 | Above this, a second user — cashier OR supervisor — names themselves as audit control. |
 | Requires approval above | AED 1,234.50 | Above this, an ORDER_REFUND_APPROVE holder must approve. |
@@ -2771,7 +2695,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the venue untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No venue yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on openNow, orderingMethod and the venue are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `getRefundPolicy` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `getRefundPolicy` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW`, `TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A location with the same label already exists in the venue.; 422 A `table` location without `tableId`, a `seat` location without `seatId`, or a table of another venue.; 422 An enable the venue cannot evidence. Biometrics switched on without a DPIA reference and a consent-notice acknowledgement, or device-assisted gender … |
 
@@ -2835,7 +2759,7 @@ delivery_locations:
 - `getTillShiftPolicy` → `SCOPE_VIEW` (read) · staff
 - `setTillShiftPolicy` → `WORKSTATION_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `getRefundPolicy` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `getRefundPolicy` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW`, `TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for …
 
 #### Requirements it meets
 
@@ -2878,7 +2802,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (98), with its required mark, default, format and its error state (400, 403, 404, 409, 412, 422).
-- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-065?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save refund policy, Save venue settings, Save cash and shift rules.
 - [ ] No transition is declared; back returns where the user came from.
@@ -2898,7 +2822,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 1 · needs the `core` module |
-| Block | Block A · ticket #18126 (APP-SETUP-BO-074) |
+| Block | Block A · task APP-SETUP-BO-074 |
 | Who uses it | venue staff holding `ACCOUNT_CONFIGURE`, `LEDGER_VIEW` (1 configure, 1 read); in the flows as finance controller, platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAccounts` reads the population and `getAccount` reads one of them — list, select, act |
@@ -2906,7 +2830,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Opens with | `accountId` (deepLink) · cold entry: **A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know … |
 | Route | `/finance/chart-of-accounts` |
 
-**What the spec says about it.** Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. Pulled to Wave 1 (CF-101). **F16 says it itself** — no chart of accounts blocks the first sale, so it cannot be Wave 2 while venue provisioning is Wave 1.
+**What the spec says about it.** Added 17 August because the contract had operations no screen declared. **Not on the wireframe board** — needs drawing. Pulled to Wave 1 (CF-101). **F16 says it itself** — no chart of accounts blocks the first sale, so it cannot be built after venue provisioning.
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** Finance sets up the chart of accounts, cost centres and legal entities before the first sale (every sale posts somewhere). The chart is either built natively or mirrors the client's ERP chart through an external code per account. The one thing to get right: the chart is a hierarchy read by type, and what may change after an account has been posted to is limited, so the design must show what is locked and why.
 
@@ -2985,7 +2909,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 **Form: Create legal entity** (modal, opened by *Create legal entity*; *Create legal entity* calls `createLegalEntity`, *Cancel* sends nothing)
 
-**Collects what `createLegalEntity` sends before it is called.** Required: `id`, `code`, `name`, `countryCode`, `currency`, `currencyScale`, `fiscalYearStartMonth`. Optional: `taxRegistrationNumber`, `regionIds`, `isActive`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `createLegalEntity` sends before it is called.** Required: `code`, `name`, `countryCode`, `currency`, `currencyScale`, `fiscalYearStartMonth`. Optional: `taxRegistrationNumber`, `regionIds`, `isActive`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -3017,18 +2941,12 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | External code | text | Code in the client's own chart. Used on export so their team sees their codes. |
-| Is suspense | yes / no (icon or chip) | 5.7.x. Where a posting with no account mapping goes. |
 | Sub type | text | 5.7.27. `AccountType` stays a closed enum of asset, liability, equity, revenue and expense because that is correct accounting, and a venue … |
-| Tags | list or chips (count when long) | How a venue groups accounts for its own reporting. Free-form, and outside the type. |
 | Notes | text | 5.7.27. Annotations on the account, which an auditor reads before the balance. |
 | Name | text | — |
 | Type | chip: Asset, Liability, Equity, Revenue, Expense | — |
-| Parent | the name it points at, never the id | — |
-| Legal entity | the name it points at, never the id | — |
-| Currency | text | — |
 
 **Every cost center** (data table, from `listCostCenters`)
 
@@ -3045,36 +2963,24 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Country code | text | — |
 | Currency | text | — |
 | Currency scale | 1,234 | — |
 | Tax registration number | text | — |
-| Fiscal year start month | 1,234 | — |
-| Regions | list or chips (count when long) | — |
-| Is active | yes / no (icon or chip) | — |
-| Scope path | text | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it … |
 
 **The selected account** (detail panel, from `getAccount`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | External code | text | Code in the client's own chart. Used on export so their team sees their codes. |
-| Is suspense | yes / no (icon or chip) | 5.7.x. Where a posting with no account mapping goes. |
 | Sub type | text | 5.7.27. `AccountType` stays a closed enum of asset, liability, equity, revenue and expense because that is correct accounting, and a venue … |
 | Tags | list or chips (count when long) | How a venue groups accounts for its own reporting. Free-form, and outside the type. |
 | Notes | text | 5.7.27. Annotations on the account, which an auditor reads before the balance. |
 | Name | text | — |
 | Type | chip: Asset, Liability, Equity, Revenue, Expense | — |
-| Parent | the name it points at, never the id | — |
-| Legal entity | the name it points at, never the id | — |
-| Currency | text | — |
-| Is postable | yes / no (icon or chip) | False for parent accounts, which aggregate only. |
-| Is active | yes / no (icon or chip) | — |
 | Balance | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **Actions and what each produces**
@@ -3111,7 +3017,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the chart accounts untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No chart accounts yet. Offers Create account (`createAccount`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on legalEntityId, type, isPostable and the chart accounts are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `listAccounts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `listAccounts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCOUNT_CONFIGURE` for `createAccount`, `updateAccount`, `createCostCenter`, `createLegalEntity`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Code already in use within this legal entity; 409 `code` sent for an account that already has entries, or a new code already in use within the legal entity. |
 
@@ -3156,7 +3062,7 @@ costCentres:
 - `listLegalEntities` → `LEDGER_VIEW` (read) · staff
 - `createLegalEntity` → `ACCOUNT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `LEDGER_VIEW`, which `listAccounts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `LEDGER_VIEW`, which `listAccounts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCOUNT_CONFIGURE` for `createAccount`, `updateAccount`, `createCostCenter`, `createLegalEntity`.
 
 #### Requirements it meets
 
@@ -3201,7 +3107,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (35), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-074?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create account, Save account, Create cost center, Create legal entity.
 - [ ] Every transition is wired: `BO-075`, `BO-077`.
@@ -3469,6 +3375,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "Shift": {"x-ticvai-persistence":"orders.pos_shift + orders.pos_shift_approval + orders.pos_shift_incident","description":"**`approvals` and `incidents` are child rows** (26 September, pull audit R099): `orders.pos_shift_approval` and `orders.pos_shift_incident`, one row per item, keyed to the shift. Until then the contract carried both and `orders.pos_shift` had nowhere to put either.\n","type":"object","required":["id","workstationId","venueId","scopePath","principalId","status","currency","currencyScale","openedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7. Also the idempotency key."},"workstationId":{"type":"string","format":"uuid"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"principalId":{"type":"string","format":"uuid","description":"Who opened it. Cash reconciles to a person and a drawer."},"principalDisplayName":{"type":"string"},"incidents":{"type":"array","description":"BL-097. **A till has exceptions and there was nowhere to write them** — a no-sale, a drawer opened without a transaction, a manager override, a guest dispute.\n**This is the log a cash-up investigation starts from**, and a shift that balances with four unexplained no-sales is not a shift that balanced.\n","items":{"type":"object","properties":{"kind":{"type":"string","enum":["noSale","drawerOpen","override","voidAfterPayment","guestDispute","tillJam","priceQuery","other"]},"at":{"type":"string","format":"date-time"},"principalId":{"type":"string","format":"uuid"},"note":{"type":"string","nullable":true}}}},"status":{"$ref":"#/components/schemas/ShiftStatus"},"currency":{"type":"string","pattern":"^[A-Z]{3}$","x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"},"currencyScale":{"type":"integer","minimum":0,"maximum":4,"x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"},"depositBoxCode":{"type":"string","nullable":true},"bagNumber":{"type":"string","nullable":true},"openingFloat":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"salesTotal":{"x-ticvai-column":"gross_sales_amount","$ref":"../shared/common.yaml#/components/schemas/Money","description":"What the till took in sales, as the guest paid it — tax included: the shift's takings, not Gross sales (CHG-FIN-002, CHG-FIN-010). **Never shown to the shift's own cashier before the count is in** (CHG-FIN-003): with the float and the lifts it gives away the expected cash.\n"},"refundsTotal":{"x-ticvai-column":"gross_refunded_amount","$ref":"../shared/common.yaml#/components/schemas/Money","description":"What the till paid back, as the guest was refunded it — tax included."},"liftsTotal":{"x-ticvai-column":"lifted_amount","$ref":"../shared/common.yaml#/components/schemas/Money","description":"Cash taken out mid-shift by lifts and withdrawals. Cash, so neither gross nor net."},"expectedCash":{"x-ticvai-column":"expected_cash_amount","allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"readOnly":true,"nullable":true,"description":"26 September, pull audit R207. **The figure the blind count was measured against**, revealed once the count is in — null until then. Until this date only `ShiftCloseResult` carried it, returned once by `closeShift`, so BO-040 could not show the over/short it exists to accept. **Null to the shift's own cashier on every read** (CHG-FIN-003, 2 October): returned only to a caller holding OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER at the venue.\n"},"countedCash":{"x-ticvai-column":"counted_cash_amount","allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"readOnly":true,"nullable":true,"description":"What the close count found. Null until the shift is counted."},"variance":{"x-ticvai-column":"variance_amount","allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"readOnly":true,"nullable":true,"description":"Counted minus expected, as `ShiftCloseResult.variance`. Negative is short. Null to the shift's own cashier, as `expectedCash` (CHG-FIN-003)."},"cashierReason":{"type":"string","nullable":true,"readOnly":true,"enum":["tillError","unrecordedRefund","miscount","other"],"description":"What the cashier said went wrong, given with the blind count (`CloseShiftRequest.cashierReason`, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003).\n"},"cashierNote":{"type":"string","nullable":true,"readOnly":true,"maxLength":1000,"description":"The cashier's note with the count (`CloseShiftRequest.notes`; CHG-FIN-003)."},"heldLeaseCount":{"type":"integer","description":"Inventory leases currently held by this workstation. Surfaced so an operator closing a shift can see what will be returned.\n"},"openedAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time","description":"When the device recorded the open. `openedAt` is the server's time."},"suspendedAt":{"type":"string","format":"date-time","nullable":true},"suspendReason":{"type":"string","maxLength":200,"nullable":true,"description":"The `reason` given to `suspendShift`. Cleared on resume."},"closedAt":{"type":"string","format":"date-time","nullable":true},"closedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Who submitted the close count. `reopenShift` refuses an approver who is this principal, and until 26 September there was nothing to compare against (pull audit R099).\n"},"recountRequestedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"**Set by `rejectShiftVariance`, cleared by the cashier's recount** (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013; DI-804). While set, the shift is `pendingVariance` waiting for the cashier rather than the supervisor: the cashier's view says \"Recount requested\" instead of \"Under review\".\n"},"recountRequestedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The supervisor who sent the count back (CHG-CSP-013)."},"recountReason":{"type":"string","nullable":true,"readOnly":true,"maxLength":500,"description":"The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003)."},"countNumber":{"type":"integer","minimum":0,"readOnly":true,"description":"How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). The latest is the one measured.\n"},"syncedAt":{"type":"string","format":"date-time","nullable":true,"description":"Null while the shift has unsynced operations."},"approvals":{"type":"array","items":{"type":"object","required":["kind","principalId","at"],"properties":{"kind":{"type":"string","enum":["open","close","variance"],"description":"`open` from `approveShiftOpen`, `close` from `approveShiftClose`, `variance` from `acceptShiftVariance`.\n"},"principalId":{"type":"string","format":"uuid"},"at":{"type":"string","format":"date-time"},"reason":{"type":"string"}}}}}},
 "ShiftCloseResult": {"x-ticvai-persistence":"none — computed","type":"object","required":["shift","expectedCash","countedCash","variance","requiresAcceptance"],"properties":{"shift":{"$ref":"#/components/schemas/Shift"},"expectedCash":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"countedCash":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"variance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Counted minus expected. Negative is short."},"requiresAcceptance":{"type":"boolean","description":"True when the variance exceeds the venue's `shiftVarianceThreshold` (audit R094). The shift is then `pendingVariance` and only `acceptShiftVariance` finalises it (audit R080 (e)).\n"},"nonCashVariances":{"type":"array","items":{"type":"object","required":["tender","declared","captured","variance"],"properties":{"tender":{"type":"string"},"declared":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"captured":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"variance":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}}}},
 "ShiftStatus": {"type":"string","enum":["pendingApproval","open","suspended","pendingVariance","pendingClosure","closed","autoClosed"]},
+"SupervisorStepUp": {"type":"object","description":"**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n","required":["principalId","credential"],"properties":{"principalId":{"type":"string","format":"uuid","description":"The supervisor signing. Recorded against the act."},"credential":{"type":"string","maxLength":512,"writeOnly":true,"description":"The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."}}},
 "TenderKind": {"type":"string","description":"`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n","enum":["cash","card","wallet","voucher","bankTransfer","hotelCharge","installment","giftCard","complimentary"]},
 "TillShiftPolicy": {"x-ticvai-persistence":"orders.till_shift_policy","type":"object","description":"**The venue's opening, closing and exception rules for every till** (CHG-CSP-020; POS-019; DI-309). One per venue. Proposed defaults are ours, client to correct.\n","required":["venueId"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string","readOnly":true},"requireOpenApproval":{"type":"boolean","default":false,"description":"Every shift opens `pendingApproval` and waits for `approveShiftOpen` (SHIFT_APPROVE_OPEN). Off by default: only a float outside `openingFloatTolerance` waits.\n"},"openingFloatTolerance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"nullable":true,"description":"How far a declared opening float may differ from the box's allocated float before the shift waits for approval (`states/shift.yaml`, pendingApproval). Null: any difference waits.\n"},"depositBoxRequired":{"type":"boolean","default":true,"description":"A shift cannot open without a deposit box (`OpenShiftRequest.depositBoxCode`); refused `400` otherwise."},"bagNumberRequired":{"type":"boolean","default":false,"description":"A shift cannot open without a bag number (`OpenShiftRequest.bagNumber`)."},"requireCloseApproval":{"type":"boolean","default":false,"description":"Every counted shift waits in `pendingClosure` for `approveShiftClose` (SHIFT_APPROVE_CLOSE), even within the variance threshold.\n"},"autoCloseAfterHours":{"type":"integer","nullable":true,"minimum":1,"maximum":48,"default":14,"description":"Hours after which an open or suspended shift nobody closed is closed by the inactivity job as `autoClosed` and the supervisors are told (`states/shift.yaml`). Null never auto-closes.\n"},"noSaleAlertCount":{"type":"integer","nullable":true,"minimum":1,"default":10,"description":"No-sales in one shift (`recordNoSale`) at which the supervisors are alerted on the venue's alerting channel; the count is on POS-020. Null sends no alert.\n"},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "TrialBalance": {"x-ticvai-persistence":"none — computed","type":"object","required":["fiscalPeriodId","isBalanced","totalDebit","totalCredit","accounts"],"properties":{"fiscalPeriodId":{"type":"string","format":"uuid"},"isBalanced":{"type":"boolean","description":"False indicates a defect, not a business condition. Double-entry cannot be unbalanced by legitimate activity.\n"},"totalDebit":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"totalCredit":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"accounts":{"type":"array","items":{"type":"object","required":["accountId","accountCode","accountName","debit","credit","balance"],"properties":{"accountId":{"type":"string","format":"uuid"},"accountCode":{"type":"string"},"accountName":{"type":"string"},"type":{"$ref":"#/components/schemas/AccountType"},"debit":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"credit":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"balance":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}}}}},

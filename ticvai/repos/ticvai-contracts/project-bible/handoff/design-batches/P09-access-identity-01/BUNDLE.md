@@ -96,10 +96,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-001` | Platform Login / MFA | B–D | 16 | 51 | 10 | 6 | 0 | 0 | — | notStarted (generated) |
-| `ADM-020` | Platform User Directory | B–D | 18 | 22 | 7 | 2 | 0 | 0 | — | notStarted (generated) |
-| `ADM-021` | Platform Role Management | B–D | 11 | 22 | 7 | 1 | 1 | 5 | — | notStarted (generated) |
-| `ADM-699` | My Account & Security | B–D | 10 | 16 | 7 | 1 | 0 | 0 | — | notStarted (generated) |
+| `ADM-001` | Platform Login / MFA | A | 16 | 51 | 10 | 6 | 0 | 0 | — | notStarted (generated) |
+| `ADM-020` | Platform User Directory | B | 18 | 20 | 7 | 2 | 0 | 0 | — | notStarted (generated) |
+| `ADM-021` | Platform Role Management | B | 11 | 22 | 7 | 1 | 1 | 5 | — | notStarted (generated) |
+| `ADM-699` | My Account & Security | B | 10 | 16 | 7 | 1 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -115,7 +115,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Access & Identity · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block A · task APP-CONSOLE-ADM-001 |
 | Who uses it | ticvai; in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | form (compact density): A sign-in: two fields, the organisation's SSO where configured, and the second-factor and role steps in place - a form, not a list to browse. |
@@ -400,7 +400,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Access & Identity · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-020 |
 | Who uses it | ticvai staff holding `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`, `USER_MANAGE` (1 operate, 1 read, 1 configure); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPrincipals` reads the population and `getPrincipal` reads one of them — list, select, act |
@@ -506,13 +506,11 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Username | text | — |
 | Display name | text | — |
 | Is active | yes / no (icon or chip) | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | Past this, resolution returns DENY regardless of grants. |
-| Primary role | the name it points at, never the id | Determines the landing screen when the principal holds several roles and picks one at login. |
 | Roles | list or chips (count when long) | — |
 | Last login at | 1 Oct 2026, 14:30 | — |
 
@@ -539,7 +537,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the platform user untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No platform user yet. Offers Create principal (`createPrincipal`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on scopePath, isActive and the platform user are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants` … |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `USER_MANAGE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Username already in use within this cell |
@@ -575,7 +573,7 @@ operators:
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
-**A refused user sees:** Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants` …
 
 #### Requirements it meets
 
@@ -607,7 +605,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (18), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-020?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, Create principal, Save principal.
 - [ ] Every transition is wired: `ADM-001`, `ADM-002`.
@@ -626,7 +624,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Access & Identity · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-021 |
 | Who uses it | ticvai staff holding `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`, `ROLE_MANAGE` (1 operate, 1 read, 1 configure); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listRoles` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -746,7 +744,7 @@ Errors to draw in the form: 409 A business code the request names is already use
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the platform role untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No platform role yet. Offers Create role (`createRole`). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listRoles` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants` … |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `ROLE_MANAGE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 422 A preset code that does not exist (`unknown-preset`), or an initial permission set that breaches a segregation rule (`segregation-breach`, naming the rule and … |
@@ -782,7 +780,7 @@ Every role:
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
-**A refused user sees:** Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants` …
 
 #### Requirements it meets
 
@@ -837,7 +835,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Access & Identity · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-699 |
 | Who uses it | ticvai |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): Two short lists the operator acts on, their own methods and their own sessions, with the account they are signed in as above them. |

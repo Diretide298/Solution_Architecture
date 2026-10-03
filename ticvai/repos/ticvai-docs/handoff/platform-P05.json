@@ -7,7 +7,7 @@
  "audience": "guest",
  "formFactor": "kiosk",
  "offlineCapable": false,
- "generated": "2026-10-02",
+ "generated": "2026-10-03",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 17,
@@ -15,10 +15,11 @@
   "contracts": 8,
   "modules": 2,
   "undrawn": 0,
-  "operationsWithNoScreen": 14
+  "operationsWithNoScreen": 15
  },
  "waves": {
-  "wave2": 17
+  "wave1": 1,
+  "wave2": 16
  },
  "modules": [
   {
@@ -32,7 +33,7 @@
    "module": "AI",
    "screens": 1,
    "waves": [
-    2
+    1
    ]
   }
  ],
@@ -46,16 +47,12 @@
    "operations": 4
   },
   {
-   "contract": "catalogue",
-   "operations": 3
-  },
-  {
    "contract": "ai",
    "operations": 3
   },
   {
-   "contract": "fnb",
-   "operations": 2
+   "contract": "catalogue",
+   "operations": 3
   },
   {
    "contract": "marketing-crm",
@@ -63,6 +60,10 @@
   },
   {
    "contract": "white-label",
+   "operations": 2
+  },
+  {
+   "contract": "fnb",
    "operations": 2
   },
   {
@@ -201,7 +202,7 @@
    "id": "KSK-015",
    "name": "Assistant",
    "module": "AI",
-   "wave": 2,
+   "wave": 1,
    "route": "/kiosk/assistant",
    "operations": 6,
    "drawn": true
@@ -280,6 +281,12 @@
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Use the existing profile or keep this booking separate"
+   },
+   {
+    "operation": "getGuestConversation",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "The guest's own handed-over conversation, with the agent's replies and the queue position"
    },
    {
     "operation": "uploadGuestDocument",

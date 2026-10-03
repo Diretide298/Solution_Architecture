@@ -1,6 +1,6 @@
 {
  "generatedBy": "tools/derive-design-manifest.py",
- "generated": "2026-10-02",
+ "generated": "2026-10-03",
  "note": "The Claude Design work list. Status is read off wireframes/frames/ every run and never stored, so a batch cannot claim to be finished and not be. Batches with thin screens sort last: a screen with fewer than 4 components cannot be drawn from what it declares, and drawing it invents requirements.",
  "batchSize": 10,
  "drawableAt": 4,
@@ -39,7 +39,7 @@
    "drawn": 134,
    "locked": 25
   },
-  "fullyDrawableBatches": 62
+  "fullyDrawableBatches": 61
  },
  "batches": [
   {
@@ -571,28 +571,6 @@
     "DEV-008"
    ],
    "drawable": 8,
-   "thin": 0,
-   "frames": 0,
-   "status": "pending"
-  },
-  {
-   "id": "P15-kitchen-01",
-   "kind": "module",
-   "label": "P15 · Kitchen",
-   "platform": "P15",
-   "screens": [
-    "KIT-001",
-    "KIT-002",
-    "KIT-003",
-    "KIT-004",
-    "KIT-005",
-    "KIT-006",
-    "KIT-007",
-    "KIT-008",
-    "KIT-009",
-    "KIT-010"
-   ],
-   "drawable": 10,
    "thin": 0,
    "frames": 0,
    "status": "pending"
@@ -1147,6 +1125,28 @@
     "CMS-018",
     "CMS-019",
     "CMS-101"
+   ],
+   "drawable": 9,
+   "thin": 1,
+   "frames": 0,
+   "status": "pending"
+  },
+  {
+   "id": "P15-kitchen-01",
+   "kind": "module",
+   "label": "P15 · Kitchen",
+   "platform": "P15",
+   "screens": [
+    "KIT-001",
+    "KIT-002",
+    "KIT-003",
+    "KIT-004",
+    "KIT-005",
+    "KIT-006",
+    "KIT-007",
+    "KIT-008",
+    "KIT-009",
+    "KIT-010"
    ],
    "drawable": 9,
    "thin": 1,

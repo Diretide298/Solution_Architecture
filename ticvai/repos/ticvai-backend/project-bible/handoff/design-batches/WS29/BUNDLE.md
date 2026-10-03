@@ -532,7 +532,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 - → `BO-290` Family, Household & Dependent Membership Configuration: *Works in Family, Household & Dependent Membership Configuration*; calls `listMembershipAnnualPass`
 - → `BO-291` Membership Commercial, Pricing & Channel Association: *Works in Membership Commercial, Pricing & Channel Association*; calls `listMembershipAnnualPass`
 - → `BO-292` Renewal, Auto-Renewal & Membership Continuity Configuration: *Works in Renewal, Auto-Renewal & Membership Continuity Configuration*; calls `listMembershipAnnualPass`
-- → `BO-293` Membership Product Validation, Approval, Publication & Versioning: *Works in Membership Product Validation, Approval, Publication & Versioning*; calls `listMembershipAnnualPass`
+- → `BO-293` Membership Product Validation, Approval, Publication & Versioning: *Works in Membership Product Validation, Approval, Publication & Versioning*; carries `challengeId`; calls `listMembershipAnnualPass`
 
 **What opens over it**
 
@@ -1928,6 +1928,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 - **approveMembershipProductValidation**: Confirmation names the consequence first, then asks for the authentication code (authenticator app, or an emailed code as fallback); only a verified challenge sends approveMembershipProductValidation with its single-use stepUpToken. Wrong code: the action is not sent and nothing changes; five wrong codes lock step-up for the policy's lockout minutes and the screen says when it lifts. Why the control exists: Platform-level product state, across tenants. *(source: contracts/satellite/subscription.yaml#approveMembershipProductValidation; R126; contracts/spine/identity.yaml#createMfaChallenge)*
 
+**Where the user goes next**
+
+- → `BO-284` Membership & Annual Pass Command Center: *Membership & Annual Pass Command Center*; carries `challengeId`
+
 #### States
 
 | State | What it shows |
@@ -1997,7 +2001,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-293?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Approve, Email me a code instead.
-- [ ] No transition is declared; back returns where the user came from.
+- [ ] Every transition is wired: `BO-284`.
 - [ ] Every gated control is gated: `PLATFORM_CELL_MANAGE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 2 edge case(s) from the process notes are drawn.

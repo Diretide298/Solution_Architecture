@@ -96,7 +96,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-318` | Dead Letters | B–D | 9 | 39 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-318` | Dead Letters | B | 9 | 33 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -112,7 +112,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Platform Ops · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-318 |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listDeadLetters` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -207,17 +207,11 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Tenant | the name it points at, never the id | The tenant whose database's outbox is republished. |
 | From | 1 Oct 2026, 14:30 | Inclusive start of the outbox `created_at` range. |
 | To | 1 Oct 2026, 14:30 | Exclusive end of the outbox `created_at` range. |
-| Event names | list or chips (count when long) | The event names asked for; null means every event. |
-| Reason | text | — |
 | Status | chip: Queued, Running, Completed, Failed, Cancelled | `queued` until the lease holder picks it up; `completed` when the cursor reaches `to`; `failed` with `lastError` after the relay's retry … |
 | Cursor at | 1 Oct 2026, 14:30 | How far it has got, the `created_at` of the last row published (with the row id as the keyset tiebreak, held by the relay). |
 | Rows published | 1,234 | — |
-| Last error | text | — |
-| Requested by | the name it points at, never the id | The staff principal who asked. |
 | Requested at | 1 Oct 2026, 14:30 | — |
 | Started at | 1 Oct 2026, 14:30 | — |
 | Finished at | 1 Oct 2026, 14:30 | Set on `completed`, `failed` or `cancelled`. |
@@ -244,7 +238,7 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the dead letters untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No dead letters yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on consumer, since and the dead letters are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listDeadLetters` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listDeadLetters` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `replayDeadLetter`, `republishOutbox`, `cancelOutboxRepublish`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The republish has already `completed`, `failed` or been `cancelled` (`republish-finished`), or the `Idempotency-Key` was used for a different request …; 409 The tenant already has a republish `queued` or `running` (`republish-in-progress`; `detail` names it), or the `Idempotency-Key` was used for a different …; 422 `from` is older than the oldest hot outbox partition … |
 
@@ -283,7 +277,7 @@ republish:
 - `republishOutbox` → `PLATFORM_CELL_MANAGE` (configure) · staff
 - `cancelOutboxRepublish` → `PLATFORM_CELL_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listDeadLetters` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listDeadLetters` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `replayDeadLetter`, `republishOutbox`, `cancelOutboxRepublish`.
 
 #### Requirements it meets
 
@@ -311,7 +305,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (39 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (33 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-318?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Replay dead letter, Republish from the outbox, Cancel republish.
 - [ ] Every transition is wired: `ADM-001`.

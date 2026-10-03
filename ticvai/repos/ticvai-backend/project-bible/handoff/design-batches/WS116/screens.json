@@ -1006,7 +1006,8 @@
     },
     {
      "name": "venueId",
-     "from": "navigation"
+     "from": "session",
+     "notes": "From the session (3 October 2026, CHG-SPF-004): a staff screen works in the venue its sign-in or device is scoped to; nothing navigates to it (the venue-scope rule)."
     },
     {
      "name": "tenantId",
@@ -2165,7 +2166,9 @@
    "params": [
     {
      "name": "decisionKey",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getConfigurationBlueprint`; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "sessionId",
@@ -2414,7 +2417,9 @@
    "params": [
     {
      "name": "decisionKey",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getConfigurationBlueprint`; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "sessionId",

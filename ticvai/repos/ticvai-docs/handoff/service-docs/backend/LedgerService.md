@@ -237,6 +237,7 @@ A guest paying USD 100 in a UAE venue has the dirham equivalent stored at the co
 The consequence is that most of the questions FX usually raises do not arise. There is no rate to lock at redemption, none at expiry, and none at refund, because the stored amount was never in a foreign currency. Allam: *"the value of the currency doesn't matter whether it goes high or down. They are purchasing a product equivalent to that currency… at the end they are paying that base currency value, and they get a refund for the base currency value."*
 **Rates are set per region; each venue picks which currencies it shows** (decided 28 September, audit R120 (a)). A guest screen passes `venueId` and gets the region's rates narrowed to the currencies that venue has chosen to display (`tenancy.VenueSettings.displayCurrencies`); the rate itself is never set per venue.
 **Superseded in part, 2 October 2026 (Chinmay; CHG-FIN-001): the guest may now pay in a currency they select.** The ledger still holds base currency only, but a guest-selected currency is charged at the gateway at the region's `tender` rate, locked on the order (`orders.Order.chargeFxRate`), and a refund goes back in the currency paid at the sale rate, so the venue never refunds at today's rate. The quotation above (Allam, 10 August) describes the display-only option this replaces for card and wallet; it still holds for foreign cash at a till (DI-282). `chargeable=true` with `venueId` narrows the list to the currencies the venue lets a guest pay in (`tenancy.VenueSettings.chargeCurrencies`); each rate says `chargeable`.
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets the published rates in force, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `LEDGER_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
 |  |  |
 |---|---|
@@ -247,6 +248,7 @@ The consequence is that most of the questions FX usually raises do not arise. Th
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
+| Guest callable | True |
 | Reads | `ledger.fx_rate` |
 | Writes | - |
 | Called by | BO-077, GST-044, WEB-035 |
@@ -1439,7 +1441,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | legal_entity_id | uuid | yes |  |
 | provider_name | text | yes | The accredited service provider the client appoints. |
 | endpoint_url | text | no |  |
@@ -1467,7 +1469,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | from_currency | text | yes |  |
 | to_currency | text | yes |  |
 | rate | numeric(18,6) | yes | Units of toCurrency per one fromCurrency. |
@@ -1584,7 +1586,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | legal_entity_id | uuid | yes |  |
 | document_kind | text | yes |  |
 | number_prefix | text | yes | e.g. |

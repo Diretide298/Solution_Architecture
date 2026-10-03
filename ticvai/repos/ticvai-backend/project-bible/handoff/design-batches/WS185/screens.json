@@ -701,7 +701,9 @@
    "params": [
     {
      "name": "experimentId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRecommendationExperiments` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1183,7 +1185,9 @@
    "params": [
     {
      "name": "strategyId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRecommendationStrategies` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1415,15 +1419,21 @@
    "params": [
     {
      "name": "decisionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `explainRecommendationDecision` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "capabilityKey",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `pauseAiCapability` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "releaseId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `rollbackAiRelease` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1555,7 +1565,9 @@
    "params": [
     {
      "name": "decisionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `explainRecommendationDecision` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

@@ -106,13 +106,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-324` | Payment & Order Financial Command Center | B–D | 2 | 46 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
+| `BO-324` | Payment & Order Financial Command Center | B–D | 2 | 14 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
 | `BO-325` | Order Payment Detail & Transaction Ledger | B–D | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-326` | Multi-Payment, Split Tender & Payment Allocation Configuration | B–D | 16 | 9 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-327` | Deposit, Partial Payment & Outstanding Balance Management | B–D | 21 | 26 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-326` | Multi-Payment, Split Tender & Payment Allocation Configuration | B–D | 16 | 5 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-327` | Deposit, Partial Payment & Outstanding Balance Management | B–D | 21 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-328` | Order Split, Merge & Transaction Relationship Management | B–D | 2 | 0 | 6 | 2 | 0 | 2 | — | notStarted (generated) |
 | `BO-329` | Related Order & Transaction Relationship Explorer | B–D | 2 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-330` | External Payment, Partner & Settlement Reference Mapping | B–D | 26 | 12 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-330` | External Payment, Partner & Settlement Reference Mapping | B–D | 26 | 5 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-331` | Payment Reconciliation & Exception Management | B–D | 0 | 2 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-332` | Financial Traceability, Control & Audit Explorer | B–D | 1 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-333` | Order Financial Analytics & AI Reconciliation Intelligence | B–D | 2 | 10 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
@@ -178,25 +178,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Shows | Format | Notes |
 |---|---|---|
 | Gross order value | text | Gross Order Value |
-| Fully paid orders | 1,234 | Fully Paid Orders |
-| Partially paid orders | 1,234 | Partially Paid Orders |
-| Unpaid orders | 1,234 | Unpaid Orders |
-| Outstanding balance | AED 1,234.50 | Outstanding Balance |
-| Payments today | text | Payments Today |
-| Failed payments | 1,234 | Failed Payments |
-| Pending payments | 1,234 | Pending Payments |
-| Refunds pending | 1,234 | Refunds Pending |
-| Reconciliation exceptions | 1,234 | Reconciliation Exceptions |
-| Unallocated payments | 1,234 | Unallocated Payments |
-| Settlement variance | text | Settlement Variance |
-| Order | text | Order ID |
-| Customer | text | Customer |
 | Channel | text | Channel |
 | Order value | text | Order Value |
-| Amount paid | AED 1,234.50 | Amount Paid |
-| Refunded | text | Refunded |
-| Outstanding | text | Outstanding |
-| Payment methods | 1,234 | Payment Methods |
 | Payment status | chip: Not required, Unpaid, Payment initiated, Authorized, Partially paid, Paid… | Payment status |
 | Settlement status | 1,234 | Settlement Status |
 | Reconciliation status | 1,234 | Reconciliation Status |
@@ -206,25 +189,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Shows | Format | Notes |
 |---|---|---|
 | Gross order value | text | Gross Order Value |
-| Fully paid orders | 1,234 | Fully Paid Orders |
-| Partially paid orders | 1,234 | Partially Paid Orders |
-| Unpaid orders | 1,234 | Unpaid Orders |
 | Outstanding balance | AED 1,234.50 | Outstanding Balance |
-| Payments today | text | Payments Today |
-| Failed payments | 1,234 | Failed Payments |
-| Pending payments | 1,234 | Pending Payments |
-| Refunds pending | 1,234 | Refunds Pending |
-| Reconciliation exceptions | 1,234 | Reconciliation Exceptions |
-| Unallocated payments | 1,234 | Unallocated Payments |
-| Settlement variance | text | Settlement Variance |
-| Order | text | Order ID |
-| Customer | text | Customer |
 | Channel | text | Channel |
 | Order value | text | Order Value |
 | Amount paid | AED 1,234.50 | Amount Paid |
-| Refunded | text | Refunded |
-| Outstanding | text | Outstanding |
-| Payment methods | 1,234 | Payment Methods |
 | Payment status | chip: Not required, Unpaid, Payment initiated, Authorized, Partially paid, Paid… | Payment status |
 | Settlement status | 1,234 | Settlement Status |
 | Reconciliation status | 1,234 | Reconciliation Status |
@@ -328,7 +296,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (2), with its required mark, default, format and its error state (409, 422).
-- [ ] Every output is drawn (46 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-324?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Payment Initiated, Authorized, Failed, Reconciliation Required.
 - [ ] Every transition is wired: `BO-100`, `BO-325`, `BO-326`, `BO-327`, `BO-329`, `BO-331`, `BO-332`, `BO-333`, `BO-328`, `BO-330`.
@@ -544,15 +512,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Channel | text | — |
-| Terminal | the name it points at, never the id | — |
-| Product | the name it points at, never the id | — |
 | Order type | text | — |
 | Customer type | text | — |
 | Allocation level | chip: Order level, Order line level, Product level, Tax fee component, Specific ticket … | — |
 | Is active | yes / no (icon or chip) | — |
-| Scope path | text | The partition key (ADR-0005). Operations write it at `venue` scope. |
 
 **Actions and what each produces**
 
@@ -617,7 +581,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (16), with its required mark, default, format and its error state (403, 412).
-- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-326?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save changes.
 - [ ] Every transition is wired: `BO-324`.
@@ -724,12 +688,8 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Percent | 12.5% | Required for `percentOfMinimumSpend`. |
 | Minimum spend per guest | AED 1,234.50 | Required for `percentOfMinimumSpend`. |
 | Applies from party size | 1,234 | A party smaller than this books with no deposit. Proposed default, client to correct. |
-| Outlets | list or chips (count when long) | The outlets it applies to. Empty means every outlet of the venue that takes bookings. |
 | Collection | chip: Authorisation hold, Charge | `authorisationHold` authorises the card and captures only on a late cancel or no-show; `charge` takes the money now and holds it as a … |
-| Deposit variant | the name it points at, never the id | The catalogue variant the deposit line is sold as: a non-inventory product the venue set up whose ledger mapping posts to deposit … |
 | Refundable until hours | 1,234 | Cancelling at least this long before the booking releases the deposit in full. Proposed default, client to correct. |
-| On late cancel or no show | chip: Forfeit, Release | What happens to the deposit on a later cancel or a `noShow`. Settled through `finance.settleDeposit`. |
-| On arrival | chip: Release hold, Apply to bill | When the party is seated, release the deposit or put it towards the bill. |
 
 **Actions and what each produces**
 
@@ -810,7 +770,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (21), with its required mark, default, format and its error state (400, 403, 412).
-- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-327?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Full Payment, Fixed Deposit, Percentage Deposit, Staged Payment, Balance Before Visit, Balance by Fixed Date, Credit Account, Save table deposit.
 - [ ] Every transition is wired: `BO-324`.
@@ -1167,16 +1127,9 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | — |
-| Payment | the name it points at, never the id | — |
-| Refund | the name it points at, never the id | — |
 | Source system | chip: Payment gateways, Acquirers, Banks, POS terminals, B2B partners, Resellers… | — |
 | Provider | text | — |
-| Merchant | text | — |
-| External transaction | text | — |
 | Authorization code | text | — |
-| Partner order | text | — |
 | Settlement batch | text | — |
 | Settlement date | 1 Oct 2026 | — |
 
@@ -1255,7 +1208,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (26), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-330?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Payment Gateways, POS Terminals, Finance Systems, Wallet Providers, Record external reference.
 - [ ] Every transition is wired: `BO-324`.

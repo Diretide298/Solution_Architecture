@@ -152,7 +152,7 @@
     "differences": "Also carries policies and the accessibility statement (YAML WEB-045) and the case list (YAML WEB-034's listMyCases) on the same page."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRaiseMyCase",
@@ -187,7 +187,9 @@
    "params": [
     {
      "name": "caseId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMyCases` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -227,7 +229,7 @@
   "name": "Survey & Feedback",
   "module": "Engagement & Support",
   "requiresModule": "marketing",
-  "wave": 3,
+  "wave": 1,
   "capability": "C33",
   "implementation": {
    "app": "guest-web",
@@ -251,6 +253,14 @@
      "to": "WEB-027",
      "trigger": "Newsletter Subscription",
      "provenance": "derived — WEB-027 declares entryState.params unsubscribeToken and WEB-026 holds none of them. The edge carries nothing: unsubscribeToken only pre-selects (deep link or optional), and WEB-027 opens on its own"
+    },
+    {
+     "to": "WEB-025",
+     "trigger": "Help Centre / FAQ",
+     "carries": [
+      "caseId"
+     ],
+     "provenance": "derived — WEB-025 declares entryState.params caseId and WEB-026 holds caseId, so an edge into it carries them"
     }
    ]
   },
@@ -386,7 +396,7 @@
     "differences": "List of visits to rate with toast actions; no rating form or survey questions are drawn."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRaiseMyCase",
@@ -448,7 +458,7 @@
   "name": "Newsletter Subscription",
   "module": "Engagement & Support",
   "requiresModule": "marketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C59",
   "implementation": {
    "app": "guest-web",
@@ -472,6 +482,11 @@
      "to": "WEB-026",
      "trigger": "Survey & Feedback",
      "provenance": "derived — WEB-026 declares entryState.params formId and WEB-027 holds none of them. The edge carries nothing: formId only pre-selects (deep link or optional), and WEB-026 opens on its own"
+    },
+    {
+     "to": "WEB-025",
+     "trigger": "Help Centre / FAQ",
+     "provenance": "derived — WEB-025 declares entryState.params caseId and WEB-027 holds none of them. The edge carries nothing: caseId only pre-selects (deep link or optional), and WEB-025 opens on its own"
     }
    ]
   },
@@ -609,7 +624,7 @@
     "differences": "Per-venue and channel toggles only for signed-in guests; no signed-out email sign-up form."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -675,6 +690,11 @@
      "to": "WEB-026",
      "trigger": "Survey & Feedback",
      "provenance": "derived — WEB-026 declares entryState.params formId and WEB-028 holds none of them. The edge carries nothing: formId only pre-selects (deep link or optional), and WEB-026 opens on its own"
+    },
+    {
+     "to": "WEB-025",
+     "trigger": "Help Centre / FAQ",
+     "provenance": "derived — WEB-025 declares entryState.params caseId and WEB-028 holds none of them. The edge carries nothing: caseId only pre-selects (deep link or optional), and WEB-025 opens on its own"
     }
    ]
   },
@@ -730,7 +750,7 @@
     "differences": "Links to parking and accessibility from the contact cards; otherwise matches."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -767,7 +787,7 @@
   "name": "AI Concierge – Home",
   "module": "Engagement & Support",
   "requiresModule": "ai",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "guest-web",
    "route": "/ai-concierge",
@@ -798,7 +818,7 @@
        "kind": "assistantPanel",
        "label": "Ask Sahli",
        "operation": "sendAiMessage",
-       "notes": "**The conversation is the content.** The question shows at once and the answer streams with its sources; on 503 (every provider failed) \"Sahli can't answer right now\" with Hand over to a person and Try again. The conversation is opened silently (`createAiConversation`) on the first message, its scope taken from the session; the guest never picks a module.",
+       "notes": "**The conversation is the content.** The question shows at once and the answer streams with its sources; on 503 (every provider failed) \"Sahli can't answer right now\" with Hand over to a person and Try again. The conversation is opened silently (`createAiConversation`) on the first message, its scope taken from the session; the guest never picks a module.\n\n**Answers stream** (decided by Chinmay, 3 October 2026 (CHG-SPF-013)): server-sent events carry the tokens, then the sources and any proposed action; the full message is stored once it ends.",
        "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
       },
       {
@@ -812,7 +832,7 @@
       {
        "kind": "textField",
        "label": "Message to the agent",
-       "operation": "sendConversationMessage",
+       "operation": "sendGuestConversationMessage",
        "notes": "Replaces the ask box once a person has taken the conversation; the transcript stays above.",
        "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)",
        "bindsTo": "ConversationMessage.body"
@@ -840,7 +860,7 @@
        "kind": "secondaryButton",
        "label": "Hand over to a person",
        "operation": "handoverToAgent",
-       "notes": "One tap, always visible in the panel header. Sends reason `guestRequested` with Sahli's own summary; the platform sets `assistantFailed`, `outOfScope` or `negativeSentiment` itself. The panel becomes the agent chat (`sendConversationMessage`) with queue position and wait; 409 offers to raise a case.",
+       "notes": "One tap, always visible in the panel header. Sends reason `guestRequested` with Sahli's own summary; the platform sets `assistantFailed`, `outOfScope` or `negativeSentiment` itself. The panel becomes the agent chat (`sendGuestConversationMessage`) with queue position and wait; 409 offers to raise a case.",
        "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
       },
       {
@@ -907,9 +927,9 @@
     "trigger": "onLoad"
    },
    {
-    "operationId": "sendConversationMessage",
+    "operationId": "sendGuestConversationMessage",
     "contract": "marketing-crm",
-    "purpose": "Ask the concierge something",
+    "purpose": "After a handover, the guest writes to the agent, as the guest: sendConversationMessage needs CASE_MANAGE (decided by Chinmay, 3 October 2026 (CHG-SPF-013))",
     "trigger": "onAction"
    },
    {
@@ -924,7 +944,9 @@
    "params": [
     {
      "name": "conversationId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiConversations` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "outletId",
@@ -932,7 +954,9 @@
     },
     {
      "name": "messageId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `sendAiMessage`; a link or an edge that holds one opens it instead."
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land here, and the person holding it did nothing wrong. Arrives with `conversationId`."
@@ -950,7 +974,7 @@
     "differences": "A floating chat panel rather than a home screen; no conversation history list (listAiConversations)."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -987,7 +1011,7 @@
   "name": "In-Venue Notifications",
   "module": "Engagement & Support",
   "requiresModule": "marketing",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "guest-web",
    "route": "/in-venue-notifications",
@@ -1095,7 +1119,7 @@
     "differences": "Deferred in the YAML (release later, R242: no in-app feed in the first release), but the prototype draws it as a live section, so the client will expect it. **Superseded 29 September (rev 3 GAP-C1, DI-1075): the screen is in the first release** (CHG-SGU-017)."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P01",
    "audience": "guest",

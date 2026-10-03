@@ -20,6 +20,12 @@ no better information.
 - **`navigation`** — everything else. The screen was reached from somewhere that knew which
   record it was about, which is the ordinary case.
 
+**A parameter the screen can do without is written `optional`** (3 October 2026, CHG-SPF-004).
+The Block A audit found 784 required parameters that no inbound edge carried, most of them ids a
+screen finds itself: it lists them and the user picks one, it creates the record, or only a button
+takes the id from the row it acts on. `screen_patterns.param_for` decides, the same rule
+`check-screen-patterns` (P5) holds the screens to.
+
 **What it deliberately does not do is invent a `coldEntry`.** That is the answer to *what happens
 when somebody opens this URL with no history* — a real product question, different for a wallet
 and a checkout, and a sentence written here would read as though somebody had decided it.
@@ -37,6 +43,8 @@ import sys
 import yaml
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(ROOT / "tools"))
+import screen_patterns as SP  # noqa: E402
 
 # Identifiers the signed-in context carries rather than the journey.
 SESSION = {"tenantId", "venueId", "workstationId", "outletId", "terminalId", "shiftId",
@@ -72,6 +80,15 @@ def op_paths() -> dict:
                 if isinstance(op, dict) and op.get("operationId"):
                     out[op["operationId"]] = path
     return out
+
+
+PACKAGE = None
+
+
+def _package():
+    global PACKAGE
+    PACKAGE = SP.Package(str(ROOT), screens={})
+    return PACKAGE
 
 
 def source_of(param: str) -> str:
@@ -131,8 +148,9 @@ def main() -> int:
             if apply:
                 ent = s.setdefault("entryState", {})
                 ent.setdefault("params", [])
+                pk = PACKAGE or _package()
                 for m in missing:
-                    ent["params"].append({"name": m, "from": source_of(m)})
+                    ent["params"].append(SP.param_for(pk, s, m, source_of(m)))
         if hit:
             docs[f] = doc
 

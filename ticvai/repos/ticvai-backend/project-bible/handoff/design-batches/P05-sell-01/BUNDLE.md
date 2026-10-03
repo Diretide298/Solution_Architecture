@@ -1,6 +1,6 @@
 # P05-sell-01 — P05 · Sell (1 of 2)
 
-**10 screens · 13 operations · 47 schemas · 5 permissions**
+**10 screens · 13 operations · 48 schemas · 5 permissions**
 
 Platform P05 Guest Kiosk · ships as **guest** ·
 guest audience · kiosk ·
@@ -122,16 +122,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `KSK-001` | Attract Loop | B–D | 0 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-002` | Language Select | B–D | 1 | 20 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-003` | What are you buying | B–D | 0 | 4 | 6 | 12 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-004` | Choose tickets | B–D | 0 | 17 | 6 | 14 | 2 | 0 | guest | notStarted (generated) |
-| `KSK-005` | Choose a performance | B–D | 0 | 35 | 5 | 9 | 1 | 0 | guest | notStarted (generated) |
-| `KSK-006` | Review | B–D | 11 | 29 | 5 | 29 | 1 | 0 | guest | notStarted (generated) |
-| `KSK-007` | Payment | B–D | 0 | 20 | 5 | 9 | 2 | 0 | guest | notStarted (generated) |
-| `KSK-008` | Payment unresolved | B–D | 0 | 0 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-009` | Ticket issued | B–D | 5 | 10 | 5 | 10 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-010` | Print failure | B–D | 6 | 0 | 4 | 6 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-001` | Attract Loop | C | 0 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-002` | Language Select | B | 1 | 20 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-003` | What are you buying | B | 0 | 4 | 6 | 12 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-004` | Choose tickets | B | 0 | 17 | 6 | 14 | 2 | 0 | guest | notStarted (generated) |
+| `KSK-005` | Choose a performance | C | 0 | 35 | 5 | 9 | 1 | 0 | guest | notStarted (generated) |
+| `KSK-006` | Review | C | 11 | 29 | 5 | 29 | 1 | 0 | guest | notStarted (generated) |
+| `KSK-007` | Payment | C | 0 | 20 | 5 | 9 | 2 | 0 | guest | notStarted (generated) |
+| `KSK-008` | Payment unresolved | C | 0 | 0 | 5 | 0 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-009` | Ticket issued | C | 5 | 10 | 5 | 10 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-010` | Print failure | C | 6 | 0 | 4 | 6 | 0 | 0 | guest | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -151,7 +151,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | Sell · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-KIOSK-KSK-001 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (touchLarge density): **the screen's operations choose no pattern** — no list, no get, no write that groups. It falls to the default, and the fallback is recorded rather than passed off as a decision |
@@ -272,7 +272,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | Sell · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-KIOSK-KSK-002 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (touchLarge density): `getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing |
@@ -446,7 +446,7 @@ Also set there, as content the tenant writes: is in maintenance, minimum app ver
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | Sell · wave 2 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-KIOSK-KSK-003 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (touchLarge density): `listProducts` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -579,6 +579,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Flow F07 branch at step 3 (recoverable): when Guest chose collect rather than buy, KSK-011 and KSK-012. A different flow with a reference lookup and no payment.
 - Flow F75 branch at step 3 (medium): when The guest wants help choosing., `KSK-015` is an assistant that can hand over to a person. **`handoverToAgent` exists because an AI that cannot escalate at an unattended machine is an AI that traps the guest.**
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -602,7 +603,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | Sell · wave 2 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-KIOSK-KSK-004 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (touchLarge density): `listProductVariants` reads the population and `getAvailability` reads one of them — list, select, act |
@@ -762,6 +763,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Client design-board frames: `Kiosk Board 1.dc.html#KSK-004`
 - Flow F07 *Guest buys at a kiosk*, step 4: Chooses tickets and quantities → Sees availability from a one-second cache (ADR-0065); the hold decides. **Tickets first, then the date and time** (step 5), on the kiosk only
 - Flow F07 branch at step 4 (recoverable): when Guest abandons mid-flow, Times out to KSK-001 after a stated interval and releases the lease. A kiosk holding capacity for someone who walked away is a kiosk selling less.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0065 *Browse availability is read from a one-second cache; the hold decides* (`docs/adr/0065-on-sale-availability-is-read-from-a-short-cache.md`)
 
 #### Acceptance for the design
@@ -787,7 +789,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | Sell · wave 2 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-KIOSK-KSK-005 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (touchLarge density): `getAvailability` reads one record and nothing reads a population — the screen is about that one thing |
@@ -952,6 +954,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Flow F07 branch at step 5 (recoverable): when Session sells out while the guest is choosing, KSK-005 refreshes and says so. Refusing at payment would be worse.
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
 - ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -975,7 +978,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | Sell · wave 2 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-KIOSK-KSK-006 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (touchLarge density): `getCart` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1160,6 +1163,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
 - ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
 - ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1184,7 +1188,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | Sell · wave 2 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-KIOSK-KSK-007 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | configEditor (touchLarge density): the screen declares only writes (`createPayment`) and no read of a population — it is settings, not a list |
@@ -1321,6 +1325,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Flow F07 branch at step 7 (requiresStaff): when Payment outcome unknown, KSK-008. **The important one.** A card charged with no response, at an unattended machine. The kiosk must inquire rather than retry, and must not print until it knows.
 - Flow F07 branch at step 7 (recoverable): when Payment declined, Returns to KSK-007 with the reason. The lease is held for the remaining window rather than released immediately — a guest fumbling for a second card should not lose their session.
 - Flow F75 branch at step 5 (high): when The payment does not resolve., `KSK-008` holds it and calls `inquirePaymentStatus` rather than retrying. **An unattended machine that retries a payment charges twice**, and nobody is there to notice.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1345,7 +1350,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | Sell · wave 2 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-KIOSK-KSK-008 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | configEditor (touchLarge density): the screen declares only writes (`inquirePaymentStatus`) and no read of a population — it is settings, not a list |
@@ -1435,6 +1440,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Client design-board frames: `Kiosk Board 1.dc.html#KSK-008`
 - Flow F57 *A guest uses a kiosk and it fails*, step 2: The payment does not resolve. → **Ask, never retry.** An unattended machine that retries charges twice and nobody notices until the statement.
 - Flow F57 branch at step 2 (high): when The status cannot be determined at all., **Held as unresolved and a person is called.** The one case where the machine must not decide — F75 branch, and the reason `KSK-008` is its own screen.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1459,7 +1465,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | Sell · wave 2 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-KIOSK-KSK-009 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (touchLarge density): `getOrder` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1552,7 +1558,7 @@ order: YAS1-000512 · 3 tickets printed
 
 #### Permissions
 
-- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner
+- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner, device
 - `getOrder` → `ORDER_VIEW` (read) · staff, guest, partner
 
 **A refused user sees:** **A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant has published like any visitor. A kiosk whose device registration is revoked goes out of service (KSK-014); it never shows a sign-in or names a permission.
@@ -1599,6 +1605,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Flow F75 *A kiosk serves itself and calls for help*, step 6: The ticket is issued. → **Printed, or sent to a phone.** `reprintOrder` by email or SMS is how a guest with no printer still leaves with a ticket; nobody else becomes its owner (GFIX-3, 2 October).
 - Flow F07 branch at step 8 (recoverable): when Printer out of paper or jammed, KSK-010. **The order is paid and the ticket exists** — it is emailed and shown as a QR on screen, and the kiosk marks itself degraded rather than dead.
 - Flow F75 branch at step 6 (high): when The ticket cannot be printed., `KSK-010` transfers the tickets to the guest instead. **The sale stands** — a paid guest with no ticket must never be told to pay again.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0045 *Every order carries a proven contact, and the gate is the checkout page* (`docs/adr/0045-every-order-carries-a-proven-contact.md`)
 
 #### Acceptance for the design
@@ -1623,7 +1630,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
 | Module | Sell · wave 2 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-KIOSK-KSK-010 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | configEditor (touchLarge density): the screen declares only writes (`transferOrderTickets`) and no read of a population — it is settings, not a list |
@@ -1693,7 +1700,7 @@ message: Your 3 tickets are paid but did not print. Send them to +971 50 ••�
 
 #### Permissions
 
-- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner
+- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner, device
 
 #### Requirements it meets
 
@@ -1730,6 +1737,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Derived from `wireframes/reference/Kiosk Board 2.dc.html`
 - Client design-board frames: `Kiosk Board 2.dc.html#KSK-010`
 - Flow F57 *A guest uses a kiosk and it fails*, step 3: Or it resolves and the printer fails. → **The sale stands.** A paid guest with no ticket must never be told to pay again — the media goes to their phone.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1969,10 +1977,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "ProductSalesContact": {"x-ticvai-persistence":"none — jsonb column on catalogue.product","type":"object","description":"Who to contact to book a view-only product (decided 29 September, W3). At least one of `phone` or `email`.\n","minProperties":1,"properties":{"phone":{"type":"string","maxLength":32,"nullable":true},"email":{"type":"string","format":"email","maxLength":254,"nullable":true},"note":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"A line shown under the contact, e.g. *Group courses are booked by phone*. At most 200 characters per language."}}},
 "ProductVariant": {"x-ticvai-persistence":"catalogue.variant","type":"object","required":["id","productId","sku","axisValues","isActive"],"properties":{"id":{"type":"string","format":"uuid"},"productId":{"type":"string","format":"uuid"},"sku":{"type":"string"},"axisValues":{"type":"object","additionalProperties":{"type":"string"}},"name":{"type":"string","maxLength":150,"nullable":true,"description":"**Taken from their variant tables, 20 September.** `axisValues` gives `{size: L}` and no string a guest can read. A menu showing *Large* needs somewhere for the word to live.\n"},"barcode":{"type":"string","maxLength":64,"nullable":true,"description":"**Taken from their variant tables, 20 September.** `catalogue.alternative_code` is a partner's own code for a variant and **requires `partnerId`**, so a manufacturer's EAN had nowhere to go. One per variant against many per variant is a different cardinality and belongs in a different place — and a POS scan should be an indexed column lookup, not a join.\n"},"isDefault":{"type":"boolean","default":false,"description":"Taken from their variant tables. Which variant a product page opens on. Ours had no way to say, so a three-size drink opened on whichever row sorted first.\n"},"isActive":{"type":"boolean","description":"False when retired. Retired variants are never deleted — orders reference them."},"description":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"**Who this ticket type is for and what it includes**, shown behind the (i) on each Adult, Child, Senior or Infant row (decided 29 September, 23SEP-6). Each language value at most 300 characters; longer is a `400`. Set with `updateProductVariant`. Whether the guest screen shows it is `BookingFlowConfig.cardInfo` (white-label).\n"}}},
 "PromotionEvaluation": {"x-ticvai-persistence":"none — computed","type":"object","required":["totalDiscount","lines","applied","rejected"],"properties":{"totalDiscount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"lines":{"type":"array","items":{"type":"object","required":["lineId","originalPrice","discountedPrice","discount"],"properties":{"lineId":{"type":"string"},"originalPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"discountedPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"discount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"appliedPromotionIds":{"type":"array","items":{"type":"string","format":"uuid"}}}}},"applied":{"type":"array","items":{"type":"object","required":["promotionId","promotionCode","discount"],"properties":{"promotionId":{"type":"string","format":"uuid"},"promotionCode":{"type":"string"},"promotionName":{"type":"string"},"discount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"couponCode":{"type":"string","nullable":true}}}},"rejected":{"type":"array","description":"Promotions that matched the products but did not apply, with the reason. This is what a cashier reads to a guest who expected a discount.\n","items":{"type":"object","required":["promotionCode","reason"],"properties":{"promotionCode":{"type":"string"},"promotionName":{"type":"string"},"reason":{"type":"string","enum":["conditionsNotMet","supersededByBetterOffer","exclusivePromotionApplied","redemptionLimitReached","budgetExhausted","outsideValidPeriod","wrongChannel","membershipRequired","couponRequired"]},"detail":{"type":"string"}}}}}},
-"PublishedTenantConfig": {"x-ticvai-persistence":"none — computed from the current ConfigVersion snapshot and the live status on whitelabel.tenant_config","type":"object","x-ticvai-agreed":"2 October: decided by Chinmay, fix before Block A starts (GFIX-1)","description":"**The public view of the tenant's configuration** (`getPublishedTenantConfig`, decided 2 October, GFIX-1). The published parts a guest surface renders with, from the current `ConfigVersion`, and the live status `setMaintenanceMode` writes. Nothing a guest cannot see on the page: no draft marker, no CMS counts, no sender addresses, no licensing, no person.\n","required":["tenantId","publishedVersion","publishedAt","isInMaintenance"],"properties":{"tenantId":{"type":"string","format":"uuid"},"publishedVersion":{"type":"string","description":"The `ConfigVersion.version` this answer was read from; a client holding the same version keeps its copy."},"publishedAt":{"type":"string","format":"date-time"},"brand":{"$ref":"#/components/schemas/BrandIdentity"},"appIcons":{"$ref":"#/components/schemas/AppIcons"},"theme":{"$ref":"#/components/schemas/Theme"},"fonts":{"$ref":"#/components/schemas/FontConfig"},"header":{"$ref":"#/components/schemas/HeaderConfig"},"footer":{"$ref":"#/components/schemas/FooterConfig"},"navigation":{"$ref":"#/components/schemas/NavigationConfig"},"homepage":{"$ref":"#/components/schemas/HomepageLayout"},"bookingFlow":{"allOf":[{"$ref":"#/components/schemas/BookingFlowConfig"}],"description":"The booking-flow display settings, resolved for `venueId` when one was sent (the tenant's values with that venue's `venueOverrides` entry laid over, rev 3 CFG-11)."},"languages":{"$ref":"#/components/schemas/LanguageConfig"},"accessibility":{"$ref":"#/components/schemas/AccessibilitySettings"},"enabledModules":{"type":"array","description":"The modules the tenant has enabled and published, so a guest surface hides a tab or a homepage section for a module that is off. Licensing is not shown.","items":{"$ref":"#/components/schemas/ModuleKey"}},"enabledFeatures":{"type":"array","description":"The `featureKey` of every feature toggle that is on in the published version.","items":{"type":"string"}},"isInMaintenance":{"type":"boolean","description":"Live state (`setMaintenanceMode`), as on `getTenantAppStatus`."},"maintenanceMessage":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true},"expectedBackAt":{"type":"string","format":"date-time","nullable":true},"minimumAppVersion":{"$ref":"#/components/schemas/MinimumAppVersion"},"availability":{"$ref":"#/components/schemas/AppAvailability"},"availabilityMessage":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true},"contact":{"$ref":"#/components/schemas/VenueContact"}}},
+"PublishedAnalyticsProvider": {"x-ticvai-persistence":"none — the enabled rows of whitelabel.analytics_provider, guest-facing fields only","description":"**What the tag loader needs and nothing else** (CHG-GCF-005): no reporting property, no credential, no venue or scope. The values are those of `StorefrontAnalyticsProvider`.","type":"object","required":["provider","measurementId","surfaces","consentCategory"],"properties":{"provider":{"type":"string","enum":["googleAnalytics4","googleTagManager","adobeAnalytics","metaPixel","matomo","other"]},"otherProviderName":{"type":"string","maxLength":100,"nullable":true,"description":"The provider's name, when `provider` is `other` (`StorefrontAnalyticsProvider.providerLabel`)."},"measurementId":{"type":"string","maxLength":100,"description":"What the tag or SDK reports to (GA4 `G-...`, Tag Manager `GTM-...`, a pixel id)."},"surfaces":{"type":"array","minItems":1,"items":{"type":"string","enum":["guestWeb","guestApp"]}},"consentCategory":{"type":"string","enum":["functional","analytics","personalisation","marketing"],"description":"The cookie category the visitor must grant before this provider loads (marketing-crm `CookieCategory`)."}}},
+"PublishedTenantConfig": {"x-ticvai-persistence":"none — computed from the current ConfigVersion snapshot and the live status on whitelabel.tenant_config","type":"object","x-ticvai-agreed":"2 October: decided by Chinmay, fix before Block A starts (GFIX-1)","description":"**The public view of the tenant's configuration** (`getPublishedTenantConfig`, decided 2 October, GFIX-1). The published parts a guest surface renders with, from the current `ConfigVersion`, and the live status `setMaintenanceMode` writes. Nothing a guest cannot see on the page: no draft marker, no CMS counts, no sender addresses, no licensing, no person.\n","required":["tenantId","publishedVersion","publishedAt","isInMaintenance"],"properties":{"tenantId":{"type":"string","format":"uuid"},"publishedVersion":{"type":"string","description":"The `ConfigVersion.version` this answer was read from; a client holding the same version keeps its copy."},"publishedAt":{"type":"string","format":"date-time"},"brand":{"$ref":"#/components/schemas/BrandIdentity"},"appIcons":{"$ref":"#/components/schemas/AppIcons"},"theme":{"$ref":"#/components/schemas/Theme"},"fonts":{"$ref":"#/components/schemas/FontConfig"},"header":{"$ref":"#/components/schemas/HeaderConfig"},"footer":{"$ref":"#/components/schemas/FooterConfig"},"navigation":{"$ref":"#/components/schemas/NavigationConfig"},"homepage":{"$ref":"#/components/schemas/HomepageLayout"},"bookingFlow":{"allOf":[{"$ref":"#/components/schemas/BookingFlowConfig"}],"description":"The booking-flow display settings, resolved for `venueId` when one was sent (the tenant's values with that venue's `venueOverrides` entry laid over, rev 3 CFG-11)."},"languages":{"$ref":"#/components/schemas/LanguageConfig"},"accessibility":{"$ref":"#/components/schemas/AccessibilitySettings"},"enabledModules":{"type":"array","description":"The modules the tenant has enabled and published, so a guest surface hides a tab or a homepage section for a module that is off. Licensing is not shown.","items":{"$ref":"#/components/schemas/ModuleKey"}},"enabledFeatures":{"type":"array","description":"The `featureKey` of every feature toggle that is on in the published version.","items":{"type":"string"}},"isInMaintenance":{"type":"boolean","description":"Live state (`setMaintenanceMode`), as on `getTenantAppStatus`."},"maintenanceMessage":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true},"expectedBackAt":{"type":"string","format":"date-time","nullable":true},"minimumAppVersion":{"$ref":"#/components/schemas/MinimumAppVersion"},"availability":{"$ref":"#/components/schemas/AppAvailability"},"availabilityMessage":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true},"contact":{"$ref":"#/components/schemas/VenueContact"},"analyticsProviders":{"type":"array","description":"**The analytics platforms the storefront and app load** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-005): a guest reads them here instead of `listAnalyticsProviders`, which needs `TENANT_CONFIGURE`. The enabled `StorefrontAnalyticsProvider` rows in force for the venue being browsed (that venue's own rows when `venueId` was sent and it has any, else the tenant-wide ones), read live, with only what the tag loader needs. **A provider loads only once marketing-crm `getCookieConsentRuntime` says its `consentCategory` is granted**; before that nothing is sent to it (2.6.58).","items":{"$ref":"#/components/schemas/PublishedAnalyticsProvider"}}}},
 "TenantAppStatus": {"x-ticvai-persistence":"none — computed","type":"object","description":"Computed on read. The published fields come from the current `ConfigVersion`, the maintenance fields from the tenant's `tenant_config` row (`setMaintenanceMode`), and the draft fields from the working draft. **Fields marked staff only are left out of a response to a caller without a staff session** (`getTenantAppStatus`).\n","required":["tenantId","isPublished","isInMaintenance"],"properties":{"tenantId":{"type":"string","format":"uuid"},"isPublished":{"type":"boolean","x-ticvai-derived":"onRead","description":"True once any version has been published."},"publishedVersion":{"type":"string","nullable":true},"publishedAt":{"type":"string","format":"date-time","nullable":true},"draftVersion":{"type":"string","description":"Staff only."},"hasUnpublishedChanges":{"type":"boolean","x-ticvai-derived":"onRead","description":"Staff only. The working draft differs from the current version's `snapshot`."},"activeModuleCount":{"type":"integer","x-ticvai-derived":"onRead","description":"Staff only. `ModuleEnablement` rows with `isEnabled` true."},"licensedModuleCount":{"type":"integer","x-ticvai-derived":"onRead","description":"Staff only. `ModuleEnablement` rows with `isLicensed` true."},"activePageCount":{"type":"integer","x-ticvai-derived":"onRead","description":"Staff only. Content pages that are `published` and enabled."},"isInMaintenance":{"type":"boolean"},"maintenanceMessage":{"$ref":"#/components/schemas/LocalisedText"},"expectedBackAt":{"type":"string","format":"date-time","nullable":true},"minimumAppVersion":{"$ref":"#/components/schemas/MinimumAppVersion"},"contact":{"$ref":"#/components/schemas/VenueContact"},"availability":{"$ref":"#/components/schemas/AppAvailability"},"availabilityMessage":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"What the sold-out or closed screen says (WEB-029). Null shows the default wording."},"venues":{"type":"array","maxItems":200,"x-ticvai-derived":"onRead","description":"**Public: the venues a guest can pick** (decided 28 September, audit R267; schema named 29 September, readiness close-out, our build plan). The source of the venue picker on WEB-001 and GST-001, returned with or without a session. **Published only**: a venue is listed when its scope node is active (`tenancy.OrgUnit.isActive`) and it is in the tenant's current published `ConfigVersion`; a venue added or reactivated since the last publish appears after the next publish, and a draft never reaches a guest. Ordered by `name`. Empty when nothing is published.\n","items":{"type":"object","required":["venueId","name"],"properties":{"venueId":{"type":"string","format":"uuid","description":"**The venue's scope node** (`tenancy.OrgUnit.id`, level venue): what every guest screen that declares `venueId` `from: session` reads once the guest picks it."},"name":{"type":"string","maxLength":200,"description":"The venue's name (`tenancy.OrgUnit.name`)."},"city":{"type":"string","maxLength":120,"nullable":true,"description":"Shown under the name so two venues with similar names can be told apart."},"openingHoursToday":{"type":"object","nullable":true,"description":"Today's opening hours in the venue's time zone, from `tenancy.VenueSettings` opening hours. Null when the venue is closed today or has none set.","properties":{"opens":{"type":"string","pattern":"^([01][0-9]|2[0-3]):[0-5][0-9]$"},"closes":{"type":"string","pattern":"^([01][0-9]|2[0-3]):[0-5][0-9]$"}}}}}},"whatsNew":{"type":"array","maxItems":10,"x-ticvai-derived":"onRead","description":"**Public: the guest \"what's new\"** (decided 29 September, rev 3 GAP-B2). Newest first, at most 10, from `platform-ops.Release.guestReleaseNotes` of the releases the tenant's cell has received; a release with no guest notes is skipped. Returned with or without a staff session.\n","items":{"type":"object","required":["version","publishedAt","notes"],"properties":{"version":{"type":"string","description":"The release version."},"publishedAt":{"type":"string","format":"date-time","description":"When the release reached the tenant's cell."},"notes":{"$ref":"#/components/schemas/LocalisedText"}}}},"recentChanges":{"type":"array","description":"Staff only. Names the principal behind each change, so it never reaches a public response.","items":{"type":"object","properties":{"area":{"type":"string"},"description":{"type":"string"},"principalId":{"type":"string","format":"uuid"},"at":{"type":"string","format":"date-time"}}}}}},
 "TenderKind": {"type":"string","description":"`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n","enum":["cash","card","wallet","voucher","bankTransfer","hotelCharge","installment","giftCard","complimentary"]},
-"Theme": {"x-ticvai-persistence":"none — embedded in tenant_config","type":"object","required":["primaryColour","secondaryColour","backgroundColour","textColour"],"properties":{"primaryColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"secondaryColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"accentColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"backgroundColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"textColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"darkMode":{"type":"object","deprecated":true,"description":"**Deprecated and ignored** (Chinmay, 2 October, workbook Q150 and the pre-apply round; CHG-CSA-035). White label has no dark or light mode: the venue's chosen theme is applied, on every device setting. The field is kept so a client built at r1 still parses, is accepted on `setTheme` and returned as stored, and **is never used to render anything or drawn on any screen**; the guest app has no Light/Dark switch.","properties":{"primaryColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"backgroundColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"textColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"}}},"cornerRadius":{"type":"integer","minimum":0,"maximum":32,"description":"The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). Its named palettes, font pairs and background tones are presets over the colours here and `FontConfig`, not stored values."},"surfaceStyle":{"type":"string","enum":["glass","solid"],"default":"glass","description":"Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3)."},"buttonStyle":{"type":"string","enum":["solid","outline","pill"],"default":"solid","description":"Button shape (decided 29 September, rev 3 CFG-3)."},"componentColours":{"type":"object","description":"**Colours for single interactive elements (decided 17 September, M17-11).** Each is optional and falls back to the theme colours. Every pair passes the same contrast check as the theme (`ContrastProblem`), or `setTheme` refuses it with 400. The guest flow stays the standard one; only the colours change.\n","properties":{"primaryCta":{"$ref":"#/components/schemas/ThemeComponentColour"},"payButton":{"$ref":"#/components/schemas/ThemeComponentColour"},"addToCart":{"$ref":"#/components/schemas/ThemeComponentColour"},"buyTicketsButton":{"$ref":"#/components/schemas/ThemeComponentColour"},"link":{"$ref":"#/components/schemas/ThemeComponentColour"},"badge":{"$ref":"#/components/schemas/ThemeComponentColour"}}}}},
+"Theme": {"x-ticvai-persistence":"none — embedded in tenant_config","type":"object","x-ticvai-contrast-pairs":[{"foreground":"textColour","background":"backgroundColour","use":"text","ratio":4.5},{"foreground":"textColour","background":"backgroundColour","use":"largeText","ratio":3.0},{"foreground":"primaryColour","background":"backgroundColour","use":"nonText","ratio":3.0},{"foreground":"secondaryColour","background":"backgroundColour","use":"nonText","ratio":3.0},{"foreground":"accentColour","background":"backgroundColour","use":"nonText","ratio":3.0},{"foreground":"componentColours.*.text","background":"componentColours.*.background","use":"text","ratio":4.5},{"foreground":"componentColours.*.background","background":"backgroundColour","use":"nonText","ratio":3.0}],"required":["primaryColour","secondaryColour","backgroundColour","textColour"],"properties":{"primaryColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"secondaryColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"accentColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"backgroundColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"textColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"darkMode":{"type":"object","deprecated":true,"description":"**Deprecated and ignored** (Chinmay, 2 October, workbook Q150 and the pre-apply round; CHG-CSA-035). White label has no dark or light mode: the venue's chosen theme is applied, on every device setting. The field is kept so a client built at r1 still parses, is accepted on `setTheme` and returned as stored, and **is never used to render anything or drawn on any screen**; the guest app has no Light/Dark switch.","properties":{"primaryColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"backgroundColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"textColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"}}},"cornerRadius":{"type":"integer","minimum":0,"maximum":32,"description":"The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). Its named palettes, font pairs and background tones are presets over the colours here and `FontConfig`, not stored values."},"surfaceStyle":{"type":"string","enum":["glass","solid"],"default":"glass","description":"Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3)."},"buttonStyle":{"type":"string","enum":["solid","outline","pill"],"default":"solid","description":"Button shape (decided 29 September, rev 3 CFG-3)."},"componentColours":{"type":"object","description":"**Colours for single interactive elements (decided 17 September, M17-11).** Each is optional and falls back to the theme colours. Every pair passes the same contrast check as the theme (`ContrastProblem`), or `setTheme` refuses it with 400. The guest flow stays the standard one; only the colours change.\n","properties":{"primaryCta":{"$ref":"#/components/schemas/ThemeComponentColour"},"payButton":{"$ref":"#/components/schemas/ThemeComponentColour"},"addToCart":{"$ref":"#/components/schemas/ThemeComponentColour"},"buyTicketsButton":{"$ref":"#/components/schemas/ThemeComponentColour"},"link":{"$ref":"#/components/schemas/ThemeComponentColour"},"badge":{"$ref":"#/components/schemas/ThemeComponentColour"}}}}},
 "VenueContact": {"x-ticvai-persistence":"none — embedded in tenant_config","type":"object","nullable":true,"description":"How a guest reaches the venue: WEB-028 Contact & Venue Information, and the screen shown on an error or when the app cannot help (decided 28 September, audit R073). Public, because nothing here is personal.\n","properties":{"phone":{"type":"string","nullable":true},"email":{"type":"string","format":"email","nullable":true},"whatsapp":{"type":"string","nullable":true},"address":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true},"openingHours":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"Prose, as the guest reads it. The bookable hours are the catalogue's."}}}
 }
 ```

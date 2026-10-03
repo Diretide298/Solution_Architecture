@@ -53,17 +53,26 @@
     {
      "to": "BO-537",
      "trigger": "Customer & Participant Information",
-     "provenance": "structural — pack board 5 wiring, 11 September 2026"
+     "provenance": "structural — pack board 5 wiring, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "BO-538",
      "trigger": "Group Rental & Participant Management",
-     "provenance": "structural — pack board 5 wiring, 11 September 2026"
+     "provenance": "structural — pack board 5 wiring, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "BO-539",
      "trigger": "Rental Agreement & Waiver Completion",
-     "provenance": "structural — pack board 5 wiring, 11 September 2026"
+     "provenance": "structural — pack board 5 wiring, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "BO-540",
@@ -73,17 +82,26 @@
     {
      "to": "BO-541",
      "trigger": "Reservation Confirmation & QR Voucher",
-     "provenance": "structural — pack board 5 wiring, 11 September 2026"
+     "provenance": "structural — pack board 5 wiring, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "BO-542",
      "trigger": "Reservation Modification, Cancellation & No-Show",
-     "provenance": "structural — pack board 5 wiring, 11 September 2026"
+     "provenance": "structural — pack board 5 wiring, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "BO-543",
      "trigger": "Reservation Detail, Timeline & Readiness",
-     "provenance": "structural — pack board 5 wiring, 11 September 2026"
+     "provenance": "structural — pack board 5 wiring, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     }
    ]
   },
@@ -668,7 +686,9 @@
    "params": [
     {
      "name": "bookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updateRentalBooking` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -822,7 +842,9 @@
    "params": [
     {
      "name": "bookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createRentalBooking`; a link or an edge that holds one opens it instead."
     }
    ]
   },
@@ -974,7 +996,9 @@
    "params": [
     {
      "name": "bookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `signRentalAgreement` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1217,7 +1241,9 @@
    "params": [
     {
      "name": "bookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1387,7 +1413,9 @@
    "params": [
     {
      "name": "bookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updateRentalBooking` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1510,7 +1538,9 @@
    "params": [
     {
      "name": "bookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

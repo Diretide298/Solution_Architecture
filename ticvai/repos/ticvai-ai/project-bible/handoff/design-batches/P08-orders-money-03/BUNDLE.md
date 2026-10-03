@@ -127,11 +127,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-075` | Account Mapping | A | 31 | 43 | 6 | 16 | 2 | 0 | — | notStarted (generated) |
-| `BO-076` | Revenue Recognition | B–D | 16 | 31 | 6 | 74 | 2 | 0 | — | notStarted (generated) |
-| `BO-077` | FX Rates & Variances | A | 15 | 29 | 6 | 1 | 2 | 4 | — | notStarted (generated) |
-| `BO-089` | Journal Entries | B–D | 19 | 28 | 6 | 22 | 1 | 0 | — | notStarted (generated) |
+| `BO-076` | Revenue Recognition | B–D | 16 | 18 | 6 | 74 | 2 | 0 | — | notStarted (generated) |
+| `BO-077` | FX Rates & Variances | A | 15 | 24 | 6 | 1 | 2 | 4 | — | notStarted (generated) |
+| `BO-089` | Journal Entries | B–D | 19 | 14 | 6 | 22 | 1 | 0 | — | notStarted (generated) |
 | `BO-090` | Period Close | B–D | 5 | 22 | 6 | 11 | 1 | 0 | — | notStarted (generated) |
-| `BO-101` | Orders & Money | B–D | 7 | 27 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
+| `BO-101` | Orders & Money | B–D | 7 | 22 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -147,7 +147,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 1 · needs the `core` module |
-| Block | Block A · ticket #20666 (APP-SETUP-BO-075) |
+| Block | Block A · task APP-SETUP-BO-075 |
 | Who uses it | venue staff holding `ACCOUNT_CONFIGURE`, `LEDGER_VIEW`, `TAX_CONFIGURE` (2 configure, 1 read); in the flows as finance controller, platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): 3 independent reads and no read of one record — the screen watches a population rather than working one |
@@ -356,7 +356,7 @@ Errors to draw in the form: 400 A required event type (`cardReceived`, `cashRece
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the account mapping untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No account mapping yet. Offers Create tax code (`createTaxCode`). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listAccountMappings` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `listAccountMappings` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `listAccountMappings` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCOUNT_CONFIGURE` for `setAccountMappings`; `TAX_CONFIGURE` for `createTaxCode`, `updateTaxCode`, `createTaxExemption`, `verifyTaxExemption`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A required event type (`cardReceived`, `cashReceived`, `refundIssued`, `priceVariance`; audit R127 (1)) has no mapping, or maps to a non-postable account; 400 Compound reference is circular or crosses countries; 400 `rate` without `effectiveFrom`, or `effectiveFrom` without `rate`. `errors[]` names the field.; 409 A rate change whose `effectiveFrom` is today or earlier, which would reprice … |
 
@@ -399,7 +399,7 @@ exemption: Free zone · VAT-AE-5 · Dubai Silicon Oasis Authority · certificate
 - `createTaxExemption` → `TAX_CONFIGURE` (configure) · staff
 - `verifyTaxExemption` → `TAX_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `LEDGER_VIEW`, which `listAccountMappings` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `LEDGER_VIEW`, which `listAccountMappings` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCOUNT_CONFIGURE` for `setAccountMappings`; `TAX_CONFIGURE` for `createTaxCode`, `updateTaxCode`, `createTaxExemption`, `verifyTaxExemption`.
 
 #### Requirements it meets
 
@@ -508,7 +508,7 @@ Errors to draw in the form: 409 Period already closed, or a run is in progress
 
 **Form: Create recognition schedule** (modal, opened by *Create recognition schedule*; *Create recognition schedule* calls `createRecognitionSchedule`, *Cancel* sends nothing)
 
-**Collects what `createRecognitionSchedule` sends before it is called.** Required: `id`, `name`, `method`, `productKinds`. Optional: `priority`, `recognitionSite`, `frequency`, `revalidateOnValidityChange`, `deferredAccountId`, `recognisedAccountId`, `breakageAccountId`, `noShowTrigger`, `noShowAccountId`, `breakageAfterDays`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `createRecognitionSchedule` sends before it is called.** Required: `name`, `method`, `productKinds`. Optional: `priority`, `recognitionSite`, `frequency`, `revalidateOnValidityChange`, `deferredAccountId`, `recognisedAccountId`, `breakageAccountId`, `noShowTrigger`, `noShowAccountId`, `breakageAfterDays`, `isActive`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -542,24 +542,17 @@ Errors to draw in the form: 400 Validation failed; 409 An active schedule at the
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
 | Method | chip: Immediate, On redemption, Straight line, Per visit, On expiry | — |
 | Priority | 1,234 | Two schedules may both claim a product kind and nothing resolved which wins — a silent double-recognition, which is the worst kind of … |
 | Recognition site | chip: Sale, Admission, Consumption | Where revenue is earned, which is not always where it was sold. A ticket sold at one venue and admitted at another earns at the gate, and … |
 | Frequency | chip: Daily, Weekly, Monthly, On event, On period close | Driven by the schedule rather than by whoever runs the job. Recognition that happens when somebody remembers is recognition with no cut-off. |
 | Revalidate on validity change | yes / no (icon or chip) | Changing an entitlement's validity did not re-time its deferred balance. A pass extended by three months has three more months of deferral … |
-| Product kinds | list or chips (count when long) | The product kinds this schedule claims, from the catalogue's `ProductKind`. |
-| Deferred account | the name it points at, never the id | — |
-| Recognised account | the name it points at, never the id | — |
-| Breakage account | the name it points at, never the id | — |
-| No show trigger | chip: Performance end, Validity end, None | 8.1.1. A no-show is breakage with a known moment, and the mechanism already existed — `breakageAfterDays` moves deferred revenue to earned … |
 
 **The selected recognition schedule** (detail panel, from `listRecognitionSchedules`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
 | Method | chip: Immediate, On redemption, Straight line, Per visit, On expiry | — |
 | Priority | 1,234 | Two schedules may both claim a product kind and nothing resolved which wins — a silent double-recognition, which is the worst kind of … |
@@ -567,13 +560,7 @@ Errors to draw in the form: 400 Validation failed; 409 An active schedule at the
 | Frequency | chip: Daily, Weekly, Monthly, On event, On period close | Driven by the schedule rather than by whoever runs the job. Recognition that happens when somebody remembers is recognition with no cut-off. |
 | Revalidate on validity change | yes / no (icon or chip) | Changing an entitlement's validity did not re-time its deferred balance. A pass extended by three months has three more months of deferral … |
 | Product kinds | list or chips (count when long) | The product kinds this schedule claims, from the catalogue's `ProductKind`. |
-| Deferred account | the name it points at, never the id | — |
-| Recognised account | the name it points at, never the id | — |
-| Breakage account | the name it points at, never the id | — |
 | No show trigger | chip: Performance end, Validity end, None | 8.1.1. A no-show is breakage with a known moment, and the mechanism already existed — `breakageAfterDays` moves deferred revenue to earned … |
-| No show account | the name it points at, never the id | Where no-show revenue lands. Separate from `recognisedAccountId` by default, because revenue from a guest who came and revenue from one who … |
-| Breakage after days | 1,234 | Days after expiry at which unredeemed value becomes breakage. |
-| Is active | yes / no (icon or chip) | — |
 
 **The deferred revenue report** (detail panel, from `getDeferredRevenue`)
 
@@ -618,7 +605,7 @@ Errors to draw in the form: 400 Validation failed; 409 An active schedule at the
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the revenue recognition untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No revenue recognition yet. Offers Create recognition schedule (`createRecognitionSchedule`). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listRecognitionSchedules` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `getDeferredRevenue` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `getDeferredRevenue` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCOUNT_CONFIGURE` for `createRecognitionSchedule`; `LEDGER_POST` for `runRecognition`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 An active schedule at the same `priority` already claims one of these product kinds.; 409 Period already closed, or a run is in progress |
 
@@ -653,7 +640,7 @@ rules:
 - `createRecognitionSchedule` → `ACCOUNT_CONFIGURE` (configure) · staff
 - `validateRecognitionSchedules` → `LEDGER_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `LEDGER_VIEW`, which `getDeferredRevenue` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `LEDGER_VIEW`, which `getDeferredRevenue` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCOUNT_CONFIGURE` for `createRecognitionSchedule`; `LEDGER_POST` for `runRecognition`.
 
 #### Requirements it meets
 
@@ -696,7 +683,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (16), with its required mark, default, format and its error state (400, 409).
-- [ ] Every output is drawn (31 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-076?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Run recognition, Create recognition schedule, Validate recognition schedules.
 - [ ] Every transition is wired: `BO-074`, `BO-075`, `BO-077`.
@@ -717,7 +704,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Orders & Money · wave 1 · needs the `core` module |
-| Block | Block A · ticket #17838 (APP-SETUP-BO-077) |
+| Block | Block A · task APP-SETUP-BO-077 |
 | Who uses it | venue staff holding `LEDGER_APPROVE`, `LEDGER_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | approvalInbox (compact density): `reviewPriceVariance` decides items that `listFxRates` queues — every row is waiting for a person, so the empty state is success |
@@ -782,7 +769,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 **Form: Save FX rate** (modal, opened by *Save FX rate*; *Save FX rate* calls `setFxRate`, *Cancel* sends nothing)
 
-**Collects what `setFxRate` sends before it is called.** Required: `fromCurrency`, `toCurrency`, `rate`, `purpose`, `effectiveFrom`. Optional: `effectiveTo`, `note`. **The note is required for a manual rate** and the call is refused without it (R127); `source`, set-by, provider reference and fetched-at are the server's. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setFxRate` sends before it is called.** Required: `fromCurrency`, `toCurrency`, `rate`, `purpose`, `effectiveFrom`. Optional: `effectiveTo`, `note`. **The note is required for a manual rate** and the call is refused without it (R127); set-by, provider reference and fetched-at are the server's. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `source` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -811,15 +798,10 @@ Errors to draw in the form: 400 No `note` was given. A manual rate says where th
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | From currency | text | — |
 | To currency | text | — |
 | Rate | text | Units of `toCurrency` per one `fromCurrency`. Six decimal places — a two-place rate on a three-place currency loses money on every … |
-| Purpose | chip: Tender, Inter entity, Reporting, Revaluation | A venue does not accept dollars at the rate it books an intercompany balance at. |
-| Source | chip: Manual, Uae central bank, Ecb, Open exchange rates, Card scheme, Provider | Where the rate came from, and which provider specifically. `source: provider` said a feed set it and not which one — two tenants on … |
 | Effective from | 1 Oct 2026, 14:30 | — |
-| Effective to | 1 Oct 2026, 14:30 | A rate change is a new row. The old one is never edited — a transaction posted last Tuesday must still reconcile at last Tuesday's rate. |
-| Set by principal | the name it points at, never the id | — |
 | Provider reference | text | The provider's own identifier for this quote. What makes a rate reproducible — an auditor asking why a payment converted at 3.6725 gets an … |
 | Fetched at | 1 Oct 2026, 14:30 | When the rate was pulled. Distinct from `effectiveFrom`, which is when it applies — a rate fetched at 06:00 for a business day starting at … |
 
@@ -885,7 +867,7 @@ Errors to draw in the form: 400 No `note` was given. A manual rate says where th
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the rates variances untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | **Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on asAt, purpose and the rates variances are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `listFxRates` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `listFxRates` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_APPROVE` for `setFxRate`, `reviewPriceVariance`, `ingestFxRates`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 No `note` was given. A manual rate says where the figure came from (audit R127 (4)).; 409 Effective window overlaps an existing bounded rate for the same pair and purpose, or does not start after the rate in force; 409 No provider is assigned to this purpose in this region (`setFxProvider`).; 409 The variance is not awaiting review: its `reviewStatus` is `notRequired` (below the venue's … |
 
@@ -921,7 +903,7 @@ variance: ORD-8K21P · Day Pass Adult · quoted AED 279.00 · server AED 299.00 
 - `reviewPriceVariance` → `LEDGER_APPROVE` (operate) · staff
 - `ingestFxRates` → `LEDGER_APPROVE` (operate) · staff, service
 
-**A refused user sees:** Shown when the caller lacks `LEDGER_VIEW`, which `listFxRates` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `LEDGER_VIEW`, which `listFxRates` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_APPROVE` for `setFxRate`, `reviewPriceVariance`, `ingestFxRates`.
 
 #### Requirements it meets
 
@@ -950,12 +932,13 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 #### References
 
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-077` · status **notStarted** · provenance generated
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0031 *Contention is leased, not locked — and where a lock is unavoidable it is named* (`docs/adr/0031-contention-and-locking.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (15), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (29 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-077?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save FX rate, Review price variance, Ingest FX rates.
 - [ ] Every transition is wired: `BO-074`, `BO-075`.
@@ -1063,38 +1046,24 @@ Errors to draw in the form: 403 Approver is the poster, or lacks LEDGER_APPROVE;
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Entry number | text | Server-assigned, in sequence per legal entity per fiscal year (decided 28 September, audit R191), for example `JE-2026-000123`. |
-| Fiscal period | the name it points at, never the id | — |
 | Status | chip: Draft, Pending approval, Posted, Reversed | — |
-| Source | chip: Manual, Order, Refund, Void, Shift, Recognition… | — |
-| Source | text | The order, refund or run that generated this entry. |
 | Description | text | — |
 | Reference | text | — |
-| Lines | list or chips (count when long) | — |
 | Total debit | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Total credit | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Posted by principal | the name it points at, never the id | — |
 
 **The selected journal entry** (detail panel, from `getJournalEntry`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Entry number | text | Server-assigned, in sequence per legal entity per fiscal year (decided 28 September, audit R191), for example `JE-2026-000123`. |
-| Fiscal period | the name it points at, never the id | — |
 | Status | chip: Draft, Pending approval, Posted, Reversed | — |
 | Source | chip: Manual, Order, Refund, Void, Shift, Recognition… | — |
-| Source | text | The order, refund or run that generated this entry. |
 | Description | text | — |
 | Reference | text | — |
-| Lines | list or chips (count when long) | — |
 | Total debit | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Total credit | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Posted by principal | the name it points at, never the id | — |
-| Approved by principal | the name it points at, never the id | — |
-| Reversal of entry | the name it points at, never the id | — |
-| Reversed by entry | the name it points at, never the id | — |
 | Posted at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
@@ -1138,7 +1107,7 @@ Errors to draw in the form: 403 Approver is the poster, or lacks LEDGER_APPROVE;
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the journal entries untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | **Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on fiscalPeriodId, status, source and the journal entries are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `listJournalEntries` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `listJournalEntries` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_APPROVE` for `approveJournalEntry`, `rejectJournal`, `reverseJournalEntry`; `LEDGER_POST` for `createJournalEntry`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Lines do not balance, or an account is not postable; 409 Already reversed, not yet posted, or the target period is not `open`. Three causes, three types.; 409 The entry is not `pendingApproval`.; 409 The entry is not awaiting approval (it is `posted` or `reversed` already; only a `draft` or `pendingApproval` entry is approved), or its fiscal period has … |
 
@@ -1175,7 +1144,7 @@ posted:
 - `rejectJournal` → `LEDGER_APPROVE` (operate) · staff
 - `reverseJournalEntry` → `LEDGER_APPROVE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `LEDGER_VIEW`, which `listJournalEntries` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `LEDGER_VIEW`, which `listJournalEntries` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_APPROVE` for `approveJournalEntry`, `rejectJournal`, `reverseJournalEntry`; `LEDGER_POST` for `createJournalEntry`.
 
 #### Requirements it meets
 
@@ -1218,7 +1187,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (19), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-089?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create journal entry, Approve journal entry, Reject journal, Reverse journal entry.
 - [ ] Every transition is wired: `BO-090`, `BO-074`, `BO-075`.
@@ -1388,7 +1357,7 @@ Errors to draw in the form: 403 The caller lacks `LEDGER_APPROVE` there.; 404 Th
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the period close untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No period close yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on legalEntityId, status and the period close are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `listFiscalPeriods` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `LEDGER_VIEW`, which `listFiscalPeriods` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_APPROVE` for `beginPeriodClose`, `closeFiscalPeriod`, `abandonPeriodClose`, `reopenPeriod`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The period is already `closed`, or one or more of the close checks failed. The checks are exactly the values of `PeriodCloseResult.checks[].check` … (PeriodCloseProblem); 409 The period is not `closed`.; 409 The period is not `closing`.; 409 The period is not `open`. |
 
@@ -1429,7 +1398,7 @@ vatReturn: Jul–Sep 2026 · Standard-rated supplies Dubai AED 9,812,400.00 · V
 - `getTrialBalance` → `LEDGER_VIEW` (read) · staff
 - `getVatReturn` → `LEDGER_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `LEDGER_VIEW`, which `listFiscalPeriods` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `LEDGER_VIEW`, which `listFiscalPeriods` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_APPROVE` for `beginPeriodClose`, `closeFiscalPeriod`, `abandonPeriodClose`, `reopenPeriod`.
 
 #### Requirements it meets
 
@@ -1558,15 +1527,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|
 | Currency code | text | A settlement has no account, so nothing else denominates it. A posting takes its currency from `ledger.account.currency` and a payment from … |
 | Provider name | text | — |
-| Period start | 1 Oct 2026 | A day in the region's time zone, local midnight to local midnight. |
-| Period end | 1 Oct 2026 | A day in the region's time zone, local midnight to local midnight. |
 | File reference | the name it points at, never the id | The `MediaAsset` holding the provider file, as given to `ingestSettlementFile`. Kept on the row because parsing is asynchronous: the job … |
-| Format | chip: Csv, Fixed width, Xml, Json | The file format given at ingest. Null when none was given. |
-| Status | chip: Ingesting, Parsing, Matching, Matched, Has exceptions, Resolved… | — |
 | Line count | 1,234 | — |
 | Matched count | 1,234 | — |
 | Exception count | 1,234 | — |
-| Provider gross | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **Card list** (card list): 28 screens, each with what needs attention.
 
@@ -1690,7 +1654,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (7), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-101?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-008`, `BO-022`, `BO-023`, `BO-024`, `BO-025`, `BO-026`, `BO-027`, `BO-029`, `BO-039`, `BO-040`, `BO-041`, `BO-042`, `BO-043`, `BO-047`, `BO-048`, `BO-059`, `BO-061`, `BO-062`, `BO-065`, `BO-074`, `BO-075`, `BO-077`, `BO-089`, `BO-090`, `BO-028`.

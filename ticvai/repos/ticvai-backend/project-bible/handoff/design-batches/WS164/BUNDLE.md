@@ -187,7 +187,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-943` | Resource Analytics Command Center | B–D | 0 | 30 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-944` | Resource Utilization & Capacity Analytics | B–D | 3 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-945` | Resource Cost, Revenue & Efficiency Analytics | B–D | 11 | 9 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-945` | Resource Cost, Revenue & Efficiency Analytics | B–D | 11 | 4 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-946` | Demand Forecast Accuracy & Planning Performance | B–D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `BO-947` | Resource KPI, SLA & Performance Framework | B–D | 0 | 44 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-948` | Resource Governance & Policy Center | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
@@ -673,7 +673,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Create resource cost** (modal, opened by *Create resource cost*; *Create resource cost* calls `createResourceCost`, *Cancel* sends nothing)
 
-**Collects what `createResourceCost` sends before it is called.** Required: `id`, `resourceId`, `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `createResourceCost` sends before it is called.** Required: `resourceId`, `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -700,15 +700,10 @@ Errors to draw in the form: 422 Unknown resource at this venue; a `transfer` wit
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Resource | the name it points at, never the id | — |
 | Kind | chip: Transfer, Operating, Replacement | — |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Incurred on | 1 Oct 2026 | — |
-| From venue | the name it points at, never the id | A `transfer` only, with `toVenueId`. |
-| To venue | the name it points at, never the id | — |
 | Note | text | — |
-| Scope path | text | The partition key (ADR-0005), written at `venue` scope. |
 
 **Actions and what each produces**
 
@@ -824,7 +819,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (11), with its required mark, default, format and its error state (400, 404, 422).
-- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (4 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-945?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Transfer cost, Asset operating cost, Resource replacement cost, Create resource cost, Delete resource cost.
 - [ ] Every transition is wired: `BO-943`.

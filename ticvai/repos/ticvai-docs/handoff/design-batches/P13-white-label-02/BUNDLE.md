@@ -159,11 +159,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `CMS-011` | Translations | A | 4 | 27 | 5 | 10 | 2 | 0 | configures | notStarted (generated) |
 | `CMS-012` | RTL Preview | A | 0 | 8 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `CMS-014` | Publishing Workflow | A | 9 | 27 | 5 | 1 | 2 | 6 | — | notStarted (generated) |
-| `CMS-015` | Version History | A | 0 | 18 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
-| `CMS-016` | Site Settings | A | 71 | 45 | 6 | 6 | 3 | 6 | configures | notStarted (generated) |
+| `CMS-015` | Version History | A | 0 | 14 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
+| `CMS-016` | Site Settings | A | 71 | 24 | 6 | 6 | 3 | 6 | configures | notStarted (generated) |
 | `CMS-017` | Domain & Certificate | A | 3 | 21 | 6 | 0 | 1 | 0 | configures | notStarted (generated) |
-| `CMS-018` | Consent & Legal | A | 25 | 51 | 6 | 4 | 2 | 4 | configures | notStarted (generated) |
-| `CMS-019` | User Access | A | 6 | 23 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `CMS-018` | Consent & Legal | A | 25 | 44 | 6 | 4 | 2 | 4 | configures | notStarted (generated) |
+| `CMS-019` | User Access | A | 6 | 21 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `CMS-101` | Help Me Choose | A | 28 | 18 | 6 | 3 | 4 | 0 | configures | notStarted (generated) |
 
 ## Thin screens in this batch
@@ -183,8 +183,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
-| Module | White Label · wave 2 · needs the `core` module |
-| Block | Block A · ticket #18194 (APP-WL-CMS-013) |
+| Module | White Label · wave 1 · needs the `core` module |
+| Block | Block A · task APP-WL-CMS-013 |
 | Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`setSeoMetadata`) and no read of a population — it is settings, not a list |
@@ -307,7 +307,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Loading (`?state=loading`) | Detail loads |
 | Error (`?state=error`) | Could not load |
 | Empty, first run (`?state=emptyFirstRun`) | No metadata saved for this page yet: the generated title and description are shown with the "Generated" badge. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_MANAGE`, which `setSeoMetadata` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `getSeoMetadata` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setSeoMetadata`, `createUrlRedirect`. |
 | Offline (`?state=offline`) | online only |
 
 #### Consistency with other screens
@@ -334,7 +334,7 @@ ar:
 - `getSeoMetadata` → `MARKETING_VIEW` (read) · staff
 - `createUrlRedirect` → `MARKETING_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `MARKETING_MANAGE`, which `setSeoMetadata` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `getSeoMetadata` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setSeoMetadata`, `createUrlRedirect`.
 
 #### Requirements it meets
 
@@ -410,8 +410,8 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
-| Module | White Label · wave 2 · needs the `core` module |
-| Block | Block A · ticket #18106 (APP-WL-CMS-011) |
+| Module | White Label · wave 1 · needs the `core` module |
+| Block | Block A · task APP-WL-CMS-011 |
 | Who uses it | venue staff holding `TENANT_CONFIGURE` (1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`setLanguages`) and no read of a population — it is settings, not a list |
@@ -650,8 +650,8 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
-| Module | White Label · wave 2 · needs the `core` module |
-| Block | Block A · ticket #18107 (APP-WL-CMS-012) |
+| Module | White Label · wave 1 · needs the `core` module |
+| Block | Block A · task APP-WL-CMS-012 |
 | Who uses it | venue staff holding `TENANT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | statusTracker (compact density): `getTenantConfig` reads one record and nothing reads a population — the screen is about that one thing |
@@ -792,8 +792,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
-| Module | White Label · wave 2 · needs the `core` module |
-| Block | Block A · ticket #18120 (APP-WL-CMS-014) |
+| Module | White Label · wave 1 · needs the `core` module |
+| Block | Block A · task APP-WL-CMS-014 |
 | Who uses it | venue staff holding `TENANT_CONFIGURE`, `TENANT_PUBLISH` (2 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | statusTracker (compact density): `getTenantAppStatus` reads one record and nothing reads a population — the screen is about that one thing |
@@ -958,7 +958,7 @@ Errors to draw in the form: 409 Nothing is published yet (`nothing-published`).
 | Loading (`?state=loading`) | The publishing workflow, read by `getTenantAppStatus`. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the publishing workflow untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No publishing workflow yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TENANT_PUBLISH`, which `publishTenantConfig` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_PUBLISH` for `publishTenantConfig`, `setPublishReviewPolicy`, `exportSitePackage`, `getSitePackage`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Nothing is published yet (`nothing-published`).; 409 Validation failed. (ConfigValidationProblem) |
 
@@ -999,7 +999,7 @@ note: New teal and simpler Kids Club booking
 - `exportSitePackage` → `TENANT_PUBLISH` (configure) · staff
 - `getSitePackage` → `TENANT_PUBLISH` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `TENANT_PUBLISH`, which `publishTenantConfig` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_PUBLISH` for `publishTenantConfig`, `setPublishReviewPolicy`, `exportSitePackage`, `getSitePackage`.
 
 #### Requirements it meets
 
@@ -1058,8 +1058,8 @@ Also apply: 9 for P13 · White Label, 8 for all of P13, 29 for every app (sectio
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
-| Module | White Label · wave 2 · needs the `core` module |
-| Block | Block A · ticket #18121 (APP-WL-CMS-015) |
+| Module | White Label · wave 1 · needs the `core` module |
+| Block | Block A · task APP-WL-CMS-015 |
 | Who uses it | venue staff holding `TENANT_CONFIGURE`, `TENANT_PUBLISH` (2 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listConfigVersions` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1094,14 +1094,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Shows | Format | Notes |
 |---|---|---|
 | Published at | 1 Oct 2026, 14:30 | — |
-| Published by principal | the name it points at, never the id | — |
 | Published by name | text | — |
 | Note | text | — |
 | Is current | yes / no (icon or chip) | — |
 | Scheduled for | 1 Oct 2026, 14:30 | — |
-| Content hash | text | — |
-| Pending build time changes | list or chips (count when long) | Changes in this version that will not reach guests until the next store release. |
-| Scope path | text | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it … |
 
 **The selected config version** (detail panel, from `listConfigVersions`)
 
@@ -1221,7 +1217,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-015?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Diff config version, Restore config version.
 - [ ] Every transition is wired: `CMS-001`, `CMS-002`, `CMS-003`, `CMS-014`.
@@ -1239,8 +1235,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
-| Module | White Label · wave 2 · needs the `core` module |
-| Block | Block A · ticket #18108 (APP-WL-CMS-016) |
+| Module | White Label · wave 1 · needs the `core` module |
+| Block | Block A · task APP-WL-CMS-016 |
 | Who uses it | venue staff holding `SCOPE_VIEW`, `TENANT_CONFIGURE` (1 read, 1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | statusTracker (compact density): `getTenantConfig` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1377,35 +1373,14 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Shows | Format | Notes |
 |---|---|---|
-| Preset | chip: Auto, Ticket box, Play centre, Venue site, Marketplace, Single event… | L1 Ticket box … L6 Season. `auto` picks by venue type; `custom` applies none. |
-| Step indicator | chip: Bar, Numbered, Dots, Segmented, Breadcrumb, Pills… | — |
 | Cart layout | chip: Sidebar right, Sidebar left, Slide in right, Slide up bottom, Single column … | `floatingIcon` is a round basket button with the item count that opens the cart (decided 29 September, rev 3 REV3-10). |
 | Card layout | chip: Stacked rows, Split rows, Cards across, Poster cards | How ticket and product cards are laid out (decided 29 September, rev 3 DG-6). Was a free string; the four values are the design's Stacked … |
-| Card size | chip: Compact, Standard, Large, Extra large | Labels Compact, Standard, Large, Extra large (decided 29 September, rev 3 DG-6). |
-| Seat picker | chip: Bowl, Zones then seats, Zones only, Seats only | Default `bowl`, as the prototype has it (decided 29 September, rev 3 CFG-6). Read only for a seated event. |
-| Map view | chip: 2D, 3D | — |
 | Density | chip: Compact, Standard, Roomy | Labels Compact, Standard, Roomy, default Compact as the design has it (decided 29 September, rev 3 DG-6). |
-| Embed mode | chip: Full page, Embedded | `embedded` hides the hero banner, event page and venue header, for a flow placed inside the venue's own site. |
-| Hero banner | yes / no (icon or chip) | — |
-| Search in banner | yes / no (icon or chip) | Off by default, as the prototype has it (decided 29 September, rev 3 CFG-6). |
-| Single event page | yes / no (icon or chip) | — |
-| Quantities on add ons | yes / no (icon or chip) | — |
 | Cart side in RTL | chip: Keep right, Mirror | The cart side when the guest reads Arabic or another right-to-left language (decided 29 September, rev 3 REV3-10). |
 | Event banner dates | yes / no (icon or chip) | Dates in event banner (decided 29 September, rev 3 23SEP-19). On, the event banner lists the next dates; off by default. |
 | Times per page | chip: 8, 12, 24, All | Times per page (decided 29 September, rev 3 REV3-1). When an event has more performances on the chosen day than fit, WEB-006 and GST-007 … |
-| Day part filter | yes / no (icon or chip) | Morning, afternoon and evening chips with counts above the times (decided 29 September, rev 3 REV3-1). |
-| Day part boundaries | grouped details | Where the day parts divide, in the venue's time zone (decided 29 September, rev 3 REV3-1). |
 | Seat view position | chip: Bottom, Right, Left, Top | Where the view-from-your-seat box sits around the seat map (decided 29 September, rev 3 REV3-5). |
 | Seat time bar | yes / no (icon or chip) | Time bar above the seat map (decided 29 September, rev 3 REV3-6). Shows the chosen performance and lets the guest switch performance or … |
-| Ticket categories | chip: Category then subcategory, Flat list | How tickets are grouped (decided 29 September, rev 3 REV3-16). `categoryThenSubcategory` shows the venue's top product categories as tiles … |
-| Ticket tags | yes / no (icon or chip) | Tags on tickets (decided 29 September, rev 3 23SEP-3). Shows a product's display tags (such as "2 Hours", "Min 1.10 m", "Valid 90 days") on … |
-| Card info | yes / no (icon or chip) | Extra info on cards (decided 29 September, rev 3 23SEP-6). Shows each ticket type's description, who it is for and what it includes, under … |
-| Concierge mascot | yes / no (icon or chip) | The concierge as mascot art or a plain button (decided 29 September, rev 3 CFG-5). |
-| Show info only | yes / no (icon or chip) | Show info-only products (decided 29 September, rev 3 REV3-14). On, a product with `guestListing` `infoOnly` (catalogue) is listed with its … |
-| Location switcher | yes / no (icon or chip) | Location switcher (decided 29 September, rev 3 REV3-18). On, the booking screens carry a "Booking at" bar with Change location, reusing the … |
-| Guest contact fields | list or chips (count when long) | What the guest-checkout pop-up asks, and nothing else (decided 29 September, W1). |
-| Date strip days | 1,234 | The date strip (decided 17 September, M17-08). How many days from today the date step shows as a strip before the calendar icon that opens … |
-| Venue overrides | list or chips (count when long) | Per-venue overrides, at most one per venue. A `venueId` that is not one of the tenant's active venues, or appears twice, is refused with … |
 
 **Venues that differ from the tenant** (data table, from `getBookingFlowConfig`): **One row per venue that overrides anything** (decided 29 September, rev 3 CFG-11). The editor sets only the fields that differ; a field left empty inherits the tenant value, and clearing one removes it from the override. A venue that is not one of the tenant's active venues, or a second row for the same venue, is refused `400` and the row is marked. An override kept for a closed venue is shown …
 
@@ -1633,7 +1608,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (71), with its required mark, default, format and its error state (400, 403, 422).
-- [ ] Every output is drawn (45 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-016?state=<state>`: loading, error, emptyNoResults, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save analytics platform, Save booking flow config.
 - [ ] Every transition is wired: `CMS-001`, `CMS-002`, `CMS-003`, `CMS-017`, `CMS-018`, `CMS-103`, `CMS-101`.
@@ -1653,8 +1628,8 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
-| Module | White Label · wave 2 · needs the `core` module |
-| Block | Block A · ticket #18109 (APP-WL-CMS-017) |
+| Module | White Label · wave 1 · needs the `core` module |
+| Block | Block A · task APP-WL-CMS-017 |
 | Who uses it | venue staff holding `TENANT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listCustomDomains` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1888,8 +1863,8 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
-| Module | White Label · wave 2 · needs the `core` module |
-| Block | Block A · ticket #18195 (APP-WL-CMS-018) |
+| Module | White Label · wave 1 · needs the `core` module |
+| Block | Block A · task APP-WL-CMS-018 |
 | Who uses it | venue staff holding `GUEST_MANAGE`, `GUEST_VIEW`, `TENANT_CONFIGURE` (2 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listPolicies` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2004,7 +1979,6 @@ Errors to draw in the form: 400 Validation failed; 404 The resource does not exi
 | Purpose | chip: Marketing, Personalisation, Profiling, Third party sharing, AI processing … | — |
 | Display name | text | — |
 | Description | text | — |
-| Channels | list or chips (count when long) | — |
 | Notice version | text | Current version of the notice. A consent against a superseded version is reported as requiring renewal rather than silently honoured. |
 | Is required for service | yes / no (icon or chip) | True for transactional. Withdrawing it means the service cannot be delivered, so it is presented differently. |
 | Expires after months | 1,234 | — |
@@ -2027,16 +2001,10 @@ Errors to draw in the form: 400 Validation failed; 404 The resource does not exi
 | Shows | Format | Notes |
 |---|---|---|
 | Answered at | 1 Oct 2026, 14:30 | — |
-| Question | the name it points at, never the id | — |
 | Question version | 1,234 | — |
 | Answer | chip: Yes, No | — |
 | Scope | chip: Per person, Per booking | — |
 | Person name | text | — |
-| Order | the name it points at, never the id | Set by `orders.checkoutCart` when the cart becomes an order. |
-| Answered by subject | the name it points at, never the id | The guest who answered, from the session. Null for an anonymous cart. |
-| Answered by principal | the name it points at, never the id | The staff member who answered on the guest's behalf. |
-| Source | chip: Guest app, Website, Kiosk, POS, Call centre, Import… | `checkout` (30 September, M18-15): an opt-in ticked beside the terms at checkout, carried on orders `checkoutCart` `marketingConsents[]` … |
-| Blocks booking | yes / no (icon or chip) | The answer is the question's `blockingAnswer` at that version. |
 | Superseded at | 1 Oct 2026, 14:30 | — |
 
 **The selected policy** (detail panel, from `listPolicies`)
@@ -2101,7 +2069,7 @@ Errors to draw in the form: 400 Validation failed; 404 The resource does not exi
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the consent legal untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No policy, purpose or consent question yet. Offers Save policy (`setPolicy`), Save consent purposes (`setConsentPurposes`) and New consent question (`createConsentQuestion`). |
 | Empty, no results (`?state=emptyNoResults`) | `listPolicies` takes no filter. The consent questions (kind, status) and the consent records (order, guest, question) do: an empty result names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TENANT_CONFIGURE`, which `listPolicies` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TENANT_CONFIGURE`, which `listPolicies` requires to show this screen, and names that permission (the screen's other reads need `GUEST_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_MANAGE` for `setConsentPurposes`, `createConsentQuestion` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 The English (`en`) or Arabic (`ar`) version is missing (audit R096); 400 Validation failed |
 
@@ -2139,7 +2107,7 @@ question: '{kind: Swim, text: Are you able to swim?, textAr: هل تستطيع �
 - `updateConsentQuestion` → `GUEST_MANAGE` (configure) · staff
 - `listConsentAnswers` → `GUEST_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `TENANT_CONFIGURE`, which `listPolicies` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `TENANT_CONFIGURE`, which `listPolicies` requires to show this screen, and names that permission (the screen's other reads need `GUEST_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_MANAGE` for `setConsentPurposes`, `createConsentQuestion` …
 
 #### Requirements it meets
 
@@ -2181,11 +2149,12 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 #### References
 
 - Wireframe frame: `wireframes/P13 Venue CMS.dc.html#cms-018` · status **notStarted** · provenance generated
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (25), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (51 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-018?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save policy, Save consent purposes, New consent question, Save as new version, Retire question.
 - [ ] Every transition is wired: `CMS-001`, `CMS-002`, `CMS-003`.
@@ -2204,8 +2173,8 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
-| Module | White Label · wave 2 · needs the `core` module |
-| Block | Block A · ticket #18084 (APP-WL-CMS-019) |
+| Module | White Label · wave 1 · needs the `core` module |
+| Block | Block A · task APP-WL-CMS-019 |
 | Who uses it | venue staff holding `ROLE_MANAGE`, `USER_MANAGE` (2 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listPrincipals` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2271,13 +2240,11 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Username | text | — |
 | Display name | text | — |
 | Is active | yes / no (icon or chip) | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | Past this, resolution returns DENY regardless of grants. |
-| Primary role | the name it points at, never the id | Determines the landing screen when the principal holds several roles and picks one at login. |
 | Roles | list or chips (count when long) | — |
 | Last login at | 1 Oct 2026, 14:30 | — |
 
@@ -2367,7 +2334,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (6), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (23 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#CMS-019?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Change access.
 - [ ] Every transition is wired: `CMS-001`, `CMS-002`, `CMS-003`.
@@ -2385,8 +2352,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
-| Module | White Label · wave 2 · needs the `core` module |
-| Block | Block A · ticket #20770 (APP-WL-CMS-101) |
+| Module | White Label · wave 1 · needs the `core` module |
+| Block | Block A · task APP-WL-CMS-101 |
 | Who uses it | venue staff holding `AI_USE`, `PRODUCT_VIEW`, `TENANT_CONFIGURE`, `TENANT_PUBLISH` (1 operate, 1 read, 2 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listGuidedChoices` reads the venue's set-ups and the editor acts on one of them — list, select, act |
@@ -2550,7 +2517,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the set-ups untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | **No Help me choose at this venue, so guests see none.** Offers New set-up, and says that once the venue's products are uploaded the assistant proposes set-ups here as drafts for review. |
 | Empty, no results (`?state=emptyNoResults`) | The source or status filter matched nothing and the venue's other set-ups are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TENANT_CONFIGURE`, which `listGuidedChoices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `TENANT_CONFIGURE`, which `listGuidedChoices` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `suggestGuidedChoice`, `getGuidedChoiceSuggestion`; `PRODUCT_VIEW` for `listProducts`, `listProductCategories`, `listEvents` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 400 A target is not in this venue, a required target id is missing for its `kind`, or the question and answer counts are outside their bounds; 400 Validation failed; 409 A suggestion for this venue is already running … |
 
@@ -2604,7 +2571,7 @@ result: None of us -> Splash and river pass (Adult AED 175, Junior AED 135, Chil
 - `suggestGuidedChoice` → `AI_USE` (operate) · staff
 - `getGuidedChoiceSuggestion` → `AI_USE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `TENANT_CONFIGURE`, which `listGuidedChoices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `TENANT_CONFIGURE`, which `listGuidedChoices` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `suggestGuidedChoice`, `getGuidedChoiceSuggestion`; `PRODUCT_VIEW` for `listProducts`, `listProductCategories`, `listEvents` …
 
 #### Requirements it meets
 
@@ -2661,6 +2628,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 
 - Wireframe frame: `wireframes/P13 Venue CMS.dc.html#cms-101` · status **notStarted** · provenance generated
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -2897,7 +2865,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "StorefrontAnalyticsProvider": {"type":"object","x-ticvai-persistence":"whitelabel.analytics_provider","description":"**One analytics platform the storefront or app reports to** (22.10.29, 29 September build). Venue configuration: a null `venueId` is the tenant-wide default a venue's own row replaces.","required":["provider","measurementId","surfaces","consentCategory","isEnabled"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"venueId":{"type":"string","format":"uuid","nullable":true},"provider":{"type":"string","enum":["googleAnalytics4","googleTagManager","adobeAnalytics","metaPixel","matomo","other"]},"providerLabel":{"type":"string","maxLength":100,"nullable":true,"description":"The name, when `provider` is `other`."},"measurementId":{"type":"string","maxLength":100,"description":"What the tag or SDK reports to (GA4 `G-...`, Tag Manager `GTM-...`, a pixel id)."},"surfaces":{"type":"array","minItems":1,"items":{"type":"string","enum":["guestWeb","guestApp"]}},"consentCategory":{"type":"string","enum":["functional","analytics","personalisation","marketing"],"default":"analytics","description":"The cookie category the visitor must grant before this provider loads (marketing-crm `CookieCategory`)."},"isEnabled":{"type":"boolean","default":true},"reportingPropertyId":{"type":"string","maxLength":100,"nullable":true,"description":"The property `getStorefrontInsights` asks the reporting API about (a GA4 property id). Staff only."},"reportingCredentialRef":{"type":"string","maxLength":200,"nullable":true,"writeOnly":true,"description":"The vault reference of the reporting credential. Accepted, never returned."},"hasReportingCredential":{"type":"boolean","readOnly":true,"description":"Whether a reporting credential is held, since the reference itself is never returned."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005)."},"updatedAt":{"type":"string","format":"date-time","readOnly":true}}},
 "TenantAppStatus": {"x-ticvai-persistence":"none — computed","type":"object","description":"Computed on read. The published fields come from the current `ConfigVersion`, the maintenance fields from the tenant's `tenant_config` row (`setMaintenanceMode`), and the draft fields from the working draft. **Fields marked staff only are left out of a response to a caller without a staff session** (`getTenantAppStatus`).\n","required":["tenantId","isPublished","isInMaintenance"],"properties":{"tenantId":{"type":"string","format":"uuid"},"isPublished":{"type":"boolean","x-ticvai-derived":"onRead","description":"True once any version has been published."},"publishedVersion":{"type":"string","nullable":true},"publishedAt":{"type":"string","format":"date-time","nullable":true},"draftVersion":{"type":"string","description":"Staff only."},"hasUnpublishedChanges":{"type":"boolean","x-ticvai-derived":"onRead","description":"Staff only. The working draft differs from the current version's `snapshot`."},"activeModuleCount":{"type":"integer","x-ticvai-derived":"onRead","description":"Staff only. `ModuleEnablement` rows with `isEnabled` true."},"licensedModuleCount":{"type":"integer","x-ticvai-derived":"onRead","description":"Staff only. `ModuleEnablement` rows with `isLicensed` true."},"activePageCount":{"type":"integer","x-ticvai-derived":"onRead","description":"Staff only. Content pages that are `published` and enabled."},"isInMaintenance":{"type":"boolean"},"maintenanceMessage":{"$ref":"#/components/schemas/LocalisedText"},"expectedBackAt":{"type":"string","format":"date-time","nullable":true},"minimumAppVersion":{"$ref":"#/components/schemas/MinimumAppVersion"},"contact":{"$ref":"#/components/schemas/VenueContact"},"availability":{"$ref":"#/components/schemas/AppAvailability"},"availabilityMessage":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"What the sold-out or closed screen says (WEB-029). Null shows the default wording."},"venues":{"type":"array","maxItems":200,"x-ticvai-derived":"onRead","description":"**Public: the venues a guest can pick** (decided 28 September, audit R267; schema named 29 September, readiness close-out, our build plan). The source of the venue picker on WEB-001 and GST-001, returned with or without a session. **Published only**: a venue is listed when its scope node is active (`tenancy.OrgUnit.isActive`) and it is in the tenant's current published `ConfigVersion`; a venue added or reactivated since the last publish appears after the next publish, and a draft never reaches a guest. Ordered by `name`. Empty when nothing is published.\n","items":{"type":"object","required":["venueId","name"],"properties":{"venueId":{"type":"string","format":"uuid","description":"**The venue's scope node** (`tenancy.OrgUnit.id`, level venue): what every guest screen that declares `venueId` `from: session` reads once the guest picks it."},"name":{"type":"string","maxLength":200,"description":"The venue's name (`tenancy.OrgUnit.name`)."},"city":{"type":"string","maxLength":120,"nullable":true,"description":"Shown under the name so two venues with similar names can be told apart."},"openingHoursToday":{"type":"object","nullable":true,"description":"Today's opening hours in the venue's time zone, from `tenancy.VenueSettings` opening hours. Null when the venue is closed today or has none set.","properties":{"opens":{"type":"string","pattern":"^([01][0-9]|2[0-3]):[0-5][0-9]$"},"closes":{"type":"string","pattern":"^([01][0-9]|2[0-3]):[0-5][0-9]$"}}}}}},"whatsNew":{"type":"array","maxItems":10,"x-ticvai-derived":"onRead","description":"**Public: the guest \"what's new\"** (decided 29 September, rev 3 GAP-B2). Newest first, at most 10, from `platform-ops.Release.guestReleaseNotes` of the releases the tenant's cell has received; a release with no guest notes is skipped. Returned with or without a staff session.\n","items":{"type":"object","required":["version","publishedAt","notes"],"properties":{"version":{"type":"string","description":"The release version."},"publishedAt":{"type":"string","format":"date-time","description":"When the release reached the tenant's cell."},"notes":{"$ref":"#/components/schemas/LocalisedText"}}}},"recentChanges":{"type":"array","description":"Staff only. Names the principal behind each change, so it never reaches a public response.","items":{"type":"object","properties":{"area":{"type":"string"},"description":{"type":"string"},"principalId":{"type":"string","format":"uuid"},"at":{"type":"string","format":"date-time"}}}}}},
 "TenantConfig": {"x-ticvai-persistence":"whitelabel.tenant_config","type":"object","description":"**The tenant's working draft**, one row per tenant (see the header). Published versions are `ConfigVersion.snapshot`, not further rows here.\n**Only `tenantId` and `version` are required**, because the draft is built one part at a time: the first `set*` call creates the row with that part alone. A part that is still unset is what `validateTenantConfig` reports (`missingRequiredAsset` and the like) and what blocks `publishTenantConfig` — a storage rule that every part exist would stop the first save.\n","required":["tenantId","version"],"properties":{"tenantId":{"type":"string","format":"uuid"},"version":{"type":"string","description":"The draft's working version label; the published one is `ConfigVersion.version`."},"isDraft":{"type":"boolean","readOnly":true,"description":"True for the working draft, which is the only row."},"brand":{"$ref":"#/components/schemas/BrandIdentity"},"appIcons":{"$ref":"#/components/schemas/AppIcons"},"bookingFlow":{"$ref":"#/components/schemas/BookingFlowConfig"},"bookingFlows":{"type":"array","readOnly":true,"x-ticvai-derived":"onRead","description":"Every venue's booking flows in the draft (`whitelabel.booking_flow`), so a publish snapshots them with the rest (decided 29 September, W12).","items":{"$ref":"#/components/schemas/BookingFlow"}},"theme":{"$ref":"#/components/schemas/Theme"},"fonts":{"$ref":"#/components/schemas/FontConfig"},"footer":{"$ref":"#/components/schemas/FooterConfig"},"notificationBranding":{"type":"object","nullable":true,"description":"BL-003. **`marketing-crm` holds the templates and nothing said whose identity they wear.** A message sent on behalf of a venue carries that venue's sender name, reply-to and logo — **an operational alert arriving from `noreply@ticvai.com` is one a guest marks as spam.**\nResolved on the template at send time rather than duplicated per template.\n","properties":{"senderName":{"type":"string"},"replyToEmail":{"type":"string","format":"email"},"smsSenderId":{"type":"string","nullable":true},"whatsappBusinessId":{"type":"string","nullable":true},"logoAssetId":{"type":"string","format":"uuid","nullable":true}}},"enabledPaymentMethods":{"type":"array","nullable":true,"description":"BL-004. **`FeatureToggle` could turn Apple Pay on and could not say which cards a tenant accepts.** Resolved against `orders.PaymentProvider.supportedMethods` — the tenant's choice within what the gateway offers, and **a tenant enabling a method their provider does not support should fail here rather than at checkout.**\n","items":{"type":"string"}},"accessibility":{"$ref":"#/components/schemas/AccessibilitySettings"},"header":{"$ref":"#/components/schemas/HeaderConfig"},"navigation":{"$ref":"#/components/schemas/NavigationConfig"},"homepage":{"$ref":"#/components/schemas/HomepageLayout"},"modules":{"type":"array","items":{"$ref":"#/components/schemas/ModuleEnablement"}},"features":{"type":"array","items":{"$ref":"#/components/schemas/FeatureToggle"}},"languages":{"$ref":"#/components/schemas/LanguageConfig"},"updatedAt":{"type":"string","format":"date-time"},"isInMaintenance":{"type":"boolean","default":false,"description":"Written by `setMaintenanceMode`; read by `getTenantAppStatus`."},"maintenanceMessage":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"The message on the branded maintenance screen."},"expectedBackAt":{"type":"string","format":"date-time","nullable":true},"minimumAppVersion":{"allOf":[{"$ref":"#/components/schemas/MinimumAppVersion"}],"description":"Live state, written by `setMaintenanceMode` (audit R073)."},"contact":{"allOf":[{"$ref":"#/components/schemas/VenueContact"}],"description":"Live state, written by `setMaintenanceMode` (audit R073)."},"availability":{"allOf":[{"$ref":"#/components/schemas/AppAvailability"}],"description":"Live state, written by `setMaintenanceMode` (audit R073)."},"availabilityMessage":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"Live state, written by `setMaintenanceMode` (audit R073)."},"venues":{"type":"array","x-ticvai-derived":"onRead","description":"The tenant's active venues, for the guest venue picker on WEB-001 and GST-001 (decided 28 September, audit R267). Public: returned without a session and cached with the rest of the response. Read from `tenancy` venues; a closed or archived venue is left out.\n","items":{"type":"object","required":["venueId","name"],"properties":{"venueId":{"type":"string","format":"uuid"},"name":{"$ref":"#/components/schemas/LocalisedText"},"city":{"type":"string","nullable":true},"openingHours":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"Today's hours as shown to a guest, e.g. \"10:00 to 22:00\"."}}}}}},
-"Theme": {"x-ticvai-persistence":"none — embedded in tenant_config","type":"object","required":["primaryColour","secondaryColour","backgroundColour","textColour"],"properties":{"primaryColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"secondaryColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"accentColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"backgroundColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"textColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"darkMode":{"type":"object","deprecated":true,"description":"**Deprecated and ignored** (Chinmay, 2 October, workbook Q150 and the pre-apply round; CHG-CSA-035). White label has no dark or light mode: the venue's chosen theme is applied, on every device setting. The field is kept so a client built at r1 still parses, is accepted on `setTheme` and returned as stored, and **is never used to render anything or drawn on any screen**; the guest app has no Light/Dark switch.","properties":{"primaryColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"backgroundColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"textColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"}}},"cornerRadius":{"type":"integer","minimum":0,"maximum":32,"description":"The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). Its named palettes, font pairs and background tones are presets over the colours here and `FontConfig`, not stored values."},"surfaceStyle":{"type":"string","enum":["glass","solid"],"default":"glass","description":"Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3)."},"buttonStyle":{"type":"string","enum":["solid","outline","pill"],"default":"solid","description":"Button shape (decided 29 September, rev 3 CFG-3)."},"componentColours":{"type":"object","description":"**Colours for single interactive elements (decided 17 September, M17-11).** Each is optional and falls back to the theme colours. Every pair passes the same contrast check as the theme (`ContrastProblem`), or `setTheme` refuses it with 400. The guest flow stays the standard one; only the colours change.\n","properties":{"primaryCta":{"$ref":"#/components/schemas/ThemeComponentColour"},"payButton":{"$ref":"#/components/schemas/ThemeComponentColour"},"addToCart":{"$ref":"#/components/schemas/ThemeComponentColour"},"buyTicketsButton":{"$ref":"#/components/schemas/ThemeComponentColour"},"link":{"$ref":"#/components/schemas/ThemeComponentColour"},"badge":{"$ref":"#/components/schemas/ThemeComponentColour"}}}}},
+"Theme": {"x-ticvai-persistence":"none — embedded in tenant_config","type":"object","x-ticvai-contrast-pairs":[{"foreground":"textColour","background":"backgroundColour","use":"text","ratio":4.5},{"foreground":"textColour","background":"backgroundColour","use":"largeText","ratio":3.0},{"foreground":"primaryColour","background":"backgroundColour","use":"nonText","ratio":3.0},{"foreground":"secondaryColour","background":"backgroundColour","use":"nonText","ratio":3.0},{"foreground":"accentColour","background":"backgroundColour","use":"nonText","ratio":3.0},{"foreground":"componentColours.*.text","background":"componentColours.*.background","use":"text","ratio":4.5},{"foreground":"componentColours.*.background","background":"backgroundColour","use":"nonText","ratio":3.0}],"required":["primaryColour","secondaryColour","backgroundColour","textColour"],"properties":{"primaryColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"secondaryColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"accentColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"backgroundColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"textColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"darkMode":{"type":"object","deprecated":true,"description":"**Deprecated and ignored** (Chinmay, 2 October, workbook Q150 and the pre-apply round; CHG-CSA-035). White label has no dark or light mode: the venue's chosen theme is applied, on every device setting. The field is kept so a client built at r1 still parses, is accepted on `setTheme` and returned as stored, and **is never used to render anything or drawn on any screen**; the guest app has no Light/Dark switch.","properties":{"primaryColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"backgroundColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"},"textColour":{"type":"string","pattern":"^#[0-9A-Fa-f]{6}$"}}},"cornerRadius":{"type":"integer","minimum":0,"maximum":32,"description":"The prototype's 0 to 22 px slider sits inside these bounds (rev 3 CFG-2, no change). Its named palettes, font pairs and background tones are presets over the colours here and `FontConfig`, not stored values."},"surfaceStyle":{"type":"string","enum":["glass","solid"],"default":"glass","description":"Cards and panels as frosted glass or opaque (decided 29 September, rev 3 CFG-3)."},"buttonStyle":{"type":"string","enum":["solid","outline","pill"],"default":"solid","description":"Button shape (decided 29 September, rev 3 CFG-3)."},"componentColours":{"type":"object","description":"**Colours for single interactive elements (decided 17 September, M17-11).** Each is optional and falls back to the theme colours. Every pair passes the same contrast check as the theme (`ContrastProblem`), or `setTheme` refuses it with 400. The guest flow stays the standard one; only the colours change.\n","properties":{"primaryCta":{"$ref":"#/components/schemas/ThemeComponentColour"},"payButton":{"$ref":"#/components/schemas/ThemeComponentColour"},"addToCart":{"$ref":"#/components/schemas/ThemeComponentColour"},"buyTicketsButton":{"$ref":"#/components/schemas/ThemeComponentColour"},"link":{"$ref":"#/components/schemas/ThemeComponentColour"},"badge":{"$ref":"#/components/schemas/ThemeComponentColour"}}}}},
 "TranslationProposals": {"type":"object","x-ticvai-persistence":"none — each draft is written on the block it translates","description":"What `proposeTranslations` drafted. **Every entry is a draft, never a publish** — a person edits and publishes it through the contract that owns the block.\n","required":["targetLocale","drafts"],"properties":{"targetLocale":{"type":"string"},"translationJobId":{"type":"string","format":"uuid","readOnly":true,"description":"The job to follow with `getTranslationProposals` (contract gap CHG-WIR-017, CMS-011; CHG-CSA-045)."},"status":{"type":"string","readOnly":true,"enum":["running","completed","failed"],"description":"`running` while drafts are still being written; `drafts` then holds those done so far."},"drafts":{"type":"array","items":{"type":"object","required":["targetKind","targetRef","draftText"],"properties":{"targetKind":{"type":"string","enum":["contentBlock","productName","emailTemplate","messageTemplate"]},"targetRef":{"type":"string","description":"The id of the block, product or template the draft sits on."},"draftText":{"type":"string","description":"The first-pass translation, as saved on the draft."}}}}}},
 "UrlRedirect": {"type":"object","x-ticvai-persistence":"control.url_redirect","description":"22.11.7. **Retired pages, expired campaigns and migrated content**, which is most of a website's history.\n**A redirect chain is the failure mode.** A → B → C loses ranking at every hop, so a new redirect whose target is itself a redirect is collapsed rather than appended.\n","required":["id","fromPath","toPath","statusCode"],"properties":{"id":{"readOnly":true,"type":"string","format":"uuid"},"fromPath":{"type":"string"},"toPath":{"type":"string"},"statusCode":{"type":"integer","enum":[301,302,307,308]},"reason":{"type":"string","enum":["contentMigrated","pageRetired","campaignExpired","restructure","slugChanged"]},"createdAt":{"type":"string","format":"date-time","readOnly":true,"nullable":true,"description":"**Taken from their `whitelabel.redirect`, 20 September.** This table counts hits and could not say when a redirect was added — a record of a site's history with no date on its own rows. Ours had `hitCount` and no timestamp of any kind.\n"},"hitCount":{"type":"integer","readOnly":true},"isActive":{"type":"boolean","default":true},"scopePath":{"readOnly":true,"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope.**"}}},
 "VenueContact": {"x-ticvai-persistence":"none — embedded in tenant_config","type":"object","nullable":true,"description":"How a guest reaches the venue: WEB-028 Contact & Venue Information, and the screen shown on an error or when the app cannot help (decided 28 September, audit R073). Public, because nothing here is personal.\n","properties":{"phone":{"type":"string","nullable":true},"email":{"type":"string","format":"email","nullable":true},"whatsapp":{"type":"string","nullable":true},"address":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true},"openingHours":{"allOf":[{"$ref":"#/components/schemas/LocalisedText"}],"nullable":true,"description":"Prose, as the guest reads it. The bookable hours are the catalogue's."}}}

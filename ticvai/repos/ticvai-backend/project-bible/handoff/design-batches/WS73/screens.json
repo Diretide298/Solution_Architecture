@@ -386,16 +386,10 @@
        "label": "Every participant waiver status",
        "columns": [
         "ParticipantWaiverStatusTrackingView.participant",
-        "ParticipantWaiverStatusTrackingView.participantId",
-        "ParticipantWaiverStatusTrackingView.customerPurchaser",
         "ParticipantWaiverStatusTrackingView.booking",
         "ParticipantWaiverStatusTrackingView.ticket",
-        "ParticipantWaiverStatusTrackingView.product",
-        "ParticipantWaiverStatusTrackingView.event",
         "ParticipantWaiverStatusTrackingView.visitDate",
         "ParticipantWaiverStatusTrackingView.ageCategory",
-        "ParticipantWaiverStatusTrackingView.group",
-        "ParticipantWaiverStatusTrackingView.waiverRequirements",
         "ParticipantWaiverStatusTrackingView.completionStatus"
        ],
        "bindsTo": "ParticipantWaiverStatusTrackingView",
@@ -414,16 +408,12 @@
        "bindsTo": "ParticipantWaiverStatusTrackingView",
        "columns": [
         "ParticipantWaiverStatusTrackingView.participant",
-        "ParticipantWaiverStatusTrackingView.participantId",
         "ParticipantWaiverStatusTrackingView.customerPurchaser",
         "ParticipantWaiverStatusTrackingView.booking",
         "ParticipantWaiverStatusTrackingView.ticket",
         "ParticipantWaiverStatusTrackingView.product",
-        "ParticipantWaiverStatusTrackingView.event",
         "ParticipantWaiverStatusTrackingView.visitDate",
         "ParticipantWaiverStatusTrackingView.ageCategory",
-        "ParticipantWaiverStatusTrackingView.group",
-        "ParticipantWaiverStatusTrackingView.waiverRequirements",
         "ParticipantWaiverStatusTrackingView.completionStatus"
        ],
        "notes": null,

@@ -109,13 +109,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-188` | Dynamic Bundle Operations Command Center | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-189` | Component Inventory & Availability Matrix | B–D | 0 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
 | `ADM-190` | Bundle Sellability & Dependency Rule Engine | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-191` | Capacity Pool & Reservation Manager | B–D | 19 | 12 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-191` | Capacity Pool & Reservation Manager | B–D | 19 | 6 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-192` | Dynamic Component Substitution Engine | B–D | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-193` | Dynamic Bundle Rule & Composition Engine | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-194` | Real-Time Availability & Checkout Validation | B–D | 1 | 0 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
-| `ADM-195` | Bundle Availability by Channel, Venue & Partner | B–D | 17 | 12 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-195` | Bundle Availability by Channel, Venue & Partner | B–D | 17 | 6 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-196` | Bundle Availability Forecast, Alerts & Recovery | B–D | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-197` | Dynamic Bundle Simulation & AI Optimization | B–D | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-197` | Dynamic Bundle Simulation & AI Optimization | B–D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -578,18 +578,12 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Bundle | the name it points at, never the id | — |
 | Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where a sale came from. Restored 24 August — this was lost in the `Money` rewrite and nine references across four contracts were pointing … |
-| Venue | the name it points at, never the id | Where the policy differs by venue for a multi-venue bundle. |
-| Partner | the name it points at, never the id | — |
 | Capacity source | chip: Shared pool, Dedicated bundle allocation, Channel allocation, Partner allocation … | — |
 | Allocation mode | chip: Hard, Soft | Hard allocation is ring-fenced for the bundle; soft is released back when unsold. |
 | Capacity ceiling | 1,234 | — |
 | Hold duration minutes | 1,234 | How long a temporary reservation of the components lasts. |
 | Booking cutoff minutes | 1,234 | Minutes before the experience after which the bundle is no longer sold. |
-| Allow overbooking | yes / no (icon or chip) | — |
-| Allow waitlist | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -659,7 +653,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (19), with its required mark, default, format and its error state (404, 422).
-- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-191?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save bundle capacity policy.
 - [ ] Every transition is wired: `ADM-188`.
@@ -1074,18 +1068,12 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Bundle | the name it points at, never the id | — |
 | Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where a sale came from. Restored 24 August — this was lost in the `Money` rewrite and nine references across four contracts were pointing … |
-| Venue | the name it points at, never the id | Where the policy differs by venue for a multi-venue bundle. |
-| Partner | the name it points at, never the id | — |
 | Capacity source | chip: Shared pool, Dedicated bundle allocation, Channel allocation, Partner allocation … | — |
 | Allocation mode | chip: Hard, Soft | Hard allocation is ring-fenced for the bundle; soft is released back when unsold. |
 | Capacity ceiling | 1,234 | — |
 | Hold duration minutes | 1,234 | How long a temporary reservation of the components lasts. |
 | Booking cutoff minutes | 1,234 | Minutes before the experience after which the bundle is no longer sold. |
-| Allow overbooking | yes / no (icon or chip) | — |
-| Allow waitlist | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -1152,7 +1140,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (17), with its required mark, default, format and its error state (404, 422).
-- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-195?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save bundle capacity policy.
 - [ ] Every transition is wired: `ADM-188`.
@@ -1344,8 +1332,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Price impact | AED 1,234.50 | Price impact |
 | Margin impact | 1,234.5 | Margin impact |
 | Capacity impact | 1,234 | Capacity impact |
-| Customer impact | text | Customer impact |
-| Revenue impact | AED 1,234.50 | Revenue impact |
 
 **The selected dynamic bundle simulation** (detail panel): The pack groups this record's detail under its own headings: “Scenario A”, “Scenario B”, “Scenario C”, “Scenario D”, “Scenario E”, “Photo”.
 
@@ -1417,7 +1403,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-197?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] No transition is declared; back returns where the user came from.

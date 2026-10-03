@@ -93,7 +93,10 @@
      "to": "BO-293",
      "trigger": "Works in Membership Product Validation, Approval, Publication & Versioning",
      "provenance": "flow F138 step 17→18",
-     "operation": "listMembershipAnnualPass"
+     "operation": "listMembershipAnnualPass",
+     "carries": [
+      "challengeId"
+     ]
     }
    ]
   },
@@ -333,7 +336,9 @@
    "params": [
     {
      "name": "challengeId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`; a link or an edge that holds one opens it instead."
     }
    ]
   },
@@ -1181,7 +1186,9 @@
    "params": [
     {
      "name": "templateId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listEntitlementTemplates` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1337,7 +1344,9 @@
    "params": [
     {
      "name": "templateId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listEntitlementTemplates` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1823,7 +1832,9 @@
    "params": [
     {
      "name": "priceListId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPriceLists` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -2080,7 +2091,17 @@
     "BO-284"
    ],
    "inferred": false,
-   "notes": "**Reached from BO-284, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation."
+   "notes": "**Reached from BO-284, the hub of its workshop board.** Stated on 4 September: the pack groups its screens ten to a board behind a command centre, and that grouping is the navigation.",
+   "transitions": [
+    {
+     "to": "BO-284",
+     "trigger": "Membership & Annual Pass Command Center",
+     "carries": [
+      "challengeId"
+     ],
+     "provenance": "derived — BO-284 declares entryState.params challengeId and BO-293 holds challengeId, so an edge into it carries them"
+    }
+   ]
   },
   "density": "compact",
   "purposeNote": "Only validated, approved and correctly versioned membership configurations can become commercially active, with complete impact and audit history. Board 1 — Final Screen Register # Backend Screen Core Responsibility 13.1. Membership & Annual Pass Command Center Portfolio management 1 13.1. Membership Product & Tier Builder Product/tier definition 2 13.1. Membership Eligibility & Qualification Rule Builder Member eligibility 3 13.1. Validity, Activation & Expiry Configuration Membership lifecycle 4 13.1. Benefits and Membership Entitlement & Admission Benefit Builder 5 entitlements 13.1. Member",
@@ -2201,7 +2222,9 @@
    "params": [
     {
      "name": "challengeId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`; a link or an edge that holds one opens it instead."
     }
    ]
   },

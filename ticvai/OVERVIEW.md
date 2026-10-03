@@ -4,7 +4,7 @@ A multi-tenant platform for ticketing, access control, point of sale and venue o
 **This package is the design of it** — the contracts, the data model, the screens, the
 journeys through them, and the reasoning behind every decision that was not obvious.
 
-**2731 operations · 33 contracts · 1112 tables · 2450 screens · 207 state models · 97 flows · 70 ADRs**
+**2738 operations · 33 contracts · 1113 tables · 2450 screens · 207 state models · 97 flows · 70 ADRs**
 
 **Design 96% · Build 33%.**
 
@@ -33,12 +33,12 @@ package has been bitten by that three times.
 | | | |
 |---|---:|---|
 | Requirements contracted | **3,153** of 3,184 | **100% of what is in scope** |
-| Operations reaching a screen | 2486 of 2731 | 91% |
+| Operations reaching a screen | 2489 of 2738 | 91% |
 | Screens reachable from an entry point | 2447 of 2450 | 100% |
 | Screens drawn on a board | 2450 of 2450 | 100% |
 | Screens in a journey | 2106 of 2450 | 86% |
 | Conflicts | 158 closed | 8 open, none blocking |
-| **Tables written** | **0** of 1112 | **build has not started** |
+| **Tables written** | **0** of 1113 | **build has not started** |
 
 ---
 
@@ -105,15 +105,15 @@ cd viewer && npm start        →  http://localhost:4173
 
 **Put last on purpose.** A landing page that only lists what exists is a landing page that misleads.
 
-**Build is 0%.** 1112 tables are designed and none is written. No migration has run, no service is scaffolded, and nothing has executed. **The design is 100% of in-scope requirements and the gap to build is the entire remaining risk.**
+**Build is 0%.** 1113 tables are designed and none is written. No migration has run, no service is scaffolded, and nothing has executed. **The design is 100% of in-scope requirements and the gap to build is the entire remaining risk.**
 
-**97 journeys of a target 60.** Seventeen contracts have exactly one — `subscription` has one over 2731 operations. **Every journey written so far has found a defect**, which is the argument for writing more.
+**97 journeys of a target 60.** Seventeen contracts have exactly one — `subscription` has one over 2738 operations. **Every journey written so far has found a defect**, which is the argument for writing more.
 
 **2450 screens cannot be reached** from their platform's entry point, and navigation is still inferred rather than designed on most of the estate.
 
 **8 conflicts are open.** None blocks build; four need an email and one needs a workshop.
 
-- **CF-171** — Chinmay + Qossai **Re-measured 20 September: 577 of 2731 operations, 28%** — the figures above are 577 of 1,626 and 35%. **The absolute number has not moved by one, and all 577 still have a `summary` that is verbatim the title of a screen in their own `x-ticvai-consumed-by`.** It reads better only because the denominator grew by 2731 operations that were specified properly. **A measurement that drifts in our own favour is the one nobody re-runs**, which is the whole argument of this row restated against itself. Concentrated in `access` (146), `catalogue` (108), `promotions` (96), `orders` (89), `marketing-crm` (68), `subscription` (50) and `approvals` (20).
+- **CF-171** — Chinmay + Qossai **Re-measured 20 September: 577 of 2738 operations, 28%** — the figures above are 577 of 1,626 and 35%. **The absolute number has not moved by one, and all 577 still have a `summary` that is verbatim the title of a screen in their own `x-ticvai-consumed-by`.** It reads better only because the denominator grew by 2738 operations that were specified properly. **A measurement that drifts in our own favour is the one nobody re-runs**, which is the whole argument of this row restated against itself. Concentrated in `access` (146), `catalogue` (108), `promotions` (96), `orders` (89), `marketing-crm` (68), `subscription` (50) and `approvals` (20).
 - **CF-170** — Chinmay + Dinesh
 - **CF-169** — Chinmay + Dinesh
 - **CF-162** — Dinesh

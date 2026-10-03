@@ -138,8 +138,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | Retail · wave 2 · needs the `retail` module |
-| Block | Block A · ticket #18206 (APP-WEB-WEB-033) |
+| Module | Retail · wave 1 · needs the `retail` module |
+| Block | Block A · task APP-WEB-WEB-033 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listMerchandise` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -369,8 +369,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Flow F51 *A guest shops in the venue and collects on the way out*, step 1: They browse the shop. → **The same catalogue the tills hold.** A price online that differs from the shelf is a complaint at the counter.
 - Flow F51 *A guest shops in the venue and collects on the way out*, step 2: They pay online at checkout, marking the item for collection. → **Paid online at checkout, and the payment creates the shop-and-drop** (decided 28 September, audit R236). Nothing is reserved before payment: stock is committed when the money is, so a guest who …
 - Flow F51 branch at step 2 (high): when The last one sells at a till while the guest is paying online., **Checkout refuses the line rather than accepting it and disappointing** (audit R236). An oversell the venue knows about at purchase is a refund it never has to make.
-- ADR-0045 *Every order carries a proven contact, and the gate is the checkout page* (`docs/adr/0045-every-order-carries-a-proven-contact.md`)
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
+- ADR-0045 *Every order carries a proven contact, and the gate is the checkout page* (`docs/adr/0045-every-order-carries-a-proven-contact.md`)
 - ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
 - ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
@@ -396,8 +396,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | Retail · wave 2 · needs the `retail` module |
-| Block | Block A · ticket #18207 (APP-WEB-WEB-042) |
+| Module | Retail · wave 1 · needs the `retail` module |
+| Block | Block A · task APP-WEB-WEB-042 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listMerchandise` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

@@ -95,16 +95,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-469` | AI Configuration Home & Start | B–D | 6 | 36 | 7 | 3 | 1 | 0 | — | notStarted (—) |
-| `ADM-470` | Setup Type & Business Intent Discovery | B–D | 21 | 6 | 7 | 3 | 0 | 0 | — | notStarted (—) |
-| `ADM-471` | Venue & Business Model Discovery | B–D | 50 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-472` | Guided Question & Answer Workspace | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-473` | Product & Admission Model Discovery | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-474` | Operational Requirement Discovery | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-475` | Commercial Requirement Discovery | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-476` | Required, Recommended & Optional Decisions | B–D | 10 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-477` | Missing Information & Clarification Center | B–D | 6 | 6 | 7 | 3 | 0 | 0 | — | notStarted (—) |
-| `ADM-478` | Configuration Blueprint & Dependency Map | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-469` | AI Configuration Home & Start | D | 6 | 36 | 7 | 3 | 1 | 0 | — | notStarted (—) |
+| `ADM-470` | Setup Type & Business Intent Discovery | D | 21 | 6 | 7 | 3 | 0 | 0 | — | notStarted (—) |
+| `ADM-471` | Venue & Business Model Discovery | D | 50 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-472` | Guided Question & Answer Workspace | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-473` | Product & Admission Model Discovery | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-474` | Operational Requirement Discovery | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-475` | Commercial Requirement Discovery | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-476` | Required, Recommended & Optional Decisions | D | 10 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-477` | Missing Information & Clarification Center | D | 6 | 6 | 7 | 3 | 0 | 0 | — | notStarted (—) |
+| `ADM-478` | Configuration Blueprint & Dependency Map | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 
 ## Design inputs from the client meetings
 

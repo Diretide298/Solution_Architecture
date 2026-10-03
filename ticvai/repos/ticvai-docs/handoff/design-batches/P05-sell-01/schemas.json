@@ -2359,6 +2359,62 @@
    }
   }
  },
+ "PublishedAnalyticsProvider": {
+  "x-ticvai-persistence": "none — the enabled rows of whitelabel.analytics_provider, guest-facing fields only",
+  "description": "**What the tag loader needs and nothing else** (CHG-GCF-005): no reporting property, no credential, no venue or scope. The values are those of `StorefrontAnalyticsProvider`.",
+  "type": "object",
+  "required": [
+   "provider",
+   "measurementId",
+   "surfaces",
+   "consentCategory"
+  ],
+  "properties": {
+   "provider": {
+    "type": "string",
+    "enum": [
+     "googleAnalytics4",
+     "googleTagManager",
+     "adobeAnalytics",
+     "metaPixel",
+     "matomo",
+     "other"
+    ]
+   },
+   "otherProviderName": {
+    "type": "string",
+    "maxLength": 100,
+    "nullable": true,
+    "description": "The provider's name, when `provider` is `other` (`StorefrontAnalyticsProvider.providerLabel`)."
+   },
+   "measurementId": {
+    "type": "string",
+    "maxLength": 100,
+    "description": "What the tag or SDK reports to (GA4 `G-...`, Tag Manager `GTM-...`, a pixel id)."
+   },
+   "surfaces": {
+    "type": "array",
+    "minItems": 1,
+    "items": {
+     "type": "string",
+     "enum": [
+      "guestWeb",
+      "guestApp"
+     ]
+    }
+   },
+   "consentCategory": {
+    "type": "string",
+    "enum": [
+     "functional",
+     "analytics",
+     "personalisation",
+     "marketing"
+    ],
+    "description": "The cookie category the visitor must grant before this provider loads (marketing-crm `CookieCategory`)."
+   }
+  }
+ },
  "PublishedTenantConfig": {
   "x-ticvai-persistence": "none — computed from the current ConfigVersion snapshot and the live status on whitelabel.tenant_config",
   "type": "object",
@@ -2468,6 +2524,13 @@
    },
    "contact": {
     "$ref": "#/components/schemas/VenueContact"
+   },
+   "analyticsProviders": {
+    "type": "array",
+    "description": "**The analytics platforms the storefront and app load** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-005): a guest reads them here instead of `listAnalyticsProviders`, which needs `TENANT_CONFIGURE`. The enabled `StorefrontAnalyticsProvider` rows in force for the venue being browsed (that venue's own rows when `venueId` was sent and it has any, else the tenant-wide ones), read live, with only what the tag loader needs. **A provider loads only once marketing-crm `getCookieConsentRuntime` says its `consentCategory` is granted**; before that nothing is sent to it (2.6.58).",
+    "items": {
+     "$ref": "#/components/schemas/PublishedAnalyticsProvider"
+    }
    }
   }
  },
@@ -2669,6 +2732,50 @@
  "Theme": {
   "x-ticvai-persistence": "none — embedded in tenant_config",
   "type": "object",
+  "x-ticvai-contrast-pairs": [
+   {
+    "foreground": "textColour",
+    "background": "backgroundColour",
+    "use": "text",
+    "ratio": 4.5
+   },
+   {
+    "foreground": "textColour",
+    "background": "backgroundColour",
+    "use": "largeText",
+    "ratio": 3.0
+   },
+   {
+    "foreground": "primaryColour",
+    "background": "backgroundColour",
+    "use": "nonText",
+    "ratio": 3.0
+   },
+   {
+    "foreground": "secondaryColour",
+    "background": "backgroundColour",
+    "use": "nonText",
+    "ratio": 3.0
+   },
+   {
+    "foreground": "accentColour",
+    "background": "backgroundColour",
+    "use": "nonText",
+    "ratio": 3.0
+   },
+   {
+    "foreground": "componentColours.*.text",
+    "background": "componentColours.*.background",
+    "use": "text",
+    "ratio": 4.5
+   },
+   {
+    "foreground": "componentColours.*.background",
+    "background": "backgroundColour",
+    "use": "nonText",
+    "ratio": 3.0
+   }
+  ],
   "required": [
    "primaryColour",
    "secondaryColour",

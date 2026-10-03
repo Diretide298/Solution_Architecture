@@ -133,8 +133,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SUP-002` | Agent Dashboard | A | 35 | 56 | 6 | 17 | 1 | 0 | — | notStarted (generated) |
-| `SUP-008` | Agent Performance & SLA View | B–D | 76 | 47 | 6 | 97 | 0 | 0 | — | notStarted (generated) |
+| `SUP-002` | Agent Dashboard | A | 35 | 27 | 6 | 17 | 1 | 0 | — | notStarted (generated) |
+| `SUP-008` | Agent Performance & SLA View | D | 76 | 25 | 6 | 97 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -149,8 +149,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
-| Module | Overview · wave 3 · needs the `marketing` module |
-| Block | Block A · ticket #18187 (APP-SETUP-SUP-002) |
+| Module | Overview · wave 1 · needs the `marketing` module |
+| Block | Block A · task APP-SETUP-SUP-002 |
 | Who uses it | venue staff holding `CASE_MANAGE`, `CASE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCases` reads the population and `getCase` reads one of them — list, select, act |
@@ -277,32 +277,19 @@ Errors to draw in the form: 400 Resolving without a resolution note
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
 | Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
 | Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
-| Category | the name it points at, never the id | — |
 | Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
 | Priority | chip: Low, Normal, High, Urgent | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Related order | text | — |
 | Sla due at | 1 Oct 2026, 14:30 | — |
 
 **Every conversation** (data table, from `listConversations`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Telephony | grouped details | BL-083. `ConversationChannel` included `voice` with nothing behind it — the model anticipated telephony and stopped at the enum. |
-| Assist session | the name it points at, never the id | BL-094. `startKioskAssist` recorded a staff member helping a guest and `createCase` recorded a service interaction, and neither referenced … |
 | Channel | chip: Web chat, In app chat, Whatsapp, SMS, Email, Kiosk… | — |
 | State | chip: With assistant, Queued, With agent, Waiting on guest, Resolved, Abandoned… | `withAssistant` and `queued` are different, and the second has a person waiting. |
-| Subject | the name it points at, never the id | 22.8.3. Resolved from phone, email, membership number or a signed-in session. |
-| Venue | the name it points at, never the id | — |
-| Assigned principal | the name it points at, never the id | — |
-| Queue | the name it points at, never the id | — |
 | Queue position | 1,234 | Place among the unclaimed conversations in `queueId`, from the live agent queue (audit R149). |
 | Estimated wait seconds | 1,234 | From the live agent queue — the conversations ahead divided across that queue's agents online now (audit R149). |
 | Handover reason | chip: Guest requested, Assistant refused, Assistant failed, Out of scope, Negative … | — |
@@ -311,43 +298,27 @@ Errors to draw in the form: 400 Resolving without a resolution note
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
 | Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
 | Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
 | Kind | chip: Lost property, Complaint, Question, Accessibility, Refund request, Other | What the guest said it was about, where the guest raised it. |
 | Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`. |
 | Recorded at | 1 Oct 2026, 14:30 | Device time the case was raised — the start of the SLA clock. |
-| Synced at | 1 Oct 2026, 14:30 | Server time the case arrived. Equal to `recordedAt` for a case raised online. |
-| Category | the name it points at, never the id | — |
 | Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
 | Priority | chip: Low, Normal, High, Urgent | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Related order | text | — |
-| Sla due at | 1 Oct 2026, 14:30 | — |
 
 **The case** (detail panel, from `getCase`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
 | Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
 | Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
 | Kind | chip: Lost property, Complaint, Question, Accessibility, Refund request, Other | What the guest said it was about, where the guest raised it. |
 | Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`. |
 | Recorded at | 1 Oct 2026, 14:30 | Device time the case was raised — the start of the SLA clock. |
-| Synced at | 1 Oct 2026, 14:30 | Server time the case arrived. Equal to `recordedAt` for a case raised online. |
-| Category | the name it points at, never the id | — |
 | Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
 | Priority | chip: Low, Normal, High, Urgent | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Related order | text | — |
-| Sla due at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -386,7 +357,7 @@ Errors to draw in the form: 400 Resolving without a resolution note
 | Error (`?state=error`) | Could not load. Names which read failed (cases or conversations) and leaves the other on screen. |
 | Empty, first run (`?state=emptyFirstRun`) | No cases assigned to you: you are available for new work. Offers Create case (`createCase`) for a contact that arrives outside the queue; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the status, assignee, priority or SLA filter, and the cases are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `CASE_VIEW`, which `listCases` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `CASE_VIEW`, which `listCases` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASE_MANAGE` for `addCaseMessage`, `createCase`, `escalateCase`, `reopenCase` and 2 more. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Resolving without a resolution note; 409 The case is not `resolved` — a `closed` case is past its reopen window, and an open one has nothing to reopen. (StateTransitionProblem) |
 
@@ -440,7 +411,7 @@ conversations:
 - `listConversations` → `CASE_VIEW` (read) · staff
 - `setAgentAvailability` → `CASE_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `CASE_VIEW`, which `listCases` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `CASE_VIEW`, which `listCases` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASE_MANAGE` for `addCaseMessage`, `createCase`, `escalateCase`, `reopenCase` and 2 more.
 
 #### Requirements it meets
 
@@ -483,7 +454,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (35), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (56 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SUP-002?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Add case message, Create case, Escalate case, Reopen case, Save case, Save agent availability.
 - [ ] Every transition is wired: `SUP-001`, `SUP-004`.
@@ -501,7 +472,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
 | Module | Overview · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-SUPPORT-SUP-008 |
 | Who uses it | venue staff holding `CASE_VIEW`, `REPORT_MANAGE`, `REPORT_VIEW_VENUE` (1 read, 1 configure, 1 operate) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listReports` reads the population and `getFinancialReport` reads one of them — list, select, act |
@@ -666,29 +637,15 @@ Errors to draw in the form: 409 The report is a system report, which is clone-on
 | Name | text | — |
 | Description | text | — |
 | Category | chip: Sales, Admission, Financial, Inventory, Guest, Operations… | — |
-| Data source | chip: Orders, Order lines, Payments, Refunds, Shifts, Scan events… | What a report may be built over. A closed set, and that is the point — a builder that accepts any table will happily produce a report over … |
-| Columns | list or chips (count when long) | — |
-| Filters | list or chips (count when long) | — |
-| Group by | list or chips (count when long) | — |
-| Parameters | list or chips (count when long) | — |
-| Required permission | chip: SESSION FORCE LOGOUT, USER MANAGE, ROLE MANAGE, PERMISSION GRANT, PERMISSION VIEW … | Permission needed to run this report, from the shared `Permission` vocabulary. The author cannot assign one they do not hold — otherwise a … |
 | Max date range days | 1,234 | Guards against a query spanning years of scan events. When a report sets none, 366 days applies (decided 28 September, audit R158), so … |
-| ID | the name it points at, never the id | — |
 | Is system | yes / no (icon or chip) | Shipped with the platform — seeded at provisioning (BL-053, `SeededReport`). Clone-only (decided 28 September, audit R096): `updateReport` … |
 
 **Every conversation** (data table, from `listConversations`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Telephony | grouped details | BL-083. `ConversationChannel` included `voice` with nothing behind it — the model anticipated telephony and stopped at the enum. |
-| Assist session | the name it points at, never the id | BL-094. `startKioskAssist` recorded a staff member helping a guest and `createCase` recorded a service interaction, and neither referenced … |
 | Channel | chip: Web chat, In app chat, Whatsapp, SMS, Email, Kiosk… | — |
 | State | chip: With assistant, Queued, With agent, Waiting on guest, Resolved, Abandoned… | `withAssistant` and `queued` are different, and the second has a person waiting. |
-| Subject | the name it points at, never the id | 22.8.3. Resolved from phone, email, membership number or a signed-in session. |
-| Venue | the name it points at, never the id | — |
-| Assigned principal | the name it points at, never the id | — |
-| Queue | the name it points at, never the id | — |
 | Queue position | 1,234 | Place among the unclaimed conversations in `queueId`, from the live agent queue (audit R149). |
 | Estimated wait seconds | 1,234 | From the live agent queue — the conversations ahead divided across that queue's agents online now (audit R149). |
 | Handover reason | chip: Guest requested, Assistant refused, Assistant failed, Out of scope, Negative … | — |
@@ -703,15 +660,7 @@ Errors to draw in the form: 409 The report is a system report, which is clone-on
 | Data source | chip: Orders, Order lines, Payments, Refunds, Shifts, Scan events… | What a report may be built over. A closed set, and that is the point — a builder that accepts any table will happily produce a report over … |
 | Columns | list or chips (count when long) | — |
 | Filters | list or chips (count when long) | — |
-| Group by | list or chips (count when long) | — |
-| Parameters | list or chips (count when long) | — |
-| Required permission | chip: SESSION FORCE LOGOUT, USER MANAGE, ROLE MANAGE, PERMISSION GRANT, PERMISSION VIEW … | Permission needed to run this report, from the shared `Permission` vocabulary. The author cannot assign one they do not hold — otherwise a … |
-| Max date range days | 1,234 | Guards against a query spanning years of scan events. When a report sets none, 366 days applies (decided 28 September, audit R158), so … |
-| ID | the name it points at, never the id | — |
-| Is system | yes / no (icon or chip) | Shipped with the platform — seeded at provisioning (BL-053, `SeededReport`). Clone-only (decided 28 September, audit R096): `updateReport` … |
-| Is retired | yes / no (icon or chip) | — |
 | Estimated cost | chip: Low, Medium, High | Informs whether it may run inline or must be queued. |
-| Created by principal | the name it points at, never the id | — |
 | Last run at | 1 Oct 2026, 14:30 | — |
 
 **The financial report** (detail panel, from `getFinancialReport`)
@@ -760,7 +709,7 @@ Errors to draw in the form: 409 The report is a system report, which is clone-on
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the agent performance sla untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No agent performance sla yet. Offers Create report (`createReport`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on category, search and the agent performance sla are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires to show this screen, and names that permission (the screen's other reads need `CASE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REPORT_MANAGE` for `createReport`, `deleteReport` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Question could not be interpreted. (ReportQuestionProblem); 400 Required parameter missing, or the date range exceeds `maxDateRangeDays` (366 days when the definition sets none, audit R158); 400 Unknown field, invalid filter, or estimated cost beyond the limit; 409 Active schedules reference this report (`report-scheduled`), or it is a system report, which is clone-only (`system-report` … |
 
@@ -786,7 +735,7 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `updateReport` → `REPORT_MANAGE` (configure) · staff, partner
 - `listConversations` → `CASE_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires to show this screen, and names that permission (the screen's other reads need `CASE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REPORT_MANAGE` for `createReport`, `deleteReport` …
 
 #### Requirements it meets
 
@@ -827,7 +776,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (76), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (47 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (25 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SUP-008?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Run report, Ask reporting question, Create report, Delete report, Save natural language query, Save report.
 - [ ] Every transition is wired: `SUP-001`, `SUP-002`.

@@ -132,7 +132,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `WEB-034` | Lost & Found | A | 11 | 28 | 6 | 1 | 1 | 0 | guest | review (client-verified) |
+| `WEB-034` | Lost & Found | A | 11 | 9 | 6 | 1 | 1 | 0 | guest | review (client-verified) |
 | `WEB-045` | Help Centre & Accessibility | A | 0 | 27 | 6 | 0 | 3 | 0 | guest | review (client-verified) |
 
 ---
@@ -148,8 +148,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | Support · wave 3 · needs the `marketing` module |
-| Block | Block A · ticket #18227 (APP-WEB-WEB-034) |
+| Module | Support · wave 1 · needs the `marketing` module |
+| Block | Block A · task APP-WEB-WEB-034 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listMyCases` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -218,38 +218,19 @@ Errors to draw in the form: 400 `kind` is `other` and `detail` is missing or emp
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
 | Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
 | Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
-| Category | the name it points at, never the id | — |
 | Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
-| Priority | chip: Low, Normal, High, Urgent | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Related order | text | — |
-| Sla due at | 1 Oct 2026, 14:30 | — |
 
 **The selected case** (detail panel, from `listMyCases`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
 | Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
 | Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
-| Category | the name it points at, never the id | — |
 | Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
-| Priority | chip: Low, Normal, High, Urgent | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Related order | text | — |
-| Sla due at | 1 Oct 2026, 14:30 | — |
-| Is sla breached | yes / no (icon or chip) | Computed when read, never stored. True once the case has been open longer than its SLA allows — the time from `recordedAt` to `resolvedAt` … |
-| Sla paused seconds | 1,234 | Accrued only while awaiting the guest. Waiting on an internal team does not pause the clock. |
-| Escalation count | 1,234 | — |
 | Resolved at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
@@ -357,7 +338,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (11), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-034?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Raise my case, Reply to my case.
 - [ ] Every transition is wired: `GST-034`.
@@ -377,8 +358,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | Support · wave 2 · needs the `core` module |
-| Block | Block A · ticket #18096 (APP-WEB-WEB-045) |
+| Module | Support · wave 1 · needs the `core` module |
+| Block | Block A · task APP-WEB-WEB-045 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listFaqs` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

@@ -128,15 +128,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-001` | Queue Directory | A | 62 | 72 | 6 | 23 | 1 | 6 | — | notStarted (generated) |
-| `BO-002` | Queue Configuration | B–D | 59 | 28 | 6 | 21 | 4 | 6 | — | notStarted (generated) |
+| `BO-001` | Queue Directory | A | 62 | 46 | 6 | 23 | 1 | 6 | — | notStarted (generated) |
+| `BO-002` | Queue Configuration | B–D | 59 | 18 | 6 | 21 | 4 | 6 | — | notStarted (generated) |
 | `BO-003` | Queue Integration Setup | B–D | 12 | 23 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-004` | Manual Wait Time Entry | B–D | 6 | 56 | 6 | 6 | 2 | 6 | — | notStarted (generated) |
-| `BO-005` | Queue Monitor | A | 55 | 62 | 6 | 34 | 3 | 6 | — | notStarted (generated) |
-| `BO-006` | Parking Configuration | A | 11 | 12 | 6 | 3 | 2 | 2 | — | notStarted (generated) |
-| `BO-030` | Work Order Verification | B–D | 7 | 44 | 6 | 10 | 0 | 2 | — | notStarted (generated) |
+| `BO-004` | Manual Wait Time Entry | B–D | 6 | 32 | 6 | 6 | 2 | 6 | — | notStarted (generated) |
+| `BO-005` | Queue Monitor | A | 55 | 38 | 6 | 34 | 3 | 6 | — | notStarted (generated) |
+| `BO-006` | Parking Configuration | A | 11 | 6 | 6 | 3 | 2 | 2 | — | notStarted (generated) |
+| `BO-030` | Work Order Verification | B–D | 7 | 22 | 6 | 10 | 0 | 2 | — | notStarted (generated) |
 | `BO-031` | Asset Register | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-032` | Admission Profiles | A | 94 | 31 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
+| `BO-032` | Admission Profiles | A | 94 | 14 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
 | `BO-033` | Blacklist Management | A | 5 | 10 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
@@ -157,7 +157,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `queue` module |
-| Block | Block A · ticket #17954 (APP-SETUP-BO-001) |
+| Block | Block A · task APP-SETUP-BO-001 |
 | Who uses it | venue staff holding `QUEUE_MANAGE`, `QUEUE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listQueues` reads the population and `getEvent` reads one of them — list, select, act |
@@ -197,7 +197,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 **Form: Configure queue feed** (modal, opened by *Configure queue feed*; *Configure queue feed* calls `configureQueueFeed`, *Cancel* sends nothing)
 
-**Collects what `configureQueueFeed` sends before it is called.** Required: `id`, `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`, `health`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `configureQueueFeed` sends before it is called.** Required: `id`, `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `health` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -308,14 +308,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 |---|---|---|
 | Code | text | — |
 | Name | in the reader's language | — |
-| Venue | the name it points at, never the id | — |
-| Attraction product | the name it points at, never the id | — |
-| Asset | the image or video | The ride. Taking it out of service closes this queue rather than leaving guests holding positions for something that is not running. |
-| Access point | the name it points at, never the id | — |
 | Kind | chip: Standby, Single rider, Fast pass, Virtual, Accessible, Group only… | 5.6.x. A ride has several queues and the model had one. |
-| Operating windows | list or chips (count when long) | When the queue runs, which is not when the venue is open. A ride closing an hour early for maintenance leaves a queue accepting guests for … |
-| Parent queue | the name it points at, never the id | Where several queues share one capacity. The standby and single-rider lines at one ride draw from the same cycles, and a parent is how that … |
-| Load balance with queues | list or chips (count when long) | BL-137. Two rides with the same theme and different waits, and nothing directed a guest to the shorter one. |
 | In queue offer enabled | yes / no (icon or chip) | A guest with twenty minutes to wait is a guest with twenty minutes to buy something. |
 | Notify before call minutes | 1,234 | BL-017, 19.2.61. A guest was not told their turn was approaching, which makes a virtual queue worse than a physical one — at least a line … |
 
@@ -323,8 +316,6 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Queue | the name it points at, never the id | — |
 | Adaptor | chip: Generic, Mock, Vendor adaptor | Vendor adaptors are bespoke work (ADR-0012). `generic` is the inbound API any system can post to; `mock` lets the feature be built and … |
 | Adaptor name | text | Named vendor where `adaptor` is `vendorAdaptor`. |
 | Credentials ref | text | Key vault reference. Credentials are never returned. |
@@ -336,18 +327,12 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The client-generated UUIDv7 from `JoinQueueRequest.id`, and the `entryId` every entry path takes. |
-| Queue | the name it points at, never the id | — |
 | Queue name | in the reader's language | — |
-| Subject | the name it points at, never the id | — |
 | Party number | 1,234 | What the guest sees and what appears on signage. |
 | Party size | 1,234 | — |
 | Status | chip: Waiting, Called, Redeemed, Expired, No show, Cancelled… | — |
 | Position in queue | 1,234 | — |
-| Parties ahead | 1,234 | — |
 | Estimated call at | 1 Oct 2026, 14:30 | — |
-| Is fast pass | yes / no (icon or chip) | — |
-| Entitlement | text | — |
 
 **Data table** (data table): Current wait, source, feed health, status
 
@@ -359,19 +344,11 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 |---|---|---|
 | Code | text | — |
 | Name | in the reader's language | — |
-| Venue | the name it points at, never the id | — |
-| Attraction product | the name it points at, never the id | — |
-| Asset | the image or video | The ride. Taking it out of service closes this queue rather than leaving guests holding positions for something that is not running. |
-| Access point | the name it points at, never the id | — |
 | Kind | chip: Standby, Single rider, Fast pass, Virtual, Accessible, Group only… | 5.6.x. A ride has several queues and the model had one. |
 | Operating windows | list or chips (count when long) | When the queue runs, which is not when the venue is open. A ride closing an hour early for maintenance leaves a queue accepting guests for … |
-| Parent queue | the name it points at, never the id | Where several queues share one capacity. The standby and single-rider lines at one ride draw from the same cycles, and a parent is how that … |
-| Load balance with queues | list or chips (count when long) | BL-137. Two rides with the same theme and different waits, and nothing directed a guest to the shorter one. |
-| In queue offer enabled | yes / no (icon or chip) | A guest with twenty minutes to wait is a guest with twenty minutes to buy something. |
 | Notify before call minutes | 1,234 | BL-017, 19.2.61. A guest was not told their turn was approaching, which makes a virtual queue worse than a physical one — at least a line … |
 | Capacity per cycle | 1,234 | — |
 | Cycle minutes | 1,234.5 | — |
-| Max party size | 1,234 | — |
 | Return window minutes | 1,234 | How long a called party has to arrive before the entry expires. |
 
 **The queue** (detail panel, from `getQueue`)
@@ -401,10 +378,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | Shows | Format | Notes |
 |---|---|---|
-| Queue | the name it points at, never the id | — |
 | Queue name | in the reader's language | — |
-| Attraction product | the name it points at, never the id | — |
-| Attraction category | the name it points at, never the id | The catalogue `ProductCategory` the attraction product is filed under — the value the `category` filter on `getWaitTimes` matches. |
 | Status | chip: Open, Paused, Closed, At capacity | — |
 | Wait minutes | 1,234 | Null where the queue is closed or no estimate is available. |
 | Source | chip: Sensor, Throughput, Manual, Unavailable | Where the estimate came from. Surfaced so an operator knows whether a figure is measured or guessed. |
@@ -554,12 +528,13 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### References
 
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-001` · status **notStarted** · provenance generated
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0012 *Queue Integration — Adaptor-First, Vendor Deferred* (`docs/adr/0012-queue-integration-adaptor-first.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (62), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (72 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (46 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-001?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Call next parties, Configure queue feed, Create queue, Save queue status, Save wait time, Test queue feed, Save queue.
 - [ ] Every transition is wired: `BO-003`, `BO-004`, `BO-005`, `BO-006`, `BO-002`.
@@ -733,14 +708,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 |---|---|---|
 | Code | text | — |
 | Name | in the reader's language | — |
-| Venue | the name it points at, never the id | — |
-| Attraction product | the name it points at, never the id | — |
-| Asset | the image or video | The ride. Taking it out of service closes this queue rather than leaving guests holding positions for something that is not running. |
-| Access point | the name it points at, never the id | — |
 | Kind | chip: Standby, Single rider, Fast pass, Virtual, Accessible, Group only… | 5.6.x. A ride has several queues and the model had one. |
-| Operating windows | list or chips (count when long) | When the queue runs, which is not when the venue is open. A ride closing an hour early for maintenance leaves a queue accepting guests for … |
-| Parent queue | the name it points at, never the id | Where several queues share one capacity. The standby and single-rider lines at one ride draw from the same cycles, and a parent is how that … |
-| Load balance with queues | list or chips (count when long) | BL-137. Two rides with the same theme and different waits, and nothing directed a guest to the shorter one. |
 | In queue offer enabled | yes / no (icon or chip) | A guest with twenty minutes to wait is a guest with twenty minutes to buy something. |
 | Notify before call minutes | 1,234 | BL-017, 19.2.61. A guest was not told their turn was approaching, which makes a virtual queue worse than a physical one — at least a line … |
 
@@ -758,10 +726,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | Shows | Format | Notes |
 |---|---|---|
-| Queue | the name it points at, never the id | — |
 | Queue name | in the reader's language | — |
-| Attraction product | the name it points at, never the id | — |
-| Attraction category | the name it points at, never the id | The catalogue `ProductCategory` the attraction product is filed under — the value the `category` filter on `getWaitTimes` matches. |
 | Status | chip: Open, Paused, Closed, At capacity | — |
 | Wait minutes | 1,234 | Null where the queue is closed or no estimate is available. |
 | Source | chip: Sensor, Throughput, Manual, Unavailable | Where the estimate came from. Surfaced so an operator knows whether a figure is measured or guessed. |
@@ -805,7 +770,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the queue untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No queue yet. Offers Create queue (`createQueue`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status and the queue are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `QUEUE_VIEW`, which `getQueue` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `QUEUE_VIEW`, which `getQueue` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `QUEUE_MANAGE` for `createQueue`, `updateQueue`, `callNextParties`, `setQueueStatus` and 1 more. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
@@ -845,7 +810,7 @@ queue:
 - `setQueueStatus` → `QUEUE_MANAGE` (configure) · staff
 - `setWaitTime` → `QUEUE_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `QUEUE_VIEW`, which `getQueue` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `QUEUE_VIEW`, which `getQueue` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `QUEUE_MANAGE` for `createQueue`, `updateQueue`, `callNextParties`, `setQueueStatus` and 1 more.
 
 #### Requirements it meets
 
@@ -892,11 +857,12 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-002` · status **notStarted** · provenance generated · **Drawn by Claude Design on `Seat Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once …
 - Derived from `wireframes/reference/Seat Board 2.dc.html`
 - Client design-board frames: `Seat Board 2.dc.html#seat-2c`
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (59), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-002?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create queue, Save queue, Call next parties, Save queue status, Save wait time, Save.
 - [ ] Every transition is wired: `BO-001`, `BO-003`, `BO-004`.
@@ -953,7 +919,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Form: Configure queue feed** (modal, opened by *Configure queue feed*; *Configure queue feed* calls `configureQueueFeed`, *Cancel* sends nothing)
 
-**Collects what `configureQueueFeed` sends before it is called.** Required: `id`, `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`, `health`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `configureQueueFeed` sends before it is called.** Required: `id`, `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `health` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1210,14 +1176,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 |---|---|---|
 | Code | text | — |
 | Name | in the reader's language | — |
-| Venue | the name it points at, never the id | — |
-| Attraction product | the name it points at, never the id | — |
-| Asset | the image or video | The ride. Taking it out of service closes this queue rather than leaving guests holding positions for something that is not running. |
-| Access point | the name it points at, never the id | — |
 | Kind | chip: Standby, Single rider, Fast pass, Virtual, Accessible, Group only… | 5.6.x. A ride has several queues and the model had one. |
-| Operating windows | list or chips (count when long) | When the queue runs, which is not when the venue is open. A ride closing an hour early for maintenance leaves a queue accepting guests for … |
-| Parent queue | the name it points at, never the id | Where several queues share one capacity. The standby and single-rider lines at one ride draw from the same cycles, and a parent is how that … |
-| Load balance with queues | list or chips (count when long) | BL-137. Two rides with the same theme and different waits, and nothing directed a guest to the shorter one. |
 | In queue offer enabled | yes / no (icon or chip) | A guest with twenty minutes to wait is a guest with twenty minutes to buy something. |
 | Notify before call minutes | 1,234 | BL-017, 19.2.61. A guest was not told their turn was approaching, which makes a virtual queue worse than a physical one — at least a line … |
 
@@ -1225,18 +1184,12 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The client-generated UUIDv7 from `JoinQueueRequest.id`, and the `entryId` every entry path takes. |
-| Queue | the name it points at, never the id | — |
 | Queue name | in the reader's language | — |
-| Subject | the name it points at, never the id | — |
 | Party number | 1,234 | What the guest sees and what appears on signage. |
 | Party size | 1,234 | — |
 | Status | chip: Waiting, Called, Redeemed, Expired, No show, Cancelled… | — |
 | Position in queue | 1,234 | — |
-| Parties ahead | 1,234 | — |
 | Estimated call at | 1 Oct 2026, 14:30 | — |
-| Is fast pass | yes / no (icon or chip) | — |
-| Entitlement | text | — |
 
 **Card list** (card list): One row per queue with a stepper and the current value
 
@@ -1248,29 +1201,18 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 |---|---|---|
 | Code | text | — |
 | Name | in the reader's language | — |
-| Venue | the name it points at, never the id | — |
-| Attraction product | the name it points at, never the id | — |
-| Asset | the image or video | The ride. Taking it out of service closes this queue rather than leaving guests holding positions for something that is not running. |
-| Access point | the name it points at, never the id | — |
 | Kind | chip: Standby, Single rider, Fast pass, Virtual, Accessible, Group only… | 5.6.x. A ride has several queues and the model had one. |
 | Operating windows | list or chips (count when long) | When the queue runs, which is not when the venue is open. A ride closing an hour early for maintenance leaves a queue accepting guests for … |
-| Parent queue | the name it points at, never the id | Where several queues share one capacity. The standby and single-rider lines at one ride draw from the same cycles, and a parent is how that … |
-| Load balance with queues | list or chips (count when long) | BL-137. Two rides with the same theme and different waits, and nothing directed a guest to the shorter one. |
-| In queue offer enabled | yes / no (icon or chip) | A guest with twenty minutes to wait is a guest with twenty minutes to buy something. |
 | Notify before call minutes | 1,234 | BL-017, 19.2.61. A guest was not told their turn was approaching, which makes a virtual queue worse than a physical one — at least a line … |
 | Capacity per cycle | 1,234 | — |
 | Cycle minutes | 1,234.5 | — |
-| Max party size | 1,234 | — |
 | Return window minutes | 1,234 | How long a called party has to arrive before the entry expires. |
 
 **The wait time** (detail panel, from `getWaitTimes`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Queue | the name it points at, never the id | — |
 | Queue name | in the reader's language | — |
-| Attraction product | the name it points at, never the id | — |
-| Attraction category | the name it points at, never the id | The catalogue `ProductCategory` the attraction product is filed under — the value the `category` filter on `getWaitTimes` matches. |
 | Status | chip: Open, Paused, Closed, At capacity | — |
 | Wait minutes | 1,234 | Null where the queue is closed or no estimate is available. |
 | Source | chip: Sensor, Throughput, Manual, Unavailable | Where the estimate came from. Surfaced so an operator knows whether a figure is measured or guessed. |
@@ -1321,7 +1263,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the manual wait time untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | **Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, openOnly and the manual wait time are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `QUEUE_MANAGE` for `setWaitTime`, `callNextParties`. |
 | Offline (`?state=offline`) | online only |
 
 #### Edge cases to draw
@@ -1360,7 +1302,7 @@ rows:
 - `getWaitTimes` → no permission · guest, public
 - `listQueueEntries` → `QUEUE_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `QUEUE_MANAGE` for `setWaitTime`, `callNextParties`.
 
 #### Requirements it meets
 
@@ -1396,11 +1338,12 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### References
 
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-004` · status **notStarted** · provenance generated
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (6), with its required mark, default, format and its error state (403, 404).
-- [ ] Every output is drawn (56 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (32 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-004?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save wait time, Call next parties, Publish.
 - [ ] Every transition is wired: `BO-001`, `BO-002`, `BO-003`.
@@ -1420,7 +1363,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `marketing` module |
-| Block | Block A · ticket #20777 (APP-SETUP-BO-005) |
+| Block | Block A · task APP-SETUP-BO-005 |
 | Who uses it | venue staff holding `AI_USE`, `QUEUE_MANAGE`, `QUEUE_VIEW`, `REPORT_VIEW_VENUE` (2 operate, 1 configure, 1 read); in the flows as guest |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listQueueEntries` reads the population and `getWaitTimes` reads one of them — list, select, act |
@@ -1428,7 +1371,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Opens with | `queueId` (BO-001) · cold entry: **A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know … |
 | Route | `/queue-management/queue-monitor` |
 
-**What the spec says about it.** Pulled to Wave 1 on 17 August (CF-101): F09 closes a cancelled event’s queue, and a Wave 1 flow cannot step through a Wave 2 screen. **Cross-platform navigation removed 24 August**: EMP-032. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.
+**What the spec says about it.** Pulled to Wave 1 on 17 August (CF-101): F09 closes a cancelled event’s queue, and a flow cannot step through a screen that is built after it. **Cross-platform navigation removed 24 August**: EMP-032. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.
 
 **Known gaps.** Removed 2 October 2026 (CHG-WIR-001): A queue monitor does not run marketing campaigns; the queue's guest notifications come from setQueueStatus and callNextParties and are transactional. The second … Removed 2 October 2026 (CHG-WIR-001): A queue monitor does not run marketing campaigns; the queue's guest notifications come from setQueueStatus and callNextParties and are transactional. The second … Removed 2 October 2026 (CHG-WIR-001): A queue monitor does not run marketing campaigns; the queue's guest notifications come from setQueueStatus and callNextParties and are transactional. The second …
 
@@ -1561,18 +1504,12 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The client-generated UUIDv7 from `JoinQueueRequest.id`, and the `entryId` every entry path takes. |
-| Queue | the name it points at, never the id | — |
 | Queue name | in the reader's language | — |
-| Subject | the name it points at, never the id | — |
 | Party number | 1,234 | What the guest sees and what appears on signage. |
 | Party size | 1,234 | — |
 | Status | chip: Waiting, Called, Redeemed, Expired, No show, Cancelled… | — |
 | Position in queue | 1,234 | — |
-| Parties ahead | 1,234 | — |
 | Estimated call at | 1 Oct 2026, 14:30 | — |
-| Is fast pass | yes / no (icon or chip) | — |
-| Entitlement | text | — |
 
 **Every queue** (data table, from `listQueues`)
 
@@ -1580,14 +1517,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 |---|---|---|
 | Code | text | — |
 | Name | in the reader's language | — |
-| Venue | the name it points at, never the id | — |
-| Attraction product | the name it points at, never the id | — |
-| Asset | the image or video | The ride. Taking it out of service closes this queue rather than leaving guests holding positions for something that is not running. |
-| Access point | the name it points at, never the id | — |
 | Kind | chip: Standby, Single rider, Fast pass, Virtual, Accessible, Group only… | 5.6.x. A ride has several queues and the model had one. |
-| Operating windows | list or chips (count when long) | When the queue runs, which is not when the venue is open. A ride closing an hour early for maintenance leaves a queue accepting guests for … |
-| Parent queue | the name it points at, never the id | Where several queues share one capacity. The standby and single-rider lines at one ride draw from the same cycles, and a parent is how that … |
-| Load balance with queues | list or chips (count when long) | BL-137. Two rides with the same theme and different waits, and nothing directed a guest to the shorter one. |
 | In queue offer enabled | yes / no (icon or chip) | A guest with twenty minutes to wait is a guest with twenty minutes to buy something. |
 | Notify before call minutes | 1,234 | BL-017, 19.2.61. A guest was not told their turn was approaching, which makes a virtual queue worse than a physical one — at least a line … |
 
@@ -1610,18 +1540,10 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The client-generated UUIDv7 from `JoinQueueRequest.id`, and the `entryId` every entry path takes. |
-| Queue | the name it points at, never the id | — |
 | Queue name | in the reader's language | — |
-| Subject | the name it points at, never the id | — |
 | Party number | 1,234 | What the guest sees and what appears on signage. |
-| Party size | 1,234 | — |
 | Status | chip: Waiting, Called, Redeemed, Expired, No show, Cancelled… | — |
-| Position in queue | 1,234 | — |
-| Parties ahead | 1,234 | — |
 | Estimated call at | 1 Oct 2026, 14:30 | — |
-| Is fast pass | yes / no (icon or chip) | — |
-| Entitlement | text | — |
 | Called at | 1 Oct 2026, 14:30 | — |
 | Return window ends at | 1 Oct 2026, 14:30 | — |
 | Redeemed at | 1 Oct 2026, 14:30 | — |
@@ -1641,10 +1563,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | Shows | Format | Notes |
 |---|---|---|
-| Queue | the name it points at, never the id | — |
 | Queue name | in the reader's language | — |
-| Attraction product | the name it points at, never the id | — |
-| Attraction category | the name it points at, never the id | The catalogue `ProductCategory` the attraction product is filed under — the value the `category` filter on `getWaitTimes` matches. |
 | Status | chip: Open, Paused, Closed, At capacity | — |
 | Wait minutes | 1,234 | Null where the queue is closed or no estimate is available. |
 | Source | chip: Sensor, Throughput, Manual, Unavailable | Where the estimate came from. Surfaced so an operator knows whether a figure is measured or guessed. |
@@ -1689,7 +1608,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the queue untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No queue yet. Offers Create queue (`createQueue`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status and the queue are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `QUEUE_VIEW`, which `listQueueEntries` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getKpiValues` requires to show this screen, and names that permission (the screen's other reads need `QUEUE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `requestSuggestion`; `QUEUE_MANAGE` for … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 422 A setting the answer cannot do without is missing (29 September, AI functions review). (AiMissingSettingProblem) |
 
@@ -1721,7 +1640,7 @@ closeMessage: Tornado Slide is closed for the rest of today. Your place has been
 - `updateQueue` → `QUEUE_MANAGE` (configure) · staff
 - `requestSuggestion` → `AI_USE` (operate) · staff, guest
 
-**A refused user sees:** Shown when the caller lacks `QUEUE_VIEW`, which `listQueueEntries` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getKpiValues` requires to show this screen, and names that permission (the screen's other reads need `QUEUE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `requestSuggestion`; `QUEUE_MANAGE` for …
 
 #### Requirements it meets
 
@@ -1769,12 +1688,13 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - Flow F21 *A ride queue fills and a guest is redirected*, step 5: Parties are called → From the virtual queue
 - Flow F21 branch at step 3 (requiresStaff): when The asset goes out of service, **The queue closes and waiting parties are released, not silently dropped.** A guest holding a place for a closed ride will come back to ask.
 - Flow F21 branch at step 5 (recoverable): when A called party does not arrive, Held for a window then skipped. Their place is not restored — **unlike a waitlist, where being asleep is not declining**, a called queue place expires because the ride is running.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0020 *— Where AI runs, and what it is isolated from* (`docs/adr/0020-ai-isolation-boundary.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (55), with its required mark, default, format and its error state (400, 403, 404, 422).
-- [ ] Every output is drawn (62 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (38 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-005?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Call next parties, Create queue, Save queue status, Save wait time, Save queue.
 - [ ] Every transition is wired: `BO-001`, `BO-002`, `BO-003`, `EMP-032`.
@@ -1791,8 +1711,8 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Access & Venue · wave 2 · needs the `access` module |
-| Block | Block A · ticket #18145 (APP-SETUP-BO-006) |
+| Module | Access & Venue · wave 1 · needs the `access` module |
+| Block | Block A · task APP-SETUP-BO-006 |
 | Who uses it | venue staff holding `PARKING_CONFIGURE` (1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAccessPoints` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1812,7 +1732,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 **Form: Save parking facility** (modal, opened by *Save parking facility*; *Save parking facility* calls `setParkingFacility`, *Cancel* sends nothing)
 
-**Collects what `setParkingFacility` sends before it is called.** Required: `name`, `venueId`, `mode`. Optional: `id`, `capacity`, `takesPayment`, `vendorSwapTargetDays`, `vendorName`, `endpoint`, `credentialRef`, `pushLeadMinutes`, `accessPointIds`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setParkingFacility` sends before it is called.** Required: `name`, `venueId`, `mode`. Optional: `id`, `capacity`, `vendorName`, `endpoint`, `credentialRef`, `pushLeadMinutes`, `accessPointIds`, `isActive`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `takesPayment`, `vendorSwapTargetDays` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1847,18 +1767,12 @@ Errors to draw in the form: 400 Validation failed; 404 The resource does not exi
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Server-assigned, and the upsert key of `setParkingFacility`. Absent in a body, it creates; present, it names the facility being replaced. |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
 | Mode | chip: None, Plate whitelist, QR handoff | CF-52, settled 14 August. Not variations of one thing — each decides what happens at sale and what a guest presents at the barrier. |
 | Capacity | 1,234 | What "full" means in the first release (decided 28 September, audit R166): the facility is full when the issued `ParkingEntitlement`s valid … |
 | Takes payment | yes / no (icon or chip) | Always false, and stated rather than assumed (19.2.78, CF-124). The requirement asks the guest app to take parking payments; the client … |
-| Vendor swap target days | 1,234 | A new parking vendor should take days, not weeks — Qossai, 14 August. The team has integrated parking APIs before and the architecture is … |
 | Vendor name | text | Staff only — omitted from a guest's `listParkingFacilities` response. |
-| Endpoint | text | Staff only — omitted from a guest's `listParkingFacilities` response. |
-| Credential ref | text | A vault reference, never the credential. Staff only — omitted from a guest's `listParkingFacilities` response. |
 | Push lead minutes | 1,234 | Staff only — omitted from a guest's `listParkingFacilities` response. How far ahead of the visit a plate is pushed. |
-| Access points | list or chips (count when long) | Where the platform validates its own code, in `none` and `qrHandoff` modes. |
 
 **Detail panel** (detail panel): TODO
 
@@ -1953,13 +1867,13 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-006` · status **notStarted** · provenance generated
 - ADR-0030 *A deep link is a pointer, not authorisation* (`docs/adr/0030-deep-link-cold-entry.md`)
-- ADR-0012 *Queue Integration — Adaptor-First, Vendor Deferred* (`docs/adr/0012-queue-integration-adaptor-first.md`)
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
+- ADR-0012 *Queue Integration — Adaptor-First, Vendor Deferred* (`docs/adr/0012-queue-integration-adaptor-first.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (11), with its required mark, default, format and its error state (400, 404).
-- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-006?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save parking facility.
 - [ ] No transition is declared; back returns where the user came from.
@@ -1984,7 +1898,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Pattern | listDetail (compact density): `listWorkOrders` reads the population and `getWorkOrder` reads one of them — list, select, act |
 | Offline | online only |
 | Opens with | `venueId` (session), `workOrderId` (deepLink) · cold entry: A work order opened from a queue or an alert. |
-| Route | `/venue-operations/access-point-directory` |
+| Route | `/venue-operations/work-order-verification` |
 
 **What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Carried eight work-order operations.** An access point directory is `access`, not `maintenance` — the two share the word *point* and nothing else. **Rewired 20 August.** **Named `Access Point Directory` and carried nine work-order operations.** On 20 August I rewired it to access points; **F12 step 4 then refused, because a supervisor verifies a work order here.** The operations were right and the name was wrong — **the flow knew what the screen was for and the name did not.**
 
@@ -2039,15 +1953,9 @@ Errors to draw in the form: 403 Verifier is the technician who completed the wor
 | Shows | Format | Notes |
 |---|---|---|
 | Downtime minutes | 1,234 | Measured from out-of-service to back-in-service, not from work start to work end. |
-| Root cause | chip: Wear and tear, Operator error, Guest damage, Manufacturing defect, Environmental … | Structured, because free text cannot be counted. *Deferred maintenance* is the value a venue least wants to see and most needs to — a fault … |
-| Root cause note | text | — |
-| Escalated at | 1 Oct 2026, 14:30 | — |
 | Escalation level | 1,234 | Escalation is a clock, not a decision. A work order on a ride nobody has accepted after twenty minutes escalates itself, because the … |
-| ID | the name it points at, never the id | — |
 | Work order number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | Title | text | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Asset name | text | The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record … |
 | Status | chip: Open, Assigned, In progress, Paused, Awaiting parts, Completed… | — |
 
@@ -2056,42 +1964,26 @@ Errors to draw in the form: 403 Verifier is the technician who completed the wor
 | Shows | Format | Notes |
 |---|---|---|
 | Downtime minutes | 1,234 | Measured from out-of-service to back-in-service, not from work start to work end. |
-| Root cause | chip: Wear and tear, Operator error, Guest damage, Manufacturing defect, Environmental … | Structured, because free text cannot be counted. *Deferred maintenance* is the value a venue least wants to see and most needs to — a fault … |
-| Root cause note | text | — |
-| Escalated at | 1 Oct 2026, 14:30 | — |
 | Escalation level | 1,234 | Escalation is a clock, not a decision. A work order on a ride nobody has accepted after twenty minutes escalates itself, because the … |
-| ID | the name it points at, never the id | — |
 | Work order number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | Title | text | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Asset name | text | The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record … |
 | Status | chip: Open, Assigned, In progress, Paused, Awaiting parts, Completed… | — |
 | Priority | chip: Low, Normal, High, Urgent, Emergency | — |
 | Kind | chip: Corrective, Planned, Inspection follow up, Incident corrective, Improvement | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Raised by principal | the name it points at, never the id | — |
 
 **The work order** (detail panel, from `getWorkOrder`)
 
 | Shows | Format | Notes |
 |---|---|---|
 | Downtime minutes | 1,234 | Measured from out-of-service to back-in-service, not from work start to work end. |
-| Root cause | chip: Wear and tear, Operator error, Guest damage, Manufacturing defect, Environmental … | Structured, because free text cannot be counted. *Deferred maintenance* is the value a venue least wants to see and most needs to — a fault … |
-| Root cause note | text | — |
-| Escalated at | 1 Oct 2026, 14:30 | — |
 | Escalation level | 1,234 | Escalation is a clock, not a decision. A work order on a ride nobody has accepted after twenty minutes escalates itself, because the … |
-| ID | the name it points at, never the id | — |
 | Work order number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | Title | text | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Asset name | text | The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record … |
 | Status | chip: Open, Assigned, In progress, Paused, Awaiting parts, Completed… | — |
 | Priority | chip: Low, Normal, High, Urgent, Emergency | — |
 | Kind | chip: Corrective, Planned, Inspection follow up, Incident corrective, Improvement | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Raised by principal | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
@@ -2125,7 +2017,7 @@ Errors to draw in the form: 403 Verifier is the technician who completed the wor
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the work order verification untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No work order verification yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on assignedToPrincipalId, status, priority, assetId, overdueOnly and the work order verification are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORK_ORDER_VIEW`, which `getWorkOrder` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORK_ORDER_VIEW`, which `listWorkOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WORK_ORDER_VERIFY` for `verifyWorkOrder`. |
 | Offline (`?state=offline`) | online only |
 
 #### Edge cases to draw
@@ -2164,7 +2056,7 @@ queue:
 - `getWorkOrder` → `WORK_ORDER_VIEW` (read) · staff
 - `listWorkOrders` → `WORK_ORDER_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `WORK_ORDER_VIEW`, which `getWorkOrder` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `WORK_ORDER_VIEW`, which `listWorkOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WORK_ORDER_VERIFY` for `verifyWorkOrder`.
 
 #### Requirements it meets
 
@@ -2203,7 +2095,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (7), with its required mark, default, format and its error state (403, 404).
-- [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-030?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Verify work order.
 - [ ] Every transition is wired: `BO-070`, `BO-069`.
@@ -2228,7 +2120,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | Pattern | listDetail (compact density): `listAssets` reads the population and `getAsset` reads one of them — list, select, act |
 | Offline | online only |
 | Opens with | `venueId` (session), `assetId` (deepLink) · cold entry: An asset opened from the register or a work order. |
-| Route | `/venue-operations/access-point-configuration` |
+| Route | `/venue-operations/asset-register-bo-031` |
 
 **What the spec says about it.** **Merged into BO-069** (decided 2 October 2026, Chinmay: fix the wrong wiring now; CHG-WIR-001). BO-031 and BO-069 are the same asset register (same seven maintenance operations, near-identical layouts); keep BO-069 and retire BO-031 (DI-671, DI-987; design-notes corrections venue-operations BO-031, BO-069). **One implementation, both ids kept**, as the M24-03 merges do: this id stays for traceability and routes to BO-069, and nothing on it is built separately. Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Carried seven asset operations.** A turnstile is an asset and configuring an access point is not asset management. **Rewired 20 August.** **Named `Access Point Configuration` and carried seven asset operations.** Same correction as BO-030 — F12 step 5 returns an asset to service here.
 
@@ -2320,7 +2212,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `access` module |
-| Block | Block A · ticket #17917 (APP-SETUP-BO-032) |
+| Block | Block A · task APP-SETUP-BO-032 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAdmissionRules` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2344,7 +2236,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Form: New profile** (modal, opened by *New profile*; *New profile* calls `createAdmissionRules`, *Cancel* sends nothing)
 
-**Collects what `createAdmissionRules` sends before it is called.** Required: `code`, `name`, `openMinutesBefore`, `closeMinutesAfter`. Optional: `perProductRules`, `maxDurationMinutes`, `requiresExitBeforeReentry`, `maxReentries`, `entryLimit`, `exitScan`, `maxExits`, `reEntryWindowMinutes`, `sameDayOnly`, `designatedAccessPointIds`, `validity`, `crossover`, `allowedAccessPointIds`, `reEntryVerification`, `ruleConditions`. `id` and `scopePath` are the server's and never asked (VO-R03). Entry limit, exit scan, re-entry window and verification, validity, crossover and the rule conditions are blocks of the profile (29 September close-out), edited here so BO-156, BO-158 and BO-160 have a home. …
+**Collects what `createAdmissionRules` sends before it is called.** Required: `code`, `name`, `openMinutesBefore`, `closeMinutesAfter`. Optional: `perProductRules`, `maxDurationMinutes`, `requiresExitBeforeReentry`, `maxReentries`, `entryLimit`, `exitScan`, `maxExits`, `reEntryWindowMinutes`, `sameDayOnly`, `designatedAccessPointIds`, `validity`, `crossover`, `allowedAccessPointIds`, `reEntryVerification`, `ruleConditions`. and `scopePath` are the server's and never asked (VO-R03). Entry limit, exit scan, re-entry window and verification, validity, crossover and the rule conditions are blocks of the profile (29 September close-out), edited here so BO-156, BO-158 and BO-160 have a home. …
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -2397,7 +2289,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Form: Save profile** (modal, opened by *Save profile*; *Save profile* calls `updateAdmissionRules`, *Cancel* sends nothing)
 
-**Collects what `updateAdmissionRules` sends before it is called.** Required: `code`, `name`, `openMinutesBefore`, `closeMinutesAfter`. Optional: `perProductRules`, `maxDurationMinutes`, `requiresExitBeforeReentry`, `maxReentries`, `entryLimit`, `exitScan`, `maxExits`, `reEntryWindowMinutes`, `sameDayOnly`, `designatedAccessPointIds`, `validity`, `crossover`, `allowedAccessPointIds`, `reEntryVerification`, `ruleConditions`. `id` and `scopePath` are the server's and never asked (VO-R03). Entry limit, exit scan, re-entry window and verification, validity, crossover and the rule conditions are blocks of the profile (29 September close-out), edited here so BO-156, BO-158 and BO-160 have a home. …
+**Collects what `updateAdmissionRules` sends before it is called.** Required: `code`, `name`, `openMinutesBefore`, `closeMinutesAfter`. Optional: `perProductRules`, `maxDurationMinutes`, `requiresExitBeforeReentry`, `maxReentries`, `entryLimit`, `exitScan`, `maxExits`, `reEntryWindowMinutes`, `sameDayOnly`, `designatedAccessPointIds`, `validity`, `crossover`, `allowedAccessPointIds`, `reEntryVerification`, `ruleConditions`. and `scopePath` are the server's and never asked (VO-R03). Entry limit, exit scan, re-entry window and verification, validity, crossover and the rule conditions are blocks of the profile (29 September close-out), edited here so BO-156, BO-158 and BO-160 have a home. …
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -2475,13 +2367,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Open minutes before | 1,234 | How long before a performance validation opens. |
 | Close minutes after | 1,234 | — |
 | Max duration minutes | 1,234 | — |
-| Entry limit | grouped details | How many times the credential may enter (decided 29 September, VM close-out). Pack 'Access Control Module' p.19 (BO-156, Entry, Exit & … |
-| Exit scan | chip: Required, Optional, None | (decided 29 September, VM close-out) `required`: re-entry needs a recorded exit. |
-| Max exits | 1,234 | Null is unlimited (decided 29 September, VM close-out) |
-| Requires exit before reentry | yes / no (icon or chip) | — |
-| Max reentries | 1,234 | — |
 | Re entry window minutes | 1,234 | Minutes after an exit within which re-entry is allowed; null is any time the credential is valid (decided 29 September, VM close-out) |
-| Re entry verification | chip: Credential only, Credential uv stamp, Credential face, Credential operator, Custom | What a re-entering guest must show besides the credential, as `listEntryTemporaryExit` returns it (added 29 September, data-model close-out … |
 
 **The selected profile** (detail panel, from `listAdmissionRules`)
 
@@ -2494,18 +2380,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Max duration minutes | 1,234 | — |
 | Entry limit | grouped details | How many times the credential may enter (decided 29 September, VM close-out). Pack 'Access Control Module' p.19 (BO-156, Entry, Exit & … |
 | Exit scan | chip: Required, Optional, None | (decided 29 September, VM close-out) `required`: re-entry needs a recorded exit. |
-| Max exits | 1,234 | Null is unlimited (decided 29 September, VM close-out) |
-| Requires exit before reentry | yes / no (icon or chip) | — |
-| Max reentries | 1,234 | — |
 | Re entry window minutes | 1,234 | Minutes after an exit within which re-entry is allowed; null is any time the credential is valid (decided 29 September, VM close-out) |
-| Re entry verification | chip: Credential only, Credential uv stamp, Credential face, Credential operator, Custom | What a re-entering guest must show besides the credential, as `listEntryTemporaryExit` returns it (added 29 September, data-model close-out … |
-| Same day only | yes / no (icon or chip) | Re-entry only on the day of the exit (decided 29 September, VM close-out) |
-| Validity | grouped details | When the credential is valid (decided 29 September, VM close-out). Pack 'Access Control Module' p.21 (BO-158, Access Validity & Time Rules). |
-| Crossover | grouped details | Crossover between parks (decided 29 September, VM close-out). Pack 'Access Control Module' p.23 (BO-160, Multi-Park & Crossover Rules) … |
-| Designated access points | list or chips (count when long) | Re-entry only through these access points; empty is any allowed access point (decided 29 September, VM close-out) |
-| Allowed access points | list or chips (count when long) | Empty means any access point in the venue. |
-| Rule conditions | grouped details | The visual rule builder body `setVisualAccessRule` writes: `appliesTo` (products or credential types), `conditions`, `logic` (AND / OR / … |
-| Per product rules | list or chips (count when long) | BL-059. Transaction rules were per profile and a ticket type could not state its own. |
 
 **Actions and what each produces**
 
@@ -2536,7 +2411,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the admission profiles untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No admission profiles yet. Offers New profile (`createAdmissionRules`). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listAdmissionRules` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SCOPE_VIEW`, which `listAdmissionRules` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SCOPE_VIEW`, which `listAdmissionRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_POINT_CONFIGURE` for `createAdmissionRules`, `updateAdmissionRules`, `setEntryRulePoints`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 A count missing for an n* entry mode, days missing for a relative validity anchor, or validity.to before validity.from |
 
@@ -2594,7 +2469,7 @@ profiles:
 - `updateAdmissionRules` → `ACCESS_POINT_CONFIGURE` (configure) · staff
 - `setEntryRulePoints` → `ACCESS_POINT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `SCOPE_VIEW`, which `listAdmissionRules` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `SCOPE_VIEW`, which `listAdmissionRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_POINT_CONFIGURE` for `createAdmissionRules`, `updateAdmissionRules`, `setEntryRulePoints`.
 
 #### Requirements it meets
 
@@ -2634,7 +2509,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (94), with its required mark, default, format and its error state (404, 422).
-- [ ] Every output is drawn (31 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-032?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: New profile, Save profile.
 - [ ] No transition is declared; back returns where the user came from.
@@ -2654,7 +2529,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `access` module |
-| Block | Block A · ticket #17918 (APP-SETUP-BO-033) |
+| Block | Block A · task APP-SETUP-BO-033 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listBlacklist` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2746,7 +2621,7 @@ Errors to draw in the form: 409 A business code the request names is already use
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the blacklist untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No blacklist yet. Offers Add blacklist entry (`addBlacklistEntry`). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listBlacklist` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SCOPE_VIEW`, which `listBlacklist` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SCOPE_VIEW`, which `listBlacklist` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_POINT_CONFIGURE` for `addBlacklistEntry`, `removeBlacklistEntry`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
@@ -2786,7 +2661,7 @@ entries:
 - `addBlacklistEntry` → `ACCESS_POINT_CONFIGURE` (configure) · staff
 - `removeBlacklistEntry` → `ACCESS_POINT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `SCOPE_VIEW`, which `listBlacklist` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `SCOPE_VIEW`, which `listBlacklist` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_POINT_CONFIGURE` for `addBlacklistEntry`, `removeBlacklistEntry`.
 
 #### Requirements it meets
 

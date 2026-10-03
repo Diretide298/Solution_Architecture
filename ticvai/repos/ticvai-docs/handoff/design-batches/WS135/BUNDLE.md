@@ -128,7 +128,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-734` | CRM Command Center | B–D | 1 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `BO-735` | Guest Directory | B–D | 13 | 21 | 6 | 16 | 1 | 0 | — | notStarted (—) |
+| `BO-735` | Guest Directory | B–D | 13 | 18 | 6 | 16 | 1 | 0 | — | notStarted (—) |
 | `BO-736` | Guest Master Configuration | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-737` | Customer 360 Profile | B–D | 0 | 70 | 6 | 12 | 3 | 0 | — | notStarted (—) |
 | `BO-738` | Activity Timeline | B–D | 0 | 11 | 6 | 3 | 0 | 0 | — | notStarted (—) |
@@ -409,11 +409,8 @@ Errors to draw in the form: 409 The entry being reversed is already reversed (`a
 | Shows | Format | Notes |
 |---|---|---|
 | Leaderboard nickname | text | BL-173. The name shown on a leaderboard, chosen by the guest. |
-| Subject | the name it points at, never the id | — |
-| Programme | the name it points at, never the id | — |
 | Points balance | 1,234 | — |
 | Lifetime points | 1,234 | — |
-| Tier | the name it points at, never the id | The tier this row's `tierCode` and `tierName` are a copy of. Added 20 September with `marketing.programme_tier`: the two strings were a … |
 | Tier code | text | — |
 | Tier name | text | — |
 | Points to next tier | 1,234 | — |
@@ -559,7 +556,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (13), with its required mark, default, format and its error state (403, 404, 409).
-- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-735?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Adjust loyalty points, Merge guest profiles, Save guest profile.
 - [ ] Every transition is wired: `BO-734`.
@@ -932,6 +929,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 1
 - Flow F244 *Marketing CRM Configuration Reference v1.0 board 1: CRM Command Center*, step 6: Works in Customer 360 Profile → Present a consolidated, actionable view of one guest. Display identity, contacts, preferences, household, organization, membership, loyalty, wallet, tickets, bookings and visits. Show LTV …
 - ADR-0023 *— Personal data lives apart from the append-only ledger* (`docs/adr/0023-pii-separation.md`)
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 

@@ -181,7 +181,7 @@
     {
      "to": "GST-015",
      "trigger": "Memberships",
-     "provenance": "derived — GST-015 declares entryState.params caseId, guestLinkId, statementId and GST-001 holds none of them. The edge carries nothing: guestLinkId only pre-selects (deep link or optional); GST-015 finds statementId (listBillingStatements) itself; GST-015 opens on listBillingStatements, and caseId has no source on GST-015 yet (a gap in GST-015, not in this edge)"
+     "provenance": "derived — GST-015 declares entryState.params caseId, guestLinkId, statementId and GST-001 holds none of them. The edge carries nothing: guestLinkId, caseId, statementId only pre-select (deep link or optional), and GST-015 opens on its own"
     },
     {
      "to": "GST-016",
@@ -545,12 +545,10 @@
        "label": "Your upcoming tickets",
        "bindsTo": "Entitlement",
        "columns": [
-        "Entitlement.productId",
         "Entitlement.validFrom",
         "Entitlement.validTo",
         "Entitlement.status",
-        "Entitlement.entriesUsed",
-        "Entitlement.entriesAllowed"
+        "Entitlement.entriesUsed"
        ],
        "operation": "listMyEntitlements",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
@@ -646,7 +644,7 @@
    {
     "operationId": "getPublishedTenantConfig",
     "contract": "white-label",
-    "purpose": "The published brand, theme, fonts, header, footer, navigation, homepage, booking-flow display settings and languages, read before anyone signs in (GFIX-1)",
+    "purpose": "The published brand, theme, fonts, header, footer, navigation, homepage, booking-flow display settings and languages, read before anyone signs in (GFIX-1)\n\nAlso the analytics providers to start once their consent category is granted, from the published config (listAnalyticsProviders needs TENANT_CONFIGURE and left the guest screens: decided by Chinmay, 3 October 2026 (CHG-SPF-007)).",
     "trigger": "onLoad",
     "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-1)"
    },
@@ -662,13 +660,6 @@
     "contract": "marketing-crm",
     "purpose": "Accept, reject or customise tracking on first launch",
     "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listAnalyticsProviders",
-    "contract": "white-label",
-    "purpose": "Analytics SDKs to start once their consent category is granted",
-    "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
    {
@@ -736,7 +727,7 @@
     "differences": "The v4 home shows no ticket strip; `listMyEntitlements` feeds the visit-day venue suggestion only."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "introVideo",
@@ -955,7 +946,7 @@
     "view": "Explore tab"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -996,8 +987,8 @@
   "capability": "C02",
   "implementation": {
    "app": "guest-app",
-   "route": "/general/attractions-list",
-   "component": "apps/guest-app/src/routes/general/AttractionsList.tsx",
+   "route": "/general/buy-tickets",
+   "component": "apps/guest-app/src/routes/general/BuyTicketsList.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1161,10 +1152,8 @@
         "WaitTime.queueName",
         "WaitTime.status",
         "WaitTime.waitMinutes",
-        "WaitTime.isStale",
         "WaitTime.heightRequirementCm",
-        "WaitTime.zone",
-        "WaitTime.asOf"
+        "WaitTime.zone"
        ],
        "operation": "getWaitTimes",
        "provenance": "contract queue.yaml GET /queues/wait-times"
@@ -1246,7 +1235,7 @@
     "view": "Buy tickets (the centre tab)"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -1287,8 +1276,8 @@
   "capability": "C02",
   "implementation": {
    "app": "guest-app",
-   "route": "/general/attraction-details",
-   "component": "apps/guest-app/src/routes/general/AttractionDetailsDetail.tsx",
+   "route": "/general/item-detail",
+   "component": "apps/guest-app/src/routes/general/ItemDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1344,9 +1333,10 @@
      "to": "GST-049",
      "trigger": "Book (a fixture with one on-sale performance opens straight on the seat map)",
      "carries": [
-      "performanceId"
+      "performanceId",
+      "eventId"
      ],
-     "provenance": "decided 29 September, rev 3 23SEP-16 and REV3-4"
+     "provenance": "authored 3 October 2026 (CHG-SPF-004): GST-004 holds eventId and GST-049 cannot load without it, so the edge carries it; was: decided 29 September, rev 3 23SEP-16 and REV3-4"
     },
     {
      "to": "GST-074",
@@ -1473,18 +1463,11 @@
        "label": "The product eligibility rule",
        "bindsTo": "ProductEligibilityRule",
        "columns": [
-        "ProductEligibilityRule.productId",
         "ProductEligibilityRule.minAgeYears",
         "ProductEligibilityRule.maxAgeYears",
         "ProductEligibilityRule.minHeightCm",
         "ProductEligibilityRule.maxHeightCm",
-        "ProductEligibilityRule.heightBandsCm",
-        "ProductEligibilityRule.accompaniedBelowAge",
-        "ProductEligibilityRule.guardianSignatureAgeFrom",
-        "ProductEligibilityRule.guardianSignatureAgeTo",
-        "ProductEligibilityRule.waiverRequired",
-        "ProductEligibilityRule.swimAbility",
-        "ProductEligibilityRule.refundableIfIneligibleAtGate"
+        "ProductEligibilityRule.guardianSignatureAgeFrom"
        ],
        "operation": "getProductEligibilityRule",
        "provenance": "contract catalogue.yaml GET /products/{productId}/eligibility-rule"
@@ -1497,10 +1480,8 @@
         "WaitTime.queueName",
         "WaitTime.status",
         "WaitTime.waitMinutes",
-        "WaitTime.isStale",
         "WaitTime.heightRequirementCm",
-        "WaitTime.zone",
-        "WaitTime.asOf"
+        "WaitTime.zone"
        ],
        "operation": "getWaitTimes",
        "provenance": "contract queue.yaml GET /queues/wait-times"
@@ -1620,7 +1601,7 @@
     "view": "Explore → Summit Coaster (Item detail)"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -1673,7 +1654,8 @@
    "exitTo": [
     "GST-001",
     "GST-002",
-    "GST-003"
+    "GST-003",
+    "GST-006"
    ],
    "transitions": [
     {
@@ -1688,6 +1670,14 @@
       "eventId"
      ],
      "provenance": "derived — GST-003 declares entryState.params eventId and GST-005 holds eventId, so an edge into it carries them"
+    },
+    {
+     "to": "GST-006",
+     "trigger": "Item Detail – Event / Exhibition",
+     "carries": [
+      "performanceId"
+     ],
+     "provenance": "authored 3 October 2026 (CHG-SPF-004): GST-005 lists them, and GST-006 cannot load without the one the user picks"
     }
    ]
   },
@@ -1819,7 +1809,7 @@
    "derivedFrom": "wireframes/reference/Guest Mobile Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Guest Mobile Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -1916,15 +1906,9 @@
        "label": "The performance",
        "bindsTo": "Performance",
        "columns": [
-        "Performance.id",
-        "Performance.eventId",
         "Performance.startsAt",
         "Performance.endsAt",
-        "Performance.approvalRequestId",
-        "Performance.requiresApprovalToCancel",
-        "Performance.status",
-        "Performance.admissionRulesId",
-        "Performance.seatMapId"
+        "Performance.status"
        ],
        "operation": "getPerformance",
        "provenance": "contract catalogue.yaml GET /performances/{performanceId}"
@@ -1934,22 +1918,10 @@
        "label": "The product",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
-        "Product.code",
         "Product.name",
         "Product.description",
-        "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
         "Product.onSaleFrom",
-        "Product.onSaleTo",
-        "Product.categoryId",
-        "Product.lifecycleState",
-        "Product.isSellable",
-        "Product.isStockTracked"
+        "Product.onSaleTo"
        ],
        "operation": "getProduct",
        "provenance": "contract catalogue.yaml GET /products/{productId}"
@@ -2004,7 +1976,7 @@
     "view": "Explore → Shows → Night of Nine → More info (Item detail, an event)"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -2041,7 +2013,7 @@
   "name": "Accessibility Information",
   "module": "Discovery & Browse",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "C17",
   "implementation": {
    "app": "guest-app",
@@ -2155,7 +2127,7 @@
     "view": "Account → All screens → Wave 2 → Accessibility information"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "listContentPages",

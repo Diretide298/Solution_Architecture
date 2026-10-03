@@ -198,7 +198,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/product-directory/product-creation-workspace-adm-119",
    "component": "apps/venue-management-web/src/routes/venue-operations/ProductDirectoryDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-007"
   },
   "navigation": {
    "entryFrom": [
@@ -466,7 +467,8 @@
    "app": "venue-management-web",
    "route": "/sell/product-import-governance-ai-configuration-assistant/bulk-product-creation-catalogue-import-adm-121",
    "component": "apps/venue-management-web/src/routes/sell/ProductImportGovernanceAiConfigurationList.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-117"
   },
   "navigation": {
    "entryFrom": [
@@ -1262,7 +1264,7 @@
     "id": "formSetConfigurationTemplate",
     "component": "modal",
     "trigger": "Save configuration template",
-    "body": "**Collects what `setConfigurationTemplate` sends before it is called.** Required: `id`, `scopePath`, `subject`, `name`, `status`. Optional: `description`, `templateKind`, `productKind`, `venueId`, `sourceProductId`, `sourcePriceListId`, `includedComponents`, `reviewFields`, `isAiDrafted`, `ownerPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setConfigurationTemplate` sends before it is called.** Required: `subject`, `name`, `status`. Optional: `description`, `templateKind`, `productKind`, `venueId`, `sourceProductId`, `sourcePriceListId`, `includedComponents`, `reviewFields`, `isAiDrafted`, `ownerPrincipalId`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "ConfigurationTemplate",
     "confirm": {
      "label": "Save configuration template",
@@ -1271,8 +1273,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "subject",
       "name",
       "status",

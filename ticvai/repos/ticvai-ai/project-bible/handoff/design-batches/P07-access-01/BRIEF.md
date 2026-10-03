@@ -122,16 +122,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SCN-001` | Sign in | B–D | 14 | 20 | 8 | 5 | 0 | 0 | — | notStarted (generated) |
-| `SCN-002` | Access point & direction | B–D | 4 | 26 | 6 | 6 | 0 | 0 | — | notStarted (generated) |
-| `SCN-003` | Ready to scan | B–D | 21 | 0 | 10 | 46 | 8 | 0 | — | notStarted (generated) |
-| `SCN-007` | Group admission | B–D | 6 | 8 | 6 | 13 | 2 | 0 | — | notStarted (generated) |
-| `SCN-008` | Manual entry | B–D | 8 | 8 | 6 | 47 | 1 | 0 | — | notStarted (generated) |
-| `SCN-009` | Ticket lookup | B–D | 7 | 35 | 6 | 15 | 4 | 0 | — | notStarted (generated) |
-| `SCN-011` | Delegated right | B–D | 4 | 16 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `SCN-013` | Offline journal | B–D | 31 | 8 | 6 | 53 | 2 | 0 | — | notStarted (generated) |
-| `SCN-014` | Sync & reconciliation | B–D | 35 | 40 | 6 | 60 | 3 | 0 | — | notStarted (generated) |
-| `SCN-015` | Offline package | B–D | 1 | 8 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
+| `SCN-001` | Sign in | A | 14 | 20 | 8 | 5 | 0 | 0 | — | notStarted (generated) |
+| `SCN-002` | Access point & direction | C | 4 | 9 | 6 | 6 | 0 | 0 | — | notStarted (generated) |
+| `SCN-003` | Ready to scan | A | 21 | 0 | 10 | 46 | 8 | 0 | — | notStarted (generated) |
+| `SCN-007` | Group admission | C | 6 | 5 | 6 | 13 | 2 | 0 | — | notStarted (generated) |
+| `SCN-008` | Manual entry | C | 8 | 5 | 6 | 47 | 1 | 0 | — | notStarted (generated) |
+| `SCN-009` | Ticket lookup | C | 7 | 12 | 6 | 15 | 4 | 0 | — | notStarted (generated) |
+| `SCN-011` | Delegated right | B | 4 | 5 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `SCN-013` | Offline journal | C | 31 | 5 | 6 | 53 | 2 | 0 | — | notStarted (generated) |
+| `SCN-014` | Sync & reconciliation | A | 35 | 16 | 6 | 60 | 3 | 0 | — | notStarted (generated) |
+| `SCN-015` | Offline package | C | 1 | 5 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

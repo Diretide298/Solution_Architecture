@@ -126,7 +126,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `WEB-030` | Ticket Transfer | A | 8 | 6 | 6 | 5 | 3 | 0 | guest | review (client-verified) |
-| `WEB-031` | My Reservations | A | 27 | 44 | 6 | 35 | 9 | 0 | guest | review (client-verified) |
+| `WEB-031` | My Reservations | A | 27 | 37 | 6 | 35 | 9 | 0 | guest | review (client-verified) |
 | `WEB-035` | Multi-Currency & Pricing | A | 1 | 27 | 6 | 12 | 3 | 4 | guest | review (client-verified) |
 
 ## Thin screens in this batch
@@ -147,7 +147,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Ticketing · wave 1 · needs the `ticketing` module |
-| Block | Block A · ticket #17924 (APP-WEB-WEB-030) |
+| Block | Block A · task APP-WEB-WEB-030 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listOrders` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -347,8 +347,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | Ticketing · wave 2 · needs the `ticketing` module |
-| Block | Block A · ticket #18162 (APP-WEB-WEB-031) |
+| Module | Ticketing · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-WEB-WEB-031 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listReservations` reads the population and `getReservation` reads one of them — list, select, act |
@@ -481,20 +481,13 @@ Errors to draw in the form: 412 The row changed since the `If-Match` version was
 | Shows | Format | Notes |
 |---|---|---|
 | Kind | chip: General, School, Corporate, Party | — |
-| Package product | text | The school-trip format or party package. |
 | Year group | text | — |
-| Access and dietary needs | text | — |
 | Celebrant name | text | The birthday child. |
-| Celebrant turning age | 1,234 | — |
-| Allergies and requests | text | — |
 | Final headcount due by | 1 Oct 2026, 14:30 | — |
 | Quote sent at | 1 Oct 2026, 14:30 | — |
 | Risk assessment sent at | 1 Oct 2026, 14:30 | — |
 | Preferred date | 1 Oct 2026 | The date the guest asked for on `requestGroupBooking` — what its `409 dateUnavailable` is checked against. |
-| Order | the name it points at, never the id | — |
-| Leader subject | the name it points at, never the id | — |
 | Organisation name | text | — |
-| Expected size | 1,234 | — |
 
 **The resource availability** (detail panel, from `getResourceAvailability`)
 
@@ -648,7 +641,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (27), with its required mark, default, format and its error state (403, 404, 409, 412, 422).
-- [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (37 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-031?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Cancel reservation, Request group booking, Change reservation.
 - [ ] Every transition is wired: `WEB-030`.
@@ -669,7 +662,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Ticketing · wave 1 · needs the `ticketing` module |
-| Block | Block A · ticket #17871 (APP-WEB-WEB-035) |
+| Block | Block A · task APP-WEB-WEB-035 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listFxRates` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -677,7 +670,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Opens with | nothing: it opens on its own |
 | Route | `/multi-currency-pricing` |
 
-**What the spec says about it.** Added 17 August. **The surface the matrix names** — 2.6.33 *"website should be able to display multi currency"* and 2.9.1 *"in the B2C portal for guests comparison"*. Wave 1 against the app's Wave 2, because **the website is where an overseas guest compares before booking** and the app is where they check after. **Display only — the sale settles in base currency** (CF-37). Not on the wireframe board; needs drawing. **`getRegionSettings` deliberately not called** — a guest does not need the venue's scope configuration to pick a currency. `listFxRates` is the currency list: a rate exists only for a currency the venue enabled, so the two questions have one answer. **Rev 3 (decided 29 September, rev 3 GAP-D2).** The web and app waves of this capability differ; they are aligned to one wave once the client picks it (open, client to choose). Rates carry `fetchedAt` (`listFxRates`; GAP-B3, already); the prototype's fixed demo rate is prototype-only (CFG-7, no change). **The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and "payment will be processed in AED", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment …
+**What the spec says about it.** Added 17 August. **The surface the matrix names** — 2.6.33 *"website should be able to display multi currency"* and 2.9.1 *"in the B2C portal for guests comparison"*. First on the website, before the app, because **the website is where an overseas guest compares before booking** and the app is where they check after. **Display only — the sale settles in base currency** (CF-37). Not on the wireframe board; needs drawing. **`getRegionSettings` deliberately not called** — a guest does not need the venue's scope configuration to pick a currency. `listFxRates` is the currency list: a rate exists only for a currency the venue enabled, so the two questions have one answer. **Rev 3 (decided 29 September, rev 3 GAP-D2).** The web and app waves of this capability differ; they are aligned to one wave once the client picks it (open, client to choose). Rates carry `fetchedAt` (`listFxRates`; GAP-B3, already); the prototype's fixed demo rate is prototype-only (CFG-7, no change). **The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and "payment will be processed in AED", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the …
 
 **From the Finance, Ledger & Tax · Reporting & Analytics process.** An overseas guest picks their currency before booking. Where the venue charges that currency the guest pays in it: the rate is locked at checkout, the card is charged in that currency, refunds come back in it, and the venue's books stay in AED with the rate recorded (decided 2 October 2026, Chinmay). Where the venue only shows a currency, prices in it are approximate and the guest pays in AED. The one thing to get right: the guest always knows which currency the card will be charged in, and an approximate figure never looks like a charge.
 

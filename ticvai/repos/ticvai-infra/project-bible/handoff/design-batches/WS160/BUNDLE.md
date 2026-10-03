@@ -132,8 +132,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-908` | Rental Duration, Extension & Return Management | B–D | 0 | 32 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-909` | Deposit & Rental Financial Control | B–D | 0 | 16 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-910` | Maintenance & Resource Blocking | B–D | 19 | 0 | 6 | 10 | 1 | 2 | — | notStarted (—) |
-| `BO-911` | Inspection, Condition & Compliance Management | B–D | 31 | 25 | 6 | 4 | 0 | 0 | — | notStarted (—) |
-| `BO-912` | Asset Lifecycle, Depreciation & Retirement | B–D | 11 | 43 | 6 | 5 | 0 | 0 | — | notStarted (—) |
+| `BO-911` | Inspection, Condition & Compliance Management | A | 31 | 25 | 6 | 4 | 0 | 0 | — | notStarted (—) |
+| `BO-912` | Asset Lifecycle, Depreciation & Retirement | B–D | 11 | 38 | 6 | 5 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -1198,7 +1198,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Form: Create resource cost** (modal, opened by *Create resource cost*; *Create resource cost* calls `createResourceCost`, *Cancel* sends nothing)
 
-**Collects what `createResourceCost` sends before it is called.** Required: `id`, `resourceId`, `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `createResourceCost` sends before it is called.** Required: `resourceId`, `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1355,8 +1355,8 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Rentals · wave 1 · needs the `resources` module |
+| Block | Block A · task APP-SETUP-BO-911 |
 | Who uses it | venue staff holding `INSPECTION_MANAGE`, `INSPECTION_SUBMIT`, `INSPECTION_VIEW` (1 configure, 1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Track) and no metric row |
@@ -1656,7 +1656,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Create resource cost** (modal, opened by *Create resource cost*; *Create resource cost* calls `createResourceCost`, *Cancel* sends nothing)
 
-**Collects what `createResourceCost` sends before it is called.** Required: `id`, `resourceId`, `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `createResourceCost` sends before it is called.** Required: `resourceId`, `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1705,15 +1705,10 @@ Errors to draw in the form: 422 Unknown resource at this venue; a `transfer` wit
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Resource | the name it points at, never the id | — |
 | Kind | chip: Transfer, Operating, Replacement | — |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Incurred on | 1 Oct 2026 | — |
-| From venue | the name it points at, never the id | A `transfer` only, with `toVenueId`. |
-| To venue | the name it points at, never the id | — |
 | Note | text | — |
-| Scope path | text | The partition key (ADR-0005), written at `venue` scope. |
 
 **The selected asset lifecycle depreciation** (detail panel): The pack groups this record's detail under its own headings: “Retirement Assessment”, “Projector P-17”, “Retirement may require”, “Stroller S-084”, “Typical operational states include”, “Board 6 shall integrate with”.
 
@@ -1846,7 +1841,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (11), with its required mark, default, format and its error state (409, 422).
-- [ ] Every output is drawn (43 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (38 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-912?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: → End of Life, Asset Information, Create resource cost.
 - [ ] Every transition is wired: `BO-903`.

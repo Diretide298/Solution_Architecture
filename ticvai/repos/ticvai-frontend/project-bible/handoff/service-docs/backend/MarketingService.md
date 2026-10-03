@@ -7,7 +7,7 @@
 | Tier | engagement: Guests and intelligence. Nothing that takes money depends on these. |
 | Contracts | `marketing-crm` |
 | Schemas owned | `marketing` |
-| Operations in the slice | 71 of 272 |
+| Operations in the slice | 72 of 274 |
 | Scale | Bursty on send, read-heavy otherwise. The one to watch for a split. |
 | If it is down | Down stops campaigns and guest lookup. Neither stops trading. |
 
@@ -32,76 +32,77 @@
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
-| campaign | [`createCampaign`](#createcampaign) | POST | `/campaigns` | setup | 2 | BO-107, BO-118, BO-121, BO-766, BO-767 |
-| campaign | [`launchCampaign`](#launchcampaign) | POST | `/campaigns/{campaignId}/launch` | setup | 2 | BO-766 |
-| campaign | [`stopCampaign`](#stopcampaign) | POST | `/campaigns/{campaignId}/stop` | setup | 2 |  |
-| campaign | [`updateCampaign`](#updatecampaign) | PATCH | `/campaigns/{campaignId}` | setup | 2 | BO-767, BO-768, BO-769, BO-772 |
+| campaign | [`createCampaign`](#createcampaign) | POST | `/campaigns` | setup | 1 | BO-107, BO-118, BO-121, BO-766, BO-767 |
+| campaign | [`launchCampaign`](#launchcampaign) | POST | `/campaigns/{campaignId}/launch` | setup | 1 | BO-766 |
+| campaign | [`stopCampaign`](#stopcampaign) | POST | `/campaigns/{campaignId}/stop` | setup | 1 |  |
+| campaign | [`updateCampaign`](#updatecampaign) | PATCH | `/campaigns/{campaignId}` | setup | 1 | BO-767, BO-768, BO-769, BO-772 |
 | consent | [`claimDeviceConsent`](#claimdeviceconsent) | POST | `/guests/{subjectId}/consents/claim-device` | core | 1 | GST-042, WEB-016 |
-| consent | [`createConsentQuestion`](#createconsentquestion) | POST | `/consent-questions` | core | 2 | CMS-018 |
+| consent | [`createConsentQuestion`](#createconsentquestion) | POST | `/consent-questions` | core | 1 | CMS-018 |
 | consent | [`getCookieConsentRuntime`](#getcookieconsentruntime) | GET | `/storefront/cookie-consent` | core | 1 | GST-001, GST-066, WEB-001, WEB-024 |
-| consent | [`getDeviceConsentHistory`](#getdeviceconsenthistory) | GET | `/consent/device/history` | core | 2 | GST-066, WEB-024 |
+| consent | [`getDeviceConsentHistory`](#getdeviceconsenthistory) | GET | `/consent/device/history` | core | 1 | GST-066, WEB-024 |
 | consent | [`getGuestConsents`](#getguestconsents) | GET | `/guests/{subjectId}/consents` | core | 1 | BO-737, BO-749, GST-039, GST-065, GST-066, WEB-020 … |
-| consent | [`listConsentAnswers`](#listconsentanswers) | GET | `/consent-answers` | core | 2 | CMS-018 |
+| consent | [`listConsentAnswers`](#listconsentanswers) | GET | `/consent-answers` | core | 1 | CMS-018 |
 | consent | [`listConsentPurposes`](#listconsentpurposes) | GET | `/consent-purposes` | core | 1 | BO-747, CMS-018, GST-039, GST-065, GST-066, WEB-011 … |
 | consent | [`listConsentQuestions`](#listconsentquestions) | GET | `/consent-questions` | core | 1 | BO-008, CMS-018, CMS-103 |
-| consent | [`listPublishedTrackingTechnologies`](#listpublishedtrackingtechnologies) | GET | `/storefront/cookie-consent/technologies` | core | 2 | GST-066, WEB-024 |
+| consent | [`listPublishedTrackingTechnologies`](#listpublishedtrackingtechnologies) | GET | `/storefront/cookie-consent/technologies` | core | 1 | GST-066, WEB-024 |
 | consent | [`recordConsent`](#recordconsent) | POST | `/guests/{subjectId}/consents` | core | 1 | BO-748, GST-039, GST-065, GST-066, POS-027, WEB-020 … |
 | consent | [`recordConsentAnswers`](#recordconsentanswers) | POST | `/consent-answers` | core | 1 | GST-007, WEB-006, WEB-011 |
 | consent | [`recordDeviceConsent`](#recorddeviceconsent) | POST | `/consent/device` | core | 1 | GST-001, GST-066, WEB-001, WEB-024 |
-| consent | [`setConsentPurposes`](#setconsentpurposes) | PUT | `/consent-purposes` | core | 2 | BO-747, CMS-018, CMS-023 |
+| consent | [`setConsentPurposes`](#setconsentpurposes) | PUT | `/consent-purposes` | core | 1 | BO-747, CMS-018, CMS-023 |
 | consent | [`setCookieBannerDesign`](#setcookiebannerdesign) | PUT | `/cookie-banner-preference` | setup | 1 | CMS-026 |
-| consent | [`setDynamicFieldQuestion`](#setdynamicfieldquestion) | PUT | `/dynamic-field-question` | setup | 3 |  |
+| consent | [`setDynamicFieldQuestion`](#setdynamicfieldquestion) | PUT | `/dynamic-field-question` | setup | 1 |  |
 | consent | [`setTrackingTechnology`](#settrackingtechnology) | PUT | `/cookie-tracking-digital` | setup | 1 | CMS-025 |
-| consent | [`updateConsentQuestion`](#updateconsentquestion) | PATCH | `/consent-questions/{questionId}` | core | 2 | CMS-018 |
-| feedback | [`submitReview`](#submitreview) | POST | `/reviews` | core | 3 | GST-035, WEB-026 |
-| guest | [`addToWishlist`](#addtowishlist) | POST | `/guests/{subjectId}/wishlist` | core | 3 | GST-020, WEB-009 |
+| consent | [`updateConsentQuestion`](#updateconsentquestion) | PATCH | `/consent-questions/{questionId}` | core | 1 | CMS-018 |
+| feedback | [`submitReview`](#submitreview) | POST | `/reviews` | core | 1 | GST-035, WEB-026 |
+| guest | [`addToWishlist`](#addtowishlist) | POST | `/guests/{subjectId}/wishlist` | core | 1 | GST-020, WEB-009 |
 | guest | [`getWishlist`](#getwishlist) | GET | `/guests/{subjectId}/wishlist` | core | 1 | GST-020, WEB-009, WEB-017, WEB-024 |
-| guest | [`listGuestDevices`](#listguestdevices) | GET | `/guests/{subjectId}/devices` | core | 2 | GST-073, WEB-024 |
-| guest | [`registerGuestDevice`](#registerguestdevice) | POST | `/guests/{subjectId}/devices` | core | 2 | GST-073 |
-| guest | [`removeFromWishlist`](#removefromwishlist) | DELETE | `/guests/{subjectId}/wishlist/{itemId}` | core | 3 | GST-020, WEB-009 |
-| guest | [`revokeGuestDevice`](#revokeguestdevice) | DELETE | `/guests/{subjectId}/devices/{deviceId}` | core | 2 | GST-073, WEB-024 |
-| guest | [`searchGuests`](#searchguests) | GET | `/guests` | core | 1 | BO-734, BO-735, POS-027, POS-030 |
-| loyalty | [`awardBadge`](#awardbadge) | POST | `/customers/{customerId}/badges` | setup | 2 | BO-826 |
+| guest | [`listGuestDevices`](#listguestdevices) | GET | `/guests/{subjectId}/devices` | core | 1 | GST-073, WEB-024 |
+| guest | [`registerGuestDevice`](#registerguestdevice) | POST | `/guests/{subjectId}/devices` | core | 1 | GST-073 |
+| guest | [`removeFromWishlist`](#removefromwishlist) | DELETE | `/guests/{subjectId}/wishlist/{itemId}` | core | 1 | GST-020, WEB-009 |
+| guest | [`revokeGuestDevice`](#revokeguestdevice) | DELETE | `/guests/{subjectId}/devices/{deviceId}` | core | 1 | GST-073, WEB-024 |
+| guest | [`searchGuests`](#searchguests) | GET | `/guests` | core | 1 | BO-734, BO-735, EMP-026, POS-027, POS-030 |
+| loyalty | [`awardBadge`](#awardbadge) | POST | `/customers/{customerId}/badges` | setup | 1 | BO-826 |
 | loyalty | [`createLoyaltyProgramme`](#createloyaltyprogramme) | POST | `/loyalty/programmes` | setup | 1 | BO-828 |
 | loyalty | [`getGuestLoyalty`](#getguestloyalty) | GET | `/guests/{subjectId}/loyalty` | core | 1 | BO-735, BO-737, BO-831, POS-002, POS-027 |
-| loyalty | [`listCustomerBadges`](#listcustomerbadges) | GET | `/customers/{customerId}/badges` | core | 2 | GST-036, WEB-043 |
-| loyalty | [`listLeaderboard`](#listleaderboard) | GET | `/loyalty/leaderboard` | core | 2 | GST-036, WEB-043 |
-| loyalty | [`listLoyaltyProgrammes`](#listloyaltyprogrammes) | GET | `/loyalty/programmes` | core | 2 | BO-833, GST-036, WEB-043 |
-| loyalty | [`listRewards`](#listrewards) | GET | `/loyalty/rewards` | core | 2 | GST-036, WEB-043 |
-| loyalty | [`setLeaderboardNickname`](#setleaderboardnickname) | PUT | `/loyalty/leaderboard-nickname` | core | 2 | GST-036, WEB-043 |
+| loyalty | [`listCustomerBadges`](#listcustomerbadges) | GET | `/customers/{customerId}/badges` | core | 1 | GST-036, WEB-043 |
+| loyalty | [`listLeaderboard`](#listleaderboard) | GET | `/loyalty/leaderboard` | core | 1 | GST-036, WEB-043 |
+| loyalty | [`listLoyaltyProgrammes`](#listloyaltyprogrammes) | GET | `/loyalty/programmes` | core | 1 | BO-833, GST-036, WEB-043 |
+| loyalty | [`listRewards`](#listrewards) | GET | `/loyalty/rewards` | core | 1 | GST-036, WEB-043 |
+| loyalty | [`setLeaderboardNickname`](#setleaderboardnickname) | PUT | `/loyalty/leaderboard-nickname` | core | 1 | GST-036, WEB-043 |
 | loyalty | [`setLoyaltyRules`](#setloyaltyrules) | PUT | `/loyalty/programmes/{programmeId}/rules` | setup | 1 | BO-827 |
-| loyalty | [`setReward`](#setreward) | PUT | `/loyalty/rewards` | setup | 2 | BO-828 |
+| loyalty | [`setReward`](#setreward) | PUT | `/loyalty/rewards` | setup | 1 | BO-828 |
 | marketing | [`createChallenge`](#createchallenge) | POST | `/challenges` | setup | 1 | BO-825, BO-829 |
-| marketing | [`createForm`](#createform) | POST | `/forms` | setup | 3 | BO-618, BO-747, BO-815, CMS-042, CMS-043 |
+| marketing | [`createForm`](#createform) | POST | `/forms` | setup | 1 | BO-618, BO-747, BO-815, CMS-042, CMS-043 |
 | marketing | [`createInvitationCampaign`](#createinvitationcampaign) | POST | `/invitation-campaigns` | setup | 1 |  |
-| marketing | [`createReferral`](#createreferral) | POST | `/referrals` | core | 2 | BO-830, GST-036, WEB-043 |
-| marketing | [`createUrlRedirect`](#createurlredirect) | POST | `/seo-redirects` | core | 2 | BO-842, CMS-013 |
-| marketing | [`getForm`](#getform) | GET | `/forms/{formId}` | core | 3 | BO-618, GST-035, WEB-026 |
+| marketing | [`createReferral`](#createreferral) | POST | `/referrals` | core | 1 | BO-830, GST-036, WEB-043 |
+| marketing | [`createUrlRedirect`](#createurlredirect) | POST | `/seo-redirects` | core | 1 | BO-842, CMS-013 |
+| marketing | [`getForm`](#getform) | GET | `/forms/{formId}` | core | 1 | BO-618, GST-035, WEB-026 |
 | marketing | [`getLoyaltyPosition`](#getloyaltyposition) | GET | `/loyalty/position` | core | 1 | GST-036, WEB-017, WEB-043 |
-| marketing | [`getMarketingSubscription`](#getmarketingsubscription) | GET | `/marketing-subscriptions` | core | 2 | GST-065, WEB-027 |
+| marketing | [`getMarketingSubscription`](#getmarketingsubscription) | GET | `/marketing-subscriptions` | core | 1 | GST-065, WEB-027 |
 | marketing | [`getMyChallenges`](#getmychallenges) | GET | `/guests/me/challenges` | core | 1 | WEB-017 |
 | marketing | [`getMyProfile`](#getmyprofile) | GET | `/guests/me/profile` | core | 1 | GST-001, GST-039, WEB-011, WEB-020 |
-| marketing | [`getSeoMetadata`](#getseometadata) | GET | `/seo-metadata` | core | 2 | CMS-013 |
-| marketing | [`getWaiverStatus`](#getwaiverstatus) | GET | `/guests/{subjectId}/waiver-status` | core | 3 | BO-852, WEB-024 |
-| marketing | [`handoverToAgent`](#handovertoagent) | POST | `/conversations/{conversationId}/handover` | core | 2 | GST-031, GST-032, GST-033, KSK-015, WEB-044 |
+| marketing | [`getSeoMetadata`](#getseometadata) | GET | `/seo-metadata` | core | 1 | CMS-013 |
+| marketing | [`getWaiverStatus`](#getwaiverstatus) | GET | `/guests/{subjectId}/waiver-status` | core | 1 | BO-852, WEB-024 |
+| marketing | [`handoverToAgent`](#handovertoagent) | POST | `/conversations/{conversationId}/handover` | core | 1 | GST-031, GST-032, GST-033, KSK-015, WEB-044 |
 | marketing | [`identifyGuest`](#identifyguest) | POST | `/guests/identify` | core | 1 | POS-002, POS-027 |
 | marketing | [`listMyCases`](#listmycases) | GET | `/my/cases` | core | 1 | GST-034, GST-040, GST-068, WEB-025, WEB-034 |
 | marketing | [`raiseMyCase`](#raisemycase) | POST | `/my/cases` | core | 1 | GST-034, GST-035, GST-040, GST-068, WEB-025, WEB-026 … |
-| marketing | [`recordLostItem`](#recordlostitem) | POST | `/lost-items` | core | 2 | BO-073, GST-034, WEB-034 |
+| marketing | [`recordLostItem`](#recordlostitem) | POST | `/lost-items` | core | 1 | BO-073, GST-034, WEB-034 |
 | marketing | [`redeemLoyaltyPoints`](#redeemloyaltypoints) | POST | `/loyalty/redemptions` | core | 1 | GST-036, GST-071, POS-002, POS-005, WEB-043 |
 | marketing | [`replyToMyCase`](#replytomycase) | POST | `/my/cases/{caseId}/messages` | core | 1 | GST-034, GST-040, GST-068, WEB-025, WEB-034 |
 | marketing | [`respondToInvitation`](#respondtoinvitation) | POST | `/invitations/{token}/respond` | core | 1 | GST-072, WEB-017 |
-| marketing | [`sendConversationMessage`](#sendconversationmessage) | POST | `/conversations/{conversationId}/messages` | core | 2 | BO-799, GST-031, GST-032, SUP-005, WEB-044 |
-| marketing | [`setAgentAvailability`](#setagentavailability) | PUT | `/agent-availability` | setup | 2 | SUP-002, SUP-003 |
-| marketing | [`setMarketingSubscription`](#setmarketingsubscription) | PUT | `/marketing-subscriptions` | core | 2 | GST-065, WEB-027 |
-| marketing | [`setSeoMetadata`](#setseometadata) | PUT | `/seo-metadata` | core | 2 | BO-842, CMS-013 |
-| marketing | [`submitForm`](#submitform) | POST | `/form-submissions` | core | 3 | GST-035, WEB-026 |
+| marketing | [`sendConversationMessage`](#sendconversationmessage) | POST | `/conversations/{conversationId}/messages` | setup | 1 | BO-799, SUP-005 |
+| marketing | [`sendGuestConversationMessage`](#sendguestconversationmessage) | POST | `/my/conversations/{conversationId}/messages` | core | 1 | GST-031, GST-032, WEB-044 |
+| marketing | [`setAgentAvailability`](#setagentavailability) | PUT | `/agent-availability` | setup | 1 | SUP-002, SUP-003 |
+| marketing | [`setMarketingSubscription`](#setmarketingsubscription) | PUT | `/marketing-subscriptions` | core | 1 | GST-065, WEB-027 |
+| marketing | [`setSeoMetadata`](#setseometadata) | PUT | `/seo-metadata` | core | 1 | BO-842, CMS-013 |
+| marketing | [`submitForm`](#submitform) | POST | `/form-submissions` | core | 1 | GST-035, WEB-026 |
 | marketing | [`updateGuestPreferences`](#updateguestpreferences) | PUT | `/guests/{subjectId}/preferences` | core | 1 | BO-740, WEB-020 |
 | marketing | [`updateMyProfile`](#updatemyprofile) | PATCH | `/guests/me/profile` | core | 1 | GST-039, WEB-011, WEB-020 |
-| marketing | [`uploadGuestDocument`](#uploadguestdocument) | POST | `/guest-documents` | setup | 2 |  |
-| message | [`createMessageTemplate`](#createmessagetemplate) | POST | `/message-templates` | setup | 2 | BO-785, BO-786, BO-787, SUP-007 |
-| message | [`listMyNotifications`](#listmynotifications) | GET | `/me/notifications` | core | 2 | GST-030, WEB-046 |
-| message | [`markMyNotificationsRead`](#markmynotificationsread) | POST | `/me/notifications/read` | core | 2 | GST-030, WEB-046 |
+| marketing | [`uploadGuestDocument`](#uploadguestdocument) | POST | `/guest-documents` | setup | 1 |  |
+| message | [`createMessageTemplate`](#createmessagetemplate) | POST | `/message-templates` | setup | 1 | BO-785, BO-786, BO-787, SUP-007 |
+| message | [`listMyNotifications`](#listmynotifications) | GET | `/me/notifications` | core | 1 | GST-030, WEB-046 |
+| message | [`markMyNotificationsRead`](#markmynotificationsread) | POST | `/me/notifications/read` | core | 1 | GST-030, WEB-046 |
 | segment | [`createSegment`](#createsegment) | POST | `/segments` | setup | 1 | ANL-007, BO-755, BO-757, BO-758, BO-759, BO-760 … |
 
 ## Group: campaign
@@ -117,7 +118,7 @@ Created in draft. One-off, scheduled, or triggered by an event such as a booking
 | Permission | `MARKETING_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, makes `marketing.campaign` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `marketing.campaign`, `marketing.campaign_variant`, `marketing.segment_criterion` |
@@ -266,7 +267,7 @@ Evaluates the segment, applies consent and suppression, and queues the send. The
 | Permission | `MARKETING_SEND` |
 | Scope level | venue |
 | Part of slice | setup, makes `marketing.campaign` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `marketing.attribution_touch`, `marketing.campaign`, `marketing.campaign_variant` |
@@ -321,7 +322,7 @@ Halts remaining sends immediately. Messages already dispatched cannot be recalle
 | Permission | `MARKETING_SEND` |
 | Scope level | venue |
 | Part of slice | setup, makes `marketing.campaign` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `marketing.campaign`, `marketing.campaign_variant`, `marketing.segment_criterion` |
@@ -427,7 +428,7 @@ Content and audience are editable only in draft. A live campaign may be paused, 
 | Permission | `MARKETING_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, changes rows of `marketing.campaign` that another operation creates |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `marketing.campaign`, `marketing.campaign_variant`, `marketing.segment_criterion` |
@@ -597,7 +598,7 @@ Writes one `ConsentRecord` per affected purpose through the `recordConsent` path
 | Permission | `GUEST_MANAGE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
@@ -773,7 +774,7 @@ Writes one `ConsentRecord` per affected purpose through the `recordConsent` path
 | Permission | `None` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -829,6 +830,7 @@ Writes one `ConsentRecord` per affected purpose through the `recordConsent` path
 **`GET /guests/{subjectId}/consents`**: Read a guest's consent state
 
 Current position per purpose and channel, with the version of the notice consented to and when. A consent whose notice version has since been superseded is reported as requiring renewal.
+**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own consents (`subjectId` is the caller's); another guest's consents is refused exactly as one that does not exist, never returned. `GUEST_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
 
 |  |  |
 |---|---|
@@ -881,7 +883,7 @@ Current position per purpose and channel, with the version of the notice consent
 | Permission | `GUEST_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -939,6 +941,8 @@ Current position per purpose and channel, with the version of the notice consent
 
 **`GET /consent-purposes`**: Configured consent purposes
 
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets the active consent purposes a guest is asked for, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `GUEST_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
 |  |  |
 |---|---|
 | Permission | `GUEST_VIEW` |
@@ -948,6 +952,7 @@ Current position per purpose and channel, with the version of the notice consent
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
+| Guest callable | True |
 | Reads | `cache:resolution`, `marketing.consent_purpose`, `marketing.consent_purpose_channel` |
 | Writes | `cache:resolution` |
 | Called by | BO-747, CMS-018, GST-039, GST-065, GST-066, WEB-011, WEB-020, WEB-024, WEB-027 |
@@ -1047,7 +1052,7 @@ Current position per purpose and channel, with the version of the notice consent
 | Permission | `None` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -1317,7 +1322,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 | Permission | `GUEST_MANAGE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -1462,7 +1467,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 | Permission | `GUEST_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, makes `marketing.form_definition_field` non-empty |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
@@ -1652,7 +1657,7 @@ Each purpose names the channels it covers, whether it is required for service, a
 | Permission | `GUEST_MANAGE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
@@ -1722,7 +1727,7 @@ Guest-facing. A low rating may open a service case automatically where the venue
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `marketing.review` |
@@ -1788,7 +1793,7 @@ Idempotent on the variant and performance — saving twice is one entry, not two
 | Permission | `None` |
 | Scope level | subject |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | subject |
 | Conflict policy | serverWins |
@@ -1907,7 +1912,7 @@ Here rather than in tenancy. `platform.device` is staff hardware bound to a work
 | Permission | `None` |
 | Scope level | subject |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | subject |
 | Conflict policy | serverWins |
@@ -1965,7 +1970,7 @@ Called on install and again whenever the provider rotates the token — which ha
 | Permission | `None` |
 | Scope level | subject |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | subject |
 | Conflict policy | serverWins |
@@ -2027,7 +2032,7 @@ Called on install and again whenever the provider rotates the token — which ha
 | Permission | `None` |
 | Scope level | subject |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | subject |
 | Conflict policy | serverWins |
@@ -2062,7 +2067,7 @@ Sign-out, uninstall, or a guest removing a device they no longer have. Revoked r
 | Permission | `None` |
 | Scope level | subject |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | subject |
 | Conflict policy | serverWins |
@@ -2104,7 +2109,7 @@ Returns profiles the caller's scope permits. Personal fields are returned only t
 | Read routing | replica |
 | Reads | `marketing.guest_profile` |
 | Writes | - |
-| Called by | BO-734, BO-735, POS-027, POS-030 |
+| Called by | BO-734, BO-735, EMP-026, POS-027, POS-030 |
 
 **Parameters**
 
@@ -2166,7 +2171,7 @@ Returns profiles the caller's scope permits. Personal fields are returned only t
 | Permission | `MARKETING_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, makes `marketing.customer_badge` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `marketing.customer_badge` |
@@ -2363,13 +2368,14 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 **`GET /customers/{customerId}/badges`**: Badges a guest holds
 
 **A badge can expire and can be revoked**, so this returns the status rather than a list of names — a guest page showing a lapsed badge as current is a promise the venue did not make.
+**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own badges (`customerId` is the caller's); another guest's badges is refused exactly as one that does not exist, never returned. `MARKETING_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
 
 |  |  |
 |---|---|
 | Permission | `MARKETING_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -2422,7 +2428,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | Permission | `None` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `marketing.loyalty_position` |
@@ -2461,15 +2467,18 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 
 **`GET /loyalty/programmes`**: List loyalty programmes
 
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets published loyalty programmes, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `MARKETING_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
 |  |  |
 |---|---|
 | Permission | `MARKETING_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
+| Guest callable | True |
 | Reads | `marketing.loyalty_programme`, `marketing.points_earning_rule`, `marketing.programme_tier` |
 | Writes | - |
 | Called by | BO-833, GST-036, WEB-043 |
@@ -2524,15 +2533,18 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 
 **`GET /loyalty/rewards`**: What points can be turned into
 
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets published rewards, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `MARKETING_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
 |  |  |
 |---|---|
 | Permission | `MARKETING_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
+| Guest callable | True |
 | Reads | `marketing.reward` |
 | Writes | - |
 | Called by | GST-036, WEB-043 |
@@ -2583,7 +2595,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | Permission | `None` |
 | Scope level | subject |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | subject |
 | Conflict policy | serverWins |
@@ -2753,7 +2765,7 @@ Earn rules and tiers. **What points redeem for is the rewards catalogue** (`setR
 | Permission | `MARKETING_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, makes `marketing.reward` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
@@ -2902,7 +2914,7 @@ Published as a version. **A change creates a new version and the old one stays r
 | Permission | `MARKETING_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, makes `marketing.form_definition`, `marketing.form_definition_field` non-empty |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `catalogue.product`, `marketing.form_definition`, `marketing.form_definition_field` |
@@ -3065,7 +3077,7 @@ BL-034. **The reward fires on the referee's qualifying act, not on the sign-up**
 | Permission | `MARKETING_MANAGE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
@@ -3128,7 +3140,7 @@ BL-034. **The reward fires on the referee's qualifying act, not on the sign-up**
 | Permission | `MARKETING_MANAGE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.url_redirect` |
@@ -3188,7 +3200,7 @@ Absent `version` returns the `published` version to a guest and the latest to st
 | Permission | `GUEST_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3298,13 +3310,14 @@ Returns the points, the tier, and **how far from the next one** — the last is 
 **`GET /marketing-subscriptions`**: What this guest has opted into
 
 **Drafted 4 September as a stub.** WEB-027 *Newsletter Subscription* sat on the wishlist and consent operations, which is why it read as a duplicate of the account dashboard. **A marketing subscription is not a consent record**: consent says what may be done with data, a subscription says what the guest asked to receive, and conflating them is how somebody unsubscribes and keeps getting email. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
+**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own marketing subscription; another guest's subscription is refused exactly as one that does not exist, never returned. `MARKETING_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
 
 |  |  |
 |---|---|
 | Permission | `MARKETING_VIEW` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3420,7 +3433,7 @@ Returns the points, the tier, and **how far from the next one** — the last is 
 | Permission | `MARKETING_VIEW` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3475,7 +3488,7 @@ Returns the points, the tier, and **how far from the next one** — the last is 
 | Permission | `GUEST_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3521,7 +3534,7 @@ Triggered by the guest asking, by the assistant refusing or failing, by sentimen
 | Permission | `None` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `marketing.agent_availability`, `marketing.conversation`, `marketing.conversation_message`, `marketing.conversation_message_attachment` |
@@ -3815,7 +3828,7 @@ Found writing F54: `GST-034 Lost & Found` declared exactly one operation and it 
 | Permission | `CASE_MANAGE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Guest callable | True |
@@ -4087,18 +4100,19 @@ The reply is written as a `CaseMessage` with `authorKind: guest` and `isInternal
 
 22.8.20. Text, images, PDFs, QR codes and tickets.
 **The sender is resolved, not declared.** A guest session sends as the guest; an agent session sends as that agent; the assistant sends as the assistant and is labelled as one — **a guest talking to a bot that presents as a person is a complaint waiting for the moment they find out.**
+**A guest writes with `sendGuestConversationMessage`** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-004): the guest screens (GST-031, GST-032, WEB-044) no longer call this; it is the agent's send and needs `CASE_MANAGE`. The guest audience and `guestAuth` stay only so a client built against r1 is not broken; they go at the next major version.
 
 |  |  |
 |---|---|
 | Permission | `CASE_MANAGE` |
 | Scope level | tenant |
-| Part of slice | core |
-| Wave | 2 |
+| Part of slice | setup, makes `marketing.conversation_message`, `marketing.conversation_message_attachment` non-empty |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `marketing.conversation`, `marketing.conversation_message`, `marketing.conversation_message_attachment` |
 | Writes | `cache:idempotency`, `marketing.conversation`, `marketing.conversation_message`, `marketing.conversation_message_attachment` |
-| Called by | BO-799, GST-031, GST-032, SUP-005, WEB-044 |
+| Called by | BO-799, SUP-005 |
 | State model | Conversation ([states/conversation.yaml](../../../states/conversation.yaml)): moves `withAgent` -> `waitingOnGuest`, `waitingOnGuest` -> `withAgent` |
 
 **Parameters**
@@ -4139,6 +4153,65 @@ The reply is written as a `CaseMessage` with `authorKind: guest` and `isInternal
 | 201 |  | Sent |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### sendGuestConversationMessage
+
+**`POST /my/conversations/{conversationId}/messages`**: Write to the agent, as the guest, in the guest's own handed-over conversation
+
+**The guest's side of a handed-over conversation** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-004). `sendConversationMessage` needs `CASE_MANAGE`, which no guest holds, and the guest chat (GST-031, GST-032, WEB-044) called it; this replaces it on every guest screen. The agent's replies and the queue position are read with `getGuestConversation`.
+
+**Scoped to the caller** (`x-ticvai-self-scoped: subject`): the message is written with `sender: guest`, never declared by the caller, and a conversation the guest is not the party to answers 404, exactly as one that does not exist.
+
+**Only once a person has it.** While the conversation is still with the assistant the guest asks with ai `sendAiMessage`; once it is queued, with an agent or waiting on the guest, they write here. A conversation that has ended (`resolved`, `abandoned`, `timedOut`) or never left the assistant is a 409 (`conversation-not-with-agent`), and the chat offers a new question or a case instead.
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | append |
+| Reads | - |
+| Writes | - |
+| Called by | GST-031, GST-032, WEB-044 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| conversationId | path | yes | string (uuid) |  |
+| Idempotency-Key | header | yes | string (uuid) | Client-generated UUIDv7. |
+
+**Request body**
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| body | string | yes | (min length 1; max length 4000) |
+| attachments | array of object |  | What the guest attaches, from their own uploads or their own tickets |
+| attachments[].assetId | string (uuid) |  |  |
+| attachments[].kind | enum (image, video, document, ticket, qr, paymentLink) |  |  |
+
+**Response**: `GuestConversationMessage`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| id | string (uuid) | yes |  |
+| sender | enum (guest, agent, assistant, system) | yes |  |
+| body | string | yes |  |
+| attachments | array of object |  |  |
+| attachments[].assetId | string (uuid) |  |  |
+| attachments[].kind | enum (image, video, document, ticket, qr, paymentLink) |  |  |
+| sentAt | string (date-time) | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 201 |  | Sent, as the guest |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 409 |  | The conversation is not with a person (conversation-not-with-agent), still with the assistant or ended |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### setAgentAvailability
 
 **`PUT /agent-availability`**: An agent goes available, away or offline
@@ -4151,7 +4224,7 @@ An agent who forgets to go offline is an agent conversations queue for. **Availa
 | Permission | `CASE_MANAGE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `marketing.agent_availability` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | lastWriterWins |
 | Reads | `cache:idempotency`, `identity.principal`, `marketing.agent_availability` |
@@ -4196,13 +4269,14 @@ An agent who forgets to go offline is an agent conversations queue for. **Availa
 **`PUT /marketing-subscriptions`**: Subscribe or unsubscribe
 
 **Drafted 4 September as a stub.** **Unsubscribe has to work without a login**, so the shape carries a token rather than relying on a session. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
+**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own marketing subscription; another guest's subscription is refused exactly as one that does not exist, never returned. `MARKETING_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
 
 |  |  |
 |---|---|
 | Permission | `MARKETING_VIEW` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
@@ -4261,7 +4335,7 @@ An agent who forgets to go offline is an agent conversations queue for. **Availa
 | Permission | `MARKETING_MANAGE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `catalogue.product`, `control.seo_metadata` |
@@ -4334,7 +4408,7 @@ Where the form has an expiry, a live acceptance means **a returning participant 
 | Permission | `GUEST_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Guest callable | True |
@@ -4535,7 +4609,7 @@ BL-133. **Deliberately not `assets`.** A guest's passport scan is not a marketin
 | Permission | `GUEST_VIEW_PII` |
 | Scope level | venue |
 | Part of slice | setup, makes `marketing.guest_document` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
@@ -4598,7 +4672,7 @@ Per-language bodies with named merge fields. A template missing a version in an 
 | Permission | `MARKETING_MANAGE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `marketing.message_template`, `marketing.message_template_version` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -4664,7 +4738,7 @@ Per-language bodies with named merge fields. A template missing a version in an 
 | Permission | `None` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -4717,7 +4791,7 @@ Marks the given notifications, or all of them when `all` is true, as opened. Onl
 | Permission | `None` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | lastWriterWins |
 | Guest callable | True |
@@ -4844,7 +4918,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | principal_id | uuid | yes | The caller. |
 | state | text | yes |  |
 | max_concurrent | integer | no |  |
@@ -4921,7 +4995,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | campaign_id | uuid | yes |  |
 | domain | text | yes |  |
 | type | text | yes |  |
@@ -4933,7 +5007,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | campaign_id | uuid | no |  |
 | label | text | yes | A, B, C... |
 | subject_override | jsonb | no | Subject line by locale. |
@@ -5151,7 +5225,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | brand_id | uuid | no | Null for the corporate design every brand inherits. |
 | inherits_from_id | uuid | no |  |
 | channel | text | yes |  |
@@ -5174,7 +5248,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | customer_id | uuid | yes |  |
 | badge_id | uuid | yes |  |
 | challenge_id | uuid | no |  |
@@ -5188,7 +5262,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | consent_key | text | yes | Opaque, minted by us, not a device fingerprint. |
 | channel | text | yes |  |
 | brand_id | uuid | no |  |
@@ -5317,7 +5391,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | subject_id | uuid | no |  |
 | seating_preference | text | no |  |
 | drink_preferences | text[] | no |  |
@@ -5329,7 +5403,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no | Added 20 August. |
+| id | uuid | yes | Added 20 August. |
 | subject_id | uuid | yes | Opaque reference. |
 | display_name | text | no |  |
 | email | text | no |  |
@@ -5442,7 +5516,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | campaign_id | uuid | yes |  |
 | type | text | yes |  |
 | points_earning_rule_id | uuid | no |  |
@@ -5528,7 +5602,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | loyalty_program_id | uuid | yes |  |
 | point_redemption_rule_code | text | yes |  |
 | name | text | yes |  |
@@ -5546,7 +5620,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | loyalty_programme_id | uuid | yes |  |
 | code | text | yes |  |
 | name | text | yes |  |
@@ -5595,7 +5669,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | loyalty_program_id | uuid | yes |  |
 | code | text | yes |  |
 | name | text | yes |  |
@@ -5756,7 +5830,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 ## Not in the first release
 
-201 operations, added to this service in later releases without changing any of the above.
+202 operations, added to this service in later releases without changing any of the above.
 
 | Group | Operations |
 |---|---|
@@ -5767,6 +5841,6 @@ Every table this service owns that the slice reads or writes, with its columns a
 | guest | `getGuestProfile`, `mergeGuestProfiles`, `updateGuestProfile` |
 | guests | `activateAudience`, `checkGuestCheckoutMatch`, `decideDuplicateCandidate`, `decideGuestCheckoutMatch`, `getAudienceOverlap`, `getGuestAttributeModel`, `getGuestIntelligence`, `getGuestMatchPolicy`, `getGuestRelationships`, `getGuestTimeline`, `getIdentityResolutionRules`, `importAudienceList`, `listAudienceActivations`, `listAudienceLists`, `listDuplicateCandidates`, `runDataRetention`, `setDataRetentionPolicy`, `setGuestAttributeModel`, `setGuestMatchPolicy`, `setGuestRelationships`, `setIdentityResolutionRules` |
 | loyalty | `adjustLoyaltyPoints`, `getLoyaltyRules`, `issueReward`, `listBadges`, `listLoyaltyCampaigns`, `listLoyaltyPointEntries`, `listRewardAssignments`, `setBadge`, `setLoyaltyCampaign` |
-| marketing | `accrueLoyaltyPoints`, `activateChallenge`, `activateJourney`, `addGuestNote`, `claimConversation`, `closeConversation`, `createJourney`, `endKioskAssist`, `getChallenge`, `getConversation`, `getGuestExtraValues`, `getJourneyPerformance`, `getLostItemMatches`, `listChallenges`, `listConversations`, `listForms`, `listGuestExtraFields`, `listJourneys`, `listLostItems`, `listMessageDispatches`, `listMessageTriggers`, `listSlaPolicies`, `listWaiverSignatures`, `matchGuest`, `matchLostItem`, `mergeGuests`, `recordPrivacyIncident`, `recordTouchPoint`, `retryMessageDispatch`, `setCallDisposition`, `setGuestExtraFields`, `setGuestExtraValues`, `setMessageTrigger`, `setSlaPolicy`, `startKioskAssist`, `transferConversation` |
+| marketing | `accrueLoyaltyPoints`, `activateChallenge`, `activateJourney`, `addGuestNote`, `claimConversation`, `closeConversation`, `createJourney`, `endKioskAssist`, `getChallenge`, `getConversation`, `getGuestConversation`, `getGuestExtraValues`, `getJourneyPerformance`, `getLostItemMatches`, `listChallenges`, `listConversations`, `listForms`, `listGuestExtraFields`, `listJourneys`, `listLostItems`, `listMessageDispatches`, `listMessageTriggers`, `listSlaPolicies`, `listWaiverSignatures`, `matchGuest`, `matchLostItem`, `mergeGuests`, `recordPrivacyIncident`, `recordTouchPoint`, `retryMessageDispatch`, `setCallDisposition`, `setGuestExtraFields`, `setGuestExtraValues`, `setMessageTrigger`, `setSlaPolicy`, `startKioskAssist`, `transferConversation` |
 | message | `getMessageStatus`, `listBusinessEventNotification`, `listCommunicationService`, `listDeliveryCommunicationPlatform`, `listDeliveryQueueFailure`, `listMessageTemplates`, `listProviderHealthUsage`, `listRoutingPriorityThrottling`, `listSystemTransactionalTemplate`, `sendTransactionalMessage`, `setBusinessEventMapping`, `setChannelProvider`, `setCommunicationRoutingRule`, `setSenderIdentityDomain` |
 | segment | `listSegmentMembers`, `listSegments`, `previewSegment`, `previewSegmentDraft` |

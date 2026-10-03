@@ -220,9 +220,9 @@
  },
  "deferredScreens": [],
  "counts": {
-  "core": 502,
-  "setup": 216,
-  "allOperations": 2731
+  "core": 504,
+  "setup": 217,
+  "allOperations": 2738
  },
  "services": {
   "AccessService": {
@@ -241,9 +241,9 @@
    "total": 443
   },
   "FnbService": {
-   "core": 53,
+   "core": 55,
    "setup": 20,
-   "total": 131
+   "total": 133
   },
   "IdentityService": {
    "core": 34,
@@ -262,13 +262,13 @@
   },
   "MarketingService": {
    "core": 53,
-   "setup": 18,
-   "total": 272
+   "setup": 19,
+   "total": 274
   },
   "OrderService": {
    "core": 86,
    "setup": 7,
-   "total": 297
+   "total": 298
   },
   "PlatformService": {
    "core": 3,
@@ -293,7 +293,7 @@
   "VenueOpsService": {
    "core": 44,
    "setup": 25,
-   "total": 285
+   "total": 287
   },
   "WalletService": {
    "core": 10,
@@ -1577,6 +1577,7 @@
     "ADM-031",
     "ANL-021",
     "ANL-022",
+    "ANL-023",
     "ANL-053"
    ],
    "enables": [
@@ -6353,14 +6354,10 @@
    "path": "/tenant-config/analytics-providers",
    "perm": "TENANT_CONFIGURE",
    "platforms": [
-    "MOB",
-    "WEB",
     "WL"
    ],
    "screens": [
-    "CMS-016",
-    "GST-001",
-    "WEB-001"
+    "CMS-016"
    ],
    "enables": []
   },
@@ -6408,6 +6405,21 @@
    "screens": [
     "GST-015",
     "WEB-023"
+   ],
+   "enables": []
+  },
+  "listBookableOutlets": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/venues/{venueId}/bookable-outlets",
+   "perm": null,
+   "platforms": [
+    "MOB"
+   ],
+   "screens": [
+    "GST-070"
    ],
    "enables": []
   },
@@ -7255,6 +7267,21 @@
    "screens": [
     "GST-015",
     "WEB-023"
+   ],
+   "enables": []
+  },
+  "listMyTableReservations": {
+   "part": "core",
+   "service": "FnbService",
+   "contract": "fnb",
+   "verb": "GET",
+   "path": "/me/table-reservations",
+   "perm": null,
+   "platforms": [
+    "MOB"
+   ],
+   "screens": [
+    "GST-070"
    ],
    "enables": []
   },
@@ -9265,7 +9292,6 @@
     "POS"
    ],
    "screens": [
-    "BO-056",
     "BO-889",
     "BO-935",
     "BO-936",
@@ -9427,7 +9453,6 @@
    "screens": [
     "BO-021",
     "KIT-006",
-    "KIT-007",
     "POS-012"
    ],
    "enables": []
@@ -10424,6 +10449,7 @@
    "screens": [
     "BO-734",
     "BO-735",
+    "EMP-026",
     "POS-027",
     "POS-030"
    ],
@@ -10554,21 +10580,36 @@
    "enables": []
   },
   "sendConversationMessage": {
-   "part": "core",
+   "part": "setup",
    "service": "MarketingService",
    "contract": "marketing-crm",
    "verb": "POST",
    "path": "/conversations/{conversationId}/messages",
    "perm": "CASE_MANAGE",
+   "platforms": [],
+   "screens": [
+    "BO-799",
+    "SUP-005"
+   ],
+   "enables": [
+    "marketing.conversation_message",
+    "marketing.conversation_message_attachment"
+   ]
+  },
+  "sendGuestConversationMessage": {
+   "part": "core",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "verb": "POST",
+   "path": "/my/conversations/{conversationId}/messages",
+   "perm": null,
    "platforms": [
     "MOB",
     "WEB"
    ],
    "screens": [
-    "BO-799",
     "GST-031",
     "GST-032",
-    "SUP-005",
     "WEB-044"
    ],
    "enables": []

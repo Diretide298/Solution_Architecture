@@ -105,7 +105,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-034` | Lost & Found | A | 11 | 28 | 5 | 1 | 1 | 0 | guest | notStarted (client-verified) |
+| `GST-034` | Lost & Found | A | 11 | 9 | 5 | 1 | 1 | 0 | guest | notStarted (client-verified) |
 
 ## Design inputs from the client meetings
 

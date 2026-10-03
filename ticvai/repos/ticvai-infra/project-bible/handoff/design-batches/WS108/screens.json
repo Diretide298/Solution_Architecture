@@ -67,7 +67,10 @@
     {
      "to": "BO-619",
      "trigger": "Accreditation Category Management",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "programmeId"
+     ]
     },
     {
      "to": "BO-620",
@@ -549,7 +552,7 @@
   "name": "Accreditation Form Builder",
   "module": "Access & Venue",
   "requiresModule": "accreditation",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "ACCREDITATION.pdf",
    "board": "1",
@@ -671,7 +674,9 @@
     },
     {
      "name": "formId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listForms` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -824,7 +829,9 @@
    "params": [
     {
      "name": "programmeId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAccreditationProgrammes` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

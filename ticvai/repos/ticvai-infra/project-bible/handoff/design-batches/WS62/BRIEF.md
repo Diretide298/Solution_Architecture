@@ -106,11 +106,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-278` | Resale Marketplace Command Center | B–D | 2 | 48 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
+| `ADM-278` | Resale Marketplace Command Center | B–D | 2 | 40 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
 | `ADM-279` | Resale Eligibility Rule Configuration | B–D | 13 | 0 | 5 | 0 | 2 | 5 | — | notStarted (generated) |
-| `ADM-280` | Resale Policy & Marketplace Settings | B–D | 54 | 16 | 5 | 0 | 0 | 5 | — | notStarted (generated) |
+| `ADM-280` | Resale Policy & Marketplace Settings | B–D | 54 | 8 | 5 | 0 | 0 | 5 | — | notStarted (generated) |
 | `ADM-281` | Listing Creation & Seller Configuration | B–D | 17 | 20 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-282` | Resale Pricing & Price Guardrails | B–D | 48 | 16 | 5 | 0 | 1 | 5 | — | notStarted (generated) |
+| `ADM-282` | Resale Pricing & Price Guardrails | B–D | 48 | 8 | 5 | 0 | 1 | 5 | — | notStarted (generated) |
 | `ADM-283` | Resale Fees, Commission & Seller Proceeds | B–D | 8 | 0 | 5 | 0 | 2 | 5 | — | notStarted (generated) |
 | `ADM-284` | Listing Approval & Moderation | B–D | 0 | 40 | 6 | 0 | 1 | 3 | — | notStarted (generated) |
 | `ADM-285` | Resale Inventory & Availability Management | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |

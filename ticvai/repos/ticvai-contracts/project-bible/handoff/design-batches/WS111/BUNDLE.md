@@ -247,7 +247,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `BO-647` Badge Template Designer: *Badge Template Designer*
 - → `BO-648` Badge Printing & Print Queue: *Badge Printing & Print Queue*
 - → `BO-649` Digital & Mobile Credential Management: *Digital & Mobile Credential Management*; carries `credentialId`
-- → `BO-650` NFC & RFID Credential Encoding: *NFC & RFID Credential Encoding*
+- → `BO-650` NFC & RFID Credential Encoding: *NFC & RFID Credential Encoding*; carries `credentialId`
 - → `BO-651` Credential Activation & Delivery: *Credential Activation & Delivery*; carries `credentialId`
 - → `BO-027` Reissue & Media Replacement: *Credential Replacement & Reissue (BO-027, absorbed BO-652, audit R276)*
 - → `BO-653` Credential Registry & Credential History: *Credential Registry & Credential History*

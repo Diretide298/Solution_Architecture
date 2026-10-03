@@ -135,7 +135,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-097` | Check Out & Check In | B–D | 24 | 20 | 5 | 25 | 0 | 0 | — | notStarted (generated) |
 | `BO-098` | Qualifications | B–D | 15 | 7 | 5 | 9 | 0 | 0 | — | notStarted (generated) |
 | `BO-099` | Performance Manifest | B–D | 2 | 8 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
-| `BO-103` | Access & Venue | B–D | 2 | 46 | 6 | 13 | 0 | 0 | — | notStarted (generated) |
+| `BO-103` | Access & Venue | B–D | 2 | 22 | 6 | 13 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -150,7 +150,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Access & Venue · wave 2 · needs the `resources` module |
+| Module | Access & Venue · wave 1 · needs the `resources` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `RESOURCE_BOOK`, `RESOURCE_VIEW` (1 operate, 1 read); in the flows as guest |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
@@ -245,7 +245,7 @@ Errors to draw in the form: 409 Conflicts, and the response names them with time
 
 **Where the user goes next**
 
-- → `BO-097` Check Out & Check In: *The guest arrives;*; calls `bookResource`
+- → `BO-097` Check Out & Check In: *The guest arrives;*; carries `bookingId`; calls `bookResource`
 - → `BO-099` Performance Manifest: *Performance Manifest*
 
 #### States
@@ -256,7 +256,7 @@ Errors to draw in the form: 409 Conflicts, and the response names them with time
 | Error (`?state=error`) | Could not load availability. **Do not book blind** — a booking made against a stale calendar is the double-booking this screen exists to prevent. |
 | Empty, first run (`?state=emptyFirstRun`) | Nothing booked in this window. **Free is the default state and it is worth showing plainly** — an empty calendar at a venue that takes bookings is either a quiet week or a resource nobody knows exists. |
 | Empty, no results (`?state=emptyNoResults`) | No availability in this window. The response says why — booked, setup, teardown, maintenance or closed — because **wait and look elsewhere are different answers**. |
-| Permission denied (`?state=emptyNoAccess`) | You do not have RESOURCE_VIEW. |
+| Permission denied (`?state=emptyNoAccess`) | You do not have `RESOURCE_VIEW`. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `RESOURCE_BOOK` for `bookResource`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Conflicts, and the response names them with times. *"Not available"* on a resource a guest can see in front of them is not an answer. (ResourceConflictProblem) |
 
@@ -287,7 +287,7 @@ rows:
 - `getResourceAvailability` → `RESOURCE_VIEW` (read) · staff, guest
 - `bookResource` → `RESOURCE_BOOK` (operate) · staff
 
-**A refused user sees:** You do not have RESOURCE_VIEW.
+**A refused user sees:** You do not have `RESOURCE_VIEW`. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `RESOURCE_BOOK` for `bookResource`.
 
 #### Requirements it meets
 
@@ -353,7 +353,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Access & Venue · wave 2 · needs the `resources` module |
+| Module | Access & Venue · wave 1 · needs the `resources` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `ORDER_CREATE`, `RENTAL_VIEW`, `RESOURCE_BOOK` (2 operate, 1 read); in the flows as guest |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
@@ -492,7 +492,7 @@ Errors to draw in the form: 409 Insufficient balance after existing holds. The r
 | Loading (`?state=loading`) | The booking and its condition history |
 | Error (`?state=error`) | Could not load. **Check-out and check-in work offline** — the deposit hold reconciles on sync. |
 | Empty, first run (`?state=emptyFirstRun`) | Nothing is out. **The list a poolside attendant checks at close** — anything still here at the end of the day is a conversation. |
-| Permission denied (`?state=emptyNoAccess`) | You do not have RESOURCE_BOOK. |
+| Permission denied (`?state=emptyNoAccess`) | Without `RENTAL_VIEW`, which `getRentalBooking` requires, the screen does not load and this state names that permission. You do not have `RESOURCE_BOOK`. |
 | Offline (`?state=offline`) | Queued locally. The deposit is authorised on sync, and **the condition note taken now is the only defence against a dispute later**. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Insufficient balance after existing holds. The reason says which — the balance itself is too low (`insufficientBalance`), or enough is there but other holds … (StoredValueProblem); 409 Nothing is held to release — the hold is already `captured`, `released` or `expired` (`authorisationNotHeld`). (StoredValueProblem); 409 The hold is no longer live — `captured`, `released` or `expired` … |
 
@@ -527,7 +527,7 @@ checkIn:
 - `captureStoredValue` → `ORDER_CREATE` (operate) · staff, device
 - `getRentalBooking` → `RENTAL_VIEW` (read) · staff
 
-**A refused user sees:** You do not have RESOURCE_BOOK.
+**A refused user sees:** Without `RENTAL_VIEW`, which `getRentalBooking` requires, the screen does not load and this state names that permission. You do not have `RESOURCE_BOOK`.
 
 #### Requirements it meets
 
@@ -684,7 +684,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Loading (`?state=loading`) | Qualifications with their expiry |
 | Error (`?state=error`) | Could not load. |
 | Empty, first run (`?state=emptyFirstRun`) | No qualifications recorded. **A role is not a skill** — 1.2.36 requires the check before assignment, not after. |
-| Permission denied (`?state=emptyNoAccess`) | You do not have RESOURCE_MANAGE. |
+| Permission denied (`?state=emptyNoAccess`) | Without `RESOURCE_VIEW`, which `getResourceQualifications` requires, the screen does not load and this state names that permission. You do not have `RESOURCE_MANAGE`. |
 | Offline (`?state=offline`) | online only |
 
 #### Consistency with other screens
@@ -716,7 +716,7 @@ qualifications:
 - `setResourceQualifications` → `RESOURCE_MANAGE` (configure) · staff
 - `getResourceQualifications` → `RESOURCE_VIEW` (read) · staff
 
-**A refused user sees:** You do not have RESOURCE_MANAGE.
+**A refused user sees:** Without `RESOURCE_VIEW`, which `getResourceQualifications` requires, the screen does not load and this state names that permission. You do not have `RESOURCE_MANAGE`.
 
 #### Requirements it meets
 
@@ -849,7 +849,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Error (`?state=error`) | Could not load the manifest. |
 | Empty, first run (`?state=emptyFirstRun`) | Nobody booked into this performance yet. |
 | Empty, no results (`?state=emptyNoResults`) | No participants match. |
-| Permission denied (`?state=emptyNoAccess`) | You do not have RESOURCE_VIEW. |
+| Permission denied (`?state=emptyNoAccess`) | You do not have `RESOURCE_VIEW`. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `RESOURCE_BOOK` for `reorderPerformanceManifest`. |
 | Offline (`?state=offline`) | The cached manifest. **An instructor at the water edge needs this more than anyone**, and that is where the signal is worst. |
 
 #### Edge cases to draw
@@ -886,7 +886,7 @@ participants:
 - `getPerformanceManifest` → `RESOURCE_VIEW` (read) · staff
 - `reorderPerformanceManifest` → `RESOURCE_BOOK` (operate) · staff
 
-**A refused user sees:** You do not have RESOURCE_VIEW.
+**A refused user sees:** You do not have `RESOURCE_VIEW`. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `RESOURCE_BOOK` for `reorderPerformanceManifest`.
 
 #### Requirements it meets
 
@@ -994,35 +994,19 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
 | External credential sources | list or chips (count when long) | BL-108. A hotel room card admitting a guest to a water park — externally issued, and the platform validates it without having sold it. |
 | Scan anomaly rules | list or chips (count when long) | BL-104. Rule-based scan anomalies, separated from the parked model-based engine — device sharing, simultaneous entries at two gates, an … |
 | Operating mode | chip: Normal, Free flow, Drop arm, Closed, Podium, Maintenance | Set by the podium with `setTurnstileMode`, and it wins (audit R221). BL-107 and BL-109. |
-| Vehicle location capture | yes / no (icon or chip) | BL-023. Nothing helped a guest find their vehicle. |
 | Mode | chip: Free rotation, Closed | Narrows `operatingMode` only: `freeRotation` or `closed` within `normal` or `podium`, null otherwise and whenever the turnstile validates … |
-| Direction | chip: Entry, Exit, Reentry, Crossover | Fixed per access point (audit R221): set in the back office by `createAccessPoint` and `updateAccessPoint`, never by the podium. |
-| Anti passback enabled | yes / no (icon or chip) | — |
 
 **Every scan event** (data table, from `listScans`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The scan's client-generated UUIDv7, the key offline replay deduplicates on. |
-| Access point | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Ticket | the name it points at, never the id | The `Entitlement.id` scanned; null where the media resolved to nothing. |
 | Media code | text | — |
 | Outcome | chip: Admitted, Denied, Overridden | — |
-| Deny reason | chip: Not found, Not yet valid, Expired, Already used, Reentry limit reached, Exit … | Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a … |
-| Direction | chip: Entry, Exit, Reentry, Crossover | — |
-| Operator principal | the name it points at, never the id | — |
-| Device | the name it points at, never the id | — |
-| Overrides scan | the name it points at, never the id | Set only on an override row, naming the denied scan it admits against (decided 28 September, audit R228). |
 
 **Takings and admissions today** (metric tile, from `getKpiValues`): **Takings and admissions**, from `getKpiValues?kpiCodes=takings,admissions`; with no `period` the period is today in the venue's time zone (decided 28 September, audit R283).
 
@@ -1041,22 +1025,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
 | External credential sources | list or chips (count when long) | BL-108. A hotel room card admitting a guest to a water park — externally issued, and the platform validates it without having sold it. |
 | Scan anomaly rules | list or chips (count when long) | BL-104. Rule-based scan anomalies, separated from the parked model-based engine — device sharing, simultaneous entries at two gates, an … |
 | Operating mode | chip: Normal, Free flow, Drop arm, Closed, Podium, Maintenance | Set by the podium with `setTurnstileMode`, and it wins (audit R221). BL-107 and BL-109. |
 | Vehicle location capture | yes / no (icon or chip) | BL-023. Nothing helped a guest find their vehicle. |
 | Mode | chip: Free rotation, Closed | Narrows `operatingMode` only: `freeRotation` or `closed` within `normal` or `podium`, null otherwise and whenever the turnstile validates … |
 | Direction | chip: Entry, Exit, Reentry, Crossover | Fixed per access point (audit R221): set in the back office by `createAccessPoint` and `updateAccessPoint`, never by the podium. |
-| Anti passback enabled | yes / no (icon or chip) | — |
-| Requires exit before reentry | yes / no (icon or chip) | Written by `createAccessPoint` and `updateAccessPoint`, and returned so the edit form reads back what it wrote. |
-| Driver | text | Driver identifier for the controller behind this access point, as written by `createAccessPoint` and `updateAccessPoint`. |
-| Geofence | grouped details | Written by `setAccessPointGeofence`; null until one is set. One `jsonb` column on the access point row (`access.access_point.geofence`) … |
-| Is active | yes / no (icon or chip) | — |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1164,7 +1140,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (2), with its required mark, default, format and its error state (400, 403).
-- [ ] Every output is drawn (46 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-103?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-001`, `BO-002`, `BO-003`, `BO-004`, `BO-005`, `BO-006`, `BO-030`, `BO-032`, `BO-033`, `BO-038`, `BO-069`, `BO-071`, `BO-072`, `BO-093`, `BO-094`, `BO-096`, `BO-097`, `BO-098`, `BO-099`.

@@ -4,7 +4,7 @@
   "name": "Lost & Found",
   "module": "Support",
   "requiresModule": "marketing",
-  "wave": 3,
+  "wave": 1,
   "capability": "C00",
   "implementation": {
    "app": "guest-web",
@@ -74,18 +74,10 @@
        "label": "Every case",
        "bindsTo": "Case",
        "columns": [
-        "Case.id",
         "Case.caseNumber",
-        "Case.subjectId",
         "Case.guestName",
         "Case.subject",
-        "Case.categoryId",
-        "Case.status",
-        "Case.priority",
-        "Case.assignedToPrincipalId",
-        "Case.venueId",
-        "Case.relatedOrderId",
-        "Case.slaDueAt"
+        "Case.status"
        ],
        "operation": "listMyCases",
        "provenance": "contract marketing-crm.yaml GET /my/cases"
@@ -101,21 +93,10 @@
        "label": "The selected case",
        "bindsTo": "Case",
        "columns": [
-        "Case.id",
         "Case.caseNumber",
-        "Case.subjectId",
         "Case.guestName",
         "Case.subject",
-        "Case.categoryId",
         "Case.status",
-        "Case.priority",
-        "Case.assignedToPrincipalId",
-        "Case.venueId",
-        "Case.relatedOrderId",
-        "Case.slaDueAt",
-        "Case.isSlaBreached",
-        "Case.slaPausedSeconds",
-        "Case.escalationCount",
         "Case.resolvedAt"
        ],
        "operation": "listMyCases",
@@ -217,7 +198,7 @@
     "differences": "No lost-item report form (item, where, when, photo); reported via the generic case form. The prototype has no lost-item form; it uses the generic case form. A prototype gap: the build follows this screen (kind, colour, brand, where last seen, photos), not the prototype (CHG-SGU-017)."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRaiseMyCase",
@@ -296,7 +277,7 @@
   "name": "Help Centre & Accessibility",
   "module": "Support",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "guest-web",
    "route": "/help-centre-and-accessibility",
@@ -442,7 +423,7 @@
     "differences": "Not a separate screen: part of the WEB-025 Help centre page."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "listFaqs",

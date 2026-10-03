@@ -1,6 +1,6 @@
 # P06-operations-03 — P06 · Operations (3 of 5)
 
-**10 screens · 47 operations · 73 schemas · 22 permissions**
+**10 screens · 50 operations · 77 schemas · 23 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -48,10 +48,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 22 permissions apply here:
-  `AI_USE, ATTENDANCE_RECORD, CAPACITY_CONFIGURE, CASE_MANAGE, CASE_VIEW, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 23 permissions apply here:
+  `AI_USE, ATTENDANCE_RECORD, CAPACITY_CONFIGURE, CASE_MANAGE, CASE_VIEW, GUEST_VIEW, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE`…. A control nobody can use must say so,
   not sit enabled and fail.
-- **21 of these operations work offline**: addCaseMessage, applyManualDiscount, createCase, createOrder, getOrder, getProduct, getQueue, getVenueMap
+- **22 of these operations work offline**: addCaseMessage, addIncidentPerson, applyManualDiscount, createCase, createOrder, getOrder, getProduct, getQueue
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
@@ -178,16 +178,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `EMP-031` | Queue monitor | B–D | 10 | 56 | 6 | 19 | 1 | 6 | — | notStarted (generated) |
-| `EMP-032` | Manual wait entry | B–D | 3 | 16 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
-| `EMP-033` | Capacity view | B–D | 3 | 30 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
-| `EMP-034` | Walk-up sale | B–D | 127 | 87 | 6 | 93 | 1 | 0 | — | notStarted (generated) |
-| `EMP-025` | Break management | B–D | 9 | 27 | 6 | 4 | 2 | 0 | — | notStarted (generated) |
-| `EMP-026` | Incident report | B–D | 18 | 44 | 6 | 10 | 1 | 0 | — | notStarted (generated) |
-| `EMP-027` | Incident detail | B–D | 16 | 44 | 7 | 1 | 0 | 0 | — | notStarted (generated) |
-| `EMP-028` | Lost & found | B–D | 32 | 44 | 6 | 13 | 1 | 0 | — | notStarted (generated) |
-| `EMP-029` | Guest assistance | B–D | 60 | 72 | 6 | 23 | 1 | 0 | — | notStarted (generated) |
-| `EMP-030` | Venue map | B–D | 0 | 3 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
+| `EMP-031` | Queue monitor | D | 10 | 23 | 6 | 19 | 1 | 6 | — | notStarted (generated) |
+| `EMP-032` | Manual wait entry | A | 3 | 10 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
+| `EMP-033` | Capacity view | B | 3 | 14 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
+| `EMP-034` | Walk-up sale | C | 127 | 34 | 6 | 93 | 1 | 0 | — | notStarted (generated) |
+| `EMP-025` | Break management | D | 9 | 9 | 6 | 4 | 2 | 0 | — | notStarted (generated) |
+| `EMP-026` | Incident report | A | 29 | 14 | 6 | 10 | 1 | 0 | — | notStarted (generated) |
+| `EMP-027` | Incident detail | D | 20 | 14 | 7 | 1 | 0 | 0 | — | notStarted (generated) |
+| `EMP-028` | Lost & found | D | 32 | 14 | 6 | 13 | 1 | 0 | — | notStarted (generated) |
+| `EMP-029` | Guest assistance | D | 64 | 23 | 6 | 23 | 1 | 0 | — | notStarted (generated) |
+| `EMP-030` | Venue map | C | 0 | 3 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

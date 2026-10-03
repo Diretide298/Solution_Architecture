@@ -103,16 +103,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `CMS-021` | Privacy & Consent Configuration Command Center | B–D | 13 | 0 | 6 | 0 | 1 | 4 | — | notStarted (generated) |
-| `CMS-022` | Data Processing Purpose & Lawful Basis Registry | B–D | 21 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `CMS-023` | Consent Purpose & Consent Type Builder | B–D | 17 | 0 | 5 | 1 | 0 | 4 | — | notStarted (generated) |
-| `CMS-024` | Communication Preference & Marketing Permission Configuration | B–D | 17 | 0 | 5 | 0 | 0 | 5 | — | notStarted (generated) |
+| `CMS-021` | Privacy & Consent Configuration Command Center | D | 13 | 0 | 6 | 0 | 1 | 4 | — | notStarted (generated) |
+| `CMS-022` | Data Processing Purpose & Lawful Basis Registry | D | 21 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `CMS-023` | Consent Purpose & Consent Type Builder | D | 17 | 0 | 5 | 1 | 0 | 4 | — | notStarted (generated) |
+| `CMS-024` | Communication Preference & Marketing Permission Configuration | D | 17 | 0 | 5 | 0 | 0 | 5 | — | notStarted (generated) |
 | `CMS-025` | Cookie, Tracking & Digital Technology Registry | A | 44 | 67 | 6 | 3 | 1 | 4 | — | notStarted (generated) |
 | `CMS-026` | Cookie Banner & Preference Center Designer | A | 31 | 0 | 5 | 1 | 2 | 4 | configures | notStarted (generated) |
-| `CMS-027` | Consent Capture Point & Customer Journey Configuration | B–D | 28 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
-| `CMS-028` | Privacy Notice, Policy & Terms Version Management | B–D | 9 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
-| `CMS-029` | Minor, Guardian & Age-Based Privacy Configuration | B–D | 8 | 0 | 5 | 0 | 0 | 4 | — | notStarted (generated) |
-| `CMS-030` | Privacy Configuration Testing, Approval & Publication | B–D | 39 | 0 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
+| `CMS-027` | Consent Capture Point & Customer Journey Configuration | D | 28 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
+| `CMS-028` | Privacy Notice, Policy & Terms Version Management | D | 9 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `CMS-029` | Minor, Guardian & Age-Based Privacy Configuration | D | 8 | 0 | 5 | 0 | 0 | 4 | — | notStarted (generated) |
+| `CMS-030` | Privacy Configuration Testing, Approval & Publication | D | 39 | 0 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -132,7 +132,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CMS-CMS-021 |
 | Who uses it | venue staff holding `GUEST_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Display configuration indicators such as; Configuration Type Scope Status) and no display directory — it is settings, not a population |
@@ -303,7 +303,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CMS-CMS-022 |
 | Who uses it | venue staff holding `GUEST_MANAGE`, `GUEST_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -454,7 +454,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CMS-CMS-023 |
 | Who uses it | venue staff holding `GUEST_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -590,7 +590,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CMS-CMS-024 |
 | Who uses it | venue staff holding `GUEST_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Administrators define) and no display directory — it is settings, not a population |
@@ -717,8 +717,8 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
-| Module | Policy · wave 3 · needs the `core` module |
-| Block | Block A · ticket #20767 (APP-SETUP-CMS-025) |
+| Module | Policy · wave 1 · needs the `core` module |
+| Block | Block A · task APP-SETUP-CMS-025 |
 | Who uses it | venue staff holding `GUEST_MANAGE`, `GUEST_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1063,8 +1063,8 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
-| Module | Policy · wave 3 · needs the `core` module |
-| Block | Block A · ticket #20768 (APP-SETUP-CMS-026) |
+| Module | Policy · wave 1 · needs the `core` module |
+| Block | Block A · task APP-SETUP-CMS-026 |
 | Who uses it | venue staff holding `GUEST_MANAGE`, `GUEST_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -1285,7 +1285,7 @@ Each field here is an **input** a tenant sets; the right column is the **output*
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CMS-CMS-027 |
 | Who uses it | venue staff holding `GUEST_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Potential capture points include; For each capture point define) and no display directory — it is settings, not a population |
@@ -1435,7 +1435,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CMS-CMS-028 |
 | Who uses it | venue staff holding `GUEST_MANAGE`, `GUEST_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1463,7 +1463,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 
 **Form: Save privacy notice policy governance** (modal, opened by *Save privacy notice policy governance*; *Save privacy notice policy governance* calls `setPrivacyNoticePolicyGovernance`, *Cancel* sends nothing)
 
-**Collects what `setPrivacyNoticePolicyGovernance` sends before it is called.** Required: `id`, `policyId`, `documentType`, `status`. Optional: `changeClassification`, `requiresReAcceptance`, `requiresNotification`, `ownerPrincipalId`, `approvedByPrincipalId`, `approvalRequestId`, `approvedAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setPrivacyNoticePolicyGovernance` sends before it is called.** Required: `policyId`, `documentType`, `status`. Optional: `changeClassification`, `requiresReAcceptance`, `requiresNotification`, `ownerPrincipalId`, `approvedByPrincipalId`, `approvedAt`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `approvalRequestId`, `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1578,7 +1578,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CMS-CMS-029 |
 | Who uses it | venue staff holding `GUEST_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Where required/configured) and no display directory — it is settings, not a population |
@@ -1704,7 +1704,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Policy · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CMS-CMS-030 |
 | Who uses it | venue staff holding `GUEST_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Detect configuration problems such as; Central configuration) and no display directory — it is settings, not a population |
@@ -1759,7 +1759,7 @@ Also apply: 8 for all of P13, 29 for every app (section *Design inputs from the 
 
 **Form: Save privacy notice policy governance** (modal, opened by *Save privacy notice policy governance*; *Save privacy notice policy governance* calls `setPrivacyNoticePolicyGovernance`, *Cancel* sends nothing)
 
-**Collects what `setPrivacyNoticePolicyGovernance` sends before it is called.** Required: `id`, `policyId`, `documentType`, `status`. Optional: `changeClassification`, `requiresReAcceptance`, `requiresNotification`, `ownerPrincipalId`, `approvedByPrincipalId`, `approvalRequestId`, `approvedAt`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setPrivacyNoticePolicyGovernance` sends before it is called.** Required: `policyId`, `documentType`, `status`. Optional: `changeClassification`, `requiresReAcceptance`, `requiresNotification`, `ownerPrincipalId`, `approvedByPrincipalId`, `approvedAt`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `approvalRequestId`, `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

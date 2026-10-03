@@ -732,15 +732,11 @@
        "bindsTo": "KpiValue",
        "columns": [
         "KpiValue.name",
-        "KpiValue.scopePath",
         "KpiValue.period",
         "KpiValue.value",
         "KpiValue.comparison",
         "KpiValue.variancePercent",
-        "KpiValue.direction",
-        "KpiValue.status",
-        "KpiValue.asOf",
-        "KpiValue.stale"
+        "KpiValue.status"
        ],
        "operation": "getKpiValues",
        "provenance": "contract reporting.yaml GET /kpi-values"
@@ -1318,7 +1314,9 @@
    "params": [
     {
      "name": "subscriptionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listWebhookSubscriptions` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

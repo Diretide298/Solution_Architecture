@@ -666,7 +666,7 @@
    "error": "Could not load. Names which read failed and leaves the flows untouched.",
    "emptyFirstRun": "**No flows at this venue yet.** Guests book through each type's default order until one is picked. Offers the flow-type cards and, from the Site Builder, the preset's flows in one step.",
    "emptyNoResults": "The flow-type filter matched nothing and the venue's other flows are still there. Names the filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires, and names that permission. **Never an empty table** — that reads as *there are no flows*."
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires to show this screen, and names that permission (the screen's other reads need `GUEST_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `updateProduct`, `setProductCategories`; `PRODUCT_VIEW` for `listProducts`, `listProductCategories`; `TENANT_PUBLISH` for `publishTenantConfig`."
   },
   "apis": [
    {
@@ -783,7 +783,9 @@
     },
     {
      "name": "productId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProducts` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "Resolves the venue from the session and opens on the flow list, or on the flow named in the link."
@@ -1048,7 +1050,7 @@
    "error": "Could not load. Names which read failed.",
    "emptyFirstRun": "**No build yet.** Shows the checklist first: nothing can be built until the client's store account for the platform is recorded and a version is published.",
    "emptyNoResults": "No build for the platform picked. Names it and offers the other.",
-   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listAppBuilds` requires, and names that permission."
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getStoreAccounts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `createAiConversation`, `sendAiMessage`; `TENANT_PUBLISH` for `requestAppBuild`."
   },
   "apis": [
    {
@@ -1121,7 +1123,9 @@
     },
     {
      "name": "conversationId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createAiConversation`; a link or an edge that holds one opens it instead."
     }
    ],
    "coldEntry": "Resolves the tenant from the session and opens on the checklist and the newest build."

@@ -293,7 +293,9 @@
    "params": [
     {
      "name": "seatMapId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createSeatMap`; a link or an edge that holds one opens it instead."
     }
    ]
   },
@@ -468,11 +470,15 @@
    "params": [
     {
      "name": "seatMapId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getSeatMap`, `setMapZones`, `updateSeatMap` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "uploadId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createUpload`; a link or an edge that holds one opens it instead."
     }
    ]
   },
@@ -613,7 +619,9 @@
    "params": [
     {
      "name": "seatMapId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `listSeats`, `updateSeats` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1498,7 +1506,9 @@
    "params": [
     {
      "name": "seatMapId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createSeatMapTemplate`; a link or an edge that holds one opens it instead."
     }
    ]
   },

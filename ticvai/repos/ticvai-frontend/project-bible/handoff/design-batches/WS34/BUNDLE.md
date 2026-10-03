@@ -107,13 +107,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-048` | Commercial Pricing Command Center | B–D | 2 | 26 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ADM-049` | Price List Master Configuration | A | 21 | 20 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-050` | Price Category & Rate Type Library | A | 12 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-051` | Rate Structure Builder | A | 0 | 12 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
+| `ADM-049` | Price List Master Configuration | B–D | 21 | 20 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-050` | Price Category & Rate Type Library | B | 12 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-051` | Rate Structure Builder | B–D | 0 | 12 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
 | `ADM-052` | Product & Service Price Assignment | B–D | 0 | 2 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `ADM-053` | Package, Bundle & Add-On Pricing | B–D | 21 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-054` | Market, Venue & Currency Pricing Structure | B–D | 23 | 0 | 5 | 0 | 1 | 4 | — | notStarted (generated) |
-| `ADM-055` | Price Hierarchy & Inheritance Configuration | A | 10 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ADM-055` | Price Hierarchy & Inheritance Configuration | B | 10 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `ADM-056` | Price List Templates, Clone & Reuse | B–D | 18 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-057` | Commercial Pricing Structure Validation | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
@@ -376,7 +376,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block A · ticket #20641 (APP-SETUP-ADM-049) |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -574,7 +574,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block A · ticket #20627 (APP-SETUP-ADM-050) |
+| Block | Block B · task APP-SETUP-ADM-050 |
 | Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -605,7 +605,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save price category rate type** (modal, opened by *Save price category rate type*; *Save price category rate type* calls `setPriceCategoryRateType`, *Cancel* sends nothing)
 
-**Collects what `setPriceCategoryRateType` sends before it is called.** Required: `id`, `scopePath`, `entryKind`, `code`, `name`, `isActive`. Optional: `description`, `categoryFamily`, `displayName`, `localizedDisplayNames`, `iconLabel`, `parentId`, `isStandard`, `sortOrder`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setPriceCategoryRateType` sends before it is called.** Required: `entryKind`, `code`, `name`, `isActive`. Optional: `description`, `categoryFamily`, `displayName`, `localizedDisplayNames`, `iconLabel`, `parentId`, `isStandard`, `sortOrder`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -742,7 +742,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block A · ticket #20642 (APP-SETUP-ADM-051) |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Detect) and no metric row |
@@ -1099,7 +1099,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save package pricing definition** (modal, opened by *Save package pricing definition*; *Save package pricing definition* calls `setPackagePricingDefinition`, *Cancel* sends nothing)
 
-**Collects what `setPackagePricingDefinition` sends before it is called.** Required: `id`, `scopePath`, `productId`, `recordKind`, `pricingModel`, `status`. Optional: `name`, `priceListId`, `addOnType`, `packagePrice`, `components`, `componentPriceVisibility`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setPackagePricingDefinition` sends before it is called.** Required: `productId`, `recordKind`, `pricingModel`, `status`. Optional: `name`, `priceListId`, `addOnType`, `packagePrice`, `components`, `componentPriceVisibility`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1259,7 +1259,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save market pricing configuration** (modal, opened by *Save market pricing configuration*; *Save market pricing configuration* calls `setMarketPricingConfiguration`, *Cancel* sends nothing)
 
-**Collects what `setMarketPricingConfiguration` sends before it is called.** Required: `id`, `scopePath`, `hierarchyLevel`. Optional: `parentId`, `countryCode`, `marketCode`, `region`, `venueId`, `brand`, `legalEntityId`, `baseCurrency`, `sellingCurrency`, `roundingProfileId`, `displayFormat`, `priceListId` and 2 more. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setMarketPricingConfiguration` sends before it is called.** Required: `hierarchyLevel`. Optional: `parentId`, `countryCode`, `marketCode`, `region`, `venueId`, `brand`, `legalEntityId`, `baseCurrency`, `sellingCurrency`, `roundingProfileId`, `displayFormat`, `priceListId` and 2 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1377,7 +1377,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block A · ticket #20643 (APP-SETUP-ADM-055) |
+| Block | Block B · task APP-SETUP-ADM-055 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Administrators configure; Configure) and no display directory — it is settings, not a population |
@@ -1552,7 +1552,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save configuration template** (modal, opened by *Save configuration template*; *Save configuration template* calls `setConfigurationTemplate`, *Cancel* sends nothing)
 
-**Collects what `setConfigurationTemplate` sends before it is called.** Required: `id`, `scopePath`, `subject`, `name`, `status`. Optional: `description`, `templateKind`, `productKind`, `venueId`, `sourceProductId`, `sourcePriceListId`, `includedComponents`, `reviewFields`, `isAiDrafted`, `ownerPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setConfigurationTemplate` sends before it is called.** Required: `subject`, `name`, `status`. Optional: `description`, `templateKind`, `productKind`, `venueId`, `sourceProductId`, `sourcePriceListId`, `includedComponents`, `reviewFields`, `isAiDrafted`, `ownerPrincipalId`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

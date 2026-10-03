@@ -41,20 +41,20 @@
      ]
     },
     {
+     "to": "GST-028",
+     "trigger": "It is confirmed with a facility",
+     "provenance": "flow F50 step 2→3",
+     "carries": [
+      "orderId"
+     ]
+    },
+    {
      "to": "BO-020",
      "trigger": "Kitchen accepts and prepares",
      "provenance": "flow F11 step 4→5",
      "operation": "createPayment",
      "crossesDevice": true,
      "back": false,
-     "carries": [
-      "orderId"
-     ]
-    },
-    {
-     "to": "GST-028",
-     "trigger": "It is confirmed with a facility",
-     "provenance": "flow F50 step 2→3",
      "carries": [
       "orderId"
      ]
@@ -78,17 +78,11 @@
        "label": "The cart",
        "bindsTo": "Cart",
        "columns": [
-        "Cart.channel",
         "Cart.status",
         "Cart.lines",
         "Cart.subtotal",
         "Cart.discountTotal",
-        "Cart.taxTotal",
-        "Cart.total",
-        "Cart.appliedPromotionIds",
-        "Cart.expiresAt",
-        "Cart.extensionsUsed",
-        "Cart.maxExtensions"
+        "Cart.taxTotal"
        ],
        "operation": "getCart",
        "provenance": "contract orders.yaml GET /carts/{cartId}"
@@ -291,7 +285,7 @@
    "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "x-ticvai-make-or-break": "M18-15: may a guest-checkout customer be sent marketing on an opt-in taken at checkout (law and the client's marketing policy)? Until the client confirms, the opt-in is shown unticked and nothing is sent without it.",
   "gaps": [
    {
@@ -387,15 +381,10 @@
        "bindsTo": "Order",
        "columns": [
         "Order.orderNumber",
-        "Order.channel",
         "Order.status",
-        "Order.currency",
         "Order.grossAmount",
         "Order.taxAmount",
-        "Order.netAmount",
-        "Order.refundedAmount",
-        "Order.lines",
-        "Order.payments"
+        "Order.netAmount"
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
@@ -478,7 +467,7 @@
     "differences": "Prototype offers \"Set a password\" to turn a guest-checkout profile into an account (linkGuestCheckout, GST-042); not declared on this screen in YAML."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formReprintOrder",
@@ -639,17 +628,11 @@
        "label": "The cart",
        "bindsTo": "Cart",
        "columns": [
-        "Cart.channel",
         "Cart.status",
-        "Cart.lines",
         "Cart.subtotal",
         "Cart.discountTotal",
-        "Cart.taxTotal",
         "Cart.total",
-        "Cart.appliedPromotionIds",
-        "Cart.expiresAt",
-        "Cart.extensionsUsed",
-        "Cart.maxExtensions"
+        "Cart.expiresAt"
        ],
        "operation": "getCart",
        "provenance": "contract orders.yaml GET /carts/{cartId}"
@@ -842,7 +825,9 @@
     },
     {
      "name": "lineId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `removeCartLine`, `updateCartLine` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "productId",
@@ -877,7 +862,7 @@
     "differences": "Basket as a bottom bar on mobile."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "confirmAbandonCart",

@@ -1106,7 +1106,7 @@
   "name": "Module Activation & Dependency Validation",
   "module": "Tenants & Licensing",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Subscription_Licensing_AI_Self_Service.pdf",
    "board": "6",

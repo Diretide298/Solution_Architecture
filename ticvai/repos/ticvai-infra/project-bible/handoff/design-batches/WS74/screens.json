@@ -48,7 +48,10 @@
     {
      "to": "CMS-063",
      "trigger": "Upload & Asset Ingestion Workspace",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026"
+     "provenance": "structural — pack board 1 wiring, 11 September 2026",
+     "carries": [
+      "assetId"
+     ]
     },
     {
      "to": "CMS-064",
@@ -63,7 +66,10 @@
     {
      "to": "CMS-066",
      "trigger": "Tags, Keywords & Classification",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026"
+     "provenance": "structural — pack board 1 wiring, 11 September 2026",
+     "carries": [
+      "assetId"
+     ]
     },
     {
      "to": "CMS-067",
@@ -73,7 +79,10 @@
     {
      "to": "CMS-068",
      "trigger": "Digital Asset 360° Profile",
-     "provenance": "structural — pack board 1 wiring, 11 September 2026"
+     "provenance": "structural — pack board 1 wiring, 11 September 2026",
+     "carries": [
+      "assetId"
+     ]
     },
     {
      "to": "CMS-069",
@@ -620,11 +629,15 @@
    "params": [
     {
      "name": "assetId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createUpload`; a link or an edge that holds one opens it instead."
     },
     {
      "name": "uploadId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createUpload`; a link or an edge that holds one opens it instead."
     }
    ]
   },
@@ -1080,7 +1093,9 @@
    "params": [
     {
      "name": "assetId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `setMediaAssetTags` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1405,11 +1420,15 @@
    "params": [
     {
      "name": "assetId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getMediaDistribution`; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "mediaId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getMediaAsset` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

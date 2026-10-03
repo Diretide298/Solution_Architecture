@@ -4,7 +4,7 @@
   "name": "White-Label Branding Management",
   "module": "Branding & Localisation",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "C57",
   "implementation": {
    "app": "ticvai-web",
@@ -26,7 +26,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-016 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-016 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -91,14 +91,10 @@
        "bindsTo": "ConfigVersion",
        "columns": [
         "ConfigVersion.publishedAt",
-        "ConfigVersion.publishedByPrincipalId",
         "ConfigVersion.publishedByName",
         "ConfigVersion.note",
         "ConfigVersion.isCurrent",
-        "ConfigVersion.scheduledFor",
-        "ConfigVersion.contentHash",
-        "ConfigVersion.pendingBuildTimeChanges",
-        "ConfigVersion.scopePath"
+        "ConfigVersion.scheduledFor"
        ],
        "operation": "listConfigVersions",
        "provenance": "contract white-label.yaml GET /tenant-config/versions"
@@ -256,7 +252,7 @@
    "error": "Could not load. Names which read failed and leaves the white-label branding untouched.",
    "emptyFirstRun": "No white-label branding yet. Offers Create preview (`createPreview`).",
    "emptyNoResults": "Never shown: `listConfigVersions` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `getAppIcons` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `TENANT_CONFIGURE`, `TENANT_PUBLISH` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098)."
   },
   "apis": [
@@ -394,11 +390,15 @@
     },
     {
      "name": "packageId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): `getSitePackage` follows a package only after this screen has generated one; the screen opens without it."
     },
     {
      "name": "version",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listConfigVersions` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -407,7 +407,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-016"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formOpenPlatformStaffGrant",
@@ -513,7 +513,7 @@
     "id": "formSetBrandIdentity",
     "component": "modal",
     "trigger": "Save brand identity",
-    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoDarkAssetRef`, `logoVariant`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`, `introVideoAssetRef`, `introVideoMode`, `showPoweredBy`. The same fields as the tenant's brand kit (CMS-004): logo variant and the intro video; \"Powered by TICVAI\" is a toggle, on by default (DEC-160). `splashChangeScope` is not sent. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setBrandIdentity` sends before it is called.** Required: `logoAssetRef`. Optional: `logoDarkAssetRef`, `logoVariant`, `faviconAssetRef`, `splashImageAssetRefs`, `splashDurationSeconds`, `splashBackgroundColour`, `showLoadingIndicator`, `introVideoAssetRef`, `introVideoMode`, `showPoweredBy`. The same fields as the tenant's brand kit (CMS-004): logo variant and the intro video; \"Powered by TICVAI\" is a toggle, on by default (DEC-160). is not sent. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `splashChangeScope` (3 October 2026, CHG-SPF-001).",
     "confirm": {
      "label": "Save brand identity",
      "operation": "setBrandIdentity"
@@ -584,7 +584,7 @@
   "name": "Domain & Certificate Management",
   "module": "Branding & Localisation",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "C96",
   "implementation": {
    "app": "ticvai-web",
@@ -606,7 +606,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-017 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-017 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -713,16 +713,10 @@
         "CustomDomain.kind",
         "CustomDomain.status",
         "CustomDomain.verificationMethod",
-        "CustomDomain.verificationRecord",
-        "CustomDomain.dnsRecords",
-        "CustomDomain.routing",
         "CustomDomain.revalidation",
-        "CustomDomain.cnameLost",
-        "CustomDomain.isPrimary",
         "CustomDomain.readiness",
         "CustomDomain.certificateExpiresAt",
-        "CustomDomain.lastCheckedAt",
-        "CustomDomain.failureReason"
+        "CustomDomain.lastCheckedAt"
        ],
        "operation": "listCustomDomains",
        "provenance": "contract white-label.yaml GET /tenant-domains"
@@ -774,7 +768,7 @@
    "error": "Could not load. Names which read failed and leaves the domain certificate untouched.",
    "emptyFirstRun": "No domain certificate yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Never shown: `listCustomDomains` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listCustomDomains` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `TENANT_CONFIGURE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098)."
   },
   "apis": [
@@ -878,7 +872,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-017"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formOpenPlatformStaffGrant",
@@ -950,7 +944,7 @@
   "name": "Interface Languages",
   "module": "Branding & Localisation",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "C57",
   "implementation": {
    "app": "ticvai-web",
@@ -971,7 +965,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-018 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-018 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -1063,7 +1057,7 @@
    "error": "Could not load. Names which read failed and leaves the localisation language pack untouched.",
    "emptyFirstRun": "No localisation language pack yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Never shown: `listFaqs` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listFaqs` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `TENANT_CONFIGURE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098)."
   },
   "apis": [
@@ -1103,19 +1097,27 @@
    "params": [
     {
      "name": "bannerId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that carries it only pre-selects the record."
     },
     {
      "name": "pageId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that carries it only pre-selects the record."
     },
     {
      "name": "policyKind",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that carries it only pre-selects the record."
     },
     {
      "name": "version",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getTenantConfig`; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "tenantId",
@@ -1137,7 +1139,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-018"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formOpenPlatformStaffGrant",
@@ -1254,7 +1256,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-019 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-019 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -1363,7 +1365,7 @@
    "error": "Could not load. Names which read failed and leaves the global defaults untouched.",
    "emptyFirstRun": "No global defaults yet. Offers Open access grant (`openPlatformStaffGrant`).",
    "emptyNoResults": "Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettingsDefaults` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_VIEW`, which `getVenueSettingsDefaults` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`; `TENANT_CONFIGURE` for `setVenueSettingsDefaults`.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098)."
   },
   "apis": [
@@ -1423,7 +1425,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-019"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formOpenPlatformStaffGrant",

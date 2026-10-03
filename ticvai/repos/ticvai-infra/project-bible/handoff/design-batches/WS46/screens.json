@@ -15,7 +15,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/promotion-rule-builder-adm-148",
    "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-010"
   },
   "navigation": {
    "entryFrom": [
@@ -1351,7 +1352,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/rule-test-simulation-ai-recommendation-workspace-adm-157",
    "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-010"
   },
   "navigation": {
    "entryFrom": [
@@ -1529,7 +1531,9 @@
    "params": [
     {
      "name": "promotionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `simulatePromotion` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

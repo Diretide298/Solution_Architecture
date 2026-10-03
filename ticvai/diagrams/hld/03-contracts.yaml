@@ -17,16 +17,16 @@ tiers:
 contracts:
 - contract: marketing-crm
   tier: satellite
-  operations: 272
+  operations: 274
   holds: null
   service: MarketingService
   verbs:
-    GET: 131
-    POST: 74
+    GET: 132
+    POST: 75
     PUT: 60
     PATCH: 5
     DELETE: 2
-  guestCallable: 47
+  guestCallable: 49
   offlineCapable: 11
   events: null
   ref: diagrams/lld/contracts/marketing-crm.yaml
@@ -71,12 +71,12 @@ contracts:
   ref: diagrams/lld/contracts/catalogue.yaml
 - contract: orders
   tier: spine
-  operations: 221
+  operations: 222
   holds: null
   service: OrderService
   verbs:
     GET: 104
-    POST: 77
+    POST: 78
     PUT: 34
     DELETE: 3
     PATCH: 3
@@ -152,16 +152,16 @@ contracts:
   ref: diagrams/lld/contracts/promotions.yaml
 - contract: fnb
   tier: satellite
-  operations: 131
+  operations: 133
   holds: null
   service: FnbService
   verbs:
     POST: 61
-    GET: 38
+    GET: 40
     PUT: 27
     PATCH: 5
-  guestCallable: 15
-  offlineCapable: 53
+  guestCallable: 17
+  offlineCapable: 54
   events:
   - fnb-kitchenTicketCreated
   - fnb-menuPublished
@@ -380,6 +380,23 @@ contracts:
   - accreditation-holderStatusChanged
   - accreditation-renewalDue
   ref: diagrams/lld/contracts/accreditation.yaml
+- contract: maintenance
+  tier: satellite
+  operations: 44
+  holds: null
+  service: VenueOpsService
+  verbs:
+    POST: 22
+    GET: 15
+    PATCH: 5
+    PUT: 2
+  guestCallable: 0
+  offlineCapable: 21
+  events:
+  - maintenance-assetReturnedToService
+  - maintenance-templatePublished
+  - maintenance-workOrderCompleted
+  ref: diagrams/lld/contracts/maintenance.yaml
 - contract: rental
   tier: satellite
   operations: 43
@@ -394,23 +411,6 @@ contracts:
   offlineCapable: 5
   events: null
   ref: diagrams/lld/contracts/rental.yaml
-- contract: maintenance
-  tier: satellite
-  operations: 42
-  holds: null
-  service: VenueOpsService
-  verbs:
-    POST: 20
-    GET: 15
-    PATCH: 5
-    PUT: 2
-  guestCallable: 0
-  offlineCapable: 20
-  events:
-  - maintenance-assetReturnedToService
-  - maintenance-templatePublished
-  - maintenance-workOrderCompleted
-  ref: diagrams/lld/contracts/maintenance.yaml
 - contract: games
   tier: satellite
   operations: 40

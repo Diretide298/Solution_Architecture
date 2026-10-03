@@ -28,22 +28,22 @@
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
 | card | [`loadGameCredits`](#loadgamecredits) | POST | `/game-cards/{cardCode}/load` | core | 1 | POS-002 |
-| giftCard | [`getGiftCard`](#getgiftcard) | GET | `/gift-cards/{cardCode}` | core | 2 | BO-1123, BO-1125, GST-071, WEB-021 |
-| retail | [`getWalletAutoReloadSetting`](#getwalletautoreloadsetting) | GET | `/wallets/{walletId}/auto-reload` | core | 2 | BO-416, GST-011, WEB-021 |
-| retail | [`getWalletExitBalance`](#getwalletexitbalance) | GET | `/wallets/{walletId}/exit-balance` | core | 2 | BO-416, BO-487, GST-011, WEB-021 |
-| retail | [`setWalletAutoReloadSetting`](#setwalletautoreloadsetting) | PUT | `/wallets/{walletId}/auto-reload` | core | 2 | BO-416, GST-011, WEB-021 |
-| retail | [`settleWalletAtExit`](#settlewalletatexit) | POST | `/wallets/{walletId}/exit-settlement` | core | 2 | BO-416, BO-487, GST-011, WEB-021 |
-| retail | [`transferWalletBalance`](#transferwalletbalance) | POST | `/wallets/{walletId}/transfer` | core | 2 | BO-1116, BO-1121, GST-071, WEB-021 |
-| wallet | [`captureWalletHold`](#capturewallethold) | POST | `/wallet-holds/{walletHoldId}/capture` | setup | 2 |  |
+| giftCard | [`getGiftCard`](#getgiftcard) | GET | `/gift-cards/{cardCode}` | core | 1 | BO-1123, BO-1125, GST-071, WEB-021 |
+| retail | [`getWalletAutoReloadSetting`](#getwalletautoreloadsetting) | GET | `/wallets/{walletId}/auto-reload` | core | 1 | BO-416, GST-011, WEB-021 |
+| retail | [`getWalletExitBalance`](#getwalletexitbalance) | GET | `/wallets/{walletId}/exit-balance` | core | 1 | BO-416, BO-487, GST-011, WEB-021 |
+| retail | [`setWalletAutoReloadSetting`](#setwalletautoreloadsetting) | PUT | `/wallets/{walletId}/auto-reload` | core | 1 | BO-416, GST-011, WEB-021 |
+| retail | [`settleWalletAtExit`](#settlewalletatexit) | POST | `/wallets/{walletId}/exit-settlement` | core | 1 | BO-416, BO-487, GST-011, WEB-021 |
+| retail | [`transferWalletBalance`](#transferwalletbalance) | POST | `/wallets/{walletId}/transfer` | core | 1 | BO-1116, BO-1121, GST-071, WEB-021 |
+| wallet | [`captureWalletHold`](#capturewallethold) | POST | `/wallet-holds/{walletHoldId}/capture` | setup | 1 |  |
 | wallet | [`expireCreditLots`](#expirecreditlots) | POST | `/credit-lots/expire` | setup | 1 | BO-1111, BO-1130 |
 | wallet | [`getWallet`](#getwallet) | GET | `/wallets/{subjectId}` | core | 1 | BO-1086, BO-1100, BO-1149, BO-1150, BO-414, BO-416 … |
-| wallet | [`holdWalletFunds`](#holdwalletfunds) | POST | `/wallets/{walletId}/holds` | setup | 2 |  |
-| wallet | [`listWalletTransactions`](#listwallettransactions) | GET | `/wallets/{subjectId}/transactions` | core | 2 | BO-1093, BO-1102, BO-1142, BO-1143, BO-1148, BO-414 … |
-| wallet | [`publishWalletConfiguration`](#publishwalletconfiguration) | POST | `/wallet-configuration/publish` | setup | 2 | BO-1092, BO-1112, BO-1132, BO-1162, BO-1173, BO-1180 … |
-| wallet | [`releaseWalletHold`](#releasewallethold) | POST | `/wallet-holds/{walletHoldId}/release` | setup | 2 |  |
-| wallet | [`restoreWalletConfigurationVersion`](#restorewalletconfigurationversion) | POST | `/wallet-configuration/versions/{version}/restore` | setup | 2 | BO-1162 |
-| wallet | [`setWalletFundingRules`](#setwalletfundingrules) | PUT | `/wallet-funding-rules` | setup | 2 | BO-1094, BO-1095, BO-1096, BO-1097, BO-1098, BO-1099 … |
-| wallet | [`setWalletRefundPolicy`](#setwalletrefundpolicy) | PUT | `/wallet-refund-policy` | setup | 2 | ADM-612, BO-1146, BO-1147 |
+| wallet | [`holdWalletFunds`](#holdwalletfunds) | POST | `/wallets/{walletId}/holds` | setup | 1 |  |
+| wallet | [`listWalletTransactions`](#listwallettransactions) | GET | `/wallets/{subjectId}/transactions` | core | 1 | BO-1093, BO-1102, BO-1142, BO-1143, BO-1148, BO-414 … |
+| wallet | [`publishWalletConfiguration`](#publishwalletconfiguration) | POST | `/wallet-configuration/publish` | setup | 1 | BO-1092, BO-1112, BO-1132, BO-1162, BO-1173, BO-1180 … |
+| wallet | [`releaseWalletHold`](#releasewallethold) | POST | `/wallet-holds/{walletHoldId}/release` | setup | 1 |  |
+| wallet | [`restoreWalletConfigurationVersion`](#restorewalletconfigurationversion) | POST | `/wallet-configuration/versions/{version}/restore` | setup | 1 | BO-1162 |
+| wallet | [`setWalletFundingRules`](#setwalletfundingrules) | PUT | `/wallet-funding-rules` | setup | 1 | BO-1094, BO-1095, BO-1096, BO-1097, BO-1098, BO-1099 … |
+| wallet | [`setWalletRefundPolicy`](#setwalletrefundpolicy) | PUT | `/wallet-refund-policy` | setup | 1 | ADM-612, BO-1146, BO-1147 |
 | wallet | [`topUpWallet`](#topupwallet) | POST | `/wallets/{subjectId}/top-ups` | core | 1 | BO-488, POS-027 |
 
 ## Group: card
@@ -135,12 +135,14 @@ Bonus credits from a promotion are tracked separately because they are typically
 
 **`GET /gift-cards/{cardCode}`**: Check a gift card balance
 
+**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for a gift card held in their own wallet; any other card code is refused exactly as one that does not exist, never returned. `WALLET_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
+
 |  |  |
 |---|---|
 | Permission | `WALLET_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
@@ -194,7 +196,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 | Permission | `WALLET_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -249,7 +251,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 | Permission | `WALLET_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
@@ -314,7 +316,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 | Permission | `WALLET_OPERATE` |
 | Scope level | subject |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | subject |
 | Conflict policy | serverWins |
@@ -395,7 +397,7 @@ Bonus credits from a promotion are tracked separately because they are typically
 | Permission | `WALLET_OPERATE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Lock | rowExclusive |
@@ -468,7 +470,7 @@ Both wallets must belong to the same tenant. **A transfer across tenants is a pa
 | Permission | `WALLET_OPERATE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Lock | rowExclusive |
@@ -540,7 +542,7 @@ Turns a `held` hold into a debit (SD-027): under the same balance row lock the h
 | Permission | `WALLET_OPERATE` |
 | Scope level | venue |
 | Part of slice | setup, makes `wallet.balance` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Lock | rowExclusive |
@@ -653,6 +655,7 @@ Extension exists because a venue will want it: a goodwill gesture, a closure, a 
 **`GET /wallets/{subjectId}`**: Read a guest wallet
 
 Stored value belonging to a guest, distinct from a bearer gift card. Where the guest is linked across cells, the authoritative balance lives in their home cell.
+**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own wallet (`subjectId` is the caller's); another guest's wallet is refused exactly as one that does not exist, never returned. `WALLET_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
 
 |  |  |
 |---|---|
@@ -722,7 +725,7 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 | Permission | `WALLET_OPERATE` |
 | Scope level | venue |
 | Part of slice | setup, makes `wallet.balance` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Lock | rowExclusive |
@@ -779,13 +782,14 @@ Stored value belonging to a guest, distinct from a bearer gift card. Where the g
 
 **Newest first: `recordedAt` descending, `id` descending as the tiebreak.** The cursor is keyset on that pair, so a transaction recorded while somebody pages cannot shift or repeat a row the way an offset would.
 **An unknown subject is 404; a wallet with no movements is an empty page.** A subject with no wallet in the caller's scope is the shared 404 — the same answer `getWallet` gives — so an empty page always means a wallet that exists and has not moved yet.
+**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own wallet (`subjectId` is the caller's); another guest's wallet is refused exactly as one that does not exist, never returned. `WALLET_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
 
 |  |  |
 |---|---|
 | Permission | `WALLET_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
@@ -847,7 +851,7 @@ Published as a version, so a change can be rolled back and so `getApprovalRecord
 | Permission | `WALLET_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `wallet.configuration_version`, `wallet.configuration_version_snapshot` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -900,7 +904,7 @@ Returns a `held` hold to available under the balance row lock (SD-027); the swee
 | Permission | `WALLET_OPERATE` |
 | Scope level | venue |
 | Part of slice | setup, makes `wallet.balance` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Lock | rowExclusive |
@@ -951,7 +955,7 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 | Permission | `WALLET_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `wallet.funding_rules`, `wallet.refund_policy` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -1007,7 +1011,7 @@ Board 8, p.98. Copies the chosen version's configuration into the working draft 
 | Permission | `WALLET_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `wallet.funding_rules` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
@@ -1180,7 +1184,7 @@ Boards 7.4 and 7.5. **A refund to a wallet and a refund to a card are different 
 | Permission | `WALLET_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `wallet.refund_policy` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
@@ -1328,7 +1332,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | wallet_id | uuid | no |  |
 | kind | text | no |  |
 | amount | numeric(18,4) | no |  |
@@ -1406,7 +1410,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | configuration_version_id | uuid | yes |  |
 | area | text | yes | The areas WalletConfigurationDiff compares. |
 | values | jsonb | yes | The area's rows as published, in that area's own schema. |
@@ -1446,7 +1450,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | code | text | yes |  |
 | name | text | yes |  |
 | category | text | no |  |
@@ -1584,7 +1588,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no | Added 20 August. |
+| id | uuid | yes | Added 20 August. |
 | subject_id | uuid | yes |  |
 | balance | numeric(18,4) | yes |  |
 | bonus_balance | numeric(18,4) | no | Promotional value. |
@@ -1616,7 +1620,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | is_auto_reload_allowed | boolean | no | Auto-reload is optional per wallet type (Chinmay, 2 October, workbook Q105, default accepted; CHG-CSA-027). |
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | code | text | yes |  |
 | name | text | yes |  |
 | owner_kind | text | no |  |

@@ -96,10 +96,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-014` | Auto-Scaling Configuration | B–D | 0 | 51 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-030` | Infrastructure Sizing & Scaling Policy | B–D | 8 | 13 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-033` | Backup & DR Status | B–D | 0 | 30 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-034` | Archival Job Monitor | B–D | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-014` | Auto-Scaling Configuration | B | 0 | 43 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-030` | Infrastructure Sizing & Scaling Policy | B | 8 | 13 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-033` | Backup & DR Status | B | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-034` | Archival Job Monitor | B | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -119,7 +119,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Infrastructure & Resilience · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-014 |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_VIEW` (1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCellJobs` reads the population and `getCellCapacity` reads one of them — list, select, act |
@@ -178,22 +178,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
 | Kind | chip: Shared, Dedicated, On premise isolated, On premise connected, Control plane, Burst | Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law … |
-| Cluster | the name it points at, never the id | — |
-| Is reachable | yes / no (icon or chip) | False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and … |
 | Last contact at | 1 Oct 2026, 14:30 | When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first. |
 | Licence expires at | 1 Oct 2026, 14:30 | On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. |
-| Participates in cross cell | yes / no (icon or chip) | False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). |
-| Region | the name it points at, never the id | — |
 | Region name | text | — |
 | Country code | text | — |
 | Tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
 | Status | chip: Provisioning, Active, Migrating, Suspended, Decommissioning, Failed | — |
-| Cloud provider | text | — |
-| Cloud region | text | — |
-| API endpoint | text | — |
 
 **The cell health** (detail panel, from `getCellHealth`)
 
@@ -311,7 +303,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (51 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (43 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-014?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-001`, `ADM-002`, `ADM-003`.
@@ -330,7 +322,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Infrastructure & Resilience · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-030 |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCellJobs` reads the population and `getCellCapacity` reads one of them — list, select, act |
@@ -422,7 +414,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the infrastructure sizing scaling untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No infrastructure sizing scaling yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellCapacity` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellCapacity` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `setScalingPolicy`. |
 | Offline (`?state=offline`) | online only |
 
 #### Edge cases to draw
@@ -460,7 +452,7 @@ Every cell job:
 - `getScalingPolicy` → `PLATFORM_CELL_VIEW` (read) · staff
 - `setScalingPolicy` → `PLATFORM_CELL_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellCapacity` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellCapacity` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `setScalingPolicy`.
 
 #### Requirements it meets
 
@@ -503,7 +495,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Infrastructure & Resilience · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-033 |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_VIEW` (1 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCellJobs` reads the population and `getCellHealth` reads one of them — list, select, act |
@@ -543,22 +535,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
 | Kind | chip: Shared, Dedicated, On premise isolated, On premise connected, Control plane, Burst | Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law … |
-| Cluster | the name it points at, never the id | — |
-| Is reachable | yes / no (icon or chip) | False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and … |
 | Last contact at | 1 Oct 2026, 14:30 | When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first. |
 | Licence expires at | 1 Oct 2026, 14:30 | On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. |
-| Participates in cross cell | yes / no (icon or chip) | False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). |
-| Region | the name it points at, never the id | — |
 | Region name | text | — |
 | Country code | text | — |
 | Tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
 | Status | chip: Provisioning, Active, Migrating, Suspended, Decommissioning, Failed | — |
-| Cloud provider | text | — |
-| Cloud region | text | — |
-| API endpoint | text | — |
 
 **The cell health** (detail panel, from `getCellHealth`)
 
@@ -653,7 +637,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-033?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-001`, `ADM-002`, `ADM-003`.
@@ -672,7 +656,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Infrastructure & Resilience · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-034 |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_VIEW` (1 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCellJobs` reads the population and `getCell` reads one of them — list, select, act |

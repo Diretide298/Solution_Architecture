@@ -4,12 +4,12 @@
   "name": "Venue Management Sign In",
   "module": "Access & Availability",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "capability": "C35",
   "implementation": {
    "app": "venue-support-web",
-   "route": "/general/agent-login",
-   "component": "apps/venue-support-web/src/routes/general/AgentLoginList.tsx",
+   "route": "/general/venue-management-sign-in",
+   "component": "apps/venue-support-web/src/routes/general/VenueManagementSignIn.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -463,7 +463,7 @@
    "provenance": "generated",
    "board": "wireframes/P12 Venue Support.dc.html#sup-003"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-006): The purpose was the configuration-screen template (\"Change how availability behaves here, and see which level the current value came from\"); the screen sets the agent's own availability (design-notes correction customer-marketing SUP-003).",
   "_platform": {
    "code": "P12",

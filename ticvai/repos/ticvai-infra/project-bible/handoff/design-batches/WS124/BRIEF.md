@@ -95,16 +95,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-549` | AI Governance Monitoring Command Center | B–D | 8 | 33 | 7 | 4 | 1 | 0 | — | notStarted (—) |
-| `ADM-550` | AI Risk Register & Risk Exposure Management | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-551` | AI Governance Control Library & Control Effectiveness | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-552` | AI Policy Compliance & Violation Monitoring | B–D | 6 | 20 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-553` | AI Data, Privacy & Usage Compliance Monitoring | B–D | 6 | 40 | 7 | 1 | 0 | 4 | — | notStarted (—) |
+| `ADM-549` | AI Governance Monitoring Command Center | D | 8 | 33 | 7 | 4 | 1 | 0 | — | notStarted (—) |
+| `ADM-550` | AI Risk Register & Risk Exposure Management | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-551` | AI Governance Control Library & Control Effectiveness | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-552` | AI Policy Compliance & Violation Monitoring | D | 6 | 20 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-553` | AI Data, Privacy & Usage Compliance Monitoring | D | 6 | 40 | 7 | 1 | 0 | 4 | — | notStarted (—) |
 | `ADM-554` | AI Quality, Behavior & Governance Drift Monitoring | A | 15 | 25 | 7 | 2 | 0 | 0 | — | notStarted (—) |
-| `ADM-555` | AI Governance Alert & Detection Center | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-555` | AI Governance Alert & Detection Center | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-556` | AI Incident & Remediation Management | A | 25 | 19 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-557` | AI Compliance, Assurance & Governance Reporting | B–D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-558` | AI Governance Review, Action Plan & Continuous Improvement | B–D | 7 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-557` | AI Compliance, Assurance & Governance Reporting | D | 6 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-558` | AI Governance Review, Action Plan & Continuous Improvement | D | 7 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 
 ## Design inputs from the client meetings
 

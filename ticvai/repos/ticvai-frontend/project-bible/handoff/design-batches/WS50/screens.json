@@ -614,18 +614,12 @@
        "label": "Every bundle capacity policy",
        "bindsTo": "BundleCapacityPolicy",
        "columns": [
-        "BundleCapacityPolicy.id",
-        "BundleCapacityPolicy.bundleId",
         "BundleCapacityPolicy.channel",
-        "BundleCapacityPolicy.venueId",
-        "BundleCapacityPolicy.partnerId",
         "BundleCapacityPolicy.capacitySource",
         "BundleCapacityPolicy.allocationMode",
         "BundleCapacityPolicy.capacityCeiling",
         "BundleCapacityPolicy.holdDurationMinutes",
-        "BundleCapacityPolicy.bookingCutoffMinutes",
-        "BundleCapacityPolicy.allowOverbooking",
-        "BundleCapacityPolicy.allowWaitlist"
+        "BundleCapacityPolicy.bookingCutoffMinutes"
        ],
        "operation": "listBundleCapacityPolicies",
        "provenance": "contract promotions.yaml GET /bundles/{bundleId}/capacity-policies"
@@ -1189,18 +1183,12 @@
        "label": "Every bundle capacity policy",
        "bindsTo": "BundleCapacityPolicy",
        "columns": [
-        "BundleCapacityPolicy.id",
-        "BundleCapacityPolicy.bundleId",
         "BundleCapacityPolicy.channel",
-        "BundleCapacityPolicy.venueId",
-        "BundleCapacityPolicy.partnerId",
         "BundleCapacityPolicy.capacitySource",
         "BundleCapacityPolicy.allocationMode",
         "BundleCapacityPolicy.capacityCeiling",
         "BundleCapacityPolicy.holdDurationMinutes",
-        "BundleCapacityPolicy.bookingCutoffMinutes",
-        "BundleCapacityPolicy.allowOverbooking",
-        "BundleCapacityPolicy.allowWaitlist"
+        "BundleCapacityPolicy.bookingCutoffMinutes"
        ],
        "operation": "listBundleCapacityPolicies",
        "provenance": "contract promotions.yaml GET /bundles/{bundleId}/capacity-policies"
@@ -1508,9 +1496,7 @@
         "DynamicBundleSimulationAiOptimizationView.substitutions",
         "DynamicBundleSimulationAiOptimizationView.priceImpact",
         "DynamicBundleSimulationAiOptimizationView.marginImpact",
-        "DynamicBundleSimulationAiOptimizationView.capacityImpact",
-        "DynamicBundleSimulationAiOptimizationView.customerImpact",
-        "DynamicBundleSimulationAiOptimizationView.revenueImpact"
+        "DynamicBundleSimulationAiOptimizationView.capacityImpact"
        ],
        "bindsTo": "DynamicBundleSimulationAiOptimizationView",
        "operation": "listDynamicBundle2",

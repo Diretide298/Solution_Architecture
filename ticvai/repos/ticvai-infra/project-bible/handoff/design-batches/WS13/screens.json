@@ -62,7 +62,10 @@
     {
      "to": "BO-368",
      "trigger": "AI Decision Support",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026"
+     "provenance": "structural — pack board 1 wiring, 9 September 2026",
+     "carries": [
+      "approvalRequestId"
+     ]
     },
     {
      "to": "BO-369",
@@ -75,7 +78,10 @@
     {
      "to": "BO-370",
      "trigger": "Escalated Approval Center",
-     "provenance": "structural — pack board 1 wiring, 9 September 2026"
+     "provenance": "structural — pack board 1 wiring, 9 September 2026",
+     "carries": [
+      "requestId"
+     ]
     },
     {
      "to": "BO-371",
@@ -671,7 +677,9 @@
    "params": [
     {
      "name": "requestId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listApprovalRequests` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "approvalRequestId",
@@ -814,7 +822,9 @@
    "params": [
     {
      "name": "approvalRequestId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listApprovalRequests` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1108,7 +1118,9 @@
    "params": [
     {
      "name": "requestId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `escalateApprovalRequest` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

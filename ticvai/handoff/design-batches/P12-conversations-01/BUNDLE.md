@@ -103,8 +103,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SUP-004` | Conversation Queue | B–D | 3 | 12 | 6 | 7 | 1 | 6 | — | notStarted (generated) |
-| `SUP-005` | Live Chat Workspace | B–D | 41 | 60 | 6 | 22 | 1 | 0 | — | notStarted (generated) |
+| `SUP-004` | Conversation Queue | A | 3 | 5 | 6 | 7 | 1 | 6 | — | notStarted (generated) |
+| `SUP-005` | Live Chat Workspace | A | 41 | 30 | 6 | 22 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -123,8 +123,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
-| Module | Conversations · wave 2 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Conversations · wave 1 · needs the `marketing` module |
+| Block | Block A · task APP-SUPPORT-SUP-004 |
 | Who uses it | venue staff holding `CASE_MANAGE`, `CASE_VIEW` (1 configure, 1 read); in the flows as guest |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCases` reads the population and `getCase` reads one of them — list, select, act |
@@ -132,7 +132,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | `conversationId` (deepLink) · cold entry: A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom. |
 | Route | `/general/conversation-queue` |
 
-**What the spec says about it.** States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101). **The guest concierge is Phase 1 and a handover needs somewhere to land** — the queue and the workspace move; the rest of the console stays Wave 3.
+**What the spec says about it.** States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Pulled forward (CF-101), and in Block A since the 1 October plan: **the guest concierge is Phase 1 and a handover needs somewhere to land** — the queue and the workspace move; the rest of the console comes later.
 
 **Known gaps.** Removed 2 October 2026 (CHG-WIR-005): The conversation queue carried the full case toolset; the queue is about conversations and case work happens in SUP-013 and SUP-005. Keep listConversations … Removed 2 October 2026 (CHG-WIR-005): The conversation queue carried the full case toolset; the queue is about conversations and case work happens in SUP-013 and SUP-005. Keep listConversations … Removed 2 October 2026 (CHG-WIR-005): The conversation queue carried the full case toolset; the queue is about conversations and case work happens in SUP-013 and SUP-005. Keep listConversations …
 
@@ -168,15 +168,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Telephony | grouped details | BL-083. `ConversationChannel` included `voice` with nothing behind it — the model anticipated telephony and stopped at the enum. |
-| Assist session | the name it points at, never the id | BL-094. `startKioskAssist` recorded a staff member helping a guest and `createCase` recorded a service interaction, and neither referenced … |
 | Channel | chip: Web chat, In app chat, Whatsapp, SMS, Email, Kiosk… | — |
 | State | chip: With assistant, Queued, With agent, Waiting on guest, Resolved, Abandoned… | `withAssistant` and `queued` are different, and the second has a person waiting. |
-| Subject | the name it points at, never the id | 22.8.3. Resolved from phone, email, membership number or a signed-in session. |
-| Venue | the name it points at, never the id | — |
-| Assigned principal | the name it points at, never the id | — |
-| Queue | the name it points at, never the id | — |
 | Queue position | 1,234 | Place among the unclaimed conversations in `queueId`, from the live agent queue (audit R149). |
 | Estimated wait seconds | 1,234 | From the live agent queue — the conversations ahead divided across that queue's agents online now (audit R149). |
 | Handover reason | chip: Guest requested, Assistant refused, Assistant failed, Out of scope, Negative … | — |
@@ -213,7 +206,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the conversation queue untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No conversation queue yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority and the conversation queue are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `CASE_VIEW`, which `listConversations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `CASE_VIEW`, which `listConversations` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASE_MANAGE` for `claimConversation`, `transferConversation`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Already claimed by another agent |
 
@@ -237,7 +230,7 @@ rows:
 - `claimConversation` → `CASE_MANAGE` (configure) · staff
 - `transferConversation` → `CASE_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `CASE_VIEW`, which `listConversations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `CASE_VIEW`, which `listConversations` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASE_MANAGE` for `claimConversation`, `transferConversation`.
 
 #### Requirements it meets
 
@@ -280,7 +273,7 @@ Also apply: 7 for all of P12, 29 for every app (section *Design inputs from the 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (3), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SUP-004?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Claim conversation, Transfer conversation.
 - [ ] Every transition is wired: `SUP-001`, `SUP-002`, `SUP-005`.
@@ -297,8 +290,8 @@ Also apply: 7 for all of P12, 29 for every app (section *Design inputs from the 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P12 Venue Support (web) |
-| Module | Conversations · wave 2 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Conversations · wave 1 · needs the `marketing` module |
+| Block | Block A · task APP-SUPPORT-SUP-005 |
 | Who uses it | venue staff holding `CASE_MANAGE`, `CASE_VIEW` (1 configure, 1 read); in the flows as agent, guest |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCases` reads the population and `getCase` reads one of them — list, select, act |
@@ -306,7 +299,7 @@ Also apply: 7 for all of P12, 29 for every app (section *Design inputs from the 
 | Opens with | `caseId` (SUP-004), `conversationId` (SUP-004) · cold entry: Resolves from the session; a cold arrival is the ordinary case. |
 | Route | `/general/live-chat-workspace` |
 
-**What the spec says about it.** States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101) with SUP-004. An agent needs a queue and a place to answer from; canned responses and SLA reporting can wait.
+**What the spec says about it.** States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Pulled forward (CF-101) with SUP-004, into Block A. An agent needs a queue and a place to answer from; canned responses and SLA reporting can wait.
 
 **From the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process.** The live chat with a guest: the whole thread (it came with the handover), guest context, composer with rich messages, and the case beside it. Internal notes and guest replies are distinct and the choice is required. Closing records an outcome that tells resolved from abandoned from a case raised.
 
@@ -432,81 +425,51 @@ Errors to draw in the form: 409 The case is not `resolved` — a `closed` case i
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
 | Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
 | Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
-| Category | the name it points at, never the id | — |
 | Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
 | Priority | chip: Low, Normal, High, Urgent | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Related order | text | — |
 | Sla due at | 1 Oct 2026, 14:30 | — |
 
 **The selected case** (detail panel, from `listCases`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
 | Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
 | Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
 | Kind | chip: Lost property, Complaint, Question, Accessibility, Refund request, Other | What the guest said it was about, where the guest raised it. |
 | Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`. |
 | Recorded at | 1 Oct 2026, 14:30 | Device time the case was raised — the start of the SLA clock. |
-| Synced at | 1 Oct 2026, 14:30 | Server time the case arrived. Equal to `recordedAt` for a case raised online. |
-| Category | the name it points at, never the id | — |
 | Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
 | Priority | chip: Low, Normal, High, Urgent | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Related order | text | — |
-| Sla due at | 1 Oct 2026, 14:30 | — |
 
 **The conversation** (detail panel, from `getConversation`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Telephony | grouped details | BL-083. `ConversationChannel` included `voice` with nothing behind it — the model anticipated telephony and stopped at the enum. |
-| Assist session | the name it points at, never the id | BL-094. `startKioskAssist` recorded a staff member helping a guest and `createCase` recorded a service interaction, and neither referenced … |
 | Channel | chip: Web chat, In app chat, Whatsapp, SMS, Email, Kiosk… | — |
 | State | chip: With assistant, Queued, With agent, Waiting on guest, Resolved, Abandoned… | `withAssistant` and `queued` are different, and the second has a person waiting. |
-| Subject | the name it points at, never the id | 22.8.3. Resolved from phone, email, membership number or a signed-in session. |
-| Venue | the name it points at, never the id | — |
-| Assigned principal | the name it points at, never the id | — |
-| Queue | the name it points at, never the id | — |
 | Queue position | 1,234 | Place among the unclaimed conversations in `queueId`, from the live agent queue (audit R149). |
 | Estimated wait seconds | 1,234 | From the live agent queue — the conversations ahead divided across that queue's agents online now (audit R149). |
 | Handover reason | chip: Guest requested, Assistant refused, Assistant failed, Out of scope, Negative … | — |
 | Handover summary | text | The assistant's own account of what the guest wants, so an agent opens with context rather than reading a transcript while somebody waits. |
 | Sentiment | chip: Positive, Neutral, Negative, Escalating | 22.8.16. `escalating` is a routing signal, not a report line. |
-| Intent | text | 22.8.13. What the guest appears to want, used for routing. |
-| Locale | text | — |
 
 **The case** (detail panel, from `getCase`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
 | Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
 | Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
 | Kind | chip: Lost property, Complaint, Question, Accessibility, Refund request, Other | What the guest said it was about, where the guest raised it. |
 | Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`. |
 | Recorded at | 1 Oct 2026, 14:30 | Device time the case was raised — the start of the SLA clock. |
-| Synced at | 1 Oct 2026, 14:30 | Server time the case arrived. Equal to `recordedAt` for a case raised online. |
-| Category | the name it points at, never the id | — |
 | Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
 | Priority | chip: Low, Normal, High, Urgent | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Related order | text | — |
-| Sla due at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -546,7 +509,7 @@ Errors to draw in the form: 409 The case is not `resolved` — a `closed` case i
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the live chat untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No live chat yet. Offers Add case message (`addCaseMessage`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority and the live chat are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `CASE_VIEW`, which `getCase` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `CASE_VIEW`, which `getCase` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASE_MANAGE` for `addCaseMessage`, `updateCase`, `escalateCase`, `createCase` and 4 more. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Resolving without a resolution note; 409 The case is not `resolved` — a `closed` case is past its reopen window, and an open one has nothing to reopen. (StateTransitionProblem) |
 
@@ -580,7 +543,7 @@ thread:
 - `closeConversation` → `CASE_MANAGE` (configure) · staff
 - `transferConversation` → `CASE_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `CASE_VIEW`, which `getCase` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `CASE_VIEW`, which `getCase` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASE_MANAGE` for `addCaseMessage`, `updateCase`, `escalateCase`, `createCase` and 4 more.
 
 #### Requirements it meets
 
@@ -631,7 +594,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (41), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (60 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SUP-005?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Add case message, Save case, Escalate case, Create case, Reopen case, Send conversation message, Close conversation, Transfer conversation.
 - [ ] Every transition is wired: `SUP-001`, `SUP-002`.

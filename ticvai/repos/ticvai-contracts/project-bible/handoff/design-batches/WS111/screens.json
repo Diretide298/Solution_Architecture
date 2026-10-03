@@ -71,7 +71,10 @@
     {
      "to": "BO-650",
      "trigger": "NFC & RFID Credential Encoding",
-     "provenance": "structural — pack board 4 wiring, 19 September 2026"
+     "provenance": "structural — pack board 4 wiring, 19 September 2026",
+     "carries": [
+      "credentialId"
+     ]
     },
     {
      "to": "BO-651",
@@ -1082,7 +1085,9 @@
    "params": [
     {
      "name": "credentialId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAccreditationCredentials` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

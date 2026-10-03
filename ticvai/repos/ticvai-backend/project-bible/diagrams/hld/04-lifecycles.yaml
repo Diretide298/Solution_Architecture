@@ -1536,8 +1536,8 @@ stateModels:
   transitions: 6
   initial:
   - reported
-  terminal:
-  - closed
+  - actionRequired
+  terminal: []
   operations:
   - updateIncident
   guarded: 6
@@ -3328,7 +3328,7 @@ stateModels:
   owner: maintenance
   service: VenueOpsService
   states: null
-  transitions: 16
+  transitions: 21
   initial:
   - open
   terminal:
@@ -3345,7 +3345,7 @@ stateModels:
   - startWorkOrder
   - updateWorkOrder
   - verifyWorkOrder
-  guarded: 16
+  guarded: 21
   ref: diagrams/lld/lifecycles/work-order.yaml
 - entity: Workflow instance
   contract: approvals

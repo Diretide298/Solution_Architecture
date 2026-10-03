@@ -157,10 +157,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `CMS-004` | Logo & Assets | A | 12 | 16 | 5 | 3 | 3 | 6 | configures | notStarted (generated) |
 | `CMS-005` | Theme Editor | A | 27 | 10 | 5 | 4 | 9 | 6 | configures | notStarted (generated) |
 | `CMS-006` | Component Preview | A | 6 | 63 | 6 | 10 | 4 | 0 | — | notStarted (generated) |
-| `CMS-007` | Page Builder | A | 36 | 28 | 5 | 13 | 4 | 6 | configures | notStarted (generated) |
-| `CMS-008` | Content Blocks | A | 62 | 53 | 6 | 10 | 2 | 6 | configures | notStarted (generated) |
+| `CMS-007` | Page Builder | A | 36 | 23 | 5 | 13 | 4 | 6 | configures | notStarted (generated) |
+| `CMS-008` | Content Blocks | A | 62 | 40 | 6 | 10 | 2 | 6 | configures | notStarted (generated) |
 | `CMS-009` | Navigation & Menus | A | 46 | 29 | 5 | 4 | 4 | 6 | configures | notStarted (generated) |
-| `CMS-010` | Media Library | A | 91 | 54 | 6 | 14 | 1 | 0 | — | notStarted (generated) |
+| `CMS-010` | Media Library | A | 91 | 37 | 6 | 14 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

@@ -149,9 +149,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `GST-048` | Upsell / Cross-Sell | A | 19 | 5 | 5 | 46 | 9 | 0 | guest | notStarted (designed) |
 | `GST-049` | Interactive Seat Selection | A | 8 | 38 | 5 | 29 | 21 | 6 | guest | notStarted (client-verified) |
 | `GST-050` | Resource Booking – Cabana | A | 19 | 18 | 6 | 21 | 4 | 6 | guest | notStarted (designed) |
-| `GST-056` | Bundle Package | A | 19 | 14 | 6 | 4 | 4 | 0 | guest | notStarted (designed) |
+| `GST-056` | Bundle Package | A | 19 | 5 | 6 | 4 | 4 | 0 | guest | notStarted (designed) |
 | `GST-058` | Resource Availability (Cabana) | A | 1 | 18 | 6 | 17 | 4 | 0 | guest | notStarted (designed) |
-| `GST-072` | Share & Group Booking | A | 14 | 27 | 6 | 8 | 8 | 6 | guest | notStarted (client-verified) |
+| `GST-072` | Share & Group Booking | A | 14 | 14 | 6 | 8 | 8 | 6 | guest | notStarted (client-verified) |
 | `GST-074` | Map Booking — Cabanas & Spots | A | 24 | 38 | 6 | 5 | 4 | 6 | guest | notStarted (designed) |
 | `GST-075` | Book a Space by the Hour | A | 23 | 40 | 6 | 25 | 7 | 0 | guest | notStarted (designed) |
 
@@ -173,7 +173,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Booking & Selection · wave 1 · needs the `ticketing` module |
-| Block | Block A · ticket #17861 (APP-MOB-GST-007) |
+| Block | Block A · task APP-MOB-GST-007 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listPerformances` reads the population and `getAvailability` reads one of them — list, select, act |
@@ -338,7 +338,7 @@ Errors to draw in the form: 409 The question has changed since the cart was read
 - → `GST-001` Home: *Home – Default*
 - → `GST-003` Buy Tickets: *Event & Attraction Listing*; carries `eventId`
 - → `GST-008` Tickets & Add-ons: *Picks a time; the tickets for it appear*; carries `performanceId`
-- → `GST-049` Interactive Seat Selection: *Picks a time on a seated event (inline step)*; carries `performanceId`
+- → `GST-049` Interactive Seat Selection: *Picks a time on a seated event (inline step)*; carries `performanceId`, `eventId`
 - → `GST-008` Tickets & Add-ons: *Picks a date and time after choosing the workshop (product-first flow)*; carries `performanceId`
 - → `GST-046` Branded Queue / Waiting Room: *Adds tickets for a performance whose on-sale waiting room is on*; carries `performanceId`; only when `addCartLine` refused `403 admission-required`: this performance's room is on and the app holds no admission token for …; calls `addCartLine`
 
@@ -520,8 +520,8 @@ Also set there, as content the tenant writes: settings.
 
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-007` · status **notStarted** · provenance client-verified
 - Prototype (mobile v4 (30 September build), verified 2026-10-01, match partial): `sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html`, view *Buy tickets → Timed entry → Book now (step 1: date, then entry window)*. Differences: Booking in the app runs the website booking engine; per-flow step order.
-- ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
+- ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
 
@@ -548,7 +548,7 @@ Also set there, as content the tenant writes: settings.
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Booking & Selection · wave 1 · needs the `ticketing` module |
-| Block | Block A · ticket #17910 (APP-MOB-GST-008) |
+| Block | Block A · task APP-MOB-GST-008 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listProductVariants` reads the ticket types of the product and a stepper sets each quantity — list, select, act (rewritten decided 29 September, rev 3 GAP-D3: the ticket-selection functions the name … |
@@ -964,8 +964,8 @@ Also set there, as content the tenant writes: answers: target, answers: filter, 
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Booking & Selection · wave 2 · needs the `ticketing` module |
-| Block | Block A · ticket #18200 (APP-MOB-GST-048) |
+| Module | Booking & Selection · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-MOB-GST-048 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): `getUpsellSuggestions` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1190,8 +1190,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Booking & Selection · wave 2 · needs the `seating` module |
-| Block | Block A · ticket #18131 (APP-MOB-GST-049) |
+| Module | Booking & Selection · wave 1 · needs the `seating` module |
+| Block | Block A · task APP-MOB-GST-049 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): `getSeatAvailability` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1483,8 +1483,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Booking & Selection · wave 3 · needs the `ticketing` module |
-| Block | Block A · ticket #18211 (APP-MOB-GST-050) |
+| Module | Booking & Selection · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-MOB-GST-050 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listProducts` reads the population and `getAvailability` reads one of them — list, select, act |
@@ -1726,8 +1726,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Booking & Selection · wave 2 · needs the `ticketing` module |
-| Block | Block A · ticket #18201 (APP-MOB-GST-056) |
+| Module | Booking & Selection · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-MOB-GST-056 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listCatalogueBundles` reads the population and `getBundle` reads one of them — list, select, act |
@@ -1793,17 +1793,8 @@ Errors to draw in the form: 403 The performance's on-sale waiting room is on and
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Kind | chip: Fixed, Dynamic, Mandatory, Optional, Promotional | — |
 | Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Components | list or chips (count when long) | — |
-| Choice groups | list or chips (count when long) | Dynamic bundles (3.5.10). A bundle may carry fixed components and choice groups at once — a family pass with fixed parking and two groups … |
-| Allocation | grouped details | — |
-| Valid from | 1 Oct 2026, 14:30 | — |
-| Valid to | 1 Oct 2026, 14:30 | — |
 | Savings amount | AED 1,234.50 | Sum of component list prices less the bundle price. |
-| Savings percentage | 1,234.5 | — |
-| Has been sold | yes / no (icon or chip) | True locks components and allocation against amendment. |
-| Is active | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -1902,7 +1893,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (19), with its required mark, default, format and its error state (403, 404, 409, 422).
-- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-056?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Add to cart.
 - [ ] Every transition is wired: `GST-001`, `GST-041`.
@@ -1920,8 +1911,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Booking & Selection · wave 3 · needs the `ticketing` module |
-| Block | Block A · ticket #18210 (APP-MOB-GST-058) |
+| Module | Booking & Selection · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-MOB-GST-058 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listProducts` reads the population and `getAvailability` reads one of them — list, select, act |
@@ -2112,8 +2103,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Booking & Selection · wave 2 · needs the `core` module |
-| Block | Block A · ticket #18202 (APP-MOB-GST-072) |
+| Module | Booking & Selection · wave 1 · needs the `core` module |
+| Block | Block A · task APP-MOB-GST-072 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): `getGroupBooking` reads one record and nothing reads a population — the screen is about that one thing |
@@ -2191,43 +2182,30 @@ Errors to draw in the form: 409 Already answered, expired or revoked — the tok
 
 | Shows | Format | Notes |
 |---|---|---|
-| Order | the name it points at, never the id | — |
-| Leader subject | the name it points at, never the id | — |
 | Organisation name | text | — |
 | Expected size | 1,234 | — |
 | Confirmed size | 1,234 | — |
 | Minimum size | 1,234 | Below which the group rate does not apply. A booking for forty that arrives as twelve is a pricing question somebody has to answer at the … |
-| Attendee capture required | yes / no (icon or chip) | Whether names are needed before admission. A school trip usually needs them and a corporate day out usually does not, and the difference is … |
-| Attendee capture due by | 1 Oct 2026, 14:30 | — |
 | Status | chip: Provisional, Confirmed, Names pending, Complete, Cancelled | — |
 
 **Group packages** (card list, from `listGroupPackages`): Was the generated table 'Every group package definition'; staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
 
 | Shows | Format | Notes |
 |---|---|---|
-| Product | text | — |
 | Kind | chip: School, Party | — |
-| Max participants | 1,234 | Pupils or children, e.g. 30 or 10. |
 | Duration minutes | 1,234 | — |
 | Host count | 1,234 | Party hosts included. |
-| Pricing basis | chip: Per participant, Per package | — |
-| Free leader ratio | 1,234 | Schools: one teacher or assistant enters free per this many pupils. |
 | Payment mode | chip: Invoice, Deposit, Full | Schools are invoiced; parties take a deposit (see `DepositPolicy`). |
-| Includes | list or chips (count when long) | — |
 
 **The group package definition** (detail panel, from `getGroupPackageDefinition`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Product | text | — |
 | Kind | chip: School, Party | — |
 | Max participants | 1,234 | Pupils or children, e.g. 30 or 10. |
 | Duration minutes | 1,234 | — |
 | Host count | 1,234 | Party hosts included. |
-| Pricing basis | chip: Per participant, Per package | — |
-| Free leader ratio | 1,234 | Schools: one teacher or assistant enters free per this many pupils. |
 | Payment mode | chip: Invoice, Deposit, Full | Schools are invoiced; parties take a deposit (see `DepositPolicy`). |
-| Includes | list or chips (count when long) | — |
 
 **Actions and what each produces**
 
@@ -2338,7 +2316,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (14), with its required mark, default, format and its error state (403, 409, 422).
-- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-072?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Share entitlement, Respond to invitation, Request group booking.
 - [ ] Every transition is wired: `GST-039`.
@@ -2356,8 +2334,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Booking & Selection · wave 3 · needs the `resources` module |
-| Block | Block A · ticket #20735 (APP-MOB-GST-074) |
+| Module | Booking & Selection · wave 1 · needs the `resources` module |
+| Block | Block A · task APP-MOB-GST-074 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `getMapResourceAvailability` reads the population of spots and a tap holds one of them — list (as a map), select, act |
@@ -2641,8 +2619,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Booking & Selection · wave 3 · needs the `resources` module |
-| Block | Block A · ticket #20705 (APP-MOB-GST-075) |
+| Module | Booking & Selection · wave 1 · needs the `resources` module |
+| Block | Block A · task APP-MOB-GST-075 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | multiStepForm (comfortable density): A staged booking — date, start time, length, room type, attendees, add-ons — ending in one `addCartLine` |

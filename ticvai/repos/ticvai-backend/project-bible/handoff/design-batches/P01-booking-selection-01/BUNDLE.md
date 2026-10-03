@@ -177,7 +177,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `WEB-005` | Ticket Type Selection | A | 2 | 71 | 6 | 27 | 31 | 6 | guest | review (client-verified) |
 | `WEB-006` | Date & Performance Selection | A | 40 | 19 | 6 | 17 | 32 | 6 | guest | review (client-verified) |
 | `WEB-007` | Interactive Seat Selection | A | 8 | 39 | 6 | 30 | 22 | 6 | guest | review (client-verified) |
-| `WEB-008` | Add-ons & Upsell | A | 19 | 22 | 5 | 47 | 16 | 0 | guest | review (client-verified) |
+| `WEB-008` | Add-ons & Upsell | A | 19 | 14 | 5 | 47 | 16 | 0 | guest | review (client-verified) |
 | `WEB-009` | Wishlist | A | 0 | 15 | 5 | 1 | 2 | 0 | guest | review (client-verified) |
 | `WEB-047` | Map Booking — Cabanas & Spots | A | 24 | 38 | 6 | 5 | 4 | 6 | guest | notStarted (client-verified) |
 | `WEB-048` | Book a Space by the Hour | A | 23 | 40 | 6 | 25 | 7 | 0 | guest | notStarted (client-verified) |
@@ -196,7 +196,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Booking & Selection · wave 1 · needs the `ticketing` module |
-| Block | Block A · ticket #18013 (APP-WEB-WEB-005) |
+| Block | Block A · task APP-WEB-WEB-005 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listProductVariants` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -641,7 +641,7 @@ Also set there, as content the tenant writes: answers: target, answers: filter, 
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Booking & Selection · wave 1 · needs the `ticketing` module |
-| Block | Block A · ticket #17870 (APP-WEB-WEB-006) |
+| Block | Block A · task APP-WEB-WEB-006 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getAvailability` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1036,8 +1036,8 @@ Also set there, as content the tenant writes: settings.
 - Flow F01 branch at step 3 (recoverable): when The session sells out between loading the page and selecting it, Selection is refused with the next available session offered. Availability comes from a one-second cache (ADR-0065), and the hold is the guarded decrement, so this is caught here rather than at …
 - Flow F01 branch at step 3 (recoverable): when The venue attached consent questions to the flow or to a product in the cart, Asked once, right after the session or date is picked (e.g. *Are you able to swim?*), per person or once per booking as each question says, and recorded as consent records by `recordConsentAnswers`. …
 - Flow F01 branch at step 3 (recoverable): when The session shows sold out online while counter allocation remains, Correct behaviour, not a defect. Availability is per channel under channel allocation — web has exhausted its share. Worth stating because it will be raised as a bug.
-- ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
+- ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
 - ADR-0065 *Browse availability is read from a one-second cache; the hold decides* (`docs/adr/0065-on-sale-availability-is-read-from-a-short-cache.md`)
 
@@ -1064,8 +1064,8 @@ Also set there, as content the tenant writes: settings.
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | Booking & Selection · wave 2 · needs the `seating` module |
-| Block | Block A · ticket #18132 (APP-WEB-WEB-007) |
+| Module | Booking & Selection · wave 1 · needs the `seating` module |
+| Block | Block A · task APP-WEB-WEB-007 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getSeatAvailability` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1433,8 +1433,8 @@ Also set there, as content the tenant writes: settings.
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | Booking & Selection · wave 2 · needs the `ticketing` module |
-| Block | Block A · ticket #18204 (APP-WEB-WEB-008) |
+| Module | Booking & Selection · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-WEB-WEB-008 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getUpsellSuggestions` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1518,19 +1518,11 @@ Errors to draw in the form: 403 The performance's on-sale waiting room is on and
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Venue | the name it points at, never the id | — |
 | Kind | chip: Fixed, Dynamic, Mandatory, Optional, Promotional | — |
 | Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Components | list or chips (count when long) | — |
-| Choice groups | list or chips (count when long) | Dynamic bundles (3.5.10). A bundle may carry fixed components and choice groups at once — a family pass with fixed parking and two groups … |
-| Allocation | grouped details | — |
-| Valid from | 1 Oct 2026, 14:30 | — |
-| Valid to | 1 Oct 2026, 14:30 | — |
-| ID | the name it points at, never the id | — |
 | Savings amount | AED 1,234.50 | Sum of component list prices less the bundle price. |
 | Savings percentage | 1,234.5 | — |
 | Has been sold | yes / no (icon or chip) | True locks components and allocation against amendment. |
-| Is active | yes / no (icon or chip) | — |
 
 **Booking steps** (progress indicator, from `getPublishedBookingFlow`): The steps of the published flow in their `sortOrder`, this one (extras) highlighted. A step the flow has turned off is not shown and is skipped by Continue and Back. Drawn in the venue's `BookingFlowSettings.stepIndicator` style; `embedMode` and `singleEventPage` come from the same published settings (CMS-016) (CHG-SGU-022).
 
@@ -1560,7 +1552,7 @@ Errors to draw in the form: 403 The performance's on-sale waiting room is on and
 
 - → `WEB-005` Ticket Type Selection: *Ticket Type Selection*
 - → `WEB-006` Date & Performance Selection: *Date & Performance Selection*; carries `cartId`, `performanceId`
-- → `WEB-010` Shopping Cart: *Shopping Cart*; carries `cartId`, `code`, `performanceId`
+- → `WEB-010` Shopping Cart: *Shopping Cart*; carries `cartId`, `code`, `lineId`, `performanceId`
 - → `WEB-016` Login / Register: *Continue — sign in or use a guest code (when sign-in is asked after add-ons)*; carries `cartId`; only when the guest is not signed in
 
 #### States
@@ -1729,16 +1721,16 @@ Also set there, as content the tenant writes: settings.
 
 - Wireframe frame: `wireframes/P01 Guest Web.dc.html#web-008` · status **review** · provenance client-verified
 - Prototype (rev 3, verified 2026-09-28, match exact): `sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html`, view *Book → 'Extras' step (e.g. Summit Peaks → Dated day pass → Continue)*. Differences: Sign-in is asked when leaving Add-ons (Config 'Ask to sign in: After add-ons', Rev 3 item 3), so WEB-008 → WEB-016 is a transition YAML does not have. Add-ons also appear on the payment step (combo) and confirmation (upsells). 28 Sep flow review: all add-ons live here only.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
 - ADR-0052 *One recommendation engine; runtime in AI, configuration in Promotions* (`docs/adr/0052-one-recommendation-engine.md`)
-- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
 - ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (19), with its required mark, default, format and its error state (403, 404, 409, 422).
-- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-008?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Add cart line.
 - [ ] Every transition is wired: `WEB-005`, `WEB-006`, `WEB-010`, `WEB-016`.
@@ -1758,8 +1750,8 @@ Also set there, as content the tenant writes: settings.
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | Booking & Selection · wave 3 · needs the `marketing` module |
-| Block | Block A · ticket #18224 (APP-WEB-WEB-009) |
+| Module | Booking & Selection · wave 1 · needs the `marketing` module |
+| Block | Block A · task APP-WEB-WEB-009 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getWishlist` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1946,8 +1938,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | Booking & Selection · wave 3 · needs the `resources` module |
-| Block | Block A · ticket #20736 (APP-WEB-WEB-047) |
+| Module | Booking & Selection · wave 1 · needs the `resources` module |
+| Block | Block A · task APP-WEB-WEB-047 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `getMapResourceAvailability` reads the population of spots and a tap holds one of them — list (as a map), select, act |
@@ -2250,8 +2242,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | Booking & Selection · wave 3 · needs the `resources` module |
-| Block | Block A · ticket #20706 (APP-WEB-WEB-048) |
+| Module | Booking & Selection · wave 1 · needs the `resources` module |
+| Block | Block A · task APP-WEB-WEB-048 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | multiStepForm (compact density): A staged booking — date, start time, length, room type, attendees, add-ons — ending in one `addCartLine`; the prototype draws it as one step revealing each choice in turn |

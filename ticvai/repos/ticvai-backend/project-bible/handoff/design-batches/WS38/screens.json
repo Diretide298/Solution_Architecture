@@ -86,6 +86,12 @@
      "operation": "listDynamicPricingStrategy"
     },
     {
+     "to": "BO-441",
+     "trigger": "Works in Rule Priority, Conflict Resolution & Dynamic Pricing Test Console",
+     "provenance": "flow F147 step 17→18",
+     "operation": "listDynamicPricingStrategy"
+    },
+    {
      "to": "ADM-089",
      "trigger": "Works in Dynamic Pricing Strategy Builder",
      "provenance": "flow F147 step 1→2",
@@ -102,12 +108,6 @@
      "carries": [
       "strategyId"
      ]
-    },
-    {
-     "to": "BO-441",
-     "trigger": "Works in Rule Priority, Conflict Resolution & Dynamic Pricing Test Console",
-     "provenance": "flow F147 step 17→18",
-     "operation": "listDynamicPricingStrategy"
     }
    ]
   },
@@ -213,19 +213,12 @@
        "kind": "dataTable",
        "label": "Every dynamic pricing strategy",
        "columns": [
-        "DynamicPricingStrategyCommandCenterView.strategyId",
         "DynamicPricingStrategyCommandCenterView.strategyName",
         "DynamicPricingStrategyCommandCenterView.strategyType",
-        "DynamicPricingStrategyCommandCenterView.productEvent",
         "DynamicPricingStrategyCommandCenterView.venue",
         "DynamicPricingStrategyCommandCenterView.basePriceSource",
         "DynamicPricingStrategyCommandCenterView.currentPrice",
-        "DynamicPricingStrategyCommandCenterView.adjustmentRange",
-        "DynamicPricingStrategyCommandCenterView.ruleCount",
-        "DynamicPricingStrategyCommandCenterView.effectivePeriod",
-        "DynamicPricingStrategyCommandCenterView.automationMode",
-        "DynamicPricingStrategyCommandCenterView.status",
-        "DynamicPricingStrategyCommandCenterView.owner"
+        "DynamicPricingStrategyCommandCenterView.status"
        ],
        "bindsTo": "DynamicPricingStrategyCommandCenterView",
        "operation": "listDynamicPricingStrategy",
@@ -242,19 +235,14 @@
        "label": "The selected dynamic pricing strategy",
        "bindsTo": "DynamicPricingStrategyCommandCenterView",
        "columns": [
-        "DynamicPricingStrategyCommandCenterView.strategyId",
         "DynamicPricingStrategyCommandCenterView.strategyName",
         "DynamicPricingStrategyCommandCenterView.strategyType",
-        "DynamicPricingStrategyCommandCenterView.productEvent",
         "DynamicPricingStrategyCommandCenterView.venue",
         "DynamicPricingStrategyCommandCenterView.basePriceSource",
         "DynamicPricingStrategyCommandCenterView.currentPrice",
-        "DynamicPricingStrategyCommandCenterView.adjustmentRange",
         "DynamicPricingStrategyCommandCenterView.ruleCount",
-        "DynamicPricingStrategyCommandCenterView.effectivePeriod",
         "DynamicPricingStrategyCommandCenterView.automationMode",
-        "DynamicPricingStrategyCommandCenterView.status",
-        "DynamicPricingStrategyCommandCenterView.owner"
+        "DynamicPricingStrategyCommandCenterView.status"
        ],
        "notes": null,
        "provenance": "pack Pricing___Revenue_Management_Reference.pdf, page 75 §Each strategy should show"
@@ -1158,7 +1146,7 @@
     "id": "formSetDemandSignalConfiguration",
     "component": "modal",
     "trigger": "Save demand signal configuration",
-    "body": "**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `id`, `scopePath`, `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setDemandSignalConfiguration` sends before it is called.** Required: `signalKind`, `source`. Optional: `signalType`, `name`, `venueId`, `productId`, `geography`, `marketCode`, `periodStart`, `periodEnd`, `currentValue`, `unit`, `reading`, `configuration` and 11 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "DemandSignal",
     "confirm": {
      "label": "Save demand signal configuration",
@@ -1167,8 +1155,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "signalKind",
       "source",
       "signalType",
@@ -1505,7 +1491,7 @@
     "id": "formSetPriceLadderMatrix",
     "component": "modal",
     "trigger": "Save price ladder matrix",
-    "body": "**Collects what `setPriceLadderMatrix` sends before it is called.** Required: `id`, `scopePath`, `dynamicPricingStrategyId`, `adjustmentModel`. Optional: `basePriceSource`, `bands`, `baseBandCode`, `stepAmount`, `minimumPrice`, `basePrice`, `maximumPrice`, `allowUpward`, `allowDownward`, `maxIncreasePercentPerAdjustment`, `maxDecreasePercentPerAdjustment`, `maximumBandsPerMovement` and 4 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setPriceLadderMatrix` sends before it is called.** Required: `dynamicPricingStrategyId`, `adjustmentModel`. Optional: `basePriceSource`, `bands`, `baseBandCode`, `stepAmount`, `minimumPrice`, `basePrice`, `maximumPrice`, `allowUpward`, `allowDownward`, `maxIncreasePercentPerAdjustment`, `maxDecreasePercentPerAdjustment`, `maximumBandsPerMovement` and 4 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "PriceLadder",
     "confirm": {
      "label": "Save price ladder matrix",
@@ -1514,8 +1500,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "dynamicPricingStrategyId",
       "adjustmentModel",
       "basePriceSource",
@@ -1737,7 +1721,7 @@
     "id": "formSetDynamicPricingGuardrailPolicy",
     "component": "modal",
     "trigger": "Save dynamic pricing guardrail policy",
-    "body": "**Collects what `setDynamicPricingGuardrailPolicy` sends before it is called.** Required: `id`, `scopePath`, `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`, `absoluteMaximumPrice`, `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`, `maximumSingleChangePercent`, `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`, `maximumChangesPerDay`, `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setDynamicPricingGuardrailPolicy` sends before it is called.** Required: `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`, `absoluteMaximumPrice`, `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`, `maximumSingleChangePercent`, `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`, `maximumChangesPerDay`, `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "DynamicPricingControl",
     "confirm": {
      "label": "Save dynamic pricing guardrail policy",
@@ -1746,8 +1730,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "scopeLevel",
       "automationLevel",
       "scopeId",
@@ -1969,7 +1951,7 @@
     "id": "formSetDynamicPricingGuardrailPolicy",
     "component": "modal",
     "trigger": "Save dynamic pricing guardrail policy",
-    "body": "**Collects what `setDynamicPricingGuardrailPolicy` sends before it is called.** Required: `id`, `scopePath`, `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`, `absoluteMaximumPrice`, `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`, `maximumSingleChangePercent`, `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`, `maximumChangesPerDay`, `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setDynamicPricingGuardrailPolicy` sends before it is called.** Required: `scopeLevel`, `automationLevel`. Optional: `scopeId`, `absoluteMinimumPrice`, `absoluteMaximumPrice`, `minimumMarginPercent`, `maximumUpliftPercent`, `maximumReductionPercent`, `maximumSingleChangePercent`, `maximumDailyChangePercent`, `maximumWeeklyChangePercent`, `minimumChangeIntervalMinutes`, `maximumChangesPerDay`, `minimumInventory` and 21 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "DynamicPricingControl",
     "confirm": {
      "label": "Save dynamic pricing guardrail policy",
@@ -1978,8 +1960,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "scopeLevel",
       "automationLevel",
       "scopeId",

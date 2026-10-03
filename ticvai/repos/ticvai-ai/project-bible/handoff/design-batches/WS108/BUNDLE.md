@@ -289,7 +289,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `BO-616` Accreditation Application Directory: *Accreditation Application Directory*; carries `applicationId`
 - → `BO-617` New Accreditation Application: *New Accreditation Application*; carries `applicationId`
 - → `BO-618` Accreditation Form Builder: *Accreditation Form Builder*; carries `programmeId`
-- → `BO-619` Accreditation Category Management: *Accreditation Category Management*
+- → `BO-619` Accreditation Category Management: *Accreditation Category Management*; carries `programmeId`
 - → `BO-620` Accreditation Program Setup: *Accreditation Program Setup*; carries `programmeId`
 - → `BO-621` Applicant Type Configuration: *Applicant Type Configuration*
 - → `BO-622` Application Requirements Matrix: *Application Requirements Matrix*
@@ -793,8 +793,8 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Access & Venue · wave 3 · needs the `accreditation` module |
-| Block | Block A · ticket #18203 (APP-SETUP-BO-618) |
+| Module | Access & Venue · wave 1 · needs the `accreditation` module |
+| Block | Block A · task APP-SETUP-BO-618 |
 | Who uses it | venue staff holding `ACCREDITATION_CONFIGURE`, `GUEST_VIEW`, `MARKETING_MANAGE`, `MARKETING_VIEW` (2 configure, 2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Fields may be configured as) and no display directory — it is settings, not a population |

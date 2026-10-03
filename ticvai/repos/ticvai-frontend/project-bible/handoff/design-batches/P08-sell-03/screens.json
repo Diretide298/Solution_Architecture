@@ -64,7 +64,9 @@
     },
     {
      "name": "runId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that carries it only pre-selects the record."
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders."
@@ -164,13 +166,8 @@
        "label": "Every serialised",
        "bindsTo": "SerialisedItem",
        "columns": [
-        "SerialisedItem.id",
-        "SerialisedItem.itemId",
-        "SerialisedItem.batchId",
         "SerialisedItem.serial",
-        "SerialisedItem.locationId",
         "SerialisedItem.status",
-        "SerialisedItem.soldOnOrderLineId",
         "SerialisedItem.warrantyUntil",
         "SerialisedItem.receivedAt"
        ],
@@ -193,13 +190,8 @@
        "label": "The selected serialised",
        "bindsTo": "SerialisedItem",
        "columns": [
-        "SerialisedItem.id",
-        "SerialisedItem.itemId",
-        "SerialisedItem.batchId",
         "SerialisedItem.serial",
-        "SerialisedItem.locationId",
         "SerialisedItem.status",
-        "SerialisedItem.soldOnOrderLineId",
         "SerialisedItem.warrantyUntil",
         "SerialisedItem.receivedAt"
        ],
@@ -267,7 +259,7 @@
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -346,14 +338,9 @@
        "label": "Every product category",
        "bindsTo": "ProductCategory",
        "columns": [
-        "ProductCategory.id",
         "ProductCategory.name",
-        "ProductCategory.nameLocalised",
         "ProductCategory.kind",
-        "ProductCategory.parentId",
-        "ProductCategory.scopePath",
         "ProductCategory.displayOrder",
-        "ProductCategory.imageAssetId",
         "ProductCategory.description",
         "ProductCategory.isActive"
        ],
@@ -425,7 +412,7 @@
    "error": "Could not load. Names which read failed and leaves the category brand merchandise untouched.",
    "emptyFirstRun": "No category brand merchandise yet. Offers no create action — this screen declares no operation that makes one.",
    "emptyNoResults": "Never shown: `listProductCategories` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProductCategories` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listProductCategories` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setProductCategories`; `TENANT_CONFIGURE` for `listBookingFlows`."
   },
   "apis": [
    {
@@ -475,7 +462,7 @@
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetProductCategories",
@@ -687,7 +674,7 @@
    "error": "Could not load. Names which read failed and leaves the merchandising product presentation untouched.",
    "emptyFirstRun": "No merchandising product presentation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on outletId, categoryId, inStockOnly, search and the merchandising product presentation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `updateMerchandise`; `WORKSTATION_CONFIGURE` for `updateSaleBoard`."
   },
   "apis": [
    {
@@ -735,11 +722,15 @@
     },
     {
      "name": "merchandiseId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMerchandise` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "saleBoardId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listSaleBoards` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders. A role opened from the directory."
@@ -752,7 +743,7 @@
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formUpdateMerchandise",
@@ -784,7 +775,7 @@
     "id": "formUpdateSaleBoard",
     "component": "modal",
     "trigger": "Save sale board",
-    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "SaleBoard",
     "confirm": {
      "label": "Save sale board",
@@ -847,7 +838,7 @@
   "name": "Product Import, Governance & AI Configuration Assistant",
   "module": "Sell",
   "requiresModule": "ticketing",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "venue-management-web",
    "route": "/sell/product-import-governance-ai-configuration-assistant",
@@ -961,7 +952,9 @@
     },
     {
      "name": "jobId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `importProductCatalogue`; a link or an edge that holds one opens it instead."
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders.",
@@ -981,7 +974,7 @@
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formImportProductCatalogue",
@@ -1146,15 +1139,8 @@
         "Campaign.name",
         "Campaign.kind",
         "Campaign.channel",
-        "Campaign.venueId",
-        "Campaign.segmentId",
-        "Campaign.content",
-        "Campaign.trigger",
         "Campaign.scheduledFor",
-        "Campaign.consentPurpose",
-        "Campaign.sendWindow",
-        "Campaign.id",
-        "Campaign.budgetCap"
+        "Campaign.consentPurpose"
        ],
        "operation": "listCampaigns",
        "provenance": "contract marketing-crm.yaml GET /campaigns"
@@ -1191,7 +1177,7 @@
    "error": "Could not load. Names which read failed and leaves the campaign audience untouched.",
    "emptyFirstRun": "No campaign audience yet. Offers Create campaign (`createCampaign`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on status and the campaign audience are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listCampaigns` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listCampaigns` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createCampaign`; `REPORT_VIEW_VENUE` for `runReport`."
   },
   "apis": [
    {
@@ -1233,7 +1219,9 @@
     },
     {
      "name": "reportId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `runReport` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders."
@@ -1246,7 +1234,7 @@
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateCampaign",
@@ -1416,13 +1404,10 @@
        "label": "The upsell suggestion",
        "bindsTo": "UpsellSuggestion",
        "columns": [
-        "UpsellSuggestion.variantId",
-        "UpsellSuggestion.bundleId",
         "UpsellSuggestion.name",
         "UpsellSuggestion.price",
         "UpsellSuggestion.discountedPrice",
         "UpsellSuggestion.source",
-        "UpsellSuggestion.ruleId",
         "UpsellSuggestion.rank",
         "UpsellSuggestion.rationale"
        ],
@@ -1443,7 +1428,7 @@
    "loading": "The cross-sell upsell recommendation, read by `getUpsellSuggestions`.",
    "error": "Could not load. Names which read failed and leaves the cross-sell upsell recommendation untouched.",
    "emptyFirstRun": "No cross-sell upsell recommendation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getRecommendations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listUpsellRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `decideRecommendations`; `PRODUCT_CONFIGURE` for `createUpsellRule`, `deleteUpsellRule`."
   },
   "apis": [
    {
@@ -1483,7 +1468,9 @@
     },
     {
      "name": "ruleId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listUpsellRules` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which before the page renders."
@@ -1496,7 +1483,7 @@
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1569,16 +1556,12 @@
        "label": "Every journey",
        "bindsTo": "Journey",
        "columns": [
-        "Journey.id",
         "Journey.name",
         "Journey.templateKind",
         "Journey.entryEvent",
-        "Journey.entryConditions",
-        "Journey.steps",
         "Journey.status",
         "Journey.maxDurationDays",
-        "Journey.reentryPolicy",
-        "Journey.scopePath"
+        "Journey.reentryPolicy"
        ],
        "operation": "listJourneys",
        "provenance": "contract marketing-crm.yaml GET /journeys"
@@ -1599,7 +1582,6 @@
        "label": "The selected journey",
        "bindsTo": "Journey",
        "columns": [
-        "Journey.id",
         "Journey.name",
         "Journey.templateKind",
         "Journey.entryEvent",
@@ -1607,8 +1589,7 @@
         "Journey.steps",
         "Journey.status",
         "Journey.maxDurationDays",
-        "Journey.reentryPolicy",
-        "Journey.scopePath"
+        "Journey.reentryPolicy"
        ],
        "operation": "listJourneys",
        "provenance": "contract marketing-crm.yaml GET /journeys"
@@ -1634,7 +1615,7 @@
    "error": "Could not load. Names which read failed and leaves the omnichannel commerce journey untouched.",
    "emptyFirstRun": "No omnichannel commerce journey yet. Offers Create journey (`createJourney`).",
    "emptyNoResults": "Never shown: `listJourneys` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listJourneys` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listJourneys` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createJourney`."
   },
   "apis": [
    {
@@ -1676,13 +1657,13 @@
    "derivedFrom": "wireframes/reference/Retail Board 5.dc.html",
    "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateJourney",
     "component": "modal",
     "trigger": "Create journey",
-    "body": "**Collects what `createJourney` sends before it is called.** Required: `id`, `name`, `entryEvent`, `steps`, `status`. Optional: `templateKind`, `entryConditions`, `maxDurationDays`, `reentryPolicy`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createJourney` sends before it is called.** Required: `name`, `entryEvent`, `steps`. Optional: `templateKind`, `entryConditions`, `maxDurationDays`, `reentryPolicy`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath`, `status` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "Journey",
     "confirm": {
      "label": "Create journey",
@@ -1691,16 +1672,13 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "name",
       "entryEvent",
       "steps",
-      "status",
       "templateKind",
       "entryConditions",
       "maxDurationDays",
-      "reentryPolicy",
-      "scopePath"
+      "reentryPolicy"
      ]
     },
     "provenance": "contract marketing-crm.yaml POST /journeys"
@@ -1787,11 +1765,7 @@
        "columns": [
         "Segment.name",
         "Segment.description",
-        "Segment.venueId",
         "Segment.match",
-        "Segment.criteria",
-        "Segment.excludeSegmentIds",
-        "Segment.id",
         "Segment.lastEvaluatedSize",
         "Segment.lastEvaluatedAt"
        ],
@@ -1848,7 +1822,7 @@
    "error": "Could not load. Names which read failed and leaves the personalized offers guest untouched.",
    "emptyFirstRun": "No personalized offers guest yet. Offers Create campaign (`createCampaign`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on search and the personalized offers guest are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listSegments` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listSegments` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createCampaign`."
   },
   "apis": [
    {
@@ -1891,7 +1865,7 @@
    "source": "Claude Design Retail pack, 24 August",
    "note": "**Drawn by Claude Design on `Retail Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateCampaign",
@@ -2027,17 +2001,11 @@
        "columns": [
         "DonationCampaign.name",
         "DonationCampaign.description",
-        "DonationCampaign.beneficiary",
-        "DonationCampaign.venueIds",
         "DonationCampaign.amountMode",
         "DonationCampaign.fixedAmounts",
         "DonationCampaign.minAmount",
         "DonationCampaign.maxAmount",
-        "DonationCampaign.liabilityAccountId",
-        "DonationCampaign.channels",
         "DonationCampaign.validFrom",
-        "DonationCampaign.validTo",
-        "DonationCampaign.isActive",
         "DonationCampaign.raisedTotal"
        ],
        "operation": "listDonationCampaigns",
@@ -2117,7 +2085,9 @@
     },
     {
      "name": "campaignId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listDonationCampaigns` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "Resolves the tenant and venue from the session; a cold arrival is the ordinary case."

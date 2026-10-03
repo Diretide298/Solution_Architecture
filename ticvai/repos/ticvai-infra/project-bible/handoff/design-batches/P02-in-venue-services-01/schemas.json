@@ -164,6 +164,55 @@
    }
   }
  },
+ "BookableOutlet": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over the published outlet, its tables and its reservation policy",
+  "description": "One restaurant a guest can book (`listBookableOutlets`; CHG-RUL-013). Published data only.",
+  "required": [
+   "outletId",
+   "venueId",
+   "name"
+  ],
+  "properties": {
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "name": {
+    "type": "string"
+   },
+   "kind": {
+    "type": "string",
+    "nullable": true
+   },
+   "cuisine": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "zone": {
+    "type": "string",
+    "nullable": true
+   },
+   "imageAssetRef": {
+    "type": "string",
+    "nullable": true
+   },
+   "depositMayApply": {
+    "type": "boolean",
+    "description": "The venue's `orders.DepositPolicy.dining` is on, so a booking from its party size takes a deposit (rev 3 REV3-8b). Shown before the guest picks a time; the amount comes with the booking."
+   },
+   "waitlistOpen": {
+    "type": "boolean",
+    "description": "The outlet takes walk-in waitlist places today (`joinRestaurantWaitlist`)."
+   }
+  }
+ },
  "BookedWindow": {
   "type": "object",
   "nullable": true,
@@ -1595,6 +1644,47 @@
    "scopePath": {
     "type": "string",
     "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "MyTableBooking": {
+  "type": "object",
+  "x-ticvai-persistence": "none — projection over fnb.table_reservation and fnb.waitlist_entry",
+  "description": "One row of the guest's own list (`listMyTableReservations`; CHG-RUL-013): a reservation or a waitlist place, as `kind` says; exactly one of `reservation` and `waitlistEntry` is set.",
+  "required": [
+   "kind",
+   "outletId"
+  ],
+  "properties": {
+   "kind": {
+    "type": "string",
+    "enum": [
+     "reservation",
+     "waitlist"
+    ]
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "outletName": {
+    "type": "string"
+   },
+   "reservation": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/TableReservation"
+     }
+    ],
+    "nullable": true
+   },
+   "waitlistEntry": {
+    "allOf": [
+     {
+      "$ref": "#/components/schemas/RestaurantWaitlist"
+     }
+    ],
+    "nullable": true
    }
   }
  },

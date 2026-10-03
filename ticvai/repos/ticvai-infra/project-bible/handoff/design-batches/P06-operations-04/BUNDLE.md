@@ -167,16 +167,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `EMP-035` | Payment on device | B–D | 25 | 0 | 5 | 10 | 2 | 0 | — | notStarted (generated) |
-| `EMP-036` | Issue media | B–D | 8 | 23 | 5 | 23 | 1 | 0 | — | notStarted (generated) |
-| `EMP-037` | Notifications | B–D | 1 | 49 | 6 | 8 | 2 | 0 | — | notStarted (generated) |
-| `EMP-039` | Announcements | B–D | 1 | 24 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-038` | Broadcast to team | B–D | 12 | 29 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
-| `EMP-040` | Knowledge base | B–D | 6 | 0 | 5 | 2 | 0 | 0 | — | notStarted (generated) |
-| `EMP-041` | Training | B–D | 3 | 16 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
-| `EMP-042` | Profile | B–D | 3 | 30 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
-| `EMP-043` | Device settings | B–D | 13 | 22 | 6 | 48 | 0 | 0 | — | notStarted (generated) |
-| `EMP-044` | Accessibility | B–D | 0 | 0 | 4 | 0 | 0 | 0 | — | notStarted (generated) |
+| `EMP-035` | Payment on device | C | 25 | 0 | 5 | 10 | 2 | 0 | — | notStarted (generated) |
+| `EMP-036` | Issue media | C | 8 | 10 | 5 | 23 | 1 | 0 | — | notStarted (generated) |
+| `EMP-037` | Notifications | D | 1 | 34 | 6 | 8 | 2 | 0 | — | notStarted (generated) |
+| `EMP-039` | Announcements | D | 1 | 9 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-038` | Broadcast to team | D | 12 | 14 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
+| `EMP-040` | Knowledge base | D | 6 | 0 | 5 | 2 | 0 | 0 | — | notStarted (generated) |
+| `EMP-041` | Training | D | 3 | 9 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
+| `EMP-042` | Profile | B | 3 | 18 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
+| `EMP-043` | Device settings | B | 13 | 9 | 6 | 48 | 0 | 0 | — | notStarted (generated) |
+| `EMP-044` | Accessibility | D | 0 | 0 | 4 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -196,7 +196,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-035 |
 | Who uses it | venue staff holding `ORDER_CREATE`, `ORDER_MODIFY` (2 operate); in the flows as cashier |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | configEditor (comfortable density): the screen declares only writes (`createPayment`, `inquirePaymentStatus`, `addTip`) and no read of a population — it is settings, not a list |
@@ -348,6 +348,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Wireframe frame: `wireframes/P06 Venue Staff App.dc.html#emp-035` · status **notStarted** · provenance generated
 - Flow F66 *A walk-up sale is taken on a handheld*, step 2: The guest taps a card on the device. → **`inquirePaymentStatus` exists because a handheld payment fails differently** — a card reader out of range does not report cleanly, and asking is safer than assuming.
 - Flow F66 branch at step 2 (high): when The payment status is unknown — the reader lost signal mid-tap., **`inquirePaymentStatus` before retrying, always.** Retrying a payment that actually succeeded charges a guest twice, and on a handheld that is the common failure.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -371,7 +372,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-036 |
 | Who uses it | venue staff holding `ASSET_LIBRARY_VIEW`, `ORDER_CREATE`, `ORDER_VIEW` (2 read, 1 operate); in the flows as cashier |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | statusTracker (comfortable density): `getMediaEntitlements` reads one record and nothing reads a population — the screen is about that one thing |
@@ -412,32 +413,19 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 |---|---|---|
 | Media code | text | — |
 | Media kind | chip: QR, Wristband, Card, NFC, Mobile pass | — |
-| Subject | the name it points at, never the id | — |
 | Is valid | yes / no (icon or chip) | — |
 | Invalid reason | text | — |
-| Can accept more | yes / no (icon or chip) | False where the media has been surrendered, expired or blocked. A cashier should know before taking money, not after. |
 | Entitlements | list or chips (count when long) | — |
 
 **The media asset** (detail panel, from `getMediaAsset`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Kind | chip: Image, Video, Audio, Document, Vector, Font… | — |
 | Status | chip: Processing, Ready, Quarantined, Failed, Archived | — |
 | Filename | text | — |
-| Content type | text | — |
-| Size bytes | 1,234 | — |
 | Title | in the reader's language | — |
 | Description | in the reader's language | Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored. |
-| Alt text | in the reader's language | Required before use in a guest-facing surface. WCAG 2.2 AA. |
-| Width | 1,234 | — |
-| Height | 1,234 | — |
 | Duration seconds | 1,234.5 | — |
-| Custom metadata | grouped details | BL-178. `assets` is a strong contract and its metadata was fixed — kind, title, alt text, dimensions, rights. |
-| Shared with tenants | list or chips (count when long) | BL-178. Cross-tenant sharing, and it is refused by default for a reason. |
-| Tags | list or chips (count when long) | — |
-| Venue | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
@@ -464,7 +452,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Loading (`?state=loading`) | The issue media, read by `getMediaEntitlements`. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the issue media untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No issue media yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires to show this screen, and names that permission (the screen's other reads need `ASSET_LIBRARY_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`. |
 | Offline (`?state=offline`) | Issues from the local range allocated at shift start |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Media expired (`mediaExpired`), blocked (`mediaBlocked`), already surrendered at exit (`mediaSurrendered`), or the entitlement cannot share media … (AppendRefusedProblem) |
 
@@ -486,7 +474,7 @@ media: Wristband WB-00418273 · Day Pass Adult
 - `appendEntitlementToMedia` → `ORDER_CREATE` (operate) · staff
 - `getMediaAsset` → `ASSET_LIBRARY_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires to show this screen, and names that permission (the screen's other reads need `ASSET_LIBRARY_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`.
 
 #### Requirements it meets
 
@@ -529,7 +517,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (8), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (23 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-036?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Append entitlement to media.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`.
@@ -548,7 +536,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-037 |
 | Who uses it | venue staff holding `APPROVAL_VIEW`, `WORKFORCE_VIEW` (2 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listAnnouncements` reads the population and `getAnnouncementReach` reads one of them — list, select, act |
@@ -592,7 +580,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Assigned to me | toggle | — | — | `listApprovalRequests` ?assignedToMe |
 | Raised by me | toggle | — | — | `listApprovalRequests` ?raisedByMe |
 | Status | select | — | Draft · Pending · Escalated · Returned · Information requested · Approved · Rejected · Withdrawn · Expired · Cancelled | `listApprovalRequests` ?status |
-| Kind | select | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; Each is an existing kind … | `listApprovalRequests` ?kind |
+| Kind | select | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; - Publishing white-label … | `listApprovalRequests` ?kind |
 | Breaching within minutes | number field (minutes) | — | — | `listApprovalRequests` ?breachingWithinMinutes |
 | Sort | segmented control | Sla proximity | Sla proximity · AI priority | `listApprovalRequests` ?sort |
 
@@ -609,18 +597,10 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Title | text | — |
 | Body | text | — |
-| Kind | chip: Operational, Safety, Emergency, Hr, Celebration | `emergency` is not a louder `operational`. It overrides the home screen, bypasses quiet hours, requires acknowledgement, and carries a … |
-| Venues | list or chips (count when long) | — |
-| Departments | list or chips (count when long) | — |
-| Roles | list or chips (count when long) | — |
-| Requires acknowledgement | yes / no (icon or chip) | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
-| Published by principal | the name it points at, never the id | — |
 | Published at | 1 Oct 2026, 14:30 | — |
-| Locale | text | — |
 
 **Action required** (data table, from `listApprovalRequests`)
 
@@ -651,18 +631,11 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Title | text | — |
 | Body | text | — |
 | Kind | chip: Operational, Safety, Emergency, Hr, Celebration | `emergency` is not a louder `operational`. It overrides the home screen, bypasses quiet hours, requires acknowledgement, and carries a … |
-| Venues | list or chips (count when long) | — |
-| Departments | list or chips (count when long) | — |
-| Roles | list or chips (count when long) | — |
-| Requires acknowledgement | yes / no (icon or chip) | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
-| Published by principal | the name it points at, never the id | — |
 | Published at | 1 Oct 2026, 14:30 | — |
-| Locale | text | — |
 
 **The announcement reach** (detail panel, from `getAnnouncementReach`)
 
@@ -803,7 +776,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (1), with its required mark, default, format and its error state (404, 422).
-- [ ] Every output is drawn (49 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (34 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-037?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Acknowledge announcement, What publishing changes.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`.
@@ -824,7 +797,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-039 |
 | Who uses it | venue staff holding `WORKFORCE_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listAnnouncements` reads the population and `getAnnouncementReach` reads one of them — list, select, act |
@@ -872,35 +845,20 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Title | text | — |
 | Body | text | — |
-| Kind | chip: Operational, Safety, Emergency, Hr, Celebration | `emergency` is not a louder `operational`. It overrides the home screen, bypasses quiet hours, requires acknowledgement, and carries a … |
-| Venues | list or chips (count when long) | — |
-| Departments | list or chips (count when long) | — |
-| Roles | list or chips (count when long) | — |
-| Requires acknowledgement | yes / no (icon or chip) | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
-| Published by principal | the name it points at, never the id | — |
 | Published at | 1 Oct 2026, 14:30 | — |
-| Locale | text | — |
 
 **The selected announcement** (detail panel, from `listAnnouncements`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Title | text | — |
 | Body | text | — |
 | Kind | chip: Operational, Safety, Emergency, Hr, Celebration | `emergency` is not a louder `operational`. It overrides the home screen, bypasses quiet hours, requires acknowledgement, and carries a … |
-| Venues | list or chips (count when long) | — |
-| Departments | list or chips (count when long) | — |
-| Roles | list or chips (count when long) | — |
-| Requires acknowledgement | yes / no (icon or chip) | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
-| Published by principal | the name it points at, never the id | — |
 | Published at | 1 Oct 2026, 14:30 | — |
-| Locale | text | — |
 
 **Actions and what each produces**
 
@@ -1002,7 +960,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (1), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-039?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Acknowledge announcement, What publishing changes.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`.
@@ -1023,7 +981,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-038 |
 | Who uses it | venue staff holding `ANNOUNCEMENT_PUBLISH`, `WORKFORCE_VIEW` (1 configure, 1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listAnnouncements` reads the population and `getAnnouncementReach` reads one of them — list, select, act |
@@ -1060,7 +1018,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Form: Publish announcement** (modal, opened by *Publish announcement*; *Publish announcement* calls `publishAnnouncement`, *Cancel* sends nothing)
 
-**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`, `kind`, `publishedAt`. Optional: `id`, `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`, `expiresAt`, `publishedByPrincipalId`, `locale`. **An `emergency` kind requires ANNOUNCEMENT_EMERGENCY** (audit R091 (1)). Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`, `kind`, `publishedAt`. Optional: `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`, `expiresAt`, `locale`. **An `emergency` kind requires ANNOUNCEMENT_EMERGENCY** (audit R091 (1)). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `publishedByPrincipalId` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1095,35 +1053,20 @@ Errors to draw in the form: 403 The caller lacks `ANNOUNCEMENT_PUBLISH` at the t
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Title | text | — |
 | Body | text | — |
-| Kind | chip: Operational, Safety, Emergency, Hr, Celebration | `emergency` is not a louder `operational`. It overrides the home screen, bypasses quiet hours, requires acknowledgement, and carries a … |
-| Venues | list or chips (count when long) | — |
-| Departments | list or chips (count when long) | — |
-| Roles | list or chips (count when long) | — |
-| Requires acknowledgement | yes / no (icon or chip) | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
-| Published by principal | the name it points at, never the id | — |
 | Published at | 1 Oct 2026, 14:30 | — |
-| Locale | text | — |
 
 **The selected announcement** (detail panel, from `listAnnouncements`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Title | text | — |
 | Body | text | — |
 | Kind | chip: Operational, Safety, Emergency, Hr, Celebration | `emergency` is not a louder `operational`. It overrides the home screen, bypasses quiet hours, requires acknowledgement, and carries a … |
-| Venues | list or chips (count when long) | — |
-| Departments | list or chips (count when long) | — |
-| Roles | list or chips (count when long) | — |
-| Requires acknowledgement | yes / no (icon or chip) | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
-| Published by principal | the name it points at, never the id | — |
 | Published at | 1 Oct 2026, 14:30 | — |
-| Locale | text | — |
 
 **The announcement reach** (detail panel, from `getAnnouncementReach`)
 
@@ -1169,7 +1112,7 @@ Errors to draw in the form: 403 The caller lacks `ANNOUNCEMENT_PUBLISH` at the t
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the broadcast team untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No broadcast team yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on unacknowledgedOnly and the broadcast team are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORKFORCE_VIEW`, which `getAnnouncementReach` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORKFORCE_VIEW`, which `listAnnouncements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ANNOUNCEMENT_PUBLISH` for `publishAnnouncement`. |
 | Offline (`?state=offline`) | Refused offline: a broadcast needs the network. The draft stays on the device and the screen says it has not gone. |
 
 #### Edge cases to draw
@@ -1202,7 +1145,7 @@ draft:
 - `getAnnouncementReach` → `WORKFORCE_VIEW` (read) · staff
 - `listAnnouncements` → `WORKFORCE_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `WORKFORCE_VIEW`, which `getAnnouncementReach` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `WORKFORCE_VIEW`, which `listAnnouncements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ANNOUNCEMENT_PUBLISH` for `publishAnnouncement`.
 
 #### Requirements it meets
 
@@ -1234,7 +1177,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (12), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (29 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-038?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Publish announcement, What publishing changes.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`.
@@ -1255,7 +1198,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `ai` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-040 |
 | Who uses it | venue staff holding `AI_USE` (1 operate); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | configEditor (comfortable density): the screen declares only writes (`semanticSearch`) and no read of a population — it is settings, not a list |
@@ -1391,7 +1334,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 3 · needs the `ai` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-041 |
 | Who uses it | venue staff holding `AI_USE`, `WORKFORCE_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listTrainingRecords` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1428,27 +1371,20 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
 | Course name | text | — |
-| Required | yes / no (icon or chip) | — |
 | Completed at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 | State | chip: Not started, In progress, Passed, Failed, Expired | — |
-| Evidence ref | text | — |
 
 **The selected training** (detail panel, from `listTrainingRecords`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
 | Course name | text | — |
 | Required | yes / no (icon or chip) | — |
 | Completed at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 | State | chip: Not started, In progress, Passed, Failed, Expired | — |
-| Evidence ref | text | — |
 
 **Actions and what each produces**
 
@@ -1476,7 +1412,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the training untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No training yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listTrainingRecords` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORKFORCE_VIEW`, which `listTrainingRecords` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORKFORCE_VIEW`, which `listTrainingRecords` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `semanticSearch`. |
 | Offline (`?state=offline`) | Cached progress; completions queue |
 
 #### Edge cases to draw
@@ -1503,7 +1439,7 @@ courses:
 - `semanticSearch` → `AI_USE` (operate) · staff
 - `listTrainingRecords` → `WORKFORCE_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `WORKFORCE_VIEW`, which `listTrainingRecords` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `WORKFORCE_VIEW`, which `listTrainingRecords` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `semanticSearch`.
 
 #### Requirements it meets
 
@@ -1531,7 +1467,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (3), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-041?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Semantic search.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`.
@@ -1551,7 +1487,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-STAFF-EMP-042 |
 | Who uses it | venue |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listMfaMethods` reads the population and `getCurrentSession` reads one of them — list, select, act |
@@ -1610,9 +1546,6 @@ Errors to draw in the form: 409 Last remaining method of a principal who holds a
 |---|---|---|
 | Kind | chip: Totp, SMS OTP, Email OTP, Biometric, Hardware token | — |
 | Label | text | — |
-| Masked target | text | Partially masked destination, so a person can tell two methods apart. |
-| Is active | yes / no (icon or chip) | — |
-| Is primary | yes / no (icon or chip) | — |
 | Enrolled at | 1 Oct 2026, 14:30 | — |
 | Last used at | 1 Oct 2026, 14:30 | — |
 
@@ -1629,12 +1562,9 @@ Errors to draw in the form: 409 Last remaining method of a principal who holds a
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Kind | chip: Totp, SMS OTP, Email OTP, Biometric, Hardware token | — |
 | Label | text | — |
 | Masked target | text | Partially masked destination, so a person can tell two methods apart. |
-| Is active | yes / no (icon or chip) | — |
-| Is primary | yes / no (icon or chip) | — |
 | Enrolled at | 1 Oct 2026, 14:30 | — |
 | Last used at | 1 Oct 2026, 14:30 | — |
 
@@ -1642,15 +1572,9 @@ Errors to draw in the form: 409 Last remaining method of a principal who holds a
 
 | Shows | Format | Notes |
 |---|---|---|
-| Session | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
-| Role | the name it points at, never the id | — |
 | Display name | text | — |
 | Scope | list or chips (count when long) | Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. |
 | Effective permissions | list or chips (count when long) | Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. |
-| Permissions by scope | list or chips (count when long) | Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves. |
-| Sale board | the name it points at, never the id | Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board. |
-| Workstation | grouped details | — |
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
@@ -1666,7 +1590,7 @@ Errors to draw in the form: 409 Last remaining method of a principal who holds a
 
 **Where the user goes next**
 
-- → `EMP-001` Sign in: *Sign in*
+- → `EMP-001` Sign in: *Sign in*; carries `providerId`
 - → `EMP-002` Select venue & role: *Select venue & role*
 - → `EMP-003` Home — on duty: *Home — on duty*
 
@@ -1739,7 +1663,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (3), with its required mark, default, format and its error state (403, 409, 422).
-- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-042?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, offline.
 - [ ] Every action is wired with its success and its failure: Add a sign-in method, Verify the new method, Remove this method.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`.
@@ -1758,7 +1682,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-STAFF-EMP-043 |
 | Who uses it | venue staff holding `DEVICE_CONFIGURE`, `DEVICE_VIEW` (1 configure, 1 read); in the flows as technician |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listDevices` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1815,28 +1739,15 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Identifier | text | — |
 | Model | text | — |
 | Offline scope | chip: None, Read only, Sell and scan, Full venue | BL-163. What this device may do with no connection, which was unstated for the staff app while `venue-pos` and `venue-scanner` had it … |
-| Firmware version | text | As the device last reported it on its heartbeat. |
-| Is required | yes / no (icon or chip) | True blocks shift open when the device is unreachable. |
 
 **The selected registered device** (detail panel, from `listDevices`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Kind | chip: Receipt printer, Ticket printer, Label printer, Cash drawer, Barcode scanner, RFID … | `mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no … |
-| Driver | text | Built to an open standard where one exists — ESC/POS, UnifiedPOS, OSDP. Adding a vendor is a driver plus configuration, not a core change … |
-| Identifier | text | — |
-| Workstation | the name it points at, never the id | Required for every kind except `mobileHandset`, which is bound to no workstation (18.1.5, 29 September), and except an access-control … |
-| Model | text | — |
-| Push token | text | BL-163. Guest devices register for push and staff devices did not — `registerGuestDevice` exists with a token, platform and failure count … |
-| Push platform | chip: Ios, Android, Web, Windows | — |
 | Push failure count | 1,234 | Consecutive failures. A token that has failed repeatedly is a device that was wiped or reassigned, and continuing to push to it is how a … |
-| Offline scope | chip: None, Read only, Sell and scan, Full venue | BL-163. What this device may do with no connection, which was unstated for the staff app while `venue-pos` and `venue-scanner` had it … |
-| Firmware version | text | As the device last reported it on its heartbeat. |
-| Is required | yes / no (icon or chip) | True blocks shift open when the device is unreachable. |
 | Status | chip: Online, Offline, Error, Consumable low, Needs attention, Local mode… | What the device last said on its heartbeat; `unknown` until it has. `localMode` is an access-control device validating from its offline … |
 | Battery percent | 1,234 | Board 1 of the client's POS design set, 20 August. A wristband encoder at 8% is a gate that stops working in an hour, and nothing in the … |
-| Last checked at | 1 Oct 2026, 14:30 | Distinct from `lastHeartbeatAt`. A heartbeat is the workstation saying the device is attached; a check is the device answering. |
 | Health | chip: Healthy, Warning, Degraded, Offline, Unknown | Derived, not reported. Computed from heartbeat age, battery, firmware currency and error rate — a device does not know whether it is … |
 
 **Actions and what each produces**
@@ -1866,7 +1777,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the device settings untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No device settings yet. Offers Register device (`registerDevice`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on workstationId, kind and the device settings are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVICE_CONFIGURE` for `registerDevice`. |
 | Offline (`?state=offline`) | **Fully offline** — device settings are local by definition |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Identifier already bound to another workstation, or `serialNumber` already registered in the tenant (`duplicate-serial`, moved here from access with the …; 422 `workstationId` missing for a kind other than `mobileHandset`, or given for a `mobileHandset` (18.1.5). |
 
@@ -1894,7 +1805,7 @@ device:
 - `listDevices` → `DEVICE_VIEW` (read) · staff
 - `registerDevice` → `DEVICE_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVICE_CONFIGURE` for `registerDevice`.
 
 #### Requirements it meets
 
@@ -1936,7 +1847,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (13), with its required mark, default, format and its error state (400, 403, 409, 422).
-- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-043?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Register device.
 - [ ] Every transition is wired: `EMP-018`, `EMP-001`, `EMP-002`, `EMP-003`.
@@ -1955,7 +1866,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-044 |
 | Who uses it | venue |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **the screen's operations choose no pattern** — no list, no get, no write that groups. It falls to the default, and the fallback is recorded rather than passed off as a decision |
@@ -2208,7 +2119,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AppendEntitlementRequest": {"type":"object","x-ticvai-persistence":"none — request only","required":["id","lines","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7 of the new order this creates, and its idempotency key — it must equal the `Idempotency-Key` header."},"lines":{"type":"array","minItems":1,"items":{"type":"object","required":["variantId","quantity"],"properties":{"variantId":{"type":"string","format":"uuid"},"quantity":{"type":"integer","minimum":1},"performanceId":{"type":"string","format":"uuid","nullable":true}}}},"paymentMethod":{"type":"string","enum":["card","cash","wallet","giftCard","chargeToAccount"]},"note":{"type":"string","maxLength":300},"recordedAt":{"type":"string","format":"date-time"}}},
 "AppendEntitlementResult": {"type":"object","x-ticvai-persistence":"none — computed","required":["order","media"],"properties":{"order":{"allOf":[{"$ref":"#/components/schemas/Order"}],"description":"A **new** order. The original is untouched — it was paid, receipted and possibly reported on, and editing it would move yesterday's revenue.\n"},"media":{"allOf":[{"$ref":"#/components/schemas/MediaEntitlements"}],"description":"The full set now on the media, so the cashier can say what the QR does."},"addedEntitlementIds":{"type":"array","items":{"type":"string","format":"uuid"}}}},
 "ApprovalDecision": {"type":"object","x-ticvai-persistence":"approvals.decision","required":["level","principalId","decision","decidedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"level":{"type":"integer"},"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"},"delegatedFrom":{"type":"string","format":"uuid","nullable":true},"decision":{"type":"string","enum":["approve","reject"]},"comment":{"type":"string","nullable":true},"reason":{"type":"string","nullable":true},"usedMfa":{"type":"boolean"},"signatureRef":{"type":"string","nullable":true},"decidedAt":{"type":"string","format":"date-time"}}},
-"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
+"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
 "ApprovalMode": {"type":"string","description":"11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once, **consensus** needs all of them, **majority** needs more than half.\nParallel and consensus differ in when it completes: parallel completes on the first approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a one-eye rule.\n","enum":["sequential","parallel","consensus","majority"]},
 "ApprovalRequest": {"type":"object","x-ticvai-persistence":"approvals.request","required":["id","kind","status","requestedByPrincipalId","requestedAt"],"properties":{"id":{"type":"string"},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"rerouteOnNoApprover":{"type":"boolean","default":true,"description":"BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"},"outOfOfficeDelegateId":{"type":"string","format":"uuid","nullable":true},"allowEmailApproval":{"type":"boolean","default":false,"description":"**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"},"reopenedFrom":{"type":"string","format":"uuid","nullable":true,"description":"**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"},"status":{"$ref":"#/components/schemas/ApprovalStatus"},"subjectContract":{"type":"string"},"subjectType":{"type":"string"},"subjectId":{"type":"string"},"scopePath":{"type":"string"},"summary":{"type":"string"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"justification":{"type":"string","nullable":true},"requestedByPrincipalId":{"type":"string","format":"uuid"},"matrixVersion":{"type":"integer"},"mode":{"$ref":"#/components/schemas/ApprovalMode"},"currentLevel":{"type":"integer"},"totalLevels":{"type":"integer"},"pendingApprovers":{"type":"array","items":{"type":"object","properties":{"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"}}}},"decisions":{"type":"array","description":"Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n","items":{"$ref":"#/components/schemas/ApprovalDecision"}},"escalations":{"type":"array","description":"11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n","items":{"type":"object","properties":{"at":{"type":"string","format":"date-time"},"reason":{"type":"string"},"fromLevel":{"type":"integer"},"toLevel":{"type":"integer"},"wasAutomatic":{"type":"boolean"}}}},"resubmittedFromId":{"type":"string","nullable":true},"reopenedFromId":{"type":"string","nullable":true},"slaDueAt":{"type":"string","format":"date-time","nullable":true},"slaBreached":{"type":"boolean"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"Who claimed or was assigned the request in a shared queue (`assignApprovalRequest`; DI-723; CHG-CSP-042). Null while it sits in the queue."},"assignedToDepartmentId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042)."},"assignedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"requestedAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"aiAssessment":{"type":"object","nullable":true,"readOnly":true,"description":"**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.","properties":{"riskScore":{"type":"integer","minimum":0,"maximum":100},"riskBand":{"type":"string","enum":["low","medium","high","critical"]},"priorityScore":{"type":"integer","minimum":0,"maximum":100},"escalationSuggestion":{"type":"object","description":"A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.","properties":{"action":{"type":"string","enum":["escalate","addBackupApprover","none"]},"reason":{"type":"string","nullable":true}}},"signals":{"type":"array","maxItems":10,"description":"The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.","items":{"type":"object","properties":{"code":{"type":"string"},"contribution":{"type":"number"},"detail":{"type":"string","nullable":true}}}},"scoreId":{"type":"string","format":"uuid","description":"The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."},"decisionRecordId":{"type":"string","description":"The ai decision record, for the audit of what the AI said and why."},"assessedAt":{"type":"string","format":"date-time"}}}}},
 "ApprovalStatus": {"type":"string","enum":["draft","pending","escalated","returned","informationRequested","approved","rejected","withdrawn","expired","cancelled"]},

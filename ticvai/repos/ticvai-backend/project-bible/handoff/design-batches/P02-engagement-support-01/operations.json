@@ -660,12 +660,12 @@
   "requestBody": null,
   "responds": "AiMessage"
  },
- "sendConversationMessage": {
+ "sendGuestConversationMessage": {
   "method": "POST",
-  "path": "/conversations/{conversationId}/messages",
+  "path": "/my/conversations/{conversationId}/messages",
   "contract": "marketing-crm",
-  "summary": "Say something, as a guest or an agent",
-  "permission": "CASE_MANAGE",
+  "summary": "Write to the agent, as the guest, in the guest's own handed-over conversation",
+  "permission": null,
   "offlineCapable": false,
   "conflictPolicy": "append",
   "scopeLevel": "tenant",
@@ -677,7 +677,7 @@
    }
   ],
   "requestBody": null,
-  "responds": "ConversationMessage"
+  "responds": "GuestConversationMessage"
  },
  "submitForm": {
   "method": "POST",

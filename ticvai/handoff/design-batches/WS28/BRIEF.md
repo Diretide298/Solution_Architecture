@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-274` | Group Booking Operations Command Center | B–D | 0 | 52 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
+| `BO-274` | Group Booking Operations Command Center | B–D | 0 | 14 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
 | `BO-275` | Group Operational Planning & Task Workspace | B–D | 18 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-276` | Participants, Guest Lists & Group Structure | B–D | 8 | 6 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-277` | Group Payment, Deposit & Balance Management | B–D | 5 | 16 | 6 | 0 | 2 | 0 | — | notStarted (generated) |

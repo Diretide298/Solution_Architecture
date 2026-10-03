@@ -115,7 +115,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-989` | Sales & Allocation Tracker | B–D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `BO-990` | Maintenance & Out of Service | B–D | 0 | 10 | 6 | 20 | 0 | 2 | — | notStarted (—) |
 | `BO-991` | Seat History | B–D | 0 | 0 | 6 | 3 | 0 | 6 | — | notStarted (—) |
-| `BO-992` | Audit & Reconciliation | B–D | 2 | 21 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-992` | Audit & Reconciliation | B–D | 2 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

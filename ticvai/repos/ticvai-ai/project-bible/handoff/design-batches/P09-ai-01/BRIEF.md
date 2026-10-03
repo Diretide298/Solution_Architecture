@@ -95,7 +95,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-037` | AI Provider & Credentials | A | 60 | 90 | 7 | 13 | 4 | 0 | — | notStarted (generated) |
+| `ADM-037` | AI Provider & Credentials | A | 60 | 74 | 7 | 13 | 4 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

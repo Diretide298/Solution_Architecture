@@ -10,7 +10,7 @@
 | Modules | 1 |
 | Undrawn | 0 |
 | Operations with no screen | 1 |
-| Waves | wave2 7 · wave3 1 |
+| Waves | wave1 3 · wave2 4 · wave3 1 |
 
 ## Gaps
 
@@ -26,24 +26,24 @@
 
 **A platform that sells in one wave and cannot refund until a later one can take money and not give it back.** Not always wrong — worth a look each time.
 
-- **Developer & API** — waves 2, 3
+- **Developer & API** — waves 1, 2, 3
 
 ## Modules
 
 | Module | Screens | Waves |
 |---|---|---|
-| Developer & API | 8 | 2, 3 |
+| Developer & API | 8 | 1, 2, 3 |
 
 ## Screens
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
 | `DEV-001` | API Reference | Developer & API | 2 | 2 | yes |
-| `DEV-002` | Register & Organisation | Developer & API | 2 | 2 | yes |
-| `DEV-003` | Clients & Credentials | Developer & API | 2 | 6 | yes |
+| `DEV-002` | Register & Organisation | Developer & API | 1 | 2 | yes |
+| `DEV-003` | Clients & Credentials | Developer & API | 1 | 6 | yes |
 | `DEV-004` | Sandbox | Developer & API | 2 | 5 | yes |
 | `DEV-005` | Webhooks | Developer & API | 2 | 5 | yes |
 | `DEV-006` | Usage & Limits | Developer & API | 2 | 2 | yes |
 | `DEV-007` | Marketplace Listing | Developer & API | 3 | 2 | yes |
-| `DEV-008` | Programme Administration | Developer & API | 2 | 7 | yes |
+| `DEV-008` | Programme Administration | Developer & API | 1 | 7 | yes |
 

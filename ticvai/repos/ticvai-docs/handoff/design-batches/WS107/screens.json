@@ -53,7 +53,10 @@
     {
      "to": "ADM-462",
      "trigger": "Invoice & Payment Management",
-     "provenance": "structural — pack board 10 wiring, 11 September 2026"
+     "provenance": "structural — pack board 10 wiring, 11 September 2026",
+     "carries": [
+      "invoiceId"
+     ]
     },
     {
      "to": "ADM-463",
@@ -78,7 +81,10 @@
     {
      "to": "ADM-467",
      "trigger": "Discount, Credit & Commercial Override Management",
-     "provenance": "structural — pack board 10 wiring, 11 September 2026"
+     "provenance": "structural — pack board 10 wiring, 11 September 2026",
+     "carries": [
+      "invoiceId"
+     ]
     },
     {
      "to": "ADM-468",
@@ -648,7 +654,9 @@
    "params": [
     {
      "name": "invoiceId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listSubscriptionInvoices` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "tenantId",
@@ -1469,7 +1477,9 @@
    "params": [
     {
      "name": "invoiceId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listCreditNotes` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "tenantId",

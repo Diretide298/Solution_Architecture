@@ -43,12 +43,18 @@
     {
      "to": "ADM-640",
      "trigger": "Recommendation Strategy Manager",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "strategyId"
+     ]
     },
     {
      "to": "ADM-641",
      "trigger": "Recommendation Objective & KPI Configuration",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "strategyId"
+     ]
     },
     {
      "to": "ADM-642",
@@ -58,27 +64,42 @@
     {
      "to": "ADM-643",
      "trigger": "Recommendation Placement & Touchpoint Manager",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "strategyId"
+     ]
     },
     {
      "to": "ADM-644",
      "trigger": "Channel & Journey Strategy Manager",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "strategyId"
+     ]
     },
     {
      "to": "ADM-645",
      "trigger": "Recommendation Priority, Ranking & Suppression Manager17",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "strategyId"
+     ]
     },
     {
      "to": "ADM-646",
      "trigger": "Recommendation Guardrails & Business Controls",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "strategyId"
+     ]
     },
     {
      "to": "ADM-647",
      "trigger": "Recommendation Policy, AI Control & Governance",
-     "provenance": "structural — pack board 1 wiring, 19 September 2026"
+     "provenance": "structural — pack board 1 wiring, 19 September 2026",
+     "carries": [
+      "strategyId"
+     ]
     },
     {
      "to": "ADM-648",
@@ -368,7 +389,9 @@
    "params": [
     {
      "name": "strategyId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRecommendationStrategies` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -551,7 +574,9 @@
    "params": [
     {
      "name": "strategyId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRecommendationStrategies` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -873,7 +898,9 @@
    "params": [
     {
      "name": "strategyId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRecommendationStrategies` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1023,7 +1050,9 @@
    "params": [
     {
      "name": "strategyId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRecommendationStrategies` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1215,7 +1244,9 @@
    "params": [
     {
      "name": "strategyId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRecommendationStrategies` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1360,7 +1391,9 @@
    "params": [
     {
      "name": "strategyId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRecommendationStrategies` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1514,7 +1547,9 @@
    "params": [
     {
      "name": "strategyId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRecommendationStrategies` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

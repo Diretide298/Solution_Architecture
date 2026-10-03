@@ -73,7 +73,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - challengeId<-navigation
   goesTo:
   - SGN-001
   - SGN-003

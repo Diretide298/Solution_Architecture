@@ -176,9 +176,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `WEB-016` | Login / Register | A | 35 | 6 | 6 | 15 | 11 | 0 | guest | review (client-verified) |
-| `WEB-017` | My Account Dashboard | A | 2 | 80 | 6 | 53 | 1 | 0 | guest | review (client-verified) |
-| `WEB-018` | My Tickets | A | 11 | 45 | 6 | 8 | 8 | 0 | guest | review (client-verified) |
-| `WEB-019` | Order History | A | 15 | 79 | 6 | 16 | 2 | 0 | guest | review (client-verified) |
+| `WEB-017` | My Account Dashboard | A | 2 | 74 | 6 | 53 | 1 | 0 | guest | review (client-verified) |
+| `WEB-018` | My Tickets | A | 11 | 37 | 6 | 8 | 8 | 0 | guest | review (client-verified) |
+| `WEB-019` | Order History | A | 15 | 74 | 6 | 16 | 2 | 0 | guest | review (client-verified) |
 | `WEB-020` | Profile & Preferences | A | 16 | 47 | 6 | 15 | 0 | 0 | guest | review (client-verified) |
 
 ---
@@ -195,7 +195,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Account & Self-Service · wave 1 · needs the `core` module |
-| Block | Block A · ticket #17990 (APP-WEB-WEB-016) |
+| Block | Block A · task APP-WEB-WEB-016 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | form (compact density): **A sign-in form, not a list.** Four ways in (a one-time code, a password, Apple or Google, UAE Pass) and a way to register; `getGuestSession` is the one piece of context. Rebuilt 28 September: the … |
@@ -533,7 +533,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Account & Self-Service · wave 1 · needs the `marketing` module |
-| Block | Block A · ticket #17991 (APP-WEB-WEB-017) |
+| Block | Block A · task APP-WEB-WEB-017 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act |
@@ -669,20 +669,14 @@ Errors to draw in the form: 409 Already answered, expired or revoked — the tok
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
 | Kind | chip: Visit, Spend, Ride, Collection, Streak, Referral… | What an entrant does to progress. `scan`, `activity` and `purchase` were added from the BO-825 pack (decided 28 September, audit R275 (c)) … |
-| Scope | chip: Individual, Family, Group, Team | 22.6.7 and 22.6.8. A family challenge is not a per-person challenge counted twice — members contribute toward one shared goal, and a school … |
-| Goal | grouped details | What completes it. |
-| Event | the name it points at, never the id | — |
 | Reward kind | chip: Badge, Loyalty points, Wallet credit, Voucher, Entitlement, None | 22.6.13. A reward that issues wallet credit is money, and it goes through the same stored-value mechanism as everything else rather than a … |
 | Reward value | 1,234 | Points, for `rewardKind: loyaltyPoints` only. A count, not an amount — a money reward is `rewardAmount`, never this. |
 | Reward amount | AED 1,234.50 | The credit, for `rewardKind: walletCredit` only. The shared `Money`, stored as `numeric(18,4)` with currency and scale resolved from the … |
-| Badge image | the image or video | — |
 | Starts at | 1 Oct 2026, 14:30 | — |
 | Ends at | 1 Oct 2026, 14:30 | — |
 | Status | chip: Draft, Active, Paused, Ended, Archived | — |
-| Scope path | text | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it … |
 
 **The wishlist** (detail panel, from `getWishlist`): A shortcut tile with the count; opens WEB-009.
 
@@ -814,7 +808,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (2), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (80 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (74 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-017?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Respond to invitation.
 - [ ] Every transition is wired: `WEB-016`, `WEB-018`, `WEB-019`.
@@ -834,7 +828,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Account & Self-Service · wave 1 · needs the `access` module |
-| Block | Block A · ticket #17992 (APP-WEB-WEB-018) |
+| Block | Block A · task APP-WEB-WEB-018 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act |
@@ -957,14 +951,6 @@ Errors to draw in the form: 409 Ticket already redeemed (`alreadyRedeemed`), alr
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | A UUIDv7, matching `TicketStatus.ticketId` — stable for the life of the ticket and independent of the media carrying it. |
-| Template | the name it points at, never the id | The definition it was issued against. Pinned at issue — a template edited next month must not change what this guest bought. |
-| Product | the name it points at, never the id | — |
-| Order | the name it points at, never the id | The order's id, a UUIDv7 as in `/orders/{orderId}` (`orders.sales_order.id`). |
-| Order line | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | Who holds it. Null is legitimate — a ticket bought as a gift or sold at a till to somebody who gave no details has no subject until it is … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
 | Media code | text | What is scanned — a QR payload, a wristband serial, a card number. Rotatable without reissuing, because a guest whose wristband broke … |
 | Status | chip: Issued, Partially consumed, Fully consumed, Expired, Cancelled, Surrendered | What the storage layer holds, and what a guest is shown. `MediaEntitlements` carried only `isValid` and a reason string — a boolean cannot … |
 | Status note | text | Not `TicketStatus` — that is a validation result with a misleading name, computed at scan time and carrying `isValid` and `isInsideVenue`. |
@@ -983,7 +969,7 @@ Errors to draw in the form: 409 Ticket already redeemed (`alreadyRedeemed`), alr
 | Expires at | 1 Oct 2026, 14:30 | — |
 | Rotation | grouped details | The time-based seed the rotating code is derived from (audit R230). Null for a credential that does not rotate (a wristband serial, a … |
 | Secret | text | Base32 shared secret. Held on the device and in the gates' offline package; replaced by `rotate=true`. |
-| Time step seconds | 1,234 | — |
+| Time step seconds | 1,234 | 30 seconds for an admission QR (Chinmay, 3 October 2026, Block A business rules: GST-055's admission QR rotates every 30 seconds … |
 | Digits | 1,234 | — |
 | Algorithm | chip: SHA1, SHA256, SHA512 | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
@@ -1136,7 +1122,7 @@ Also set there, as content the tenant writes: social links: platform.
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (11), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (45 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (37 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-018?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Transfer order tickets, Issue wallet pass, Share entitlement.
 - [ ] Every transition is wired: `WEB-016`, `WEB-017`, `WEB-019`.
@@ -1157,7 +1143,7 @@ Also set there, as content the tenant writes: social links: platform.
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Account & Self-Service · wave 1 · needs the `ticketing` module |
-| Block | Block A · ticket #17923 (APP-WEB-WEB-019) |
+| Block | Block A · task APP-WEB-WEB-019 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listMyOrders` reads the population and `getOrder` reads one of them — list, select, act |
@@ -1196,7 +1182,6 @@ Also set there, as content the tenant writes: social links: platform.
 | Legal entity | picker: choose a legal entity | — | — | `listCreditMemos` ?legalEntityId |
 | Issued from | date picker | — | — | `listCreditMemos` ?issuedFrom |
 | Issued to | date picker | — | — | `listCreditMemos` ?issuedTo |
-| Language | text field | — | pattern `^[a-z]{2}(-[A-Z]{2})?$` | `getTaxDocumentRendition` ?language |
 
 **Form: Ask for a refund** (modal, opened by *Ask for a refund*; *Create refund request* calls `createRefundRequest`, *Cancel* sends nothing)
 
@@ -1330,18 +1315,13 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Shows | Format | Notes |
 |---|---|---|
 | Order number | text | The number a guest reads and a cashier types. Server-assigned: the venue prefix and a sequence per venue, for example `DXB1-000123` … |
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for … |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
 | Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Net amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Lines | list or chips (count when long) | — |
-| Payments | list or chips (count when long) | — |
-| Charge currency | text | The currency the guest selected and is charged in (CHG-FIN-001, 2 October 2026). |
 | Charge total | AED 1,234.50 | `grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to … |
-| Charge FX rate | text | Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`) … |
 
 **Actions and what each produces**
 
@@ -1361,7 +1341,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 - **View tickets**: Opens My Tickets (WEB-018) on that order. *(source: screens/P01-guest-web-storefront.yaml#WEB-019 transitions)*
 - **Request a refund**: Enters the venue's approval queue; the row shows "Refund requested" until operations approve, reject or ask for more information. *(source: DI-254; contracts/spine/orders.yaml#createRefundRequest)*
 
-**Data it reads**: `listMyOrders` (onLoad, The orders this guest placed); `listTaxInvoices` (onLoad, List tax invoices); `getTaxInvoice` (onLoad, Show a tax invoice); `listCreditMemos` (onLoad, List credit memos); `getTaxDocumentRendition` (onLoad, Download the invoice / credit memo PDF)
+**Data it reads**: `listMyOrders` (onLoad, The orders this guest placed); `listTaxInvoices` (onLoad, List tax invoices); `getTaxInvoice` (onLoad, Show a tax invoice); `listCreditMemos` (onLoad, List credit memos)
 
 **Where the user goes next**
 
@@ -1468,7 +1448,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (15), with its required mark, default, format and its error state (403, 404, 409, 422).
-- [ ] Every output is drawn (79 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (74 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-019?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Download or email the PDF, Ask for a refund, Get a tax invoice.
 - [ ] Every transition is wired: `WEB-016`, `WEB-017`, `WEB-018`.
@@ -1488,7 +1468,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Account & Self-Service · wave 1 · needs the `marketing` module |
-| Block | Block A · ticket #17993 (APP-WEB-WEB-020) |
+| Block | Block A · task APP-WEB-WEB-020 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listConsentPurposes` reads the population and `getGuestProfile` reads one of them — list, select, act |
@@ -1513,7 +1493,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 **Form: Save guest preferences** (modal, opened by *Save guest preferences*; *Save guest preferences* calls `updateGuestPreferences`, *Cancel* sends nothing)
 
-**Collects what `updateGuestPreferences` sends before it is called.** Nothing in the body is required. Optional: `id`, `subjectId`, `seatingPreference`, `drinkPreferences`, `dietary`, `accessibility`, `preferredChannel`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `updateGuestPreferences` sends before it is called.** Nothing in the body is required. Optional: `seatingPreference`, `drinkPreferences`, `dietary`, `accessibility`, `preferredChannel`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `subjectId` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

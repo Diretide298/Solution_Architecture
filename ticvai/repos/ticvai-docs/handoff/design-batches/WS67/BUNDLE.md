@@ -102,16 +102,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ANL-021` | Dashboard Library | B–D | 0 | 62 | 6 | 18 | 2 | 0 | — | notStarted (—) |
-| `ANL-022` | Dashboard Creation Wizard | B–D | 18 | 0 | 5 | 18 | 1 | 0 | — | notStarted (—) |
-| `ANL-023` | Drag-and-Drop Dashboard Canvas | A | 20 | 33 | 6 | 0 | 3 | 0 | — | notStarted (—) |
-| `ANL-024` | Widget & Visualization Library | B–D | 0 | 12 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ANL-021` | Dashboard Library | D | 0 | 62 | 6 | 18 | 2 | 0 | — | notStarted (—) |
+| `ANL-022` | Dashboard Creation Wizard | D | 18 | 0 | 5 | 18 | 1 | 0 | — | notStarted (—) |
+| `ANL-023` | Drag-and-Drop Dashboard Canvas | A | 37 | 33 | 6 | 18 | 3 | 0 | — | notStarted (—) |
+| `ANL-024` | Widget & Visualization Library | D | 0 | 12 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `ANL-025` | KPI Builder | A | 22 | 7 | 5 | 0 | 1 | 0 | — | notStarted (—) |
-| `ANL-026` | Targets, Thresholds & KPI Status Rules | B–D | 0 | 16 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `ANL-027` | Data & Filter Configuration | B–D | 18 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `ANL-028` | Drill-Down & Interaction Designer | B–D | 9 | 0 | 5 | 0 | 3 | 0 | — | notStarted (—) |
-| `ANL-029` | Dashboard Access, Publishing & Versioning | B–D | 0 | 12 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `ANL-030` | Dashboard Preview, Validation & Health | B–D | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-026` | Targets, Thresholds & KPI Status Rules | D | 0 | 16 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ANL-027` | Data & Filter Configuration | D | 18 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ANL-028` | Drill-Down & Interaction Designer | D | 9 | 0 | 5 | 0 | 3 | 0 | — | notStarted (—) |
+| `ANL-029` | Dashboard Access, Publishing & Versioning | D | 0 | 12 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `ANL-030` | Dashboard Preview, Validation & Health | D | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -131,7 +131,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-021 |
 | Who uses it | venue staff holding `REPORT_MANAGE`, `REPORT_VIEW_VENUE` (1 configure, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display dashboard cards/table containing; Dashboard Categories; Dashboard Types) and no metric row |
@@ -418,7 +418,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-022 |
 | Who uses it | venue staff holding `REPORT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Select; Select one or multiple domains) and no display directory — it is settings, not a population |
@@ -601,8 +601,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
-| Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | Block A · ticket #20782 (APP-SETUP-ANL-023) |
+| Module | Analytics · wave 1 · needs the `analytics` module |
+| Block | Block A · task APP-SETUP-ANL-023 |
 | Who uses it | venue staff holding `REPORT_MANAGE`, `REPORT_VIEW_VENUE` (1 configure, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): A canvas edited and saved as a whole (`updateDashboard` replaces the tiles), drawn 2 October 2026 from the client's dashboard specification (MATRIX 8.7.12: grid, gallery, data pane, field wells … |
@@ -669,7 +669,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Width `tiles[].position.width` | number field | required | — | — | — | — | `updateDashboard` body |
 | Height `tiles[].position.height` | number field | required | — | — | — | — | `updateDashboard` body |
 
-Errors to draw in the form: 409 Moving a dashboard to a module the caller is not entitled to. The same guard as `createDashboard` — without it, an update would be the way round the create …; 422 A tile's report lacks the column encodings its visualisation needs (problem type `tile-encoding-missing`, CHG-FIN-007), as `createDashboard`.
+Errors to draw in the form: 400 The tiles' refreshes per minute exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (proposed default 24, audit R094), as on `createDashboard` …; 409 Moving a dashboard to a module the caller is not entitled to. The same guard as `createDashboard` — without it, an update would be the way round the create …; 422 A tile's report lacks the column encodings its visualisation needs (problem type `tile-encoding-missing`, CHG-FIN-007), as `createDashboard`.
 
 **Form: Archive dashboard** (confirmDialog, opened by *Archive dashboard*; *Archive dashboard* calls `deleteDashboard`, *Cancel* sends nothing)
 
@@ -678,6 +678,32 @@ Names the dashboard and its tile count; archived dashboards leave the library un
 Sends no fields: a confirmation, not a form.
 
 Errors to draw in the form: 409 The dashboard is shared. Un-share it first.
+
+**Form: Save dashboard** (modal, opened by *Save dashboard*; *Create dashboard* calls `createDashboard`, *Keep editing* sends nothing)
+
+**The first Save of a new dashboard** (decided by Chinmay, 3 October 2026 (CHG-SPF-011)): names it and creates it with `createDashboard`, tiles and all; every later Save goes straight to `updateDashboard`. The refresh budget is checked here too. Dismissing sends nothing; the canvas keeps its tiles.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Name `name` | text field | required | — | max length 200 | — | — | `createDashboard` body |
+| Module `module` | field | required | — | — | — | Which module this dashboard belongs to, and therefore who may see it. Added 22 September for the command centre: one shell that shows each login the dashboards of the modules it … | `createDashboard` body |
+| Description `description` | text area | optional | — | max length 1000 | — | — | `createDashboard` body |
+| Venue `venueId` | picker: choose a venue | optional | — | — | shows names, sends the id | Narrows every tile to one venue. Omitting it shows each viewer everything their own scope permits — it can never show a viewer beyond that. | `createDashboard` body |
+| Is shared `isShared` | toggle | optional | off | — | — | — | `createDashboard` body |
+| Tiles `tiles` | repeatable rows | required | — | at least 1; at most 24 | — | — | `createDashboard` body |
+| ID `tiles[].id` | picker: choose an id | required | — | — | shows names, sends the id | — | `createDashboard` body |
+| Title `tiles[].title` | text field | optional | — | — | — | — | `createDashboard` body |
+| Report `tiles[].reportId` | picker: choose a report | required | — | — | shows names, sends the id | — | `createDashboard` body |
+| Visualisation `tiles[].visualisation` | select | required | — | Number · Line · Area · Bar · Stacked bar · Stacked bar100 · Combo · Pie · Donut · Table · Matrix · Gauge … | — | Extended 22 September from eight marks to twenty against `Ticketing_Platform_Native_Dashboard_Visualization_Requirements.pdf`, which names eighteen components and marks every one … | `createDashboard` body |
+| Parameters `tiles[].parameters` | key and value settings | optional | — | — | — | Open on purpose, and not yet specified. Holds the tile's run parameters (keyed by the report's `ReportParameter.key`, as `RunReportRequest.parameters`) and its display settings — … | `createDashboard` body |
+| Refresh seconds `tiles[].refreshSeconds` | number field (seconds) | optional | — | min 30 | — | Minimum thirty seconds. A tile refreshing every second is a load problem wearing a convenience costume. | `createDashboard` body |
+| Position `tiles[].position` | group | required | — | — | — | — | `createDashboard` body |
+| Row `tiles[].position.row` | number field | required | — | — | — | — | `createDashboard` body |
+| Column `tiles[].position.column` | number field | required | — | — | — | — | `createDashboard` body |
+| Width `tiles[].position.width` | number field | required | — | — | — | — | `createDashboard` body |
+| Height `tiles[].position.height` | number field | required | — | — | — | — | `createDashboard` body |
+
+Errors to draw in the form: 400 The tiles' refreshes per minute exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (proposed default 24, audit R094); 409 The caller is not entitled to the dashboard's module — the tenant has not licensed it, or the principal holds no permission in it.; 422 A tile's report lacks the column encodings its visualisation needs (problem type `tile-encoding-missing`, CHG-FIN-007; the rule is on …
 
 **Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
 
@@ -749,7 +775,7 @@ Errors to draw in the form: 409 The dashboard is shared. Un-share it first.
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save dashboard (primary button) | `updateDashboard` PUT `/dashboards/{dashboardId}` | CreateDashboardRequest | Dashboard | 409 Moving a dashboard to a module the caller is not entitled to. The same guard as `createDashboard` — without it, an update would be the way round the create …; 422 A tile's report lacks the column encodings its … | opens confirmDialog first |
+| Save dashboard (primary button) | `updateDashboard` PUT `/dashboards/{dashboardId}` | CreateDashboardRequest | Dashboard | 400 The tiles' refreshes per minute exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (proposed default 24, audit R094), as on `createDashboard` …; 409 Moving a dashboard to a module the caller is not … | opens confirmDialog first |
 | Undo (icon button) | navigation or local | — | — | — | — |
 | Redo (icon button) | navigation or local | — | — | — | — |
 | Cancel (secondary button) | navigation or local | — | — | — | — |
@@ -778,9 +804,9 @@ Errors to draw in the form: 409 The dashboard is shared. Un-share it first.
 | Error (`?state=error`) | Could not load. Names which read failed (the dashboard or a report) and leaves the canvas as it was. |
 | Empty, first run (`?state=emptyFirstRun`) | A new dashboard with no tiles yet. The gallery is open and says "Drag a visual onto the grid"; nothing is created until Save dashboard. |
 | Empty, no results (`?state=emptyNoResults`) | The report search matched nothing. Names the search and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_MANAGE`, which saving requires; the dashboard opens read-only and names that permission. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listReports` requires to show this screen, and names that permission. A caller without `REPORT_MANAGE` sees the dashboard read-only: Save (`createDashboard`, `updateDashboard`) and Archive (`deleteDashboard`) are disabled and name that permission (decided by Chinmay, 3 October 2026 (CHG-SPF-011)). |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Moving a dashboard to a module the caller is not entitled to. The same guard as `createDashboard` — without it, an update would be the way round the create …; 409 The dashboard is shared. Un-share it first.; 422 A tile's report lacks the column encodings its visualisation needs (problem type `tile-encoding-missing`, CHG-FIN-007), as `createDashboard`. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 The tiles' refreshes per minute exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (proposed default 24, audit R094); 400 The tiles' refreshes per minute exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (proposed default 24, audit R094), as on `createDashboard` …; 409 Moving a dashboard to a module the caller is not entitled to. The same guard as … |
 
 #### Edge cases to draw
 
@@ -814,14 +840,31 @@ tiles:
 - `recordDashboardView` → `REPORT_VIEW_VENUE` (operate) · staff
 - `listReports` → `REPORT_VIEW_VENUE` (operate) · staff, partner
 - `getReport` → `REPORT_VIEW_VENUE` (operate) · staff, partner
+- `createDashboard` → `REPORT_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `REPORT_MANAGE`, which saving requires; the dashboard opens read-only and names that permission.
+**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listReports` requires to show this screen, and names that permission. A caller without `REPORT_MANAGE` sees the dashboard read-only: Save (`createDashboard`, `updateDashboard`) and Archive (`deleteDashboard`) are disabled and name that permission (decided by Chinmay, 3 October 2026 (CHG-SPF-011)).
 
 Screen guard: `REPORT_MANAGE`
 
 #### Requirements it meets
 
-No matrix row traces to this screen's operations or data.
+18 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+
+| Ref | Requirement (shortened) | Domain | Verdict | Via |
+|---|---|---|---|---|
+| 1.2.79 | System shall monitor operational service levels. | Ticketing Catalogue | CONTRACTED | `createDashboard` |
+| 1.3.27 | System shall provide real-time dashboards showing attendance, check-ins, occupancy, sales, capacity utilization and operational KPIs. | Ticketing Catalogue | CONTRACTED | `createDashboard` |
+| 1.3.28 | System shall provide event performance analytics including attendance, revenue, conversion rates, capacity utilization and customer engagement. | Ticketing Catalogue | CONTRACTED | `createDashboard` |
+| 8.7.1 | System shall provide executive dashboards. | Unified Operations Dashboard | CONTRACTED | `createDashboard` |
+| 8.7.2 | System shall provide operational dashboards. | Unified Operations Dashboard | CONTRACTED | `createDashboard` |
+| 8.7.3 | System shall provide financial dashboards. | Unified Operations Dashboard | CONTRACTED | `createDashboard` |
+| 8.7.4 | System shall provide sales dashboards. | Unified Operations Dashboard | CONTRACTED | `createDashboard` |
+| 8.7.5 | System shall provide marketing dashboards. | Unified Operations Dashboard | CONTRACTED | `createDashboard` |
+| 8.7.6 | System shall provide ticketing dashboards. | Unified Operations Dashboard | CONTRACTED | `createDashboard` |
+| 8.7.7 | System shall provide access control dashboards. | Unified Operations Dashboard | CONTRACTED | `createDashboard` |
+| 8.7.8 | System shall provide membership dashboards. | Unified Operations Dashboard | CONTRACTED | `createDashboard` |
+| 8.7.9 | System shall provide loyalty dashboards. | Unified Operations Dashboard | CONTRACTED | `createDashboard` |
+| … 6 more | | | | `traceability.json` |
 
 #### Client meeting inputs
 
@@ -846,7 +889,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (20), with its required mark, default, format and its error state (403, 404, 409, 422).
+- [ ] Every input above is drawn (37), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
 - [ ] Every output is drawn (33 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-023?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save dashboard, Undo, Redo, Cancel, Archive dashboard.
@@ -867,7 +910,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-024 |
 | Who uses it | venue staff holding `REPORT_VIEW_TENANT` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§KPI Components) and no metric row |
@@ -1032,8 +1075,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
-| Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | Block A · ticket #20783 (APP-SETUP-ANL-025) |
+| Module | Analytics · wave 1 · needs the `analytics` module |
+| Block | Block A · task APP-SETUP-ANL-025 |
 | Who uses it | venue staff holding `REPORT_MANAGE`, `REPORT_VIEW_TENANT` (1 configure, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Define whether) and no display directory — it is settings, not a population |
@@ -1136,7 +1179,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Loading (`?state=loading`) | The KPIs already defined. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the form untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | Only the seeded KPIs exist (takings, admissions and the finance measures). Offers Create KPI (`createKpi`) for the tenant's first own KPI. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_MANAGE`, which `createKpi` requires; the KPI list stays readable and the form names that permission. |
+| Permission denied (`?state=emptyNoAccess`) | Without `REPORT_VIEW_TENANT`, which `listKpis` requires, the screen does not load and this state names that permission. Shown when the caller lacks `REPORT_MANAGE`, which `createKpi` requires; the KPI list stays readable and the form names that permission. |
 | Offline (`?state=offline`) | online only |
 
 #### Edge cases to draw
@@ -1165,7 +1208,7 @@ kpis:
 - `listKpis` → `REPORT_VIEW_TENANT` (operate) · staff
 - `createKpi` → `REPORT_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `REPORT_MANAGE`, which `createKpi` requires; the KPI list stays readable and the form names that permission.
+**A refused user sees:** Without `REPORT_VIEW_TENANT`, which `listKpis` requires, the screen does not load and this state names that permission. Shown when the caller lacks `REPORT_MANAGE`, which `createKpi` requires; the KPI list stays readable and the form names that permission.
 
 Screen guard: `REPORT_VIEW_TENANT`
 
@@ -1214,7 +1257,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-026 |
 | Who uses it | venue staff holding `REPORT_MANAGE`, `REPORT_VIEW_TENANT` (1 configure, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§For each KPI) and no metric row |
@@ -1415,7 +1458,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-027 |
 | Who uses it | venue staff holding `REPORT_MANAGE`, `REPORT_VIEW_TENANT` (1 configure, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Select; Configure) and no display directory — it is settings, not a population |
@@ -1498,7 +1541,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the data filter are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Moving a dashboard to a module the caller is not entitled to. The same guard as `createDashboard` — without it, an update would be the way round the create …; 422 A tile's report lacks the column encodings its visualisation needs (problem type `tile-encoding-missing`, CHG-FIN-007), as `createDashboard`. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 The tiles' refreshes per minute exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (proposed default 24, audit R094), as on `createDashboard` …; 409 Moving a dashboard to a module the caller is not entitled to. The same guard as `createDashboard` — without it, an update would be the way round the create …; 422 A tile's report lacks the column encodings its visualisation needs … |
 
 #### Edge cases to draw
 
@@ -1569,7 +1612,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (409, 422).
+- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (400, 409, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-027?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -1591,7 +1634,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-028 |
 | Who uses it | venue staff holding `REPORT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Define) and no display directory — it is settings, not a population |
@@ -1660,7 +1703,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Empty, first run (`?state=emptyFirstRun`) | No drill-down interaction designer configured yet. Carries the create action and says what the platform does in the meantime. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Moving a dashboard to a module the caller is not entitled to. The same guard as `createDashboard` — without it, an update would be the way round the create …; 422 A tile's report lacks the column encodings its visualisation needs (problem type `tile-encoding-missing`, CHG-FIN-007), as `createDashboard`. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 The tiles' refreshes per minute exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (proposed default 24, audit R094), as on `createDashboard` …; 409 Moving a dashboard to a module the caller is not entitled to. The same guard as `createDashboard` — without it, an update would be the way round the create …; 422 A tile's report lacks the column encodings its visualisation needs … |
 
 #### Edge cases to draw
 
@@ -1732,7 +1775,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (409, 422).
+- [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 409, 422).
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-028?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -1754,7 +1797,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-029 |
 | Who uses it | venue staff holding `REPORT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1840,7 +1883,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Empty, no results (`?state=emptyNoResults`) | The filter narrowed it and the access publishing versioning are still there. Names the active filter and offers to clear it. |
 | Permission denied (`?state=emptyNoAccess`) | Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Moving a dashboard to a module the caller is not entitled to. The same guard as `createDashboard` — without it, an update would be the way round the create …; 422 A tile's report lacks the column encodings its visualisation needs (problem type `tile-encoding-missing`, CHG-FIN-007), as `createDashboard`. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 The tiles' refreshes per minute exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (proposed default 24, audit R094), as on `createDashboard` …; 409 Moving a dashboard to a module the caller is not entitled to. The same guard as `createDashboard` — without it, an update would be the way round the create …; 422 A tile's report lacks the column encodings its visualisation needs … |
 
 #### Edge cases to draw
 
@@ -1914,7 +1957,7 @@ Also apply: 1 for P16 · Analytics, 14 for all of P16, 29 for every app (section
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (409, 422).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 409, 422).
 - [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-029?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
@@ -1936,7 +1979,7 @@ Also apply: 1 for P16 · Analytics, 14 for all of P16, 29 for every app (section
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-030 |
 | Who uses it | venue staff holding `REPORT_VIEW_TENANT`, `REPORT_VIEW_VENUE` (2 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |

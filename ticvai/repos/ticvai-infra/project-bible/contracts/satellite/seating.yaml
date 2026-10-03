@@ -1242,10 +1242,17 @@ paths:
         **Not offline-capable.** Seated inventory cannot be leased, so a terminal without a connection
         cannot sell seats.
 
+        **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026,
+        Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets the seat availability of
+        a published performance, and nothing in draft, unpublished or withdrawn; asked for by id, such a
+        record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see
+        drafts (ADR-0025).
+
         '
       tags:
       - availability
       x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-guest-callable: true
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1321,10 +1328,16 @@ paths:
         and nothing is held. Staff and POS sales keep at most 10 seats per sale (audit R080 (c)),
         refused the same way.
 
+        **A guest does this within their own session** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-003;
+        `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own
+        cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to
+        do it for a guest at a till or in the back office (ADR-0025).
+
         '
       tags:
       - hold
       x-ticvai-permission: ORDER_CREATE
+      x-ticvai-guest-callable: true
       x-ticvai-scope-level: venue
       x-ticvai-lock: rowExclusive
       x-ticvai-lock-excludes:
@@ -1479,7 +1492,6 @@ paths:
         format: uuid
     post:
       operationId: extendSeatHold
-      x-ticvai-consumed-by: []
       x-ticvai-audience:
       - staff
       summary: Extend a hold
@@ -1826,10 +1838,16 @@ paths:
         Returns contiguous groups where the party requires them — a family of four split across two rows
         is a complaint, not a booking.
 
+        **A guest does this within their own session** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-003;
+        `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own
+        cart, hold, order or payment in their own session. `PRODUCT_VIEW` is what a staff caller must hold to
+        do it for a guest at a till or in the back office (ADR-0025).
+
         '
       tags:
       - recommendation
       x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-guest-callable: true
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins

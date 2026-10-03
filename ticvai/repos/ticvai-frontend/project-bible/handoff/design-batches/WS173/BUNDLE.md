@@ -1061,6 +1061,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - Client workshop board: `wireframes/WS148 Seat Management Venue Mapping Reference v1.0 Board 9.dc.html#bo-1039`
 - Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 9
 - Flow F282 *Seat Management Venue Mapping Reference v1.0 board 9: Recommendation Command …*, step 12: Works in Seat Upgrade Recommendations → Offer an eligible higher-value alternative before or after purchase. Compare current and candidate seat on view, distance, level, amenities, accessibility and price difference. Apply membership …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1217,6 +1218,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS148 Seat Management Venue Mapping Reference v1.0 Board 9.dc.html#bo-1040`
 - Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 9
 - Flow F282 *Seat Management Venue Mapping Reference v1.0 board 9: Recommendation Command …*, step 14: Works in Alternatives & Reseating → Provide comparable options when selected or issued seats become unavailable. Rank same-price, better-price, better-view, same-section, accessible and adjacent alternatives. Support operational …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 

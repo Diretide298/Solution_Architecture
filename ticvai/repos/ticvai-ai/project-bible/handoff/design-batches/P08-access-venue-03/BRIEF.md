@@ -135,7 +135,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-097` | Check Out & Check In | B–D | 24 | 20 | 5 | 25 | 0 | 0 | — | notStarted (generated) |
 | `BO-098` | Qualifications | B–D | 15 | 7 | 5 | 9 | 0 | 0 | — | notStarted (generated) |
 | `BO-099` | Performance Manifest | B–D | 2 | 8 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
-| `BO-103` | Access & Venue | B–D | 2 | 46 | 6 | 13 | 0 | 0 | — | notStarted (generated) |
+| `BO-103` | Access & Venue | B–D | 2 | 22 | 6 | 13 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

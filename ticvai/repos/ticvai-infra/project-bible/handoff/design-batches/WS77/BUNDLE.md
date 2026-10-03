@@ -96,16 +96,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `CMS-091` | Asset Distribution & Delivery Command Center | B–D | 0 | 48 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `CMS-092` | Asset Usage & Distribution Map | B–D | 0 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `CMS-093` | Channel & Distribution Configuration | B–D | 13 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `CMS-094` | Secure Delivery URL, CDN & Rendition Delivery | B–D | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
-| `CMS-095` | Asset Replacement & Propagation Management | B–D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `CMS-096` | Fallback, Expiry & Distribution Continuity | B–D | 1 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
-| `CMS-097` | DAM API & Integration Hub | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `CMS-098` | Delivery Monitoring & Integration Health | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `CMS-099` | Asset Usage & Performance Analytics | B–D | 0 | 6 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `CMS-100` | Distribution Intelligence, AI Insights & Optimization | B–D | 1 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `CMS-091` | Asset Distribution & Delivery Command Center | B | 0 | 48 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `CMS-092` | Asset Usage & Distribution Map | B | 0 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `CMS-093` | Channel & Distribution Configuration | B | 13 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `CMS-094` | Secure Delivery URL, CDN & Rendition Delivery | B | 0 | 0 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `CMS-095` | Asset Replacement & Propagation Management | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `CMS-096` | Fallback, Expiry & Distribution Continuity | B | 1 | 0 | 6 | 3 | 1 | 0 | — | notStarted (—) |
+| `CMS-097` | DAM API & Integration Hub | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `CMS-098` | Delivery Monitoring & Integration Health | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `CMS-099` | Asset Usage & Performance Analytics | B | 0 | 6 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `CMS-100` | Distribution Intelligence, AI Insights & Optimization | B | 1 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -125,7 +125,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Media Library · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CMS-CMS-091 |
 | Who uses it | venue staff holding `ASSET_LIBRARY_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display; Show) and no metric row |
@@ -349,7 +349,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Media Library · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CMS-CMS-092 |
 | Who uses it | venue staff holding `ASSET_LIBRARY_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -508,7 +508,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Media Library · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CMS-CMS-093 |
 | Who uses it | venue staff holding `ASSET_LIBRARY_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -629,7 +629,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Media Library · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CMS-CMS-094 |
 | Who uses it | venue staff holding `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -750,7 +750,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Media Library · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CMS-CMS-095 |
 | Who uses it | venue staff holding `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -880,7 +880,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Media Library · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CMS-CMS-096 |
 | Who uses it | venue staff holding `ASSET_LIBRARY_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configured Fallback) and no display directory — it is settings, not a population |
@@ -1001,7 +1001,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Media Library · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CMS-CMS-097 |
 | Who uses it | venue staff holding `ASSET_LIBRARY_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1117,7 +1117,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Media Library · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CMS-CMS-098 |
 | Who uses it | venue staff holding `ASSET_LIBRARY_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Display; Detect) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -1250,7 +1250,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Media Library · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CMS-CMS-099 |
 | Who uses it | venue staff holding `ASSET_LIBRARY_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Performance Metrics) and a per-row directory (§Display; Identify) — counts over a population, then the population |
@@ -1398,7 +1398,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P13 Venue CMS (web) |
 | Module | Media Library · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CMS-CMS-100 |
 | Who uses it | venue staff holding `ASSET_LIBRARY_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area, with a live preview of … · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Select DAM Asset) and no display directory — it is settings, not a population |

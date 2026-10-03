@@ -189,17 +189,12 @@
        "kind": "dataTable",
        "label": "Every rules workflow",
        "columns": [
-        "RulesWorkflowCommandCenterView.ruleWorkflowId",
         "RulesWorkflowCommandCenterView.name",
         "RulesWorkflowCommandCenterView.type",
         "RulesWorkflowCommandCenterView.sourceModule",
         "RulesWorkflowCommandCenterView.businessProcess",
-        "RulesWorkflowCommandCenterView.version",
-        "RulesWorkflowCommandCenterView.owner",
         "RulesWorkflowCommandCenterView.effectiveDate",
-        "RulesWorkflowCommandCenterView.status",
-        "RulesWorkflowCommandCenterView.lastModified",
-        "RulesWorkflowCommandCenterView.usage"
+        "RulesWorkflowCommandCenterView.status"
        ],
        "bindsTo": "RulesWorkflowCommandCenterView",
        "operation": "listRuleWorkflow",
@@ -216,17 +211,14 @@
        "label": "The selected rules workflow",
        "bindsTo": "RulesWorkflowCommandCenterView",
        "columns": [
-        "RulesWorkflowCommandCenterView.ruleWorkflowId",
         "RulesWorkflowCommandCenterView.name",
         "RulesWorkflowCommandCenterView.type",
         "RulesWorkflowCommandCenterView.sourceModule",
         "RulesWorkflowCommandCenterView.businessProcess",
-        "RulesWorkflowCommandCenterView.version",
         "RulesWorkflowCommandCenterView.owner",
         "RulesWorkflowCommandCenterView.effectiveDate",
         "RulesWorkflowCommandCenterView.status",
-        "RulesWorkflowCommandCenterView.lastModified",
-        "RulesWorkflowCommandCenterView.usage"
+        "RulesWorkflowCommandCenterView.lastModified"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Classify as”.",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 5 §Each configuration should show"
@@ -870,7 +862,7 @@
   "name": "Roles, Authority, Delegation & Approval Limits",
   "module": "Platform",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Rules__Workflow__Approval___Automation_Engine_Reference.pdf",
    "board": "1",
@@ -881,7 +873,8 @@
    "app": "venue-management-web",
    "route": "/approvals/approval-delegations/roles-authority-delegation-approval-limits-adm-243",
    "component": "apps/venue-management-web/src/routes/approvals/ApprovalDelegations.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-087"
   },
   "navigation": {
    "entryFrom": [
@@ -902,7 +895,10 @@
     {
      "to": "BO-087",
      "trigger": "Open Approval Delegations",
-     "provenance": "a section of BO-087 since 2 October 2026 (CHG-MOV-002)"
+     "provenance": "a section of BO-087 since 2 October 2026 (CHG-MOV-002)",
+     "carries": [
+      "delegationId"
+     ]
     }
    ]
   },
@@ -1089,7 +1085,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/approval-sla-policy-configuration-bo-388/sla-escalation-reminder-timeout-rules-adm-244",
    "component": "apps/venue-management-web/src/routes/venue-operations/ApprovalSlaPolicyConfiguration.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-388"
   },
   "navigation": {
    "entryFrom": [
@@ -1734,7 +1731,9 @@
    "params": [
     {
      "name": "challengeId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`; a link or an edge that holds one opens it instead."
     }
    ]
   },

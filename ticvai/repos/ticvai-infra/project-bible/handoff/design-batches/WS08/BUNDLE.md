@@ -136,7 +136,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-219` | Re-entry & Temporary Exit Journey | B–D | 4 | 0 | 5 | 9 | 0 | 6 | — | notStarted (generated) |
 | `BO-220` | Multi-Park & Crossover Journey Orchestrator | B–D | 47 | 0 | 6 | 9 | 0 | 6 | — | notStarted (generated) |
 | `BO-221` | Fast Pass & Attraction Access Journey | B–D | 27 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-222` | Special Event, Free View & Alternative Admission | A | 15 | 0 | 5 | 1 | 0 | 0 | — | notStarted (generated) |
+| `BO-222` | Special Event, Free View & Alternative Admission | C | 15 | 0 | 5 | 1 | 0 | 0 | — | notStarted (generated) |
 | `BO-223` | Journey Simulation, Audit & Publication | B–D | 8 | 26 | 6 | 9 | 0 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
@@ -505,8 +505,8 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 - → `BO-216` Group Leader & Fast B2B Validation: *Works in Group Leader & Fast B2B Validation*; calls `listGuestJourney`
 - → `BO-217` Group Attendance & Partial Entry Manager: *Works in Group Attendance & Partial Entry Manager*; calls `listGuestJourney`
 - → `BO-218` Family, Child, POD & Companion Journey: *Works in Family, Child, POD & Companion Journey*; calls `listGuestJourney`
-- → `BO-219` Re-entry & Temporary Exit Journey: *Works in Re-entry & Temporary Exit Journey*; calls `listGuestJourney`
-- → `BO-220` Multi-Park & Crossover Journey Orchestrator: *Works in Multi-Park & Crossover Journey Orchestrator*; calls `listGuestJourney`
+- → `BO-219` Re-entry & Temporary Exit Journey: *Works in Re-entry & Temporary Exit Journey*; carries `profileId`; calls `listGuestJourney`
+- → `BO-220` Multi-Park & Crossover Journey Orchestrator: *Works in Multi-Park & Crossover Journey Orchestrator*; carries `profileId`; calls `listGuestJourney`
 - → `BO-221` Fast Pass & Attraction Access Journey: *Works in Fast Pass & Attraction Access Journey*; calls `listGuestJourney`
 - → `BO-222` Special Event, Free View & Alternative Admission: *Works in Special Event, Free View & Alternative Admission*; calls `listGuestJourney`
 - → `BO-223` Journey Simulation, Audit & Publication: *Works in Journey Simulation, Audit & Publication*; calls `listGuestJourney`
@@ -1853,6 +1853,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - Client workshop board: `wireframes/WS25 Access Control Board 8.dc.html#bo-221`
 - Workshop pack: Access Control Module_Reference.pdf board 8
 - Flow F118 *Access Control board 8: Guest Journey Command Center*, step 14: Works in Fast Pass & Attraction Access Journey → Configure the operational experience for limited and unlimited priority-access entitlements. The matrix requires Silver Fast Pass to support three accesses and Gold to support unlimited access with …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1877,7 +1878,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | Block A · ticket #20680 (APP-SETUP-BO-222) |
+| Block | Block C · task APP-SETUP-BO-222 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |

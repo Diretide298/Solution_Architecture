@@ -131,16 +131,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-034` | Scan Activity | B–D | 7 | 27 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
-| `BO-035` | Override Audit | B–D | 7 | 34 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
+| `BO-034` | Scan Activity | B–D | 7 | 10 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
+| `BO-035` | Override Audit | B–D | 7 | 17 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
 | `BO-038` | Reconciliation Queue | B–D | 3 | 20 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-069` | Asset Register | B–D | 42 | 36 | 6 | 23 | 3 | 0 | — | notStarted (generated) |
-| `BO-071` | Planned Maintenance | B–D | 21 | 32 | 6 | 5 | 2 | 2 | — | notStarted (generated) |
-| `BO-072` | Incident Log | B–D | 31 | 44 | 6 | 10 | 0 | 0 | — | notStarted (generated) |
-| `BO-092` | Venue Maps | A | 14 | 26 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-069` | Asset Register | B–D | 42 | 22 | 6 | 23 | 3 | 0 | — | notStarted (generated) |
+| `BO-071` | Planned Maintenance | B–D | 21 | 21 | 6 | 5 | 2 | 2 | — | notStarted (generated) |
+| `BO-072` | Incident Log | B–D | 35 | 22 | 6 | 10 | 0 | 0 | — | notStarted (generated) |
+| `BO-092` | Venue Maps | A | 14 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-093` | Map Import & Labelling | A | 66 | 27 | 6 | 4 | 3 | 0 | — | notStarted (generated) |
 | `BO-094` | Map Editor & Publish | A | 57 | 9 | 5 | 13 | 3 | 0 | — | notStarted (generated) |
-| `BO-095` | Resources | B–D | 26 | 27 | 6 | 19 | 1 | 0 | — | notStarted (generated) |
+| `BO-095` | Resources | B–D | 26 | 13 | 6 | 19 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -206,36 +206,19 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The scan's client-generated UUIDv7, the key offline replay deduplicates on. |
-| Access point | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Ticket | the name it points at, never the id | The `Entitlement.id` scanned; null where the media resolved to nothing. |
 | Media code | text | — |
 | Outcome | chip: Admitted, Denied, Overridden | — |
-| Deny reason | chip: Not found, Not yet valid, Expired, Already used, Reentry limit reached, Exit … | Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a … |
-| Direction | chip: Entry, Exit, Reentry, Crossover | — |
-| Operator principal | the name it points at, never the id | — |
-| Device | the name it points at, never the id | — |
-| Overrides scan | the name it points at, never the id | Set only on an override row, naming the denied scan it admits against (decided 28 September, audit R228). |
 
 **The selected scan event** (detail panel, from `listScans`): **An override is its own row** (decided 28 September, audit R228): outcome `overridden`, `operatorPrincipalId` is the supervisor who overrode, and `overridesScanId` links it to the denied scan, which is never updated. Selecting either row shows the other.
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The scan's client-generated UUIDv7, the key offline replay deduplicates on. |
-| Access point | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Ticket | the name it points at, never the id | The `Entitlement.id` scanned; null where the media resolved to nothing. |
 | Media code | text | — |
 | Outcome | chip: Admitted, Denied, Overridden | — |
 | Deny reason | chip: Not found, Not yet valid, Expired, Already used, Reentry limit reached, Exit … | Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a … |
 | Direction | chip: Entry, Exit, Reentry, Crossover | — |
 | Operator principal | the name it points at, never the id | — |
-| Device | the name it points at, never the id | — |
 | Overrides scan | the name it points at, never the id | Set only on an override row, naming the denied scan it admits against (decided 28 September, audit R228). |
-| Override reason | text | The supervisor's justification, on the override row only. The overriding principal is that row's `operatorPrincipalId`. |
 | Recorded at | 1 Oct 2026, 14:30 | — |
 | Synced at | 1 Oct 2026, 14:30 | Null while pending. Differs from recordedAt for offline scans. |
 
@@ -266,7 +249,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the scan activity untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No scan activity yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the scan activity are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP` for `lookupTicket`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither mediaCode nor ticketId supplied |
 
@@ -312,7 +295,7 @@ scans:
 - `listScans` → `REPORT_VIEW_VENUE` (operate) · staff
 - `lookupTicket` → `TICKET_LOOKUP` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP` for `lookupTicket`.
 
 #### Requirements it meets
 
@@ -346,7 +329,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (7), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-034?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Lookup ticket.
 - [ ] No transition is declared; back returns where the user came from.
@@ -421,18 +404,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The scan's client-generated UUIDv7, the key offline replay deduplicates on. |
-| Access point | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Ticket | the name it points at, never the id | The `Entitlement.id` scanned; null where the media resolved to nothing. |
 | Media code | text | — |
 | Outcome | chip: Admitted, Denied, Overridden | — |
-| Deny reason | chip: Not found, Not yet valid, Expired, Already used, Reentry limit reached, Exit … | Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a … |
-| Direction | chip: Entry, Exit, Reentry, Crossover | — |
-| Operator principal | the name it points at, never the id | — |
-| Device | the name it points at, never the id | — |
-| Overrides scan | the name it points at, never the id | Set only on an override row, naming the denied scan it admits against (decided 28 September, audit R228). |
 
 **Every audit** (data table, from `listAuditRecords`)
 
@@ -450,19 +423,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The scan's client-generated UUIDv7, the key offline replay deduplicates on. |
-| Access point | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Ticket | the name it points at, never the id | The `Entitlement.id` scanned; null where the media resolved to nothing. |
 | Media code | text | — |
 | Outcome | chip: Admitted, Denied, Overridden | — |
 | Deny reason | chip: Not found, Not yet valid, Expired, Already used, Reentry limit reached, Exit … | Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a … |
 | Direction | chip: Entry, Exit, Reentry, Crossover | — |
 | Operator principal | the name it points at, never the id | — |
-| Device | the name it points at, never the id | — |
 | Overrides scan | the name it points at, never the id | Set only on an override row, naming the denied scan it admits against (decided 28 September, audit R228). |
-| Override reason | text | The supervisor's justification, on the override row only. The overriding principal is that row's `operatorPrincipalId`. |
 | Recorded at | 1 Oct 2026, 14:30 | — |
 | Synced at | 1 Oct 2026, 14:30 | Null while pending. Differs from recordedAt for offline scans. |
 
@@ -491,7 +457,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the override audit untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No override audit yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the override audit are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires to show this screen, and names that permission (the screen's other reads need `AUDIT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP` for `lookupTicket`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither mediaCode nor ticketId supplied |
 
@@ -530,7 +496,7 @@ overrides:
 - `lookupTicket` → `TICKET_LOOKUP` (operate) · staff
 - `listAuditRecords` → `AUDIT_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires to show this screen, and names that permission (the screen's other reads need `AUDIT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP` for `lookupTicket`.
 
 #### Requirements it meets
 
@@ -564,7 +530,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (7), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (34 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (17 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-035?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Lookup ticket.
 - [ ] No transition is declared; back returns where the user came from.
@@ -674,7 +640,7 @@ Errors to draw in the form: 409 Already resolved, differently (`alreadyResolved`
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the reconciliation queue untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No reconciliation queue yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, openOnly and the reconciliation queue are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `resolveSyncRejection`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Already resolved, differently (`alreadyResolved`). (OrderRefusedProblem) |
 
@@ -706,7 +672,7 @@ rejections:
 - `listSyncRejections` → `ORDER_VIEW` (read) · staff
 - `resolveSyncRejection` → `ORDER_MODIFY` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `resolveSyncRejection`.
 
 #### Requirements it meets
 
@@ -752,7 +718,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Access & Venue · wave 2 · needs the `maintenance` module |
+| Module | Access & Venue · wave 1 · needs the `maintenance` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `ASSET_MANAGE`, `ASSET_VIEW` (1 configure, 1 read); in the flows as technician |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
@@ -869,16 +835,10 @@ Errors to draw in the form: 409 Return to service attempted without the inspecti
 |---|---|---|
 | Asset tag | text | Unique per venue (decided 28 September, audit R108). Two assets in one venue never share a tag; `createAsset` refuses a duplicate with … |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Category | the name it points at, never the id | — |
 | Location description | text | — |
-| Criticality | chip: Safety critical, Revenue critical, Standard, Low | — |
-| Manufacturer | text | — |
-| Model | text | — |
 | Serial number | text | — |
 | Commissioned at | 1 Oct 2026 | — |
 | Warranty expires at | 1 Oct 2026 | — |
-| Supplier | the name it points at, never the id | — |
 
 **The selected asset** (detail panel, from `listAssets`)
 
@@ -886,20 +846,12 @@ Errors to draw in the form: 409 Return to service attempted without the inspecti
 |---|---|---|
 | Asset tag | text | Unique per venue (decided 28 September, audit R108). Two assets in one venue never share a tag; `createAsset` refuses a duplicate with … |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Category | the name it points at, never the id | — |
 | Location description | text | — |
 | Criticality | chip: Safety critical, Revenue critical, Standard, Low | — |
 | Manufacturer | text | — |
-| Model | text | — |
 | Serial number | text | — |
 | Commissioned at | 1 Oct 2026 | — |
 | Warranty expires at | 1 Oct 2026 | — |
-| Supplier | the name it points at, never the id | — |
-| Linked products | list or chips (count when long) | Products this asset delivers. A fault here can stop them selling. |
-| Linked access point | the name it points at, never the id | Access point this asset controls. Out of service blocks it. |
-| Requires inspection to return | yes / no (icon or chip) | True means a completed inspection is required before return to service. A technician cannot simply declare a ride safe. |
-| Documents | list or chips (count when long) | Manuals, procedures, certificates, each with its name and kind. Stored one row per document in `maintenance.asset_document`, which is where … |
 
 **The asset history entry** (detail panel, from `getAssetHistory`)
 
@@ -952,7 +904,7 @@ Errors to draw in the form: 409 Return to service attempted without the inspecti
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the asset register untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No asset register yet. Offers Create asset (`createAsset`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, categoryId, status, maintenanceDue and the asset register are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ASSET_VIEW`, which `listAssets` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ASSET_VIEW`, which `listAssets` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ASSET_MANAGE` for `createAsset`, `setAssetStatus`, `updateAsset`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 Return to service attempted without the inspection this asset category requires. |
 
@@ -1003,7 +955,7 @@ assets:
 - `setAssetStatus` → `ASSET_MANAGE` (configure) · staff
 - `updateAsset` → `ASSET_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `ASSET_VIEW`, which `listAssets` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ASSET_VIEW`, which `listAssets` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ASSET_MANAGE` for `createAsset`, `setAssetStatus`, `updateAsset`.
 
 #### Requirements it meets
 
@@ -1048,7 +1000,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (42), with its required mark, default, format and its error state (403, 404, 409).
-- [ ] Every output is drawn (36 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-069?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create asset, Lookup asset, Save asset status, Save asset.
 - [ ] Every transition is wired: `BO-070`.
@@ -1161,26 +1113,18 @@ Errors to draw in the form: 400 Neither an interval nor a usage trigger supplied
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
-| Asset | the image or video | — |
-| Asset category | the name it points at, never the id | Applies to every asset in the category rather than one. |
 | Interval days | 1,234 | Elapsed-time trigger. |
 | Usage interval | 1,234.5 | Usage trigger — cycles, hours, kilometres. Whichever comes first when both are set. |
 | Lead time days | 1,234 | How far ahead the work order is generated, so parts can be ordered before the job is already late. |
-| Task template | grouped details | — |
 | Last completed at | 1 Oct 2026, 14:30 | — |
 | Next due at | 1 Oct 2026, 14:30 | — |
-| Is active | yes / no (icon or chip) | — |
 
 **The selected maintenance plan** (detail panel, from `listMaintenancePlans`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
-| Asset | the image or video | — |
-| Asset category | the name it points at, never the id | Applies to every asset in the category rather than one. |
 | Interval days | 1,234 | Elapsed-time trigger. |
 | Usage interval | 1,234.5 | Usage trigger — cycles, hours, kilometres. Whichever comes first when both are set. |
 | Lead time days | 1,234 | How far ahead the work order is generated, so parts can be ordered before the job is already late. |
@@ -1193,16 +1137,13 @@ Errors to draw in the form: 400 Neither an interval nor a usage trigger supplied
 
 | Shows | Format | Notes |
 |---|---|---|
-| Plan | the name it points at, never the id | — |
 | Plan name | text | — |
-| Asset | the image or video | — |
 | Asset name | text | — |
 | Criticality | chip: Safety critical, Revenue critical, Standard, Low | — |
 | Due at | 1 Oct 2026, 14:30 | — |
 | Is overdue | yes / no (icon or chip) | — |
 | Days overdue | 1,234 | — |
 | Triggered by | chip: Interval, Usage | — |
-| Work order | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
@@ -1237,7 +1178,7 @@ Errors to draw in the form: 400 Neither an interval nor a usage trigger supplied
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the planned maintenance untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No planned maintenance yet. Offers Create maintenance plan (`createMaintenancePlan`). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listMaintenancePlans` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ASSET_VIEW`, which `listMaintenancePlans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ASSET_VIEW`, which `listMaintenancePlans` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ASSET_MANAGE` for `createMaintenancePlan`, `updateMaintenancePlan`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither an interval nor a usage trigger supplied |
 
@@ -1288,7 +1229,7 @@ plans:
 - `getDueMaintenance` → `ASSET_VIEW` (read) · staff
 - `updateMaintenancePlan` → `ASSET_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `ASSET_VIEW`, which `listMaintenancePlans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ASSET_VIEW`, which `listMaintenancePlans` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ASSET_MANAGE` for `createMaintenancePlan`, `updateMaintenancePlan`.
 
 #### Requirements it meets
 
@@ -1324,7 +1265,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (21), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (32 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-071?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create maintenance plan, Change plan.
 - [ ] Every transition is wired: `BO-070`.
@@ -1424,8 +1365,12 @@ Errors to draw in the form: 409 The incident is not reportable (`isReportable` f
 | Corrective actions `correctiveActions` | text area | optional | — | max length 5000 | — | — | `updateIncident` body |
 | Corrective work order `correctiveWorkOrderId` | picker: choose a corrective work order | optional | — | — | shows names, sends the id | — | `updateIncident` body |
 | Attachment refs `attachmentRefs` | list of values (chips) | optional | — | — | — | — | `updateIncident` body |
+| Escalate `escalate` | group | optional | — | — | — | Escalate an incident under investigation (the optional Escalated step; CHG-RUL-011). | `updateIncident` body |
+| To principal `escalate.toPrincipalId` | picker: choose a to principal | required | — | — | shows names, sends the id | — | `updateIncident` body |
+| Reason `escalate.reason` | text area | required | — | min length 3; max length 1000 | — | — | `updateIncident` body |
+| Reason `reason` | text area | optional | — | min length 3; max length 1000 | — | Why the status changes. Required to reopen a closed incident (back to `underInvestigation`) and to close a `reported` one straight away (CHG-RUL-011). | `updateIncident` body |
 
-Errors to draw in the form: 400 Closure attempted without findings or a corrective action; 403 A critical incident closed by the person who completed its corrective action (`closer-completed-action`; workbook Q530; CHG-CSA-033).
+Errors to draw in the form: 400 Closure attempted without findings or a corrective action; 403 A critical incident closed by the person who completed its corrective action (`closer-completed-action`; workbook Q530; CHG-CSA-033).; 422 A move outside the incident flow (`incident-transition-not-allowed`; CHG-RUL-011): to `actionRequired`, from `closed` to anything but `underInvestigation`, a …
 
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1441,60 +1386,38 @@ Errors to draw in the form: 400 Closure attempted without findings or a correcti
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Incident number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Kind | chip: Guest injury, Staff injury, Near miss, Property damage, Equipment failure, Security … | — |
 | Severity | chip: Near miss, Minor, Moderate, Major, Critical | — |
 | Status | chip: Reported, Under investigation, Action required, Closed | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Location description | text | — |
-| Is reportable | yes / no (icon or chip) | Requires notification to an external authority within a statutory window. |
 | Notification due at | 1 Oct 2026, 14:30 | — |
 | Notified at | 1 Oct 2026, 14:30 | The earliest `notifiedAt` among this incident's authority notifications. Maintained on write by `recordAuthorityNotification`; each … |
-| Assigned to principal | the name it points at, never the id | — |
 
 **The selected incident** (detail panel, from `listIncidents`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Incident number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | Kind | chip: Guest injury, Staff injury, Near miss, Property damage, Equipment failure, Security … | — |
 | Severity | chip: Near miss, Minor, Moderate, Major, Critical | — |
 | Status | chip: Reported, Under investigation, Action required, Closed | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Location description | text | — |
-| Is reportable | yes / no (icon or chip) | Requires notification to an external authority within a statutory window. |
 | Notification due at | 1 Oct 2026, 14:30 | — |
 | Notified at | 1 Oct 2026, 14:30 | The earliest `notifiedAt` among this incident's authority notifications. Maintained on write by `recordAuthorityNotification`; each … |
-| Assigned to principal | the name it points at, never the id | — |
-| Reported by principal | the name it points at, never the id | — |
-| Corrective work order | the name it points at, never the id | — |
 | Occurred at | 1 Oct 2026, 14:30 | — |
-| Recorded at | 1 Oct 2026, 14:30 | — |
 
 **The incident** (detail panel, from `getIncident`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Incident number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | Kind | chip: Guest injury, Staff injury, Near miss, Property damage, Equipment failure, Security … | — |
 | Severity | chip: Near miss, Minor, Moderate, Major, Critical | — |
 | Status | chip: Reported, Under investigation, Action required, Closed | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Location description | text | — |
-| Is reportable | yes / no (icon or chip) | Requires notification to an external authority within a statutory window. |
 | Notification due at | 1 Oct 2026, 14:30 | — |
 | Notified at | 1 Oct 2026, 14:30 | The earliest `notifiedAt` among this incident's authority notifications. Maintained on write by `recordAuthorityNotification`; each … |
-| Assigned to principal | the name it points at, never the id | — |
-| Reported by principal | the name it points at, never the id | — |
-| Corrective work order | the name it points at, never the id | — |
 | Occurred at | 1 Oct 2026, 14:30 | — |
-| Recorded at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -1502,7 +1425,7 @@ Errors to draw in the form: 400 Closure attempted without findings or a correcti
 |---|---|---|---|---|---|
 | Report incident (primary button) | `reportIncident` POST `/incidents` | ReportIncidentRequest | Incident | 400 Validation failed | opens modal first |
 | Record authority notification (secondary button) | `recordAuthorityNotification` POST `/incidents/{incidentId}/notify-authority` | inline | Incident | 409 The incident is not reportable (`isReportable` false, audit R106 (6)). | opens modal first |
-| Save incident (secondary button) | `updateIncident` PATCH `/incidents/{incidentId}` | inline | Incident | 400 Closure attempted without findings or a corrective action; 403 A critical incident closed by the person who completed its corrective action (`closer-completed-action`; workbook Q530; CHG-CSA-033). | opens modal first |
+| Save incident (secondary button) | `updateIncident` PATCH `/incidents/{incidentId}` | inline | Incident | 400 Closure attempted without findings or a corrective action; 403 A critical incident closed by the person who completed its corrective action (`closer-completed-action`; workbook Q530; CHG-CSA-033).; 422 A move … | opens modal first |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1528,9 +1451,9 @@ Errors to draw in the form: 400 Closure attempted without findings or a correcti
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the incident log untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No incident log yet. Offers Record authority notification (`recordAuthorityNotification`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on severity, status, isReportable and the incident log are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `INCIDENT_VIEW`, which `listIncidents` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `INCIDENT_VIEW`, which `listIncidents` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_MANAGE` for `recordAuthorityNotification`, `updateIncident`; `INCIDENT_REPORT` for `reportIncident`. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Closure attempted without findings or a corrective action; 400 Validation failed; 409 The incident is not reportable (`isReportable` false, audit R106 (6)). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Closure attempted without findings or a corrective action; 400 Validation failed; 409 The incident is not reportable (`isReportable` false, audit R106 (6)).; 422 A move outside the incident flow (`incident-transition-not-allowed`; CHG-RUL-011): to `actionRequired`, from `closed` to anything but `underInvestigation`, a … |
 
 #### Edge cases to draw
 
@@ -1568,7 +1491,7 @@ incidents:
 - `recordAuthorityNotification` → `INCIDENT_MANAGE` (configure) · staff
 - `updateIncident` → `INCIDENT_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `INCIDENT_VIEW`, which `listIncidents` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `INCIDENT_VIEW`, which `listIncidents` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_MANAGE` for `recordAuthorityNotification`, `updateIncident`; `INCIDENT_REPORT` for `reportIncident`.
 
 #### Requirements it meets
 
@@ -1604,8 +1527,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (31), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (35), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-072?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Report incident, Record authority notification, Save incident.
 - [ ] Every transition is wired: `BO-070`.
@@ -1624,8 +1547,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Access & Venue · wave 2 · needs the `seating` module |
-| Block | Block A · ticket #17839 (APP-SETUP-BO-092) |
+| Module | Access & Venue · wave 1 · needs the `seating` module |
+| Block | Block A · task APP-SETUP-BO-092 |
 | Who uses it | venue staff holding `VENUE_MAP_MANAGE`, `VENUE_MAP_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listVenueMaps` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1653,7 +1576,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Form: Create venue map** (modal, opened by *Create venue map*; *Create venue map* calls `createVenueMap`, *Cancel* sends nothing)
 
-**Collects what `createVenueMap` sends before it is called.** Required: `name`, `venueId`. Optional: `kind`, `floorLevel`, `baseAssetId`, `baseImageAlignment`, `boundsGeoJson`. `id`, `status` (draft) and scope are the server's; the form asks only for the map's own fields. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `createVenueMap` sends before it is called.** Required: `name`, `venueId`. Optional: `kind`, `floorLevel`, `baseAssetId`, `baseImageAlignment`, `boundsGeoJson`. and scope are the server's; the form asks only for the map's own fields. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `status` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1684,36 +1607,24 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | Derived from `venueId`. Not sent by a client. |
 | Kind | chip: Park, Floor, Zone, Parking | — |
 | Floor level | 1,234 | — |
 | Status | chip: Draft, Published, Archived | `draft` on create. Moves through `publishVenueMap` (`states/venue-map.yaml`), never by sending a value. |
 | Published version | 1,234 | The `VenueMapVersion.version` guests are served. Null until the first publish. |
-| Is georeferenced | yes / no (icon or chip) | Whether a guest can be located on it. Without a georeference the map is a picture — useful, and not navigable. |
-| Base image | the image or video | The illustrated map a guest actually sees, held in `assets` like any other media. |
-| Base image alignment | grouped details | How the illustration lines up with the geometry. They are drawn at different scales by different people, and a point placed on the plan … |
 | Tile set ref | text | Where a base image is large enough to need zoom levels. A 12,000-pixel park map is not something a phone downloads on arrival, and a guest … |
 
 **The selected venue map** (detail panel, from `listVenueMaps`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | Derived from `venueId`. Not sent by a client. |
 | Kind | chip: Park, Floor, Zone, Parking | — |
 | Floor level | 1,234 | — |
 | Status | chip: Draft, Published, Archived | `draft` on create. Moves through `publishVenueMap` (`states/venue-map.yaml`), never by sending a value. |
 | Published version | 1,234 | The `VenueMapVersion.version` guests are served. Null until the first publish. |
-| Is georeferenced | yes / no (icon or chip) | Whether a guest can be located on it. Without a georeference the map is a picture — useful, and not navigable. |
-| Base image | the image or video | The illustrated map a guest actually sees, held in `assets` like any other media. |
 | Base image alignment | grouped details | How the illustration lines up with the geometry. They are drawn at different scales by different people, and a point placed on the plan … |
 | Tile set ref | text | Where a base image is large enough to need zoom levels. A 12,000-pixel park map is not something a phone downloads on arrival, and a guest … |
-| Bounds geo json | text | — |
 | Graph status | chip: Not built, Connected, Disconnected, Partial | Whether every public point can actually be reached. Computed at publish. |
 
 **Actions and what each produces**
@@ -1730,8 +1641,8 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Where the user goes next**
 
-- → `BO-093` Map Import & Labelling: *The plan is uploaded and read*; calls `createVenueMap`
-- → `BO-094` Map Editor & Publish: *Map Editor & Publish*
+- → `BO-093` Map Import & Labelling: *The plan is uploaded and read*; carries `mapId`; calls `createVenueMap`
+- → `BO-094` Map Editor & Publish: *Map Editor & Publish*; carries `mapId`
 
 #### States
 
@@ -1741,7 +1652,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the venue maps untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No venue maps yet. Offers Create venue map (`createVenueMap`). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listVenueMaps` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `VENUE_MAP_VIEW`, which `listVenueMaps` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `VENUE_MAP_VIEW`, which `listVenueMaps` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `VENUE_MAP_MANAGE` for `createVenueMap`. |
 | Offline (`?state=offline`) | online only |
 
 #### Consistency with other screens
@@ -1772,7 +1683,7 @@ maps:
 - `listVenueMaps` → `VENUE_MAP_VIEW` (read) · staff
 - `createVenueMap` → `VENUE_MAP_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `VENUE_MAP_VIEW`, which `listVenueMaps` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `VENUE_MAP_VIEW`, which `listVenueMaps` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `VENUE_MAP_MANAGE` for `createVenueMap`.
 
 #### Requirements it meets
 
@@ -1803,7 +1714,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (14), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-092?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create venue map.
 - [ ] Every transition is wired: `BO-093`, `BO-094`.
@@ -1821,8 +1732,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Access & Venue · wave 2 · needs the `seating` module |
-| Block | Block A · ticket #17840 (APP-SETUP-BO-093) |
+| Module | Access & Venue · wave 1 · needs the `seating` module |
+| Block | Block A · task APP-SETUP-BO-093 |
 | Who uses it | venue staff holding `VENUE_MAP_MANAGE`, `VENUE_MAP_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`importVenueGeometry`, `proposeVenueLabels`, `acceptVenueLabelProposals`) and no read of a population — it is settings, not a list |
@@ -2091,8 +2002,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Access & Venue · wave 2 · needs the `seating` module |
-| Block | Block A · ticket #17920 (APP-SETUP-BO-094) |
+| Module | Access & Venue · wave 1 · needs the `seating` module |
+| Block | Block A · task APP-SETUP-BO-094 |
 | Who uses it | venue staff holding `ASSET_LIBRARY_VIEW`, `PRODUCT_VIEW`, `VENUE_MAP_MANAGE`, `VENUE_MAP_PUBLISH`, `VENUE_MAP_VIEW` (3 read, 2 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | statusTracker (compact density): `getVenueMap` reads one record and nothing reads a population — the screen is about that one thing |
@@ -2139,7 +2050,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Form: Save venue point** (modal, opened by *Save venue point*; *Save venue point* calls `setVenuePoint`, *Cancel* sends nothing)
 
-**Collects what `setVenuePoint` sends before it is called.** Required: `id`, `mapId`, `kind`, `name`, `position`. Optional: `nameLocalised`, `outletId`, `productId`, `accessPointId`, `isStepFree`, `openingHours`, `iconRef`, `isActive`, `isNavigable`, `isDestination`, `pointId`; and the item details decided 29 September (MOB-4, MOB-6): `description`, `media`, `featuredOffer` (a product or a bundle, on any kind of point), `typicalDurationMinutes`, `interestTags`, `cuisineTags`; and `retailTags` (30 September, MoM 4.7). Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setVenuePoint` sends before it is called.** Required: `kind`, `name`, `position`. Optional: `nameLocalised`, `outletId`, `productId`, `accessPointId`, `isStepFree`, `openingHours`, `iconRef`, `isActive`, `isNavigable`, `isDestination`, `pointId`; and the item details decided 29 September (MOB-4, MOB-6): `description`, `media`, `featuredOffer` (a product or a bundle, on any kind of point), `typicalDurationMinutes`, `interestTags`, `cuisineTags`; and `retailTags` (30 September, MoM 4.7). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `mapId` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -2294,7 +2205,7 @@ Errors to draw in the form: 400 Validation failed; 404 The resource does not exi
 | Loading (`?state=loading`) | The map editor publish, read by `getVenueMap`. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the map editor publish untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No map editor publish yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `VENUE_MAP_VIEW`, which `getVenueMap` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `VENUE_MAP_VIEW`, which `getVenueMap` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ASSET_LIBRARY_VIEW` for `searchMedia`; `PRODUCT_VIEW` for `listProducts`, `listCatalogueBundles`; `VENUE_MAP_MANAGE` for `setVenuePoint` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 400 Validation failed; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 Closing this strands a point, and the response … |
 
@@ -2339,7 +2250,7 @@ closure:
 - `getVenueMapGraph` → `VENUE_MAP_VIEW` (read) · staff, guest
 - `setPlacedResource` → `VENUE_MAP_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `VENUE_MAP_VIEW`, which `getVenueMap` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `VENUE_MAP_VIEW`, which `getVenueMap` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ASSET_LIBRARY_VIEW` for `searchMedia`; `PRODUCT_VIEW` for `listProducts`, `listCatalogueBundles`; `VENUE_MAP_MANAGE` for `setVenuePoint` …
 
 #### Requirements it meets
 
@@ -2387,6 +2298,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Flow F26 branch at step 6 (recoverable): when A point links to an outlet that has closed., Publish is refused and **the response names which point**. A restaurant point pointing nowhere is worse than no point, because a guest walks there.
 - Flow F26 branch at step 6 (recoverable): when A placed cabana has no linked resource or no price band, or two places share a label., Publish is refused with `resourceUnlinked`, `resourcePriceBandMissing` or `duplicateResourceLabel`, naming the place (decided 29 September, rev 3 REV3-15). **A cabana a guest can tap and cannot buy …
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -2482,18 +2394,11 @@ Errors to draw in the form: 422 A `cleaningPolicy` with `timesPerDay` and no `cl
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Kind | chip: Cabana, Lounger, Locker, Wheelchair, Stroller, Equipment… | BL-135. `locker` was an entitlement kind in `orders` and nothing issued, assigned or released one. |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Parent resource | the name it points at, never the id | A pool cabana belongs to the pool area; a seat belongs to an auditorium. Booking a parent takes its children with it, which is the … |
-| Principal | the name it points at, never the id | For a resource of kind `instructor` or `staff`. `workforce` still owns their rota — this says whether they are qualified and whether they … |
-| Attributes | grouped details | Configurable per kind — capacity, size, shade, power, poolside. |
 | Setup minutes | 1,234 | Before the booking, not inside it. An auditorium booked 14:00–16:00 is unavailable from 13:30 with a 30-minute setup, and a calendar that … |
 | Teardown minutes | 1,234 | After the booking. Kept as it is (decided 29 September, W10): with a `cleaningPolicy` of `afterEveryBooking` the cleaning buffer is added … |
-| Requires qualification | list or chips (count when long) | Qualification codes a person must hold to be assigned to this. |
 
 **Data table** (data table): Status column carries the reason — **booked and under repair need different responses from somebody looking for something free**
 
@@ -2501,21 +2406,14 @@ Errors to draw in the form: 422 A `cleaningPolicy` with `timesPerDay` and no `cl
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Kind | chip: Cabana, Lounger, Locker, Wheelchair, Stroller, Equipment… | BL-135. `locker` was an entitlement kind in `orders` and nothing issued, assigned or released one. |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Parent resource | the name it points at, never the id | A pool cabana belongs to the pool area; a seat belongs to an auditorium. Booking a parent takes its children with it, which is the … |
-| Principal | the name it points at, never the id | For a resource of kind `instructor` or `staff`. `workforce` still owns their rota — this says whether they are qualified and whether they … |
 | Attributes | grouped details | Configurable per kind — capacity, size, shade, power, poolside. |
 | Setup minutes | 1,234 | Before the booking, not inside it. An auditorium booked 14:00–16:00 is unavailable from 13:30 with a 30-minute setup, and a calendar that … |
 | Teardown minutes | 1,234 | After the booking. Kept as it is (decided 29 September, W10): with a `cleaningPolicy` of `afterEveryBooking` the cleaning buffer is added … |
-| Requires qualification | list or chips (count when long) | Qualification codes a person must hold to be assigned to this. |
 | Deposit amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Status | chip: Available, Booked, Checked out, Maintenance, Retired | — |
-| Is active | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
 
@@ -2547,7 +2445,7 @@ Errors to draw in the form: 422 A `cleaningPolicy` with `timesPerDay` and no `cl
 | Error (`?state=error`) | Could not load resources. Existing bookings are unaffected. |
 | Empty, first run (`?state=emptyFirstRun`) | No bookable resources yet. **A cabana sold as a product sells a slot** — define the object here and it becomes something a guest can be handed and can return. |
 | Empty, no results (`?state=emptyNoResults`) | No resource matches this kind or window. Widen the window rather than the kind — availability moves, definitions do not. |
-| Permission denied (`?state=emptyNoAccess`) | You do not have RESOURCE_VIEW. The list is not empty. |
+| Permission denied (`?state=emptyNoAccess`) | You do not have `RESOURCE_VIEW`. The list is not empty. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `RESOURCE_MANAGE` for `createResource`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 A `cleaningPolicy` with `timesPerDay` and no `cleaningsPerDay`, or whose window ends before it starts (W10, 29 September). |
 
@@ -2588,7 +2486,7 @@ resources:
 - `listResources` → `RESOURCE_VIEW` (read) · staff
 - `createResource` → `RESOURCE_MANAGE` (configure) · staff
 
-**A refused user sees:** You do not have RESOURCE_VIEW. The list is not empty.
+**A refused user sees:** You do not have `RESOURCE_VIEW`. The list is not empty. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `RESOURCE_MANAGE` for `createResource`.
 
 #### Requirements it meets
 
@@ -2629,7 +2527,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (26), with its required mark, default, format and its error state (422).
-- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-095?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create resource.
 - [ ] Every transition is wired: `BO-096`, `BO-097`, `BO-098`.
@@ -2773,7 +2671,7 @@ Method, path, parameters, request and response for every operation these screens
 "setPlacedResource": {"method":"POST","path":"/venue-maps/{mapId}/resources","contract":"venue-map","summary":"Place or amend a bookable resource on the map","permission":"VENUE_MAP_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SetPlacedResourceRequest","responds":"PlacedResource"},
 "setVenuePoint": {"method":"POST","path":"/venue-maps/{mapId}/points","contract":"venue-map","summary":"Place or amend a point of interest","permission":"VENUE_MAP_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"SetVenuePointRequest","responds":"VenuePoint"},
 "updateAsset": {"method":"PATCH","path":"/assets/{assetId}","contract":"maintenance","summary":"Amend an asset","permission":"ASSET_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Asset"},
-"updateIncident": {"method":"PATCH","path":"/incidents/{incidentId}","contract":"maintenance","summary":"Investigate, escalate or close an incident","permission":"INCIDENT_MANAGE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Incident"},
+"updateIncident": {"method":"PATCH","path":"/incidents/{incidentId}","contract":"maintenance","summary":"Investigate, escalate, close or reopen an incident","permission":"INCIDENT_MANAGE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Incident"},
 "updateMaintenancePlan": {"method":"PATCH","path":"/maintenance-plans/{planId}","contract":"maintenance","summary":"Amend or suspend a plan","permission":"ASSET_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"MaintenancePlan"},
 "validateVenueMapGraph": {"method":"POST","path":"/venue-maps/{mapId}/validate-graph","contract":"venue-map","summary":"What is unreachable, before anyone publishes it","permission":"VENUE_MAP_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"GraphValidation"}
 }
@@ -2803,11 +2701,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "DueMaintenanceTask": {"x-ticvai-persistence":"none — computed","type":"object","required":["planId","assetId","assetName","dueAt","isOverdue","criticality"],"properties":{"planId":{"type":"string","format":"uuid"},"planName":{"type":"string"},"assetId":{"type":"string","format":"uuid"},"assetName":{"type":"string"},"criticality":{"$ref":"#/components/schemas/AssetCriticality"},"dueAt":{"type":"string","format":"date-time"},"isOverdue":{"type":"boolean"},"daysOverdue":{"type":"integer"},"triggeredBy":{"type":"string","enum":["interval","usage"]},"workOrderId":{"type":"string","format":"uuid","nullable":true}}},
 "GraphValidation": {"type":"object","description":"**What breaks before a guest finds it.** Run at publish and on demand.\n","required":["isValid","components"],"properties":{"isValid":{"type":"boolean"},"components":{"type":"integer"},"unreachablePoints":{"type":"array","description":"No path at all. **Usually a point placed after the paths were drawn.**","items":{"type":"object","properties":{"pointId":{"type":"string","format":"uuid"},"name":{"type":"string"},"kind":{"type":"string"}}}},"stepOnlyPoints":{"type":"array","description":"Reachable, and only by steps. **The map works perfectly until a wheelchair user opens it**, and nothing in the drawing makes this visible — which is the whole reason for this list.\n","items":{"type":"object","properties":{"pointId":{"type":"string","format":"uuid"},"name":{"type":"string"}}}},"deadEndPaths":{"type":"array","items":{"type":"string","format":"uuid"}},"criticalUnreachable":{"type":"array","description":"**First aid, emergency exits and assembly points that cannot be reached.** Separated from the rest because an unreachable gift shop is a defect and an unreachable assembly point is a safety finding, and a single list of two hundred items buries it.\n","items":{"type":"object","properties":{"pointId":{"type":"string","format":"uuid"},"name":{"type":"string"},"kind":{"type":"string"}}}},"resourceFindings":{"type":"array","description":"**Placed resources a guest could not buy** (rev 3 REV3-15), named by label. Any entry here makes `isValid` false, and `publishVenueMap` refuses with the matching blocker.\n","items":{"type":"object","required":["placedResourceId","label","reason"],"properties":{"placedResourceId":{"type":"string","format":"uuid"},"label":{"type":"string"},"reason":{"type":"string","enum":["resourceUnlinked","resourcePriceBandMissing","duplicateResourceLabel"]}}}}}},
 "GuestListing": {"type":"string","enum":["bookable","infoOnly","hidden"],"default":"bookable","description":"**How a product appears to a guest** (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to the basket. `infoOnly`: listed and searched with its details, photo and `notBookableLabel` whether or not it is on sale, and **never added to a basket** (`addCartLine` refuses it with `409`); the screen opens its details instead. `hidden`: never listed or searched for a guest, and reachable only where a staff channel sells it. Independent of `isSellable`, which says whether a channel may sell it at all.\n"},
-"Incident": {"x-ticvai-persistence":"maintenance.incident","type":"object","required":["id","incidentNumber","kind","severity","status","venueId","occurredAt","reportedByPrincipalId"],"properties":{"id":{"type":"string","format":"uuid"},"incidentNumber":{"type":"string","readOnly":true,"description":"**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"},"kind":{"$ref":"#/components/schemas/IncidentKind"},"severity":{"$ref":"#/components/schemas/IncidentSeverity"},"status":{"$ref":"#/components/schemas/IncidentStatus"},"venueId":{"type":"string","format":"uuid"},"assetId":{"type":"string","format":"uuid","nullable":true},"locationDescription":{"type":"string","nullable":true},"isReportable":{"type":"boolean","description":"Requires notification to an external authority within a statutory window."},"notificationDueAt":{"type":"string","format":"date-time","nullable":true},"notifiedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"The earliest `notifiedAt` among this incident's authority notifications. **Maintained on write** by `recordAuthorityNotification`; each notification itself is a row of `maintenance.incident_authority_notification`.\n"},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true},"reportedByPrincipalId":{"type":"string","format":"uuid"},"correctiveWorkOrderId":{"type":"string","format":"uuid","nullable":true},"occurredAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"},"closedAt":{"type":"string","format":"date-time","nullable":true},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
+"Incident": {"x-ticvai-persistence":"maintenance.incident","type":"object","required":["id","incidentNumber","kind","severity","status","venueId","occurredAt","reportedByPrincipalId"],"properties":{"id":{"type":"string","format":"uuid"},"incidentNumber":{"type":"string","readOnly":true,"description":"**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"},"kind":{"$ref":"#/components/schemas/IncidentKind"},"severity":{"$ref":"#/components/schemas/IncidentSeverity"},"status":{"$ref":"#/components/schemas/IncidentStatus"},"venueId":{"type":"string","format":"uuid"},"assetId":{"type":"string","format":"uuid","nullable":true},"locationDescription":{"type":"string","nullable":true},"isReportable":{"type":"boolean","description":"Requires notification to an external authority within a statutory window."},"notificationDueAt":{"type":"string","format":"date-time","nullable":true},"notifiedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"The earliest `notifiedAt` among this incident's authority notifications. **Maintained on write** by `recordAuthorityNotification`; each notification itself is a row of `maintenance.incident_authority_notification`.\n"},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true},"reportedByPrincipalId":{"type":"string","format":"uuid"},"correctiveWorkOrderId":{"type":"string","format":"uuid","nullable":true},"escalation":{"type":"object","nullable":true,"readOnly":true,"description":"**Set while the incident is escalated** (the optional Escalated step of the 3 October flow; CHG-RUL-011). Screens show \"Escalated\" when `status` is `underInvestigation` and this is set. Cleared when the incident closes.\n","properties":{"toPrincipalId":{"type":"string","format":"uuid"},"byPrincipalId":{"type":"string","format":"uuid"},"reason":{"type":"string"},"escalatedAt":{"type":"string","format":"date-time"}}},"reopenCount":{"type":"integer","minimum":0,"readOnly":true,"description":"How many times the incident was reopened (CHG-RUL-011). Each reopen is a logged row."},"occurredAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"},"closedAt":{"type":"string","format":"date-time","nullable":true},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
 "IncidentAuthorityNotification": {"x-ticvai-persistence":"maintenance.incident_authority_notification","type":"object","description":"**One notification to an external authority, appended by `recordAuthorityNotification`.** An incident may be reported to more than one authority, or to the same one twice, and each is the evidence that an obligation was met — so each is a row, not an overwrite of `maintenance.incident.notified_at`.\n","required":["id","incidentId","authority","notifiedAt"],"properties":{"id":{"type":"string","format":"uuid"},"incidentId":{"type":"string","format":"uuid"},"authority":{"type":"string","maxLength":200},"reference":{"type":"string","maxLength":128,"nullable":true},"notifiedAt":{"type":"string","format":"date-time"},"notifiedByPrincipalId":{"type":"string","format":"uuid"},"attachmentRefs":{"type":"array","items":{"type":"string"}},"recordedAt":{"type":"string","format":"date-time"}}},
 "IncidentDetail": {"x-ticvai-persistence":"maintenance.incident","allOf":[{"$ref":"#/components/schemas/Incident"},{"type":"object","properties":{"description":{"type":"string","description":"The original report. Never edited — investigation adds to the record."},"investigationNote":{"type":"string","nullable":true,"readOnly":true,"description":"The latest entry of `investigationNotes`, kept for readers that show one line."},"investigationNotes":{"type":"array","readOnly":true,"description":"**Every investigation note, oldest first** (decided 28 September, audit R106 (5)). Read from `maintenance.incident_investigation_note`; appended by `updateIncident`.\n","items":{"$ref":"#/components/schemas/IncidentInvestigationNote"}},"rootCause":{"type":"string","nullable":true},"correctiveActions":{"type":"string","nullable":true},"firstAidGiven":{"type":"boolean"},"emergencyServicesCalled":{"type":"boolean"},"witnessCount":{"type":"integer"},"attachmentRefs":{"type":"array","items":{"type":"string"}},"involvedParties":{"type":"array","description":"Who was involved, as given in `ReportIncidentRequest.involvedSubjectIds` and `involvedStaffPrincipalIds`. Read from `maintenance.incident_involved_party`.\n","items":{"$ref":"#/components/schemas/IncidentInvolvedParty"}},"authorityNotifications":{"type":"array","description":"Read from `maintenance.incident_authority_notification`, oldest first.","items":{"$ref":"#/components/schemas/IncidentAuthorityNotification"}}}}]},
-"IncidentInvestigationNote": {"x-ticvai-persistence":"maintenance.incident_investigation_note","type":"object","description":"**One investigation note, appended by `updateIncident`** (decided 28 September, audit R106 (5)). A history rather than a field, so what an investigator thought on Tuesday survives what they found on Thursday.\n","required":["id","incidentId","note","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"incidentId":{"type":"string","format":"uuid"},"note":{"type":"string","maxLength":10000},"writtenByPrincipalId":{"type":"string","format":"uuid"},"recordedAt":{"type":"string","format":"date-time"}}},
-"IncidentInvolvedParty": {"x-ticvai-persistence":"maintenance.incident_involved_party","type":"object","description":"**One person involved in an incident, by opaque reference.** A guest or member of the public is a `pii.subject` id — personal details live there, the erasable store of ADR-0023, so the incident record survives an erasure request intact. A member of staff is a principal id. Exactly one of the two is set, as `kind` says.\n","required":["id","incidentId","kind"],"properties":{"id":{"type":"string","format":"uuid"},"incidentId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["subject","staff"]},"subjectId":{"type":"string","format":"uuid","nullable":true,"description":"A `pii.subject` id where `kind` is `subject`."},"principalId":{"type":"string","format":"uuid","nullable":true,"description":"The staff principal where `kind` is `staff`."}}},
+"IncidentInvestigationNote": {"x-ticvai-persistence":"maintenance.incident_investigation_note","type":"object","description":"**One investigation note, appended by `updateIncident`** (decided 28 September, audit R106 (5)). A history rather than a field, so what an investigator thought on Tuesday survives what they found on Thursday.\n","required":["id","incidentId","note","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"incidentId":{"type":"string","format":"uuid"},"note":{"type":"string","maxLength":10000},"kind":{"type":"string","enum":["note","statusChange","escalation","reopen"],"default":"note","description":"**Every change is logged here** (CHG-RUL-011): an investigator's note, or a row the server writes for a status change, an escalation or a reopen, with `note` as its reason.\n"},"fromStatus":{"allOf":[{"$ref":"#/components/schemas/IncidentStatus"}],"nullable":true},"toStatus":{"allOf":[{"$ref":"#/components/schemas/IncidentStatus"}],"nullable":true},"writtenByPrincipalId":{"type":"string","format":"uuid"},"recordedAt":{"type":"string","format":"date-time"}}},
+"IncidentInvolvedParty": {"x-ticvai-persistence":"maintenance.incident_involved_party","type":"object","description":"**One person involved in an incident, by opaque reference.** A guest or member of the public is a `pii.subject` id — personal details live there, the erasable store of ADR-0023, so the incident record survives an erasure request intact. A member of staff is a principal id. Exactly one of the two is set, as `kind` says.\n","required":["id","incidentId","kind"],"properties":{"id":{"type":"string","format":"uuid"},"incidentId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["subject","staff"]},"subjectId":{"type":"string","format":"uuid","nullable":true,"description":"A `pii.subject` id where `kind` is `subject`."},"principalId":{"type":"string","format":"uuid","nullable":true,"description":"The staff principal where `kind` is `staff`."},"role":{"type":"string","nullable":true,"enum":["injured","involved","witness","reporter",null],"description":"The person's part in the incident, from `addIncidentPerson` (CHG-RUL-013)."},"contactStored":{"type":"boolean","readOnly":true,"description":"Whether a contact is held for the person: only with their consent to be contacted (`AddIncidentPersonRequest.contactConsent`; CHG-RUL-013).\n"}}},
 "IncidentKind": {"type":"string","enum":["guestInjury","staffInjury","nearMiss","propertyDamage","equipmentFailure","securityIncident","fireOrEvacuation","foodSafety","environmental","other"]},
 "IncidentSeverity": {"type":"string","enum":["nearMiss","minor","moderate","major","critical"]},
 "IncidentStatus": {"type":"string","enum":["reported","underInvestigation","actionRequired","closed"]},

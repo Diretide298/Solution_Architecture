@@ -4,7 +4,7 @@
   "name": "Conversation Queue",
   "module": "Conversations",
   "requiresModule": "marketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C32",
   "implementation": {
    "app": "venue-support-web",
@@ -48,7 +48,7 @@
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101). **The guest concierge is Phase 1 and a handover needs somewhere to land** — the queue and the workspace move; the rest of the console stays Wave 3.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Pulled forward (CF-101), and in Block A since the 1 October plan: **the guest concierge is Phase 1 and a handover needs somewhere to land** — the queue and the workspace move; the rest of the console comes later.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listCases` reads the population and `getCase` reads one of them — list, select, act",
@@ -65,15 +65,8 @@
        "label": "Every conversation",
        "bindsTo": "Conversation",
        "columns": [
-        "Conversation.id",
-        "Conversation.telephony",
-        "Conversation.assistSessionId",
         "Conversation.channel",
         "Conversation.state",
-        "Conversation.subjectId",
-        "Conversation.venueId",
-        "Conversation.assignedPrincipalId",
-        "Conversation.queueId",
         "Conversation.queuePosition",
         "Conversation.estimatedWaitSeconds",
         "Conversation.handoverReason"
@@ -113,7 +106,7 @@
    "error": "Could not load. Names which read failed and leaves the conversation queue untouched.",
    "emptyFirstRun": "No conversation queue yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority and the conversation queue are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `CASE_VIEW`, which `listConversations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `CASE_VIEW`, which `listConversations` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASE_MANAGE` for `claimConversation`, `transferConversation`."
   },
   "apis": [
    {
@@ -156,7 +149,7 @@
    "provenance": "generated",
    "board": "wireframes/P12 Venue Support.dc.html#sup-004"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formTransferConversation",
@@ -250,7 +243,7 @@
   "name": "Live Chat Workspace",
   "module": "Conversations",
   "requiresModule": "marketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C32",
   "implementation": {
    "app": "venue-support-web",
@@ -287,7 +280,7 @@
     }
    ]
   },
-  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101) with SUP-004. An agent needs a queue and a place to answer from; canned responses and SLA reporting can wait.",
+  "notes": "States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Pulled forward (CF-101) with SUP-004, into Block A. An agent needs a queue and a place to answer from; canned responses and SLA reporting can wait.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listCases` reads the population and `getCase` reads one of them — list, select, act",
@@ -332,17 +325,11 @@
        "label": "Every case",
        "bindsTo": "Case",
        "columns": [
-        "Case.id",
         "Case.caseNumber",
-        "Case.subjectId",
         "Case.guestName",
         "Case.subject",
-        "Case.categoryId",
         "Case.status",
         "Case.priority",
-        "Case.assignedToPrincipalId",
-        "Case.venueId",
-        "Case.relatedOrderId",
         "Case.slaDueAt"
        ],
        "operation": "listCases",
@@ -359,22 +346,14 @@
        "label": "The selected case",
        "bindsTo": "Case",
        "columns": [
-        "Case.id",
         "Case.caseNumber",
-        "Case.subjectId",
         "Case.guestName",
         "Case.subject",
         "Case.kind",
         "Case.channel",
         "Case.recordedAt",
-        "Case.syncedAt",
-        "Case.categoryId",
         "Case.status",
-        "Case.priority",
-        "Case.assignedToPrincipalId",
-        "Case.venueId",
-        "Case.relatedOrderId",
-        "Case.slaDueAt"
+        "Case.priority"
        ],
        "operation": "listCases",
        "provenance": "contract marketing-crm.yaml GET /cases"
@@ -384,22 +363,14 @@
        "label": "The conversation",
        "bindsTo": "Conversation",
        "columns": [
-        "Conversation.id",
         "Conversation.telephony",
-        "Conversation.assistSessionId",
         "Conversation.channel",
         "Conversation.state",
-        "Conversation.subjectId",
-        "Conversation.venueId",
-        "Conversation.assignedPrincipalId",
-        "Conversation.queueId",
         "Conversation.queuePosition",
         "Conversation.estimatedWaitSeconds",
         "Conversation.handoverReason",
         "Conversation.handoverSummary",
-        "Conversation.sentiment",
-        "Conversation.intent",
-        "Conversation.locale"
+        "Conversation.sentiment"
        ],
        "operation": "getConversation",
        "provenance": "contract marketing-crm.yaml GET /conversations/{conversationId}"
@@ -409,22 +380,14 @@
        "label": "The case",
        "bindsTo": "CaseDetail",
        "columns": [
-        "CaseDetail.id",
         "CaseDetail.caseNumber",
-        "CaseDetail.subjectId",
         "CaseDetail.guestName",
         "CaseDetail.subject",
         "CaseDetail.kind",
         "CaseDetail.channel",
         "CaseDetail.recordedAt",
-        "CaseDetail.syncedAt",
-        "CaseDetail.categoryId",
         "CaseDetail.status",
-        "CaseDetail.priority",
-        "CaseDetail.assignedToPrincipalId",
-        "CaseDetail.venueId",
-        "CaseDetail.relatedOrderId",
-        "CaseDetail.slaDueAt"
+        "CaseDetail.priority"
        ],
        "operation": "getCase",
        "provenance": "contract marketing-crm.yaml GET /cases/{caseId}"
@@ -646,7 +609,7 @@
    "error": "Could not load. Names which read failed and leaves the live chat untouched.",
    "emptyFirstRun": "No live chat yet. Offers Add case message (`addCaseMessage`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority and the live chat are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `CASE_VIEW`, which `getCase` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `CASE_VIEW`, which `getCase` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASE_MANAGE` for `addCaseMessage`, `updateCase`, `escalateCase`, `createCase` and 4 more."
   },
   "apis": [
    {
@@ -756,7 +719,7 @@
    "provenance": "generated",
    "board": "wireframes/P12 Venue Support.dc.html#sup-005"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-006): The purpose was the generic template (\"Work with live chat workspace for this venue\"); the workspace serves one conversation (design-notes correction customer-marketing SUP-005).",
   "_platform": {
    "code": "P12",

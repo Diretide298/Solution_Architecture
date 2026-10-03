@@ -48,7 +48,7 @@
     {
      "to": "WEB-019",
      "trigger": "Order History",
-     "provenance": "derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-016 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional); WEB-019 finds invoiceId (listTaxInvoices) itself; WEB-019 opens on listMyOrders, and documentId has no source on WEB-019 yet (a gap in WEB-019, not in this edge)"
+     "provenance": "derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-016 holds none of them. The edge carries nothing: orderId, documentId, invoiceId only pre-select (deep link or optional), and WEB-019 opens on its own"
     },
     {
      "to": "WEB-010",
@@ -450,7 +450,7 @@
     "differences": "No password sign-in and no mobile-number OTP (YAML has guestPasswordLogin and 'Email or mobile number'); it is a modal, not a page. Account → Security still shows 'Two-step verification' and passkeys, which the YAML ruled out for guests (R167). Guest checkout route belongs to WEB-012 in the prototype."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -590,20 +590,14 @@
        "label": "The challenge",
        "bindsTo": "Challenge",
        "columns": [
-        "Challenge.id",
         "Challenge.name",
         "Challenge.kind",
-        "Challenge.scope",
-        "Challenge.goal",
-        "Challenge.eventId",
         "Challenge.rewardKind",
         "Challenge.rewardValue",
         "Challenge.rewardAmount",
-        "Challenge.badgeAssetId",
         "Challenge.startsAt",
         "Challenge.endsAt",
-        "Challenge.status",
-        "Challenge.scopePath"
+        "Challenge.status"
        ],
        "operation": "getMyChallenges",
        "provenance": "contract marketing-crm.yaml GET /guests/me/challenges"
@@ -743,7 +737,7 @@
    "derivedFrom": "wireframes/reference/Dashboards Board.dc.html",
    "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -913,14 +907,6 @@
        "label": "The selected entitlement",
        "bindsTo": "Entitlement",
        "columns": [
-        "Entitlement.id",
-        "Entitlement.templateId",
-        "Entitlement.productId",
-        "Entitlement.orderId",
-        "Entitlement.orderLineId",
-        "Entitlement.subjectId",
-        "Entitlement.venueId",
-        "Entitlement.scopePath",
         "Entitlement.mediaCode",
         "Entitlement.status",
         "Entitlement.statusNote",
@@ -1066,7 +1052,7 @@
     "differences": "QR is static — no rotating code with a visible countdown (YAML R230). Prototype adds reschedule, add guests, refund, resale and cancel on the ticket sheet (YAML routes refunds to WEB-019 and transfers to WEB-030)."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formIssueWalletPass",
@@ -1278,18 +1264,13 @@
        "bindsTo": "Order",
        "columns": [
         "Order.orderNumber",
-        "Order.channel",
         "Order.status",
         "Order.currency",
         "Order.grossAmount",
         "Order.taxAmount",
         "Order.netAmount",
         "Order.refundedAmount",
-        "Order.lines",
-        "Order.payments",
-        "Order.chargeCurrency",
-        "Order.chargeTotal",
-        "Order.chargeFxRate"
+        "Order.chargeTotal"
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
@@ -1369,7 +1350,7 @@
     "operationId": "getTaxDocumentRendition",
     "contract": "finance",
     "purpose": "Download the invoice / credit memo PDF",
-    "trigger": "onLoad",
+    "trigger": "onAction",
     "provenance": "build, 29 September 2026"
    },
    {
@@ -1391,11 +1372,15 @@
     },
     {
      "name": "documentId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getTaxDocumentRendition` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "invoiceId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listTaxInvoices` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
@@ -1420,7 +1405,7 @@
     "differences": "A list pane with toast-only actions; no order detail view. Refund request and transfer are rows, not flows."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateRefundRequest",
@@ -1733,13 +1718,13 @@
     "differences": "Split over three panes; fields are read-only with a 'Save changes' toast. No 'which level the current value came from' (YAML purpose). Consent purposes appear as two marketing toggles rather than the configured purpose list."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formUpdateGuestPreferences",
     "component": "modal",
     "trigger": "Save guest preferences",
-    "body": "**Collects what `updateGuestPreferences` sends before it is called.** Nothing in the body is required. Optional: `id`, `subjectId`, `seatingPreference`, `drinkPreferences`, `dietary`, `accessibility`, `preferredChannel`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `updateGuestPreferences` sends before it is called.** Nothing in the body is required. Optional: `seatingPreference`, `drinkPreferences`, `dietary`, `accessibility`, `preferredChannel`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `subjectId` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "GuestPreferences",
     "confirm": {
      "label": "Save guest preferences",
@@ -1748,8 +1733,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "subjectId",
       "seatingPreference",
       "drinkPreferences",
       "dietary",

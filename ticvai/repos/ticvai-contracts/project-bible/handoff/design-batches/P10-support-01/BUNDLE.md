@@ -103,7 +103,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-021` | Support & Contact | B–D | 23 | 44 | 6 | 11 | 0 | 0 | — | notStarted (generated) |
+| `PTR-021` | Support & Contact | D | 23 | 22 | 6 | 11 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -119,7 +119,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Support · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-PARTNER-PTR-021 |
 | Who uses it | partner staff holding `CASE_MANAGE`, `CASE_VIEW` (1 configure, 1 read) |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listCases` reads the population and `getCase` reads one of them — list, select, act |
@@ -203,60 +203,38 @@ Errors to draw in the form: 409 The case is not `resolved` — a `closed` case i
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
 | Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
 | Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
-| Category | the name it points at, never the id | — |
 | Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
 | Priority | chip: Low, Normal, High, Urgent | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Related order | text | — |
 | Sla due at | 1 Oct 2026, 14:30 | — |
 
 **The selected case** (detail panel, from `listCases`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
 | Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
 | Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
 | Kind | chip: Lost property, Complaint, Question, Accessibility, Refund request, Other | What the guest said it was about, where the guest raised it. |
 | Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`. |
 | Recorded at | 1 Oct 2026, 14:30 | Device time the case was raised — the start of the SLA clock. |
-| Synced at | 1 Oct 2026, 14:30 | Server time the case arrived. Equal to `recordedAt` for a case raised online. |
-| Category | the name it points at, never the id | — |
 | Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
 | Priority | chip: Low, Normal, High, Urgent | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Related order | text | — |
-| Sla due at | 1 Oct 2026, 14:30 | — |
 
 **The case** (detail panel, from `getCase`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
 | Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
 | Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
 | Kind | chip: Lost property, Complaint, Question, Accessibility, Refund request, Other | What the guest said it was about, where the guest raised it. |
 | Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`. |
 | Recorded at | 1 Oct 2026, 14:30 | Device time the case was raised — the start of the SLA clock. |
-| Synced at | 1 Oct 2026, 14:30 | Server time the case arrived. Equal to `recordedAt` for a case raised online. |
-| Category | the name it points at, never the id | — |
 | Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
 | Priority | chip: Low, Normal, High, Urgent | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Related order | text | — |
-| Sla due at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -284,7 +262,7 @@ Errors to draw in the form: 409 The case is not `resolved` — a `closed` case i
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the support contact untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No support contact yet. Offers Create case (`createCase`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority and the support contact are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `CASE_VIEW`, which `getCase` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `CASE_VIEW`, which `listCases` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASE_MANAGE` for `createCase`, `addCaseMessage`, `reopenCase`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The case is not `resolved` — a `closed` case is past its reopen window, and an open one has nothing to reopen. (StateTransitionProblem) |
 
@@ -305,7 +283,7 @@ cases:
 - `listCases` → `CASE_VIEW` (read) · staff, guest, partner
 - `reopenCase` → `CASE_MANAGE` (configure) · staff, partner
 
-**A refused user sees:** Shown when the caller lacks `CASE_VIEW`, which `getCase` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `CASE_VIEW`, which `listCases` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASE_MANAGE` for `createCase`, `addCaseMessage`, `reopenCase`.
 
 #### Requirements it meets
 
@@ -342,7 +320,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (23), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-021?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create case, Add case message, Reopen case.
 - [ ] Every transition is wired: `PTR-003`.

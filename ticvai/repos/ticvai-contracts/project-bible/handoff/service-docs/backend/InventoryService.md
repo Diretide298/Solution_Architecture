@@ -30,8 +30,8 @@
 | item | [`createInventoryItem`](#createinventoryitem) | POST | `/inventory-items` | setup | 1 | BO-081, BO-105 |
 | item | [`setInventoryKitDefinition`](#setinventorykitdefinition) | PUT | `/inventory-items/{itemId}/kit-definition` | setup | 1 | BO-081 |
 | item | [`updateInventoryItem`](#updateinventoryitem) | PATCH | `/inventory-items/{itemId}` | setup | 1 | BO-081 |
-| receipt | [`createGoodsReceipt`](#creategoodsreceipt) | POST | `/goods-receipts` | setup | 2 | BO-052, EMP-065 |
-| receipt | [`rejectReceivedGoods`](#rejectreceivedgoods) | POST | `/goods-receipts/{receiptId}/reject` | setup | 2 | BO-052, EMP-065 |
+| receipt | [`createGoodsReceipt`](#creategoodsreceipt) | POST | `/goods-receipts` | setup | 1 | BO-052, EMP-065 |
+| receipt | [`rejectReceivedGoods`](#rejectreceivedgoods) | POST | `/goods-receipts/{receiptId}/reject` | setup | 1 | BO-052, EMP-065 |
 
 ## Group: inventory
 
@@ -394,7 +394,7 @@ Receipt increments stock and creates the accrual the invoice will later match ag
 | Permission | `PROCUREMENT_RECEIVE` |
 | Scope level | venue |
 | Part of slice | setup, makes `inventory.goods_receipt` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `inventory.goods_receipt`, `inventory.goods_receipt_line` |
@@ -478,7 +478,7 @@ Quality failure, damage, wrong item, expiry too near. Reverses the stock increme
 | Permission | `PROCUREMENT_RECEIVE` |
 | Scope level | venue |
 | Part of slice | setup, changes rows of `inventory.goods_receipt` that another operation creates |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `inventory.goods_receipt`, `inventory.goods_receipt_line` |

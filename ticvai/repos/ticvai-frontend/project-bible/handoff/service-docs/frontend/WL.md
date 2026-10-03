@@ -26,33 +26,1188 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 
 | ID | Screen | Module | Wave | Operations |
 |---|---|---|---|---|
+| [ADM-016](#adm-016-white-label-branding-management) | White-Label Branding Management | Branding & Localisation | 1 | 16 |
+| [ADM-017](#adm-017-domain-certificate-management) | Domain & Certificate Management | Branding & Localisation | 1 | 10 |
+| [ADM-018](#adm-018-interface-languages) | Interface Languages | Branding & Localisation | 1 | 5 |
+| [ADM-424](#adm-424-module-activation-dependency-validation) | Module Activation & Dependency Validation | Tenants & Licensing | 1 | 7 |
+| [CMS-001](#cms-001-tenant-workspace) | Tenant Workspace | White Label | 1 | 7 |
+| [CMS-002](#cms-002-brand-kit) | Brand Kit | White Label | 1 | 4 |
+| [CMS-003](#cms-003-typography) | Typography | White Label | 1 | 2 |
+| [CMS-004](#cms-004-logo-assets) | Logo & Assets | White Label | 1 | 4 |
+| [CMS-005](#cms-005-theme-editor) | Theme Editor | White Label | 1 | 2 |
+| [CMS-006](#cms-006-component-preview) | Component Preview | White Label | 1 | 6 |
+| [CMS-007](#cms-007-page-builder) | Page Builder | White Label | 1 | 12 |
+| [CMS-008](#cms-008-content-blocks) | Content Blocks | White Label | 1 | 10 |
+| [CMS-009](#cms-009-navigation-menus) | Navigation & Menus | White Label | 1 | 6 |
+| [CMS-010](#cms-010-media-library) | Media Library | White Label | 1 | 11 |
+| [CMS-011](#cms-011-translations) | Translations | White Label | 1 | 3 |
+| [CMS-012](#cms-012-rtl-preview) | RTL Preview | White Label | 1 | 2 |
+| [CMS-013](#cms-013-seo-metadata) | SEO & Metadata | White Label | 1 | 3 |
+| [CMS-014](#cms-014-publishing-workflow) | Publishing Workflow | White Label | 1 | 10 |
+| [CMS-015](#cms-015-version-history) | Version History | White Label | 1 | 3 |
+| [CMS-016](#cms-016-site-settings) | Site Settings | White Label | 1 | 5 |
+| [CMS-017](#cms-017-domain-certificate) | Domain & Certificate | White Label | 1 | 7 |
+| [CMS-018](#cms-018-consent-legal) | Consent & Legal | White Label | 1 | 8 |
+| [CMS-019](#cms-019-user-access) | User Access | White Label | 1 | 3 |
+| [CMS-101](#cms-101-help-me-choose) | Help Me Choose | White Label | 1 | 12 |
 | [CMS-102](#cms-102-site-builder) | Site Builder | White Label | 1 | 7 |
 | [CMS-103](#cms-103-booking-flows) | Booking Flows | White Label | 1 | 14 |
 | [CMS-104](#cms-104-app-build-store-publishing) | App Build & Store Publishing | White Label | 1 | 9 |
-| [ADM-016](#adm-016-white-label-branding-management) | White-Label Branding Management | Branding & Localisation | 2 | 16 |
-| [ADM-017](#adm-017-domain-certificate-management) | Domain & Certificate Management | Branding & Localisation | 2 | 10 |
-| [ADM-018](#adm-018-interface-languages) | Interface Languages | Branding & Localisation | 2 | 5 |
-| [CMS-001](#cms-001-tenant-workspace) | Tenant Workspace | White Label | 2 | 7 |
-| [CMS-002](#cms-002-brand-kit) | Brand Kit | White Label | 2 | 4 |
-| [CMS-003](#cms-003-typography) | Typography | White Label | 2 | 2 |
-| [CMS-004](#cms-004-logo-assets) | Logo & Assets | White Label | 2 | 4 |
-| [CMS-005](#cms-005-theme-editor) | Theme Editor | White Label | 2 | 2 |
-| [CMS-006](#cms-006-component-preview) | Component Preview | White Label | 2 | 6 |
-| [CMS-007](#cms-007-page-builder) | Page Builder | White Label | 2 | 12 |
-| [CMS-008](#cms-008-content-blocks) | Content Blocks | White Label | 2 | 10 |
-| [CMS-009](#cms-009-navigation-menus) | Navigation & Menus | White Label | 2 | 6 |
-| [CMS-010](#cms-010-media-library) | Media Library | White Label | 2 | 11 |
-| [CMS-011](#cms-011-translations) | Translations | White Label | 2 | 3 |
-| [CMS-012](#cms-012-rtl-preview) | RTL Preview | White Label | 2 | 2 |
-| [CMS-013](#cms-013-seo-metadata) | SEO & Metadata | White Label | 2 | 3 |
-| [CMS-014](#cms-014-publishing-workflow) | Publishing Workflow | White Label | 2 | 10 |
-| [CMS-015](#cms-015-version-history) | Version History | White Label | 2 | 3 |
-| [CMS-016](#cms-016-site-settings) | Site Settings | White Label | 2 | 5 |
-| [CMS-017](#cms-017-domain-certificate) | Domain & Certificate | White Label | 2 | 7 |
-| [CMS-018](#cms-018-consent-legal) | Consent & Legal | White Label | 2 | 8 |
-| [CMS-019](#cms-019-user-access) | User Access | White Label | 2 | 3 |
-| [CMS-101](#cms-101-help-me-choose) | Help Me Choose | White Label | 2 | 12 |
-| [ADM-424](#adm-424-module-activation-dependency-validation) | Module Activation & Dependency Validation | Tenants & Licensing | 3 | 7 |
+
+## ADM-016 White-Label Branding Management
+
+**Support a tenant's branding from the platform console, inside an open grant.**
+
+|  |  |
+|---|---|
+| Module | Branding & Localisation |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/general/white-label-branding-management` |
+| Component | `apps/ticvai-web/src/routes/general/WhiteLabelBrandingManagementForm.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| tenantId | navigation |
+| packageId | navigation |
+| version | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `openPlatformStaffGrant` | [IdentityService](../backend/IdentityService.md#openplatformstaffgrant) | onAction | Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (decided 28 September, audit R098) | `PLATFORM_TENANT_ACCESS` |
+| `listTenants` | [PlatformService](../backend/PlatformService.md#listtenants) | onLoad | The tenant picker — the operator picks a tenant before acting in its cell (audit R098) | `PLATFORM_TENANT_VIEW` |
+| `createPreview` | [WhiteLabelService](../backend/WhiteLabelService.md#createpreview) | onAction | Generate a preview link | `TENANT_CONFIGURE` |
+| `diffConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#diffconfigversion) | onAction | Compare a version against the working draft | `TENANT_CONFIGURE` |
+| `getAppIcons` | [WhiteLabelService](../backend/WhiteLabelService.md#getappicons) | onLoad | Read app icon set | `TENANT_CONFIGURE` |
+| `getBrandIdentity` | [WhiteLabelService](../backend/WhiteLabelService.md#getbrandidentity) | onLoad | Read brand identity | `TENANT_CONFIGURE` |
+| `getTheme` | [WhiteLabelService](../backend/WhiteLabelService.md#gettheme) | onLoad | Read colour theme | `TENANT_CONFIGURE` |
+| `listConfigVersions` | [WhiteLabelService](../backend/WhiteLabelService.md#listconfigversions) | onLoad | Version history | `TENANT_CONFIGURE` |
+| `publishTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#publishtenantconfig) | onAction | Publish the working draft | `TENANT_PUBLISH` |
+| `restoreConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#restoreconfigversion) | onAction | Restore a previous version | `TENANT_PUBLISH` |
+| `setAppIcons` | [WhiteLabelService](../backend/WhiteLabelService.md#setappicons) | onAction | Set app icons | `TENANT_CONFIGURE` |
+| `setBrandIdentity` | [WhiteLabelService](../backend/WhiteLabelService.md#setbrandidentity) | onAction | Set logo, favicon and splash | `TENANT_CONFIGURE` |
+| `setTheme` | [WhiteLabelService](../backend/WhiteLabelService.md#settheme) | onAction | Set colour theme | `TENANT_CONFIGURE` |
+| `listOwnPlatformStaffGrants` | [IdentityService](../backend/IdentityService.md#listownplatformstaffgrants) | onAction | Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001) | `PLATFORM_TENANT_ACCESS` |
+| `exportSitePackage` | [WhiteLabelService](../backend/WhiteLabelService.md#exportsitepackage) | onAction | Generate a site package (self-hosted) | `TENANT_PUBLISH` |
+| `getSitePackage` | [WhiteLabelService](../backend/WhiteLabelService.md#getsitepackage) | onLoad | Follow the generated package until it is ready | `TENANT_PUBLISH` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The white-label branding list. |
+| error | Could not load. Names which read failed and leaves the white-label branding untouched. |
+| emptyFirstRun | No white-label branding yet. Offers Create preview (`createPreview`). |
+| emptyNoResults | Never shown: `listConfigVersions` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `TENANT_CONFIGURE`, `TENANT_PUBLISH` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`. |
+| grantRequired | No access into this tenant yet. A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers Open access grant (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098). |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| ADM-001 | Platform Login / MFA |  |  |
+| ADM-002 | Platform Dashboard |  |  |
+
+## ADM-017 Domain & Certificate Management
+
+**Support a tenant's custom domains and certificates from the platform console.**
+
+|  |  |
+|---|---|
+| Module | Branding & Localisation |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/general/domain-and-certificate-management` |
+| Component | `apps/ticvai-web/src/routes/general/DomainAndCertificateManagementForm.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| domainId | deepLink |
+| tenantId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `openPlatformStaffGrant` | [IdentityService](../backend/IdentityService.md#openplatformstaffgrant) | onAction | Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (decided 28 September, audit R098) | `PLATFORM_TENANT_ACCESS` |
+| `listTenants` | [PlatformService](../backend/PlatformService.md#listtenants) | onLoad | The tenant picker — the operator picks a tenant before acting in its cell (audit R098) | `PLATFORM_TENANT_VIEW` |
+| `listCustomDomains` | [WhiteLabelService](../backend/WhiteLabelService.md#listcustomdomains) | onLoad | The domains this tenant has claimed | `TENANT_CONFIGURE` |
+| `claimCustomDomain` | [WhiteLabelService](../backend/WhiteLabelService.md#claimcustomdomain) | onAction | Claim a domain and get a verification token | `TENANT_CONFIGURE` |
+| `verifyCustomDomain` | [WhiteLabelService](../backend/WhiteLabelService.md#verifycustomdomain) | onAction | Check the record and issue the certificate | `TENANT_CONFIGURE` |
+| `relinquishCustomDomain` | [WhiteLabelService](../backend/WhiteLabelService.md#relinquishcustomdomain) | onAction | Give the domain up | `TENANT_CONFIGURE` |
+| `listOwnPlatformStaffGrants` | [IdentityService](../backend/IdentityService.md#listownplatformstaffgrants) | onAction | Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001) | `PLATFORM_TENANT_ACCESS` |
+| `getPlatformSubdomain` | [WhiteLabelService](../backend/WhiteLabelService.md#getplatformsubdomain) | onLoad | The tenant's platform subdomain in its cell (DEC-546) | `TENANT_CONFIGURE` |
+| `setPrimaryDomain` | [WhiteLabelService](../backend/WhiteLabelService.md#setprimarydomain) | onAction | Make a domain the primary one | `TENANT_CONFIGURE` |
+| `regenerateDomainToken` | [WhiteLabelService](../backend/WhiteLabelService.md#regeneratedomaintoken) | onAction | Issue a new validation token | `TENANT_CONFIGURE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The domain certificate list. |
+| error | Could not load. Names which read failed and leaves the domain certificate untouched. |
+| emptyFirstRun | No domain certificate yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Never shown: `listCustomDomains` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `TENANT_CONFIGURE` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`. |
+| grantRequired | No access into this tenant yet. A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers Open access grant (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098). |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| ADM-001 | Platform Login / MFA |  |  |
+| ADM-002 | Platform Dashboard |  |  |
+| ADM-016 | White-Label Branding Management | tenantId |  |
+
+## ADM-018 Interface Languages
+
+**Add or select a tenant's interface languages beyond English and Arabic, inside an open grant, and see how far the interface strings reach in each.**
+
+|  |  |
+|---|---|
+| Module | Branding & Localisation |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/general/localisation-and-language-pack` |
+| Component | `apps/ticvai-web/src/routes/general/LocalisationAndLanguagePackDetail.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| bannerId | deepLink |
+| pageId | deepLink |
+| policyKind | deepLink |
+| version | deepLink |
+| tenantId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `openPlatformStaffGrant` | [IdentityService](../backend/IdentityService.md#openplatformstaffgrant) | onAction | Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (decided 28 September, audit R098) | `PLATFORM_TENANT_ACCESS` |
+| `listTenants` | [PlatformService](../backend/PlatformService.md#listtenants) | onLoad | The tenant picker — the operator picks a tenant before acting in its cell (audit R098) | `PLATFORM_TENANT_VIEW` |
+| `setLanguages` | [WhiteLabelService](../backend/WhiteLabelService.md#setlanguages) | onAction | from page inventory | `TENANT_CONFIGURE` |
+| `listOwnPlatformStaffGrants` | [IdentityService](../backend/IdentityService.md#listownplatformstaffgrants) | onAction | Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001) | `PLATFORM_TENANT_ACCESS` |
+| `getTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantconfig) | onLoad | The tenant's languages in force | `TENANT_CONFIGURE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The localisation language pack list. |
+| error | Could not load. Names which read failed and leaves the localisation language pack untouched. |
+| emptyFirstRun | No localisation language pack yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Never shown: `listFaqs` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `TENANT_CONFIGURE` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`. |
+| grantRequired | No access into this tenant yet. A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers Open access grant (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098). |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| ADM-001 | Platform Login / MFA |  |  |
+| ADM-002 | Platform Dashboard |  |  |
+
+## ADM-424 Module Activation & Dependency Validation
+
+**Activate the modules purchased in Board 4/5 and verify all required dependencies.**
+
+|  |  |
+|---|---|
+| Module | Tenants & Licensing |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/tenants-licensing/module-activation-dependency-validation-adm-424` |
+| Component | `apps/ticvai-web/src/routes/tenants-licensing/ModuleActivationDependencyValidation.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| tenantId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listTenants` | [PlatformService](../backend/PlatformService.md#listtenants) | onLoad | Pick the tenant whose modules are being activated (audit R098) | `PLATFORM_TENANT_VIEW` |
+| `openPlatformStaffGrant` | [IdentityService](../backend/IdentityService.md#openplatformstaffgrant) | onAction | Open a time-boxed, audited grant into the picked tenant before activating anything (audit R098) | `PLATFORM_TENANT_ACCESS` |
+| `getTenantLicences` | [PlatformService](../backend/PlatformService.md#gettenantlicences) | onLoad | The modules the tenant has bought | `PLATFORM_TENANT_VIEW` |
+| `listModuleCatalogue` | [PlatformService](../backend/PlatformService.md#listmodulecatalogue) | onLoad | Each module's dependencies, to validate before activation | `PLATFORM_PLAN_MANAGE` |
+| `getModuleEnablement` | [WhiteLabelService](../backend/WhiteLabelService.md#getmoduleenablement) | onLoad | Which modules are switched on now | `TENANT_CONFIGURE` |
+| `setModuleEnablement` | [WhiteLabelService](../backend/WhiteLabelService.md#setmoduleenablement) | onAction | Switch the purchased modules on | `TENANT_CONFIGURE` |
+| `listOwnPlatformStaffGrants` | [IdentityService](../backend/IdentityService.md#listownplatformstaffgrants) | onAction | Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001) | `PLATFORM_TENANT_ACCESS` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The module activation dependency list. |
+| error | Could not load. Names which read failed and leaves the module activation dependency untouched. |
+| emptyFirstRun | No module activation dependency yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
+| emptyNoResults | The filter narrowed it and the module activation dependency are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| grantRequired | No access into this tenant yet. A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers Open access grant (`openPlatformStaffGrant`: reason, permissions `TENANT_CONFIGURE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| ADM-419 | Back to Provisioning Command Center |  |  |
+
+## CMS-001 Tenant Workspace
+
+**Land a tenant somewhere that shows what is live and what is not, and hold step 1 of the Site Builder (venue and modules).**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/tenant-workspace` |
+| Component | `apps/venue-management-web/src/routes/white-label/TenantWorkspaceDetail.tsx` |
+| Pattern | statusTracker |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | Whether the guest web and app are live | `None` |
+| `getModuleEnablement` | [WhiteLabelService](../backend/WhiteLabelService.md#getmoduleenablement) | onLoad | Which modules guests can see | `TENANT_CONFIGURE` |
+| `getFeatureToggles` | [WhiteLabelService](../backend/WhiteLabelService.md#getfeaturetoggles) | onLoad | Which features are switched on | `TENANT_CONFIGURE` |
+| `setModuleEnablement` | [WhiteLabelService](../backend/WhiteLabelService.md#setmoduleenablement) | onAction | Switch a module on or off for guests | `TENANT_CONFIGURE` |
+| `setFeatureToggles` | [WhiteLabelService](../backend/WhiteLabelService.md#setfeaturetoggles) | onAction | Switch a feature on or off | `TENANT_CONFIGURE` |
+| `setMaintenanceMode` | [WhiteLabelService](../backend/WhiteLabelService.md#setmaintenancemode) | onAction | Put the guest web and app into maintenance, and set the rest of the live app status — minimum app version, contact details, availability (decided 28 September, audit R073) | `TENANT_CONFIGURE` |
+| `getSiteSetupProgress` | [WhiteLabelService](../backend/WhiteLabelService.md#getsitesetupprogress) | onLoad | Where the tenant is in the Site Builder | `TENANT_CONFIGURE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The tenant, read by `getTenantAppStatus`. |
+| error | Could not load. Names which read failed and leaves the tenant untouched. |
+| emptyFirstRun | Nothing published yet: the status shows "Never published" and the Site Builder card offers to start (CMS-102). A tenant always exists here. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTenantConfig` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-102 | Site Builder |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-004 | Logo & Assets |  |  |
+| CMS-061 | Digital Asset Management Command Center |  |  |
+| CMS-071 | AI Asset Intelligence Command Center |  |  |
+| CMS-081 | DAM Governance & Rights Command Center |  |  |
+| CMS-091 | Asset Distribution & Delivery Command Center |  |  |
+| CMS-008 | Content Blocks |  |  |
+| CMS-009 | Navigation & Menus |  |  |
+| CMS-010 | Media Library |  |  |
+| CMS-011 | Translations |  |  |
+| CMS-016 | Site Settings |  |  |
+| CMS-019 | User Access |  |  |
+| CMS-015 | Version History | version |  |
+| CMS-021 | Privacy & Consent Configuration Command Center |  |  |
+| CMS-031 | Privacy Operations Command Center |  |  |
+| CMS-041 | Waiver & Consent Command Center |  |  |
+| CMS-051 | Waiver Operations Command Center |  |  |
+| CMS-003 | Typography |  |  |
+
+## CMS-002 Brand Kit
+
+**Set the things every surface reads.**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/brand-kit` |
+| Component | `apps/venue-management-web/src/routes/white-label/BrandKitDetail.tsx` |
+| Pattern | statusTracker |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| uploadId | deepLink |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getBrandIdentity` | [WhiteLabelService](../backend/WhiteLabelService.md#getbrandidentity) | onLoad | Read brand identity | `TENANT_CONFIGURE` |
+| `setBrandIdentity` | [WhiteLabelService](../backend/WhiteLabelService.md#setbrandidentity) | onAction | Set logo, favicon and splash | `TENANT_CONFIGURE` |
+| `createUpload` | [VenueOpsService](../backend/VenueOpsService.md#createupload) | onAction | Request a signed upload URL | `ASSET_LIBRARY_MANAGE` |
+| `completeUpload` | [VenueOpsService](../backend/VenueOpsService.md#completeupload) | background | Completes the upload behind the one upload control | `ASSET_LIBRARY_MANAGE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The brand kit, read by `getBrandIdentity`. |
+| error | Could not load. Names which read failed and leaves the brand kit untouched. |
+| emptyFirstRun | No brand kit yet. Offers Create upload (`createUpload`). |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getBrandIdentity` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-005 | Sets the colour theme |  |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-003 | Typography |  |  |
+| CMS-004 | Logo & Assets |  |  |
+
+## CMS-003 Typography
+
+**Choose the two typefaces, Latin and Arabic; the type scale is TICVAI's fixed token set.**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/typography` |
+| Component | `apps/venue-management-web/src/routes/white-label/TypographyDetail.tsx` |
+| Pattern | statusTracker |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getFonts` | [WhiteLabelService](../backend/WhiteLabelService.md#getfonts) | onLoad | Read font configuration | `TENANT_CONFIGURE` |
+| `setFonts` | [WhiteLabelService](../backend/WhiteLabelService.md#setfonts) | onAction | Set fonts | `TENANT_CONFIGURE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The typography, read by `getFonts`. |
+| error | Could not load. Names which read failed and leaves the typography untouched. |
+| emptyFirstRun | No typography yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getFonts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-004 | Logo & Assets |  |  |
+| CMS-006 | Component Preview |  |  |
+
+## CMS-004 Logo & Assets
+
+**Hold the marks every surface needs, at the sizes it needs them, and the mobile app's intro video (Site Builder steps 5 and 6).**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/logo-assets` |
+| Component | `apps/venue-management-web/src/routes/white-label/LogoAssetsDetail.tsx` |
+| Pattern | statusTracker |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getBrandIdentity` | [WhiteLabelService](../backend/WhiteLabelService.md#getbrandidentity) | onLoad | The logo, favicon and splash in use | `TENANT_CONFIGURE` |
+| `getAppIcons` | [WhiteLabelService](../backend/WhiteLabelService.md#getappicons) | onLoad | The app icon set at every size | `TENANT_CONFIGURE` |
+| `setAppIcons` | [WhiteLabelService](../backend/WhiteLabelService.md#setappicons) | onAction | Replace the app icon set | `TENANT_CONFIGURE` |
+| `setBrandIdentity` | [WhiteLabelService](../backend/WhiteLabelService.md#setbrandidentity) | onAction | Replace a logo, favicon or splash | `TENANT_CONFIGURE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The logo assets, read by `getBrandIdentity`. |
+| error | Could not load. Names which read failed and leaves the logo assets untouched. |
+| emptyFirstRun | No logo assets yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getBrandIdentity` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
+
+## CMS-005 Theme Editor
+
+**Tune the theme and watch it apply everywhere at once.**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/theme-editor` |
+| Component | `apps/venue-management-web/src/routes/white-label/ThemeEditorDetail.tsx` |
+| Pattern | statusTracker |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getTheme` | [WhiteLabelService](../backend/WhiteLabelService.md#gettheme) | onLoad | Read colour theme | `TENANT_CONFIGURE` |
+| `setTheme` | [WhiteLabelService](../backend/WhiteLabelService.md#settheme) | onAction | Set colour theme | `TENANT_CONFIGURE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The theme editor, read by `getTheme`. |
+| error | Could not load. Names which read failed and leaves the theme editor untouched. |
+| emptyFirstRun | Before the first save `getTheme` answers 404 not-configured: the editor opens pre-filled from the preset with Save, and the first `setTheme` creates the part. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTheme` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-007 | Rearranges the homepage |  |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
+| CMS-006 | Component Preview |  |  |
+
+## CMS-006 Component Preview
+
+**Check the theme against the components that carry it.**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/component-preview` |
+| Component | `apps/venue-management-web/src/routes/white-label/ComponentPreviewDetail.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| productId | CMS-006 |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `createPreview` | [WhiteLabelService](../backend/WhiteLabelService.md#createpreview) | onAction | Generate a preview link | `TENANT_CONFIGURE` |
+| `getTheme` | [WhiteLabelService](../backend/WhiteLabelService.md#gettheme) | onLoad | The theme being previewed | `TENANT_CONFIGURE` |
+| `getFonts` | [WhiteLabelService](../backend/WhiteLabelService.md#getfonts) | onLoad | The fonts being previewed | `TENANT_CONFIGURE` |
+| `getBrandIdentity` | [WhiteLabelService](../backend/WhiteLabelService.md#getbrandidentity) | onLoad | The marks being previewed | `TENANT_CONFIGURE` |
+| `getBookingFlowConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#getbookingflowconfig) | onLoad | The booking presentation being previewed | `TENANT_CONFIGURE` |
+| `previewProductTickets` | [OrderService](../backend/OrderService.md#previewproducttickets) | onAction | A product's PDF ticket and Apple and Google Wallet pass proofs with the draft theme (CHG-CSP-038) | `PRODUCT_VIEW` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The component preview list. |
+| error | Could not load. Names which read failed and leaves the component preview untouched. |
+| emptyFirstRun | No component preview yet. Offers Create preview (`createPreview`). |
+| emptyNoResults | Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTheme` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_VIEW` for `previewProductTickets`. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
+| CMS-014 | White-Label Branding Management |  |  |
+
+## CMS-007 Page Builder
+
+**Assemble a storefront page from blocks the tenant cannot break.**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/page-builder` |
+| Component | `apps/venue-management-web/src/routes/white-label/PageBuilderDetail.tsx` |
+| Pattern | statusTracker |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| pageId | navigation |
+| actionId | navigation |
+| blockId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listContentPages` | [WhiteLabelService](../backend/WhiteLabelService.md#listcontentpages) | onLoad | The guest app's content pages | `TENANT_CONFIGURE` |
+| `createContentPage` | [WhiteLabelService](../backend/WhiteLabelService.md#createcontentpage) | onAction | Create a content page | `TENANT_CONFIGURE` |
+| `updateContentPage` | [WhiteLabelService](../backend/WhiteLabelService.md#updatecontentpage) | onAction | Edit a content page | `TENANT_CONFIGURE` |
+| `getHomepageLayout` | [WhiteLabelService](../backend/WhiteLabelService.md#gethomepagelayout) | onLoad | Read homepage layout | `TENANT_CONFIGURE` |
+| `setHomepageLayout` | [WhiteLabelService](../backend/WhiteLabelService.md#sethomepagelayout) | onAction | Set homepage section order | `TENANT_CONFIGURE` |
+| `getModuleEnablement` | [WhiteLabelService](../backend/WhiteLabelService.md#getmoduleenablement) | onLoad | Which modules are on, so a section whose module is off is disabled in the builder (decided 28 September, audit R163 (4)) | `TENANT_CONFIGURE` |
+| `deleteContentPage` | [WhiteLabelService](../backend/WhiteLabelService.md#deletecontentpage) | onAction | Delete a content page | `TENANT_CONFIGURE` |
+| `proposeMarketingContent` | [AiService](../backend/AiService.md#proposemarketingcontent) | onAction | Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply | `AI_USE` |
+| `decideProposedAction` | [AiService](../backend/AiService.md#decideproposedaction) | onAction | Record which AI draft or proposal was used, or why it was refused | `AI_USE` |
+| `createContentBlock` | [WhiteLabelService](../backend/WhiteLabelService.md#createcontentblock) | onAction | Author a scheduled or personalised content block (BL-172) | `TENANT_CONFIGURE` |
+| `publishContentBlock` | [WhiteLabelService](../backend/WhiteLabelService.md#publishcontentblock) | onAction | Publish a block now or on its schedule; follows the publish review policy (CHG-CSA-042) | `TENANT_PUBLISH` |
+| `listLandingPageTemplates` | [WhiteLabelService](../backend/WhiteLabelService.md#listlandingpagetemplates) | onLoad | The landing-page templates TICVAI provides (DEC-548) | `TENANT_CONFIGURE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The record, read by `getHomepageLayout`. |
+| error | Could not load. Names which read failed and leaves the record untouched. |
+| emptyFirstRun | No record yet. Offers Create content page (`createContentPage`). |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listContentPages` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `proposeMarketingContent`, `decideProposedAction`; `TENANT_PUBLISH` for `publishContentBlock`. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-012 | Previews in both directions |  |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
+
+## CMS-008 Content Blocks
+
+**Define what a block can and cannot contain, and set the banners (Site Builder step 5).**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/content-blocks` |
+| Component | `apps/venue-management-web/src/routes/white-label/ContentBlocksDetail.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| bannerId | navigation |
+| promoBlockId | navigation |
+| actionId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `createBanner` | [WhiteLabelService](../backend/WhiteLabelService.md#createbanner) | onAction | Create a banner | `TENANT_CONFIGURE` |
+| `updateBanner` | [WhiteLabelService](../backend/WhiteLabelService.md#updatebanner) | onAction | Change or schedule a banner | `TENANT_CONFIGURE` |
+| `createPromoBlock` | [WhiteLabelService](../backend/WhiteLabelService.md#createpromoblock) | onAction | Create a promo block | `TENANT_CONFIGURE` |
+| `updatePromoBlock` | [WhiteLabelService](../backend/WhiteLabelService.md#updatepromoblock) | onAction | Change a promo block | `TENANT_CONFIGURE` |
+| `deletePromoBlock` | [WhiteLabelService](../backend/WhiteLabelService.md#deletepromoblock) | onAction | Remove a promo block | `TENANT_CONFIGURE` |
+| `listPromoBlocks` | [WhiteLabelService](../backend/WhiteLabelService.md#listpromoblocks) | onLoad | List promotional blocks | `TENANT_CONFIGURE` |
+| `listBanners` | [WhiteLabelService](../backend/WhiteLabelService.md#listbanners) | onLoad | List banners | `TENANT_CONFIGURE` |
+| `deleteBanner` | [WhiteLabelService](../backend/WhiteLabelService.md#deletebanner) | onAction | Delete a banner | `TENANT_CONFIGURE` |
+| `proposeMarketingContent` | [AiService](../backend/AiService.md#proposemarketingcontent) | onAction | Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply | `AI_USE` |
+| `decideProposedAction` | [AiService](../backend/AiService.md#decideproposedaction) | onAction | Record which AI draft or proposal was used, or why it was refused | `AI_USE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The content blocks list. |
+| error | Could not load. Names which read failed and leaves the content blocks untouched. |
+| emptyFirstRun | No content blocks yet. Offers Create banner (`createBanner`). |
+| emptyNoResults | Never shown: `listPromoBlocks` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listPromoBlocks` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `proposeMarketingContent`, `decideProposedAction`. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
+
+## CMS-009 Navigation & Menus
+
+**Three editors, each saved on its own: the header, the footer and the mobile tab bar with the Buy tickets button (Site Builder steps 5 and 6); and the links a tenant's own site uses to deep-link in.**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/navigation-menus` |
+| Component | `apps/venue-management-web/src/routes/white-label/NavigationMenusDetail.tsx` |
+| Pattern | listDetail |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getNavigation` | [WhiteLabelService](../backend/WhiteLabelService.md#getnavigation) | onLoad | The navigation and the mobile tab set (MOB-1) | `TENANT_CONFIGURE` |
+| `setNavigation` | [WhiteLabelService](../backend/WhiteLabelService.md#setnavigation) | onAction | Save the navigation, the mobile tabs and the Buy tickets button (MOB-1, MOB-2) | `TENANT_CONFIGURE` |
+| `setHeader` | [WhiteLabelService](../backend/WhiteLabelService.md#setheader) | onAction | The header editor, saved on its own (DEC-049) | `TENANT_CONFIGURE` |
+| `setFooter` | [WhiteLabelService](../backend/WhiteLabelService.md#setfooter) | onAction | The footer editor, saved on its own (DEC-049) | `TENANT_CONFIGURE` |
+| `getDeepLinkScheme` | [WhiteLabelService](../backend/WhiteLabelService.md#getdeeplinkscheme) | onLoad | The published deep-link scheme (DEC-548) | `TENANT_CONFIGURE` |
+| `buildDeepLink` | [WhiteLabelService](../backend/WhiteLabelService.md#builddeeplink) | onAction | Build a deep link to a target for a tenant's own site (DEC-548) | `TENANT_CONFIGURE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The navigation menus list. |
+| error | Could not load. Names which read failed and leaves the navigation menus untouched. |
+| emptyFirstRun | Nothing configured yet: the header, footer and tab bar open with the preset's defaults, each with its own Save. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getNavigation` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
+
+## CMS-010 Media Library
+
+**Hold the imagery, and know where it is used.**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/media-library` |
+| Component | `apps/venue-management-web/src/routes/white-label/MediaLibraryDetail.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| mediaId | deepLink |
+| uploadId | deepLink |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `searchMedia` | [VenueOpsService](../backend/VenueOpsService.md#searchmedia) | onLoad | Search the asset library | `ASSET_LIBRARY_VIEW` |
+| `completeUpload` | [VenueOpsService](../backend/VenueOpsService.md#completeupload) | onAction | Confirm an upload and create the asset | `ASSET_LIBRARY_MANAGE` |
+| `createCollection` | [VenueOpsService](../backend/VenueOpsService.md#createcollection) | onAction | Create a collection | `ASSET_LIBRARY_MANAGE` |
+| `createUpload` | [VenueOpsService](../backend/VenueOpsService.md#createupload) | onAction | Request a signed upload URL | `ASSET_LIBRARY_MANAGE` |
+| `deleteMediaAsset` | [VenueOpsService](../backend/VenueOpsService.md#deletemediaasset) | onAction | Delete an asset | `ASSET_LIBRARY_MANAGE` |
+| `getExpiringRights` | [VenueOpsService](../backend/VenueOpsService.md#getexpiringrights) | onLoad | Assets whose licence is expiring or expired | `ASSET_LIBRARY_VIEW` |
+| `getMediaAsset` | [VenueOpsService](../backend/VenueOpsService.md#getmediaasset) | onAction | Read an asset with derivatives and usage | `ASSET_LIBRARY_VIEW` |
+| `listCollections` | [VenueOpsService](../backend/VenueOpsService.md#listcollections) | onLoad | List collections | `ASSET_LIBRARY_VIEW` |
+| `replaceMediaAsset` | [VenueOpsService](../backend/VenueOpsService.md#replacemediaasset) | onAction | Replace the file behind an asset | `ASSET_LIBRARY_MANAGE` |
+| `updateMediaAsset` | [VenueOpsService](../backend/VenueOpsService.md#updatemediaasset) | onAction | Amend metadata, tags or rights | `ASSET_LIBRARY_MANAGE` |
+| `semanticSearch` | [AiService](../backend/AiService.md#semanticsearch) | onAction | Natural-language search of the media library (kind media) | `AI_USE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The media list. |
+| error | Could not load. Names which read failed and leaves the media untouched. |
+| emptyFirstRun | No media yet. Offers Create collection (`createCollection`); distinct from a filter that matched nothing. |
+| emptyNoResults | Nothing matches the filter on kind, tag, collectionId, venueId, search, unusedOnly and the media are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `ASSET_LIBRARY_VIEW`, which `searchMedia` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `semanticSearch`; `ASSET_LIBRARY_MANAGE` for `completeUpload`, `createCollection`, `createUpload`, `deleteMediaAsset` and 2 more. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit | uploadId |  |
+| CMS-003 | Typography |  |  |
+
+## CMS-011 Translations
+
+**Fill in what every language is missing.**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/translations` |
+| Component | `apps/venue-management-web/src/routes/white-label/TranslationsDetail.tsx` |
+| Pattern | configEditor |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| translationJobId | CMS-011 |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `setLanguages` | [WhiteLabelService](../backend/WhiteLabelService.md#setlanguages) | onAction | Set enabled languages and default | `TENANT_CONFIGURE` |
+| `getTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantconfig) | onLoad | Languages and translation gaps | `TENANT_CONFIGURE` |
+| `getTranslationProposals` | [AiService](../backend/AiService.md#gettranslationproposals) | onAction | Follow a translation job and review its proposals (CHG-CSA-045) | `TENANT_CONFIGURE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The saved translations. |
+| error | Could not load. Names which read failed and leaves the translations untouched. |
+| emptyFirstRun | No translations configured. The form opens empty and `setLanguages` saves the first one; it says what the platform does in the meantime. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `setLanguages` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
+
+## CMS-012 RTL Preview
+
+**See the site as an Arabic reader sees it.**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/rtl-preview` |
+| Component | `apps/venue-management-web/src/routes/white-label/RtlPreviewDetail.tsx` |
+| Pattern | statusTracker |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `validateTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#validatetenantconfig) | onAction | Validate the working draft | `TENANT_CONFIGURE` |
+| `createPreview` | [WhiteLabelService](../backend/WhiteLabelService.md#createpreview) | onAction | A preview of the draft with language ar | `TENANT_CONFIGURE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The Arabic preview of the draft. |
+| error | Could not load. Names which read failed and leaves the rtl preview untouched. |
+| emptyFirstRun | No rtl preview yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTenantConfig` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-014 | Publishes |  |  |
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
+
+## CMS-013 SEO & Metadata
+
+**Control how a page looks everywhere it is not the page.**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/seo-metadata` |
+| Component | `apps/venue-management-web/src/routes/white-label/SeoMetadataDetail.tsx` |
+| Pattern | configEditor |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `setSeoMetadata` | [MarketingService](../backend/MarketingService.md#setseometadata) | onAction | Title, description and share image | `MARKETING_MANAGE` |
+| `getSeoMetadata` | [MarketingService](../backend/MarketingService.md#getseometadata) | onLoad | The metadata in force for this page | `MARKETING_VIEW` |
+| `createUrlRedirect` | [MarketingService](../backend/MarketingService.md#createurlredirect) | onAction | Redirect the old address when the slug changes | `MARKETING_MANAGE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | Detail loads |
+| error | Could not load |
+| emptyFirstRun | No metadata saved for this page yet: the generated title and description are shown with the "Generated" badge. |
+| emptyNoAccess | Shown when the caller lacks `MARKETING_VIEW`, which `getSeoMetadata` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setSeoMetadata`, `createUrlRedirect`. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
+
+## CMS-014 Publishing Workflow
+
+**Move a change from draft to live, with someone accountable (Site Builder step 7).**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/publishing-workflow` |
+| Component | `apps/venue-management-web/src/routes/white-label/PublishingWorkflowDetail.tsx` |
+| Pattern | statusTracker |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| venueId | session |
+| version | navigation |
+| packageId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `publishTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#publishtenantconfig) | onAction | Publish the working draft | `TENANT_PUBLISH` |
+| `validateTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#validatetenantconfig) | onAction | Validate the working draft | `TENANT_CONFIGURE` |
+| `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | App status and recent changes | `None` |
+| `listBookingFlows` | [WhiteLabelService](../backend/WhiteLabelService.md#listbookingflows) | onLoad | The venue's flows and whether each is valid, for the gate (W12) | `TENANT_CONFIGURE` |
+| `diffConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#diffconfigversion) | onAction | What changes against the live version | `TENANT_CONFIGURE` |
+| `createPreview` | [WhiteLabelService](../backend/WhiteLabelService.md#createpreview) | onAction | Preview the draft before publishing | `TENANT_CONFIGURE` |
+| `getPublishReviewPolicy` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishreviewpolicy) | onLoad | Whether publishing needs a review (off by default, DEC-156) | `TENANT_CONFIGURE` |
+| `setPublishReviewPolicy` | [WhiteLabelService](../backend/WhiteLabelService.md#setpublishreviewpolicy) | onAction | Switch the optional review step on or off (DEC-156) | `TENANT_PUBLISH` |
+| `exportSitePackage` | [WhiteLabelService](../backend/WhiteLabelService.md#exportsitepackage) | onAction | Generate a site package for a self-hosted tenant (DEC-144) | `TENANT_PUBLISH` |
+| `getSitePackage` | [WhiteLabelService](../backend/WhiteLabelService.md#getsitepackage) | onAction | The site package and its download link | `TENANT_PUBLISH` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The publishing workflow, read by `getTenantAppStatus`. |
+| error | Could not load. Names which read failed and leaves the publishing workflow untouched. |
+| emptyFirstRun | No publishing workflow yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_PUBLISH` for `publishTenantConfig`, `setPublishReviewPolicy`, `exportSitePackage`, `getSitePackage`. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
+| CMS-103 | Fix a booking flow | bookingFlowId |  |
+| CMS-104 | Build the mobile app |  |  |
+| CMS-102 | Back to the Site Builder |  |  |
+| CMS-015 | Rolls back when something is wrong | version |  |
+
+## CMS-015 Version History
+
+**See who changed what and go back if it was wrong — by restoring into the draft, reviewing, then publishing.**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/version-history` |
+| Component | `apps/venue-management-web/src/routes/white-label/VersionHistoryDetail.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| version | deepLink |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listConfigVersions` | [WhiteLabelService](../backend/WhiteLabelService.md#listconfigversions) | onLoad | Version history | `TENANT_CONFIGURE` |
+| `diffConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#diffconfigversion) | onAction | Compare a version against the working draft | `TENANT_CONFIGURE` |
+| `restoreConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#restoreconfigversion) | onAction | Restore a previous version into the working draft; it does not publish (audit R139 (b)) | `TENANT_PUBLISH` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The version history list. |
+| error | Could not load. Names which read failed and leaves the version history untouched. |
+| emptyFirstRun | No version history yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Never shown: `listConfigVersions` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listConfigVersions` requires, and names it. A user with `TENANT_CONFIGURE` and not `TENANT_PUBLISH` sees the versions with Restore hidden and the reason named, because `restoreConfigVersion` needs `TENANT_PUBLISH`. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
+| CMS-014 | Review and publish the restored draft | version |  |
+
+## CMS-016 Site Settings
+
+**The values the whole site inherits from, and the venue-wide booking settings each venue may override (decided 29 September, rev 3 CFG-11); the settings of one flow are on CMS-103 (W12).**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/site-settings` |
+| Component | `apps/venue-management-web/src/routes/white-label/SiteSettingsDetail.tsx` |
+| Pattern | statusTracker |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getBookingFlowConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#getbookingflowconfig) | onLoad | How the guest booking flow looks and steps | `TENANT_CONFIGURE` |
+| `setBookingFlowConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#setbookingflowconfig) | onAction | Preset, step indicator, cart layout, embed mode | `TENANT_CONFIGURE` |
+| `listOrgUnits` | [TenancyService](../backend/TenancyService.md#listorgunits) | onLoad | The tenant's venues, for the per-venue override picker (rev 3 CFG-11) | `SCOPE_VIEW` |
+| `listAnalyticsProviders` | [WhiteLabelService](../backend/WhiteLabelService.md#listanalyticsproviders) | onLoad | Connected analytics platforms | `TENANT_CONFIGURE` |
+| `setAnalyticsProvider` | [WhiteLabelService](../backend/WhiteLabelService.md#setanalyticsprovider) | onAction | Connect or change an analytics platform | `TENANT_CONFIGURE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The site settings, read by `getTenantConfig`. |
+| error | Could not load. Names which read failed and leaves the site settings untouched. |
+| emptyNoResults | A venue picked in Settings for with no override shows the tenant settings it inherits, labelled as inherited, rather than an empty form (rev 3 CFG-11). |
+| emptyFirstRun | No site settings yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getBookingFlowConfig` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
+| CMS-017 | Domain & Certificate |  |  |
+| CMS-018 | Consent & Legal |  |  |
+| CMS-103 | Booking flows |  |  |
+| CMS-101 | Help me choose |  |  |
+
+## CMS-017 Domain & Certificate
+
+**Point the tenant’s own domain at their site.**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/domain-certificate` |
+| Component | `apps/venue-management-web/src/routes/white-label/DomainCertificateDetail.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| domainId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listCustomDomains` | [WhiteLabelService](../backend/WhiteLabelService.md#listcustomdomains) | onLoad | Domains claimed, and their state | `TENANT_CONFIGURE` |
+| `claimCustomDomain` | [WhiteLabelService](../backend/WhiteLabelService.md#claimcustomdomain) | onAction | Claim a domain | `TENANT_CONFIGURE` |
+| `verifyCustomDomain` | [WhiteLabelService](../backend/WhiteLabelService.md#verifycustomdomain) | onAction | Prove control before it serves traffic | `TENANT_CONFIGURE` |
+| `relinquishCustomDomain` | [WhiteLabelService](../backend/WhiteLabelService.md#relinquishcustomdomain) | onAction | Release a domain | `TENANT_CONFIGURE` |
+| `getPlatformSubdomain` | [WhiteLabelService](../backend/WhiteLabelService.md#getplatformsubdomain) | onLoad | The tenant's platform subdomain (DEC-547) | `TENANT_CONFIGURE` |
+| `setPrimaryDomain` | [WhiteLabelService](../backend/WhiteLabelService.md#setprimarydomain) | onAction | Make a domain the primary one; the others redirect to it (DEC-547) | `TENANT_CONFIGURE` |
+| `regenerateDomainToken` | [WhiteLabelService](../backend/WhiteLabelService.md#regeneratedomaintoken) | onAction | Issue a new validation token when the old one timed out (DEC-547) | `TENANT_CONFIGURE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | Detail loads |
+| error | Could not load |
+| emptyFirstRun | No custom domain yet: "Your site is at venue.<cell>.ticvai.app", with Claim custom domain. |
+| emptyNoResults | Never shown: `listCustomDomains` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listCustomDomains` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
+
+## CMS-018 Consent & Legal
+
+**Manage the notices every consent is captured against, and the booking consent questions a venue asks ("Are you able to swim?", "I accept the risk"), with the record of every answer (decided 29 September, rev 3 REV3-26).**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/consent-legal` |
+| Component | `apps/venue-management-web/src/routes/white-label/ConsentLegalDetail.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| policyKind | navigation |
+| questionId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listPolicies` | [WhiteLabelService](../backend/WhiteLabelService.md#listpolicies) | onLoad | Privacy, terms and cookie notices | `TENANT_CONFIGURE` |
+| `setPolicy` | [WhiteLabelService](../backend/WhiteLabelService.md#setpolicy) | onAction | Edit and publish a notice | `TENANT_CONFIGURE` |
+| `listConsentPurposes` | [MarketingService](../backend/MarketingService.md#listconsentpurposes) | onLoad | What guests can consent to | `GUEST_VIEW` |
+| `setConsentPurposes` | [MarketingService](../backend/MarketingService.md#setconsentpurposes) | onAction | Set the consent purposes | `GUEST_MANAGE` |
+| `listConsentQuestions` | [MarketingService](../backend/MarketingService.md#listconsentquestions) | onLoad | The venue's booking consent questions (rev 3 REV3-26) | `GUEST_VIEW` |
+| `createConsentQuestion` | [MarketingService](../backend/MarketingService.md#createconsentquestion) | onAction | Define a consent question, created at version 1 | `GUEST_MANAGE` |
+| `updateConsentQuestion` | [MarketingService](../backend/MarketingService.md#updateconsentquestion) | onAction | Change a question (a new version) or retire it | `GUEST_MANAGE` |
+| `listConsentAnswers` | [MarketingService](../backend/MarketingService.md#listconsentanswers) | onAction | The consent records, filtered by order, guest or question | `GUEST_VIEW` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The consent legal list. |
+| error | Could not load. Names which read failed and leaves the consent legal untouched. |
+| emptyFirstRun | No policy, purpose or consent question yet. Offers Save policy (`setPolicy`), Save consent purposes (`setConsentPurposes`) and New consent question (`createConsentQuestion`). |
+| emptyNoResults | `listPolicies` takes no filter. The consent questions (kind, status) and the consent records (order, guest, question) do: an empty result names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listPolicies` requires to show this screen, and names that permission (the screen's other reads need `GUEST_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_MANAGE` for `setConsentPurposes`, `createConsentQuestion`, `updateConsentQuestion`. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
+
+## CMS-019 User Access
+
+**Say who in the tenant may change what.**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/user-access` |
+| Component | `apps/venue-management-web/src/routes/white-label/UserAccessDetail.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| principalId | session |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listPrincipals` | [IdentityService](../backend/IdentityService.md#listprincipals) | onLoad | List principals | `USER_MANAGE` |
+| `listRoles` | [IdentityService](../backend/IdentityService.md#listroles) | onLoad | List roles | `ROLE_MANAGE` |
+| `updatePrincipal` | [IdentityService](../backend/IdentityService.md#updateprincipal) | onAction | Grant or remove a CMS role for the selected person | `USER_MANAGE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The user access list. |
+| error | Could not load. Names which read failed and leaves the user access untouched. |
+| emptyFirstRun | Nobody but the tenant owner has access yet: an empty list here is normal on a new tenant. Change access is offered on each person once they exist; people are invited from the platform's user management, not here. |
+| emptyNoResults | Nothing matches the filter on scopePath, isActive and the user access are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-001 | Tenant Workspace |  |  |
+| CMS-002 | Brand Kit |  |  |
+| CMS-003 | Typography |  |  |
+
+## CMS-101 Help Me Choose
+
+**Set up a venue's Help me choose so its answers filter the catalogue, review the question set the assistant proposes from the venue's products, preview the filtered list and publish it (Site Builder step 4).**
+
+|  |  |
+|---|---|
+| Module | White Label |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/white-label/help-me-choose` |
+| Component | `apps/venue-management-web/src/routes/white-label/HelpMeChoose.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| venueId | session |
+| guidedChoiceId | navigation |
+| suggestionId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listGuidedChoices` | [WhiteLabelService](../backend/WhiteLabelService.md#listguidedchoices) | onLoad | The venue's set-ups, filtered by source and status (rev 3 REV3-11) | `TENANT_CONFIGURE` |
+| `createGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#createguidedchoice) | onAction | Start a set-up by hand, as a draft | `TENANT_CONFIGURE` |
+| `updateGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#updateguidedchoice) | onAction | Edit a draft, including an AI suggestion under review | `TENANT_CONFIGURE` |
+| `deleteGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#deleteguidedchoice) | onAction | Delete a draft or dismiss a suggestion | `TENANT_CONFIGURE` |
+| `publishGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#publishguidedchoice) | onAction | Make a reviewed set-up the one guests see at this venue | `TENANT_PUBLISH` |
+| `unpublishGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#unpublishguidedchoice) | onAction | Stop showing it to guests; back to draft | `TENANT_PUBLISH` |
+| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onAction | Products an answer can open | `PRODUCT_VIEW` |
+| `listProductCategories` | [CatalogueService](../backend/CatalogueService.md#listproductcategories) | onAction | Categories an answer can open | `PRODUCT_VIEW` |
+| `listEvents` | [CatalogueService](../backend/CatalogueService.md#listevents) | onAction | Events an answer can open | `PRODUCT_VIEW` |
+| `listBookingFlows` | [WhiteLabelService](../backend/WhiteLabelService.md#listbookingflows) | onAction | The venue's flows an answer can open (target kind bookingFlow, W12) | `TENANT_CONFIGURE` |
+| `suggestGuidedChoice` | [AiService](../backend/AiService.md#suggestguidedchoice) | onAction | Ask the assistant for a question set from product attributes (age and height rules, level tags, certifications); it lands here as a draft through white-label proposeGuidedChoice (W4) | `AI_USE` |
+| `getGuidedChoiceSuggestion` | [AiService](../backend/AiService.md#getguidedchoicesuggestion) | onAction | The reasons behind a Help me choose suggestion | `AI_USE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The venue's Help me choose set-ups, read by `listGuidedChoices`. |
+| error | Could not load. Names which read failed and leaves the set-ups untouched. |
+| emptyFirstRun | No Help me choose at this venue, so guests see none. Offers New set-up, and says that once the venue's products are uploaded the assistant proposes set-ups here as drafts for review. |
+| emptyNoResults | The source or status filter matched nothing and the venue's other set-ups are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listGuidedChoices` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `suggestGuidedChoice`, `getGuidedChoiceSuggestion`; `PRODUCT_VIEW` for `listProducts`, `listProductCategories`, `listEvents`; `TENANT_PUBLISH` for `publishGuidedChoice`, `unpublishGuidedChoice`. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| CMS-016 | Back to Site Settings |  |  |
+| CMS-102 | Back to the Site Builder |  |  |
 
 ## CMS-102 Site Builder
 
@@ -167,7 +1322,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | error | Could not load. Names which read failed and leaves the flows untouched. |
 | emptyFirstRun | No flows at this venue yet. Guests book through each type's default order until one is picked. Offers the flow-type cards and, from the Site Builder, the preset's flows in one step. |
 | emptyNoResults | The flow-type filter matched nothing and the venue's other flows are still there. Names the filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires, and names that permission. Never an empty table — that reads as *there are no flows*. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires to show this screen, and names that permission (the screen's other reads need `GUEST_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `updateProduct`, `setProductCategories`; `PRODUCT_VIEW` for `listProducts`, `listProductCategories`; `TENANT_PUBLISH` for `publishTenantConfig`. |
 
 **Goes to**
 
@@ -220,7 +1375,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | error | Could not load. Names which read failed. |
 | emptyFirstRun | No build yet. Shows the checklist first: nothing can be built until the client's store account for the platform is recorded and a version is published. |
 | emptyNoResults | No build for the platform picked. Names it and offers the other. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listAppBuilds` requires, and names that permission. |
+| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getStoreAccounts` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `createAiConversation`, `sendAiMessage`; `TENANT_PUBLISH` for `requestAppBuild`. |
 
 **Goes to**
 
@@ -229,1158 +1384,3 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | CMS-102 | Back to the Site Builder |  |  |
 | CMS-004 | App icons and splash |  |  |
 | CMS-014 | Publish the configuration first |  |  |
-
-## ADM-016 White-Label Branding Management
-
-**Support a tenant's branding from the platform console, inside an open grant.**
-
-|  |  |
-|---|---|
-| Module | Branding & Localisation |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/general/white-label-branding-management` |
-| Component | `apps/ticvai-web/src/routes/general/WhiteLabelBrandingManagementForm.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| tenantId | navigation |
-| packageId | navigation |
-| version | navigation |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `openPlatformStaffGrant` | [IdentityService](../backend/IdentityService.md#openplatformstaffgrant) | onAction | Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (decided 28 September, audit R098) | `PLATFORM_TENANT_ACCESS` |
-| `listTenants` | [PlatformService](../backend/PlatformService.md#listtenants) | onLoad | The tenant picker — the operator picks a tenant before acting in its cell (audit R098) | `PLATFORM_TENANT_VIEW` |
-| `createPreview` | [WhiteLabelService](../backend/WhiteLabelService.md#createpreview) | onAction | Generate a preview link | `TENANT_CONFIGURE` |
-| `diffConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#diffconfigversion) | onAction | Compare a version against the working draft | `TENANT_CONFIGURE` |
-| `getAppIcons` | [WhiteLabelService](../backend/WhiteLabelService.md#getappicons) | onLoad | Read app icon set | `TENANT_CONFIGURE` |
-| `getBrandIdentity` | [WhiteLabelService](../backend/WhiteLabelService.md#getbrandidentity) | onLoad | Read brand identity | `TENANT_CONFIGURE` |
-| `getTheme` | [WhiteLabelService](../backend/WhiteLabelService.md#gettheme) | onLoad | Read colour theme | `TENANT_CONFIGURE` |
-| `listConfigVersions` | [WhiteLabelService](../backend/WhiteLabelService.md#listconfigversions) | onLoad | Version history | `TENANT_CONFIGURE` |
-| `publishTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#publishtenantconfig) | onAction | Publish the working draft | `TENANT_PUBLISH` |
-| `restoreConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#restoreconfigversion) | onAction | Restore a previous version | `TENANT_PUBLISH` |
-| `setAppIcons` | [WhiteLabelService](../backend/WhiteLabelService.md#setappicons) | onAction | Set app icons | `TENANT_CONFIGURE` |
-| `setBrandIdentity` | [WhiteLabelService](../backend/WhiteLabelService.md#setbrandidentity) | onAction | Set logo, favicon and splash | `TENANT_CONFIGURE` |
-| `setTheme` | [WhiteLabelService](../backend/WhiteLabelService.md#settheme) | onAction | Set colour theme | `TENANT_CONFIGURE` |
-| `listOwnPlatformStaffGrants` | [IdentityService](../backend/IdentityService.md#listownplatformstaffgrants) | onAction | Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001) | `PLATFORM_TENANT_ACCESS` |
-| `exportSitePackage` | [WhiteLabelService](../backend/WhiteLabelService.md#exportsitepackage) | onAction | Generate a site package (self-hosted) | `TENANT_PUBLISH` |
-| `getSitePackage` | [WhiteLabelService](../backend/WhiteLabelService.md#getsitepackage) | onLoad | Follow the generated package until it is ready | `TENANT_PUBLISH` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The white-label branding list. |
-| error | Could not load. Names which read failed and leaves the white-label branding untouched. |
-| emptyFirstRun | No white-label branding yet. Offers Create preview (`createPreview`). |
-| emptyNoResults | Never shown: `listConfigVersions` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getAppIcons` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| grantRequired | No access into this tenant yet. A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers Open access grant (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098). |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| ADM-001 | Platform Login / MFA |  |  |
-| ADM-002 | Platform Dashboard |  |  |
-
-## ADM-017 Domain & Certificate Management
-
-**Support a tenant's custom domains and certificates from the platform console.**
-
-|  |  |
-|---|---|
-| Module | Branding & Localisation |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/general/domain-and-certificate-management` |
-| Component | `apps/ticvai-web/src/routes/general/DomainAndCertificateManagementForm.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| domainId | deepLink |
-| tenantId | navigation |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `openPlatformStaffGrant` | [IdentityService](../backend/IdentityService.md#openplatformstaffgrant) | onAction | Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (decided 28 September, audit R098) | `PLATFORM_TENANT_ACCESS` |
-| `listTenants` | [PlatformService](../backend/PlatformService.md#listtenants) | onLoad | The tenant picker — the operator picks a tenant before acting in its cell (audit R098) | `PLATFORM_TENANT_VIEW` |
-| `listCustomDomains` | [WhiteLabelService](../backend/WhiteLabelService.md#listcustomdomains) | onLoad | The domains this tenant has claimed | `TENANT_CONFIGURE` |
-| `claimCustomDomain` | [WhiteLabelService](../backend/WhiteLabelService.md#claimcustomdomain) | onAction | Claim a domain and get a verification token | `TENANT_CONFIGURE` |
-| `verifyCustomDomain` | [WhiteLabelService](../backend/WhiteLabelService.md#verifycustomdomain) | onAction | Check the record and issue the certificate | `TENANT_CONFIGURE` |
-| `relinquishCustomDomain` | [WhiteLabelService](../backend/WhiteLabelService.md#relinquishcustomdomain) | onAction | Give the domain up | `TENANT_CONFIGURE` |
-| `listOwnPlatformStaffGrants` | [IdentityService](../backend/IdentityService.md#listownplatformstaffgrants) | onAction | Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001) | `PLATFORM_TENANT_ACCESS` |
-| `getPlatformSubdomain` | [WhiteLabelService](../backend/WhiteLabelService.md#getplatformsubdomain) | onLoad | The tenant's platform subdomain in its cell (DEC-546) | `TENANT_CONFIGURE` |
-| `setPrimaryDomain` | [WhiteLabelService](../backend/WhiteLabelService.md#setprimarydomain) | onAction | Make a domain the primary one | `TENANT_CONFIGURE` |
-| `regenerateDomainToken` | [WhiteLabelService](../backend/WhiteLabelService.md#regeneratedomaintoken) | onAction | Issue a new validation token | `TENANT_CONFIGURE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The domain certificate list. |
-| error | Could not load. Names which read failed and leaves the domain certificate untouched. |
-| emptyFirstRun | No domain certificate yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Never shown: `listCustomDomains` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listCustomDomains` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| grantRequired | No access into this tenant yet. A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers Open access grant (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098). |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| ADM-001 | Platform Login / MFA |  |  |
-| ADM-002 | Platform Dashboard |  |  |
-| ADM-016 | White-Label Branding Management | tenantId |  |
-
-## ADM-018 Interface Languages
-
-**Add or select a tenant's interface languages beyond English and Arabic, inside an open grant, and see how far the interface strings reach in each.**
-
-|  |  |
-|---|---|
-| Module | Branding & Localisation |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/general/localisation-and-language-pack` |
-| Component | `apps/ticvai-web/src/routes/general/LocalisationAndLanguagePackDetail.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| bannerId | deepLink |
-| pageId | deepLink |
-| policyKind | deepLink |
-| version | deepLink |
-| tenantId | navigation |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `openPlatformStaffGrant` | [IdentityService](../backend/IdentityService.md#openplatformstaffgrant) | onAction | Open a time-boxed, audited platform-staff grant into the picked tenant before any tenant-scoped operation here; the tenant sees it (decided 28 September, audit R098) | `PLATFORM_TENANT_ACCESS` |
-| `listTenants` | [PlatformService](../backend/PlatformService.md#listtenants) | onLoad | The tenant picker — the operator picks a tenant before acting in its cell (audit R098) | `PLATFORM_TENANT_VIEW` |
-| `setLanguages` | [WhiteLabelService](../backend/WhiteLabelService.md#setlanguages) | onAction | from page inventory | `TENANT_CONFIGURE` |
-| `listOwnPlatformStaffGrants` | [IdentityService](../backend/IdentityService.md#listownplatformstaffgrants) | onAction | Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001) | `PLATFORM_TENANT_ACCESS` |
-| `getTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantconfig) | onLoad | The tenant's languages in force | `TENANT_CONFIGURE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The localisation language pack list. |
-| error | Could not load. Names which read failed and leaves the localisation language pack untouched. |
-| emptyFirstRun | No localisation language pack yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Never shown: `listFaqs` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listFaqs` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| grantRequired | No access into this tenant yet. A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers Open access grant (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098). |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| ADM-001 | Platform Login / MFA |  |  |
-| ADM-002 | Platform Dashboard |  |  |
-
-## CMS-001 Tenant Workspace
-
-**Land a tenant somewhere that shows what is live and what is not, and hold step 1 of the Site Builder (venue and modules).**
-
-|  |  |
-|---|---|
-| Module | White Label |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/white-label/tenant-workspace` |
-| Component | `apps/venue-management-web/src/routes/white-label/TenantWorkspaceDetail.tsx` |
-| Pattern | statusTracker |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | Whether the guest web and app are live | `None` |
-| `getModuleEnablement` | [WhiteLabelService](../backend/WhiteLabelService.md#getmoduleenablement) | onLoad | Which modules guests can see | `TENANT_CONFIGURE` |
-| `getFeatureToggles` | [WhiteLabelService](../backend/WhiteLabelService.md#getfeaturetoggles) | onLoad | Which features are switched on | `TENANT_CONFIGURE` |
-| `setModuleEnablement` | [WhiteLabelService](../backend/WhiteLabelService.md#setmoduleenablement) | onAction | Switch a module on or off for guests | `TENANT_CONFIGURE` |
-| `setFeatureToggles` | [WhiteLabelService](../backend/WhiteLabelService.md#setfeaturetoggles) | onAction | Switch a feature on or off | `TENANT_CONFIGURE` |
-| `setMaintenanceMode` | [WhiteLabelService](../backend/WhiteLabelService.md#setmaintenancemode) | onAction | Put the guest web and app into maintenance, and set the rest of the live app status — minimum app version, contact details, availability (decided 28 September, audit R073) | `TENANT_CONFIGURE` |
-| `getSiteSetupProgress` | [WhiteLabelService](../backend/WhiteLabelService.md#getsitesetupprogress) | onLoad | Where the tenant is in the Site Builder | `TENANT_CONFIGURE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The tenant, read by `getTenantAppStatus`. |
-| error | Could not load. Names which read failed and leaves the tenant untouched. |
-| emptyFirstRun | Nothing published yet: the status shows "Never published" and the Site Builder card offers to start (CMS-102). A tenant always exists here. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTenantConfig` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| CMS-102 | Site Builder |  |  |
-| CMS-002 | Brand Kit |  |  |
-| CMS-004 | Logo & Assets |  |  |
-| CMS-061 | Digital Asset Management Command Center |  |  |
-| CMS-071 | AI Asset Intelligence Command Center |  |  |
-| CMS-081 | DAM Governance & Rights Command Center |  |  |
-| CMS-091 | Asset Distribution & Delivery Command Center |  |  |
-| CMS-008 | Content Blocks |  |  |
-| CMS-009 | Navigation & Menus |  |  |
-| CMS-010 | Media Library |  |  |
-| CMS-011 | Translations |  |  |
-| CMS-016 | Site Settings |  |  |
-| CMS-019 | User Access |  |  |
-| CMS-015 | Version History | version |  |
-| CMS-021 | Privacy & Consent Configuration Command Center |  |  |
-| CMS-031 | Privacy Operations Command Center |  |  |
-| CMS-041 | Waiver & Consent Command Center |  |  |
-| CMS-051 | Waiver Operations Command Center |  |  |
-| CMS-003 | Typography |  |  |
-
-## CMS-002 Brand Kit
-
-**Set the things every surface reads.**
-
-|  |  |
-|---|---|
-| Module | White Label |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/white-label/brand-kit` |
-| Component | `apps/venue-management-web/src/routes/white-label/BrandKitDetail.tsx` |
-| Pattern | statusTracker |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| uploadId | deepLink |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `getBrandIdentity` | [WhiteLabelService](../backend/WhiteLabelService.md#getbrandidentity) | onLoad | Read brand identity | `TENANT_CONFIGURE` |
-| `setBrandIdentity` | [WhiteLabelService](../backend/WhiteLabelService.md#setbrandidentity) | onAction | Set logo, favicon and splash | `TENANT_CONFIGURE` |
-| `createUpload` | [VenueOpsService](../backend/VenueOpsService.md#createupload) | onAction | Request a signed upload URL | `ASSET_LIBRARY_MANAGE` |
-| `completeUpload` | [VenueOpsService](../backend/VenueOpsService.md#completeupload) | background | Completes the upload behind the one upload control | `ASSET_LIBRARY_MANAGE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The brand kit, read by `getBrandIdentity`. |
-| error | Could not load. Names which read failed and leaves the brand kit untouched. |
-| emptyFirstRun | No brand kit yet. Offers Create upload (`createUpload`). |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getBrandIdentity` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| CMS-005 | Sets the colour theme |  |  |
-| CMS-001 | Tenant Workspace |  |  |
-| CMS-003 | Typography |  |  |
-| CMS-004 | Logo & Assets |  |  |
-
-## CMS-003 Typography
-
-**Choose the two typefaces, Latin and Arabic; the type scale is TICVAI's fixed token set.**
-
-|  |  |
-|---|---|
-| Module | White Label |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/white-label/typography` |
-| Component | `apps/venue-management-web/src/routes/white-label/TypographyDetail.tsx` |
-| Pattern | statusTracker |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `getFonts` | [WhiteLabelService](../backend/WhiteLabelService.md#getfonts) | onLoad | Read font configuration | `TENANT_CONFIGURE` |
-| `setFonts` | [WhiteLabelService](../backend/WhiteLabelService.md#setfonts) | onAction | Set fonts | `TENANT_CONFIGURE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The typography, read by `getFonts`. |
-| error | Could not load. Names which read failed and leaves the typography untouched. |
-| emptyFirstRun | No typography yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getFonts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| CMS-001 | Tenant Workspace |  |  |
-| CMS-002 | Brand Kit |  |  |
-| CMS-004 | Logo & Assets |  |  |
-| CMS-006 | Component Preview |  |  |
-
-## CMS-004 Logo & Assets
-
-**Hold the marks every surface needs, at the sizes it needs them, and the mobile app's intro video (Site Builder steps 5 and 6).**
-
-|  |  |
-|---|---|
-| Module | White Label |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/white-label/logo-assets` |
-| Component | `apps/venue-management-web/src/routes/white-label/LogoAssetsDetail.tsx` |
-| Pattern | statusTracker |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `getBrandIdentity` | [WhiteLabelService](../backend/WhiteLabelService.md#getbrandidentity) | onLoad | The logo, favicon and splash in use | `TENANT_CONFIGURE` |
-| `getAppIcons` | [WhiteLabelService](../backend/WhiteLabelService.md#getappicons) | onLoad | The app icon set at every size | `TENANT_CONFIGURE` |
-| `setAppIcons` | [WhiteLabelService](../backend/WhiteLabelService.md#setappicons) | onAction | Replace the app icon set | `TENANT_CONFIGURE` |
-| `setBrandIdentity` | [WhiteLabelService](../backend/WhiteLabelService.md#setbrandidentity) | onAction | Replace a logo, favicon or splash | `TENANT_CONFIGURE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The logo assets, read by `getBrandIdentity`. |
-| error | Could not load. Names which read failed and leaves the logo assets untouched. |
-| emptyFirstRun | No logo assets yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getBrandIdentity` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| CMS-001 | Tenant Workspace |  |  |
-| CMS-002 | Brand Kit |  |  |
-| CMS-003 | Typography |  |  |
-
-## CMS-005 Theme Editor
-
-**Tune the theme and watch it apply everywhere at once.**
-
-|  |  |
-|---|---|
-| Module | White Label |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/white-label/theme-editor` |
-| Component | `apps/venue-management-web/src/routes/white-label/ThemeEditorDetail.tsx` |
-| Pattern | statusTracker |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `getTheme` | [WhiteLabelService](../backend/WhiteLabelService.md#gettheme) | onLoad | Read colour theme | `TENANT_CONFIGURE` |
-| `setTheme` | [WhiteLabelService](../backend/WhiteLabelService.md#settheme) | onAction | Set colour theme | `TENANT_CONFIGURE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The theme editor, read by `getTheme`. |
-| error | Could not load. Names which read failed and leaves the theme editor untouched. |
-| emptyFirstRun | Before the first save `getTheme` answers 404 not-configured: the editor opens pre-filled from the preset with Save, and the first `setTheme` creates the part. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTheme` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| CMS-007 | Rearranges the homepage |  |  |
-| CMS-001 | Tenant Workspace |  |  |
-| CMS-002 | Brand Kit |  |  |
-| CMS-003 | Typography |  |  |
-| CMS-006 | Component Preview |  |  |
-
-## CMS-006 Component Preview
-
-**Check the theme against the components that carry it.**
-
-|  |  |
-|---|---|
-| Module | White Label |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/white-label/component-preview` |
-| Component | `apps/venue-management-web/src/routes/white-label/ComponentPreviewDetail.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| productId | CMS-006 |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `createPreview` | [WhiteLabelService](../backend/WhiteLabelService.md#createpreview) | onAction | Generate a preview link | `TENANT_CONFIGURE` |
-| `getTheme` | [WhiteLabelService](../backend/WhiteLabelService.md#gettheme) | onLoad | The theme being previewed | `TENANT_CONFIGURE` |
-| `getFonts` | [WhiteLabelService](../backend/WhiteLabelService.md#getfonts) | onLoad | The fonts being previewed | `TENANT_CONFIGURE` |
-| `getBrandIdentity` | [WhiteLabelService](../backend/WhiteLabelService.md#getbrandidentity) | onLoad | The marks being previewed | `TENANT_CONFIGURE` |
-| `getBookingFlowConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#getbookingflowconfig) | onLoad | The booking presentation being previewed | `TENANT_CONFIGURE` |
-| `previewProductTickets` | [OrderService](../backend/OrderService.md#previewproducttickets) | onAction | A product's PDF ticket and Apple and Google Wallet pass proofs with the draft theme (CHG-CSP-038) | `PRODUCT_VIEW` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The component preview list. |
-| error | Could not load. Names which read failed and leaves the component preview untouched. |
-| emptyFirstRun | No component preview yet. Offers Create preview (`createPreview`). |
-| emptyNoResults | Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTheme` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| CMS-001 | Tenant Workspace |  |  |
-| CMS-002 | Brand Kit |  |  |
-| CMS-003 | Typography |  |  |
-| CMS-014 | White-Label Branding Management |  |  |
-
-## CMS-007 Page Builder
-
-**Assemble a storefront page from blocks the tenant cannot break.**
-
-|  |  |
-|---|---|
-| Module | White Label |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/white-label/page-builder` |
-| Component | `apps/venue-management-web/src/routes/white-label/PageBuilderDetail.tsx` |
-| Pattern | statusTracker |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| pageId | navigation |
-| actionId | navigation |
-| blockId | navigation |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listContentPages` | [WhiteLabelService](../backend/WhiteLabelService.md#listcontentpages) | onLoad | The guest app's content pages | `TENANT_CONFIGURE` |
-| `createContentPage` | [WhiteLabelService](../backend/WhiteLabelService.md#createcontentpage) | onAction | Create a content page | `TENANT_CONFIGURE` |
-| `updateContentPage` | [WhiteLabelService](../backend/WhiteLabelService.md#updatecontentpage) | onAction | Edit a content page | `TENANT_CONFIGURE` |
-| `getHomepageLayout` | [WhiteLabelService](../backend/WhiteLabelService.md#gethomepagelayout) | onLoad | Read homepage layout | `TENANT_CONFIGURE` |
-| `setHomepageLayout` | [WhiteLabelService](../backend/WhiteLabelService.md#sethomepagelayout) | onAction | Set homepage section order | `TENANT_CONFIGURE` |
-| `getModuleEnablement` | [WhiteLabelService](../backend/WhiteLabelService.md#getmoduleenablement) | onLoad | Which modules are on, so a section whose module is off is disabled in the builder (decided 28 September, audit R163 (4)) | `TENANT_CONFIGURE` |
-| `deleteContentPage` | [WhiteLabelService](../backend/WhiteLabelService.md#deletecontentpage) | onAction | Delete a content page | `TENANT_CONFIGURE` |
-| `proposeMarketingContent` | [AiService](../backend/AiService.md#proposemarketingcontent) | onAction | Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply | `AI_USE` |
-| `decideProposedAction` | [AiService](../backend/AiService.md#decideproposedaction) | onAction | Record which AI draft or proposal was used, or why it was refused | `AI_USE` |
-| `createContentBlock` | [WhiteLabelService](../backend/WhiteLabelService.md#createcontentblock) | onAction | Author a scheduled or personalised content block (BL-172) | `TENANT_CONFIGURE` |
-| `publishContentBlock` | [WhiteLabelService](../backend/WhiteLabelService.md#publishcontentblock) | onAction | Publish a block now or on its schedule; follows the publish review policy (CHG-CSA-042) | `TENANT_PUBLISH` |
-| `listLandingPageTemplates` | [WhiteLabelService](../backend/WhiteLabelService.md#listlandingpagetemplates) | onLoad | The landing-page templates TICVAI provides (DEC-548) | `TENANT_CONFIGURE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The record, read by `getHomepageLayout`. |
-| error | Could not load. Names which read failed and leaves the record untouched. |
-| emptyFirstRun | No record yet. Offers Create content page (`createContentPage`). |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listContentPages` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| CMS-012 | Previews in both directions |  |  |
-| CMS-001 | Tenant Workspace |  |  |
-| CMS-002 | Brand Kit |  |  |
-| CMS-003 | Typography |  |  |
-
-## CMS-008 Content Blocks
-
-**Define what a block can and cannot contain, and set the banners (Site Builder step 5).**
-
-|  |  |
-|---|---|
-| Module | White Label |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/white-label/content-blocks` |
-| Component | `apps/venue-management-web/src/routes/white-label/ContentBlocksDetail.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| bannerId | navigation |
-| promoBlockId | navigation |
-| actionId | navigation |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `createBanner` | [WhiteLabelService](../backend/WhiteLabelService.md#createbanner) | onAction | Create a banner | `TENANT_CONFIGURE` |
-| `updateBanner` | [WhiteLabelService](../backend/WhiteLabelService.md#updatebanner) | onAction | Change or schedule a banner | `TENANT_CONFIGURE` |
-| `createPromoBlock` | [WhiteLabelService](../backend/WhiteLabelService.md#createpromoblock) | onAction | Create a promo block | `TENANT_CONFIGURE` |
-| `updatePromoBlock` | [WhiteLabelService](../backend/WhiteLabelService.md#updatepromoblock) | onAction | Change a promo block | `TENANT_CONFIGURE` |
-| `deletePromoBlock` | [WhiteLabelService](../backend/WhiteLabelService.md#deletepromoblock) | onAction | Remove a promo block | `TENANT_CONFIGURE` |
-| `listPromoBlocks` | [WhiteLabelService](../backend/WhiteLabelService.md#listpromoblocks) | onLoad | List promotional blocks | `TENANT_CONFIGURE` |
-| `listBanners` | [WhiteLabelService](../backend/WhiteLabelService.md#listbanners) | onLoad | List banners | `TENANT_CONFIGURE` |
-| `deleteBanner` | [WhiteLabelService](../backend/WhiteLabelService.md#deletebanner) | onAction | Delete a banner | `TENANT_CONFIGURE` |
-| `proposeMarketingContent` | [AiService](../backend/AiService.md#proposemarketingcontent) | onAction | Draft subject lines, message bodies or content variants from a brief, for the author to edit and apply | `AI_USE` |
-| `decideProposedAction` | [AiService](../backend/AiService.md#decideproposedaction) | onAction | Record which AI draft or proposal was used, or why it was refused | `AI_USE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The content blocks list. |
-| error | Could not load. Names which read failed and leaves the content blocks untouched. |
-| emptyFirstRun | No content blocks yet. Offers Create banner (`createBanner`). |
-| emptyNoResults | Never shown: `listPromoBlocks` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listPromoBlocks` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| CMS-001 | Tenant Workspace |  |  |
-| CMS-002 | Brand Kit |  |  |
-| CMS-003 | Typography |  |  |
-
-## CMS-009 Navigation & Menus
-
-**Three editors, each saved on its own: the header, the footer and the mobile tab bar with the Buy tickets button (Site Builder steps 5 and 6); and the links a tenant's own site uses to deep-link in.**
-
-|  |  |
-|---|---|
-| Module | White Label |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/white-label/navigation-menus` |
-| Component | `apps/venue-management-web/src/routes/white-label/NavigationMenusDetail.tsx` |
-| Pattern | listDetail |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `getNavigation` | [WhiteLabelService](../backend/WhiteLabelService.md#getnavigation) | onLoad | The navigation and the mobile tab set (MOB-1) | `TENANT_CONFIGURE` |
-| `setNavigation` | [WhiteLabelService](../backend/WhiteLabelService.md#setnavigation) | onAction | Save the navigation, the mobile tabs and the Buy tickets button (MOB-1, MOB-2) | `TENANT_CONFIGURE` |
-| `setHeader` | [WhiteLabelService](../backend/WhiteLabelService.md#setheader) | onAction | The header editor, saved on its own (DEC-049) | `TENANT_CONFIGURE` |
-| `setFooter` | [WhiteLabelService](../backend/WhiteLabelService.md#setfooter) | onAction | The footer editor, saved on its own (DEC-049) | `TENANT_CONFIGURE` |
-| `getDeepLinkScheme` | [WhiteLabelService](../backend/WhiteLabelService.md#getdeeplinkscheme) | onLoad | The published deep-link scheme (DEC-548) | `TENANT_CONFIGURE` |
-| `buildDeepLink` | [WhiteLabelService](../backend/WhiteLabelService.md#builddeeplink) | onAction | Build a deep link to a target for a tenant's own site (DEC-548) | `TENANT_CONFIGURE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The navigation menus list. |
-| error | Could not load. Names which read failed and leaves the navigation menus untouched. |
-| emptyFirstRun | Nothing configured yet: the header, footer and tab bar open with the preset's defaults, each with its own Save. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getNavigation` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| CMS-001 | Tenant Workspace |  |  |
-| CMS-002 | Brand Kit |  |  |
-| CMS-003 | Typography |  |  |
-
-## CMS-010 Media Library
-
-**Hold the imagery, and know where it is used.**
-
-|  |  |
-|---|---|
-| Module | White Label |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/white-label/media-library` |
-| Component | `apps/venue-management-web/src/routes/white-label/MediaLibraryDetail.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| mediaId | deepLink |
-| uploadId | deepLink |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `searchMedia` | [VenueOpsService](../backend/VenueOpsService.md#searchmedia) | onLoad | Search the asset library | `ASSET_LIBRARY_VIEW` |
-| `completeUpload` | [VenueOpsService](../backend/VenueOpsService.md#completeupload) | onAction | Confirm an upload and create the asset | `ASSET_LIBRARY_MANAGE` |
-| `createCollection` | [VenueOpsService](../backend/VenueOpsService.md#createcollection) | onAction | Create a collection | `ASSET_LIBRARY_MANAGE` |
-| `createUpload` | [VenueOpsService](../backend/VenueOpsService.md#createupload) | onAction | Request a signed upload URL | `ASSET_LIBRARY_MANAGE` |
-| `deleteMediaAsset` | [VenueOpsService](../backend/VenueOpsService.md#deletemediaasset) | onAction | Delete an asset | `ASSET_LIBRARY_MANAGE` |
-| `getExpiringRights` | [VenueOpsService](../backend/VenueOpsService.md#getexpiringrights) | onLoad | Assets whose licence is expiring or expired | `ASSET_LIBRARY_VIEW` |
-| `getMediaAsset` | [VenueOpsService](../backend/VenueOpsService.md#getmediaasset) | onAction | Read an asset with derivatives and usage | `ASSET_LIBRARY_VIEW` |
-| `listCollections` | [VenueOpsService](../backend/VenueOpsService.md#listcollections) | onLoad | List collections | `ASSET_LIBRARY_VIEW` |
-| `replaceMediaAsset` | [VenueOpsService](../backend/VenueOpsService.md#replacemediaasset) | onAction | Replace the file behind an asset | `ASSET_LIBRARY_MANAGE` |
-| `updateMediaAsset` | [VenueOpsService](../backend/VenueOpsService.md#updatemediaasset) | onAction | Amend metadata, tags or rights | `ASSET_LIBRARY_MANAGE` |
-| `semanticSearch` | [AiService](../backend/AiService.md#semanticsearch) | onAction | Natural-language search of the media library (kind media) | `AI_USE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The media list. |
-| error | Could not load. Names which read failed and leaves the media untouched. |
-| emptyFirstRun | No media yet. Offers Create collection (`createCollection`); distinct from a filter that matched nothing. |
-| emptyNoResults | Nothing matches the filter on kind, tag, collectionId, venueId, search, unusedOnly and the media are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `ASSET_LIBRARY_VIEW`, which `searchMedia` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| CMS-001 | Tenant Workspace |  |  |
-| CMS-002 | Brand Kit | uploadId |  |
-| CMS-003 | Typography |  |  |
-
-## CMS-011 Translations
-
-**Fill in what every language is missing.**
-
-|  |  |
-|---|---|
-| Module | White Label |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/white-label/translations` |
-| Component | `apps/venue-management-web/src/routes/white-label/TranslationsDetail.tsx` |
-| Pattern | configEditor |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| translationJobId | CMS-011 |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `setLanguages` | [WhiteLabelService](../backend/WhiteLabelService.md#setlanguages) | onAction | Set enabled languages and default | `TENANT_CONFIGURE` |
-| `getTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantconfig) | onLoad | Languages and translation gaps | `TENANT_CONFIGURE` |
-| `getTranslationProposals` | [AiService](../backend/AiService.md#gettranslationproposals) | onAction | Follow a translation job and review its proposals (CHG-CSA-045) | `TENANT_CONFIGURE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The saved translations. |
-| error | Could not load. Names which read failed and leaves the translations untouched. |
-| emptyFirstRun | No translations configured. The form opens empty and `setLanguages` saves the first one; it says what the platform does in the meantime. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `setLanguages` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| CMS-001 | Tenant Workspace |  |  |
-| CMS-002 | Brand Kit |  |  |
-| CMS-003 | Typography |  |  |
-
-## CMS-012 RTL Preview
-
-**See the site as an Arabic reader sees it.**
-
-|  |  |
-|---|---|
-| Module | White Label |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/white-label/rtl-preview` |
-| Component | `apps/venue-management-web/src/routes/white-label/RtlPreviewDetail.tsx` |
-| Pattern | statusTracker |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `validateTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#validatetenantconfig) | onAction | Validate the working draft | `TENANT_CONFIGURE` |
-| `createPreview` | [WhiteLabelService](../backend/WhiteLabelService.md#createpreview) | onAction | A preview of the draft with language ar | `TENANT_CONFIGURE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The Arabic preview of the draft. |
-| error | Could not load. Names which read failed and leaves the rtl preview untouched. |
-| emptyFirstRun | No rtl preview yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getTenantConfig` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| CMS-014 | Publishes |  |  |
-| CMS-001 | Tenant Workspace |  |  |
-| CMS-002 | Brand Kit |  |  |
-| CMS-003 | Typography |  |  |
-
-## CMS-013 SEO & Metadata
-
-**Control how a page looks everywhere it is not the page.**
-
-|  |  |
-|---|---|
-| Module | White Label |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/white-label/seo-metadata` |
-| Component | `apps/venue-management-web/src/routes/white-label/SeoMetadataDetail.tsx` |
-| Pattern | configEditor |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `setSeoMetadata` | [MarketingService](../backend/MarketingService.md#setseometadata) | onAction | Title, description and share image | `MARKETING_MANAGE` |
-| `getSeoMetadata` | [MarketingService](../backend/MarketingService.md#getseometadata) | onLoad | The metadata in force for this page | `MARKETING_VIEW` |
-| `createUrlRedirect` | [MarketingService](../backend/MarketingService.md#createurlredirect) | onAction | Redirect the old address when the slug changes | `MARKETING_MANAGE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | Detail loads |
-| error | Could not load |
-| emptyFirstRun | No metadata saved for this page yet: the generated title and description are shown with the "Generated" badge. |
-| emptyNoAccess | Shown when the caller lacks `MARKETING_MANAGE`, which `setSeoMetadata` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| CMS-001 | Tenant Workspace |  |  |
-| CMS-002 | Brand Kit |  |  |
-| CMS-003 | Typography |  |  |
-
-## CMS-014 Publishing Workflow
-
-**Move a change from draft to live, with someone accountable (Site Builder step 7).**
-
-|  |  |
-|---|---|
-| Module | White Label |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/white-label/publishing-workflow` |
-| Component | `apps/venue-management-web/src/routes/white-label/PublishingWorkflowDetail.tsx` |
-| Pattern | statusTracker |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| venueId | session |
-| version | navigation |
-| packageId | navigation |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `publishTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#publishtenantconfig) | onAction | Publish the working draft | `TENANT_PUBLISH` |
-| `validateTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#validatetenantconfig) | onAction | Validate the working draft | `TENANT_CONFIGURE` |
-| `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | App status and recent changes | `None` |
-| `listBookingFlows` | [WhiteLabelService](../backend/WhiteLabelService.md#listbookingflows) | onLoad | The venue's flows and whether each is valid, for the gate (W12) | `TENANT_CONFIGURE` |
-| `diffConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#diffconfigversion) | onAction | What changes against the live version | `TENANT_CONFIGURE` |
-| `createPreview` | [WhiteLabelService](../backend/WhiteLabelService.md#createpreview) | onAction | Preview the draft before publishing | `TENANT_CONFIGURE` |
-| `getPublishReviewPolicy` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishreviewpolicy) | onLoad | Whether publishing needs a review (off by default, DEC-156) | `TENANT_CONFIGURE` |
-| `setPublishReviewPolicy` | [WhiteLabelService](../backend/WhiteLabelService.md#setpublishreviewpolicy) | onAction | Switch the optional review step on or off (DEC-156) | `TENANT_PUBLISH` |
-| `exportSitePackage` | [WhiteLabelService](../backend/WhiteLabelService.md#exportsitepackage) | onAction | Generate a site package for a self-hosted tenant (DEC-144) | `TENANT_PUBLISH` |
-| `getSitePackage` | [WhiteLabelService](../backend/WhiteLabelService.md#getsitepackage) | onAction | The site package and its download link | `TENANT_PUBLISH` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The publishing workflow, read by `getTenantAppStatus`. |
-| error | Could not load. Names which read failed and leaves the publishing workflow untouched. |
-| emptyFirstRun | No publishing workflow yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_PUBLISH`, which `publishTenantConfig` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| CMS-001 | Tenant Workspace |  |  |
-| CMS-002 | Brand Kit |  |  |
-| CMS-003 | Typography |  |  |
-| CMS-103 | Fix a booking flow | bookingFlowId |  |
-| CMS-104 | Build the mobile app |  |  |
-| CMS-102 | Back to the Site Builder |  |  |
-| CMS-015 | Rolls back when something is wrong | version |  |
-
-## CMS-015 Version History
-
-**See who changed what and go back if it was wrong — by restoring into the draft, reviewing, then publishing.**
-
-|  |  |
-|---|---|
-| Module | White Label |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/white-label/version-history` |
-| Component | `apps/venue-management-web/src/routes/white-label/VersionHistoryDetail.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| version | deepLink |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listConfigVersions` | [WhiteLabelService](../backend/WhiteLabelService.md#listconfigversions) | onLoad | Version history | `TENANT_CONFIGURE` |
-| `diffConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#diffconfigversion) | onAction | Compare a version against the working draft | `TENANT_CONFIGURE` |
-| `restoreConfigVersion` | [WhiteLabelService](../backend/WhiteLabelService.md#restoreconfigversion) | onAction | Restore a previous version into the working draft; it does not publish (audit R139 (b)) | `TENANT_PUBLISH` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The version history list. |
-| error | Could not load. Names which read failed and leaves the version history untouched. |
-| emptyFirstRun | No version history yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Never shown: `listConfigVersions` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listConfigVersions` requires, and names it. A user with `TENANT_CONFIGURE` and not `TENANT_PUBLISH` sees the versions with Restore hidden and the reason named, because `restoreConfigVersion` needs `TENANT_PUBLISH`. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| CMS-001 | Tenant Workspace |  |  |
-| CMS-002 | Brand Kit |  |  |
-| CMS-003 | Typography |  |  |
-| CMS-014 | Review and publish the restored draft | version |  |
-
-## CMS-016 Site Settings
-
-**The values the whole site inherits from, and the venue-wide booking settings each venue may override (decided 29 September, rev 3 CFG-11); the settings of one flow are on CMS-103 (W12).**
-
-|  |  |
-|---|---|
-| Module | White Label |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/white-label/site-settings` |
-| Component | `apps/venue-management-web/src/routes/white-label/SiteSettingsDetail.tsx` |
-| Pattern | statusTracker |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `getBookingFlowConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#getbookingflowconfig) | onLoad | How the guest booking flow looks and steps | `TENANT_CONFIGURE` |
-| `setBookingFlowConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#setbookingflowconfig) | onAction | Preset, step indicator, cart layout, embed mode | `TENANT_CONFIGURE` |
-| `listOrgUnits` | [TenancyService](../backend/TenancyService.md#listorgunits) | onLoad | The tenant's venues, for the per-venue override picker (rev 3 CFG-11) | `SCOPE_VIEW` |
-| `listAnalyticsProviders` | [WhiteLabelService](../backend/WhiteLabelService.md#listanalyticsproviders) | onLoad | Connected analytics platforms | `TENANT_CONFIGURE` |
-| `setAnalyticsProvider` | [WhiteLabelService](../backend/WhiteLabelService.md#setanalyticsprovider) | onAction | Connect or change an analytics platform | `TENANT_CONFIGURE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The site settings, read by `getTenantConfig`. |
-| error | Could not load. Names which read failed and leaves the site settings untouched. |
-| emptyNoResults | A venue picked in Settings for with no override shows the tenant settings it inherits, labelled as inherited, rather than an empty form (rev 3 CFG-11). |
-| emptyFirstRun | No site settings yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `getBookingFlowConfig` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| CMS-001 | Tenant Workspace |  |  |
-| CMS-002 | Brand Kit |  |  |
-| CMS-003 | Typography |  |  |
-| CMS-017 | Domain & Certificate |  |  |
-| CMS-018 | Consent & Legal |  |  |
-| CMS-103 | Booking flows |  |  |
-| CMS-101 | Help me choose |  |  |
-
-## CMS-017 Domain & Certificate
-
-**Point the tenant’s own domain at their site.**
-
-|  |  |
-|---|---|
-| Module | White Label |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/white-label/domain-certificate` |
-| Component | `apps/venue-management-web/src/routes/white-label/DomainCertificateDetail.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| domainId | navigation |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listCustomDomains` | [WhiteLabelService](../backend/WhiteLabelService.md#listcustomdomains) | onLoad | Domains claimed, and their state | `TENANT_CONFIGURE` |
-| `claimCustomDomain` | [WhiteLabelService](../backend/WhiteLabelService.md#claimcustomdomain) | onAction | Claim a domain | `TENANT_CONFIGURE` |
-| `verifyCustomDomain` | [WhiteLabelService](../backend/WhiteLabelService.md#verifycustomdomain) | onAction | Prove control before it serves traffic | `TENANT_CONFIGURE` |
-| `relinquishCustomDomain` | [WhiteLabelService](../backend/WhiteLabelService.md#relinquishcustomdomain) | onAction | Release a domain | `TENANT_CONFIGURE` |
-| `getPlatformSubdomain` | [WhiteLabelService](../backend/WhiteLabelService.md#getplatformsubdomain) | onLoad | The tenant's platform subdomain (DEC-547) | `TENANT_CONFIGURE` |
-| `setPrimaryDomain` | [WhiteLabelService](../backend/WhiteLabelService.md#setprimarydomain) | onAction | Make a domain the primary one; the others redirect to it (DEC-547) | `TENANT_CONFIGURE` |
-| `regenerateDomainToken` | [WhiteLabelService](../backend/WhiteLabelService.md#regeneratedomaintoken) | onAction | Issue a new validation token when the old one timed out (DEC-547) | `TENANT_CONFIGURE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | Detail loads |
-| error | Could not load |
-| emptyFirstRun | No custom domain yet: "Your site is at venue.<cell>.ticvai.app", with Claim custom domain. |
-| emptyNoResults | Never shown: `listCustomDomains` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listCustomDomains` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| CMS-001 | Tenant Workspace |  |  |
-| CMS-002 | Brand Kit |  |  |
-| CMS-003 | Typography |  |  |
-
-## CMS-018 Consent & Legal
-
-**Manage the notices every consent is captured against, and the booking consent questions a venue asks ("Are you able to swim?", "I accept the risk"), with the record of every answer (decided 29 September, rev 3 REV3-26).**
-
-|  |  |
-|---|---|
-| Module | White Label |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/white-label/consent-legal` |
-| Component | `apps/venue-management-web/src/routes/white-label/ConsentLegalDetail.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| policyKind | navigation |
-| questionId | navigation |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listPolicies` | [WhiteLabelService](../backend/WhiteLabelService.md#listpolicies) | onLoad | Privacy, terms and cookie notices | `TENANT_CONFIGURE` |
-| `setPolicy` | [WhiteLabelService](../backend/WhiteLabelService.md#setpolicy) | onAction | Edit and publish a notice | `TENANT_CONFIGURE` |
-| `listConsentPurposes` | [MarketingService](../backend/MarketingService.md#listconsentpurposes) | onLoad | What guests can consent to | `GUEST_VIEW` |
-| `setConsentPurposes` | [MarketingService](../backend/MarketingService.md#setconsentpurposes) | onAction | Set the consent purposes | `GUEST_MANAGE` |
-| `listConsentQuestions` | [MarketingService](../backend/MarketingService.md#listconsentquestions) | onLoad | The venue's booking consent questions (rev 3 REV3-26) | `GUEST_VIEW` |
-| `createConsentQuestion` | [MarketingService](../backend/MarketingService.md#createconsentquestion) | onAction | Define a consent question, created at version 1 | `GUEST_MANAGE` |
-| `updateConsentQuestion` | [MarketingService](../backend/MarketingService.md#updateconsentquestion) | onAction | Change a question (a new version) or retire it | `GUEST_MANAGE` |
-| `listConsentAnswers` | [MarketingService](../backend/MarketingService.md#listconsentanswers) | onAction | The consent records, filtered by order, guest or question | `GUEST_VIEW` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The consent legal list. |
-| error | Could not load. Names which read failed and leaves the consent legal untouched. |
-| emptyFirstRun | No policy, purpose or consent question yet. Offers Save policy (`setPolicy`), Save consent purposes (`setConsentPurposes`) and New consent question (`createConsentQuestion`). |
-| emptyNoResults | `listPolicies` takes no filter. The consent questions (kind, status) and the consent records (order, guest, question) do: an empty result names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listPolicies` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| CMS-001 | Tenant Workspace |  |  |
-| CMS-002 | Brand Kit |  |  |
-| CMS-003 | Typography |  |  |
-
-## CMS-019 User Access
-
-**Say who in the tenant may change what.**
-
-|  |  |
-|---|---|
-| Module | White Label |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/white-label/user-access` |
-| Component | `apps/venue-management-web/src/routes/white-label/UserAccessDetail.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| principalId | session |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listPrincipals` | [IdentityService](../backend/IdentityService.md#listprincipals) | onLoad | List principals | `USER_MANAGE` |
-| `listRoles` | [IdentityService](../backend/IdentityService.md#listroles) | onLoad | List roles | `ROLE_MANAGE` |
-| `updatePrincipal` | [IdentityService](../backend/IdentityService.md#updateprincipal) | onAction | Grant or remove a CMS role for the selected person | `USER_MANAGE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The user access list. |
-| error | Could not load. Names which read failed and leaves the user access untouched. |
-| emptyFirstRun | Nobody but the tenant owner has access yet: an empty list here is normal on a new tenant. Change access is offered on each person once they exist; people are invited from the platform's user management, not here. |
-| emptyNoResults | Nothing matches the filter on scopePath, isActive and the user access are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| CMS-001 | Tenant Workspace |  |  |
-| CMS-002 | Brand Kit |  |  |
-| CMS-003 | Typography |  |  |
-
-## CMS-101 Help Me Choose
-
-**Set up a venue's Help me choose so its answers filter the catalogue, review the question set the assistant proposes from the venue's products, preview the filtered list and publish it (Site Builder step 4).**
-
-|  |  |
-|---|---|
-| Module | White Label |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/white-label/help-me-choose` |
-| Component | `apps/venue-management-web/src/routes/white-label/HelpMeChoose.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| venueId | session |
-| guidedChoiceId | navigation |
-| suggestionId | navigation |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listGuidedChoices` | [WhiteLabelService](../backend/WhiteLabelService.md#listguidedchoices) | onLoad | The venue's set-ups, filtered by source and status (rev 3 REV3-11) | `TENANT_CONFIGURE` |
-| `createGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#createguidedchoice) | onAction | Start a set-up by hand, as a draft | `TENANT_CONFIGURE` |
-| `updateGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#updateguidedchoice) | onAction | Edit a draft, including an AI suggestion under review | `TENANT_CONFIGURE` |
-| `deleteGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#deleteguidedchoice) | onAction | Delete a draft or dismiss a suggestion | `TENANT_CONFIGURE` |
-| `publishGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#publishguidedchoice) | onAction | Make a reviewed set-up the one guests see at this venue | `TENANT_PUBLISH` |
-| `unpublishGuidedChoice` | [WhiteLabelService](../backend/WhiteLabelService.md#unpublishguidedchoice) | onAction | Stop showing it to guests; back to draft | `TENANT_PUBLISH` |
-| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onAction | Products an answer can open | `PRODUCT_VIEW` |
-| `listProductCategories` | [CatalogueService](../backend/CatalogueService.md#listproductcategories) | onAction | Categories an answer can open | `PRODUCT_VIEW` |
-| `listEvents` | [CatalogueService](../backend/CatalogueService.md#listevents) | onAction | Events an answer can open | `PRODUCT_VIEW` |
-| `listBookingFlows` | [WhiteLabelService](../backend/WhiteLabelService.md#listbookingflows) | onAction | The venue's flows an answer can open (target kind bookingFlow, W12) | `TENANT_CONFIGURE` |
-| `suggestGuidedChoice` | [AiService](../backend/AiService.md#suggestguidedchoice) | onAction | Ask the assistant for a question set from product attributes (age and height rules, level tags, certifications); it lands here as a draft through white-label proposeGuidedChoice (W4) | `AI_USE` |
-| `getGuidedChoiceSuggestion` | [AiService](../backend/AiService.md#getguidedchoicesuggestion) | onAction | The reasons behind a Help me choose suggestion | `AI_USE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The venue's Help me choose set-ups, read by `listGuidedChoices`. |
-| error | Could not load. Names which read failed and leaves the set-ups untouched. |
-| emptyFirstRun | No Help me choose at this venue, so guests see none. Offers New set-up, and says that once the venue's products are uploaded the assistant proposes set-ups here as drafts for review. |
-| emptyNoResults | The source or status filter matched nothing and the venue's other set-ups are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `TENANT_CONFIGURE`, which `listGuidedChoices` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| CMS-016 | Back to Site Settings |  |  |
-| CMS-102 | Back to the Site Builder |  |  |
-
-## ADM-424 Module Activation & Dependency Validation
-
-**Activate the modules purchased in Board 4/5 and verify all required dependencies.**
-
-|  |  |
-|---|---|
-| Module | Tenants & Licensing |
-| Wave | 3 |
-| Licensed module | core |
-| Route | `/tenants-licensing/module-activation-dependency-validation-adm-424` |
-| Component | `apps/ticvai-web/src/routes/tenants-licensing/ModuleActivationDependencyValidation.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| tenantId | navigation |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listTenants` | [PlatformService](../backend/PlatformService.md#listtenants) | onLoad | Pick the tenant whose modules are being activated (audit R098) | `PLATFORM_TENANT_VIEW` |
-| `openPlatformStaffGrant` | [IdentityService](../backend/IdentityService.md#openplatformstaffgrant) | onAction | Open a time-boxed, audited grant into the picked tenant before activating anything (audit R098) | `PLATFORM_TENANT_ACCESS` |
-| `getTenantLicences` | [PlatformService](../backend/PlatformService.md#gettenantlicences) | onLoad | The modules the tenant has bought | `PLATFORM_TENANT_VIEW` |
-| `listModuleCatalogue` | [PlatformService](../backend/PlatformService.md#listmodulecatalogue) | onLoad | Each module's dependencies, to validate before activation | `PLATFORM_PLAN_MANAGE` |
-| `getModuleEnablement` | [WhiteLabelService](../backend/WhiteLabelService.md#getmoduleenablement) | onLoad | Which modules are switched on now | `TENANT_CONFIGURE` |
-| `setModuleEnablement` | [WhiteLabelService](../backend/WhiteLabelService.md#setmoduleenablement) | onAction | Switch the purchased modules on | `TENANT_CONFIGURE` |
-| `listOwnPlatformStaffGrants` | [IdentityService](../backend/IdentityService.md#listownplatformstaffgrants) | onAction | Find a grant into the picked tenant already open, after a reload (audit R098; CHG-SBO-001) | `PLATFORM_TENANT_ACCESS` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The module activation dependency list. |
-| error | Could not load. Names which read failed and leaves the module activation dependency untouched. |
-| emptyFirstRun | No module activation dependency yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
-| emptyNoResults | The filter narrowed it and the module activation dependency are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Names the missing permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| grantRequired | No access into this tenant yet. A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers Open access grant (`openPlatformStaffGrant`: reason, permissions `TENANT_CONFIGURE`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| ADM-419 | Back to Provisioning Command Center |  |  |

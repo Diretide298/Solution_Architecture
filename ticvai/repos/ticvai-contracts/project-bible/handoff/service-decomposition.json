@@ -1,5 +1,5 @@
 {
- "note": "How 33 contracts and 1112 tables become 17 modules, deployed as 5 units. **The data boundaries were drawn first and the service boundaries follow them** — no service spans two schemas it does not own. **30 September 2026 (ADR-0055):** the 17 are modules of one .NET solution, and `deployable` on each says which of the five units it ships in; `workers` carries the relay, the consumers and the scheduled jobs and owns no module.",
+ "note": "How 33 contracts and 1113 tables become 17 modules, deployed as 5 units. **The data boundaries were drawn first and the service boundaries follow them** — no service spans two schemas it does not own. **30 September 2026 (ADR-0055):** the 17 are modules of one .NET solution, and `deployable` on each says which of the five units it ships in; `workers` carries the relay, the consumers and the scheduled jobs and owns no module.",
  "generated": "21 September 2026",
  "tiers": {
   "foundation": "Read by everything, reads nothing above. Deploys first and alone.",
@@ -145,7 +145,7 @@
     "orders",
     "payments"
    ],
-   "operations": 297,
+   "operations": 298,
    "tables": 114,
    "why": "**The transactional core.** 96 operations, 34 tables, and the highest write rate in the platform. Separate because its scaling profile is unlike anything else — a Saturday evening is ten times a Tuesday morning.\n\n**`shift` belongs here and not in Tenancy.** A shift is venue-scoped, which is what made it look like a tenancy concern — but **venue scope is the platform's default rather than a service boundary**: 675 of 1,014 operations are venue-scoped.\n\n**What decides the service is who owns the tables.** A shift holds cash, `orders.deposit_box` reconciles against payments, and `orders.cash_movement` posts to `ledger.posting` at close. **A till's takings and a till's drawer are the same money counted twice** — separating them makes every settlement a distributed join.\n\n**Guest recurring billing lives here, decided by [ADR-0048](../../docs/adr/0048-guest-recurring-billing-is-commerce.md)** rather than in the Control Plane that provisions cells. `payments.dunning_policy` and `payments.dunning_case` are the two newest tables in the service. **A charge on a schedule fails differently from a charge at a till** — nobody is standing at the counter when a renewal declines, so the recovery path is a queue and a timetable rather than a second card.",
    "scale": "Write-heavy, spiky, latency-critical. **The one that autoscales.**",
@@ -289,7 +289,7 @@
    "schemas": [
     "fnb"
    ],
-   "operations": 131,
+   "operations": 133,
    "tables": 51,
    "why": "**96 operations and 34 tables — the largest single domain after marketing.** Its own service because a kitchen pass has a latency profile nothing else shares: a bump must land in under a second on a display that may be offline.",
    "scale": "Write-heavy during service, idle between. **Two peaks a day, sharply.**",
@@ -355,7 +355,7 @@
    "schemas": [
     "marketing"
    ],
-   "operations": 272,
+   "operations": 274,
    "tables": 132,
    "why": "**93 operations and 37 tables — the biggest thing in the package, and probably two services eventually.** CRM and campaigns have different write patterns: a guest profile is read constantly and written rarely; a campaign send is a burst of millions of rows nobody reads again.\n\n**Kept as one for now** because splitting a service before it has a load profile is guessing.",
    "scale": "Bursty on send, read-heavy otherwise. **The one to watch for a split.**",
@@ -444,8 +444,8 @@
     "rental",
     "transport"
    ],
-   "operations": 285,
-   "tables": 123,
+   "operations": 287,
+   "tables": 124,
    "why": "**Six small domains, 102 operations, one team.** Queue, maintenance, bookable resources, venue mapping, media assets and arcade. None is large enough to deploy alone, all are venue-scoped, none is on the critical sale path, and **all six are licensed as optional modules** — a venue that buys none of them should not be running six idle services.",
    "scale": "Low and steady. Queue readings are the only frequent write.",
    "risk": "Down degrades venue operations. Selling and admitting continue.",

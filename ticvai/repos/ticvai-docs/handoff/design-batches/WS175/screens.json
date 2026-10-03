@@ -149,7 +149,9 @@
    "params": [
     {
      "name": "seatMapId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `listSeats` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ],
    "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that list — never an empty form that looks configurable."
@@ -309,14 +311,11 @@
        "bindsTo": "KpiValue",
        "columns": [
         "KpiValue.name",
-        "KpiValue.scopePath",
         "KpiValue.period",
         "KpiValue.value",
         "KpiValue.target",
-        "KpiValue.comparison",
         "KpiValue.variancePercent",
-        "KpiValue.status",
-        "KpiValue.asOf"
+        "KpiValue.status"
        ],
        "operation": "getKpiValues",
        "notes": "Sold, issued, scanned, no-show, blocked, available and effective capacity, one KPI per row.",
@@ -1364,7 +1363,9 @@
    "params": [
     {
      "name": "reportId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `runReport` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1503,7 +1504,9 @@
    "params": [
     {
      "name": "executionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `exportReportResult` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

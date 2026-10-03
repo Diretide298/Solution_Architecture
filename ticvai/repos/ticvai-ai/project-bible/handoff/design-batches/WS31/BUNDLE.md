@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-304` | Order & Reservation Command Center | B–D | 0 | 46 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-304` | Order & Reservation Command Center | B–D | 0 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-305` | Order Detail & Transaction Workspace | B–D | 0 | 50 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
 | `BO-306` | Reservation & Hold Policy Configuration | B–D | 12 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-307` | Order & Reservation Status Lifecycle Configuration | B–D | 8 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
@@ -181,57 +181,25 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| Orders today | text | Orders Today |
-| Confirmed orders | 1,234 | Confirmed Orders |
-| Active reservations | 1,234 | Active Reservations |
-| Temporary holds | 1,234 | Temporary Holds |
-| Pending payment | 1,234 | Pending Payment |
-| Expiring reservations | 1,234 | Expiring Reservations |
-| Failed orders | 1,234 | Failed Orders |
-| Partially fulfilled | text | Partially Fulfilled |
-| Completed orders | 1,234 | Completed Orders |
-| Cancelled orders | 1,234 | Cancelled Orders |
-| Orders requiring attention | text | Orders Requiring Attention |
 | Gross order value | text | Gross Order Value |
-| Order | text | Order ID |
-| Reservation | text | Reservation ID |
 | Channel | text | Channel |
-| Venue | text | Venue |
 | Order value | text | Order Value |
 | Payment status | 1,234 | Payment Status |
 | Reservation status | 1,234 | Reservation Status |
 | Fulfillment status | 1,234 | Fulfillment Status |
-| Created date | 1 Oct 2026, 14:30 | Created Date |
-| Expiry | 1 Oct 2026, 14:30 | Expiry |
-| Owner agent | text | Owner/Agent |
 
 **The selected order reservation** (detail panel): The pack groups this record's detail under its own headings: “Search using”.
 
 | Shows | Format | Notes |
 |---|---|---|
 | Orders today | text | Orders Today |
-| Confirmed orders | 1,234 | Confirmed Orders |
-| Active reservations | 1,234 | Active Reservations |
-| Temporary holds | 1,234 | Temporary Holds |
-| Pending payment | 1,234 | Pending Payment |
-| Expiring reservations | 1,234 | Expiring Reservations |
-| Failed orders | 1,234 | Failed Orders |
-| Partially fulfilled | text | Partially Fulfilled |
-| Completed orders | 1,234 | Completed Orders |
-| Cancelled orders | 1,234 | Cancelled Orders |
-| Orders requiring attention | text | Orders Requiring Attention |
 | Gross order value | text | Gross Order Value |
-| Order | text | Order ID |
-| Reservation | text | Reservation ID |
 | Channel | text | Channel |
-| Venue | text | Venue |
 | Order value | text | Order Value |
 | Payment status | 1,234 | Payment Status |
 | Reservation status | 1,234 | Reservation Status |
 | Fulfillment status | 1,234 | Fulfillment Status |
 | Created date | 1 Oct 2026, 14:30 | Created Date |
-| Expiry | 1 Oct 2026, 14:30 | Expiry |
-| Owner agent | text | Owner/Agent |
 
 **Permissions this screen separates** (banner): **The pack separates these permissions and no action on the screen claims them yet:** Open Order, Open Reservation, Extend Hold, Resend Confirmation, Collect Payment, Add Note, View Timeline. Each needs attaching to the control it gates, or the screen needs the control.
 
@@ -244,7 +212,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Where the user goes next**
 
 - → `BO-100` Venue Home: *Venue Home*
-- → `BO-305` Order Detail & Transaction Workspace: *Works in Order Detail & Transaction Workspace*; carries `orderId`; calls `listOrderReservation`
 - → `BO-306` Reservation & Hold Policy Configuration: *Works in Reservation & Hold Policy Configuration*; calls `listOrderReservation`
 - → `BO-307` Order & Reservation Status Lifecycle Configuration: *Works in Order & Reservation Status Lifecycle Configuration*; calls `listOrderReservation`
 - → `BO-308` Order Creation & Source/Channel Configuration: *Works in Order Creation & Source/Channel Configuration*; calls `listOrderReservation`
@@ -253,6 +220,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `BO-311` Capacity Reservation & Inventory Commitment: *Works in Capacity Reservation & Inventory Commitment*; calls `listOrderReservation`
 - → `BO-312` Reservation Confirmation, Expiry & Fulfillment Readiness: *Works in Reservation Confirmation, Expiry & Fulfillment Readiness*; calls `listOrderReservation`
 - → `BO-313` Order Lifecycle Timeline, SLA, Exceptions & AI Operations: *Works in Order Lifecycle Timeline, SLA, Exceptions & AI Operations*; calls `listOrderReservation`
+- → `BO-305` Order Detail & Transaction Workspace: *Works in Order Detail & Transaction Workspace*; carries `orderId`; calls `listOrderReservation`
 
 #### States
 
@@ -319,10 +287,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (46 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-304?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `BO-100`, `BO-305`, `BO-306`, `BO-307`, `BO-308`, `BO-309`, `BO-310`, `BO-311`, `BO-312`, `BO-313`.
+- [ ] Every transition is wired: `BO-100`, `BO-306`, `BO-307`, `BO-308`, `BO-309`, `BO-310`, `BO-311`, `BO-312`, `BO-313`, `BO-305`.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
@@ -547,6 +515,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS84 Order   Reservation Management Board 1.dc.html#bo-305`
 - Workshop pack: Order___Reservation_Management_Reference.pdf board 1
 - Flow F140 *Order Reservation Management board 1: Order & Reservation Command Center*, step 2: Works in Order Detail & Transaction Workspace → Provide the authoritative 360-degree view of a single order. This should become one of the most important operational screens in TICVAI.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 

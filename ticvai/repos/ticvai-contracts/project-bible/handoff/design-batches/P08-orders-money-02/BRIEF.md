@@ -1,6 +1,6 @@
 # P08-orders-money-02 — P08 · Orders & Money (2 of 3)
 
-**10 screens · 66 operations · 87 schemas · 28 permissions**
+**10 screens · 66 operations · 88 schemas · 28 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -163,16 +163,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-041` | Cash Movements | B–D | 18 | 53 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
-| `BO-042` | Banking & Safe | B–D | 24 | 26 | 6 | 18 | 0 | 0 | — | notStarted (generated) |
-| `BO-043` | Daily Reconciliation | B–D | 25 | 94 | 6 | 24 | 3 | 0 | — | notStarted (generated) |
-| `BO-047` | Order Corrections & Exceptions | B–D | 127 | 53 | 6 | 70 | 0 | 0 | — | notStarted (generated) |
+| `BO-041` | Cash Movements | B–D | 18 | 28 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
+| `BO-042` | Banking & Safe | B–D | 27 | 26 | 6 | 18 | 0 | 0 | — | notStarted (generated) |
+| `BO-043` | Daily Reconciliation | B–D | 34 | 66 | 6 | 24 | 3 | 0 | — | notStarted (generated) |
+| `BO-047` | Order Corrections & Exceptions | B–D | 127 | 39 | 6 | 70 | 0 | 0 | — | notStarted (generated) |
 | `BO-048` | Retail Products | B–D | 26 | 19 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
-| `BO-059` | Sales Reports | B–D | 76 | 35 | 6 | 93 | 3 | 0 | — | notStarted (generated) |
-| `BO-061` | Scheduled Reports | B–D | 26 | 16 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
-| `BO-062` | Venue Profile | B–D | 9 | 9 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-065` | Venue Configuration | A | 98 | 18 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
-| `BO-074` | Chart of Accounts | A | 35 | 44 | 6 | 39 | 2 | 0 | — | notStarted (generated) |
+| `BO-059` | Sales Reports | B–D | 76 | 20 | 6 | 93 | 3 | 0 | — | notStarted (generated) |
+| `BO-061` | Scheduled Reports | B–D | 26 | 12 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
+| `BO-062` | Venue Profile | B–D | 9 | 7 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-065` | Venue Configuration | A | 98 | 16 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
+| `BO-074` | Chart of Accounts | A | 35 | 26 | 6 | 39 | 2 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

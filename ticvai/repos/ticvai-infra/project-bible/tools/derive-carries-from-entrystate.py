@@ -162,6 +162,12 @@ class Contracts:
         if isinstance(props, dict):
             if "id" in props and name and name not in ("Page", "Problem"):
                 out.add(lcfirst(name) + "Id")
+                # **A row's id also goes by its last word** (3 October 2026, CHG-SPF-004): screens
+                # name `RentalBooking.id` `bookingId` and `VenueMap.id` `mapId`, and the strict name
+                # left required parameters uncarried. Scoped by contract, as every yield is.
+                words = re.findall(r"[A-Z][a-z0-9]*", name)
+                if len(words) > 1:
+                    out.add(words[-1].lower() + "Id")
             for k, v in props.items():
                 out.add(k)
                 self.names_in(v, here, out, None, depth + 1, seen)

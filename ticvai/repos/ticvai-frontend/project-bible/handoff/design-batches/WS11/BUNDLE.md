@@ -556,7 +556,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 - → `BO-100` Venue Home: *Venue Home*
 - → `BO-245` Fraud Detection Rule & Signal Library: *Works in Fraud Detection Rule & Signal Library*; calls `listAccessSecurityFraud`
-- → `BO-247` Unified Identity & Credential Lock Manager: *Works in Unified Identity & Credential Lock Manager*; calls `listAccessSecurityFraud`
+- → `BO-247` Unified Identity & Credential Lock Manager: *Works in Unified Identity & Credential Lock Manager*; carries `lockId`; calls `listAccessSecurityFraud`
 - → `BO-249` Relationship & Companion Fraud Monitoring: *Works in Relationship & Companion Fraud Monitoring*; calls `listAccessSecurityFraud`
 - → `BO-250` Access Risk Scoring & Decision Engine: *Works in Access Risk Scoring & Decision Engine*; calls `listAccessSecurityFraud`
 - → `BO-251` Real-Time Security Response & Playbook Builder: *Works in Real-Time Security Response & Playbook Builder*; calls `listAccessSecurityFraud`
@@ -1236,7 +1236,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `BIOMETRIC_IMAGE_VIEW`, `GUEST_MANAGE`, `INCIDENT_MANAGE`, `SCOPE_VIEW` (3 configure, 1 ?, 1 read); in the flows as venue manager |
+| Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `BIOMETRIC_IMAGE_VIEW`, `GUEST_MANAGE`, `INCIDENT_MANAGE`, `SCOPE_VIEW` (3 configure, 2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Monitor) and no metric row |
 | Offline | online only |
@@ -1378,7 +1378,7 @@ anomaly:
 - `setSecurityInvestigationEvidence` → `ACCESS_POINT_CONFIGURE` (configure) · staff
 - `updateSecurityAlert` → `INCIDENT_MANAGE` (configure) · staff
 - `reviewFaceReenrolment` → `GUEST_MANAGE` (configure) · staff
-- `getFaceReenrolmentImages` → `BIOMETRIC_IMAGE_VIEW` (tier not set) · staff · step-up mfa
+- `getFaceReenrolmentImages` → `BIOMETRIC_IMAGE_VIEW` (read) · staff · step-up mfa
 
 **A refused user sees:** Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 

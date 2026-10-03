@@ -4,7 +4,7 @@
   "name": "Security & Compliance Dashboard",
   "module": "Security & Compliance",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "capability": "C97",
   "implementation": {
    "app": "ticvai-web",
@@ -24,22 +24,22 @@
    ],
    "transitions": [
     {
+     "to": "ADM-001",
+     "trigger": "Platform Login / MFA",
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-031 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
+    },
+    {
+     "to": "ADM-002",
+     "trigger": "Platform Dashboard",
+     "provenance": "derived — ADM-002 declares entryState.params  and ADM-031 holds none of them. The edge carries nothing: ADM-031 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
+    },
+    {
      "to": "ADM-004",
      "trigger": "Platform Audit Log",
      "provenance": "flow F106 step 1→2",
      "carries": [
       "tenantId"
      ]
-    },
-    {
-     "to": "ADM-001",
-     "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-031 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
-    },
-    {
-     "to": "ADM-002",
-     "trigger": "Platform Dashboard",
-     "provenance": "derived — ADM-002 declares entryState.params  and ADM-031 holds none of them. The edge carries nothing: ADM-031 is opened from ADM-002, so this edge is the way back and ADM-002 keeps its own state"
     }
    ]
   },
@@ -189,7 +189,7 @@
    "error": "Could not load. Names which read failed and leaves the security compliance untouched.",
    "emptyFirstRun": "No security compliance yet. Offers Create dashboard (`createDashboard`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on module, includeArchived and the security compliance are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listDashboards` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_VENUE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`; `REPORT_MANAGE` for `createDashboard`, `updateDashboard`.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098)."
   },
   "apis": [
@@ -252,7 +252,9 @@
    "params": [
     {
      "name": "dashboardId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listDashboards` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "tenantId",
@@ -274,7 +276,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-031"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formOpenPlatformStaffGrant",
@@ -394,7 +396,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-032 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-032 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -492,7 +494,7 @@
    "error": "Could not load. Names which read failed and leaves the waf security policy untouched.",
    "emptyFirstRun": "No waf security policy yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellHealth` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listWafRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `setWafPolicy`."
   },
   "apis": [
    {
@@ -512,7 +514,9 @@
    "params": [
     {
      "name": "cellId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listWafRules` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A platform-admin link resolves against the tenant in the link and refuses if the operator does not hold that tenant.** A link is not authorisation. If the target is gone the screen says so and returns to the directory — **an admin console that silently shows the wrong tenant is worse than one that shows nothing.** Arrives with `cellId`.",
@@ -529,7 +533,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-032"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "cancelDecommission",

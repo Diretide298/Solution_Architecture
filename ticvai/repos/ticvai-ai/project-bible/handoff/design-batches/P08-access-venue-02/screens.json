@@ -67,18 +67,8 @@
        "label": "Every scan event",
        "bindsTo": "ScanEvent",
        "columns": [
-        "ScanEvent.id",
-        "ScanEvent.accessPointId",
-        "ScanEvent.venueId",
-        "ScanEvent.scopePath",
-        "ScanEvent.ticketId",
         "ScanEvent.mediaCode",
-        "ScanEvent.outcome",
-        "ScanEvent.denyReason",
-        "ScanEvent.direction",
-        "ScanEvent.operatorPrincipalId",
-        "ScanEvent.deviceId",
-        "ScanEvent.overridesScanId"
+        "ScanEvent.outcome"
        ],
        "operation": "listScans",
        "provenance": "contract access.yaml GET /access/scans"
@@ -109,19 +99,12 @@
        "label": "The selected scan event",
        "bindsTo": "ScanEvent",
        "columns": [
-        "ScanEvent.id",
-        "ScanEvent.accessPointId",
-        "ScanEvent.venueId",
-        "ScanEvent.scopePath",
-        "ScanEvent.ticketId",
         "ScanEvent.mediaCode",
         "ScanEvent.outcome",
         "ScanEvent.denyReason",
         "ScanEvent.direction",
         "ScanEvent.operatorPrincipalId",
-        "ScanEvent.deviceId",
         "ScanEvent.overridesScanId",
-        "ScanEvent.overrideReason",
         "ScanEvent.recordedAt",
         "ScanEvent.syncedAt"
        ],
@@ -150,7 +133,7 @@
    "error": "Could not load. Names which read failed and leaves the scan activity untouched.",
    "emptyFirstRun": "No scan activity yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the scan activity are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP` for `lookupTicket`."
   },
   "apis": [
    {
@@ -180,7 +163,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-034"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "getOfflinePackage",
@@ -304,18 +287,8 @@
        "label": "Every scan event",
        "bindsTo": "ScanEvent",
        "columns": [
-        "ScanEvent.id",
-        "ScanEvent.accessPointId",
-        "ScanEvent.venueId",
-        "ScanEvent.scopePath",
-        "ScanEvent.ticketId",
         "ScanEvent.mediaCode",
-        "ScanEvent.outcome",
-        "ScanEvent.denyReason",
-        "ScanEvent.direction",
-        "ScanEvent.operatorPrincipalId",
-        "ScanEvent.deviceId",
-        "ScanEvent.overridesScanId"
+        "ScanEvent.outcome"
        ],
        "operation": "listScans",
        "provenance": "contract access.yaml GET /access/scans"
@@ -362,19 +335,12 @@
        "label": "The selected scan event",
        "bindsTo": "ScanEvent",
        "columns": [
-        "ScanEvent.id",
-        "ScanEvent.accessPointId",
-        "ScanEvent.venueId",
-        "ScanEvent.scopePath",
-        "ScanEvent.ticketId",
         "ScanEvent.mediaCode",
         "ScanEvent.outcome",
         "ScanEvent.denyReason",
         "ScanEvent.direction",
         "ScanEvent.operatorPrincipalId",
-        "ScanEvent.deviceId",
         "ScanEvent.overridesScanId",
-        "ScanEvent.overrideReason",
         "ScanEvent.recordedAt",
         "ScanEvent.syncedAt"
        ],
@@ -403,7 +369,7 @@
    "error": "Could not load. Names which read failed and leaves the override audit untouched.",
    "emptyFirstRun": "No override audit yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the override audit are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listScans` requires to show this screen, and names that permission (the screen's other reads need `AUDIT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP` for `lookupTicket`."
   },
   "apis": [
    {
@@ -439,7 +405,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-035"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "getOfflinePackage",
@@ -555,7 +521,7 @@
    "error": "Could not load. Names which read failed and leaves the reconciliation queue untouched.",
    "emptyFirstRun": "No reconciliation queue yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, openOnly and the reconciliation queue are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `resolveSyncRejection`."
   },
   "apis": [
    {
@@ -585,7 +551,9 @@
    "params": [
     {
      "name": "rejectionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listSyncRejections` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -594,7 +562,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-038"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formResolveSyncRejection",
@@ -700,7 +668,7 @@
   "name": "Asset Register",
   "module": "Access & Venue",
   "requiresModule": "maintenance",
-  "wave": 2,
+  "wave": 1,
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -770,16 +738,10 @@
        "columns": [
         "Asset.assetTag",
         "Asset.name",
-        "Asset.venueId",
-        "Asset.categoryId",
         "Asset.locationDescription",
-        "Asset.criticality",
-        "Asset.manufacturer",
-        "Asset.model",
         "Asset.serialNumber",
         "Asset.commissionedAt",
-        "Asset.warrantyExpiresAt",
-        "Asset.supplierId"
+        "Asset.warrantyExpiresAt"
        ],
        "operation": "listAssets",
        "provenance": "contract maintenance.yaml GET /assets"
@@ -805,20 +767,12 @@
        "columns": [
         "Asset.assetTag",
         "Asset.name",
-        "Asset.venueId",
-        "Asset.categoryId",
         "Asset.locationDescription",
         "Asset.criticality",
         "Asset.manufacturer",
-        "Asset.model",
         "Asset.serialNumber",
         "Asset.commissionedAt",
-        "Asset.warrantyExpiresAt",
-        "Asset.supplierId",
-        "Asset.linkedProductIds",
-        "Asset.linkedAccessPointId",
-        "Asset.requiresInspectionToReturn",
-        "Asset.documents"
+        "Asset.warrantyExpiresAt"
        ],
        "operation": "listAssets",
        "provenance": "contract maintenance.yaml GET /assets"
@@ -902,7 +856,7 @@
    "error": "Could not load. Names which read failed and leaves the asset register untouched.",
    "emptyFirstRun": "No asset register yet. Offers Create asset (`createAsset`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on venueId, categoryId, status, maintenanceDue and the asset register are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ASSET_VIEW`, which `listAssets` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `ASSET_VIEW`, which `listAssets` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ASSET_MANAGE` for `createAsset`, `setAssetStatus`, `updateAsset`."
   },
   "apis": [
    {
@@ -978,7 +932,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-069"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateAsset",
@@ -1157,17 +1111,12 @@
        "label": "Every maintenance plan",
        "bindsTo": "MaintenancePlan",
        "columns": [
-        "MaintenancePlan.id",
         "MaintenancePlan.name",
-        "MaintenancePlan.assetId",
-        "MaintenancePlan.assetCategoryId",
         "MaintenancePlan.intervalDays",
         "MaintenancePlan.usageInterval",
         "MaintenancePlan.leadTimeDays",
-        "MaintenancePlan.taskTemplate",
         "MaintenancePlan.lastCompletedAt",
-        "MaintenancePlan.nextDueAt",
-        "MaintenancePlan.isActive"
+        "MaintenancePlan.nextDueAt"
        ],
        "operation": "listMaintenancePlans",
        "provenance": "contract maintenance.yaml GET /maintenance-plans"
@@ -1183,10 +1132,7 @@
        "label": "The selected maintenance plan",
        "bindsTo": "MaintenancePlan",
        "columns": [
-        "MaintenancePlan.id",
         "MaintenancePlan.name",
-        "MaintenancePlan.assetId",
-        "MaintenancePlan.assetCategoryId",
         "MaintenancePlan.intervalDays",
         "MaintenancePlan.usageInterval",
         "MaintenancePlan.leadTimeDays",
@@ -1203,16 +1149,13 @@
        "label": "The due maintenance task",
        "bindsTo": "DueMaintenanceTask",
        "columns": [
-        "DueMaintenanceTask.planId",
         "DueMaintenanceTask.planName",
-        "DueMaintenanceTask.assetId",
         "DueMaintenanceTask.assetName",
         "DueMaintenanceTask.criticality",
         "DueMaintenanceTask.dueAt",
         "DueMaintenanceTask.isOverdue",
         "DueMaintenanceTask.daysOverdue",
-        "DueMaintenanceTask.triggeredBy",
-        "DueMaintenanceTask.workOrderId"
+        "DueMaintenanceTask.triggeredBy"
        ],
        "operation": "getDueMaintenance",
        "provenance": "contract maintenance.yaml GET /maintenance-plans/due"
@@ -1244,7 +1187,7 @@
    "error": "Could not load. Names which read failed and leaves the planned maintenance untouched.",
    "emptyFirstRun": "No planned maintenance yet. Offers Create maintenance plan (`createMaintenancePlan`).",
    "emptyNoResults": "Never shown: `listMaintenancePlans` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `ASSET_VIEW`, which `listMaintenancePlans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `ASSET_VIEW`, which `listMaintenancePlans` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ASSET_MANAGE` for `createMaintenancePlan`, `updateMaintenancePlan`."
   },
   "apis": [
    {
@@ -1288,7 +1231,9 @@
    "params": [
     {
      "name": "planId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMaintenancePlans` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1297,7 +1242,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-071"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateMaintenancePlan",
@@ -1437,18 +1382,12 @@
        "label": "Every incident",
        "bindsTo": "Incident",
        "columns": [
-        "Incident.id",
         "Incident.incidentNumber",
-        "Incident.kind",
         "Incident.severity",
         "Incident.status",
-        "Incident.venueId",
-        "Incident.assetId",
         "Incident.locationDescription",
-        "Incident.isReportable",
         "Incident.notificationDueAt",
-        "Incident.notifiedAt",
-        "Incident.assignedToPrincipalId"
+        "Incident.notifiedAt"
        ],
        "operation": "listIncidents",
        "provenance": "contract maintenance.yaml GET /incidents"
@@ -1464,22 +1403,14 @@
        "label": "The selected incident",
        "bindsTo": "Incident",
        "columns": [
-        "Incident.id",
         "Incident.incidentNumber",
         "Incident.kind",
         "Incident.severity",
         "Incident.status",
-        "Incident.venueId",
-        "Incident.assetId",
         "Incident.locationDescription",
-        "Incident.isReportable",
         "Incident.notificationDueAt",
         "Incident.notifiedAt",
-        "Incident.assignedToPrincipalId",
-        "Incident.reportedByPrincipalId",
-        "Incident.correctiveWorkOrderId",
-        "Incident.occurredAt",
-        "Incident.recordedAt"
+        "Incident.occurredAt"
        ],
        "operation": "listIncidents",
        "provenance": "contract maintenance.yaml GET /incidents"
@@ -1489,22 +1420,14 @@
        "label": "The incident",
        "bindsTo": "IncidentDetail",
        "columns": [
-        "IncidentDetail.id",
         "IncidentDetail.incidentNumber",
         "IncidentDetail.kind",
         "IncidentDetail.severity",
         "IncidentDetail.status",
-        "IncidentDetail.venueId",
-        "IncidentDetail.assetId",
         "IncidentDetail.locationDescription",
-        "IncidentDetail.isReportable",
         "IncidentDetail.notificationDueAt",
         "IncidentDetail.notifiedAt",
-        "IncidentDetail.assignedToPrincipalId",
-        "IncidentDetail.reportedByPrincipalId",
-        "IncidentDetail.correctiveWorkOrderId",
-        "IncidentDetail.occurredAt",
-        "IncidentDetail.recordedAt"
+        "IncidentDetail.occurredAt"
        ],
        "operation": "getIncident",
        "provenance": "contract maintenance.yaml GET /incidents/{incidentId}"
@@ -1542,7 +1465,7 @@
    "error": "Could not load. Names which read failed and leaves the incident log untouched.",
    "emptyFirstRun": "No incident log yet. Offers Record authority notification (`recordAuthorityNotification`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on severity, status, isReportable and the incident log are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `INCIDENT_VIEW`, which `listIncidents` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `INCIDENT_VIEW`, which `listIncidents` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_MANAGE` for `recordAuthorityNotification`, `updateIncident`; `INCIDENT_REPORT` for `reportIncident`."
   },
   "apis": [
    {
@@ -1589,7 +1512,9 @@
    "params": [
     {
      "name": "incidentId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listIncidents` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `incidentId`.",
@@ -1606,7 +1531,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-072"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formReportIncident",
@@ -1714,7 +1639,7 @@
   "name": "Venue Maps",
   "module": "Access & Venue",
   "requiresModule": "seating",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-mapping/venue-maps",
@@ -1731,12 +1656,18 @@
      "to": "BO-093",
      "trigger": "The plan is uploaded and read",
      "provenance": "flow F26 step 1→2",
-     "operation": "createVenueMap"
+     "operation": "createVenueMap",
+     "carries": [
+      "mapId"
+     ]
     },
     {
      "to": "BO-094",
      "trigger": "Map Editor & Publish",
-     "provenance": "derived — BO-094 declares entryState.params mapId, pathId and BO-092 holds none of them. The edge carries nothing: mapId, pathId only pre-select (deep link or optional), and BO-094 opens on its own"
+     "carries": [
+      "mapId"
+     ],
+     "provenance": "derived — BO-094 declares entryState.params mapId, pathId and BO-092 holds mapId, so an edge into it carries them"
     }
    ]
   },
@@ -1760,17 +1691,11 @@
        "label": "Every venue map",
        "bindsTo": "VenueMap",
        "columns": [
-        "VenueMap.id",
         "VenueMap.name",
-        "VenueMap.venueId",
-        "VenueMap.scopePath",
         "VenueMap.kind",
         "VenueMap.floorLevel",
         "VenueMap.status",
         "VenueMap.publishedVersion",
-        "VenueMap.isGeoreferenced",
-        "VenueMap.baseAssetId",
-        "VenueMap.baseImageAlignment",
         "VenueMap.tileSetRef"
        ],
        "operation": "listVenueMaps",
@@ -1787,19 +1712,13 @@
        "label": "The selected venue map",
        "bindsTo": "VenueMap",
        "columns": [
-        "VenueMap.id",
         "VenueMap.name",
-        "VenueMap.venueId",
-        "VenueMap.scopePath",
         "VenueMap.kind",
         "VenueMap.floorLevel",
         "VenueMap.status",
         "VenueMap.publishedVersion",
-        "VenueMap.isGeoreferenced",
-        "VenueMap.baseAssetId",
         "VenueMap.baseImageAlignment",
         "VenueMap.tileSetRef",
-        "VenueMap.boundsGeoJson",
         "VenueMap.graphStatus"
        ],
        "operation": "listVenueMaps",
@@ -1826,7 +1745,7 @@
    "error": "Could not load. Names which read failed and leaves the venue maps untouched.",
    "emptyFirstRun": "No venue maps yet. Offers Create venue map (`createVenueMap`).",
    "emptyNoResults": "Never shown: `listVenueMaps` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `VENUE_MAP_VIEW`, which `listVenueMaps` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `VENUE_MAP_VIEW`, which `listVenueMaps` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `VENUE_MAP_MANAGE` for `createVenueMap`."
   },
   "apis": [
    {
@@ -1861,13 +1780,13 @@
    "derivedFrom": "wireframes/reference/Seat Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateVenueMap",
     "component": "modal",
     "trigger": "Create venue map",
-    "body": "**Collects what `createVenueMap` sends before it is called.** Required: `name`, `venueId`. Optional: `kind`, `floorLevel`, `baseAssetId`, `baseImageAlignment`, `boundsGeoJson`. `id`, `status` (draft) and scope are the server's; the form asks only for the map's own fields. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createVenueMap` sends before it is called.** Required: `name`, `venueId`. Optional: `kind`, `floorLevel`, `baseAssetId`, `baseImageAlignment`, `boundsGeoJson`. and scope are the server's; the form asks only for the map's own fields. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `status` (3 October 2026, CHG-SPF-001).",
     "confirm": {
      "label": "Create venue map",
      "operation": "createVenueMap"
@@ -1915,7 +1834,7 @@
   "name": "Map Import & Labelling",
   "module": "Access & Venue",
   "requiresModule": "seating",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-mapping/map-import",
@@ -2126,11 +2045,15 @@
    "params": [
     {
      "name": "mapId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `importVenueGeometry`, `proposeVenueLabels`, `acceptVenueLabelProposals` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "jobId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `importVenueGeometry`; a link or an edge that holds one opens it instead."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `mapId`."
@@ -2142,7 +2065,7 @@
    "derivedFrom": "wireframes/reference/Seat Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formAcceptVenueLabelProposals",
@@ -2190,7 +2113,7 @@
   "name": "Map Editor & Publish",
   "module": "Access & Venue",
   "requiresModule": "seating",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "venue-management-web",
    "route": "/venue-mapping/map-editor",
@@ -2386,7 +2309,7 @@
    "loading": "The map editor publish, read by `getVenueMap`.",
    "error": "Could not load. Names which read failed and leaves the map editor publish untouched.",
    "emptyFirstRun": "No map editor publish yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `VENUE_MAP_VIEW`, which `getVenueMap` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `VENUE_MAP_VIEW`, which `getVenueMap` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ASSET_LIBRARY_VIEW` for `searchMedia`; `PRODUCT_VIEW` for `listProducts`, `listCatalogueBundles`; `VENUE_MAP_MANAGE` for `setVenuePoint`, `validateVenueMapGraph`, `setPathClosure`, `setPlacedResource`; `VENUE_MAP_PUBLISH` for `publishVenueMap`."
   },
   "apis": [
    {
@@ -2464,7 +2387,9 @@
     },
     {
      "name": "pathId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `setPathClosure` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `mapId`, `pathId`."
@@ -2476,13 +2401,13 @@
    "derivedFrom": "wireframes/reference/Seat Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetVenuePoint",
     "component": "modal",
     "trigger": "Save venue point",
-    "body": "**Collects what `setVenuePoint` sends before it is called.** Required: `id`, `mapId`, `kind`, `name`, `position`. Optional: `nameLocalised`, `outletId`, `productId`, `accessPointId`, `isStepFree`, `openingHours`, `iconRef`, `isActive`, `isNavigable`, `isDestination`, `pointId`; and the item details decided 29 September (MOB-4, MOB-6): `description`, `media`, `featuredOffer` (a product or a bundle, on any kind of point), `typicalDurationMinutes`, `interestTags`, `cuisineTags`; and `retailTags` (30 September, MoM 4.7). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setVenuePoint` sends before it is called.** Required: `kind`, `name`, `position`. Optional: `nameLocalised`, `outletId`, `productId`, `accessPointId`, `isStepFree`, `openingHours`, `iconRef`, `isActive`, `isNavigable`, `isDestination`, `pointId`; and the item details decided 29 September (MOB-4, MOB-6): `description`, `media`, `featuredOffer` (a product or a bundle, on any kind of point), `typicalDurationMinutes`, `interestTags`, `cuisineTags`; and `retailTags` (30 September, MoM 4.7). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `mapId` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "SetVenuePointRequest",
     "confirm": {
      "label": "Save venue point",
@@ -2491,8 +2416,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "mapId",
       "kind",
       "name",
       "position",
@@ -2687,18 +2610,11 @@
        "label": "Every resource",
        "bindsTo": "Resource",
        "columns": [
-        "Resource.id",
         "Resource.code",
         "Resource.name",
         "Resource.kind",
-        "Resource.venueId",
-        "Resource.scopePath",
-        "Resource.parentResourceId",
-        "Resource.principalId",
-        "Resource.attributes",
         "Resource.setupMinutes",
-        "Resource.teardownMinutes",
-        "Resource.requiresQualification"
+        "Resource.teardownMinutes"
        ],
        "operation": "listResources",
        "provenance": "contract resources.yaml GET /resources"
@@ -2730,21 +2646,14 @@
        "label": "The selected resource",
        "bindsTo": "Resource",
        "columns": [
-        "Resource.id",
         "Resource.code",
         "Resource.name",
         "Resource.kind",
-        "Resource.venueId",
-        "Resource.scopePath",
-        "Resource.parentResourceId",
-        "Resource.principalId",
         "Resource.attributes",
         "Resource.setupMinutes",
         "Resource.teardownMinutes",
-        "Resource.requiresQualification",
         "Resource.depositAmount",
-        "Resource.status",
-        "Resource.isActive"
+        "Resource.status"
        ],
        "operation": "listResources",
        "provenance": "contract resources.yaml GET /resources"
@@ -2770,7 +2679,7 @@
    "error": "Could not load resources. Existing bookings are unaffected.",
    "emptyFirstRun": "No bookable resources yet. **A cabana sold as a product sells a slot** — define the object here and it becomes something a guest can be handed and can return.",
    "emptyNoResults": "No resource matches this kind or window. Widen the window rather than the kind — availability moves, definitions do not.",
-   "emptyNoAccess": "You do not have RESOURCE_VIEW. The list is not empty."
+   "emptyNoAccess": "You do not have `RESOURCE_VIEW`. The list is not empty. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `RESOURCE_MANAGE` for `createResource`."
   },
   "apis": [
    {
@@ -2803,7 +2712,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-095"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateResource",

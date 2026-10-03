@@ -110,17 +110,11 @@
        "bindsTo": "AiProvider",
        "columns": [
         "AiProvider.kind",
-        "AiProvider.capability",
         "AiProvider.model",
-        "AiProvider.failoverProviderId",
-        "AiProvider.degradeGracefully",
         "AiProvider.priority",
         "AiProvider.scopeLevel",
         "AiProvider.credentialRotatedAt",
-        "AiProvider.credentialExpiresAt",
-        "AiProvider.vendor",
-        "AiProvider.credentialHint",
-        "AiProvider.compatibility"
+        "AiProvider.credentialExpiresAt"
        ],
        "operation": "listAiProviders",
        "provenance": "contract ai.yaml GET /providers"
@@ -152,24 +146,14 @@
        "label": "The selected AI provider",
        "bindsTo": "AiProvider",
        "columns": [
-        "AiProvider.id",
         "AiProvider.kind",
-        "AiProvider.capability",
         "AiProvider.model",
-        "AiProvider.failoverProviderId",
-        "AiProvider.degradeGracefully",
         "AiProvider.priority",
         "AiProvider.scopeLevel",
         "AiProvider.credentialRotatedAt",
         "AiProvider.credentialExpiresAt",
         "AiProvider.lastVerifiedAt",
-        "AiProvider.endpoint",
-        "AiProvider.residency",
-        "AiProvider.maxTokens",
-        "AiProvider.vendor",
-        "AiProvider.residencyClasses",
-        "AiProvider.credentialHint",
-        "AiProvider.compatibility"
+        "AiProvider.residency"
        ],
        "operation": "listAiProviders",
        "provenance": "contract ai.yaml GET /providers"
@@ -260,7 +244,7 @@
    "error": "Could not load. Names which read failed and leaves the provider credentials untouched.",
    "emptyFirstRun": "No AI provider for this tenant yet; the managed default (TICVAI curated, UAE-only through Core42 Compass unless the tenant is Global-allowed) answers meanwhile. Offers Save AI provider (`setAiProvider`, `id` optional, so it creates one); distinct from a filter that matched nothing.",
    "emptyNoResults": "Never shown: `listAiProviders` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `AI_CONFIGURE`, which `listAiProviders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `AI_CONFIGURE`, which `listAiProviders` requires to show this screen, and names that permission (the screen's other reads need `AI_USE`, `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_APPROVE` for `publishPromptTemplate`; `PLATFORM_AI_MANAGE` for `setAiModel`, `setAiByokEnablement`; `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`, `openPlatformStaffGrant`; `PLATFORM_TENANT_MANAGE` for `setAiProvider`; `SCOPE_VIEW` for `getRegionSettings`.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so the provider list and every action are disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098, R203)."
   },
   "apis": [
@@ -371,7 +355,9 @@
    "params": [
     {
      "name": "providerId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiProviders` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "regionId",
@@ -380,11 +366,15 @@
     },
     {
      "name": "modelId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiProviders` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "templateKey",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPromptTemplates` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "tenantId",
@@ -405,7 +395,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-037"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formOpenPlatformStaffGrant",
@@ -431,7 +421,7 @@
     "id": "formSetAiProvider",
     "component": "modal",
     "trigger": "Save AI provider",
-    "body": "**Collects what `setAiProvider` sends before it is called.** Required: `kind`, `capability`, `priority`, `isActive`. Optional: `id`, `model`, `failoverProviderId`, `degradeGracefully`, `scopeLevel`, `scopePath`, `credentialRef`, `credentialRotatedAt`, `credentialExpiresAt`, `lastVerifiedAt`, `endpoint`, `residency` and 1 more. **Set for the picked tenant**; a `residency` outside what the tenant's region allows is refused `409 residency-refused` and shown against that field (decided 28 September, audit R203). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setAiProvider` sends before it is called.** Required: `kind`, `capability`, `priority`, `isActive`. Optional: `id`, `model`, `failoverProviderId`, `degradeGracefully`, `scopeLevel`, `scopePath`, `credentialRef`, `credentialExpiresAt`, `endpoint`, `residency` and 1 more. **Set for the picked tenant**; a `residency` outside what the tenant's region allows is refused `409 residency-refused` and shown against that field (decided 28 September, audit R203). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `credentialRotatedAt`, `lastVerifiedAt` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "AiProvider",
     "confirm": {
      "label": "Save AI provider",
@@ -451,9 +441,7 @@
       "scopeLevel",
       "scopePath",
       "credentialRef",
-      "credentialRotatedAt",
       "credentialExpiresAt",
-      "lastVerifiedAt",
       "endpoint",
       "residency",
       "maxTokens"

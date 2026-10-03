@@ -4,7 +4,7 @@
   "name": "Refunds & Resale",
   "module": "Account & Self-Service",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "read-write",
   "implementation": {
    "app": "guest-app",
@@ -104,7 +104,7 @@
     "view": "Account → All screens → Wave 2 → Refunds & resale"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateRefundRequest",
@@ -182,7 +182,7 @@
   "name": "Face Pass",
   "module": "Account & Self-Service",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "read-write",
   "implementation": {
    "app": "guest-app",
@@ -240,14 +240,9 @@
        "label": "The face pass enrolment",
        "bindsTo": "FacePassEnrolment",
        "columns": [
-        "FacePassEnrolment.id",
-        "FacePassEnrolment.subjectId",
-        "FacePassEnrolment.entitlementId",
         "FacePassEnrolment.source",
         "FacePassEnrolment.capturedAt",
-        "FacePassEnrolment.consentPurposeId",
         "FacePassEnrolment.consentGivenAt",
-        "FacePassEnrolment.guardianSubjectId",
         "FacePassEnrolment.isActive",
         "FacePassEnrolment.expiresAt"
        ],
@@ -346,7 +341,9 @@
    "params": [
     {
      "name": "enrolmentId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `enrolFacePass`; a link or an edge that holds one opens it instead."
     },
     {
      "name": "subjectId",
@@ -367,7 +364,7 @@
     "view": "Account → All screens → Wave 2 → Face Pass (also Account → Face Pass)"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -404,7 +401,7 @@
   "name": "Payment Methods",
   "module": "Account & Self-Service",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "read-write",
   "implementation": {
    "app": "guest-app",
@@ -474,11 +471,7 @@
         "GiftCard.kind",
         "GiftCard.faceValue",
         "GiftCard.balance",
-        "GiftCard.status",
-        "GiftCard.blockedReason",
-        "GiftCard.issuedAt",
-        "GiftCard.activatedAt",
-        "GiftCard.expiresAt"
+        "GiftCard.status"
        ],
        "operation": "getGiftCard",
        "provenance": "contract wallet.yaml GET /gift-cards/{cardCode}"
@@ -568,11 +561,15 @@
     },
     {
      "name": "walletId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `transferWalletBalance` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "cardCode",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getGiftCard` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ],
    "coldEntry": "**Resolves from the session.** A guest arriving cold is asked to sign in and returned here afterwards — never a 404, and never a screen that silently shows somebody else's data (ADR-0030).",
@@ -597,7 +594,7 @@
     "differences": "The Account → \"Payment methods\" row opens Engine settings instead of this screen. **The frame must open this screen** from Account → Payment methods; the prototype's link to Engine settings is a wiring slip (CHG-SGU-020)."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formStorePaymentToken",
@@ -690,7 +687,7 @@
   "name": "Security & Sign-in",
   "module": "Account & Self-Service",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "read-write",
   "implementation": {
    "app": "guest-app",
@@ -766,10 +763,6 @@
        "bindsTo": "GuestDevice",
        "columns": [
         "GuestDevice.platform",
-        "GuestDevice.appVersion",
-        "GuestDevice.osVersion",
-        "GuestDevice.deviceModel",
-        "GuestDevice.locale",
         "GuestDevice.status",
         "GuestDevice.failureCount",
         "GuestDevice.registeredAt"
@@ -903,11 +896,15 @@
     },
     {
      "name": "challengeId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`; a link or an edge that holds one opens it instead."
     },
     {
      "name": "methodId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMfaMethods` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**Resolves from the session.** A guest arriving cold is asked to sign in and returned here afterwards — never a 404, and never a screen that silently shows somebody else's data (ADR-0030)."
@@ -925,7 +922,7 @@
    "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "confirmRevokeGuestDevice",

@@ -312,7 +312,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/eligibility-rule-builder-adm-199",
    "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-010"
   },
   "navigation": {
    "entryFrom": [
@@ -495,8 +496,6 @@
         "CrmCustomerSegmentManagerView.estimatedAudience",
         "CrmCustomerSegmentManagerView.lastRefreshed",
         "CrmCustomerSegmentManagerView.promotionsUsingSegment",
-        "CrmCustomerSegmentManagerView.conversion",
-        "CrmCustomerSegmentManagerView.revenue",
         "CrmCustomerSegmentManagerView.status"
        ],
        "bindsTo": "CrmCustomerSegmentManagerView",

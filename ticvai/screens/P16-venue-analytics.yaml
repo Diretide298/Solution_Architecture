@@ -199,6 +199,8 @@ screens:
     - to: ANL-019
       trigger: AI Management Insights
       provenance: structural — ANL-001 is P16's home screen and its exits are its launcher
+      carries:
+      - insightId
   notes: '**Built 20 August. Answers 3 board screens**: F&B Executive Command Center; Retail Executive
     Command Center; Enterprise Frontline Operations Dashboard. **Three board screens, one screen with
     a domain selector.** F&B, Retail and POS each drew an executive command centre and they differ only
@@ -4094,7 +4096,7 @@ screens:
     purpose: Create one
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id004
+    invalidates: &id002
     - listDashboards
   wireframe:
     status: notStarted
@@ -5507,7 +5509,7 @@ screens:
     purpose: Create a report
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id005
+    invalidates: &id003
     - listReports
   wireframe:
     status: notStarted
@@ -6828,7 +6830,7 @@ screens:
     purpose: Add a recipient
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: &id003
+    invalidates: &id001
     - listReportSubscriptions
   wireframe:
     status: notStarted
@@ -6956,7 +6958,7 @@ screens:
     purpose: Channel, format and recipients
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id003
+    invalidates: *id001
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-044
@@ -8152,7 +8154,7 @@ screens:
     purpose: Accept a generated dashboard
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id004
+    invalidates: *id002
   wireframe:
     status: notStarted
     board: wireframes/P16 Venue Analytics.dc.html#anl-053
@@ -8249,7 +8251,7 @@ screens:
     purpose: Accept a generated report
     trigger: onAction
     provenance: board reading, 19 September 2026
-    invalidates: *id005
+    invalidates: *id003
   entryState:
     preloaded:
     - Selected Dataset

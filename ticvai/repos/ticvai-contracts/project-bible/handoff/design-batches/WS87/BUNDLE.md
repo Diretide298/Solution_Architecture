@@ -136,7 +136,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-486` | Customer Card / Wallet Identification | B–D | 0 | 4 | 6 | 2 | 1 | 6 | — | notStarted (—) |
 | `BO-487` | Customer Wallet & Balance Summary | B–D | 0 | 6 | 6 | 16 | 1 | 6 | — | notStarted (—) |
 | `BO-488` | Self-Service Wallet Top-Up | B–D | 0 | 15 | 6 | 33 | 1 | 6 | — | notStarted (—) |
-| `BO-489` | Bonus, Free Game & Benefit View | B–D | 3 | 22 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-489` | Bonus, Free Game & Benefit View | B–D | 3 | 17 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-490` | Game & Ride Eligibility / “What Can I Play?” | B–D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-491` | Redemption Balance & Prize Discovery | B–D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-492` | Customer Game & Wallet Transaction History | B–D | 2 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
@@ -772,6 +772,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS67 Game and Ride Board 10.dc.html#bo-487`
 - Workshop pack: Game_and_Ride_Module.pdf board 10
 - Flow F196 *Game and Ride board 10: Self-Service Experience Command Center*, step 6: Works in Customer Wallet & Balance Summary → Present all relevant wallet balances clearly to the customer. The source specifically requires customers' stored credits to be viewable through self-service kiosks.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -929,6 +930,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS67 Game and Ride Board 10.dc.html#bo-488`
 - Workshop pack: Game_and_Ride_Module.pdf board 10
 - Flow F196 *Game and Ride board 10: Self-Service Experience Command Center*, step 8: Works in Self-Service Wallet Top-Up → Allow customers to add value to their game wallet through an enabled kiosk/channel.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1022,19 +1024,14 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 | Shows | Format | Notes |
 |---|---|---|
-| Game | the name it points at, never the id | — |
 | Name | text | — |
 | Playable | yes / no (icon or chip) | — |
 | Cost kind | chip: Free with entitlement, Credit, Direct pay, Not playable | — |
 | Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Entitlement | the name it points at, never the id | — |
 | Remaining plays | 1,234 | — |
 | Blocked reason | text | — |
 | Tickets typically earned | 1,234 | — |
 | Benefit name | text | not in the schema: `Benefit name` |
-| Valid until | text | not in the schema: `Valid until` |
-| Can be used at | text | not in the schema: `Can be used at` |
-| Cannot be used at | text | not in the schema: `Cannot be used at` |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1130,7 +1127,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (3), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (17 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-489?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-484`.

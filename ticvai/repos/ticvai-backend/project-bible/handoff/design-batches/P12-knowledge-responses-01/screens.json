@@ -119,7 +119,7 @@
    "provenance": "generated",
    "board": "wireframes/P12 Venue Support.dc.html#sup-006"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSemanticSearch",
@@ -221,15 +221,9 @@
        "label": "Every message template",
        "bindsTo": "MessageTemplate",
        "columns": [
-        "MessageTemplate.id",
         "MessageTemplate.code",
         "MessageTemplate.name",
-        "MessageTemplate.channel",
-        "MessageTemplate.subjects",
-        "MessageTemplate.bodies",
-        "MessageTemplate.mergeFields",
-        "MessageTemplate.missingLanguages",
-        "MessageTemplate.providerTemplateId"
+        "MessageTemplate.channel"
        ],
        "operation": "listMessageTemplates",
        "provenance": "contract marketing-crm.yaml GET /message-templates"
@@ -279,7 +273,7 @@
    "error": "Could not load. Names which read failed and leaves the canned response untouched.",
    "emptyFirstRun": "No canned response yet. Offers Create message template (`createMessageTemplate`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on channel and the canned response are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listMessageTemplates` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `listMessageTemplates` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createMessageTemplate`."
   },
   "apis": [
    {
@@ -312,13 +306,13 @@
    "provenance": "generated",
    "board": "wireframes/P12 Venue Support.dc.html#sup-007"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateMessageTemplate",
     "component": "modal",
     "trigger": "Create message template",
-    "body": "**Collects what `createMessageTemplate` sends before it is called.** Required: `id`, `code`, `name`, `channel`, `bodies`. Optional: `subjects`, `mergeFields`, `missingLanguages`, `providerTemplateId`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createMessageTemplate` sends before it is called.** Required: `code`, `name`, `channel`, `bodies`. Optional: `subjects`, `mergeFields`, `providerTemplateId`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `missingLanguages` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "MessageTemplate",
     "confirm": {
      "label": "Create message template",
@@ -327,14 +321,12 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "code",
       "name",
       "channel",
       "bodies",
       "subjects",
       "mergeFields",
-      "missingLanguages",
       "providerTemplateId"
      ]
     },

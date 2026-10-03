@@ -139,22 +139,14 @@
        "label": "The resale marketplace config",
        "bindsTo": "ResaleMarketplaceConfig",
        "columns": [
-        "ResaleMarketplaceConfig.id",
         "ResaleMarketplaceConfig.marketplaceName",
         "ResaleMarketplaceConfig.pricingMode",
         "ResaleMarketplaceConfig.maximumDiscountPercent",
         "ResaleMarketplaceConfig.sellerCanEditPrice",
         "ResaleMarketplaceConfig.maximumPriceChanges",
         "ResaleMarketplaceConfig.minimumMinutesBetweenPriceChanges",
-        "ResaleMarketplaceConfig.moderationMode",
-        "ResaleMarketplaceConfig.reviewTriggers",
-        "ResaleMarketplaceConfig.expiryRule",
-        "ResaleMarketplaceConfig.expiryOffset",
-        "ResaleMarketplaceConfig.withdrawalPolicy",
-        "ResaleMarketplaceConfig.maximumWithdrawals",
         "ResaleMarketplaceConfig.cancellationFee",
-        "ResaleMarketplaceConfig.checkoutHoldMinutes",
-        "ResaleMarketplaceConfig.buyerIdentityVerificationRequired"
+        "ResaleMarketplaceConfig.checkoutHoldMinutes"
        ],
        "operation": "getResaleMarketplaceConfig",
        "provenance": "contract orders.yaml GET /resale-marketplace-config"
@@ -737,22 +729,14 @@
        "label": "The resale marketplace config",
        "bindsTo": "ResaleMarketplaceConfig",
        "columns": [
-        "ResaleMarketplaceConfig.id",
         "ResaleMarketplaceConfig.marketplaceName",
         "ResaleMarketplaceConfig.pricingMode",
         "ResaleMarketplaceConfig.maximumDiscountPercent",
         "ResaleMarketplaceConfig.sellerCanEditPrice",
         "ResaleMarketplaceConfig.maximumPriceChanges",
         "ResaleMarketplaceConfig.minimumMinutesBetweenPriceChanges",
-        "ResaleMarketplaceConfig.moderationMode",
-        "ResaleMarketplaceConfig.reviewTriggers",
-        "ResaleMarketplaceConfig.expiryRule",
-        "ResaleMarketplaceConfig.expiryOffset",
-        "ResaleMarketplaceConfig.withdrawalPolicy",
-        "ResaleMarketplaceConfig.maximumWithdrawals",
         "ResaleMarketplaceConfig.cancellationFee",
-        "ResaleMarketplaceConfig.checkoutHoldMinutes",
-        "ResaleMarketplaceConfig.buyerIdentityVerificationRequired"
+        "ResaleMarketplaceConfig.checkoutHoldMinutes"
        ],
        "operation": "getResaleMarketplaceConfig",
        "provenance": "contract orders.yaml GET /resale-marketplace-config"
@@ -817,7 +801,7 @@
     "id": "formSetResaleMarketplaceConfig",
     "component": "modal",
     "trigger": "Save resale marketplace config",
-    "body": "**Collects what `setResaleMarketplaceConfig` sends before it is called.** Required: `id`, `marketplaceName`, `pricingMode`, `moderationMode`, `isActive`. Optional: `maximumDiscountPercent`, `sellerCanEditPrice`, `maximumPriceChanges`, `minimumMinutesBetweenPriceChanges`, `reviewTriggers`, `expiryRule`, `expiryOffset`, `withdrawalPolicy`, `maximumWithdrawals`, `cancellationFee`, `checkoutHoldMinutes`, `buyerIdentityVerificationRequired` and 16 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setResaleMarketplaceConfig` sends before it is called.** Required: `marketplaceName`, `pricingMode`, `moderationMode`, `isActive`. Optional: `maximumDiscountPercent`, `sellerCanEditPrice`, `maximumPriceChanges`, `minimumMinutesBetweenPriceChanges`, `reviewTriggers`, `expiryRule`, `expiryOffset`, `withdrawalPolicy`, `maximumWithdrawals`, `cancellationFee`, `checkoutHoldMinutes`, `buyerIdentityVerificationRequired` and 16 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "ResaleMarketplaceConfig",
     "confirm": {
      "label": "Save resale marketplace config",
@@ -826,7 +810,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "marketplaceName",
       "pricingMode",
       "moderationMode",
@@ -1231,22 +1214,14 @@
        "label": "The resale marketplace config",
        "bindsTo": "ResaleMarketplaceConfig",
        "columns": [
-        "ResaleMarketplaceConfig.id",
         "ResaleMarketplaceConfig.marketplaceName",
         "ResaleMarketplaceConfig.pricingMode",
         "ResaleMarketplaceConfig.maximumDiscountPercent",
         "ResaleMarketplaceConfig.sellerCanEditPrice",
         "ResaleMarketplaceConfig.maximumPriceChanges",
         "ResaleMarketplaceConfig.minimumMinutesBetweenPriceChanges",
-        "ResaleMarketplaceConfig.moderationMode",
-        "ResaleMarketplaceConfig.reviewTriggers",
-        "ResaleMarketplaceConfig.expiryRule",
-        "ResaleMarketplaceConfig.expiryOffset",
-        "ResaleMarketplaceConfig.withdrawalPolicy",
-        "ResaleMarketplaceConfig.maximumWithdrawals",
         "ResaleMarketplaceConfig.cancellationFee",
-        "ResaleMarketplaceConfig.checkoutHoldMinutes",
-        "ResaleMarketplaceConfig.buyerIdentityVerificationRequired"
+        "ResaleMarketplaceConfig.checkoutHoldMinutes"
        ],
        "operation": "getResaleMarketplaceConfig",
        "provenance": "contract orders.yaml GET /resale-marketplace-config"
@@ -1311,7 +1286,7 @@
     "id": "formSetResaleMarketplaceConfig",
     "component": "modal",
     "trigger": "Save resale marketplace config",
-    "body": "**Collects what `setResaleMarketplaceConfig` sends before it is called.** Required: `id`, `marketplaceName`, `pricingMode`, `moderationMode`, `isActive`. Optional: `maximumDiscountPercent`, `sellerCanEditPrice`, `maximumPriceChanges`, `minimumMinutesBetweenPriceChanges`, `reviewTriggers`, `expiryRule`, `expiryOffset`, `withdrawalPolicy`, `maximumWithdrawals`, `cancellationFee`, `checkoutHoldMinutes`, `buyerIdentityVerificationRequired` and 16 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setResaleMarketplaceConfig` sends before it is called.** Required: `marketplaceName`, `pricingMode`, `moderationMode`, `isActive`. Optional: `maximumDiscountPercent`, `sellerCanEditPrice`, `maximumPriceChanges`, `minimumMinutesBetweenPriceChanges`, `reviewTriggers`, `expiryRule`, `expiryOffset`, `withdrawalPolicy`, `maximumWithdrawals`, `cancellationFee`, `checkoutHoldMinutes`, `buyerIdentityVerificationRequired` and 16 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "ResaleMarketplaceConfig",
     "confirm": {
      "label": "Save resale marketplace config",
@@ -1320,7 +1295,6 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "marketplaceName",
       "pricingMode",
       "moderationMode",

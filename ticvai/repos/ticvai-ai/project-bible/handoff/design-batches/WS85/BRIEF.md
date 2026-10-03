@@ -138,7 +138,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-468` | Rejected Transaction & Reason Analysis | B–D | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-469` | Wallet & Deduction Transaction Monitor | B–D | 0 | 0 | 6 | 3 | 0 | 6 | — | notStarted (—) |
 | `BO-470` | Entitlement & Free-Play Consumption Monitor | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-471` | Offline, Synchronization & Recovery Monitor | B–D | 14 | 24 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-471` | Offline, Synchronization & Recovery Monitor | B–D | 14 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-473` | Operational Analytics & Reconciliation Dashboard | B–D | 0 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch

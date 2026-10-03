@@ -96,15 +96,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-005` | Tenant Directory | A | 57 | 73 | 7 | 17 | 0 | 0 | — | notStarted (generated) |
-| `ADM-006` | Tenant Hierarchy Explorer | B–D | 16 | 67 | 7 | 15 | 0 | 0 | — | notStarted (generated) |
-| `ADM-007` | Module & Feature Entitlement | B–D | 12 | 65 | 6 | 14 | 0 | 0 | — | notStarted (generated) |
-| `ADM-008` | Subscription & Plan Management | A | 83 | 86 | 6 | 24 | 0 | 0 | — | notStarted (generated) |
-| `ADM-009` | Tenant Billing & Invoicing | B–D | 4 | 67 | 6 | 11 | 0 | 0 | — | notStarted (generated) |
-| `ADM-010` | Usage Metering | B–D | 0 | 59 | 6 | 16 | 0 | 0 | — | notStarted (generated) |
-| `ADM-011` | Licence & Seat Management | B–D | 17 | 65 | 6 | 16 | 0 | 6 | — | notStarted (generated) |
-| `ADM-012` | Tenant Isolation & Resource Pool | B–D | 6 | 63 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
-| `ADM-015` | API Rate Limit & Quota Management | B–D | 24 | 63 | 7 | 33 | 2 | 0 | — | notStarted (generated) |
+| `ADM-005` | Tenant Directory | A | 57 | 48 | 7 | 17 | 0 | 0 | — | notStarted (generated) |
+| `ADM-006` | Tenant Hierarchy Explorer | B | 16 | 45 | 7 | 15 | 0 | 0 | — | notStarted (generated) |
+| `ADM-007` | Module & Feature Entitlement | B | 12 | 42 | 6 | 14 | 0 | 0 | — | notStarted (generated) |
+| `ADM-008` | Subscription & Plan Management | A | 83 | 57 | 6 | 24 | 0 | 0 | — | notStarted (generated) |
+| `ADM-009` | Tenant Billing & Invoicing | B | 4 | 42 | 6 | 11 | 0 | 0 | — | notStarted (generated) |
+| `ADM-010` | Usage Metering | B | 0 | 36 | 6 | 16 | 0 | 0 | — | notStarted (generated) |
+| `ADM-011` | Licence & Seat Management | B | 17 | 42 | 6 | 16 | 0 | 6 | — | notStarted (generated) |
+| `ADM-012` | Tenant Isolation & Resource Pool | B | 6 | 40 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
+| `ADM-015` | API Rate Limit & Quota Management | B | 24 | 50 | 7 | 33 | 2 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -120,7 +120,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 1 · needs the `core` module |
-| Block | Block A · ticket #17824 (APP-SETUP-ADM-005) |
+| Block | Block A · task APP-SETUP-ADM-005 |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_MANAGE`, `PLATFORM_TENANT_TERMINATE`, `PLATFORM_TENANT_VIEW`… (3 configure, 2 read, 2 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTenants` reads the population and `getEntitlementUsage` reads one of them — list, select, act |
@@ -302,12 +302,9 @@ Errors to draw in the form: 409 The tenant is terminated (`tenant-terminated`, a
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
-| Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Plan name | text | — |
 | Cell count | 1,234 | — |
 | Venue count | 1,234 | — |
-| Billing email | text | — |
 
 **Every cell** (data table, from `listTenantCells`)
 
@@ -315,31 +312,20 @@ Errors to draw in the form: 409 The tenant is terminated (`tenant-terminated`, a
 |---|---|---|
 | Name | text | — |
 | Kind | chip: Shared, Dedicated, On premise isolated, On premise connected, Control plane, Burst | Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law … |
-| Is reachable | yes / no (icon or chip) | False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and … |
 | Last contact at | 1 Oct 2026, 14:30 | When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first. |
 | Licence expires at | 1 Oct 2026, 14:30 | On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. |
-| Participates in cross cell | yes / no (icon or chip) | False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). |
 | Region name | text | — |
 | Country code | text | — |
-| Tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
 
 **The selected tenant** (detail panel, from `listTenants`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
 | Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Suspension effective at | 1 Oct 2026, 14:30 | When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. A future value is a pending suspension: the tenant stays `active` … |
-| Suspension notice message | in the reader's language | The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`. |
-| Termination scheduled at | 1 Oct 2026, 14:30 | When `terminateTenant` started the retention window. Null when no termination is under way. |
-| Termination retention until | 1 Oct 2026, 14:30 | `terminationScheduledAt` plus the request's `retentionDays`. Stored, not recomputed — the day count is client-supplied and exists nowhere … |
-| Termination reason | text | — |
-| Termination requested by principal | the name it points at, never the id | — |
-| Plan | the name it points at, never the id | — |
 | Plan name | text | — |
 | Cell count | 1,234 | — |
 | Venue count | 1,234 | — |
@@ -348,35 +334,24 @@ Errors to draw in the form: 409 The tenant is terminated (`tenant-terminated`, a
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Display name | text | — |
 | Protocol | chip: Oidc, Saml2 | — |
 | Metadata URL | text | — |
 | Issuer | text | — |
-| Client | text | — |
 | Client secret ref | text | Key vault reference. The secret itself is never returned. |
 | Group mappings | list or chips (count when long) | A group with no mapping grants nothing. No default role, ever — otherwise the identity provider becomes a way to mint access nobody … |
 | Auto provision principals | yes / no (icon or chip) | Create a principal on first successful sign-in. |
 | Is enforced | yes / no (icon or chip) | — |
-| Is active | yes / no (icon or chip) | — |
 
 **The tenant** (detail panel, from `getTenant`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
 | Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Suspension effective at | 1 Oct 2026, 14:30 | When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. A future value is a pending suspension: the tenant stays `active` … |
-| Suspension notice message | in the reader's language | The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`. |
-| Termination scheduled at | 1 Oct 2026, 14:30 | When `terminateTenant` started the retention window. Null when no termination is under way. |
-| Termination retention until | 1 Oct 2026, 14:30 | `terminationScheduledAt` plus the request's `retentionDays`. Stored, not recomputed — the day count is client-supplied and exists nowhere … |
-| Termination reason | text | — |
-| Termination requested by principal | the name it points at, never the id | — |
-| Plan | the name it points at, never the id | — |
 | Plan name | text | — |
 | Cell count | 1,234 | — |
 | Venue count | 1,234 | — |
@@ -445,7 +420,7 @@ Errors to draw in the form: 409 The tenant is terminated (`tenant-terminated`, a
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the tenant untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No tenants yet. Offers Create tenant, the first act of onboarding; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status, planId and the tenant are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_CELL_VIEW`, `USER_MANAGE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `provisionCell` … |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098). |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Confirmation code does not match; 400 Metadata unreachable, or no group mappings supplied; 400 Placement is outside the region's jurisdiction, or the target cloud has no region in that country.; 400 Validation failed |
@@ -508,7 +483,7 @@ tenants:
 - `updateTenant` → `PLATFORM_TENANT_MANAGE` (configure) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_CELL_VIEW`, `USER_MANAGE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `provisionCell` …
 
 #### Requirements it meets
 
@@ -551,7 +526,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (57), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (73 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (48 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-005?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, Add licence add on, Create tenant, Provision cell, Reactivate tenant, Remove licence add on, Save SSO config, Suspend tenant, Terminate tenant, Save tenant.
 - [ ] Every transition is wired: `ADM-001`, `ADM-002`, `ADM-003`, `ADM-008`, `ADM-012`.
@@ -571,7 +546,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-006 |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_MANAGE`, `PLATFORM_TENANT_VIEW`, `SCOPE_MANAGE`, `SCOPE_VIEW` (3 read, 1 operate, 2 configure); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTenants` reads the population and `getSsoConfig` reads one of them — list, select, act |
@@ -667,12 +642,9 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
-| Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Plan name | text | — |
 | Cell count | 1,234 | — |
 | Venue count | 1,234 | — |
-| Billing email | text | — |
 
 **Every cell** (data table, from `listTenantCells`)
 
@@ -680,13 +652,10 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 |---|---|---|
 | Name | text | — |
 | Kind | chip: Shared, Dedicated, On premise isolated, On premise connected, Control plane, Burst | Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law … |
-| Is reachable | yes / no (icon or chip) | False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and … |
 | Last contact at | 1 Oct 2026, 14:30 | When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first. |
 | Licence expires at | 1 Oct 2026, 14:30 | On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. |
-| Participates in cross cell | yes / no (icon or chip) | False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). |
 | Region name | text | — |
 | Country code | text | — |
-| Tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
 
 **Every org unit** (data table, from `listOrgUnits`)
 
@@ -703,19 +672,11 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
 | Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Suspension effective at | 1 Oct 2026, 14:30 | When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. A future value is a pending suspension: the tenant stays `active` … |
-| Suspension notice message | in the reader's language | The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`. |
-| Termination scheduled at | 1 Oct 2026, 14:30 | When `terminateTenant` started the retention window. Null when no termination is under way. |
-| Termination retention until | 1 Oct 2026, 14:30 | `terminationScheduledAt` plus the request's `retentionDays`. Stored, not recomputed — the day count is client-supplied and exists nowhere … |
-| Termination reason | text | — |
-| Termination requested by principal | the name it points at, never the id | — |
-| Plan | the name it points at, never the id | — |
 | Plan name | text | — |
 | Cell count | 1,234 | — |
 | Venue count | 1,234 | — |
@@ -731,19 +692,11 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
 | Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Suspension effective at | 1 Oct 2026, 14:30 | When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. A future value is a pending suspension: the tenant stays `active` … |
-| Suspension notice message | in the reader's language | The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`. |
-| Termination scheduled at | 1 Oct 2026, 14:30 | When `terminateTenant` started the retention window. Null when no termination is under way. |
-| Termination retention until | 1 Oct 2026, 14:30 | `terminationScheduledAt` plus the request's `retentionDays`. Stored, not recomputed — the day count is client-supplied and exists nowhere … |
-| Termination reason | text | — |
-| Termination requested by principal | the name it points at, never the id | — |
-| Plan | the name it points at, never the id | — |
 | Plan name | text | — |
 | Cell count | 1,234 | — |
 | Venue count | 1,234 | — |
@@ -785,7 +738,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the tenant hierarchy untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No tenant hierarchy yet. Offers Create org unit (`createOrgUnit`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status, planId and the tenant hierarchy are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_CELL_VIEW`, `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for … |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `SCOPE_MANAGE`, `SCOPE_VIEW`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Idempotency conflict or optimistic concurrency failure. Two causes, so two types.; 409 The tenant is terminated (`tenant-terminated`, audit R214 (3)). |
@@ -834,7 +787,7 @@ Every tenant:
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
-**A refused user sees:** Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_CELL_VIEW`, `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for …
 
 #### Requirements it meets
 
@@ -877,7 +830,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (16), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (67 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (45 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-006?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, Save tenant, Create org unit.
 - [ ] Every transition is wired: `ADM-001`, `ADM-002`, `ADM-003`, `ADM-007`.
@@ -896,7 +849,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-007 |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_MANAGE`, `PLATFORM_TENANT_VIEW` (2 read, 1 configure); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTenantCells` reads the population and `getTenantLicences` reads one of them — list, select, act |
@@ -955,13 +908,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|
 | Name | text | — |
 | Kind | chip: Shared, Dedicated, On premise isolated, On premise connected, Control plane, Burst | Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law … |
-| Is reachable | yes / no (icon or chip) | False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and … |
 | Last contact at | 1 Oct 2026, 14:30 | When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first. |
 | Licence expires at | 1 Oct 2026, 14:30 | On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. |
-| Participates in cross cell | yes / no (icon or chip) | False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). |
 | Region name | text | — |
 | Country code | text | — |
-| Tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
 
 **Every tenant** (data table, from `listTenants`)
 
@@ -970,34 +920,22 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
-| Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Suspension effective at | 1 Oct 2026, 14:30 | When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. A future value is a pending suspension: the tenant stays `active` … |
-| Suspension notice message | in the reader's language | The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`. |
 | Termination scheduled at | 1 Oct 2026, 14:30 | When `terminateTenant` started the retention window. Null when no termination is under way. |
 | Termination retention until | 1 Oct 2026, 14:30 | `terminationScheduledAt` plus the request's `retentionDays`. Stored, not recomputed — the day count is client-supplied and exists nowhere … |
-| Termination reason | text | — |
 
 **The selected cell** (detail panel, from `listTenantCells`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
 | Kind | chip: Shared, Dedicated, On premise isolated, On premise connected, Control plane, Burst | Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law … |
-| Cluster | the name it points at, never the id | — |
-| Is reachable | yes / no (icon or chip) | False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and … |
 | Last contact at | 1 Oct 2026, 14:30 | When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first. |
 | Licence expires at | 1 Oct 2026, 14:30 | On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. |
-| Participates in cross cell | yes / no (icon or chip) | False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). |
-| Region | the name it points at, never the id | — |
 | Region name | text | — |
 | Country code | text | — |
 | Tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
 | Status | chip: Provisioning, Active, Migrating, Suspended, Decommissioning, Failed | — |
-| Cloud provider | text | — |
-| Cloud region | text | — |
-| API endpoint | text | — |
 
 **The entitlement usage** (detail panel, from `getEntitlementUsage`)
 
@@ -1024,19 +962,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
 | Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Suspension effective at | 1 Oct 2026, 14:30 | When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. A future value is a pending suspension: the tenant stays `active` … |
-| Suspension notice message | in the reader's language | The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`. |
-| Termination scheduled at | 1 Oct 2026, 14:30 | When `terminateTenant` started the retention window. Null when no termination is under way. |
-| Termination retention until | 1 Oct 2026, 14:30 | `terminationScheduledAt` plus the request's `retentionDays`. Stored, not recomputed — the day count is client-supplied and exists nowhere … |
-| Termination reason | text | — |
-| Termination requested by principal | the name it points at, never the id | — |
-| Plan | the name it points at, never the id | — |
 | Plan name | text | — |
 | Cell count | 1,234 | — |
 | Venue count | 1,234 | — |
@@ -1087,7 +1017,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the module feature entitlement untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No module feature entitlement yet. Offers Add licence add on (`addLicenceAddOn`). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listTenantCells` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_CELL_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_MANAGE` for `addLicenceAddOn` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Module is currently enabled by the tenant. (DowngradeConflictProblem) |
 
@@ -1136,7 +1066,7 @@ Every cell:
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `removeLicenceAddOn` → `PLATFORM_TENANT_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_CELL_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_MANAGE` for `addLicenceAddOn` …
 
 #### Requirements it meets
 
@@ -1179,7 +1109,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (12), with its required mark, default, format and its error state (403, 404, 409).
-- [ ] Every output is drawn (65 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (42 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-007?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Add licence add on, Remove licence add on.
 - [ ] Every transition is wired: `ADM-001`, `ADM-002`, `ADM-003`, `BO-074`, `ADM-012`.
@@ -1198,7 +1128,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 1 · needs the `core` module |
-| Block | Block A · ticket #18060 (APP-SETUP-ADM-008) |
+| Block | Block A · task APP-SETUP-ADM-008 |
 | Who uses it | ticvai staff holding `PLATFORM_BILLING_MANAGE`, `PLATFORM_BILLING_VIEW`, `PLATFORM_CELL_VIEW`, `PLATFORM_PLAN_MANAGE`, `PLATFORM_TENANT_MANAGE`, `PLATFORM_TENANT_VIEW` (3 configure, 3 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPlans` reads the population and `getEntitlementUsage` reads one of them — list, select, act |
@@ -1372,25 +1302,17 @@ Errors to draw in the form: 409 An invoice already exists for this period
 | Name | text | — |
 | Description | text | — |
 | Cell tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
-| Licensed modules | list or chips (count when long) | A closed set as of 24 August. `moduleKey` was a free string, so nothing could join a licence to a screen — a tenant without an F&B licence … |
-| Limits | list or chips (count when long) | — |
 | Base price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Billing period | chip: Monthly, Quarterly, Annual | — |
-| Includes branded app | yes / no (icon or chip) | Branded native publishing carries per-tenant operational cost and is priced, not absorbed. |
-| Included AI tokens | 1,234 | AI tokens the package includes per billing period. Usage beyond it is a `metered` invoice line at the AI module's price (decided 29 … |
-| Is active | yes / no (icon or chip) | — |
 
 **Every subscription invoice** (data table, from `listSubscriptionInvoices`)
 
 | Shows | Format | Notes |
 |---|---|---|
 | Invoice number | text | A tax invoice number, so gapless, per legal entity (decided 28 September, audit R152): one unbroken sequence for the TICVAI legal entity … |
-| Period start | 1 Oct 2026 | — |
-| Period end | 1 Oct 2026 | — |
 | Status | chip: Draft, Issued, Paid, Overdue, Disputed, Cancelled | — |
 | Subtotal | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Issued at | 1 Oct 2026, 14:30 | — |
 | Due at | 1 Oct 2026 | — |
 
@@ -1400,13 +1322,10 @@ Errors to draw in the form: 409 An invoice already exists for this period
 |---|---|---|
 | Name | text | — |
 | Kind | chip: Shared, Dedicated, On premise isolated, On premise connected, Control plane, Burst | Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law … |
-| Is reachable | yes / no (icon or chip) | False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and … |
 | Last contact at | 1 Oct 2026, 14:30 | When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first. |
 | Licence expires at | 1 Oct 2026, 14:30 | On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. |
-| Participates in cross cell | yes / no (icon or chip) | False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). |
 | Region name | text | — |
 | Country code | text | — |
-| Tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
 
 **Every tenant** (data table, from `listTenants`)
 
@@ -1415,13 +1334,9 @@ Errors to draw in the form: 409 An invoice already exists for this period
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
-| Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Suspension effective at | 1 Oct 2026, 14:30 | When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. A future value is a pending suspension: the tenant stays `active` … |
-| Suspension notice message | in the reader's language | The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`. |
 | Termination scheduled at | 1 Oct 2026, 14:30 | When `terminateTenant` started the retention window. Null when no termination is under way. |
 | Termination retention until | 1 Oct 2026, 14:30 | `terminationScheduledAt` plus the request's `retentionDays`. Stored, not recomputed — the day count is client-supplied and exists nowhere … |
-| Termination reason | text | — |
 
 **The selected plan** (detail panel, from `getPlan`)
 
@@ -1432,13 +1347,7 @@ Errors to draw in the form: 409 An invoice already exists for this period
 | Description | text | — |
 | Cell tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
 | Licensed modules | list or chips (count when long) | A closed set as of 24 August. `moduleKey` was a free string, so nothing could join a licence to a screen — a tenant without an F&B licence … |
-| Limits | list or chips (count when long) | — |
 | Base price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Billing period | chip: Monthly, Quarterly, Annual | — |
-| Includes branded app | yes / no (icon or chip) | Branded native publishing carries per-tenant operational cost and is priced, not absorbed. |
-| Included AI tokens | 1,234 | AI tokens the package includes per billing period. Usage beyond it is a `metered` invoice line at the AI module's price (decided 29 … |
-| ID | the name it points at, never the id | — |
-| Is active | yes / no (icon or chip) | — |
 | Subscriber count | 1,234 | — |
 | Published at | 1 Oct 2026, 14:30 | — |
 
@@ -1460,19 +1369,11 @@ Errors to draw in the form: 409 An invoice already exists for this period
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
 | Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Suspension effective at | 1 Oct 2026, 14:30 | When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. A future value is a pending suspension: the tenant stays `active` … |
-| Suspension notice message | in the reader's language | The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`. |
-| Termination scheduled at | 1 Oct 2026, 14:30 | When `terminateTenant` started the retention window. Null when no termination is under way. |
-| Termination retention until | 1 Oct 2026, 14:30 | `terminationScheduledAt` plus the request's `retentionDays`. Stored, not recomputed — the day count is client-supplied and exists nowhere … |
-| Termination reason | text | — |
-| Termination requested by principal | the name it points at, never the id | — |
-| Plan | the name it points at, never the id | — |
 | Plan name | text | — |
 | Cell count | 1,234 | — |
 | Venue count | 1,234 | — |
@@ -1536,7 +1437,7 @@ Errors to draw in the form: 409 An invoice already exists for this period
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the subscription plan untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No subscription plan yet. Offers Create plan (`createPlan`). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listPlans` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listPlans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listPlans` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_BILLING_VIEW`, `PLATFORM_CELL_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_BILLING_MANAGE` for … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 An invoice already exists for this period; 409 Downgrade conflicts with current usage. The response names every module and limit that would be violated. (DowngradeConflictProblem); 422 `effectiveFrom` was sent and is not the date the change must take effect: today for an upgrade, the next renewal for a downgrade (`effective-date-not-allowed` …; 422 `offeredToTenantId` on a standard package … |
 
@@ -1600,7 +1501,7 @@ preview:
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `previewSubscriptionChange` → `PLATFORM_TENANT_VIEW` (read) · staff, prospect
 
-**A refused user sees:** Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listPlans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listPlans` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_BILLING_VIEW`, `PLATFORM_CELL_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_BILLING_MANAGE` for …
 
 #### Requirements it meets
 
@@ -1641,7 +1542,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (83), with its required mark, default, format and its error state (403, 404, 409, 422).
-- [ ] Every output is drawn (86 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (57 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-008?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save subscription, Create plan, Create plan version, Generate invoice, Preview subscription change.
 - [ ] Every transition is wired: `ADM-001`, `ADM-002`, `ADM-003`, `ADM-011`.
@@ -1660,7 +1561,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-009 |
 | Who uses it | ticvai staff holding `PLATFORM_BILLING_MANAGE`, `PLATFORM_BILLING_VIEW`, `PLATFORM_TENANT_VIEW` (1 configure, 2 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listSubscriptionInvoices` reads the population and `getEntitlementUsage` reads one of them — list, select, act |
@@ -1712,16 +1613,10 @@ Errors to draw in the form: 409 An invoice already exists for this period
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Invoice number | text | A tax invoice number, so gapless, per legal entity (decided 28 September, audit R152): one unbroken sequence for the TICVAI legal entity … |
-| Period start | 1 Oct 2026 | — |
-| Period end | 1 Oct 2026 | — |
 | Status | chip: Draft, Issued, Paid, Overdue, Disputed, Cancelled | — |
-| Lines | list or chips (count when long) | — |
 | Subtotal | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Plan version used | text | Priced against the version the tenant is subscribed to, not the latest. |
 | Issued at | 1 Oct 2026, 14:30 | — |
 | Due at | 1 Oct 2026 | — |
 
@@ -1729,33 +1624,22 @@ Errors to draw in the form: 409 An invoice already exists for this period
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
-| Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Suspension effective at | 1 Oct 2026, 14:30 | When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. A future value is a pending suspension: the tenant stays `active` … |
-| Suspension notice message | in the reader's language | The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`. |
 | Termination scheduled at | 1 Oct 2026, 14:30 | When `terminateTenant` started the retention window. Null when no termination is under way. |
 | Termination retention until | 1 Oct 2026, 14:30 | `terminationScheduledAt` plus the request's `retentionDays`. Stored, not recomputed — the day count is client-supplied and exists nowhere … |
-| Termination reason | text | — |
-| Termination requested by principal | the name it points at, never the id | — |
 
 **The selected subscription invoice** (detail panel, from `listSubscriptionInvoices`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Invoice number | text | A tax invoice number, so gapless, per legal entity (decided 28 September, audit R152): one unbroken sequence for the TICVAI legal entity … |
-| Period start | 1 Oct 2026 | — |
-| Period end | 1 Oct 2026 | — |
 | Status | chip: Draft, Issued, Paid, Overdue, Disputed, Cancelled | — |
-| Lines | list or chips (count when long) | — |
 | Subtotal | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Plan version used | text | Priced against the version the tenant is subscribed to, not the latest. |
 | Issued at | 1 Oct 2026, 14:30 | — |
 | Due at | 1 Oct 2026 | — |
 | Paid at | 1 Oct 2026, 14:30 | — |
@@ -1778,19 +1662,11 @@ Errors to draw in the form: 409 An invoice already exists for this period
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
 | Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Suspension effective at | 1 Oct 2026, 14:30 | When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. A future value is a pending suspension: the tenant stays `active` … |
-| Suspension notice message | in the reader's language | The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`. |
-| Termination scheduled at | 1 Oct 2026, 14:30 | When `terminateTenant` started the retention window. Null when no termination is under way. |
-| Termination retention until | 1 Oct 2026, 14:30 | `terminationScheduledAt` plus the request's `retentionDays`. Stored, not recomputed — the day count is client-supplied and exists nowhere … |
-| Termination reason | text | — |
-| Termination requested by principal | the name it points at, never the id | — |
-| Plan | the name it points at, never the id | — |
 | Plan name | text | — |
 | Cell count | 1,234 | — |
 | Venue count | 1,234 | — |
@@ -1836,7 +1712,7 @@ Errors to draw in the form: 409 An invoice already exists for this period
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the tenant billing invoicing untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No tenant billing invoicing yet. Offers Generate invoice (`generateInvoice`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status and the tenant billing invoicing are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_BILLING_VIEW`, which `listSubscriptionInvoices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_BILLING_VIEW`, which `listSubscriptionInvoices` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_BILLING_MANAGE` for … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 An invoice already exists for this period |
 
@@ -1879,7 +1755,7 @@ Every subscription invoice:
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `listCreditNotes` → `PLATFORM_BILLING_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `PLATFORM_BILLING_VIEW`, which `listSubscriptionInvoices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_BILLING_VIEW`, which `listSubscriptionInvoices` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_BILLING_MANAGE` for …
 
 #### Requirements it meets
 
@@ -1916,7 +1792,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (4), with its required mark, default, format and its error state (403, 404, 409).
-- [ ] Every output is drawn (67 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (42 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-009?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Generate invoice.
 - [ ] Every transition is wired: `ADM-001`, `ADM-002`, `ADM-003`.
@@ -1935,7 +1811,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-010 |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_VIEW` (2 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTenantCells` reads the population and `getUsageMetering` reads one of them — list, select, act |
@@ -1975,13 +1851,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 |---|---|---|
 | Name | text | — |
 | Kind | chip: Shared, Dedicated, On premise isolated, On premise connected, Control plane, Burst | Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law … |
-| Is reachable | yes / no (icon or chip) | False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and … |
 | Last contact at | 1 Oct 2026, 14:30 | When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first. |
 | Licence expires at | 1 Oct 2026, 14:30 | On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. |
-| Participates in cross cell | yes / no (icon or chip) | False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). |
 | Region name | text | — |
 | Country code | text | — |
-| Tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
 
 **Every tenant** (data table, from `listTenants`)
 
@@ -1990,34 +1863,22 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
-| Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Suspension effective at | 1 Oct 2026, 14:30 | When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. A future value is a pending suspension: the tenant stays `active` … |
-| Suspension notice message | in the reader's language | The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`. |
 | Termination scheduled at | 1 Oct 2026, 14:30 | When `terminateTenant` started the retention window. Null when no termination is under way. |
 | Termination retention until | 1 Oct 2026, 14:30 | `terminationScheduledAt` plus the request's `retentionDays`. Stored, not recomputed — the day count is client-supplied and exists nowhere … |
-| Termination reason | text | — |
 
 **The selected cell** (detail panel, from `listTenantCells`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
 | Kind | chip: Shared, Dedicated, On premise isolated, On premise connected, Control plane, Burst | Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law … |
-| Cluster | the name it points at, never the id | — |
-| Is reachable | yes / no (icon or chip) | False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and … |
 | Last contact at | 1 Oct 2026, 14:30 | When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first. |
 | Licence expires at | 1 Oct 2026, 14:30 | On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. |
-| Participates in cross cell | yes / no (icon or chip) | False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). |
-| Region | the name it points at, never the id | — |
 | Region name | text | — |
 | Country code | text | — |
 | Tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
 | Status | chip: Provisioning, Active, Migrating, Suspended, Decommissioning, Failed | — |
-| Cloud provider | text | — |
-| Cloud region | text | — |
-| API endpoint | text | — |
 
 **The entitlement usage** (detail panel, from `getEntitlementUsage`)
 
@@ -2030,19 +1891,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
 | Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Suspension effective at | 1 Oct 2026, 14:30 | When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. A future value is a pending suspension: the tenant stays `active` … |
-| Suspension notice message | in the reader's language | The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`. |
-| Termination scheduled at | 1 Oct 2026, 14:30 | When `terminateTenant` started the retention window. Null when no termination is under way. |
-| Termination retention until | 1 Oct 2026, 14:30 | `terminationScheduledAt` plus the request's `retentionDays`. Stored, not recomputed — the day count is client-supplied and exists nowhere … |
-| Termination reason | text | — |
-| Termination requested by principal | the name it points at, never the id | — |
-| Plan | the name it points at, never the id | — |
 | Plan name | text | — |
 | Cell count | 1,234 | — |
 | Venue count | 1,234 | — |
@@ -2147,7 +2000,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403, 404).
-- [ ] Every output is drawn (59 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (36 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-010?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-001`, `ADM-002`, `ADM-003`.
@@ -2165,7 +2018,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-011 |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_MANAGE`, `PLATFORM_TENANT_VIEW` (2 read, 1 configure); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTenantCells` reads the population and `getEntitlementUsage` reads one of them — list, select, act |
@@ -2236,13 +2089,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|---|
 | Name | text | — |
 | Kind | chip: Shared, Dedicated, On premise isolated, On premise connected, Control plane, Burst | Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law … |
-| Is reachable | yes / no (icon or chip) | False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and … |
 | Last contact at | 1 Oct 2026, 14:30 | When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first. |
 | Licence expires at | 1 Oct 2026, 14:30 | On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. |
-| Participates in cross cell | yes / no (icon or chip) | False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). |
 | Region name | text | — |
 | Country code | text | — |
-| Tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
 
 **Every tenant** (data table, from `listTenants`)
 
@@ -2251,34 +2101,22 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
-| Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Suspension effective at | 1 Oct 2026, 14:30 | When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. A future value is a pending suspension: the tenant stays `active` … |
-| Suspension notice message | in the reader's language | The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`. |
 | Termination scheduled at | 1 Oct 2026, 14:30 | When `terminateTenant` started the retention window. Null when no termination is under way. |
 | Termination retention until | 1 Oct 2026, 14:30 | `terminationScheduledAt` plus the request's `retentionDays`. Stored, not recomputed — the day count is client-supplied and exists nowhere … |
-| Termination reason | text | — |
 
 **The selected cell** (detail panel, from `listTenantCells`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
 | Kind | chip: Shared, Dedicated, On premise isolated, On premise connected, Control plane, Burst | Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law … |
-| Cluster | the name it points at, never the id | — |
-| Is reachable | yes / no (icon or chip) | False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and … |
 | Last contact at | 1 Oct 2026, 14:30 | When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first. |
 | Licence expires at | 1 Oct 2026, 14:30 | On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. |
-| Participates in cross cell | yes / no (icon or chip) | False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). |
-| Region | the name it points at, never the id | — |
 | Region name | text | — |
 | Country code | text | — |
 | Tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
 | Status | chip: Provisioning, Active, Migrating, Suspended, Decommissioning, Failed | — |
-| Cloud provider | text | — |
-| Cloud region | text | — |
-| API endpoint | text | — |
 
 **The subscription** (detail panel, from `getSubscription`)
 
@@ -2298,19 +2136,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
 | Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Suspension effective at | 1 Oct 2026, 14:30 | When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. A future value is a pending suspension: the tenant stays `active` … |
-| Suspension notice message | in the reader's language | The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`. |
-| Termination scheduled at | 1 Oct 2026, 14:30 | When `terminateTenant` started the retention window. Null when no termination is under way. |
-| Termination retention until | 1 Oct 2026, 14:30 | `terminationScheduledAt` plus the request's `retentionDays`. Stored, not recomputed — the day count is client-supplied and exists nowhere … |
-| Termination reason | text | — |
-| Termination requested by principal | the name it points at, never the id | — |
-| Plan | the name it points at, never the id | — |
 | Plan name | text | — |
 | Cell count | 1,234 | — |
 | Venue count | 1,234 | — |
@@ -2364,7 +2194,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the licence seat untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No licence seat yet. Offers Add licence add on (`addLicenceAddOn`). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listTenantCells` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_CELL_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_MANAGE` for `addLicenceAddOn` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Module is currently enabled by the tenant. (DowngradeConflictProblem) |
 
@@ -2416,7 +2246,7 @@ Every cell:
 - `previewSubscriptionChange` → `PLATFORM_TENANT_VIEW` (read) · staff, prospect
 - `removeLicenceAddOn` → `PLATFORM_TENANT_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_CELL_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_MANAGE` for `addLicenceAddOn` …
 
 #### Requirements it meets
 
@@ -2463,7 +2293,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (17), with its required mark, default, format and its error state (403, 404, 409).
-- [ ] Every output is drawn (65 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (42 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-011?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Add licence add on, Preview subscription change, Remove licence add on.
 - [ ] Every transition is wired: `ADM-001`, `ADM-002`, `ADM-003`, `PTR-020`, `ADM-007`.
@@ -2482,7 +2312,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-012 |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_VIEW` (1 configure, 2 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTenantCells` reads the population and `getEntitlementUsage` reads one of them — list, select, act |
@@ -2537,13 +2367,10 @@ Errors to draw in the form: 400 Placement is outside the region's jurisdiction, 
 |---|---|---|
 | Name | text | — |
 | Kind | chip: Shared, Dedicated, On premise isolated, On premise connected, Control plane, Burst | Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law … |
-| Is reachable | yes / no (icon or chip) | False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and … |
 | Last contact at | 1 Oct 2026, 14:30 | When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first. |
 | Licence expires at | 1 Oct 2026, 14:30 | On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. |
-| Participates in cross cell | yes / no (icon or chip) | False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). |
 | Region name | text | — |
 | Country code | text | — |
-| Tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
 
 **Every tenant** (data table, from `listTenants`)
 
@@ -2552,52 +2379,32 @@ Errors to draw in the form: 400 Placement is outside the region's jurisdiction, 
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
-| Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Suspension effective at | 1 Oct 2026, 14:30 | When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. A future value is a pending suspension: the tenant stays `active` … |
-| Suspension notice message | in the reader's language | The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`. |
 | Termination scheduled at | 1 Oct 2026, 14:30 | When `terminateTenant` started the retention window. Null when no termination is under way. |
 | Termination retention until | 1 Oct 2026, 14:30 | `terminationScheduledAt` plus the request's `retentionDays`. Stored, not recomputed — the day count is client-supplied and exists nowhere … |
-| Termination reason | text | — |
 
 **The selected cell** (detail panel, from `listTenantCells`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
 | Kind | chip: Shared, Dedicated, On premise isolated, On premise connected, Control plane, Burst | Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law … |
-| Cluster | the name it points at, never the id | — |
-| Is reachable | yes / no (icon or chip) | False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and … |
 | Last contact at | 1 Oct 2026, 14:30 | When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first. |
 | Licence expires at | 1 Oct 2026, 14:30 | On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. |
-| Participates in cross cell | yes / no (icon or chip) | False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). |
-| Region | the name it points at, never the id | — |
 | Region name | text | — |
 | Country code | text | — |
 | Tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
 | Status | chip: Provisioning, Active, Migrating, Suspended, Decommissioning, Failed | — |
-| Cloud provider | text | — |
-| Cloud region | text | — |
-| API endpoint | text | — |
 
 **The tenant** (detail panel, from `getTenant`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
 | Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Suspension effective at | 1 Oct 2026, 14:30 | When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. A future value is a pending suspension: the tenant stays `active` … |
-| Suspension notice message | in the reader's language | The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`. |
-| Termination scheduled at | 1 Oct 2026, 14:30 | When `terminateTenant` started the retention window. Null when no termination is under way. |
-| Termination retention until | 1 Oct 2026, 14:30 | `terminationScheduledAt` plus the request's `retentionDays`. Stored, not recomputed — the day count is client-supplied and exists nowhere … |
-| Termination reason | text | — |
-| Termination requested by principal | the name it points at, never the id | — |
-| Plan | the name it points at, never the id | — |
 | Plan name | text | — |
 | Cell count | 1,234 | — |
 | Venue count | 1,234 | — |
@@ -2653,7 +2460,7 @@ Errors to draw in the form: 400 Placement is outside the region's jurisdiction, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the tenant isolation resource untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No tenant isolation resource yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listTenantCells` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_CELL_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `provisionCell`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Placement is outside the region's jurisdiction, or the target cloud has no region in that country.; 409 A cell already exists for this region |
 
@@ -2701,7 +2508,7 @@ Every cell:
 - `listTenants` → `PLATFORM_TENANT_VIEW` (read) · staff
 - `getCellCapacity` → `PLATFORM_CELL_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_CELL_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `provisionCell`.
 
 #### Requirements it meets
 
@@ -2743,7 +2550,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (63 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-012?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Provision cell.
 - [ ] Every transition is wired: `ADM-001`, `ADM-002`, `ADM-003`, `ADM-006`, `ADM-013`.
@@ -2762,7 +2569,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Tenants & Licensing · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-015 |
 | Who uses it | ticvai staff holding `DEVELOPER_ADMIN`, `DEVELOPER_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (1 configure, 2 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTenantCells` reads the population and `getTenantLicences` reads one of them — list, select, act |
@@ -2800,7 +2607,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save API quota** (modal, opened by *Save API quota*; *Save API quota* calls `setApiQuota`, *Cancel* sends nothing)
 
-**Collects what `setApiQuota` sends before it is called.** Required: `clientId`, `sustainedPerMinute`. Optional: `id`, `burstPerSecond`, `dailyCap`, `perOperationOverrides`, `onBreach`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setApiQuota` sends before it is called.** Required: `clientId`, `sustainedPerMinute`. Optional: `burstPerSecond`, `dailyCap`, `perOperationOverrides`, `onBreach`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -2879,13 +2686,9 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
-| Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Suspension effective at | 1 Oct 2026, 14:30 | When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. A future value is a pending suspension: the tenant stays `active` … |
-| Suspension notice message | in the reader's language | The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`. |
 | Termination scheduled at | 1 Oct 2026, 14:30 | When `terminateTenant` started the retention window. Null when no termination is under way. |
 | Termination retention until | 1 Oct 2026, 14:30 | `terminationScheduledAt` plus the request's `retentionDays`. Stored, not recomputed — the day count is client-supplied and exists nowhere … |
-| Termination reason | text | — |
 
 **Every API client** (data table, from `listApiClients`)
 
@@ -2930,19 +2733,11 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
 | Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Suspension effective at | 1 Oct 2026, 14:30 | When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. A future value is a pending suspension: the tenant stays `active` … |
-| Suspension notice message | in the reader's language | The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`. |
-| Termination scheduled at | 1 Oct 2026, 14:30 | When `terminateTenant` started the retention window. Null when no termination is under way. |
-| Termination retention until | 1 Oct 2026, 14:30 | `terminationScheduledAt` plus the request's `retentionDays`. Stored, not recomputed — the day count is client-supplied and exists nowhere … |
-| Termination reason | text | — |
-| Termination requested by principal | the name it points at, never the id | — |
-| Plan | the name it points at, never the id | — |
 | Plan name | text | — |
 | Cell count | 1,234 | — |
 | Venue count | 1,234 | — |
@@ -2959,7 +2754,6 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | P95 latency ms | 1,234.5 | — |
 | P99 latency ms | 1,234.5 | — |
 | Quota breaches | 1,234 | — |
-| By operation | list or chips (count when long) | — |
 
 **The licence position** (detail panel, from `getTenantLicences`)
 
@@ -2995,7 +2789,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the api rate limit untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No api rate limit yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires to show this screen, and names that permission (the screen's other reads need `DEVELOPER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVELOPER_ADMIN` for `setApiQuota` … |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `DEVELOPER_ADMIN`, `DEVELOPER_VIEW`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Already decided (`already-decided`), or the listing's certification lapsed since the request (`certification-required`).; 422 `reject` without a `reason`. |
@@ -3055,7 +2849,7 @@ Every cell:
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
-**A refused user sees:** Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires to show this screen, and names that permission (the screen's other reads need `DEVELOPER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVELOPER_ADMIN` for `setApiQuota` …
 
 #### Requirements it meets
 
@@ -3100,7 +2894,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (24), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (63 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (50 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-015?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, Save API quota, Decide production access, Save anomaly rule.
 - [ ] Every transition is wired: `ADM-001`, `ADM-002`, `ADM-003`, `ADM-011`.

@@ -379,7 +379,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save channel connection configuration** (modal, opened by *Save channel connection configuration*; *Save channel connection configuration* calls `setChannelConnectionConfiguration`, *Cancel* sends nothing)
 
-**Collects what `setChannelConnectionConfiguration` sends before it is called.** Required: `id`, `scopePath`, `salesChannelId`, `connectorName`, `environment`, `connectionType`. Optional: `partner`, `direction`, `endpoint`, `apiVersion`, `authenticationType`, `credentialsReference`, `certificateReference`, `certificateExpiresAt`, `timeoutMs`, `rateLimitPerMinute`, `ipRestrictions`, `retryPolicy` and 3 more. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setChannelConnectionConfiguration` sends before it is called.** Required: `salesChannelId`, `connectorName`, `environment`, `connectionType`. Optional: `partner`, `direction`, `endpoint`, `apiVersion`, `authenticationType`, `credentialsReference`, `certificateReference`, `certificateExpiresAt`, `timeoutMs`, `rateLimitPerMinute`, `ipRestrictions`, `retryPolicy` and 3 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -539,7 +539,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save channel sync setting** (modal, opened by *Save channel sync setting*; *Save channel sync setting* calls `setChannelSyncSetting`, *Cancel* sends nothing)
 
-**Collects what `setChannelSyncSetting` sends before it is called.** Required: `id`, `scopePath`, `salesChannelId`, `domain`. Optional: `channelConnectionId`, `direction`, `frequency`, `isPaused`, `lastSuccessfulSyncAt`, `nextSyncAt`, `recordsProcessed`, `successful`, `failed`, `pending`, `warnings`, `durationMs` and 1 more. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setChannelSyncSetting` sends before it is called.** Required: `salesChannelId`, `domain`. Optional: `channelConnectionId`, `direction`, `frequency`, `isPaused` and 1 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `durationMs`, `failed`, `id`, `lastSuccessfulSyncAt`, `mismatchCount`, `nextSyncAt`, `pending`, `recordsProcessed`, `scopePath`, `successful`, `warnings` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

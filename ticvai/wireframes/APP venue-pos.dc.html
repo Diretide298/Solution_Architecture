@@ -400,7 +400,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listProducts · evaluatePromotions · holdOrder · applyManualDiscount +28</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline · denied</span></div>
           <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, cardCode&larr;deepLink, cartId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#pos-003">POS-003</a>  &mdash; <i>Choose a date and performance for a timed pr</i> <span class="car">productId</span><br><a href="#pos-004">POS-004</a>  &mdash; <i>Select seats on the plan</i> <span class="car">productId · performanceId</span><br><a href="#pos-005">POS-005</a>  &mdash; <i>Charge, or swipe the pay control</i> <span class="car">discount</span><br><a href="#pos-006">POS-006</a>  &mdash; <i>Recall held</i> <span class="car">orderId</span><br><a href="#pos-007">POS-007</a>  &mdash; <i>Close Shift</i><br><a href="#pos-008">POS-008</a>  &mdash; <i>Reports</i><br><a href="#pos-009">POS-009</a> <br><a href="#pos-010">POS-010</a>  &mdash; <i>Add to Existing Ticket</i> <span class="car">orderId</span><br><a href="#pos-011">POS-011</a>  &mdash; <i>Three days later the guest returns one item</i> <span class="car">orderId · outletId</span><br><a href="#pos-013">POS-013</a>  &mdash; <i>Offline sales and sync</i><br><a href="#pos-020">POS-020</a>  &mdash; <i>Shift Exceptions &amp; Alerts</i><br><a href="#pos-030">POS-030</a>  &mdash; <i>History</i> <span class="car">orderId</span><br><a href="#pos-031">POS-031</a>  &mdash; <i>Reserve</i> <span class="car">cartId</span><br><a href="#pos-018">POS-018</a>  &mdash; <i>A guest wants cash back and the drawer is he</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#pos-003">POS-003</a>  &mdash; <i>Choose a date and performance for a timed pr</i> <span class="car">productId</span><br><a href="#pos-004">POS-004</a>  &mdash; <i>Select seats on the plan</i> <span class="car">productId · performanceId</span><br><a href="#pos-005">POS-005</a>  &mdash; <i>Charge, or swipe the pay control</i> <span class="car">discount</span><br><a href="#pos-006">POS-006</a>  &mdash; <i>Recall held</i> <span class="car">orderId</span><br><a href="#pos-007">POS-007</a>  &mdash; <i>Close Shift</i><br><a href="#pos-008">POS-008</a>  &mdash; <i>Reports</i><br><a href="#pos-009">POS-009</a> <br><a href="#pos-010">POS-010</a>  &mdash; <i>Add to Existing Ticket</i> <span class="car">orderId</span><br><a href="#pos-011">POS-011</a>  &mdash; <i>Three days later the guest returns one item</i> <span class="car">orderId · outletId</span><br><a href="#pos-013">POS-013</a>  &mdash; <i>Offline sales and sync</i><br><a href="#pos-020">POS-020</a>  &mdash; <i>Shift Exceptions &amp; Alerts</i> <span class="car">requestId</span><br><a href="#pos-030">POS-030</a>  &mdash; <i>History</i> <span class="car">orderId</span><br><a href="#pos-031">POS-031</a>  &mdash; <i>Reserve</i> <span class="car">cartId</span><br><a href="#pos-018">POS-018</a>  &mdash; <i>A guest wants cash back and the drawer is he</i></div>
           <div><b>MACHINE</b> &middot; <code>dstep</code> from <b>detail</b> &middot; detail · datetime · zone · seats · qty<div class="mac">detail&rarr;<b>qty</b> <i>product is admission</i> &nbsp;detail&rarr;<b>datetime</b> <i>product is dated or timed</i> &nbsp;detail&rarr;<b>zone</b> <i>product is seated</i> &nbsp;datetime&rarr;<b>qty</b> <i>date and performance chose</i> &nbsp;zone&rarr;<b>seats</b> <i>zone chosen</i> &nbsp;seats&rarr;<b>qty</b> <i>seats picked</i></div></div>
           <div><b>OVERLAYS</b><div class="ov"><b>drawer</b> drawerTicketDetail &middot; <i>Select a ticket</i> &middot; <b>Continue</b> &rarr; <a href="#pos-002">POS-002</a> <span class="car">productId · variantQty</span> &middot; Close <span class="dis">discards variantQty</span></div><div class="ov"><b>drawer</b> drawerDateAndSession &middot; <i>Continue from ticket detail</i> &middot; <b>Continue</b> &rarr; <a href="#pos-002">POS-002</a> <span class="car">productId · visitDate · sessionTime</span> &middot; Close <span class="dis">discards visitDate · sessionTime</span></div><div class="ov"><b>drawer</b> drawerSeatSelection &middot; <i>Continue from date and performance</i> &middot; <b>Add to sale</b> &rarr; <a href="#pos-002">POS-002</a> <span class="car">productId · performanceId · seatPicks · holdExpiresAt</span> &middot; Close <span class="dis">discards seatPicks · zoneId</span></div><div class="ov"><b>modal</b> formEvaluatePromotions &middot; <i>Evaluate promotions</i> &middot; <b>Evaluate promotions</b> &middot; Cancel <span class="dis">discards venueId · channel · lines · subjectId · membershipTierId · couponCodes · evaluateAt</span></div><div class="ov"><b>modal</b> formHoldOrder &middot; <i>Hold order</i> &middot; <b>Hold order</b> &middot; Cancel <span class="dis">discards recordedAt · label · holdUntil</span></div><div class="ov"><b>modal</b> formApplyManualDiscount &middot; <i>Apply manual discount</i> &middot; <b>Apply manual discount</b> &middot; Cancel <span class="dis">discards id · reason · recordedAt · lineId · amount · percentage · reasonCode · approverPrincipalId</span></div><div class="ov"><b>modal</b> formCreateOrder &middot; <i>Create order</i> &middot; <b>Create order</b> &middot; Cancel <span class="dis">discards id · venueId · channel · lines · recordedAt · shiftId · subjectId · guestLinkId · catalogueBundleVersion</span></div><div class="ov"><b>modal</b> formReprintOrder &middot; <i>Reprint order</i> &middot; <b>Reprint order</b> &middot; Cancel <span class="dis">discards delivery · recordedAt · destination · lineIds · reason</span></div><div class="ov"><b>modal</b> formEvaluateApprovalRequirement &middot; <i>Evaluate approval requirement</i> &middot; <b>Evaluate approval requirement</b> &middot; Cancel <span class="dis">discards kind · scopePath · amount · attributes</span></div><div class="ov"><b>modal</b> formCreatePayment &middot; <i>Create payment</i> &middot; <b>Create payment</b> &middot; Cancel <span class="dis">discards id · orderId · tender · amount · recordedAt · tenderCurrency · tenderAmount · walletAuthorisationId · deviceId</span></div><div class="ov"><b>modal</b> formIssueGameCard &middot; <i>Issue game card</i> &middot; <b>Issue game card</b> &middot; Cancel <span class="dis">discards id · kind · venueId · cardCode · subjectId · initialCredits · validMonths</span></div><div class="ov"><b>modal</b> formLoadGameCredits &middot; <i>Load game credits</i> &middot; <b>Load game credits</b> &middot; Cancel <span class="dis">discards id · credits · recordedAt · bonusCredits · amountPaid · orderId</span></div><div class="ov"><b>modal</b> formAddCartLine &middot; <i>Add cart line</i> &middot; <b>Add cart line</b> &middot; Cancel <span class="dis">discards variantId · quantity · performanceId · seatIds · parentLineId · attributes</span></div><div class="ov"><b>modal</b> formIdentifyGuest &middot; <i>Identify guest</i> &middot; <b>Identify guest</b> &middot; Cancel <span class="dis">discards token · tokenKind</span></div><div class="ov"><b>modal</b> formRedeemLoyaltyPoints &middot; <i>Redeem loyalty points</i> &middot; <b>Redeem loyalty points</b> &middot; Cancel <span class="dis">discards subjectId · programmeId · points · rewardId · orderId</span></div><div class="ov"><b>modal</b> formCreateApprovalRequest &middot; <i>Create approval request</i> &middot; <b>Create approval request</b> &middot; Cancel <span class="dis">discards id · kind · subjectContract · subjectType · subjectId · scopePath · summary · amount · attributes · justification · isDraft</span></div><div class="ov"><b>modal</b> formCreateRetailSale &middot; <i>Create retail sale</i> &middot; <b>Create retail sale</b> &middot; Cancel <span class="dis">discards id · outletId · lines · recordedAt · shiftId · subjectId · couponCodes</span></div></div>
         </div>
@@ -419,7 +419,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; getAvailability · acquireInventoryHold · listProductVariants · getProduct +4</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline · denied</span></div>
           <div><b>ARRIVES WITH</b> &middot; inventoryHoldId&larr;deepLink, productId&larr;POS-002</div>
-          <div><b>GOES TO</b> &middot; <a href="#pos-002">POS-002</a>  &mdash; <i>Back</i> <span class="car">productId</span><br><a href="#pos-004">POS-004</a>  &mdash; <i>Sell — Seat Map</i> <span class="car">performanceId</span><br><a href="#pos-005">POS-005</a>  &mdash; <i>Add to sale, then charge</i><br><a href="#pos-006">POS-006</a>  &mdash; <i>Held Orders</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#pos-002">POS-002</a>  &mdash; <i>Back</i> <span class="car">productId</span><br><a href="#pos-004">POS-004</a>  &mdash; <i>Sell — Seat Map</i> <span class="car">holdId · performanceId</span><br><a href="#pos-005">POS-005</a>  &mdash; <i>Add to sale, then charge</i><br><a href="#pos-006">POS-006</a>  &mdash; <i>Held Orders</i></div>
           
           <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formAcquireInventoryHold &middot; <i>Acquire inventory hold</i> &middot; <b>Acquire inventory hold</b> &middot; Cancel <span class="dis">discards id · channelCapacityId · requestedUnits · ttlSeconds · channel</span></div></div>
         </div>
@@ -893,7 +893,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listCashMovements · listDepositBoxes</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, shiftId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; <a href="#pos-001">POS-001</a>  &mdash; <i>Begin Shift</i> <span class="car">shiftId</span><br><a href="#pos-018">POS-018</a>  &mdash; <i>Safe drop destinations are allocated</i> <span class="car">shiftId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#pos-001">POS-001</a>  &mdash; <i>Begin Shift</i> <span class="car">shiftId</span><br><a href="#pos-018">POS-018</a>  &mdash; <i>Safe drop destinations are allocated</i> <span class="car">boxId · shiftId</span></div>
           
           
         </div>
@@ -914,7 +914,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, deviceId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; <a href="#pos-001">POS-001</a>  &mdash; <i>Begin Shift</i> <span class="car">shiftId</span><br><a href="#pos-019">POS-019</a>  &mdash; <i>Shift policy is set</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetReaderScannerPeripheral &middot; <i>Assign peripheral to this till</i> &middot; <b>Assign peripheral to this till</b> &middot; Cancel <span class="dis">discards assignedWorkstationId · custodianPrincipalId</span></div><div class="ov"><b>modal</b> formConfigureWorkstation &middot; <i>Configure workstation</i> &middot; <b>Configure workstation</b> &middot; Cancel <span class="dis">discards name · saleBoardId · cashierInputMode · guestDisplayContent · loadedMediaStockId · mediaStockRemaining · departmentId · accessPointId · devices · deploymentProfile · edgeNodeId · isActive</span></div></div>
+          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formSetReaderScannerPeripheral &middot; <i>Assign peripheral to this till</i> &middot; <b>Assign peripheral to this till</b> &middot; Cancel <span class="dis">discards assignedWorkstationId · custodianPrincipalId</span></div><div class="ov"><b>modal</b> formConfigureWorkstation &middot; <i>Configure workstation</i> &middot; <b>Configure workstation</b> &middot; Cancel <span class="dis">discards name · saleBoardId · cashierInputMode · guestDisplayContent · loadedMediaStockId · departmentId · accessPointId · devices · deploymentProfile · edgeNodeId · isActive</span></div></div>
         </div>
       </div>
       <div id="pos-017" class="scr">
@@ -1831,7 +1831,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listFnbOrders</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; workstationId&larr;session, outletId&larr;session</div>
-          <div><b>GOES TO</b> &middot; <a href="#pos-025">POS-025</a>  &mdash; <i>Till Home</i><br><a href="#pos-022">POS-022</a>  &mdash; <i>Send to Kitchen</i> <span class="car">orderId</span></div>
+          <div><b>GOES TO</b> &middot; <a href="#pos-025">POS-025</a>  &mdash; <i>Till Home</i><br><a href="#pos-022">POS-022</a>  &mdash; <i>Send to Kitchen</i> <span class="car">orderId · ticketId</span></div>
           
           
         </div>
@@ -1923,7 +1923,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div class="body">
             <div class="top">
               <div><h2>Kitchen Operations Command Center</h2>
-                <small>Kitchen Display &middot; wave 2 &middot; touchLarge</small></div>
+                <small>Kitchen Display &middot; wave 1 &middot; touchLarge</small></div>
               <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
             </div>
             <div class="strip">offline capable · works from the local journal</div>
@@ -1937,7 +1937,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listKitchenTickets · listKitchenStations · listFnbOrders</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, stationId&larr;session</div>
-          <div><b>GOES TO</b> &middot; entry point · <a href="#kit-002">KIT-002</a>  &mdash; <i>Kitchen Display System (KDS)</i><br><a href="#kit-003">KIT-003</a>  &mdash; <i>Order Firing &amp; Course Management</i><br><a href="#kit-004">KIT-004</a>  &mdash; <i>Active Order Management &amp; Fulfilment Journey</i> <span class="car">orderId</span><br><a href="#kit-005">KIT-005</a>  &mdash; <i>Kitchen Station Workload &amp; Dynamic Routing</i><br><a href="#kit-006">KIT-006</a>  &mdash; <i>Expeditor &amp; Order Assembly</i><br><a href="#kit-007">KIT-007</a>  &mdash; <i>Guest Collection, Buzzer &amp; Digital Notificat</i> <span class="car">orderId</span><br><a href="#kit-008">KIT-008</a>  &mdash; <i>Exceptions, Re-Fire &amp; Unavailable Items</i><br><a href="#kit-009">KIT-009</a>  &mdash; <i>SLA, Priority &amp; Service Rules</i><br><a href="#kit-010">KIT-010</a>  &mdash; <i>Kitchen Performance, AI &amp; Operational Optimi</i></div>
+          <div><b>GOES TO</b> &middot; entry point · <a href="#kit-002">KIT-002</a>  &mdash; <i>Kitchen Display System (KDS)</i> <span class="car">ticketId</span><br><a href="#kit-003">KIT-003</a>  &mdash; <i>Order Firing &amp; Course Management</i> <span class="car">ticketId</span><br><a href="#kit-004">KIT-004</a>  &mdash; <i>Active Order Management &amp; Fulfilment Journey</i> <span class="car">orderId</span><br><a href="#kit-005">KIT-005</a>  &mdash; <i>Kitchen Station Workload &amp; Dynamic Routing</i><br><a href="#kit-006">KIT-006</a>  &mdash; <i>Expeditor &amp; Order Assembly</i> <span class="car">ticketId</span><br><a href="#kit-007">KIT-007</a>  &mdash; <i>Guest Collection, Buzzer &amp; Digital Notificat</i> <span class="car">orderId</span><br><a href="#kit-008">KIT-008</a>  &mdash; <i>Exceptions, Re-Fire &amp; Unavailable Items</i> <span class="car">ticketId</span><br><a href="#kit-009">KIT-009</a>  &mdash; <i>SLA, Priority &amp; Service Rules</i><br><a href="#kit-010">KIT-010</a>  &mdash; <i>Kitchen Performance, AI &amp; Operational Optimi</i></div>
           
           
         </div>
@@ -1953,7 +1953,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div class="body">
             <div class="top">
               <div><h2>Kitchen Display System (KDS)</h2>
-                <small>Kitchen Display &middot; wave 2 &middot; touchLarge</small></div>
+                <small>Kitchen Display &middot; wave 1 &middot; touchLarge</small></div>
               <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
             </div>
             <div class="strip">offline capable · works from the local journal</div>
@@ -1983,7 +1983,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div class="body">
             <div class="top">
               <div><h2>Order Firing &amp; Course Management</h2>
-                <small>Kitchen Display &middot; wave 2 &middot; touchLarge</small></div>
+                <small>Kitchen Display &middot; wave 1 &middot; touchLarge</small></div>
               <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
             </div>
             <div class="strip">offline capable · works from the local journal</div>
@@ -2013,7 +2013,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div class="body">
             <div class="top">
               <div><h2>Active Order Management &amp; Fulfilment Jou</h2>
-                <small>Kitchen Display &middot; wave 2 &middot; touchLarge</small></div>
+                <small>Kitchen Display &middot; wave 1 &middot; touchLarge</small></div>
               <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
             </div>
             <div class="strip">offline capable · works from the local journal</div>
@@ -2027,7 +2027,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div><b>OPERATIONS</b> &middot; listKitchenTickets · getFnbOrder</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, stationId&larr;session, orderId&larr;KIT-002</div>
-          <div><b>GOES TO</b> &middot; <a href="#kit-001">KIT-001</a>  &mdash; <i>Kitchen Operations Command Center</i><br><a href="#kit-008">KIT-008</a>  &mdash; <i>Exceptions, Re-Fire &amp; Unavailable Items</i></div>
+          <div><b>GOES TO</b> &middot; <a href="#kit-001">KIT-001</a>  &mdash; <i>Kitchen Operations Command Center</i><br><a href="#kit-008">KIT-008</a>  &mdash; <i>Exceptions, Re-Fire &amp; Unavailable Items</i> <span class="car">ticketId</span></div>
           
           
         </div>
@@ -2043,7 +2043,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div class="body">
             <div class="top">
               <div><h2>Kitchen Station Workload &amp; Dynamic Routi</h2>
-                <small>Kitchen Display &middot; wave 2 &middot; touchLarge</small></div>
+                <small>Kitchen Display &middot; wave 1 &middot; touchLarge</small></div>
               <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
             </div>
             <div class="strip">offline capable · works from the local journal</div>
@@ -2073,7 +2073,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div class="body">
             <div class="top">
               <div><h2>Expeditor &amp; Order Assembly</h2>
-                <small>Kitchen Display &middot; wave 2 &middot; touchLarge</small></div>
+                <small>Kitchen Display &middot; wave 1 &middot; touchLarge</small></div>
               <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
             </div>
             <div class="strip">offline capable · works from the local journal</div>
@@ -2103,23 +2103,23 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div class="body">
             <div class="top">
               <div><h2>Guest Collection, Buzzer &amp; Digital Notif</h2>
-                <small>Kitchen Display &middot; wave 2 &middot; touchLarge</small></div>
+                <small>Kitchen Display &middot; wave 1 &middot; touchLarge</small></div>
               <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
             </div>
             <div class="strip">offline capable · works from the local journal</div>
             <div class="canvas">
               <div class="kpis"><div class="kpi"><b>On the rail</b><span>14</span></div><div class="kpi"><b>Oldest</b><span>6m 20s</span></div><div class="kpi"><b>Breaching</b><span>2</span></div><div class="kpi"><b>86&#x27;d</b><span>3</span></div></div>
-              <div class="two"><div class="grow"><div class="panel"><span class="kind">cardList</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes sits above one that arrived first, because a kitchen works to when food is wante</span></div><div class="panel"><b>Guest status board — Preparing and Ready for pickup</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Order numbers only, never a name**, in two columns, Preparing and Ready for pickup, readable from across the room. **Owned here** (decided 1 October 2026, POSV2-7); the</span></div><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read is a number they will not read. The station-load tile is not in the first release (</span></div></div></div>
+              <div class="two"><div class="grow"><div class="panel"><b>Guest status board — Preparing and Ready for pickup</b><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">**Order numbers only, never a name**, in two columns, Preparing and Ready for pickup, readable from across the room. **Owned here** (decided 1 October 2026, POSV2-7); the</span></div><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read is a number they will not read. The station-load tile is not in the first release (</span></div></div></div>
             </div>
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listKitchenTickets · recordOrderHandover</div>
+          <div><b>OPERATIONS</b> &middot; listKitchenTickets</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · error · emptyFirstRun · emptyNoResults · emptyNoAccess · offline</span></div>
-          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, stationId&larr;session, orderId&larr;KIT-002</div>
+          <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, stationId&larr;session</div>
           <div><b>GOES TO</b> &middot; <a href="#kit-001">KIT-001</a>  &mdash; <i>Kitchen Operations Command Center</i></div>
           
-          <div><b>OVERLAYS</b><div class="ov"><b>modal</b> formRecordOrderHandover &middot; <i>Record order handover</i> &middot; <b>Record order handover</b> &middot; Cancel <span class="dis">discards outcome · recordedAt · deliveredToLocationId · runnerPrincipalId · note</span></div></div>
+          
         </div>
       </div>
       <div id="kit-008" class="scr">
@@ -2133,7 +2133,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div class="body">
             <div class="top">
               <div><h2>Exceptions, Re-Fire &amp; Unavailable Items</h2>
-                <small>Kitchen Display &middot; wave 2 &middot; touchLarge</small></div>
+                <small>Kitchen Display &middot; wave 1 &middot; touchLarge</small></div>
               <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
             </div>
             <div class="strip">offline capable · works from the local journal</div>
@@ -2163,7 +2163,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div class="body">
             <div class="top">
               <div><h2>SLA, Priority &amp; Service Rules</h2>
-                <small>Kitchen Display &middot; wave 2 &middot; touchLarge</small></div>
+                <small>Kitchen Display &middot; wave 1 &middot; touchLarge</small></div>
               <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
             </div>
             <div class="strip">offline capable · works from the local journal</div>
@@ -2193,7 +2193,7 @@ border-radius:9px;font:800 13px/1.5 Manrope,system-ui,sans-serif;letter-spacing:
           <div class="body">
             <div class="top">
               <div><h2>Kitchen Performance, AI &amp; Operational Op</h2>
-                <small>Kitchen Display &middot; wave 2 &middot; touchLarge</small></div>
+                <small>Kitchen Display &middot; wave 1 &middot; touchLarge</small></div>
               <div class="acts"><div class="chip">This venue &#9662;</div><div class="chip live">Live</div><div class="chip cta">Primary action</div></div>
             </div>
             <div class="strip">offline capable · works from the local journal</div>

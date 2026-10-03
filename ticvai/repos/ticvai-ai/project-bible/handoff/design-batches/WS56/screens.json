@@ -221,16 +221,11 @@
        "kind": "dataTable",
        "label": "Every workflow operations",
        "columns": [
-        "WorkflowOperationsCommandCenterView.workflowInstanceId",
         "WorkflowOperationsCommandCenterView.workflow",
         "WorkflowOperationsCommandCenterView.module",
         "WorkflowOperationsCommandCenterView.businessObject",
         "WorkflowOperationsCommandCenterView.initiatedBy",
-        "WorkflowOperationsCommandCenterView.started",
-        "WorkflowOperationsCommandCenterView.currentStep",
-        "WorkflowOperationsCommandCenterView.owner",
         "WorkflowOperationsCommandCenterView.priority",
-        "WorkflowOperationsCommandCenterView.sla",
         "WorkflowOperationsCommandCenterView.status"
        ],
        "bindsTo": "WorkflowOperationsCommandCenterView",
@@ -248,16 +243,13 @@
        "label": "The selected workflow operations",
        "bindsTo": "WorkflowOperationsCommandCenterView",
        "columns": [
-        "WorkflowOperationsCommandCenterView.workflowInstanceId",
         "WorkflowOperationsCommandCenterView.workflow",
         "WorkflowOperationsCommandCenterView.module",
         "WorkflowOperationsCommandCenterView.businessObject",
         "WorkflowOperationsCommandCenterView.initiatedBy",
         "WorkflowOperationsCommandCenterView.started",
         "WorkflowOperationsCommandCenterView.currentStep",
-        "WorkflowOperationsCommandCenterView.owner",
         "WorkflowOperationsCommandCenterView.priority",
-        "WorkflowOperationsCommandCenterView.sla",
         "WorkflowOperationsCommandCenterView.status"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Show activity originating from”, “Use”, “Refund Approval Workflow”.",
@@ -456,11 +448,15 @@
    "params": [
     {
      "name": "requestId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that carries it only pre-selects the record."
     },
     {
      "name": "approvalRequestId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that carries it only pre-selects the record."
     }
    ]
   },
@@ -1106,16 +1102,8 @@
         "SlaEscalationBottleneckMonitorView.workflow",
         "SlaEscalationBottleneckMonitorView.instance",
         "SlaEscalationBottleneckMonitorView.currentStep",
-        "SlaEscalationBottleneckMonitorView.owner",
-        "SlaEscalationBottleneckMonitorView.started",
-        "SlaEscalationBottleneckMonitorView.target",
         "SlaEscalationBottleneckMonitorView.timeRemaining",
-        "SlaEscalationBottleneckMonitorView.risk",
         "SlaEscalationBottleneckMonitorView.escalationLevel",
-        "SlaEscalationBottleneckMonitorView.firstReminder",
-        "SlaEscalationBottleneckMonitorView.secondReminder",
-        "SlaEscalationBottleneckMonitorView.managerEscalation",
-        "SlaEscalationBottleneckMonitorView.executiveEscalation",
         "SlaEscalationBottleneckMonitorView.finalOutcome"
        ],
        "bindsTo": "SlaEscalationBottleneckMonitorView",
@@ -1137,14 +1125,8 @@
         "SlaEscalationBottleneckMonitorView.currentStep",
         "SlaEscalationBottleneckMonitorView.owner",
         "SlaEscalationBottleneckMonitorView.started",
-        "SlaEscalationBottleneckMonitorView.target",
         "SlaEscalationBottleneckMonitorView.timeRemaining",
-        "SlaEscalationBottleneckMonitorView.risk",
         "SlaEscalationBottleneckMonitorView.escalationLevel",
-        "SlaEscalationBottleneckMonitorView.firstReminder",
-        "SlaEscalationBottleneckMonitorView.secondReminder",
-        "SlaEscalationBottleneckMonitorView.managerEscalation",
-        "SlaEscalationBottleneckMonitorView.executiveEscalation",
         "SlaEscalationBottleneckMonitorView.finalOutcome"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Purchase Order Approval”, “Breakdown”.",
@@ -1826,14 +1808,9 @@
         "ProcessOptimizationAutomationOpportunityCenterView.opportunityType",
         "Duplicate Steps",
         "ProcessOptimizationAutomationOpportunityCenterView.process",
-        "ProcessOptimizationAutomationOpportunityCenterView.module",
-        "ProcessOptimizationAutomationOpportunityCenterView.monthlyVolume",
-        "ProcessOptimizationAutomationOpportunityCenterView.currentSteps",
         "ProcessOptimizationAutomationOpportunityCenterView.averageDuration",
-        "ProcessOptimizationAutomationOpportunityCenterView.manualSteps",
         "ProcessOptimizationAutomationOpportunityCenterView.approvalRate",
-        "ProcessOptimizationAutomationOpportunityCenterView.exceptionRate",
-        "ProcessOptimizationAutomationOpportunityCenterView.estimatedOpportunity"
+        "ProcessOptimizationAutomationOpportunityCenterView.exceptionRate"
        ],
        "bindsTo": "ProcessOptimizationAutomationOpportunityCenterView",
        "operation": "listProcessAutomationOpportunity",
@@ -1855,12 +1832,9 @@
         "ProcessOptimizationAutomationOpportunityCenterView.process",
         "ProcessOptimizationAutomationOpportunityCenterView.module",
         "ProcessOptimizationAutomationOpportunityCenterView.monthlyVolume",
-        "ProcessOptimizationAutomationOpportunityCenterView.currentSteps",
         "ProcessOptimizationAutomationOpportunityCenterView.averageDuration",
-        "ProcessOptimizationAutomationOpportunityCenterView.manualSteps",
         "ProcessOptimizationAutomationOpportunityCenterView.approvalRate",
-        "ProcessOptimizationAutomationOpportunityCenterView.exceptionRate",
-        "ProcessOptimizationAutomationOpportunityCenterView.estimatedOpportunity"
+        "ProcessOptimizationAutomationOpportunityCenterView.exceptionRate"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Low-Value Refund Approval”, “Before changing anything”, “Estimated result”.",
        "provenance": "pack Rules__Workflow__Approval___Automation_Engine_Reference.pdf, page 36 §Identify"

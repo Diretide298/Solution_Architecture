@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Maintenance & Safety
   version: 0.1.0
-  x-ticvai-screen-count: 42
+  x-ticvai-screen-count: 44
   x-ticvai-tier: satellite
   x-ticvai-module: "17 — Maintenance & Safety Management"
   x-ticvai-requirements: 50
@@ -2131,7 +2131,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: uploadIncidentMedia
-      x-ticvai-consumed-by: []
+      x-ticvai-consumed-by:
+        - "P06 EMP-026 Incident report"
       x-ticvai-agreed: '3 October: Chinmay, Block A business rules, EMP-026 ("bind media upload for photos"); CHG-RUL-013; shape follows attachWorkOrderEvidence, with the signed upload of assets.createUpload'
       x-ticvai-audience: [staff]
       summary: Add a photo, video or document to an incident
@@ -2195,7 +2196,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: addIncidentPerson
-      x-ticvai-consumed-by: []
+      x-ticvai-consumed-by:
+        - "P06 EMP-026 Incident report"
       x-ticvai-agreed: '3 October: Chinmay, Block A business rules, EMP-026 ("a person involved entry: name, role, contact, optional guest lookup, stored as PII subjects; consent rules apply"); CHG-RUL-013; shape follows reportIncident involved parties'
       x-ticvai-audience: [staff]
       summary: Add a person involved in an incident

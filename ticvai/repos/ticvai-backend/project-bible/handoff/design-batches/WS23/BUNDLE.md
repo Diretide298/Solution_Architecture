@@ -96,14 +96,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-042` | Partner Operations Command Center | B–D | 2 | 28 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `PTR-043` | Partner Orders & Booking Management | B–D | 2 | 32 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `PTR-044` | Reservations, Holds & Release Management | B–D | 0 | 160 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `PTR-045` | Partner Cancellations, Refunds & Amendments | B–D | 8 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `PTR-046` | Partner Statement & Account Activity | B–D | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `PTR-049` | Partner Disputes, Cases & Service Management | B–D | 21 | 8 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `PTR-050` | Partner Performance Scorecard & Risk Monitoring | B–D | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `PTR-051` | Partner AI Intelligence & Relationship Optimization | B–D | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-042` | Partner Operations Command Center | B | 2 | 28 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `PTR-043` | Partner Orders & Booking Management | B | 2 | 32 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `PTR-044` | Reservations, Holds & Release Management | B | 0 | 160 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `PTR-045` | Partner Cancellations, Refunds & Amendments | B | 8 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `PTR-046` | Partner Statement & Account Activity | B | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-049` | Partner Disputes, Cases & Service Management | B | 21 | 8 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-050` | Partner Performance Scorecard & Risk Monitoring | B | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-051` | Partner AI Intelligence & Relationship Optimization | B | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -123,7 +123,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-PARTNER-PTR-042 |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each partner should show) — counts over a population, then the population |
@@ -337,7 +337,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-PARTNER-PTR-043 |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -518,7 +518,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-PARTNER-PTR-044 |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -831,7 +831,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-PARTNER-PTR-045 |
 | Who uses it | partner staff holding `ORDER_MODIFY`, `PLATFORM_TENANT_VIEW` (1 operate, 1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -976,7 +976,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-PARTNER-PTR-046 |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display) and a per-row directory (§Each line should show) — counts over a population, then the population |
@@ -1043,9 +1043,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Date | 1 Oct 2026 | Date |
 | Transaction type | chip: Booking, Invoice, Payment, Refund, Credit note, Commission… | Transaction Type |
 | Reference | text | Reference |
-| Order invoice | text | Order/Invoice number |
-| Debit | AED 1,234.50 | Debit |
-| Credit | AED 1,234.50 | Credit |
 | Running balance | AED 1,234.50 | Running Balance |
 | Due date | 1 Oct 2026 | Due Date |
 | Status | text | Status: open, partiallyPaid, paid, overdue or void |
@@ -1059,7 +1056,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Reference | text | Reference |
 | Order invoice | text | Order/Invoice number |
 | Debit | AED 1,234.50 | Debit |
-| Credit | AED 1,234.50 | Credit |
 | Running balance | AED 1,234.50 | Running Balance |
 | Due date | 1 Oct 2026 | Due Date |
 | Status | text | Status: open, partiallyPaid, paid, overdue or void |
@@ -1136,7 +1132,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-046?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `PTR-042`.
@@ -1154,7 +1150,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-PARTNER-PTR-049 |
 | Who uses it | partner staff holding `CASE_MANAGE`, `PLATFORM_TENANT_VIEW` (1 configure, 1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Monitor) and no metric row |
@@ -1344,7 +1340,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-PARTNER-PTR-050 |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -1472,7 +1468,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Partners · wave 3 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-PARTNER-PTR-051 |
 | Who uses it | partner staff holding `PLATFORM_TENANT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Analyze) and no metric row |

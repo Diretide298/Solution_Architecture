@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 96 |
-| Operations | 217 |
+| Operations | 220 |
 | Contracts | 21 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 144 |
-| Waves | wave1 25 · wave2 40 · wave3 31 |
+| Operations with no screen | 147 |
+| Waves | wave1 30 · wave2 35 · wave3 31 |
 
 ## Gaps
 
-### 144 operations with no screen here
+### 147 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,13 +60,15 @@
 | `listSeatPricingRules` | catalogue | GET | Seat-level dynamic pricing rules |
 | `relinquishInventoryHold` | catalogue | DELETE | Return unsold units |
 | `renewInventoryHold` | catalogue | POST | Extend a lease TTL |
-| … | | | 104 more |
+| … | | | 107 more |
 
-### 1 modules split across waves
+### 3 modules split across waves
 
 **A platform that sells in one wave and cannot refund until a later one can take money and not give it back.** Not always wrong — worth a look each time.
 
+- **Floor Service** — waves 1, 2
 - **Operations** — waves 1, 2, 3
+- **Stock on the Floor** — waves 1, 2
 
 ## Modules
 
@@ -74,8 +76,8 @@
 |---|---|---|
 | Operations | 46 | 1, 2, 3 |
 | Rentals | 30 | 3 |
-| Floor Service | 10 | 2 |
-| Stock on the Floor | 10 | 2 |
+| Floor Service | 10 | 1, 2 |
+| Stock on the Floor | 10 | 1, 2 |
 
 ## Screens
 
@@ -102,13 +104,13 @@
 | `EMP-023` | Swap request | Operations | 2 | 3 | yes |
 | `EMP-024` | Clock in / out | Operations | 1 | 2 | yes |
 | `EMP-025` | Break management | Operations | 2 | 2 | yes |
-| `EMP-026` | Incident report | Operations | 1 | 3 | yes |
+| `EMP-026` | Incident report | Operations | 1 | 6 | yes |
 | `EMP-027` | Incident detail | Operations | 2 | 4 | yes |
 | `EMP-028` | Lost & found | Operations | 2 | 7 | yes |
 | `EMP-029` | Guest assistance | Operations | 2 | 12 | yes |
 | `EMP-030` | Venue map | Operations | 2 | 2 | yes |
 | `EMP-031` | Queue monitor | Operations | 2 | 8 | yes |
-| `EMP-032` | Manual wait entry | Operations | 2 | 3 | yes |
+| `EMP-032` | Manual wait entry | Operations | 1 | 3 | yes |
 | `EMP-033` | Capacity view | Operations | 2 | 3 | yes |
 | `EMP-034` | Walk-up sale | Operations | 2 | 20 | yes |
 | `EMP-035` | Payment on device | Operations | 2 | 4 | yes |
@@ -134,16 +136,16 @@
 | `EMP-055` | Create / Edit Reservation | Floor Service | 2 | 4 | yes |
 | `EMP-056` | Walk-In & Waitlist Management | Floor Service | 2 | 4 | yes |
 | `EMP-057` | Guest Profile & Dining History | Floor Service | 2 | 5 | yes |
-| `EMP-058` | Live Table & Service Management | Floor Service | 2 | 12 | yes |
-| `EMP-059` | Table Order, Bill & Payment Management | Floor Service | 2 | 8 | yes |
+| `EMP-058` | Live Table & Service Management | Floor Service | 1 | 12 | yes |
+| `EMP-059` | Table Order, Bill & Payment Management | Floor Service | 1 | 8 | yes |
 | `EMP-060` | Reservation & Table Performance | Floor Service | 2 | 3 | yes |
 | `EMP-061` | Retail Inventory Command Center | Stock on the Floor | 2 | 6 | yes |
 | `EMP-062` | Store Stock & SKU Availability | Stock on the Floor | 2 | 3 | yes |
 | `EMP-063` | Requisition & Smart Store Replenishment | Stock on the Floor | 2 | 4 | yes |
 | `EMP-064` | Store-to-Store & Warehouse Transfers | Stock on the Floor | 2 | 5 | yes |
-| `EMP-065` | Receiving | Stock on the Floor | 2 | 6 | yes |
+| `EMP-065` | Receiving | Stock on the Floor | 1 | 6 | yes |
 | `EMP-066` | Stock Count & Cycle Count Management | Stock on the Floor | 2 | 4 | yes |
-| `EMP-067` | Damage, Loss, Shrinkage & Stock Adjustment | Stock on the Floor | 2 | 5 | yes |
+| `EMP-067` | Damage, Loss, Shrinkage & Stock Adjustment | Stock on the Floor | 1 | 5 | yes |
 | `EMP-068` | Reservation, Allocation & Omnichannel Inventory | Stock on the Floor | 2 | 4 | yes |
 | `EMP-069` | Barcode, RFID, Serialized Stock & Traceability | Stock on the Floor | 2 | 2 | yes |
 | `EMP-070` | Inventory Exceptions, AI Replenishment & Action Center | Stock on the Floor | 2 | 3 | yes |

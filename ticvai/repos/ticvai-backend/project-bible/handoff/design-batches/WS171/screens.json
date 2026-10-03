@@ -1450,9 +1450,7 @@
         "SeatComplianceFinding.message",
         "SeatComplianceFinding.required",
         "SeatComplianceFinding.actual",
-        "SeatComplianceFinding.affectedSeatIds",
-        "Owner",
-        "Deadline"
+        "Owner"
        ],
        "operation": "validateSeatCompliance",
        "notes": "Accessible quantities, companion ratios, route continuity, conflicts, labels and channel parity.",
@@ -1474,7 +1472,6 @@
         "SeatComplianceFinding.message",
         "SeatComplianceFinding.required",
         "SeatComplianceFinding.actual",
-        "SeatComplianceFinding.affectedSeatIds",
         "Rule reference",
         "Remediation",
         "Evidence"

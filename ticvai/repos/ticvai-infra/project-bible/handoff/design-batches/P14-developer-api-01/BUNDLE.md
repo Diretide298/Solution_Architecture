@@ -96,13 +96,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `DEV-001` | API Reference | B–D | 1 | 38 | 6 | 11 | 4 | 0 | — | notStarted (generated) |
+| `DEV-001` | API Reference | B | 1 | 38 | 6 | 11 | 4 | 0 | — | notStarted (generated) |
 | `DEV-002` | Register & Organisation | A | 12 | 0 | 5 | 6 | 0 | 0 | — | notStarted (generated) |
 | `DEV-003` | Clients & Credentials | A | 15 | 16 | 6 | 17 | 4 | 0 | — | notStarted (generated) |
-| `DEV-004` | Sandbox | B–D | 14 | 31 | 6 | 20 | 3 | 0 | — | notStarted (generated) |
-| `DEV-005` | Webhooks | B–D | 9 | 21 | 6 | 13 | 0 | 0 | — | notStarted (generated) |
-| `DEV-006` | Usage & Limits | B–D | 0 | 14 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
-| `DEV-007` | Marketplace Listing | B–D | 8 | 20 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
+| `DEV-004` | Sandbox | B | 14 | 31 | 6 | 20 | 3 | 0 | — | notStarted (generated) |
+| `DEV-005` | Webhooks | B | 9 | 21 | 6 | 13 | 0 | 0 | — | notStarted (generated) |
+| `DEV-006` | Usage & Limits | B | 0 | 13 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
+| `DEV-007` | Marketplace Listing | B | 8 | 17 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
 | `DEV-008` | Programme Administration | A | 41 | 24 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
 
 ---
@@ -119,7 +119,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P14 Developer (web) |
 | Module | Developer & API · wave 2 · needs the `developerApi` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-DEVPORTAL-DEV-001 |
 | Who uses it | partner staff holding `DEVELOPER_VIEW` (1 read); in the flows as partner |
 | Device and orientation | This is a developer portal on a desktop browser, 1440 wide, with a docs-style left navigation. · LTR · light, dark theme |
 | Pattern | listDetail (compact density): `listApiVersions` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -317,8 +317,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Control · P14 Developer (web) |
-| Module | Developer & API · wave 2 · needs the `developerApi` module |
-| Block | Block A · ticket #20609 (APP-SETUP-DEV-002) |
+| Module | Developer & API · wave 1 · needs the `developerApi` module |
+| Block | Block A · task APP-SETUP-DEV-002 |
 | Who uses it | partner staff holding `DEVELOPER_MANAGE`, `DEVELOPER_VIEW` (1 configure, 1 read); in the flows as partner |
 | Device and orientation | This is a developer portal on a desktop browser, 1440 wide, with a docs-style left navigation. · LTR · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`registerDeveloper`, `setDeveloperMembers`) and no read of a population — it is settings, not a list |
@@ -492,8 +492,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Control · P14 Developer (web) |
-| Module | Developer & API · wave 2 · needs the `developerApi` module |
-| Block | Block A · ticket #20615 (APP-SETUP-DEV-003) |
+| Module | Developer & API · wave 1 · needs the `developerApi` module |
+| Block | Block A · task APP-SETUP-DEV-003 |
 | Who uses it | partner staff holding `DEVELOPER_MANAGE`, `DEVELOPER_VIEW` (1 configure, 1 read); in the flows as partner |
 | Device and orientation | This is a developer portal on a desktop browser, 1440 wide, with a docs-style left navigation. · LTR · light, dark theme |
 | Pattern | listDetail (compact density): `listApiClients` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -623,7 +623,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 - → `DEV-005` Webhooks: *Webhooks*
 - → `DEV-004` Sandbox: *They provision a sandbox and build against it*; carries `clientId`; calls `createApiClient`
-- → `DEV-008` Programme Administration: *TICVAI decides the request*; carries `listingId`; calls `requestProductionAccess`
+- → `DEV-008` Programme Administration: *TICVAI decides the request*; carries `listingId`, `requestId`; calls `requestProductionAccess`
 
 **What opens over it**
 
@@ -752,7 +752,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P14 Developer (web) |
 | Module | Developer & API · wave 2 · needs the `developerApi` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-DEVPORTAL-DEV-004 |
 | Who uses it | partner staff holding `DEVELOPER_MANAGE`, `DEVELOPER_VIEW` (1 configure, 1 read); in the flows as partner |
 | Device and orientation | This is a developer portal on a desktop browser, 1440 wide, with a docs-style left navigation. · LTR · light, dark theme |
 | Pattern | listDetail (compact density): `listSandboxes` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -887,7 +887,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Error (`?state=error`) | Could not load. A running sandbox is unaffected. |
 | Empty, first run (`?state=emptyFirstRun`) | **No sandbox yet. Provisioning takes a few minutes and the data is generated, not copied** — no production data is ever cloned or masked into it, which is the decision the whole environment rests on. |
 | Empty, no results (`?state=emptyNoResults`) | No sandbox matches. |
-| Permission denied (`?state=emptyNoAccess`) | You do not have DEVELOPER_MANAGE. |
+| Permission denied (`?state=emptyNoAccess`) | Without `DEVELOPER_VIEW`, which `listSandboxes` requires, the screen does not load and this state names that permission. You do not have `DEVELOPER_MANAGE`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The listing is not certified, or its certification has lapsed (`certification-required`); or the client is not a sandbox client, or a request for it is already …; 422 An empty `ipAllowList` (`ip-allow-list-required`) or an unknown scope (`unknown-scope`). |
 
@@ -925,7 +925,7 @@ Every sandbox:
 - `listProductionAccessRequests` → `DEVELOPER_VIEW` (read) · staff, partner
 - `requestProductionAccess` → `DEVELOPER_MANAGE` (configure) · partner
 
-**A refused user sees:** You do not have DEVELOPER_MANAGE.
+**A refused user sees:** Without `DEVELOPER_VIEW`, which `listSandboxes` requires, the screen does not load and this state names that permission. You do not have `DEVELOPER_MANAGE`.
 
 #### Requirements it meets
 
@@ -990,7 +990,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P14 Developer (web) |
 | Module | Developer & API · wave 2 · needs the `developerApi` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-DEVPORTAL-DEV-005 |
 | Who uses it | partner staff holding `DEVELOPER_MANAGE`, `DEVELOPER_VIEW` (1 configure, 1 read); in the flows as partner |
 | Device and orientation | This is a developer portal on a desktop browser, 1440 wide, with a docs-style left navigation. · LTR · light, dark theme |
 | Pattern | listDetail (compact density): `listWebhookSubscriptions` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1108,7 +1108,7 @@ Errors to draw in the form: 422 An entry in `eventTypes` is not in the webhook e
 | Error (`?state=error`) | Could not load. Deliveries continue regardless of this screen. |
 | Empty, first run (`?state=emptyFirstRun`) | **No subscriptions. Twenty-nine business events are available** — and the state names a few, because a developer who does not know what exists cannot subscribe to it. |
 | Empty, no results (`?state=emptyNoResults`) | No delivery matches this window or status. |
-| Permission denied (`?state=emptyNoAccess`) | You do not have DEVELOPER_VIEW. |
+| Permission denied (`?state=emptyNoAccess`) | You do not have `DEVELOPER_VIEW`. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVELOPER_MANAGE` for `createWebhookSubscription`, `replayEvents`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 An entry in `eventTypes` is not in the webhook event catalogue. |
 
@@ -1145,7 +1145,7 @@ listWebhookDeliveries (WebhookDelivery):
 - `replayEvents` → `DEVELOPER_MANAGE` (configure) · staff, partner
 - `listWebhookEventTypes` → `DEVELOPER_VIEW` (read) · staff, partner
 
-**A refused user sees:** You do not have DEVELOPER_VIEW.
+**A refused user sees:** You do not have `DEVELOPER_VIEW`. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVELOPER_MANAGE` for `createWebhookSubscription`, `replayEvents`.
 
 #### Requirements it meets
 
@@ -1205,7 +1205,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P14 Developer (web) |
 | Module | Developer & API · wave 2 · needs the `developerApi` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-DEVPORTAL-DEV-006 |
 | Who uses it | partner staff holding `DEVELOPER_VIEW` (1 read); in the flows as partner |
 | Device and orientation | This is a developer portal on a desktop browser, 1440 wide, with a docs-style left navigation. · LTR · light, dark theme |
 | Pattern | statusTracker (compact density): `getApiUsage` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1248,7 +1248,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | P95 latency ms | 1,234.5 | — |
 | P99 latency ms | 1,234.5 | — |
 | Quota breaches | 1,234 | — |
-| By operation | list or chips (count when long) | — |
 
 **Metric tile** (metric tile): Calls, success rate, p95 latency, quota headroom.
 
@@ -1347,7 +1346,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#DEV-006?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `DEV-007`.
@@ -1365,7 +1364,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P14 Developer (web) |
 | Module | Developer & API · wave 3 · needs the `developerApi` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-DEVPORTAL-DEV-007 |
 | Who uses it | partner staff holding `DEVELOPER_MANAGE`, `DEVELOPER_VIEW` (1 configure, 1 read); in the flows as partner |
 | Device and orientation | This is a developer portal on a desktop browser, 1440 wide, with a docs-style left navigation. · LTR · light, dark theme |
 | Pattern | listDetail (compact density): `listIntegrationListings` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1407,11 +1406,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Name | text | — |
 | Category | chip: Crm, Marketing, Accounting, Hotel, Transport, Analytics… | — |
 | Description | text | — |
-| Integration URL | text | — |
-| Required scopes | list or chips (count when long) | — |
 | Status | chip: Draft, Submitted, In review, Certified, Rejected, Revoked… | — |
 | Certified until | 1 Oct 2026 | Certification expires. An integration certified against v1 and still listed after v3 is TICVAI vouching for something it has not looked at … |
-| Certified against version | text | — |
 | Listing fee model | chip: None, Flat, Revenue share | — |
 
 **Banner** (banner): **Certification expires, and the date is shown.** An integration certified against v1 and still listed after v3 is Softlabs vouching for something nobody has looked at in two years. When it lapses, the production clients issued against it are suspended.
@@ -1443,7 +1439,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Where the user goes next**
 
-- → `DEV-008` Programme Administration: *TICVAI reviews the integration and certifies it*; calls `submitIntegrationListing`
+- → `DEV-008` Programme Administration: *TICVAI reviews the integration and certifies it*; carries `listingId`; calls `submitIntegrationListing`
 
 #### States
 
@@ -1453,7 +1449,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Error (`?state=error`) | Could not load listings. |
 | Empty, first run (`?state=emptyFirstRun`) | **Nothing submitted. Certification gates production keys and the listing** (17 September minutes, M17-06): build and test in the sandbox, submit here, and once certified request production access. A private integration is certified without appearing in the marketplace. |
 | Empty, no results (`?state=emptyNoResults`) | No listing matches this category or status. |
-| Permission denied (`?state=emptyNoAccess`) | You do not have DEVELOPER_MANAGE. |
+| Permission denied (`?state=emptyNoAccess`) | Without `DEVELOPER_VIEW`, which `listIntegrationListings` requires, the screen does not load and this state names that permission. You do not have `DEVELOPER_MANAGE`. |
 | Offline (`?state=offline`) | online only |
 
 #### Edge cases to draw
@@ -1485,7 +1481,7 @@ Every integration listing:
 - `listIntegrationListings` → `DEVELOPER_VIEW` (read) · public, staff, partner
 - `submitIntegrationListing` → `DEVELOPER_MANAGE` (configure) · partner
 
-**A refused user sees:** You do not have DEVELOPER_MANAGE.
+**A refused user sees:** Without `DEVELOPER_VIEW`, which `listIntegrationListings` requires, the screen does not load and this state names that permission. You do not have `DEVELOPER_MANAGE`.
 
 #### Requirements it meets
 
@@ -1520,7 +1516,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (8), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (17 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#DEV-007?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Submit for certification, Submit integration listing.
 - [ ] Every transition is wired: `DEV-008`.
@@ -1538,8 +1534,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Control · P14 Developer (web) |
-| Module | Developer & API · wave 2 · needs the `developerApi` module |
-| Block | Block A · ticket #20616 (APP-SETUP-DEV-008) |
+| Module | Developer & API · wave 1 · needs the `developerApi` module |
+| Block | Block A · task APP-SETUP-DEV-008 |
 | Who uses it | partner staff holding `DEVELOPER_ADMIN`, `DEVELOPER_VIEW` (1 configure, 1 read); in the flows as partner |
 | Device and orientation | This is a developer portal on a desktop browser, 1440 wide, with a docs-style left navigation. · LTR · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`setApiQuota`, `certifyIntegration`, `setApiLicensing`) and no read of a population — it is settings, not a list |
@@ -1587,7 +1583,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save API licensing** (modal, opened by *Save API licensing*; *Save API licensing* calls `setApiLicensing`, *Cancel* sends nothing)
 
-**Collects what `setApiLicensing` sends before it is called.** Required: `licensedModules`. Optional: `id`, `callAllowancePerMonth`, `overageRatePerThousand`, `revenueSharePercent`, `effectiveFrom`, `effectiveTo`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setApiLicensing` sends before it is called.** Required: `licensedModules`. Optional: `callAllowancePerMonth`, `overageRatePerThousand`, `revenueSharePercent`, `effectiveFrom`, `effectiveTo`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

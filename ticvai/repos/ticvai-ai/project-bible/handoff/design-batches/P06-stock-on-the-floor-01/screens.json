@@ -75,18 +75,10 @@
        "label": "Every stock movement",
        "bindsTo": "StockMovement",
        "columns": [
-        "StockMovement.id",
-        "StockMovement.itemId",
-        "StockMovement.locationId",
-        "StockMovement.kind",
         "StockMovement.quantity",
-        "StockMovement.unit",
-        "StockMovement.reason",
-        "StockMovement.costCenterId",
         "StockMovement.recordedAt",
         "StockMovement.balanceAfter",
-        "StockMovement.unitCost",
-        "StockMovement.totalCost"
+        "StockMovement.unitCost"
        ],
        "operation": "listStockMovements",
        "provenance": "contract inventory.yaml GET /stock-movements"
@@ -117,22 +109,11 @@
        "label": "The selected stock movement",
        "bindsTo": "StockMovement",
        "columns": [
-        "StockMovement.id",
-        "StockMovement.itemId",
-        "StockMovement.locationId",
         "StockMovement.kind",
         "StockMovement.quantity",
-        "StockMovement.unit",
-        "StockMovement.reason",
-        "StockMovement.costCenterId",
-        "StockMovement.recordedAt",
         "StockMovement.balanceAfter",
         "StockMovement.unitCost",
-        "StockMovement.totalCost",
-        "StockMovement.principalId",
-        "StockMovement.sourceType",
-        "StockMovement.sourceId",
-        "StockMovement.journalEntryId"
+        "StockMovement.totalCost"
        ],
        "operation": "listStockMovements",
        "provenance": "contract inventory.yaml GET /stock-movements"
@@ -142,15 +123,8 @@
        "label": "The stock position",
        "bindsTo": "StockPosition",
        "columns": [
-        "StockPosition.itemId",
         "StockPosition.itemName",
-        "StockPosition.sku",
-        "StockPosition.locationId",
         "StockPosition.locationName",
-        "StockPosition.onHand",
-        "StockPosition.allocated",
-        "StockPosition.available",
-        "StockPosition.unit",
         "StockPosition.value",
         "StockPosition.lastCountedAt",
         "StockPosition.lastMovementAt"
@@ -220,7 +194,9 @@
     },
     {
      "name": "alertId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAlerts` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "dashboardId",
@@ -244,7 +220,7 @@
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -341,15 +317,8 @@
        "label": "The stock position",
        "bindsTo": "StockPosition",
        "columns": [
-        "StockPosition.itemId",
         "StockPosition.itemName",
-        "StockPosition.sku",
-        "StockPosition.locationId",
         "StockPosition.locationName",
-        "StockPosition.onHand",
-        "StockPosition.allocated",
-        "StockPosition.available",
-        "StockPosition.unit",
         "StockPosition.value",
         "StockPosition.lastCountedAt",
         "StockPosition.lastMovementAt"
@@ -431,7 +400,8 @@
     },
     {
      "name": "outletId",
-     "from": "navigation"
+     "from": "session",
+     "notes": "From the session (3 October 2026, CHG-SPF-004): a staff screen works in the outlet its sign-in or device is scoped to; nothing navigates to it (the venue-scope rule)."
     }
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to."
@@ -444,7 +414,7 @@
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -519,17 +489,9 @@
        "label": "Every requisition",
        "bindsTo": "Requisition",
        "columns": [
-        "Requisition.id",
         "Requisition.requisitionNumber",
-        "Requisition.venueId",
-        "Requisition.departmentId",
         "Requisition.status",
-        "Requisition.lines",
         "Requisition.estimatedTotal",
-        "Requisition.raisedByPrincipalId",
-        "Requisition.approvedByPrincipalId",
-        "Requisition.approvalNote",
-        "Requisition.requiredBy",
         "Requisition.approvedAt"
        ],
        "operation": "listRequisitions",
@@ -568,17 +530,10 @@
        "label": "The selected requisition",
        "bindsTo": "Requisition",
        "columns": [
-        "Requisition.id",
         "Requisition.requisitionNumber",
-        "Requisition.venueId",
-        "Requisition.departmentId",
         "Requisition.status",
         "Requisition.lines",
         "Requisition.estimatedTotal",
-        "Requisition.raisedByPrincipalId",
-        "Requisition.approvedByPrincipalId",
-        "Requisition.approvalNote",
-        "Requisition.requiredBy",
         "Requisition.approvedAt"
        ],
        "operation": "listRequisitions",
@@ -611,7 +566,7 @@
    "error": "Could not load. Names which read failed and leaves the requisition smart store untouched.",
    "emptyFirstRun": "No requisition smart store yet. Offers Create requisition (`createRequisition`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on status, raisedByPrincipalId and the requisition smart store are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listRequisitions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `PROCUREMENT_VIEW`, which `listRequisitions` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PROCUREMENT_REQUEST` for `createRequisition`, `updateRequisitionLines`.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -653,7 +608,9 @@
     },
     {
      "name": "requisitionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRequisitions` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to.",
@@ -673,7 +630,7 @@
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateRequisition",
@@ -774,12 +731,9 @@
        "label": "Every stock location",
        "bindsTo": "StockLocation",
        "columns": [
-        "StockLocation.id",
         "StockLocation.code",
         "StockLocation.name",
-        "StockLocation.venueId",
         "StockLocation.kind",
-        "StockLocation.parentLocationId",
         "StockLocation.isActive"
        ],
        "operation": "listStockLocations",
@@ -824,12 +778,9 @@
        "label": "The selected stock location",
        "bindsTo": "StockLocation",
        "columns": [
-        "StockLocation.id",
         "StockLocation.code",
         "StockLocation.name",
-        "StockLocation.venueId",
         "StockLocation.kind",
-        "StockLocation.parentLocationId",
         "StockLocation.isActive"
        ],
        "operation": "listStockLocations",
@@ -862,7 +813,7 @@
    "error": "Could not load. Names which read failed and leaves the store-to-store warehouse transfers untouched.",
    "emptyFirstRun": "No store-to-store warehouse transfers yet. Offers Create stock transfer (`createStockTransfer`).",
    "emptyNoResults": "Never shown: `listStockLocations` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listStockLocations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listStockLocations` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createStockTransfer`, `receiveStockTransfer`.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -911,7 +862,9 @@
     },
     {
      "name": "transferId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listStockTransfers` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to.",
@@ -931,7 +884,7 @@
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateStockTransfer",
@@ -997,7 +950,7 @@
   "name": "Receiving",
   "module": "Stock on the Floor",
   "requiresModule": "inventory",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/receiving-store-put-away",
@@ -1100,18 +1053,11 @@
        "label": "The stock transfer",
        "bindsTo": "StockTransfer",
        "columns": [
-        "StockTransfer.id",
         "StockTransfer.transferNumber",
-        "StockTransfer.fromLocationId",
-        "StockTransfer.toLocationId",
         "StockTransfer.status",
         "StockTransfer.lines",
-        "StockTransfer.dispatchedByPrincipalId",
-        "StockTransfer.receivedByPrincipalId",
         "StockTransfer.dispatchedAt",
-        "StockTransfer.receivedAt",
-        "StockTransfer.closeShortReason",
-        "StockTransfer.scopePath"
+        "StockTransfer.receivedAt"
        ],
        "operation": "getStockTransfer",
        "provenance": "contract inventory.yaml GET /stock-transfers/{transferId}"
@@ -1202,7 +1148,7 @@
    "loading": "The receiving store put-away, read by `getStockTransfer`.",
    "error": "Could not load. Names which read failed and leaves the receiving store put-away untouched.",
    "emptyFirstRun": "No receiving store put-away yet. Offers Create goods receipt (`createGoodsReceipt`).",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getStockTransfer` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getStockTransfer` requires to show this screen, and names that permission (the screen's other reads need `PROCUREMENT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_REPORT` for `logColdChain`; `PROCUREMENT_RECEIVE` for `createGoodsReceipt`, `rejectReceivedGoods`; `PRODUCT_CONFIGURE` for `receiveStockTransfer`.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -1253,7 +1199,9 @@
     },
     {
      "name": "receiptId",
-     "from": "EMP-003"
+     "from": "EMP-003",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createGoodsReceipt`; a link or an edge that holds one opens it instead."
     },
     {
      "name": "transferId",
@@ -1271,7 +1219,7 @@
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -1393,7 +1341,7 @@
    "loading": "The stock count cycle, read by `listStockCounts`.",
    "error": "Could not load. Names which read failed and leaves the stock count cycle untouched.",
    "emptyFirstRun": "No stock count cycle yet. Offers Start stock count (`startStockCount`).",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listStockCounts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listStockCounts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `startStockCount`, `enterCountLine`, `setDailyCount`.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -1443,7 +1391,7 @@
    "derivedFrom": "wireframes/reference/Retail Board 4.dc.html",
    "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formStartStockCount",
@@ -1557,7 +1505,7 @@
   "name": "Damage, Loss, Shrinkage & Stock Adjustment",
   "module": "Stock on the Floor",
   "requiresModule": "fnb",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "venue-staff-app",
    "route": "/operations/damage-loss-shrinkage-stock-adjustment",
@@ -1693,7 +1641,7 @@
    "loading": "The saved damage loss shrinkage.",
    "error": "Could not load. Names which read failed and leaves the damage loss shrinkage untouched.",
    "emptyFirstRun": "No damage loss shrinkage configured. The form opens empty and `recordWaste` saves the first one; it says what the platform does in the meantime.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_MODIFY`, which `recordWaste` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `INCIDENT_VIEW`, which `getHaccpStatus` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_MANAGE` for `signCorrectiveAction`; `INCIDENT_REPORT` for `logTemperature`; `ORDER_MODIFY` for `recordWaste`; `PRODUCT_CONFIGURE` for `createStockMovement`.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -1755,7 +1703,7 @@
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateStockMovement",
@@ -1890,15 +1838,8 @@
        "label": "The stock position",
        "bindsTo": "StockPosition",
        "columns": [
-        "StockPosition.itemId",
         "StockPosition.itemName",
-        "StockPosition.sku",
-        "StockPosition.locationId",
         "StockPosition.locationName",
-        "StockPosition.onHand",
-        "StockPosition.allocated",
-        "StockPosition.available",
-        "StockPosition.unit",
         "StockPosition.value",
         "StockPosition.lastCountedAt",
         "StockPosition.lastMovementAt"
@@ -1953,7 +1894,7 @@
    "loading": "The reservation allocation omnichannel, read by `getStockPositions`.",
    "error": "Could not load. Names which read failed and leaves the reservation allocation omnichannel untouched.",
    "emptyFirstRun": "No reservation allocation omnichannel yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getStockPositions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getStockPositions` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `reserveMerchandise`, `collectMerchandiseReservation`, `cancelMerchandiseReservation`.",
    "offline": "**Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice."
   },
   "apis": [
@@ -1992,11 +1933,14 @@
     },
     {
      "name": "outletId",
-     "from": "EMP-003"
+     "from": "session",
+     "notes": "From the session (3 October 2026, CHG-SPF-004): a staff screen works in the outlet its sign-in or device is scoped to; nothing navigates to it (the venue-scope rule)."
     },
     {
      "name": "reservationId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `collectMerchandiseReservation`, `cancelMerchandiseReservation` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to."
@@ -2008,7 +1952,7 @@
    "derivedFrom": "wireframes/reference/Retail Board 4.dc.html",
    "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formReserveMerchandise",
@@ -2113,13 +2057,8 @@
        "label": "Every serialised",
        "bindsTo": "SerialisedItem",
        "columns": [
-        "SerialisedItem.id",
-        "SerialisedItem.itemId",
-        "SerialisedItem.batchId",
         "SerialisedItem.serial",
-        "SerialisedItem.locationId",
         "SerialisedItem.status",
-        "SerialisedItem.soldOnOrderLineId",
         "SerialisedItem.warrantyUntil",
         "SerialisedItem.receivedAt"
        ],
@@ -2152,13 +2091,8 @@
        "label": "The selected serialised",
        "bindsTo": "SerialisedItem",
        "columns": [
-        "SerialisedItem.id",
-        "SerialisedItem.itemId",
-        "SerialisedItem.batchId",
         "SerialisedItem.serial",
-        "SerialisedItem.locationId",
         "SerialisedItem.status",
-        "SerialisedItem.soldOnOrderLineId",
         "SerialisedItem.warrantyUntil",
         "SerialisedItem.receivedAt"
        ],
@@ -2226,7 +2160,7 @@
    "derivedFrom": "wireframes/reference/Retail Board 4.dc.html",
    "note": "**Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P06",
    "audience": "staff",
@@ -2322,18 +2256,10 @@
        "label": "Every alert",
        "bindsTo": "Alert",
        "columns": [
-        "Alert.id",
-        "Alert.ruleId",
         "Alert.raisedAt",
         "Alert.severity",
         "Alert.status",
-        "Alert.observedValue",
-        "Alert.threshold",
-        "Alert.scopePath",
-        "Alert.acknowledgedByPrincipalId",
-        "Alert.acknowledgedAt",
-        "Alert.resolvedAt",
-        "Alert.escalatedAt"
+        "Alert.acknowledgedAt"
        ],
        "operation": "listAlerts",
        "provenance": "contract reporting.yaml GET /alerts"
@@ -2364,18 +2290,11 @@
        "label": "The selected alert",
        "bindsTo": "Alert",
        "columns": [
-        "Alert.id",
-        "Alert.ruleId",
         "Alert.raisedAt",
         "Alert.severity",
         "Alert.status",
         "Alert.observedValue",
-        "Alert.threshold",
-        "Alert.scopePath",
-        "Alert.acknowledgedByPrincipalId",
-        "Alert.acknowledgedAt",
-        "Alert.resolvedAt",
-        "Alert.escalatedAt"
+        "Alert.acknowledgedAt"
        ],
        "operation": "listAlerts",
        "provenance": "contract reporting.yaml GET /alerts"
@@ -2407,7 +2326,7 @@
    "error": "Could not load. Names which read failed and leaves the inventory exceptions replenishment untouched.",
    "emptyFirstRun": "No inventory exceptions replenishment yet. Offers Create requisition (`createRequisition`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on status, severity, workstationId, shiftId, itemId and the inventory exceptions replenishment are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PROCUREMENT_REQUEST` for `createRequisition`.",
    "offline": "**Not available offline.** `listAlerts` reads the analytical replica (ADR-0016). **Corrected 24 August** — the shared \"works from cache and queues what it records\" wording was applied to a screen whose only operation is an analytical read."
   },
   "apis": [
@@ -2444,7 +2363,9 @@
     },
     {
      "name": "alertId",
-     "from": "EMP-003"
+     "from": "EMP-003",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAlerts` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to.",
@@ -2463,7 +2384,7 @@
    "derivedFrom": "wireframes/reference/Inventory Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Inventory Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formAcknowledgeAlert",

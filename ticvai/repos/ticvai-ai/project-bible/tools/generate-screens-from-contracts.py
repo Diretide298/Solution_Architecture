@@ -76,6 +76,20 @@ except Exception:  # noqa: BLE001 — a stream without reconfigure prints as it 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from contract_shapes import (load_contracts, path_params,  # noqa: E402
                              response_schemas, schema_fields)
+import screen_patterns as SP  # noqa: E402 — the 3 October rules (CHG-SPF-001..004), shared with the check
+
+# **Is the platform being built a phone or a handheld?** Set by `main()` per platform file; it caps
+# every list and panel at five columns there (CHG-SPF-002).
+SMALL_SCREEN = False
+_PACKAGE = None
+
+
+def package():
+    """The contracts as `tools/screen_patterns.py` reads them, once, for the entry-parameter rules."""
+    global _PACKAGE
+    if _PACKAGE is None:
+        _PACKAGE = SP.Package(str(ROOT), screens={})
+    return _PACKAGE
 
 # Provenance prefixes this generator owns; anything else on an overlay is somebody's
 # decision and is carried through a rebuild.
@@ -194,10 +208,19 @@ def choose_pattern(op_ids: list[str]) -> tuple[str, str]:
                           "recorded rather than passed off as a decision")
 
 
-def columns_for(schema: str, schemas: dict, limit: int = 12) -> list[str]:
-    """Field paths a component can bind, plumbing removed, declaration order kept."""
-    return [f"{schema}.{p}" for p in schema_fields(schema, schemas)
-            if p not in PLUMBING][:limit]
+def columns_for(schema: str, schemas: dict, limit: int = 12, kind: str | None = None) -> list[str]:
+    """Field paths a component shows, plumbing removed, declaration order kept.
+
+    **With a `kind`, narrowed to the fields the screen is about** (3 October 2026, CHG-SPF-002): the
+    Block A audit found phones showing sixteen fields of an incident and panels dumping every
+    property of a schema. `screen_patterns.pick_columns` keeps names, states, money and dates, drops
+    plumbing and foreign ids, and keeps at most five on a phone or handheld. Without a `kind` (what a
+    screen arrives holding, `entryState.preloaded`) nothing is narrowed.
+    """
+    raw = [f"{schema}.{p}" for p in schema_fields(schema, schemas) if p not in PLUMBING][:limit]
+    if kind is None:
+        return raw
+    return SP.pick_columns(None, {"kind": kind, "columns": raw}, SMALL_SCREEN)
 
 
 def keep_note(note) -> str | None:
@@ -331,8 +354,11 @@ def body_fields(entry: dict, schemas: dict) -> tuple[str | None, list[tuple[str,
                     props.update(schema_fields(r, schemas))
                     req |= _required_of(r, schemas)
             name = None
+        # **A readOnly field is the server's to set, never the form's to ask** (3 October 2026,
+        # CHG-SPF-001): the Block A audit found BO-094's form asking for `id` and `mapId`.
         fields = [(f, b if isinstance(b, dict) else {}, f in req)
-                  for f, b in props.items() if f not in PLUMBING]
+                  for f, b in props.items() if f not in PLUMBING
+                  and not (isinstance(b, dict) and b.get("readOnly") is True)]
         if fields:
             fields.sort(key=lambda t: not t[2])      # required first, declaration order kept
             return name, fields
@@ -374,9 +400,16 @@ def filter_components(ops: dict, oid: str) -> list[dict]:
             for n, b in filter_params(ops.get(oid))]
 
 
-def screen_permission(ops: dict, known: list[str]) -> tuple[str, str] | None:
-    """`(permission, operation)` the screen's reads require — its writes where it has none."""
-    ordered = ([o for o in known if o.startswith(READS)]
+def screen_permission(ops: dict, known: list[str],
+                      loads: set | None = None) -> tuple[str, str] | None:
+    """`(permission, operation)` the screen's reads require — its writes where it has none.
+
+    **The read the screen loads with comes first** (`loads`, the operations triggered on load):
+    a picker read on a button is not what the no-access state is about (CHG-SPF-003).
+    """
+    loads = loads or set()
+    ordered = ([o for o in known if o.startswith(READS) and o in loads]
+               + [o for o in known if o.startswith(READS) and o not in loads]
                + [o for o in known if not o.startswith(READS)])
     for o in ordered:
         perm = ops[o]["op"].get("x-ticvai-permission")
@@ -482,7 +515,9 @@ def bind_read(ops: dict, schemas: dict, oid: str, pattern: str) -> tuple[str, di
                              "operation": oid, "notes": f"Downloads `{media[0]}`.",
                              "provenance": cite(ops, oid)}
     sch = shape_of(ops, oid)
-    cols = columns_for(sch, schemas, limit=16) if sch else []
+    cols = columns_for(sch, schemas, limit=16,
+                       kind="dataTable" if oid.startswith(("list", "search")) else "detailPanel") \
+        if sch else []
     region = "contextPanel" if TEMPLATES.get(pattern) == "split" else "contentBody"
     if not cols:
         # **An inline response still says what the screen shows.** `getAvailability` returns an
@@ -502,7 +537,7 @@ def bind_read(ops: dict, schemas: dict, oid: str, pattern: str) -> tuple[str, di
             "provenance": cite(ops, oid)}
     if oid.startswith(("list", "search")):
         return "contentBody", {"kind": "dataTable", "label": f"Every {schema_noun(sch)}",
-                               "bindsTo": sch, "columns": cols[:12], "operation": oid,
+                               "bindsTo": sch, "columns": cols, "operation": oid,
                                "provenance": cite(ops, oid)}
     return region, {"kind": "detailPanel", "label": f"The {schema_noun(sch)}", "bindsTo": sch,
                     "columns": cols, "operation": oid, "provenance": cite(ops, oid)}
@@ -598,9 +633,11 @@ OWN_STATES = [re.compile(p.replace("{N}", _N)) for p in (
     r"^Nothing matches the filter on [\w, ]{1,200} and the {N} are still there\. Names the active "
     r"filter and offers to clear it\.$",
     r"^Never shown: `\w+` takes no filter, so an empty list is always the first-run state above\.$",
-    r"^Shown when the caller lacks `[A-Za-z0-9_.:-]+`, which `\w+` requires, and names that "
-    r"permission\. \*\*Never an empty table\*\* — that reads as \*there is no data\* and sends "
-    r"somebody to support with the wrong question\.$",
+    r"^Shown when the caller lacks `[A-Za-z0-9_.:-]+`, which `\w+` requires( to show this "
+    r"screen)?, and names that permission\. \*\*Never an empty table\*\* — that reads as \*there "
+    r"is no data\* and sends somebody to support with the wrong question\.( A caller who can see "
+    r"the screen but lacks what an action needs sees that action disabled, naming its permission: "
+    r"[^\n]*)?$",
 )]
 OWNED_STATES = ("loading", "error", "emptyFirstRun", "emptyNoResults", "emptyNoAccess")
 
@@ -609,8 +646,35 @@ def is_own_state(v) -> bool:
     return isinstance(v, str) and any(p.match(v.strip()) for p in OWN_STATES)
 
 
+def no_access_state(ops: dict, known: list[str], loads: set | None = None) -> str | None:
+    """**The read's permission for viewing, and each action's where the actions need more**
+    (3 October 2026, CHG-SPF-003). The Block A audit found BO-094 naming `VENUE_MAP_VIEW` while its
+    every button needs `VENUE_MAP_MANAGE` or `VENUE_MAP_PUBLISH`: a caller told the first is
+    missing gets it and still cannot work. `tools/check-screen-patterns.py` holds the rule."""
+    perm = screen_permission(ops, known, loads)
+    if not perm:
+        return None
+    loads = loads or set()
+    acts: dict = {}
+    for o in known:
+        if o in loads:
+            continue
+        p = ops[o]["op"].get("x-ticvai-permission")
+        if isinstance(p, str) and p and p != perm[0]:
+            acts.setdefault(p, []).append(o)
+    text = (f"Shown when the caller lacks `{perm[0]}`, which `{perm[1]}` requires to show this "
+            f"screen, and names that permission. " + NO_ACCESS_TAIL)
+    if acts:
+        text += (" A caller who can see the screen but lacks what an action needs sees that action "
+                 "disabled, naming its permission: "
+                 + "; ".join(f"`{p}` for " + ", ".join(f"`{o}`" for o in os_[:4])
+                             for p, os_ in sorted(acts.items())[:6]) + ".")
+    return text
+
+
 def derived_states(pattern: str, noun: str, known: list[str], ops: dict,
-                   collection_op: str | None, detail_op: str | None) -> dict:
+                   collection_op: str | None, detail_op: str | None,
+                   loads: set | None = None) -> dict:
     """The rendering states the screen's operations justify, and no others."""
     if pattern == "configEditor":
         loading = f"The saved {noun}."
@@ -651,11 +715,19 @@ def derived_states(pattern: str, noun: str, known: list[str], ops: dict,
         # answer for a list that cannot be narrowed is that it never happens.
         states["emptyNoResults"] = (f"Never shown: `{collection_op}` takes no filter, so an empty "
                                     f"list is always the first-run state above.")
-    perm = screen_permission(ops, known)
-    if perm:
-        states["emptyNoAccess"] = (f"Shown when the caller lacks `{perm[0]}`, which `{perm[1]}` "
-                                   f"requires, and names that permission. " + NO_ACCESS_TAIL)
+    na = no_access_state(ops, known, loads)
+    if na:
+        states["emptyNoAccess"] = na
     return states
+
+
+def entry_param(screen: dict, name: str, ops: dict, known: list[str]) -> dict:
+    """**Required only when nothing else can supply it** (3 October 2026, CHG-SPF-004). The audit
+    found 784 required parameters no inbound edge carried: `WEB-044` needing a `conversationId` it
+    creates itself, list screens needing the id of the row the user has not picked yet. A screen
+    that lists or reads the id itself, makes it, or only acts on it, opens without it
+    (`screen_patterns.param_for`, the rule `check-screen-patterns` P5 holds the screens to)."""
+    return SP.param_for(package(), screen, name, "navigation")
 
 
 def build(screen: dict, ops: dict, schemas: dict, report: Counter) -> dict:
@@ -691,7 +763,7 @@ def build(screen: dict, ops: dict, schemas: dict, report: Counter) -> dict:
 
     # --- the collection ------------------------------------------------------------------------
     if pattern in ("listDetail", "approvalInbox", "commandCentre") and coll_schema:
-        cols = columns_for(coll_schema, schemas)
+        cols = columns_for(coll_schema, schemas, kind="dataTable")
         if cols:
             counts["bound"] += 1
             # **R250: a filter exists where the operation takes one.** The no-results state below
@@ -730,7 +802,7 @@ def build(screen: dict, ops: dict, schemas: dict, report: Counter) -> dict:
 
     # --- the selection --------------------------------------------------------------------------
     if pattern in ("listDetail", "approvalInbox", "statusTracker") and det_schema:
-        cols = columns_for(det_schema, schemas, limit=16)
+        cols = columns_for(det_schema, schemas, limit=16, kind="detailPanel")
         if cols:
             counts["bound"] += 1
             # **A status tracker's record is the screen, not a side panel.** `_patterns.yaml` gives
@@ -883,8 +955,10 @@ def build(screen: dict, ops: dict, schemas: dict, report: Counter) -> dict:
     # --- states ---------------------------------------------------------------------------------
     tabled = any(c.get("operation") == collection_op and c.get("kind") == "dataTable"
                  for r in regions for c in r["components"])
+    loads = {a.get("operationId") for a in (screen.get("apis") or [])
+             if a.get("trigger") in SP.LOAD_TRIGGERS}
     states = derived_states(pattern, noun, known, ops, collection_op if tabled else None,
-                            detail_op)
+                            detail_op, loads)
     prior = screen.get("states") or {}
     for k, v in prior.items():
         if not v or is_own_state(v):
@@ -957,7 +1031,7 @@ def build(screen: dict, ops: dict, schemas: dict, report: Counter) -> dict:
     entry = dict(screen.get("entryState") or {})
     needed = sorted({p for o in known for p in path_params(ops[o])})
     if needed and not entry.get("params"):
-        entry["params"] = [{"name": p, "from": "navigation"} for p in needed]
+        entry["params"] = [entry_param(screen, p, ops, known) for p in needed]
     if pattern in ("listDetail", "approvalInbox") and det_schema:
         entry["preloaded"] = columns_for(det_schema, schemas, limit=5)
     if entry:
@@ -967,8 +1041,9 @@ def build(screen: dict, ops: dict, schemas: dict, report: Counter) -> dict:
     out["apisNote"] = (
         f"Rebuilt {STAMP} from the {len(known)} operation"
         f"{'s' if len(known) != 1 else ''} this screen declares, not from a workshop pack — it has "
-        f"none. Columns are every field the response schema declares, plumbing aside — narrowing "
-        f"them to the ones that matter is work a person still owes this screen.")
+        f"none. Columns are the fields the screen is about, chosen by "
+        f"`screen_patterns.pick_columns`: plumbing and foreign ids out, at most five on a phone or "
+        f"handheld (CHG-SPF-002).")
 
     report[f"pattern:{pattern}"] += 1
     report["overlays"] += len(overlays)
@@ -996,6 +1071,8 @@ def main() -> int:
     pending = []
     for path in files:
         doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+        global SMALL_SCREEN
+        SMALL_SCREEN = doc["platform"].get("formFactor") in SP.SMALL_FORM_FACTORS
         touched = 0
         for i, screen in enumerate(doc["screens"]):
             src = screen.get("source") or {}

@@ -167,16 +167,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `EMP-035` | Payment on device | B–D | 25 | 0 | 5 | 10 | 2 | 0 | — | notStarted (generated) |
-| `EMP-036` | Issue media | B–D | 8 | 23 | 5 | 23 | 1 | 0 | — | notStarted (generated) |
-| `EMP-037` | Notifications | B–D | 1 | 49 | 6 | 8 | 2 | 0 | — | notStarted (generated) |
-| `EMP-039` | Announcements | B–D | 1 | 24 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-038` | Broadcast to team | B–D | 12 | 29 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
-| `EMP-040` | Knowledge base | B–D | 6 | 0 | 5 | 2 | 0 | 0 | — | notStarted (generated) |
-| `EMP-041` | Training | B–D | 3 | 16 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
-| `EMP-042` | Profile | B–D | 3 | 30 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
-| `EMP-043` | Device settings | B–D | 13 | 22 | 6 | 48 | 0 | 0 | — | notStarted (generated) |
-| `EMP-044` | Accessibility | B–D | 0 | 0 | 4 | 0 | 0 | 0 | — | notStarted (generated) |
+| `EMP-035` | Payment on device | C | 25 | 0 | 5 | 10 | 2 | 0 | — | notStarted (generated) |
+| `EMP-036` | Issue media | C | 8 | 10 | 5 | 23 | 1 | 0 | — | notStarted (generated) |
+| `EMP-037` | Notifications | D | 1 | 34 | 6 | 8 | 2 | 0 | — | notStarted (generated) |
+| `EMP-039` | Announcements | D | 1 | 9 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-038` | Broadcast to team | D | 12 | 14 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
+| `EMP-040` | Knowledge base | D | 6 | 0 | 5 | 2 | 0 | 0 | — | notStarted (generated) |
+| `EMP-041` | Training | D | 3 | 9 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
+| `EMP-042` | Profile | B | 3 | 18 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
+| `EMP-043` | Device settings | B | 13 | 9 | 6 | 48 | 0 | 0 | — | notStarted (generated) |
+| `EMP-044` | Accessibility | D | 0 | 0 | 4 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

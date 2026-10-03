@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "kiosk",
  "offlineCapable": true,
- "generated": "2026-10-02",
+ "generated": "2026-10-03",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 10,
@@ -18,14 +18,14 @@
   "operationsWithNoScreen": 9
  },
  "waves": {
-  "wave2": 10
+  "wave1": 10
  },
  "modules": [
   {
    "module": "Kitchen",
    "screens": 10,
    "waves": [
-    2
+    1
    ]
   }
  ],
@@ -44,7 +44,7 @@
    "id": "KIT-001",
    "name": "Kitchen Operations Command Center",
    "module": "Kitchen",
-   "wave": 2,
+   "wave": 1,
    "route": "/kitchen/kitchen-operations-command-center",
    "operations": 3,
    "drawn": true
@@ -53,7 +53,7 @@
    "id": "KIT-002",
    "name": "Kitchen Display System (KDS)",
    "module": "Kitchen",
-   "wave": 2,
+   "wave": 1,
    "route": "/kitchen/kitchen-display-system-kds",
    "operations": 5,
    "drawn": true
@@ -62,7 +62,7 @@
    "id": "KIT-003",
    "name": "Order Firing & Course Management",
    "module": "Kitchen",
-   "wave": 2,
+   "wave": 1,
    "route": "/kitchen/order-firing-course-management",
    "operations": 5,
    "drawn": true
@@ -71,7 +71,7 @@
    "id": "KIT-004",
    "name": "Active Order Management & Fulfilment Journey",
    "module": "Kitchen",
-   "wave": 2,
+   "wave": 1,
    "route": "/kitchen/active-order-management-fulfilment-journey",
    "operations": 2,
    "drawn": true
@@ -80,7 +80,7 @@
    "id": "KIT-005",
    "name": "Kitchen Station Workload & Dynamic Routing",
    "module": "Kitchen",
-   "wave": 2,
+   "wave": 1,
    "route": "/kitchen/kitchen-station-workload-dynamic-routing",
    "operations": 3,
    "drawn": true
@@ -89,7 +89,7 @@
    "id": "KIT-006",
    "name": "Expeditor & Order Assembly",
    "module": "Kitchen",
-   "wave": 2,
+   "wave": 1,
    "route": "/kitchen/expeditor-order-assembly",
    "operations": 6,
    "drawn": true
@@ -98,16 +98,16 @@
    "id": "KIT-007",
    "name": "Guest Collection, Buzzer & Digital Notification",
    "module": "Kitchen",
-   "wave": 2,
+   "wave": 1,
    "route": "/kitchen/guest-collection-buzzer-digital-notification",
-   "operations": 2,
+   "operations": 1,
    "drawn": true
   },
   {
    "id": "KIT-008",
    "name": "Exceptions, Re-Fire & Unavailable Items",
    "module": "Kitchen",
-   "wave": 2,
+   "wave": 1,
    "route": "/kitchen/exceptions-re-fire-unavailable-items",
    "operations": 5,
    "drawn": true
@@ -116,7 +116,7 @@
    "id": "KIT-009",
    "name": "SLA, Priority & Service Rules",
    "module": "Kitchen",
-   "wave": 2,
+   "wave": 1,
    "route": "/kitchen/sla-priority-service-rules",
    "operations": 3,
    "drawn": true
@@ -125,7 +125,7 @@
    "id": "KIT-010",
    "name": "Kitchen Performance, AI & Operational Optimization",
    "module": "Kitchen",
-   "wave": 2,
+   "wave": 1,
    "route": "/kitchen/kitchen-performance-ai-operational-optimization",
    "operations": 3,
    "drawn": true

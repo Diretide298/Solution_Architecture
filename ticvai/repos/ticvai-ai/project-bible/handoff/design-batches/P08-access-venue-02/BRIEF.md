@@ -131,16 +131,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-034` | Scan Activity | B–D | 7 | 27 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
-| `BO-035` | Override Audit | B–D | 7 | 34 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
+| `BO-034` | Scan Activity | B–D | 7 | 10 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
+| `BO-035` | Override Audit | B–D | 7 | 17 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
 | `BO-038` | Reconciliation Queue | B–D | 3 | 20 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `BO-069` | Asset Register | B–D | 42 | 36 | 6 | 23 | 3 | 0 | — | notStarted (generated) |
-| `BO-071` | Planned Maintenance | B–D | 21 | 32 | 6 | 5 | 2 | 2 | — | notStarted (generated) |
-| `BO-072` | Incident Log | B–D | 31 | 44 | 6 | 10 | 0 | 0 | — | notStarted (generated) |
-| `BO-092` | Venue Maps | A | 14 | 26 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-069` | Asset Register | B–D | 42 | 22 | 6 | 23 | 3 | 0 | — | notStarted (generated) |
+| `BO-071` | Planned Maintenance | B–D | 21 | 21 | 6 | 5 | 2 | 2 | — | notStarted (generated) |
+| `BO-072` | Incident Log | B–D | 35 | 22 | 6 | 10 | 0 | 0 | — | notStarted (generated) |
+| `BO-092` | Venue Maps | A | 14 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-093` | Map Import & Labelling | A | 66 | 27 | 6 | 4 | 3 | 0 | — | notStarted (generated) |
 | `BO-094` | Map Editor & Publish | A | 57 | 9 | 5 | 13 | 3 | 0 | — | notStarted (generated) |
-| `BO-095` | Resources | B–D | 26 | 27 | 6 | 19 | 1 | 0 | — | notStarted (generated) |
+| `BO-095` | Resources | B–D | 26 | 13 | 6 | 19 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

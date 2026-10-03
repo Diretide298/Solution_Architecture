@@ -582,7 +582,8 @@
    "params": [
     {
      "name": "venueId",
-     "from": "navigation"
+     "from": "session",
+     "notes": "From the session (3 October 2026, CHG-SPF-004): a staff screen works in the venue its sign-in or device is scoped to; nothing navigates to it (the venue-scope rule)."
     }
    ],
    "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that list — never an empty form that looks configurable."
@@ -893,7 +894,9 @@
    "params": [
     {
      "name": "paymentId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `voidPayment` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1236,7 +1239,9 @@
    "params": [
     {
      "name": "paymentId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `inquirePaymentStatus` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

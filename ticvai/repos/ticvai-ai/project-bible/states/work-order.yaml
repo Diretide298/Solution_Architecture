@@ -76,6 +76,36 @@ transitions:
   operation: cancelWorkOrder
   trigger: operation
   guard: No longer required
+# **Cancellable until any labour time or part is recorded** (Chinmay, 3 October 2026, Block A business rules;
+# CHG-RUL-010). Starting or pausing a job does not stop a cancel; the first recordWorkOrderTime or
+# recordWorkOrderParts does (409 work-recorded). After that the job is completed, or closed with a reason.
+- from: inProgress
+  to: cancelled
+  operation: cancelWorkOrder
+  trigger: operation
+  guard: No labour time and no part recorded yet
+- from: paused
+  to: cancelled
+  operation: cancelWorkOrder
+  trigger: operation
+  guard: No labour time and no part recorded yet
+- from: awaitingParts
+  to: cancelled
+  operation: cancelWorkOrder
+  trigger: operation
+  guard: No labour time and no part recorded yet
+- from: paused
+  to: closed
+  operation: closeWorkOrder
+  trigger: operation
+  guard: Work is recorded and the job will not be finished; closed with a reason (CHG-RUL-010)
+  requiresApproval: true
+- from: awaitingParts
+  to: closed
+  operation: closeWorkOrder
+  trigger: operation
+  guard: Work is recorded and the job will not be finished; closed with a reason (CHG-RUL-010)
+  requiresApproval: true
 - from: assigned
   to: assigned
   operation: acceptWorkOrder

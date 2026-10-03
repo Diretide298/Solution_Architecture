@@ -387,16 +387,11 @@
        "label": "Every commercial campaign",
        "bindsTo": "CommercialCampaign",
        "columns": [
-        "CommercialCampaign.id",
-        "CommercialCampaign.venueId",
         "CommercialCampaign.code",
         "CommercialCampaign.name",
         "CommercialCampaign.description",
-        "CommercialCampaign.ownerPrincipalId",
-        "CommercialCampaign.legalEntityId",
         "CommercialCampaign.validFrom",
-        "CommercialCampaign.validTo",
-        "CommercialCampaign.budgets"
+        "CommercialCampaign.validTo"
        ],
        "operation": "listCommercialCampaigns",
        "provenance": "contract promotions.yaml GET /commercial-campaigns"

@@ -145,25 +145,8 @@
        "label": "Every payment order financial",
        "columns": [
         "PaymentOrderFinancialCommandCenterView.grossOrderValue",
-        "PaymentOrderFinancialCommandCenterView.fullyPaidOrders",
-        "PaymentOrderFinancialCommandCenterView.partiallyPaidOrders",
-        "PaymentOrderFinancialCommandCenterView.unpaidOrders",
-        "PaymentOrderFinancialCommandCenterView.outstandingBalance",
-        "PaymentOrderFinancialCommandCenterView.paymentsToday",
-        "PaymentOrderFinancialCommandCenterView.failedPayments",
-        "PaymentOrderFinancialCommandCenterView.pendingPayments",
-        "PaymentOrderFinancialCommandCenterView.refundsPending",
-        "PaymentOrderFinancialCommandCenterView.reconciliationExceptions",
-        "PaymentOrderFinancialCommandCenterView.unallocatedPayments",
-        "PaymentOrderFinancialCommandCenterView.settlementVariance",
-        "PaymentOrderFinancialCommandCenterView.orderId",
-        "PaymentOrderFinancialCommandCenterView.customer",
         "PaymentOrderFinancialCommandCenterView.channel",
         "PaymentOrderFinancialCommandCenterView.orderValue",
-        "PaymentOrderFinancialCommandCenterView.amountPaid",
-        "PaymentOrderFinancialCommandCenterView.refunded",
-        "PaymentOrderFinancialCommandCenterView.outstanding",
-        "PaymentOrderFinancialCommandCenterView.paymentMethods",
         "PaymentOrderFinancialCommandCenterView.paymentStatus",
         "PaymentOrderFinancialCommandCenterView.settlementStatus",
         "PaymentOrderFinancialCommandCenterView.reconciliationStatus"
@@ -184,25 +167,10 @@
        "bindsTo": "PaymentOrderFinancialCommandCenterView",
        "columns": [
         "PaymentOrderFinancialCommandCenterView.grossOrderValue",
-        "PaymentOrderFinancialCommandCenterView.fullyPaidOrders",
-        "PaymentOrderFinancialCommandCenterView.partiallyPaidOrders",
-        "PaymentOrderFinancialCommandCenterView.unpaidOrders",
         "PaymentOrderFinancialCommandCenterView.outstandingBalance",
-        "PaymentOrderFinancialCommandCenterView.paymentsToday",
-        "PaymentOrderFinancialCommandCenterView.failedPayments",
-        "PaymentOrderFinancialCommandCenterView.pendingPayments",
-        "PaymentOrderFinancialCommandCenterView.refundsPending",
-        "PaymentOrderFinancialCommandCenterView.reconciliationExceptions",
-        "PaymentOrderFinancialCommandCenterView.unallocatedPayments",
-        "PaymentOrderFinancialCommandCenterView.settlementVariance",
-        "PaymentOrderFinancialCommandCenterView.orderId",
-        "PaymentOrderFinancialCommandCenterView.customer",
         "PaymentOrderFinancialCommandCenterView.channel",
         "PaymentOrderFinancialCommandCenterView.orderValue",
         "PaymentOrderFinancialCommandCenterView.amountPaid",
-        "PaymentOrderFinancialCommandCenterView.refunded",
-        "PaymentOrderFinancialCommandCenterView.outstanding",
-        "PaymentOrderFinancialCommandCenterView.paymentMethods",
         "PaymentOrderFinancialCommandCenterView.paymentStatus",
         "PaymentOrderFinancialCommandCenterView.settlementStatus",
         "PaymentOrderFinancialCommandCenterView.reconciliationStatus"
@@ -656,15 +624,11 @@
        "label": "Every payment allocation rule",
        "bindsTo": "PaymentAllocationRule",
        "columns": [
-        "PaymentAllocationRule.id",
         "PaymentAllocationRule.channel",
-        "PaymentAllocationRule.terminalId",
-        "PaymentAllocationRule.productId",
         "PaymentAllocationRule.orderType",
         "PaymentAllocationRule.customerType",
         "PaymentAllocationRule.allocationLevel",
-        "PaymentAllocationRule.isActive",
-        "PaymentAllocationRule.scopePath"
+        "PaymentAllocationRule.isActive"
        ],
        "operation": "listPaymentAllocationRules",
        "provenance": "contract orders.yaml GET /payment-allocation-rules"
@@ -831,12 +795,8 @@
         "DiningDepositPolicy.percent",
         "DiningDepositPolicy.minimumSpendPerGuest",
         "DiningDepositPolicy.appliesFromPartySize",
-        "DiningDepositPolicy.outletIds",
         "DiningDepositPolicy.collection",
-        "DiningDepositPolicy.depositVariantId",
-        "DiningDepositPolicy.refundableUntilHours",
-        "DiningDepositPolicy.onLateCancelOrNoShow",
-        "DiningDepositPolicy.onArrival"
+        "DiningDepositPolicy.refundableUntilHours"
        ],
        "operation": "getDepositPolicy",
        "notes": "**A venue option, off unless the venue switches it on here** (decided 29 September, rev 3 REV3-8b, superseding audit R077 (a) \"no table deposit in the first release\": the capability ships, disabled by default). The venue sets from what party size it applies, the basis (per guest, per table, or a percentage of a minimum spend) and the amount; nothing about the amount is fixed in code. While it is off a table booking takes no payment and the guest sees a \"no card needed\" confirmation (REV3-8).",
@@ -944,7 +904,9 @@
    "params": [
     {
      "name": "depositId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `listDepositActivity`, `recordDepositActivity` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1461,16 +1423,9 @@
        "label": "Every external reference mapping",
        "bindsTo": "ExternalReferenceMapping",
        "columns": [
-        "ExternalReferenceMapping.id",
-        "ExternalReferenceMapping.orderId",
-        "ExternalReferenceMapping.paymentId",
-        "ExternalReferenceMapping.refundId",
         "ExternalReferenceMapping.sourceSystem",
         "ExternalReferenceMapping.provider",
-        "ExternalReferenceMapping.merchantId",
-        "ExternalReferenceMapping.externalTransactionId",
         "ExternalReferenceMapping.authorizationCode",
-        "ExternalReferenceMapping.partnerOrderId",
         "ExternalReferenceMapping.settlementBatch",
         "ExternalReferenceMapping.settlementDate"
        ],

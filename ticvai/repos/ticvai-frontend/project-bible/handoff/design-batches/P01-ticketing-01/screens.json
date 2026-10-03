@@ -26,7 +26,7 @@
     {
      "to": "WEB-031",
      "trigger": "My Reservations",
-     "provenance": "derived — WEB-031 declares entryState.params groupBookingId, productId, reservationId, resourceId and WEB-030 holds none of them. The edge carries nothing: reservationId only pre-selects (deep link or optional); WEB-031 finds groupBookingId (requestGroupBooking), productId (listGroupPackages) itself; WEB-031 opens on listGroupPackages, and resourceId has no source on WEB-031 yet (a gap in WEB-031, not in this edge)"
+     "provenance": "derived — WEB-031 declares entryState.params groupBookingId, productId, reservationId, resourceId and WEB-030 holds none of them. The edge carries nothing: reservationId, groupBookingId, resourceId only pre-select (deep link or optional); WEB-031 finds productId (listGroupPackages) itself, and WEB-031 opens on its own"
     },
     {
      "to": "GST-014",
@@ -135,7 +135,9 @@
     },
     {
      "name": "transferId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that carries it only pre-selects the record."
     }
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
@@ -160,7 +162,7 @@
     "differences": "List pane with toast actions; no recipient form. Prototype adds cancel transfer and withdraw resale listing."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateResaleListing",
@@ -252,7 +254,7 @@
   "name": "My Reservations",
   "module": "Ticketing",
   "requiresModule": "ticketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C00",
   "implementation": {
    "app": "guest-web",
@@ -367,20 +369,13 @@
        "bindsTo": "GroupBooking",
        "columns": [
         "GroupBooking.kind",
-        "GroupBooking.packageProductId",
         "GroupBooking.yearGroup",
-        "GroupBooking.accessAndDietaryNeeds",
         "GroupBooking.celebrantName",
-        "GroupBooking.celebrantTurningAge",
-        "GroupBooking.allergiesAndRequests",
         "GroupBooking.finalHeadcountDueBy",
         "GroupBooking.quoteSentAt",
         "GroupBooking.riskAssessmentSentAt",
         "GroupBooking.preferredDate",
-        "GroupBooking.orderId",
-        "GroupBooking.leaderSubjectId",
-        "GroupBooking.organisationName",
-        "GroupBooking.expectedSize"
+        "GroupBooking.organisationName"
        ],
        "operation": "getGroupBooking",
        "provenance": "contract orders.yaml GET /group-bookings/{groupBookingId}"
@@ -568,15 +563,21 @@
     },
     {
      "name": "reservationId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listReservations` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "groupBookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `requestGroupBooking`; a link or an edge that holds one opens it instead."
     },
     {
      "name": "resourceId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getResourceAvailability` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "productId",
@@ -605,7 +606,7 @@
     "differences": "The prototype uses the WEB-031 label for the group booking request dialog (deposit / invoice quote) inside Kids Club → 'Birthday party / group' and 'School trip', which the YAML covers only through requestGroupBooking. 'Pay now' on a held reservation has no YAML route (WEB-014 is pay-by-link)."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -673,7 +674,7 @@
     }
    ]
   },
-  "notes": "Added 17 August. **The surface the matrix names** — 2.6.33 *\"website should be able to display multi currency\"* and 2.9.1 *\"in the B2C portal for guests comparison\"*. Wave 1 against the app's Wave 2, because **the website is where an overseas guest compares before booking** and the app is where they check after. **Display only — the sale settles in base currency** (CF-37). Not on the wireframe board; needs drawing. **`getRegionSettings` deliberately not called** — a guest does not need the venue's scope configuration to pick a currency. `listFxRates` is the currency list: a rate exists only for a currency the venue enabled, so the two questions have one answer.\n\n**Rev 3 (decided 29 September, rev 3 GAP-D2).** The web and app waves of this capability differ; they are aligned to one wave once the client picks it (open, client to choose).\n\nRates carry `fetchedAt` (`listFxRates`; GAP-B3, already); the prototype's fixed demo rate is prototype-only (CFG-7, no change).\n\n**The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and \"payment will be processed in AED\", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment request goes to the payment partner in that currency. The ledger stays in the venue's base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the venue shows but does not charge is still an approximate price, marked \"approx.\", with \"You pay in <base currency>\" beside it.",
+  "notes": "Added 17 August. **The surface the matrix names** — 2.6.33 *\"website should be able to display multi currency\"* and 2.9.1 *\"in the B2C portal for guests comparison\"*. First on the website, before the app, because **the website is where an overseas guest compares before booking** and the app is where they check after. **Display only — the sale settles in base currency** (CF-37). Not on the wireframe board; needs drawing. **`getRegionSettings` deliberately not called** — a guest does not need the venue's scope configuration to pick a currency. `listFxRates` is the currency list: a rate exists only for a currency the venue enabled, so the two questions have one answer.\n\n**Rev 3 (decided 29 September, rev 3 GAP-D2).** The web and app waves of this capability differ; they are aligned to one wave once the client picks it (open, client to choose).\n\nRates carry `fetchedAt` (`listFxRates`; GAP-B3, already); the prototype's fixed demo rate is prototype-only (CFG-7, no change).\n\n**The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses the display-only rule, CF-37 and \"payment will be processed in AED\", in favour of option (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`, a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the payment request goes to the payment partner in that currency. The ledger stays in the venue's base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the venue shows but does not charge is still an approximate price, marked \"approx.\", with \"You pay in <base currency>\" beside it.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listFxRates` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -793,7 +794,7 @@
     "differences": "Matches the YAML's charged-vs-shown rule. Separately, Config → Currency switches the whole storefront currency, which contradicts 'always charged in AED'. **Resolved 2 October 2026 (CHG-FIN-001):** the guest may pay in the selected currency, so a storefront currency switch is right where the venue charges that currency."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P01",
    "audience": "guest",

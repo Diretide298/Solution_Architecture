@@ -121,9 +121,8 @@ screens:
     - to: CMS-008
       trigger: Content Blocks
       provenance: 'derived — CMS-008 declares entryState.params actionId, bannerId, promoBlockId and CMS-001
-        holds none of them. The edge carries nothing: CMS-008 finds bannerId (createBanner), promoBlockId
-        (createPromoBlock) itself; CMS-008 opens on listPromoBlocks, and actionId has no source on CMS-008
-        yet (a gap in CMS-008, not in this edge)'
+        holds none of them. The edge carries nothing: bannerId, promoBlockId, actionId only pre-select
+        (deep link or optional), and CMS-008 opens on its own'
     - to: CMS-009
       trigger: Navigation & Menus
       provenance: 'derived — CMS-009 declares entryState.params  and CMS-001 holds none of them. The edge
@@ -3366,13 +3365,13 @@ screens:
     - to: CMS-017
       trigger: Domain & Certificate
       provenance: 'derived — CMS-017 declares entryState.params domainId and CMS-016 holds none of them.
-        The edge carries nothing: CMS-017 finds domainId (listCustomDomains) itself, and CMS-017 opens
+        The edge carries nothing: domainId only pre-selects (deep link or optional), and CMS-017 opens
         on its own'
     - to: CMS-018
       trigger: Consent & Legal
       provenance: 'derived — CMS-018 declares entryState.params policyKind, questionId and CMS-016 holds
-        none of them. The edge carries nothing: CMS-018 finds policyKind (listPolicies), questionId (listConsentAnswers)
-        itself, and CMS-018 opens on its own'
+        none of them. The edge carries nothing: policyKind, questionId only pre-select (deep link or optional),
+        and CMS-018 opens on its own'
     - to: CMS-103
       trigger: Booking flows
       provenance: authored 29 September, W12 (flow-level settings and step order moved to CMS-103)
@@ -9868,6 +9867,8 @@ screens:
     - to: CMS-063
       trigger: Upload & Asset Ingestion Workspace
       provenance: structural — pack board 1 wiring, 11 September 2026
+      carries:
+      - assetId
     - to: CMS-064
       trigger: Folder, Collection & Workspace Management
       provenance: structural — pack board 1 wiring, 11 September 2026
@@ -9877,12 +9878,16 @@ screens:
     - to: CMS-066
       trigger: Tags, Keywords & Classification
       provenance: structural — pack board 1 wiring, 11 September 2026
+      carries:
+      - assetId
     - to: CMS-067
       trigger: Advanced Search & Discovery
       provenance: structural — pack board 1 wiring, 11 September 2026
     - to: CMS-068
       trigger: Digital Asset 360° Profile
       provenance: structural — pack board 1 wiring, 11 September 2026
+      carries:
+      - assetId
     - to: CMS-069
       trigger: Bulk Asset Management Workspace
       provenance: structural — pack board 1 wiring, 11 September 2026

@@ -176,7 +176,7 @@
    "error": "Could not load. Names which read failed and leaves the software version untouched.",
    "emptyFirstRun": "No software version yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on venueId, saleBoardKind and the software version are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `DEVICE_VIEW`, which `getWorkstationHealth` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listWorkstations` requires to show this screen, and names that permission (the screen's other reads need `DEVICE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVICE_MANAGE` for `startDeviceFirmwareRollout`, `rollbackDeviceFirmware`, `createDeviceFirmware`, `setDeviceFirmwareStatus`; `TENANT_CONFIGURE` for `setConfigurationProfile`, `deployConfigurationProfile`."
   },
   "apis": [
    {
@@ -270,7 +270,9 @@
     },
     {
      "name": "profileId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `deployConfigurationProfile` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "workstationId",
@@ -278,11 +280,15 @@
     },
     {
      "name": "rolloutId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `startDeviceFirmwareRollout`; a link or an edge that holds one opens it instead."
     },
     {
      "name": "firmwareId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listDeviceFirmware` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first. Resolves from the session — a till is signed into."
@@ -295,13 +301,13 @@
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetConfigurationProfile",
     "component": "modal",
     "trigger": "Save configuration profile",
-    "body": "**Collects what `setConfigurationProfile` sends before it is called.** Required: `name`, `venueKindScope`. Optional: `scopePath`, `settings`, `deployedCount`, `publishedAt`. **Not asked:** `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setConfigurationProfile` sends before it is called.** Required: `name`, `venueKindScope`. Optional: `scopePath`, `settings`. **Not asked:** `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `deployedCount`, `publishedAt` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "ConfigurationProfile",
     "confirm": {
      "label": "Save configuration profile",
@@ -313,9 +319,7 @@
       "name",
       "venueKindScope",
       "scopePath",
-      "settings",
-      "deployedCount",
-      "publishedAt"
+      "settings"
      ]
     },
     "provenance": "contract tenancy.yaml PUT /configuration-profiles"
@@ -324,7 +328,7 @@
     "id": "formDeployConfigurationProfile",
     "component": "modal",
     "trigger": "Deploy configuration profile",
-    "body": "**Collects what `deployConfigurationProfile` sends before it is called.** Required: `profileId`. Optional: `targetWorkstationIds`, `targetFilter`, `strategy`, `succeededCount`, `failedCount`, `failureReasons`, `startedAt`, `completedAt`. **Not asked:** `id` is a client UUIDv7 generated silently; `status` is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `deployConfigurationProfile` sends before it is called.** Nothing in the body is required. Optional: `targetWorkstationIds`, `targetFilter`, `strategy`. **Not asked:** is a client UUIDv7 generated silently; is set by the server (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `completedAt`, `failedCount`, `failureReasons`, `id`, `profileId`, `startedAt`, `status`, `succeededCount` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "ProfileDeployment",
     "confirm": {
      "label": "Deploy configuration profile",
@@ -333,15 +337,9 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "profileId",
       "targetWorkstationIds",
       "targetFilter",
-      "strategy",
-      "succeededCount",
-      "failedCount",
-      "failureReasons",
-      "startedAt",
-      "completedAt"
+      "strategy"
      ]
     },
     "provenance": "contract tenancy.yaml POST /configuration-profiles/{profileId}/deploy"
@@ -459,15 +457,10 @@
        "label": "Every sync rejection",
        "bindsTo": "SyncRejection",
        "columns": [
-        "SyncRejection.id",
-        "SyncRejection.workstationId",
         "SyncRejection.kind",
         "SyncRejection.recordedAt",
         "SyncRejection.rejectedAt",
-        "SyncRejection.problem",
-        "SyncRejection.payload",
-        "SyncRejection.resolvedAt",
-        "SyncRejection.resolvedByPrincipalId"
+        "SyncRejection.resolvedAt"
        ],
        "operation": "listSyncRejections",
        "provenance": "contract orders.yaml GET /sync/rejections"
@@ -528,7 +521,7 @@
    "error": "Could not load. Names which read failed and leaves the offline policy rules untouched.",
    "emptyFirstRun": "No offline policy rules yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on workstationId, kind, resolved and the offline policy rules are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `resolveSyncRejection`; `TENANT_CONFIGURE` for `setOfflinePolicy`."
   },
   "apis": [
    {
@@ -562,7 +555,9 @@
     },
     {
      "name": "rejectionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listSyncRejections` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first.",
@@ -582,13 +577,13 @@
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetOfflinePolicy",
     "component": "modal",
     "trigger": "Save offline policy",
-    "body": "**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional: `id`, `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setOfflinePolicy` sends before it is called.** Required: `scopePath`. Optional: `maxOfflineHours`, `allowedOffline`, `offlineValueCeiling`, `offlineTransactionCeiling`, `onCeilingBreach`, `requiresManagerToExtend`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "OfflinePolicy",
     "confirm": {
      "label": "Save offline policy",
@@ -598,7 +593,6 @@
      "label": "Cancel",
      "discards": [
       "scopePath",
-      "id",
       "maxOfflineHours",
       "allowedOffline",
       "offlineValueCeiling",
@@ -796,7 +790,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-131"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the pasted board placeholder \"Connectivity & Auto-Switch Settings — from the client design board, 20 August\".",
   "_platform": {
    "code": "P08",
@@ -888,15 +882,10 @@
        "label": "Every sync rejection",
        "bindsTo": "SyncRejection",
        "columns": [
-        "SyncRejection.id",
-        "SyncRejection.workstationId",
         "SyncRejection.kind",
         "SyncRejection.recordedAt",
         "SyncRejection.rejectedAt",
-        "SyncRejection.problem",
-        "SyncRejection.payload",
-        "SyncRejection.resolvedAt",
-        "SyncRejection.resolvedByPrincipalId"
+        "SyncRejection.resolvedAt"
        ],
        "operation": "listSyncRejections",
        "provenance": "contract orders.yaml GET /sync/rejections"
@@ -951,7 +940,7 @@
    "error": "Could not load. Names which read failed and leaves the offline transaction sync untouched.",
    "emptyFirstRun": "No offline transaction sync yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on workstationId, kind, resolved and the offline transaction sync are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `syncOrders`."
   },
   "apis": [
    {
@@ -991,7 +980,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-132"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSyncOrders",
@@ -1116,15 +1105,10 @@
        "label": "Waiting for a decision",
        "bindsTo": "SyncRejection",
        "columns": [
-        "SyncRejection.id",
-        "SyncRejection.workstationId",
         "SyncRejection.kind",
         "SyncRejection.recordedAt",
         "SyncRejection.rejectedAt",
-        "SyncRejection.problem",
-        "SyncRejection.payload",
-        "SyncRejection.resolvedAt",
-        "SyncRejection.resolvedByPrincipalId"
+        "SyncRejection.resolvedAt"
        ],
        "operation": "listSyncRejections",
        "provenance": "contract orders.yaml GET /sync/rejections"
@@ -1134,18 +1118,12 @@
        "label": "Every alert",
        "bindsTo": "Alert",
        "columns": [
-        "Alert.id",
-        "Alert.ruleId",
         "Alert.ruleName",
         "Alert.metric",
         "Alert.raisedAt",
         "Alert.severity",
         "Alert.status",
-        "Alert.observedValue",
-        "Alert.threshold",
-        "Alert.scopePath",
-        "Alert.workstationId",
-        "Alert.shiftId"
+        "Alert.observedValue"
        ],
        "operation": "listAlerts",
        "provenance": "contract reporting.yaml GET /alerts"
@@ -1229,7 +1207,7 @@
    "error": "Could not load. Names which read failed and leaves the offline alerts limits untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
    "emptyNoResults": "Nothing matches the filter on workstationId, kind, resolved and the offline alerts limits are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission (the screen's other reads need `AUDIT_VIEW`, `REPORT_VIEW_VENUE`, `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `resolveSyncRejection`; `REPORT_MANAGE` for `setAlertRule`."
   },
   "apis": [
    {
@@ -1291,15 +1269,21 @@
     },
     {
      "name": "reportId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `runReport` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "requestId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that carries it only pre-selects the record."
     },
     {
      "name": "rejectionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listSyncRejections` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first. An approval request opened from the queue.",
@@ -1319,7 +1303,7 @@
    "source": "Claude Design POS pack, 24 August",
    "note": "**Drawn by Claude Design on `POS Board 5.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRunReport",

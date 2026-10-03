@@ -156,14 +156,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-017` | Capacity Management | B–D | 24 | 30 | 6 | 14 | 7 | 0 | — | notStarted (generated) |
-| `BO-018` | Allocation & Holds | B–D | 4 | 26 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-019` | Closures & Blackouts | B–D | 44 | 40 | 6 | 38 | 1 | 0 | — | notStarted (generated) |
-| `BO-037` | Offline Package Status | B–D | 52 | 49 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
+| `BO-017` | Capacity Management | B–D | 24 | 20 | 6 | 14 | 7 | 0 | — | notStarted (generated) |
+| `BO-018` | Allocation & Holds | B–D | 4 | 14 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-019` | Closures & Blackouts | B–D | 44 | 31 | 6 | 38 | 1 | 0 | — | notStarted (generated) |
+| `BO-037` | Offline Package Status | B–D | 52 | 32 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
 | `BO-063` | Opening Hours & Calendar | B–D | 16 | 9 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
-| `BO-102` | Sell | B–D | 2 | 51 | 6 | 57 | 0 | 0 | — | notStarted (generated) |
+| `BO-102` | Sell | B–D | 2 | 37 | 6 | 57 | 0 | 0 | — | notStarted (generated) |
 | `BO-109` | Menu Builder & POS Layout Designer | B–D | 49 | 7 | 6 | 8 | 2 | 2 | — | notStarted (generated) |
-| `BO-110` | Recipe & BOM Management | A | 0 | 0 | 6 | 0 | 2 | 2 | — | notStarted (generated) |
+| `BO-110` | Recipe & BOM Management | B | 0 | 0 | 6 | 0 | 2 | 2 | — | notStarted (generated) |
 | `BO-111` | Ingredient Substitution, Allergen & Nutrition | B–D | 21 | 29 | 5 | 6 | 1 | 0 | — | notStarted (generated) |
 | `BO-112` | Production Planning & Production Sheets | B–D | 35 | 18 | 5 | 17 | 1 | 0 | — | notStarted (generated) |
 

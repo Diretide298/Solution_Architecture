@@ -94,9 +94,13 @@ screens:
     - to: KIT-002
       trigger: Kitchen Display System (KDS)
       provenance: flow F83 step 1→2
+      carries:
+      - ticketId
     - to: KIT-003
       trigger: Order Firing & Course Management
       provenance: structural — KIT-001 is P15's home screen and its exits are its launcher
+      carries:
+      - ticketId
     - to: KIT-004
       trigger: Active Order Management & Fulfilment Journey
       provenance: structural — KIT-001 is P15's home screen and its exits are its launcher
@@ -108,6 +112,8 @@ screens:
     - to: KIT-006
       trigger: Expeditor & Order Assembly
       provenance: structural — KIT-001 is P15's home screen and its exits are its launcher
+      carries:
+      - ticketId
     - to: KIT-007
       trigger: Guest Collection, Buzzer & Digital Notification
       provenance: structural — KIT-001 is P15's home screen and its exits are its launcher
@@ -116,6 +122,8 @@ screens:
     - to: KIT-008
       trigger: Exceptions, Re-Fire & Unavailable Items
       provenance: structural — KIT-001 is P15's home screen and its exits are its launcher
+      carries:
+      - ticketId
     - to: KIT-009
       trigger: SLA, Priority & Service Rules
       provenance: structural — KIT-001 is P15's home screen and its exits are its launcher
@@ -829,6 +837,8 @@ screens:
     - to: KIT-008
       trigger: Exceptions, Re-Fire & Unavailable Items
       provenance: flow F83 step 4→5
+      carries:
+      - ticketId
   notes: '**Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.**
     This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3d` — a frame in the client pack, which
     is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`

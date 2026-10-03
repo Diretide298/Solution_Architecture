@@ -354,7 +354,7 @@
   "name": "Virtual Ticket Identity & Master Record Configuration",
   "module": "Access & Venue",
   "requiresModule": "access",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "1",
@@ -1082,7 +1082,9 @@
    "params": [
     {
      "name": "ruleId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMultiMediaBinding` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

@@ -4,7 +4,7 @@
   "name": "Transport — Route & Schedule",
   "module": "Transport",
   "requiresModule": "transport",
-  "wave": 3,
+  "wave": 1,
   "implementation": {
    "app": "guest-web",
    "route": "/transport/route-and-schedule",

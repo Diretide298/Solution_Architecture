@@ -171,7 +171,10 @@
     {
      "to": "EMP-082",
      "trigger": "Active Rental Detail & Live Timeline",
-     "provenance": "structural — Rental board 7 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 7 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "EMP-083",
@@ -181,12 +184,18 @@
     {
      "to": "EMP-084",
      "trigger": "Extension Pricing & Confirmation",
-     "provenance": "structural — Rental board 7 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 7 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "EMP-085",
      "trigger": "Equipment Swap / Replacement",
-     "provenance": "structural — Rental board 7 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 7 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "EMP-086",
@@ -206,7 +215,10 @@
     {
      "to": "EMP-089",
      "trigger": "Active Group Rental Management",
-     "provenance": "structural — Rental board 7 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 7 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "EMP-090",
@@ -336,7 +348,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -646,7 +660,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `extendRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -776,7 +792,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `swapRentalEquipment` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1253,7 +1271,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1312,10 +1332,7 @@
         "Rentals due next hour",
         "Predicted late returns",
         "Future reservation conflicts",
-        "Extension demand",
-        "Equipment incident trends",
-        "Location return pressure",
-        "Expected inventory shortage"
+        "Extension demand"
        ],
        "kind": "dataTable",
        "label": "Every active rental intelligence",
@@ -1335,9 +1352,7 @@
         "Predicted late returns",
         "Future reservation conflicts",
         "Extension demand",
-        "Equipment incident trends",
-        "Location return pressure",
-        "Expected inventory shortage"
+        "Equipment incident trends"
        ],
        "kind": "detailPanel",
        "label": "The selected active rental intelligence",

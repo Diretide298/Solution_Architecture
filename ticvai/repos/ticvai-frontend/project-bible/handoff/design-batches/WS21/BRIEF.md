@@ -96,14 +96,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-022` | Partner Management Command Center | B–D | 2 | 30 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `PTR-023` | Partner Profile & Organization Setup | B–D | 16 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `PTR-024` | Partner Onboarding & Application Workflow | B–D | 15 | 0 | 5 | 0 | 3 | 0 | — | notStarted (generated) |
-| `PTR-025` | Partner Contacts & User Administration | B–D | 40 | 0 | 5 | 5 | 1 | 0 | — | notStarted (generated) |
-| `PTR-027` | Partner Brand, Venue & Business Scope Assignment | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `PTR-028` | Partner Documentation & Compliance Repository | B–D | 15 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `PTR-030` | Partner Approval, Status & Lifecycle Management | B–D | 12 | 0 | 5 | 0 | 2 | 3 | — | notStarted (generated) |
-| `PTR-031` | Partner 360° Profile, Readiness & AI Review | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-022` | Partner Management Command Center | B | 2 | 30 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `PTR-023` | Partner Profile & Organization Setup | B | 16 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `PTR-024` | Partner Onboarding & Application Workflow | B | 15 | 0 | 5 | 0 | 3 | 0 | — | notStarted (generated) |
+| `PTR-025` | Partner Contacts & User Administration | B | 40 | 0 | 5 | 5 | 1 | 0 | — | notStarted (generated) |
+| `PTR-027` | Partner Brand, Venue & Business Scope Assignment | B | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `PTR-028` | Partner Documentation & Compliance Repository | B | 15 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `PTR-030` | Partner Approval, Status & Lifecycle Management | B | 12 | 0 | 5 | 0 | 2 | 3 | — | notStarted (generated) |
+| `PTR-031` | Partner 360° Profile, Readiness & AI Review | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

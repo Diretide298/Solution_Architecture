@@ -1588,7 +1588,9 @@
     },
     {
      "name": "requestId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createApprovalRequest`; a link or an edge that holds one opens it instead."
     }
    ]
   },

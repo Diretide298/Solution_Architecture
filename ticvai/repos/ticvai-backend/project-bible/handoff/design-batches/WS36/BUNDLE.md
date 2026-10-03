@@ -142,7 +142,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-072` | Fee Applicability & Charging Rule Builder | B–D | 5 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-073` | Fee Waiver, Tax Exemption & Exception Rules | B–D | 11 | 0 | 5 | 0 | 1 | 4 | — | notStarted (generated) |
 | `ADM-074` | Price Calculation Sequence & Formula Engine | B–D | 25 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-075` | Currency Precision, Rounding & Monetary Rules | A | 11 | 2 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `ADM-075` | Currency Precision, Rounding & Monetary Rules | B | 11 | 2 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
 | `ADM-076` | Price Breakdown, Calculation Simulation & Explainability | B–D | 13 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-077` | Calculation Validation, Reconciliation & Service Interface | A | 0 | 0 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
 
@@ -163,8 +163,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block A · ticket #20665 (APP-SETUP-ADM-069) |
+| Module | Commercial · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-SETUP-ADM-069 |
 | Who uses it | venue staff holding `LEDGER_VIEW`, `PRODUCT_CONFIGURE`, `TAX_CONFIGURE` (1 read, 2 configure); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -521,7 +521,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save fee definition** (modal, opened by *Save fee definition*; *Save fee definition* calls `setFeeDefinition`, *Cancel* sends nothing)
 
-**Collects what `setFeeDefinition` sends before it is called.** Required: `id`, `scopePath`, `code`, `name`, `feeType`, `valueType`, `chargeBasis`, `status`. Optional: `description`, `amount`, `percentage`, `tiers`, `taxTreatment`, `refundability`, `visibility`, `effectiveFrom`, `effectiveTo`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setFeeDefinition` sends before it is called.** Required: `code`, `name`, `feeType`, `valueType`, `chargeBasis`, `status`. Optional: `description`, `amount`, `percentage`, `tiers`, `taxTreatment`, `refundability`, `visibility`, `effectiveFrom`, `effectiveTo`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -954,7 +954,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Form: Save price calculation policy** (modal, opened by *Save price calculation policy*; *Save price calculation policy* calls `setPriceCalculationPolicy`, *Cancel* sends nothing)
 
-**Collects what `setPriceCalculationPolicy` sends before it is called.** Required: `id`, `scopePath`, `code`, `name`, `status`. Optional: `isDefault`, `effectiveFrom`, `effectiveTo`, `steps`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setPriceCalculationPolicy` sends before it is called.** Required: `code`, `name`, `status`. Optional: `isDefault`, `effectiveFrom`, `effectiveTo`, `steps`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1072,7 +1072,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block A · ticket #20628 (APP-SETUP-ADM-075) |
+| Block | Block B · task APP-SETUP-ADM-075 |
 | Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1092,7 +1092,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save currency rounding rule** (modal, opened by *Save currency rounding rule*; *Save currency rounding rule* calls `setCurrencyRoundingRule`, *Cancel* sends nothing)
 
-**Collects what `setCurrencyRoundingRule` sends before it is called.** Required: `id`, `scopePath`, `currency`, `decimalPlaces`, `roundingMethod`, `roundingStage`, `status`. Optional: `code`, `name`, `minimumMonetaryUnit`, `displayPrecision`, `calculationPrecision`, `cashRoundingIncrement`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setCurrencyRoundingRule` sends before it is called.** Required: `currency`, `decimalPlaces`, `roundingMethod`, `roundingStage`, `status`. Optional: `code`, `name`, `minimumMonetaryUnit`, `displayPrecision`, `calculationPrecision`, `cashRoundingIncrement`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1357,8 +1357,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block A · ticket #20638 (APP-SETUP-ADM-077) |
+| Module | Commercial · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-SETUP-ADM-077 |
 | Who uses it | venue staff holding `LEDGER_POST`, `LEDGER_VIEW`, `PRODUCT_VIEW` (1 operate, 2 read); in the flows as platform admin |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

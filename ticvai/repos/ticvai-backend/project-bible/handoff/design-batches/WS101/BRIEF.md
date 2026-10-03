@@ -96,16 +96,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-399` | Recommended Package Overview | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-400` | Commercial Model & Tier Selection | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-401` | Module Marketplace | B–D | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-402` | AI Module & Package Recommendations | B–D | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-403` | Module Detail & Commercial Treatment | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-404` | Module Dependency & Compatibility Manager | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-405` | Add-Ons, Capacity & Commercial Options | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-406` | Commercial Package Simulator | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-407` | Package Review & Commercial Summary | B–D | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-408` | Final Package Approval & Handoff | B–D | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
+| `ADM-399` | Recommended Package Overview | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-400` | Commercial Model & Tier Selection | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-401` | Module Marketplace | B | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-402` | AI Module & Package Recommendations | B | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-403` | Module Detail & Commercial Treatment | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-404` | Module Dependency & Compatibility Manager | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-405` | Add-Ons, Capacity & Commercial Options | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-406` | Commercial Package Simulator | B | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-407` | Package Review & Commercial Summary | B | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-408` | Final Package Approval & Handoff | B | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

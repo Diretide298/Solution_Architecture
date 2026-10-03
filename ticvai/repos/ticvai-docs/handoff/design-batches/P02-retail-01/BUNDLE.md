@@ -116,8 +116,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Retail · wave 2 · needs the `retail` module |
-| Block | Block A · ticket #18196 (APP-MOB-GST-026) |
+| Module | Retail · wave 1 · needs the `retail` module |
+| Block | Block A · task APP-MOB-GST-026 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listMerchandise` reads the population and `getGameCard` reads one of them — list, select, act |
@@ -235,7 +235,7 @@ Errors to draw in the form: 403 The performance's on-sale waiting room is on and
 
 - → `GST-001` Home: *Home – Default*
 - → `BO-048` Retail Products: *Collected on the way out*; carries `merchandiseId`; calls `listMerchandise`
-- → `GST-041` Checkout Entry: *Checkout Entry*; carries `performanceId`
+- → `GST-041` Checkout Entry: *Checkout Entry*; carries `lineId`, `performanceId`
 
 #### States
 

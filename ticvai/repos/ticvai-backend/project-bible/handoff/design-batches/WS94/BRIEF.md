@@ -108,7 +108,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-560` | Due Soon & Customer Notification Management | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-561` | Overdue Rental Management | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-562` | Active Group Rental Management | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-563` | Active Rental Intelligence & Operational Alerts | B–D | 0 | 14 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-563` | Active Rental Intelligence & Operational Alerts | B–D | 0 | 9 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

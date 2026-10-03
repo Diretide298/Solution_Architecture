@@ -116,7 +116,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | High-Demand Access · wave 1 · needs the `ticketing` module |
-| Block | Block A · ticket #17951 (APP-MOB-GST-046) |
+| Block | Block A · task APP-MOB-GST-046 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): `getWaitingRoomPosition` reads one guest's place in one performance's room, polled — the screen is about that one thing |

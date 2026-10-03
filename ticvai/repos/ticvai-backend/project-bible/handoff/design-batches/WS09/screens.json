@@ -435,7 +435,9 @@
     },
     {
      "name": "podiumId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPodiumConsole` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -785,7 +787,9 @@
    "params": [
     {
      "name": "reasonCodeId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `deleteReasonCode` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -958,7 +962,7 @@
    "loading": "The manual override supervisor configuration as saved.",
    "error": "Could not load. Names which read failed and leaves the manual override supervisor untouched.",
    "emptyFirstRun": "No manual override supervisor configured yet. Carries the create action and says what the platform does in the meantime.",
-   "emptyNoAccess": "Names the missing permission, **ACCESS_OVERRIDE** (was ACCESS_POINT_CONFIGURE until 29 September, K1: recording an admission against a failed validation is an override, not gate configuration). Never an empty table."
+   "emptyNoAccess": "Names the missing permission, **`ACCESS_OVERRIDE`** (was ACCESS_POINT_CONFIGURE until 29 September, K1: recording an admission against a failed validation is an override, not gate configuration). Never an empty table."
   },
   "apis": [
    {
@@ -1124,7 +1128,9 @@
    "params": [
     {
      "name": "lockId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `releaseIdentityLock` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1206,7 +1212,7 @@
   "name": "Live Gate Mode & Lane Control",
   "module": "Access & Venue",
   "requiresModule": "access",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "9",
@@ -1687,7 +1693,7 @@
    "error": "Could not load. Names which read failed and leaves the operational incident exception untouched.",
    "emptyFirstRun": "No operational incident exception yet. Carries the create action; distinct from a filter that matched nothing.",
    "emptyNoResults": "The filter narrowed it and the operational incident exception are still there. The pack's own statuses are Open → Investigating → Resolved → Closed — the state names which is selected.",
-   "emptyNoAccess": "Names the missing permission, **INCIDENT_MANAGE** (was ACCESS_POINT_CONFIGURE until 29 September, K1: investigating, assigning and closing an incident is incident management, as for F&B and maintenance incidents). Never an empty table."
+   "emptyNoAccess": "Names the missing permission, **`INCIDENT_MANAGE`** (was ACCESS_POINT_CONFIGURE until 29 September, K1: investigating, assigning and closing an incident is incident management, as for F&B and maintenance incidents). Never an empty table."
   },
   "apis": [
    {

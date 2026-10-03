@@ -173,7 +173,7 @@
    "provenance": "generated",
    "board": "wireframes/P14 Developer.dc.html#dev-001"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P14",
    "formFactor": "web",
@@ -203,7 +203,7 @@
   "name": "Register & Organisation",
   "module": "Developer & API",
   "requiresModule": "developerApi",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "developer-portal-web",
    "route": "/developer/organisation",
@@ -327,7 +327,9 @@
    "params": [
     {
      "name": "developerId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `registerDeveloper`; a link or an edge that holds one opens it instead."
     }
    ],
    "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `developerId`."
@@ -337,7 +339,7 @@
    "provenance": "generated",
    "board": "wireframes/P14 Developer.dc.html#dev-002"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetDeveloperMembers",
@@ -386,7 +388,7 @@
   "name": "Clients & Credentials",
   "module": "Developer & API",
   "requiresModule": "developerApi",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "developer-portal-web",
    "route": "/developer/clients",
@@ -423,7 +425,8 @@
      "provenance": "flow F36 step 4→5",
      "operation": "requestProductionAccess",
      "carries": [
-      "listingId"
+      "listingId",
+      "requestId"
      ]
     }
    ]
@@ -684,7 +687,7 @@
    "provenance": "generated",
    "board": "wireframes/P14 Developer.dc.html#dev-003"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P14",
    "formFactor": "web",
@@ -907,7 +910,7 @@
    "error": "Could not load. A running sandbox is unaffected.",
    "emptyFirstRun": "**No sandbox yet. Provisioning takes a few minutes and the data is generated, not copied** — no production data is ever cloned or masked into it, which is the decision the whole environment rests on.\n",
    "emptyNoResults": "No sandbox matches.",
-   "emptyNoAccess": "You do not have DEVELOPER_MANAGE."
+   "emptyNoAccess": "Without `DEVELOPER_VIEW`, which `listSandboxes` requires, the screen does not load and this state names that permission. You do not have `DEVELOPER_MANAGE`."
   },
   "apis": [
    {
@@ -956,7 +959,9 @@
    "params": [
     {
      "name": "sandboxId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listSandboxes` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "clientId",
@@ -977,7 +982,7 @@
    "provenance": "generated",
    "board": "wireframes/P14 Developer.dc.html#dev-004"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P14",
    "formFactor": "web",
@@ -1155,7 +1160,7 @@
    "error": "Could not load. Deliveries continue regardless of this screen.",
    "emptyFirstRun": "**No subscriptions. Twenty-nine business events are available** — and the state names a few, because a developer who does not know what exists cannot subscribe to it.\n",
    "emptyNoResults": "No delivery matches this window or status.",
-   "emptyNoAccess": "You do not have DEVELOPER_VIEW."
+   "emptyNoAccess": "You do not have `DEVELOPER_VIEW`. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVELOPER_MANAGE` for `createWebhookSubscription`, `replayEvents`."
   },
   "apis": [
    {
@@ -1203,7 +1208,9 @@
    "params": [
     {
      "name": "subscriptionId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listWebhookSubscriptions` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A partner link resolves within that partner's own scope and refuses outside it.** A forwarded link between partners must not open another partner's record. If the target is gone the screen says so and offers the partner's own list. Arrives with `subscriptionId`.",
@@ -1220,7 +1227,7 @@
    "provenance": "generated",
    "board": "wireframes/P14 Developer.dc.html#dev-005"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateWebhookSubscription",
@@ -1340,8 +1347,7 @@
         "ApiUsageSummary.p50LatencyMs",
         "ApiUsageSummary.p95LatencyMs",
         "ApiUsageSummary.p99LatencyMs",
-        "ApiUsageSummary.quotaBreaches",
-        "ApiUsageSummary.byOperation"
+        "ApiUsageSummary.quotaBreaches"
        ],
        "operation": "getApiUsage",
        "provenance": "contract public-api.yaml GET /api-usage"
@@ -1409,7 +1415,7 @@
    "provenance": "generated",
    "board": "wireframes/P14 Developer.dc.html#dev-006"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P14",
    "formFactor": "web",
@@ -1461,7 +1467,10 @@
      "to": "DEV-008",
      "trigger": "TICVAI reviews the integration and certifies it",
      "provenance": "flow F36 step 2→3",
-     "operation": "submitIntegrationListing"
+     "operation": "submitIntegrationListing",
+     "carries": [
+      "listingId"
+     ]
     }
    ]
   },
@@ -1485,11 +1494,8 @@
         "IntegrationListing.name",
         "IntegrationListing.category",
         "IntegrationListing.description",
-        "IntegrationListing.integrationUrl",
-        "IntegrationListing.requiredScopes",
         "IntegrationListing.status",
         "IntegrationListing.certifiedUntil",
-        "IntegrationListing.certifiedAgainstVersion",
         "IntegrationListing.listingFeeModel"
        ],
        "operation": "listIntegrationListings",
@@ -1552,7 +1558,7 @@
    "error": "Could not load listings.",
    "emptyFirstRun": "**Nothing submitted. Certification gates production keys and the listing** (17 September minutes, M17-06): build and test in the sandbox, submit here, and once certified request production access. A private integration is certified without appearing in the marketplace.",
    "emptyNoResults": "No listing matches this category or status.",
-   "emptyNoAccess": "You do not have DEVELOPER_MANAGE."
+   "emptyNoAccess": "Without `DEVELOPER_VIEW`, which `listIntegrationListings` requires, the screen does not load and this state names that permission. You do not have `DEVELOPER_MANAGE`."
   },
   "apis": [
    {
@@ -1585,7 +1591,7 @@
    "provenance": "generated",
    "board": "wireframes/P14 Developer.dc.html#dev-007"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSubmitIntegrationListing",
@@ -1640,7 +1646,7 @@
   "name": "Programme Administration",
   "module": "Developer & API",
   "requiresModule": "developerApi",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "developer-portal-web",
    "route": "/developer/admin",
@@ -1876,7 +1882,9 @@
     },
     {
      "name": "requestId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProductionAccessRequests` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A version link is expected to point at something superseded — that is what versions are for.** The screen opens the requested version read-only, says it is not current, and links to the one that is. **An old version is history, not an error.** Arrives with `listingId`, `version`."
@@ -1886,7 +1894,7 @@
    "provenance": "generated",
    "board": "wireframes/P14 Developer.dc.html#dev-008"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCertifyIntegration",
@@ -1911,7 +1919,7 @@
     "id": "formSetApiLicensing",
     "component": "modal",
     "trigger": "Save API licensing",
-    "body": "**Collects what `setApiLicensing` sends before it is called.** Required: `licensedModules`. Optional: `id`, `callAllowancePerMonth`, `overageRatePerThousand`, `revenueSharePercent`, `effectiveFrom`, `effectiveTo`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setApiLicensing` sends before it is called.** Required: `licensedModules`. Optional: `callAllowancePerMonth`, `overageRatePerThousand`, `revenueSharePercent`, `effectiveFrom`, `effectiveTo`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "ApiLicence",
     "confirm": {
      "label": "Save API licensing",
@@ -1921,7 +1929,6 @@
      "label": "Cancel",
      "discards": [
       "licensedModules",
-      "id",
       "callAllowancePerMonth",
       "overageRatePerThousand",
       "revenueSharePercent",

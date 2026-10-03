@@ -108,7 +108,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-560` | Due Soon & Customer Notification Management | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-561` | Overdue Rental Management | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-562` | Active Group Rental Management | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `BO-563` | Active Rental Intelligence & Operational Alerts | B–D | 0 | 14 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-563` | Active Rental Intelligence & Operational Alerts | B–D | 0 | 9 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -187,14 +187,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 **Where the user goes next**
 
 - → `BO-100` Venue Home: *Back to Venue Home*
-- → `BO-555` Active Rental Detail & Live Timeline: *Active Rental Detail & Live Timeline*
+- → `BO-555` Active Rental Detail & Live Timeline: *Active Rental Detail & Live Timeline*; carries `bookingId`
 - → `BO-556` Rental Extension Request: *Rental Extension Request*
-- → `BO-557` Extension Pricing & Confirmation: *Extension Pricing & Confirmation*
-- → `BO-558` Equipment Swap / Replacement: *Equipment Swap / Replacement*
+- → `BO-557` Extension Pricing & Confirmation: *Extension Pricing & Confirmation*; carries `bookingId`
+- → `BO-558` Equipment Swap / Replacement: *Equipment Swap / Replacement*; carries `bookingId`
 - → `BO-559` Rental Incident & Operational Exception: *Rental Incident & Operational Exception*
 - → `BO-560` Due Soon & Customer Notification Management: *Due Soon & Customer Notification Management*
 - → `BO-561` Overdue Rental Management: *Overdue Rental Management*
-- → `BO-562` Active Group Rental Management: *Active Group Rental Management*
+- → `BO-562` Active Group Rental Management: *Active Group Rental Management*; carries `bookingId`
 - → `BO-563` Active Rental Intelligence & Operational Alerts: *Active Rental Intelligence & Operational Alerts*
 
 #### States
@@ -1217,9 +1217,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Predicted late returns | text | not in the schema: `Predicted late returns` |
 | Future reservation conflicts | text | not in the schema: `Future reservation conflicts` |
 | Extension demand | text | not in the schema: `Extension demand` |
-| Equipment incident trends | text | not in the schema: `Equipment incident trends` |
-| Location return pressure | text | not in the schema: `Location return pressure` |
-| Expected inventory shortage | text | not in the schema: `Expected inventory shortage` |
 
 **The selected active rental intelligence** (detail panel): The pack groups this record's detail under its own headings: “RNT-10482”, “Confirmed”, “Ready for Checkout”, “Active”, “Incident”, “Overdue”.
 
@@ -1230,8 +1227,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Future reservation conflicts | text | not in the schema: `Future reservation conflicts` |
 | Extension demand | text | not in the schema: `Extension demand` |
 | Equipment incident trends | text | not in the schema: `Equipment incident trends` |
-| Location return pressure | text | not in the schema: `Location return pressure` |
-| Expected inventory shortage | text | not in the schema: `Expected inventory shortage` |
 
 **Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
@@ -1308,7 +1303,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-563?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-554`.

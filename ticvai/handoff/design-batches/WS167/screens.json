@@ -437,15 +437,21 @@
    "params": [
     {
      "name": "seatMapId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getSeatMap`, `publishSeatMap`, `proposeSeatMapChanges` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "actionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `decideProposedAction` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "planId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getActionPlan` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -789,7 +795,9 @@
    "params": [
     {
      "name": "seatMapId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `diffSeatMapVersions` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -938,11 +946,15 @@
    "params": [
     {
      "name": "seatMapId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that carries it only pre-selects the record."
     },
     {
      "name": "performanceId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updatePerformance` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1246,7 +1258,9 @@
    "params": [
     {
      "name": "poolId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `releaseSeatHoldPool` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

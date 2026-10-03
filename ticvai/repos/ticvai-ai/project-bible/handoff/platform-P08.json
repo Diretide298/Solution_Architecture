@@ -7,20 +7,20 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-02",
+ "generated": "2026-10-03",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 1661,
-  "operations": 1839,
+  "operations": 1837,
   "contracts": 31,
   "modules": 19,
   "undrawn": 0,
-  "operationsWithNoScreen": 195
+  "operationsWithNoScreen": 198
  },
  "waves": {
-  "wave1": 61,
-  "wave2": 85,
-  "wave3": 1515
+  "wave1": 125,
+  "wave2": 64,
+  "wave3": 1472
  },
  "modules": [
   {
@@ -36,6 +36,7 @@
    "module": "Commercial",
    "screens": 368,
    "waves": [
+    1,
     3
    ]
   },
@@ -43,6 +44,7 @@
    "module": "Rentals",
    "screens": 199,
    "waves": [
+    1,
     3
    ]
   },
@@ -59,6 +61,7 @@
    "module": "Engagement & Support",
    "screens": 120,
    "waves": [
+    1,
     3
    ]
   },
@@ -75,6 +78,7 @@
    "module": "Games & Rides",
    "screens": 98,
    "waves": [
+    1,
     3
    ]
   },
@@ -82,6 +86,7 @@
    "module": "Platform",
    "screens": 79,
    "waves": [
+    1,
     3
    ]
   },
@@ -208,11 +213,11 @@
    "operations": 55
   },
   {
-   "contract": "inventory",
-   "operations": 55
+   "contract": "ai",
+   "operations": 53
   },
   {
-   "contract": "ai",
+   "contract": "inventory",
    "operations": 53
   },
   {
@@ -228,11 +233,11 @@
    "operations": 46
   },
   {
-   "contract": "tenancy",
+   "contract": "subscription",
    "operations": 44
   },
   {
-   "contract": "subscription",
+   "contract": "tenancy",
    "operations": 44
   },
   {
@@ -240,11 +245,11 @@
    "operations": 43
   },
   {
-   "contract": "maintenance",
+   "contract": "workforce",
    "operations": 41
   },
   {
-   "contract": "workforce",
+   "contract": "maintenance",
    "operations": 41
   },
   {
@@ -284,11 +289,11 @@
    "operations": 12
   },
   {
-   "contract": "retail",
+   "contract": "white-label",
    "operations": 11
   },
   {
-   "contract": "white-label",
+   "contract": "retail",
    "operations": 11
   },
   {
@@ -571,7 +576,7 @@
    "id": "ADM-069",
    "name": "Tax Profile & Jurisdiction Configuration",
    "module": "Commercial",
-   "wave": 3,
+   "wave": 1,
    "route": "/commercial/tax-profile-jurisdiction-configuration-adm-069",
    "operations": 5,
    "drawn": true
@@ -643,7 +648,7 @@
    "id": "ADM-077",
    "name": "Calculation Validation, Reconciliation & Service Interface",
    "module": "Commercial",
-   "wave": 3,
+   "wave": 1,
    "route": "/commercial/calculation-validation-reconciliation-service-interface-adm-077",
    "operations": 4,
    "drawn": true
@@ -1426,7 +1431,7 @@
    "id": "ADM-164",
    "name": "Code Distribution & Assignment Manager",
    "module": "Commercial",
-   "wave": 3,
+   "wave": 1,
    "route": "/commercial/code-distribution-assignment-manager-adm-164",
    "operations": 2,
    "drawn": true
@@ -2137,7 +2142,7 @@
    "id": "ADM-243",
    "name": "Roles, Authority, Delegation & Approval Limits",
    "module": "Platform",
-   "wave": 3,
+   "wave": 1,
    "route": "/approvals/approval-delegations/roles-authority-delegation-approval-limits-adm-243",
    "operations": 3,
    "drawn": true
@@ -3010,7 +3015,7 @@
    "id": "ADM-342",
    "name": "Authentication & MFA Policy Manager",
    "module": "Platform",
-   "wave": 3,
+   "wave": 1,
    "route": "/platform/authentication-mfa-policy-manager-adm-342",
    "operations": 7,
    "drawn": true
@@ -3118,7 +3123,7 @@
    "id": "ADM-354",
    "name": "External Workflow System Integration",
    "module": "Platform",
-   "wave": 3,
+   "wave": 1,
    "route": "/platform/external-workflow-system-integration-adm-354",
    "operations": 3,
    "drawn": true
@@ -3352,7 +3357,7 @@
    "id": "ADM-570",
    "name": "Gateway, PSP & Acquirer Directory",
    "module": "Commercial",
-   "wave": 3,
+   "wave": 1,
    "route": "/commercial/gateway-psp-acquirer-directory-t28-adm-570",
    "operations": 2,
    "drawn": true
@@ -3649,7 +3654,7 @@
    "id": "ADM-603",
    "name": "B2B Invoice, On-Account & Payment Terms Configuration",
    "module": "Commercial",
-   "wave": 3,
+   "wave": 1,
    "route": "/commercial/b2b-invoice-on-account-payment-terms-configuration-t96-adm-603",
    "operations": 4,
    "drawn": true
@@ -4549,7 +4554,7 @@
    "id": "BO-006",
    "name": "Parking Configuration",
    "module": "Access & Venue",
-   "wave": 2,
+   "wave": 1,
    "route": "/parking/parking-configuration",
    "operations": 2,
    "drawn": true
@@ -4585,7 +4590,7 @@
    "id": "BO-010",
    "name": "Promotions & Coupons",
    "module": "Sell",
-   "wave": 2,
+   "wave": 1,
    "route": "/venue-operations/promotions-coupons",
    "operations": 26,
    "drawn": true
@@ -4594,7 +4599,7 @@
    "id": "BO-011",
    "name": "Packages & Bundles",
    "module": "Sell",
-   "wave": 2,
+   "wave": 1,
    "route": "/venue-operations/packages-bundles",
    "operations": 11,
    "drawn": true
@@ -4603,7 +4608,7 @@
    "id": "BO-012",
    "name": "Membership Products",
    "module": "Sell",
-   "wave": 2,
+   "wave": 1,
    "route": "/venue-operations/membership-products",
    "operations": 12,
    "drawn": true
@@ -4612,7 +4617,7 @@
    "id": "BO-013",
    "name": "Channel & Distribution",
    "module": "Sell",
-   "wave": 2,
+   "wave": 1,
    "route": "/venue-operations/channel-distribution",
    "operations": 10,
    "drawn": true
@@ -4676,7 +4681,7 @@
    "name": "F&B Order Management",
    "module": "Food & Beverage",
    "wave": 1,
-   "route": "/fnb/bo-020",
+   "route": "/fnb/fnb-order-management",
    "operations": 9,
    "drawn": true
   },
@@ -4685,7 +4690,7 @@
    "name": "Order Search",
    "module": "Food & Beverage",
    "wave": 1,
-   "route": "/fnb/bo-021",
+   "route": "/fnb/order-search",
    "operations": 3,
    "drawn": true
   },
@@ -4756,7 +4761,7 @@
    "id": "BO-029",
    "name": "Report Builder",
    "module": "Orders & Money",
-   "wave": 2,
+   "wave": 1,
    "route": "/venue-operations/report-builder",
    "operations": 8,
    "drawn": true
@@ -4766,7 +4771,7 @@
    "name": "Work Order Verification",
    "module": "Access & Venue",
    "wave": 1,
-   "route": "/venue-operations/access-point-directory",
+   "route": "/venue-operations/work-order-verification",
    "operations": 3,
    "drawn": true
   },
@@ -4775,7 +4780,7 @@
    "name": "Asset Register",
    "module": "Access & Venue",
    "wave": 1,
-   "route": "/venue-operations/access-point-configuration",
+   "route": "/venue-operations/asset-register-bo-031",
    "operations": 0,
    "drawn": true
   },
@@ -4891,7 +4896,7 @@
    "id": "BO-044",
    "name": "F&B Outlets",
    "module": "Venue Operations",
-   "wave": 2,
+   "wave": 1,
    "route": "/venue-operations/f-b-outlets",
    "operations": 15,
    "drawn": true
@@ -4901,7 +4906,7 @@
    "name": "Menu Management",
    "module": "Food & Beverage",
    "wave": 1,
-   "route": "/fnb/bo-045",
+   "route": "/fnb/menu-management",
    "operations": 18,
    "drawn": true
   },
@@ -4910,7 +4915,7 @@
    "name": "Kitchen Display",
    "module": "Food & Beverage",
    "wave": 1,
-   "route": "/fnb/bo-046",
+   "route": "/fnb/kitchen-display",
    "operations": 3,
    "drawn": true
   },
@@ -4927,7 +4932,7 @@
    "id": "BO-048",
    "name": "Retail Products",
    "module": "Orders & Money",
-   "wave": 2,
+   "wave": 1,
    "route": "/venue-operations/retail-products",
    "operations": 4,
    "drawn": true
@@ -4990,7 +4995,7 @@
    "id": "BO-055",
    "name": "Rota & Scheduling",
    "module": "People & Access Rights",
-   "wave": 2,
+   "wave": 1,
    "route": "/venue-operations/rota-scheduling",
    "operations": 5,
    "drawn": true
@@ -5001,7 +5006,7 @@
    "module": "People & Access Rights",
    "wave": 2,
    "route": "/venue-operations/time-attendance",
-   "operations": 3,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -5116,7 +5121,7 @@
    "id": "BO-069",
    "name": "Asset Register",
    "module": "Access & Venue",
-   "wave": 2,
+   "wave": 1,
    "route": "/venue-operations/asset-register",
    "operations": 7,
    "drawn": true
@@ -5199,7 +5204,7 @@
    "module": "Stock & Supply",
    "wave": 1,
    "route": "/inventory/requisitions",
-   "operations": 10,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -5224,7 +5229,7 @@
    "id": "BO-081",
    "name": "Inventory Items",
    "module": "Stock & Supply",
-   "wave": 2,
+   "wave": 1,
    "route": "/inventory/inventory-items",
    "operations": 9,
    "drawn": true
@@ -5323,7 +5328,7 @@
    "id": "BO-092",
    "name": "Venue Maps",
    "module": "Access & Venue",
-   "wave": 2,
+   "wave": 1,
    "route": "/venue-mapping/venue-maps",
    "operations": 2,
    "drawn": true
@@ -5332,7 +5337,7 @@
    "id": "BO-093",
    "name": "Map Import & Labelling",
    "module": "Access & Venue",
-   "wave": 2,
+   "wave": 1,
    "route": "/venue-mapping/map-import",
    "operations": 5,
    "drawn": true
@@ -5341,7 +5346,7 @@
    "id": "BO-094",
    "name": "Map Editor & Publish",
    "module": "Access & Venue",
-   "wave": 2,
+   "wave": 1,
    "route": "/venue-mapping/map-editor",
    "operations": 10,
    "drawn": true
@@ -5359,7 +5364,7 @@
    "id": "BO-096",
    "name": "Resource Calendar",
    "module": "Access & Venue",
-   "wave": 2,
+   "wave": 1,
    "route": "/resources/calendar",
    "operations": 2,
    "drawn": true
@@ -5368,7 +5373,7 @@
    "id": "BO-097",
    "name": "Check Out & Check In",
    "module": "Access & Venue",
-   "wave": 2,
+   "wave": 1,
    "route": "/resources/check-out",
    "operations": 6,
    "drawn": true
@@ -6286,7 +6291,7 @@
    "id": "BO-109",
    "name": "Menu Builder & POS Layout Designer",
    "module": "Sell",
-   "wave": 2,
+   "wave": 1,
    "route": "/sell/menu-builder-pos-layout-designer",
    "operations": 5,
    "drawn": true
@@ -6484,7 +6489,7 @@
    "id": "BO-111",
    "name": "Ingredient Substitution, Allergen & Nutrition",
    "module": "Sell",
-   "wave": 2,
+   "wave": 1,
    "route": "/sell/ingredient-substitution-allergen-nutrition",
    "operations": 6,
    "drawn": true
@@ -6583,7 +6588,7 @@
    "id": "BO-112",
    "name": "Production Planning & Production Sheets",
    "module": "Sell",
-   "wave": 2,
+   "wave": 1,
    "route": "/sell/production-planning-production-sheets",
    "operations": 8,
    "drawn": true
@@ -7078,7 +7083,7 @@
    "id": "BO-117",
    "name": "Product Import, Governance & AI Configuration Assistant",
    "module": "Sell",
-   "wave": 2,
+   "wave": 1,
    "route": "/sell/product-import-governance-ai-configuration-assistant",
    "operations": 3,
    "drawn": true
@@ -7429,7 +7434,7 @@
    "id": "BO-136",
    "name": "F&B Global Settings & Controls",
    "module": "Food & Beverage",
-   "wave": 2,
+   "wave": 1,
    "route": "/food-beverage/f-b-global-settings-controls",
    "operations": 3,
    "drawn": true
@@ -7564,7 +7569,7 @@
    "id": "BO-151",
    "name": "Access Location Grouping",
    "module": "Access & Venue",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/access-location-grouping-bo-151",
    "operations": 3,
    "drawn": true
@@ -7600,7 +7605,7 @@
    "id": "BO-155",
    "name": "Visual Access Rule Builder",
    "module": "Access & Venue",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/visual-access-rule-builder-bo-155",
    "operations": 2,
    "drawn": true
@@ -7654,7 +7659,7 @@
    "id": "BO-161",
    "name": "Guest, Companion & Eligibility Rules",
    "module": "Access & Venue",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/guest-companion-eligibility-rules-bo-161",
    "operations": 3,
    "drawn": true
@@ -7699,7 +7704,7 @@
    "id": "BO-166",
    "name": "Credential Activation & Display Rules",
    "module": "Access & Venue",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/credential-activation-display-rules-bo-166",
    "operations": 2,
    "drawn": true
@@ -7708,7 +7713,7 @@
    "id": "BO-167",
    "name": "Device Binding & Session Security",
    "module": "Access & Venue",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/device-binding-session-security-bo-167",
    "operations": 3,
    "drawn": true
@@ -7717,7 +7722,7 @@
    "id": "BO-168",
    "name": "BLE Beacon & Geofence Configuration",
    "module": "Access & Venue",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/ble-beacon-geofence-configuration-bo-168",
    "operations": 1,
    "drawn": true
@@ -7870,7 +7875,7 @@
    "id": "BO-185",
    "name": "Biometric Verification Profile Builder",
    "module": "Access & Venue",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/biometric-verification-profile-builder-bo-185",
    "operations": 1,
    "drawn": true
@@ -7879,7 +7884,7 @@
    "id": "BO-186",
    "name": "Face Pass Enrollment Configuration",
    "module": "Access & Venue",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/face-pass-enrollment-configuration-bo-186",
    "operations": 1,
    "drawn": true
@@ -7897,7 +7902,7 @@
    "id": "BO-188",
    "name": "Face Tag Temporary Enrollment",
    "module": "Access & Venue",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/face-tag-temporary-enrollment-bo-188",
    "operations": 2,
    "drawn": true
@@ -7906,7 +7911,7 @@
    "id": "BO-189",
    "name": "Face Matching & Verification Thresholds",
    "module": "Access & Venue",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/face-matching-verification-thresholds-bo-189",
    "operations": 2,
    "drawn": true
@@ -8014,7 +8019,7 @@
    "id": "BO-201",
    "name": "Gate Modes, Free Spin & Emergency Controls",
    "module": "Access & Venue",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/gate-modes-free-spin-emergency-controls-bo-201",
    "operations": 2,
    "drawn": true
@@ -8275,7 +8280,7 @@
    "id": "BO-230",
    "name": "Live Gate Mode & Lane Control",
    "module": "Access & Venue",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/live-gate-mode-lane-control-bo-230",
    "operations": 5,
    "drawn": true
@@ -9211,7 +9216,7 @@
    "id": "BO-335",
    "name": "Virtual Ticket Identity & Master Record Configuration",
    "module": "Access & Venue",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/virtual-ticket-identity-master-record-configuration-bo-335",
    "operations": 1,
    "drawn": true
@@ -9310,7 +9315,7 @@
    "id": "BO-346",
    "name": "PDF, Printable & POS Ticket Designer",
    "module": "Access & Venue",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/pdf-printable-pos-ticket-designer-bo-346",
    "operations": 5,
    "drawn": true
@@ -9751,7 +9756,7 @@
    "id": "BO-395",
    "name": "Game & Ride Directory",
    "module": "Games & Rides",
-   "wave": 3,
+   "wave": 1,
    "route": "/games-rides/game-ride-directory-bo-395",
    "operations": 4,
    "drawn": true
@@ -11749,7 +11754,7 @@
    "id": "BO-618",
    "name": "Accreditation Form Builder",
    "module": "Access & Venue",
-   "wave": 3,
+   "wave": 1,
    "route": "/access-venue/accreditation-form-builder-bo-618",
    "operations": 4,
    "drawn": true
@@ -12442,7 +12447,7 @@
    "id": "BO-696",
    "name": "Event Duplication & Clone Configuration",
    "module": "Sell",
-   "wave": 3,
+   "wave": 1,
    "route": "/sell/event-duplication-clone-configuration-bo-696",
    "operations": 2,
    "drawn": true
@@ -12622,7 +12627,7 @@
    "id": "BO-716",
    "name": "Event Lifecycle & Change Command Center",
    "module": "Sell",
-   "wave": 3,
+   "wave": 1,
    "route": "/sell/event-lifecycle-change-command-center-bo-716",
    "operations": 2,
    "drawn": true
@@ -12973,7 +12978,7 @@
    "id": "BO-755",
    "name": "Dynamic Segment Builder",
    "module": "Engagement & Support",
-   "wave": 3,
+   "wave": 1,
    "route": "/engagement-support/dynamic-segment-builder-bo-755",
    "operations": 3,
    "drawn": true
@@ -13072,7 +13077,7 @@
    "id": "BO-766",
    "name": "Campaign Builder",
    "module": "Engagement & Support",
-   "wave": 3,
+   "wave": 1,
    "route": "/engagement-support/campaign-builder-bo-766",
    "operations": 5,
    "drawn": true
@@ -13126,7 +13131,7 @@
    "id": "BO-772",
    "name": "A/B & AI Optimization",
    "module": "Engagement & Support",
-   "wave": 3,
+   "wave": 1,
    "route": "/engagement-support/a-b-ai-optimization-bo-772",
    "operations": 6,
    "drawn": true
@@ -13243,7 +13248,7 @@
    "id": "BO-785",
    "name": "Template Library",
    "module": "Engagement & Support",
-   "wave": 3,
+   "wave": 1,
    "route": "/engagement-support/template-library-bo-785",
    "operations": 4,
    "drawn": true
@@ -13360,7 +13365,7 @@
    "id": "BO-798",
    "name": "Intent & Knowledge Management",
    "module": "Engagement & Support",
-   "wave": 3,
+   "wave": 1,
    "route": "/engagement-support/intent-knowledge-management-bo-798",
    "operations": 4,
    "drawn": true
@@ -13603,7 +13608,7 @@
    "id": "BO-825",
    "name": "Challenge Builder",
    "module": "Engagement & Support",
-   "wave": 3,
+   "wave": 1,
    "route": "/engagement-support/challenge-builder-bo-825",
    "operations": 4,
    "drawn": true
@@ -13612,7 +13617,7 @@
    "id": "BO-826",
    "name": "Achievement & Badge Engine",
    "module": "Engagement & Support",
-   "wave": 3,
+   "wave": 1,
    "route": "/engagement-support/achievement-badge-engine-bo-826",
    "operations": 3,
    "drawn": true
@@ -13621,7 +13626,7 @@
    "id": "BO-827",
    "name": "Points & Activity Rules",
    "module": "Engagement & Support",
-   "wave": 3,
+   "wave": 1,
    "route": "/engagement-support/points-activity-rules-bo-827",
    "operations": 3,
    "drawn": true
@@ -13630,7 +13635,7 @@
    "id": "BO-828",
    "name": "Milestones & Reward Rules",
    "module": "Engagement & Support",
-   "wave": 3,
+   "wave": 1,
    "route": "/engagement-support/milestones-reward-rules-bo-828",
    "operations": 2,
    "drawn": true
@@ -13891,7 +13896,7 @@
    "id": "BO-857",
    "name": "Resource Creation & Profile",
    "module": "Rentals",
-   "wave": 3,
+   "wave": 1,
    "route": "/rentals/resource-creation-profile-bo-857",
    "operations": 7,
    "drawn": true
@@ -13927,7 +13932,7 @@
    "id": "BO-861",
    "name": "Resource Package & Bundle Configuration",
    "module": "Rentals",
-   "wave": 3,
+   "wave": 1,
    "route": "/rentals/resource-package-bundle-configuration-bo-861",
    "operations": 3,
    "drawn": true
@@ -13972,7 +13977,7 @@
    "id": "BO-866",
    "name": "Resource Availability Schedule Configuration",
    "module": "Rentals",
-   "wave": 3,
+   "wave": 1,
    "route": "/rentals/resource-availability-schedule-configuration-bo-866",
    "operations": 4,
    "drawn": true
@@ -14008,7 +14013,7 @@
    "id": "BO-870",
    "name": "Operational Time & Resource Blocking",
    "module": "Rentals",
-   "wave": 3,
+   "wave": 1,
    "route": "/rentals/operational-time-resource-blocking-bo-870",
    "operations": 3,
    "drawn": true
@@ -14071,7 +14076,7 @@
    "id": "BO-877",
    "name": "Qualification & Assignment Rule Engine",
    "module": "Rentals",
-   "wave": 3,
+   "wave": 1,
    "route": "/rentals/qualification-assignment-rule-engine-bo-877",
    "operations": 2,
    "drawn": true
@@ -14377,7 +14382,7 @@
    "id": "BO-911",
    "name": "Inspection, Condition & Compliance Management",
    "module": "Rentals",
-   "wave": 3,
+   "wave": 1,
    "route": "/rentals/inspection-condition-compliance-management-bo-911",
    "operations": 4,
    "drawn": true
@@ -14449,7 +14454,7 @@
    "id": "BO-919",
    "name": "AI Event Resource Forecasting",
    "module": "Rentals",
-   "wave": 3,
+   "wave": 1,
    "route": "/rentals/ai-event-resource-forecasting-bo-919",
    "operations": 3,
    "drawn": true
@@ -14521,7 +14526,7 @@
    "id": "BO-927",
    "name": "AI Staffing Requirement Forecast",
    "module": "Rentals",
-   "wave": 3,
+   "wave": 1,
    "route": "/rentals/ai-staffing-requirement-forecast-bo-927",
    "operations": 6,
    "drawn": true
@@ -15724,6 +15729,18 @@
     "summary": "Change many products at once, with a preview"
    },
    {
+    "operation": "rejectRequisition",
+    "contract": "inventory",
+    "verb": "POST",
+    "summary": "Reject a requisition"
+   },
+   {
+    "operation": "returnRequisition",
+    "contract": "inventory",
+    "verb": "POST",
+    "summary": "Return a requisition for more information"
+   },
+   {
     "operation": "actOnWaiverRequirements",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -15950,6 +15967,12 @@
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Store a guest photo, ID or signed document"
+   },
+   {
+    "operation": "cancelPaymentLink",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Cancel a live payment link"
    },
    {
     "operation": "convertToTermProduct",
@@ -16430,10 +16453,31 @@
     ]
    },
    {
+    "module": "Commercial",
+    "waves": [
+     1,
+     3
+    ]
+   },
+   {
+    "module": "Engagement & Support",
+    "waves": [
+     1,
+     3
+    ]
+   },
+   {
     "module": "Food & Beverage",
     "waves": [
      1,
      2
+    ]
+   },
+   {
+    "module": "Games & Rides",
+    "waves": [
+     1,
+     3
     ]
    },
    {
@@ -16456,6 +16500,20 @@
     "waves": [
      1,
      2,
+     3
+    ]
+   },
+   {
+    "module": "Platform",
+    "waves": [
+     1,
+     3
+    ]
+   },
+   {
+    "module": "Rentals",
+    "waves": [
+     1,
      3
     ]
    },

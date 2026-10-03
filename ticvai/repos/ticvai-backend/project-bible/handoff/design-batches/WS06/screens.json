@@ -84,21 +84,21 @@
      "operation": "listDeviceGate"
     },
     {
-     "to": "BO-203",
-     "trigger": "Works in Hardware Compatibility, Health, Testing & Deployment",
-     "provenance": "flow F116 step 17→18",
-     "operation": "listDeviceGate",
-     "carries": [
-      "deviceId"
-     ]
-    },
-    {
      "to": "BO-196",
      "trigger": "Works in Physical Device Registration & Provisioning",
      "provenance": "flow F116 step 3→4",
      "operation": "listDeviceGate",
      "carries": [
       "placementId"
+     ]
+    },
+    {
+     "to": "BO-203",
+     "trigger": "Works in Hardware Compatibility, Health, Testing & Deployment",
+     "provenance": "flow F116 step 17→18",
+     "operation": "listDeviceGate",
+     "carries": [
+      "deviceId"
      ]
     }
    ]
@@ -1576,7 +1576,7 @@
   "name": "Gate Modes, Free Spin & Emergency Controls",
   "module": "Access & Venue",
   "requiresModule": "access",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Access Control Module_Reference.pdf",
    "board": "6",

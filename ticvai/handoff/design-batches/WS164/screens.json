@@ -594,15 +594,10 @@
        "label": "Every resource cost entry",
        "bindsTo": "ResourceCostEntry",
        "columns": [
-        "ResourceCostEntry.id",
-        "ResourceCostEntry.resourceId",
         "ResourceCostEntry.kind",
         "ResourceCostEntry.amount",
         "ResourceCostEntry.incurredOn",
-        "ResourceCostEntry.fromVenueId",
-        "ResourceCostEntry.toVenueId",
-        "ResourceCostEntry.note",
-        "ResourceCostEntry.scopePath"
+        "ResourceCostEntry.note"
        ],
        "operation": "listResourceCosts",
        "provenance": "contract resources.yaml GET /resource-costs"
@@ -672,7 +667,7 @@
     "id": "formCreateResourceCost",
     "component": "modal",
     "trigger": "Create resource cost",
-    "body": "**Collects what `createResourceCost` sends before it is called.** Required: `id`, `resourceId`, `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createResourceCost` sends before it is called.** Required: `resourceId`, `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "ResourceCostEntry",
     "confirm": {
      "label": "Create resource cost",
@@ -681,15 +676,13 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "resourceId",
       "kind",
       "amount",
       "incurredOn",
       "fromVenueId",
       "toVenueId",
-      "note",
-      "scopePath"
+      "note"
      ]
     },
     "provenance": "contract resources.yaml POST /resource-costs"
@@ -706,7 +699,9 @@
    "params": [
     {
      "name": "costId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listResourceCosts` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

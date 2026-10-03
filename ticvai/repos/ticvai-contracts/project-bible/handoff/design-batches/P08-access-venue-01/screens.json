@@ -87,14 +87,7 @@
        "columns": [
         "Queue.code",
         "Queue.name",
-        "Queue.venueId",
-        "Queue.attractionProductId",
-        "Queue.assetId",
-        "Queue.accessPointId",
         "Queue.kind",
-        "Queue.operatingWindows",
-        "Queue.parentQueueId",
-        "Queue.loadBalanceWithQueueIds",
         "Queue.inQueueOfferEnabled",
         "Queue.notifyBeforeCallMinutes"
        ],
@@ -106,8 +99,6 @@
        "label": "Every queue feed",
        "bindsTo": "QueueFeed",
        "columns": [
-        "QueueFeed.id",
-        "QueueFeed.queueId",
         "QueueFeed.adaptor",
         "QueueFeed.adaptorName",
         "QueueFeed.credentialsRef",
@@ -123,18 +114,12 @@
        "label": "Every waiting guest",
        "bindsTo": "WaitingGuest",
        "columns": [
-        "WaitingGuest.id",
-        "WaitingGuest.queueId",
         "WaitingGuest.queueName",
-        "WaitingGuest.subjectId",
         "WaitingGuest.partyNumber",
         "WaitingGuest.partySize",
         "WaitingGuest.status",
         "WaitingGuest.positionInQueue",
-        "WaitingGuest.partiesAhead",
-        "WaitingGuest.estimatedCallAt",
-        "WaitingGuest.isFastPass",
-        "WaitingGuest.entitlementId"
+        "WaitingGuest.estimatedCallAt"
        ],
        "operation": "listQueueEntries",
        "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
@@ -163,19 +148,11 @@
        "columns": [
         "Queue.code",
         "Queue.name",
-        "Queue.venueId",
-        "Queue.attractionProductId",
-        "Queue.assetId",
-        "Queue.accessPointId",
         "Queue.kind",
         "Queue.operatingWindows",
-        "Queue.parentQueueId",
-        "Queue.loadBalanceWithQueueIds",
-        "Queue.inQueueOfferEnabled",
         "Queue.notifyBeforeCallMinutes",
         "Queue.capacityPerCycle",
         "Queue.cycleMinutes",
-        "Queue.maxPartySize",
         "Queue.returnWindowMinutes"
        ],
        "operation": "listQueues",
@@ -217,10 +194,7 @@
        "label": "The wait time",
        "bindsTo": "WaitTime",
        "columns": [
-        "WaitTime.queueId",
         "WaitTime.queueName",
-        "WaitTime.attractionProductId",
-        "WaitTime.attractionCategoryId",
         "WaitTime.status",
         "WaitTime.waitMinutes",
         "WaitTime.source",
@@ -417,7 +391,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-001"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCallNextParties",
@@ -440,7 +414,7 @@
     "id": "formConfigureQueueFeed",
     "component": "modal",
     "trigger": "Configure queue feed",
-    "body": "**Collects what `configureQueueFeed` sends before it is called.** Required: `id`, `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`, `health`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `configureQueueFeed` sends before it is called.** Required: `id`, `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `health` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "QueueFeed",
     "confirm": {
      "label": "Configure queue feed",
@@ -455,8 +429,7 @@
       "isEnabled",
       "adaptorName",
       "credentialsRef",
-      "expectedIntervalSeconds",
-      "health"
+      "expectedIntervalSeconds"
      ]
     },
     "provenance": "contract queue.yaml PUT /queue-feeds"
@@ -694,14 +667,7 @@
        "columns": [
         "Queue.code",
         "Queue.name",
-        "Queue.venueId",
-        "Queue.attractionProductId",
-        "Queue.assetId",
-        "Queue.accessPointId",
         "Queue.kind",
-        "Queue.operatingWindows",
-        "Queue.parentQueueId",
-        "Queue.loadBalanceWithQueueIds",
         "Queue.inQueueOfferEnabled",
         "Queue.notifyBeforeCallMinutes"
        ],
@@ -759,10 +725,7 @@
        "label": "The wait time",
        "bindsTo": "WaitTime",
        "columns": [
-        "WaitTime.queueId",
         "WaitTime.queueName",
-        "WaitTime.attractionProductId",
-        "WaitTime.attractionCategoryId",
         "WaitTime.status",
         "WaitTime.waitMinutes",
         "WaitTime.source",
@@ -940,7 +903,7 @@
    "error": "Could not load. Names which read failed and leaves the queue untouched.",
    "emptyFirstRun": "No queue yet. Offers Create queue (`createQueue`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on status and the queue are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `QUEUE_VIEW`, which `getQueue` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `QUEUE_VIEW`, which `getQueue` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `QUEUE_MANAGE` for `createQueue`, `updateQueue`, `callNextParties`, `setQueueStatus` and 1 more."
   },
   "apis": [
    {
@@ -1015,7 +978,7 @@
    "derivedFrom": "wireframes/reference/Seat Board 2.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 14 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "cancelPerformance",
@@ -1314,7 +1277,9 @@
     },
     {
      "name": "orderId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that carries it only pre-selects the record."
     },
     {
      "name": "venueId",
@@ -1335,13 +1300,13 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-003"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formConfigureQueueFeed",
     "component": "modal",
     "trigger": "Configure queue feed",
-    "body": "**Collects what `configureQueueFeed` sends before it is called.** Required: `id`, `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`, `health`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `configureQueueFeed` sends before it is called.** Required: `id`, `queueId`, `adaptor`, `isEnabled`. Optional: `adaptorName`, `credentialsRef`, `expectedIntervalSeconds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `health` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "QueueFeed",
     "confirm": {
      "label": "Configure queue feed",
@@ -1356,8 +1321,7 @@
       "isEnabled",
       "adaptorName",
       "credentialsRef",
-      "expectedIntervalSeconds",
-      "health"
+      "expectedIntervalSeconds"
      ]
     },
     "provenance": "contract queue.yaml PUT /queue-feeds"
@@ -1471,14 +1435,7 @@
        "columns": [
         "Queue.code",
         "Queue.name",
-        "Queue.venueId",
-        "Queue.attractionProductId",
-        "Queue.assetId",
-        "Queue.accessPointId",
         "Queue.kind",
-        "Queue.operatingWindows",
-        "Queue.parentQueueId",
-        "Queue.loadBalanceWithQueueIds",
         "Queue.inQueueOfferEnabled",
         "Queue.notifyBeforeCallMinutes"
        ],
@@ -1490,18 +1447,12 @@
        "label": "Every waiting guest",
        "bindsTo": "WaitingGuest",
        "columns": [
-        "WaitingGuest.id",
-        "WaitingGuest.queueId",
         "WaitingGuest.queueName",
-        "WaitingGuest.subjectId",
         "WaitingGuest.partyNumber",
         "WaitingGuest.partySize",
         "WaitingGuest.status",
         "WaitingGuest.positionInQueue",
-        "WaitingGuest.partiesAhead",
-        "WaitingGuest.estimatedCallAt",
-        "WaitingGuest.isFastPass",
-        "WaitingGuest.entitlementId"
+        "WaitingGuest.estimatedCallAt"
        ],
        "operation": "listQueueEntries",
        "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
@@ -1530,19 +1481,11 @@
        "columns": [
         "Queue.code",
         "Queue.name",
-        "Queue.venueId",
-        "Queue.attractionProductId",
-        "Queue.assetId",
-        "Queue.accessPointId",
         "Queue.kind",
         "Queue.operatingWindows",
-        "Queue.parentQueueId",
-        "Queue.loadBalanceWithQueueIds",
-        "Queue.inQueueOfferEnabled",
         "Queue.notifyBeforeCallMinutes",
         "Queue.capacityPerCycle",
         "Queue.cycleMinutes",
-        "Queue.maxPartySize",
         "Queue.returnWindowMinutes"
        ],
        "operation": "listQueues",
@@ -1553,10 +1496,7 @@
        "label": "The wait time",
        "bindsTo": "WaitTime",
        "columns": [
-        "WaitTime.queueId",
         "WaitTime.queueName",
-        "WaitTime.attractionProductId",
-        "WaitTime.attractionCategoryId",
         "WaitTime.status",
         "WaitTime.waitMinutes",
         "WaitTime.source",
@@ -1614,7 +1554,7 @@
    "error": "Could not load. Names which read failed and leaves the manual wait time untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
    "emptyNoResults": "Nothing matches the filter on venueId, openOnly and the manual wait time are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `QUEUE_MANAGE` for `setWaitTime`, `callNextParties`."
   },
   "apis": [
    {
@@ -1681,7 +1621,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-004"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetWaitTime",
@@ -1838,7 +1778,7 @@
     }
    ]
   },
-  "notes": "Pulled to Wave 1 on 17 August (CF-101): F09 closes a cancelled event’s queue, and a Wave 1 flow cannot step through a Wave 2 screen. **Cross-platform navigation removed 24 August**: EMP-032. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
+  "notes": "Pulled to Wave 1 on 17 August (CF-101): F09 closes a cancelled event’s queue, and a flow cannot step through a screen that is built after it. **Cross-platform navigation removed 24 August**: EMP-032. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listQueueEntries` reads the population and `getWaitTimes` reads one of them — list, select, act",
@@ -1862,18 +1802,12 @@
        "label": "Every waiting guest",
        "bindsTo": "WaitingGuest",
        "columns": [
-        "WaitingGuest.id",
-        "WaitingGuest.queueId",
         "WaitingGuest.queueName",
-        "WaitingGuest.subjectId",
         "WaitingGuest.partyNumber",
         "WaitingGuest.partySize",
         "WaitingGuest.status",
         "WaitingGuest.positionInQueue",
-        "WaitingGuest.partiesAhead",
-        "WaitingGuest.estimatedCallAt",
-        "WaitingGuest.isFastPass",
-        "WaitingGuest.entitlementId"
+        "WaitingGuest.estimatedCallAt"
        ],
        "operation": "listQueueEntries",
        "provenance": "contract queue.yaml GET /queues/{queueId}/entries"
@@ -1885,14 +1819,7 @@
        "columns": [
         "Queue.code",
         "Queue.name",
-        "Queue.venueId",
-        "Queue.attractionProductId",
-        "Queue.assetId",
-        "Queue.accessPointId",
         "Queue.kind",
-        "Queue.operatingWindows",
-        "Queue.parentQueueId",
-        "Queue.loadBalanceWithQueueIds",
         "Queue.inQueueOfferEnabled",
         "Queue.notifyBeforeCallMinutes"
        ],
@@ -1936,18 +1863,10 @@
        "label": "The selected waiting guest",
        "bindsTo": "WaitingGuest",
        "columns": [
-        "WaitingGuest.id",
-        "WaitingGuest.queueId",
         "WaitingGuest.queueName",
-        "WaitingGuest.subjectId",
         "WaitingGuest.partyNumber",
-        "WaitingGuest.partySize",
         "WaitingGuest.status",
-        "WaitingGuest.positionInQueue",
-        "WaitingGuest.partiesAhead",
         "WaitingGuest.estimatedCallAt",
-        "WaitingGuest.isFastPass",
-        "WaitingGuest.entitlementId",
         "WaitingGuest.calledAt",
         "WaitingGuest.returnWindowEndsAt",
         "WaitingGuest.redeemedAt",
@@ -1975,10 +1894,7 @@
        "label": "The wait time",
        "bindsTo": "WaitTime",
        "columns": [
-        "WaitTime.queueId",
         "WaitTime.queueName",
-        "WaitTime.attractionProductId",
-        "WaitTime.attractionCategoryId",
         "WaitTime.status",
         "WaitTime.waitMinutes",
         "WaitTime.source",
@@ -2151,7 +2067,7 @@
    "error": "Could not load. Names which read failed and leaves the queue untouched.",
    "emptyFirstRun": "No queue yet. Offers Create queue (`createQueue`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on status and the queue are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `QUEUE_VIEW`, which `listQueueEntries` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getKpiValues` requires to show this screen, and names that permission (the screen's other reads need `QUEUE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `requestSuggestion`; `QUEUE_MANAGE` for `callNextParties`, `createQueue`, `setQueueStatus`, `setWaitTime` and 1 more."
   },
   "apis": [
    {
@@ -2258,7 +2174,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-005"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "createCampaign",
@@ -2349,7 +2265,7 @@
   "name": "Parking Configuration",
   "module": "Access & Venue",
   "requiresModule": "access",
-  "wave": 2,
+  "wave": 1,
   "capability": "C39",
   "implementation": {
    "app": "venue-management-web",
@@ -2383,18 +2299,12 @@
        "label": "Every parking facility",
        "bindsTo": "ParkingFacility",
        "columns": [
-        "ParkingFacility.id",
         "ParkingFacility.name",
-        "ParkingFacility.venueId",
         "ParkingFacility.mode",
         "ParkingFacility.capacity",
         "ParkingFacility.takesPayment",
-        "ParkingFacility.vendorSwapTargetDays",
         "ParkingFacility.vendorName",
-        "ParkingFacility.endpoint",
-        "ParkingFacility.credentialRef",
-        "ParkingFacility.pushLeadMinutes",
-        "ParkingFacility.accessPointIds"
+        "ParkingFacility.pushLeadMinutes"
        ],
        "operation": "listParkingFacilities",
        "provenance": "contract access.yaml GET /parking-facilities"
@@ -2461,13 +2371,13 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-006"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetParkingFacility",
     "component": "modal",
     "trigger": "Save parking facility",
-    "body": "**Collects what `setParkingFacility` sends before it is called.** Required: `name`, `venueId`, `mode`. Optional: `id`, `capacity`, `takesPayment`, `vendorSwapTargetDays`, `vendorName`, `endpoint`, `credentialRef`, `pushLeadMinutes`, `accessPointIds`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setParkingFacility` sends before it is called.** Required: `name`, `venueId`, `mode`. Optional: `id`, `capacity`, `vendorName`, `endpoint`, `credentialRef`, `pushLeadMinutes`, `accessPointIds`, `isActive`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `takesPayment`, `vendorSwapTargetDays` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "ParkingFacility",
     "confirm": {
      "label": "Save parking facility",
@@ -2481,8 +2391,6 @@
       "mode",
       "id",
       "capacity",
-      "takesPayment",
-      "vendorSwapTargetDays",
       "vendorName",
       "endpoint",
       "credentialRef",
@@ -2541,8 +2449,8 @@
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
-   "route": "/venue-operations/access-point-directory",
-   "component": "apps/venue-management-web/src/routes/venue-operations/AccessPointDirectoryDetail.tsx",
+   "route": "/venue-operations/work-order-verification",
+   "component": "apps/venue-management-web/src/routes/venue-operations/WorkOrderVerificationDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2625,15 +2533,9 @@
        "bindsTo": "WorkOrder",
        "columns": [
         "WorkOrder.downtimeMinutes",
-        "WorkOrder.rootCause",
-        "WorkOrder.rootCauseNote",
-        "WorkOrder.escalatedAt",
         "WorkOrder.escalationLevel",
-        "WorkOrder.id",
         "WorkOrder.workOrderNumber",
         "WorkOrder.title",
-        "WorkOrder.venueId",
-        "WorkOrder.assetId",
         "WorkOrder.assetName",
         "WorkOrder.status"
        ],
@@ -2659,21 +2561,13 @@
        "bindsTo": "WorkOrder",
        "columns": [
         "WorkOrder.downtimeMinutes",
-        "WorkOrder.rootCause",
-        "WorkOrder.rootCauseNote",
-        "WorkOrder.escalatedAt",
         "WorkOrder.escalationLevel",
-        "WorkOrder.id",
         "WorkOrder.workOrderNumber",
         "WorkOrder.title",
-        "WorkOrder.venueId",
-        "WorkOrder.assetId",
         "WorkOrder.assetName",
         "WorkOrder.status",
         "WorkOrder.priority",
-        "WorkOrder.kind",
-        "WorkOrder.assignedToPrincipalId",
-        "WorkOrder.raisedByPrincipalId"
+        "WorkOrder.kind"
        ],
        "operation": "listWorkOrders",
        "provenance": "contract maintenance.yaml GET /work-orders"
@@ -2684,21 +2578,13 @@
        "bindsTo": "WorkOrderDetail",
        "columns": [
         "WorkOrderDetail.downtimeMinutes",
-        "WorkOrderDetail.rootCause",
-        "WorkOrderDetail.rootCauseNote",
-        "WorkOrderDetail.escalatedAt",
         "WorkOrderDetail.escalationLevel",
-        "WorkOrderDetail.id",
         "WorkOrderDetail.workOrderNumber",
         "WorkOrderDetail.title",
-        "WorkOrderDetail.venueId",
-        "WorkOrderDetail.assetId",
         "WorkOrderDetail.assetName",
         "WorkOrderDetail.status",
         "WorkOrderDetail.priority",
-        "WorkOrderDetail.kind",
-        "WorkOrderDetail.assignedToPrincipalId",
-        "WorkOrderDetail.raisedByPrincipalId"
+        "WorkOrderDetail.kind"
        ],
        "operation": "getWorkOrder",
        "provenance": "contract maintenance.yaml GET /work-orders/{workOrderId}"
@@ -2744,7 +2630,7 @@
    "error": "Could not load. Names which read failed and leaves the work order verification untouched.",
    "emptyFirstRun": "No work order verification yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on assignedToPrincipalId, status, priority, assetId, overdueOnly and the work order verification are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `WORK_ORDER_VIEW`, which `getWorkOrder` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `WORK_ORDER_VIEW`, which `listWorkOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WORK_ORDER_VERIFY` for `verifyWorkOrder`."
   },
   "apis": [
    {
@@ -2794,7 +2680,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-030"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "acceptWorkOrder",
@@ -2866,8 +2752,8 @@
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
-   "route": "/venue-operations/access-point-configuration",
-   "component": "apps/venue-management-web/src/routes/venue-operations/AccessPointConfigurationDetail.tsx",
+   "route": "/venue-operations/asset-register-bo-031",
+   "component": "apps/venue-management-web/src/routes/venue-operations/AssetRegisterBO031Detail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2914,7 +2800,9 @@
     },
     {
      "name": "assetId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that carries it only pre-selects the record."
     }
    ],
    "coldEntry": "An asset opened from the register or a work order.",
@@ -2994,13 +2882,7 @@
         "AdmissionRules.openMinutesBefore",
         "AdmissionRules.closeMinutesAfter",
         "AdmissionRules.maxDurationMinutes",
-        "AdmissionRules.entryLimit",
-        "AdmissionRules.exitScan",
-        "AdmissionRules.maxExits",
-        "AdmissionRules.requiresExitBeforeReentry",
-        "AdmissionRules.maxReentries",
-        "AdmissionRules.reEntryWindowMinutes",
-        "AdmissionRules.reEntryVerification"
+        "AdmissionRules.reEntryWindowMinutes"
        ],
        "operation": "listAdmissionRules",
        "provenance": "contract access.yaml GET /admission-rules"
@@ -3023,18 +2905,7 @@
         "AdmissionRules.maxDurationMinutes",
         "AdmissionRules.entryLimit",
         "AdmissionRules.exitScan",
-        "AdmissionRules.maxExits",
-        "AdmissionRules.requiresExitBeforeReentry",
-        "AdmissionRules.maxReentries",
-        "AdmissionRules.reEntryWindowMinutes",
-        "AdmissionRules.reEntryVerification",
-        "AdmissionRules.sameDayOnly",
-        "AdmissionRules.validity",
-        "AdmissionRules.crossover",
-        "AdmissionRules.designatedAccessPointIds",
-        "AdmissionRules.allowedAccessPointIds",
-        "AdmissionRules.ruleConditions",
-        "AdmissionRules.perProductRules"
+        "AdmissionRules.reEntryWindowMinutes"
        ],
        "operation": "listAdmissionRules",
        "provenance": "contract access.yaml GET /admission-rules"
@@ -3066,7 +2937,7 @@
    "error": "Could not load. Names which read failed and leaves the admission profiles untouched.",
    "emptyFirstRun": "No admission profiles yet. Offers New profile (`createAdmissionRules`).",
    "emptyNoResults": "Never shown: `listAdmissionRules` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listAdmissionRules` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listAdmissionRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_POINT_CONFIGURE` for `createAdmissionRules`, `updateAdmissionRules`, `setEntryRulePoints`."
   },
   "apis": [
    {
@@ -3108,11 +2979,15 @@
    "params": [
     {
      "name": "profileId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAdmissionRules` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "ruleId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAdmissionRules` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `profileId`.",
@@ -3129,13 +3004,13 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-032"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateAdmissionRules",
     "component": "modal",
     "trigger": "New profile",
-    "body": "**Collects what `createAdmissionRules` sends before it is called.** Required: `code`, `name`, `openMinutesBefore`, `closeMinutesAfter`. Optional: `perProductRules`, `maxDurationMinutes`, `requiresExitBeforeReentry`, `maxReentries`, `entryLimit`, `exitScan`, `maxExits`, `reEntryWindowMinutes`, `sameDayOnly`, `designatedAccessPointIds`, `validity`, `crossover`, `allowedAccessPointIds`, `reEntryVerification`, `ruleConditions`. `id` and `scopePath` are the server's and never asked (VO-R03). Entry limit, exit scan, re-entry window and verification, validity, crossover and the rule conditions are blocks of the profile (29 September close-out), edited here so BO-156, BO-158 and BO-160 have a home. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createAdmissionRules` sends before it is called.** Required: `code`, `name`, `openMinutesBefore`, `closeMinutesAfter`. Optional: `perProductRules`, `maxDurationMinutes`, `requiresExitBeforeReentry`, `maxReentries`, `entryLimit`, `exitScan`, `maxExits`, `reEntryWindowMinutes`, `sameDayOnly`, `designatedAccessPointIds`, `validity`, `crossover`, `allowedAccessPointIds`, `reEntryVerification`, `ruleConditions`. and `scopePath` are the server's and never asked (VO-R03). Entry limit, exit scan, re-entry window and verification, validity, crossover and the rule conditions are blocks of the profile (29 September close-out), edited here so BO-156, BO-158 and BO-160 have a home. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).",
     "confirm": {
      "label": "New profile",
      "operation": "createAdmissionRules"
@@ -3170,7 +3045,7 @@
     "id": "formUpdateAdmissionRules",
     "component": "modal",
     "trigger": "Save profile",
-    "body": "**Collects what `updateAdmissionRules` sends before it is called.** Required: `code`, `name`, `openMinutesBefore`, `closeMinutesAfter`. Optional: `perProductRules`, `maxDurationMinutes`, `requiresExitBeforeReentry`, `maxReentries`, `entryLimit`, `exitScan`, `maxExits`, `reEntryWindowMinutes`, `sameDayOnly`, `designatedAccessPointIds`, `validity`, `crossover`, `allowedAccessPointIds`, `reEntryVerification`, `ruleConditions`. `id` and `scopePath` are the server's and never asked (VO-R03). Entry limit, exit scan, re-entry window and verification, validity, crossover and the rule conditions are blocks of the profile (29 September close-out), edited here so BO-156, BO-158 and BO-160 have a home. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `updateAdmissionRules` sends before it is called.** Required: `code`, `name`, `openMinutesBefore`, `closeMinutesAfter`. Optional: `perProductRules`, `maxDurationMinutes`, `requiresExitBeforeReentry`, `maxReentries`, `entryLimit`, `exitScan`, `maxExits`, `reEntryWindowMinutes`, `sameDayOnly`, `designatedAccessPointIds`, `validity`, `crossover`, `allowedAccessPointIds`, `reEntryVerification`, `ruleConditions`. and `scopePath` are the server's and never asked (VO-R03). Entry limit, exit scan, re-entry window and verification, validity, crossover and the rule conditions are blocks of the profile (29 September close-out), edited here so BO-156, BO-158 and BO-160 have a home. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).",
     "confirm": {
      "label": "Save profile",
      "operation": "updateAdmissionRules"
@@ -3350,7 +3225,7 @@
    "error": "Could not load. Names which read failed and leaves the blacklist untouched.",
    "emptyFirstRun": "No blacklist yet. Offers Add blacklist entry (`addBlacklistEntry`).",
    "emptyNoResults": "Never shown: `listBlacklist` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listBlacklist` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listBlacklist` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_POINT_CONFIGURE` for `addBlacklistEntry`, `removeBlacklistEntry`."
   },
   "apis": [
    {
@@ -3399,7 +3274,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-033"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P08",
    "audience": "staff",

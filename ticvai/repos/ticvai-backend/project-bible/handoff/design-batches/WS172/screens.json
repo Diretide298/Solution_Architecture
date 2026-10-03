@@ -53,17 +53,26 @@
     {
      "to": "BO-1026",
      "trigger": "Availability & Best-Fit Search",
-     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "carries": [
+      "requestId"
+     ]
     },
     {
      "to": "BO-1027",
      "trigger": "Bulk Seat Allocation",
-     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "carries": [
+      "requestId"
+     ]
     },
     {
      "to": "BO-1028",
      "trigger": "Roster & Participant Assignment",
-     "provenance": "structural — pack board 8 wiring, 19 September 2026"
+     "provenance": "structural — pack board 8 wiring, 19 September 2026",
+     "carries": [
+      "requestId"
+     ]
     },
     {
      "to": "BO-1029",
@@ -534,7 +543,9 @@
    "params": [
     {
      "name": "requestId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listGroupSeatRequests` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -678,7 +689,9 @@
    "params": [
     {
      "name": "requestId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listGroupSeatRequests` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -822,7 +835,9 @@
    "params": [
     {
      "name": "requestId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listGroupSeatRequests` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1104,7 +1119,9 @@
    "params": [
     {
      "name": "poolId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `releaseSeatHoldPool` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

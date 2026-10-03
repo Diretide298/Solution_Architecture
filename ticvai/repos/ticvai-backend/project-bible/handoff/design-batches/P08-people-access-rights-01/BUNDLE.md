@@ -1,6 +1,6 @@
 # P08-people-access-rights-01 — P08 · People & Access Rights (1 of 2)
 
-**10 screens · 47 operations · 41 schemas · 13 permissions**
+**10 screens · 46 operations · 42 schemas · 12 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 13 permissions apply here:
-  `ANNOUNCEMENT_PUBLISH, APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_REQUEST, APPROVAL_VIEW, ATTENDANCE_RECORD, PERMISSION_VIEW, ROLE_MANAGE, SCOPE_VIEW, SESSION_FORCE_LOGOUT, USER_MANAGE, WORKFORCE_MANAGE`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 12 permissions apply here:
+  `ANNOUNCEMENT_PUBLISH, APPROVAL_CONFIGURE, APPROVAL_DECIDE, APPROVAL_REQUEST, APPROVAL_VIEW, PERMISSION_VIEW, ROLE_MANAGE, SCOPE_VIEW, SESSION_FORCE_LOGOUT, USER_MANAGE, WORKFORCE_MANAGE, WORKFORCE_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -121,16 +121,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-053` | Staff Directory | A | 24 | 23 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
+| `BO-053` | Staff Directory | B | 28 | 21 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
 | `BO-054` | Role Assignment | A | 16 | 16 | 6 | 6 | 1 | 5 | — | notStarted (generated) |
-| `BO-055` | Rota & Scheduling | B–D | 32 | 33 | 6 | 21 | 0 | 0 | — | notStarted (generated) |
-| `BO-056` | Time & Attendance | B–D | 11 | 33 | 6 | 5 | 0 | 0 | — | notStarted (generated) |
-| `BO-057` | Training & Certification | B–D | 2 | 24 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-066` | Notification Settings | B–D | 12 | 29 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
-| `BO-084` | Approval Inbox | B–D | 11 | 19 | 6 | 22 | 0 | 3 | — | notStarted (generated) |
+| `BO-055` | Rota & Scheduling | B–D | 32 | 19 | 6 | 21 | 0 | 0 | — | notStarted (generated) |
+| `BO-056` | Time & Attendance | B–D | 5 | 19 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
+| `BO-057` | Training & Certification | B–D | 2 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-066` | Notification Settings | B–D | 12 | 23 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
+| `BO-084` | Approval Inbox | B–D | 11 | 11 | 6 | 22 | 0 | 3 | — | notStarted (generated) |
 | `BO-085` | Approval Request | B–D | 8 | 8 | 6 | 24 | 0 | 3 | — | notStarted (generated) |
 | `BO-086` | Approval Matrix | B–D | 24 | 10 | 6 | 49 | 0 | 3 | — | notStarted (generated) |
-| `BO-087` | Approval Delegations | A | 8 | 16 | 6 | 2 | 0 | 3 | — | notStarted (generated) |
+| `BO-087` | Approval Delegations | B | 8 | 12 | 6 | 2 | 0 | 3 | — | notStarted (generated) |
 
 ---
 
@@ -146,7 +146,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 1 · needs the `core` module |
-| Block | Block A · ticket #17798 (APP-SETUP-BO-053) |
+| Block | Block B · task APP-SETUP-BO-053 |
 | Who uses it | venue staff holding `PERMISSION_VIEW`, `SESSION_FORCE_LOGOUT`, `USER_MANAGE`, `WORKFORCE_MANAGE`, `WORKFORCE_VIEW` (2 read, 1 operate, 2 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPrincipals` reads the population and `getPrincipal` reads one of them — list, select, act |
@@ -212,10 +212,14 @@ Errors to draw in the form: 400 Validation failed; 409 Username already in use w
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
 | Reason `reason` | text area | required | — | min length 3; max length 500 | — | — | `forceLogout` body |
+| Workstation `workstationId` | picker: choose a workstation | optional | — | — | shows names, sends the id | The till making the call. Required with no session (the POS-000 door; CHG-RUL-015). | `forceLogout` body |
+| Supervisor step up `supervisorStepUp` | group | optional | — | — | — | The supervisor ending the session, signing on this device. Required with no session (POS-000), ignored with one (CHG-RUL-015). | `forceLogout` body |
+| Principal `supervisorStepUp.principalId` | picker: choose a principal | required | — | — | shows names, sends the id | The supervisor signing. Recorded against the act. | `forceLogout` body |
+| Credential `supervisorStepUp.credential` | text area | required | — | max length 512 | — | The supervisor's staff PIN, as they sign in at a till with it. A PIN, never a password (audit R123 (7)). | `forceLogout` body |
 
 Carried, not typed: `sessionId`
 
-Errors to draw in the form: 403 Authenticated but not permitted at the requested scope
+Errors to draw in the form: 403 The caller lacks SESSION_FORCE_LOGOUT, or, with no session, the supervisor step-up is missing or failed or the session is not at the till's venue …
 
 **Form: Sign everyone out** (confirmDialog, opened by *Sign everyone out*; *Sign everyone out* calls `revokeAllSessions`, *Cancel* sends nothing)
 
@@ -272,13 +276,11 @@ Errors to draw in the form: 403 Step-up token missing, expired or issued for a d
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Username | text | — |
 | Display name | text | — |
 | Is active | yes / no (icon or chip) | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | Past this, resolution returns DENY regardless of grants. |
-| Primary role | the name it points at, never the id | Determines the landing screen when the principal holds several roles and picks one at login. |
 | Roles | list or chips (count when long) | — |
 | Last login at | 1 Oct 2026, 14:30 | — |
 
@@ -298,7 +300,7 @@ Errors to draw in the form: 403 Step-up token missing, expired or issued for a d
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| End this session (destructive button) | `forceLogout` POST `/auth/sessions/{sessionId}/force-logout` | inline | — | 403 Authenticated but not permitted at the requested scope | opens confirmDialog first |
+| End this session (destructive button) | `forceLogout` POST `/auth/sessions/{sessionId}/force-logout` | inline | — | 403 The caller lacks SESSION_FORCE_LOGOUT, or, with no session, the supervisor step-up is missing or failed or the session is not at the till's venue … | step-up: pin (On the POS-000 door nobody at the till has a session, so a supervisor's own PIN on the device proves who ended the …); opens confirmDialog first |
 | Create principal (primary button) | `createPrincipal` POST `/principals` | CreatePrincipalRequest | Principal | 400 Validation failed; 409 Username already in use within this cell | opens modal first |
 | Save principal (secondary button) | `updatePrincipal` PATCH `/principals/{principalId}` | inline | Principal | — | opens modal first |
 | Reset principal credential (destructive button) | `resetPrincipalCredential` POST `/principals/{principalId}/credential-reset` | ResetCredentialRequest | — | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. | step-up: mfa (Replaces somebody else's secret, which is the whole of an account takeover.) |
@@ -318,7 +320,7 @@ Errors to draw in the form: 403 Step-up token missing, expired or issued for a d
 
 **Where the user goes next**
 
-- → `BO-055` Rota & Scheduling: *Rota & Scheduling*
+- → `BO-055` Rota & Scheduling: *Rota & Scheduling*; carries `assignmentId`
 
 **What opens over it**
 
@@ -332,7 +334,7 @@ Errors to draw in the form: 403 Step-up token missing, expired or issued for a d
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the staff untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No staff yet. Offers Create principal (`createPrincipal`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on scopePath, isActive and the staff are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires to show this screen, and names that permission (the screen's other reads need `SESSION_FORCE_LOGOUT`, `WORKFORCE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PERMISSION_VIEW` for … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither `principalId` nor `jobTitleId` with `scopePath`, or both.; 400 Validation failed; 409 Overlaps an existing primary posting, or the employee is terminated externally; 409 Username already in use within this cell |
 
@@ -391,13 +393,13 @@ staff:
 - `listWorkAssignments` → `WORKFORCE_VIEW` (read) · staff
 - `setWorkAssignment` → `WORKFORCE_MANAGE` (configure) · staff
 - `suggestRoleAssignment` → `PERMISSION_VIEW` (read) · staff
-- `listActiveSessions` → `SESSION_FORCE_LOGOUT` (operate) · staff, partner
-- `forceLogout` → `SESSION_FORCE_LOGOUT` (operate) · staff, partner
+- `listActiveSessions` → `SESSION_FORCE_LOGOUT` (operate) · staff, partner · step-up pin
+- `forceLogout` → `SESSION_FORCE_LOGOUT` (operate) · staff, partner · step-up pin
 - `revokeAllSessions` → `SESSION_FORCE_LOGOUT` (operate) · staff, partner
 - `createMfaChallenge` → no permission · staff, partner, guest
 - `verifyMfaChallenge` → no permission · staff, partner, guest
 
-**A refused user sees:** Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires to show this screen, and names that permission (the screen's other reads need `SESSION_FORCE_LOGOUT`, `WORKFORCE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PERMISSION_VIEW` for …
 
 #### Requirements it meets
 
@@ -429,8 +431,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (24), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (23 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (28), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-053?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: End this session, Create principal, Save principal, Reset principal credential, Sign everyone out, Email me a code instead.
 - [ ] Every transition is wired: `BO-055`.
@@ -449,7 +451,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 1 · needs the `core` module |
-| Block | Block A · ticket #17799 (APP-SETUP-BO-054) |
+| Block | Block A · task APP-SETUP-BO-054 |
 | Who uses it | venue staff holding `PERMISSION_VIEW`, `ROLE_MANAGE`, `USER_MANAGE` (1 read, 2 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listRoles` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -585,7 +587,7 @@ Errors to draw in the form: 409 A business code the request names is already use
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the role assignment untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No role assignment yet. Offers Create role (`createRole`). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listRoles` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires to show this screen, and names that permission (the screen's other reads need `PERMISSION_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `USER_MANAGE` for `updatePrincipal`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither `principalId` nor `jobTitleId` with `scopePath`, or both.; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 Breaches a segregation rule. Names the rule and both permissions.; 422 A preset code that does not exist (`unknown-preset`), or an initial permission set that … |
 
@@ -633,7 +635,7 @@ roles:
 - `resolvePermissions` → `PERMISSION_VIEW` (read) · staff
 - `listCapabilityTemplates` → `PERMISSION_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires to show this screen, and names that permission (the screen's other reads need `PERMISSION_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `USER_MANAGE` for `updatePrincipal`.
 
 #### Requirements it meets
 
@@ -690,7 +692,7 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | People & Access Rights · wave 2 · needs the `core` module |
+| Module | People & Access Rights · wave 1 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `SCOPE_VIEW`, `WORKFORCE_MANAGE`, `WORKFORCE_VIEW` (2 read, 1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
@@ -728,7 +730,7 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 
 **Form: Create rota assignment** (modal, opened by *Create rota assignment*; *Create rota assignment* calls `createRotaAssignment`, *Cancel* sends nothing)
 
-**Collects what `createRotaAssignment` sends before it is called.** Required: `principalId`, `venueId`, `position`, `startsAt`, `endsAt`. Optional: `overtimeMinutes`, `restPeriodBefore`, `breachesWorkingHourLimit`, `labourCost`, `id`, `displayName`, `departmentId`, `requiredRoleId`, `workstationId`, `status`, `breakMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `createRotaAssignment` sends before it is called.** Required: `principalId`, `venueId`, `position`, `startsAt`, `endsAt`. Optional: `restPeriodBefore`, `labourCost`, `departmentId`, `requiredRoleId`, `workstationId`, `status`, `breakMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `breachesWorkingHourLimit`, `displayName`, `id`, `overtimeMinutes` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -750,7 +752,7 @@ Errors to draw in the form: 409 Overlaps an existing assignment, or the person l
 
 **Form: Save rota assignment** (modal, opened by *Save rota assignment*; *Save rota assignment* calls `updateRotaAssignment`, *Cancel* sends nothing)
 
-**Collects what `updateRotaAssignment` sends before it is called.** Required: `principalId`, `venueId`, `position`, `startsAt`, `endsAt`. Optional: `overtimeMinutes`, `restPeriodBefore`, `breachesWorkingHourLimit`, `labourCost`, `id`, `displayName`, `departmentId`, `requiredRoleId`, `workstationId`, `status`, `breakMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `updateRotaAssignment` sends before it is called.** Required: `principalId`, `venueId`, `position`, `startsAt`, `endsAt`. Optional: `restPeriodBefore`, `labourCost`, `departmentId`, `requiredRoleId`, `workstationId`, `status`, `breakMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `breachesWorkingHourLimit`, `displayName`, `id`, `overtimeMinutes` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -806,14 +808,8 @@ Errors to draw in the form: 409 The swap is not like for like (audit R129 (6)): 
 | Rest period before | 1,234 | Minutes since the previous shift ended. The check that stops a closing shift followed by an opening one, which is legal in most places and … |
 | Breaches working hour limit | yes / no (icon or chip) | Flagged at assignment, not discovered at payroll. A rota that breaches a statutory limit is a rota somebody has to redo, and finding out a … |
 | Labour cost | AED 1,234.50 | Cost at the point of scheduling. A manager building a rota without seeing its cost is a manager who finds out from finance. |
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
 | Display name | text | — |
-| Venue | the name it points at, never the id | — |
-| Department | the name it points at, never the id | — |
 | Position | text | What they are rostered to do — gate steward, cashier, lifeguard, technician. Most positions never touch a till, which is why a rota … |
-| Required role | the name it points at, never the id | Checked on assignment. A rota naming someone unqualified is a rota that gets overridden. |
-| Workstation | the name it points at, never the id | Where the position needs a till. The link between a rota and a cash session, without merging the two. |
 
 **The selected rota assignment** (detail panel, from `listRotaAssignments`)
 
@@ -821,16 +817,8 @@ Errors to draw in the form: 409 The swap is not like for like (audit R129 (6)): 
 |---|---|---|
 | Overtime minutes | 1,234 | BL-044, 1.2.83. UAE labour law limits working hours and mandates rest periods, and nothing in the package counted either. |
 | Rest period before | 1,234 | Minutes since the previous shift ended. The check that stops a closing shift followed by an opening one, which is legal in most places and … |
-| Breaches working hour limit | yes / no (icon or chip) | Flagged at assignment, not discovered at payroll. A rota that breaches a statutory limit is a rota somebody has to redo, and finding out a … |
 | Labour cost | AED 1,234.50 | Cost at the point of scheduling. A manager building a rota without seeing its cost is a manager who finds out from finance. |
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
 | Display name | text | — |
-| Venue | the name it points at, never the id | — |
-| Department | the name it points at, never the id | — |
-| Position | text | What they are rostered to do — gate steward, cashier, lifeguard, technician. Most positions never touch a till, which is why a rota … |
-| Required role | the name it points at, never the id | Checked on assignment. A rota naming someone unqualified is a rota that gets overridden. |
-| Workstation | the name it points at, never the id | Where the position needs a till. The link between a rota and a cash session, without merging the two. |
 | Starts at | 1 Oct 2026, 14:30 | — |
 | Ends at | 1 Oct 2026, 14:30 | — |
 | Status | chip: Planned, Published, Confirmed, Swap pending, Cancelled, Completed… | — |
@@ -867,7 +855,7 @@ Errors to draw in the form: 409 The swap is not like for like (audit R129 (6)): 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the rota scheduling untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No rota scheduling yet. Offers Create rota assignment (`createRotaAssignment`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on from, to, principalId, departmentId and the rota scheduling are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORKFORCE_VIEW`, which `listRotaAssignments` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORKFORCE_VIEW`, which `listRotaAssignments` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WORKFORCE_MANAGE` for `createRotaAssignment` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Overlaps an existing assignment, or the person lacks the required role; 409 The swap is not like for like (audit R129 (6)): the other person does not hold the assignment's role (`swap-role-mismatch`), or is not staff at the … |
 
@@ -901,7 +889,7 @@ shifts:
 - `requestShiftSwap` → `WORKFORCE_VIEW` (read) · staff
 - `listOrgUnits` → `SCOPE_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `WORKFORCE_VIEW`, which `listRotaAssignments` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `WORKFORCE_VIEW`, which `listRotaAssignments` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WORKFORCE_MANAGE` for `createRotaAssignment` …
 
 #### Requirements it meets
 
@@ -940,7 +928,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (32), with its required mark, default, format and its error state (403, 409).
-- [ ] Every output is drawn (33 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-055?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create rota assignment, Save rota assignment, Request shift swap.
 - [ ] Every transition is wired: `BO-056`.
@@ -959,14 +947,14 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 2 · needs the `core` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ATTENDANCE_RECORD`, `WORKFORCE_MANAGE`, `WORKFORCE_VIEW` (1 operate, 1 configure, 1 read) |
+| Who uses it | venue staff holding `WORKFORCE_MANAGE`, `WORKFORCE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAttendance` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
 | Offline | online only |
 | Opens with | `recordId` (deepLink) · cold entry: **A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know … |
 | Route | `/venue-operations/time-attendance` |
 
-**What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+**What the spec says about it.** Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **Attendance is self clock-in only** (decided by Chinmay, 3 October 2026 (CHG-SPF-009), not the recommendation): staff clock in and out themselves on the staff app (`recordAttendance`, EMP-024 and EMP-025); a supervisor corrects a record afterwards here with Amend attendance (`amendAttendance`). Record attendance left this screen.
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** Attendance against the rota: who clocked in and out, where, late starts, no-shows and who covered, with supervisor amendments kept as history (the original is never overwritten). The one thing to get right: clock-ins are shown beside the assignments that expected them, so exceptions jump out.
 
@@ -994,21 +982,6 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Corrected at `correctedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `amendAttendance` body |
 | Reason `reason` | text area | required | — | max length 300 | — | — | `amendAttendance` body |
 
-**Form: Record attendance** (modal, opened by *Record attendance*; *Record attendance* calls `recordAttendance`, *Cancel* sends nothing)
-
-**Collects what `recordAttendance` sends before it is called.** Required: `kind`, `occurredAt`. Optional: `assignmentId`, `accessPointId`, `latitude`, `longitude`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Kind `kind` | radio group | required | — | Clock in · Clock out · Break start · Break end | — | — | `recordAttendance` body |
-| Occurred at `occurredAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | Device time. The server records both this and when it arrived. | `recordAttendance` body |
-| Assignment `assignmentId` | picker: choose an assignment | optional | — | — | shows names, sends the id | — | `recordAttendance` body |
-| Access point `accessPointId` | picker: choose an access point | optional | — | — | shows names, sends the id | — | `recordAttendance` body |
-| Latitude `latitude` | number field | optional | — | — | — | — | `recordAttendance` body |
-| Longitude `longitude` | number field | optional | — | — | — | — | `recordAttendance` body |
-
-Errors to draw in the form: 409 Out of sequence — a clock-out with no clock-in, or a second clock-in. Reported rather than silently corrected.
-
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
 - **Filters**: Date (default today), person picker, Exceptions only toggle. *(source: contracts/satellite/workforce.yaml#listAttendance)*
@@ -1023,39 +996,25 @@ Errors to draw in the form: 409 Out of sequence — a clock-out with no clock-in
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
-| Assignment | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
 | Kind | chip: Clock in, Clock out, Break start, Break end | — |
 | Occurred at | 1 Oct 2026, 14:30 | Device time — when it happened. |
 | Recorded at | 1 Oct 2026, 14:30 | When the server received it. Both are kept: a steward clocking in offline at a gate is not late because the sync was. |
-| Access point | the name it points at, never the id | — |
 | Latitude | 1,234.5 | — |
 | Longitude | 1,234.5 | — |
 | Is amended | yes / no (icon or chip) | — |
-| Amended by principal | the name it points at, never the id | Who made the latest amendment. The full history is `amendments` (audit R129 (7)). |
 
 **The selected attendance** (detail panel, from `listAttendance`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
-| Assignment | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
 | Kind | chip: Clock in, Clock out, Break start, Break end | — |
 | Occurred at | 1 Oct 2026, 14:30 | Device time — when it happened. |
 | Recorded at | 1 Oct 2026, 14:30 | When the server received it. Both are kept: a steward clocking in offline at a gate is not late because the sync was. |
-| Access point | the name it points at, never the id | — |
 | Latitude | 1,234.5 | — |
 | Longitude | 1,234.5 | — |
-| Is amended | yes / no (icon or chip) | — |
-| Amended by principal | the name it points at, never the id | Who made the latest amendment. The full history is `amendments` (audit R129 (7)). |
 | Amendment reason | text | The latest amendment's reason. The full history is `amendments` (audit R129 (7)). |
 | Original occurred at | 1 Oct 2026, 14:30 | The original is never overwritten. Attendance feeds pay, and a record that can be quietly rewritten is not evidence. |
 | Amendments | list or chips (count when long) | Every correction, oldest first, one row each (decided 28 September, audit R129 (7)). |
-| Exception | chip: Late, Early leave, Missing clock out, No show, Out of geofence, Unscheduled | Computed against the rota. Null where the record matches what was expected. |
 
 **Amendment history** (data table, from `listAttendance`): **Every correction, not only the last** (decided 28 September, audit R129 (7)) — read from `AttendanceRecord.amendments`: who, when, before, after and why.
 
@@ -1072,7 +1031,6 @@ Errors to draw in the form: 409 Out of sequence — a clock-out with no clock-in
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Amend attendance (primary button) | `amendAttendance` POST `/attendance/{recordId}/amend` | inline | AttendanceRecord | — | opens modal first |
-| Record attendance (secondary button) | `recordAttendance` POST `/attendance/clock` | inline | AttendanceRecord | 409 Out of sequence — a clock-out with no clock-in, or a second clock-in. Reported rather than silently corrected. | opens modal first |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1089,9 +1047,8 @@ Errors to draw in the form: 409 Out of sequence — a clock-out with no clock-in
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the time attendance untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No time attendance yet. Offers Record attendance (`recordAttendance`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on date, principalId, exceptionsOnly and the time attendance are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORKFORCE_VIEW`, which `listAttendance` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORKFORCE_VIEW`, which `listAttendance` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WORKFORCE_MANAGE` for `amendAttendance`. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Out of sequence — a clock-out with no clock-in, or a second clock-in. Reported rather than silently corrected. |
 
 #### Edge cases to draw
 
@@ -1127,21 +1084,17 @@ day:
 
 - `listAttendance` → `WORKFORCE_VIEW` (read) · staff
 - `amendAttendance` → `WORKFORCE_MANAGE` (configure) · staff
-- `recordAttendance` → `ATTENDANCE_RECORD` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `WORKFORCE_VIEW`, which `listAttendance` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `WORKFORCE_VIEW`, which `listAttendance` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WORKFORCE_MANAGE` for `amendAttendance`.
 
 #### Requirements it meets
 
-5 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+2 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 8.9.7 | System shall display staffing levels, shift attendance, assignments, absences, overtime, and workforce utilization. | Unified Operations Dashboard | CONTRACTED | `listAttendance` |
 | 1.2.75 | System shall maintain complete audit logs. | Ticketing Catalogue | CONTRACTED | `amendAttendance` |
-| 1.2.81 | System shall record planned shifts, actual check-in times, actual check-out times, attendance status, lateness, early departures, no-shows, overtime hours, attendance exceptions, and workforce … | Ticketing Catalogue | CONTRACTED | `recordAttendance` |
-| 18.9.1 | Attendance Management - Users shall clock in and clock out. | Employee Mobile App & AI Assistant | CONTRACTED | `recordAttendance` |
-| 18.9.2 | Shift Management - Users shall view assigned shifts. | Employee Mobile App & AI Assistant | CONTRACTED | `recordAttendance` |
 
 #### Client meeting inputs
 
@@ -1159,12 +1112,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (11), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (33 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (5), with its required mark, default, format and its error state.
+- [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-056?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Amend attendance, Record attendance.
+- [ ] Every action is wired with its success and its failure: Amend attendance.
 - [ ] No transition is declared; back returns where the user came from.
-- [ ] Every gated control is gated: `ATTENDANCE_RECORD`, `WORKFORCE_MANAGE`, `WORKFORCE_VIEW`.
+- [ ] Every gated control is gated: `WORKFORCE_MANAGE`, `WORKFORCE_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 1 edge case(s) from the process notes are drawn.
 - [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
@@ -1236,13 +1189,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Username | text | — |
 | Display name | text | — |
 | Is active | yes / no (icon or chip) | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | Past this, resolution returns DENY regardless of grants. |
-| Primary role | the name it points at, never the id | Determines the landing screen when the principal holds several roles and picks one at login. |
 | Roles | list or chips (count when long) | — |
 | Last login at | 1 Oct 2026, 14:30 | — |
 
@@ -1306,7 +1257,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (2), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-057?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] No transition is declared; back returns where the user came from.
@@ -1355,7 +1306,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Publish announcement** (modal, opened by *Publish announcement*; *Publish announcement* calls `publishAnnouncement`, *Cancel* sends nothing)
 
-**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`, `kind`, `publishedAt`. Optional: `id`, `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`, `expiresAt`, `publishedByPrincipalId`, `locale`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`, `kind`, `publishedAt`. Optional: `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`, `expiresAt`, `locale`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `publishedByPrincipalId` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1387,16 +1338,10 @@ Errors to draw in the form: 403 The caller lacks `ANNOUNCEMENT_PUBLISH` at the t
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Title | text | — |
 | Body | text | — |
 | Kind | chip: Operational, Safety, Emergency, Hr, Celebration | `emergency` is not a louder `operational`. It overrides the home screen, bypasses quiet hours, requires acknowledgement, and carries a … |
-| Venues | list or chips (count when long) | — |
-| Departments | list or chips (count when long) | — |
-| Roles | list or chips (count when long) | — |
-| Requires acknowledgement | yes / no (icon or chip) | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
-| Published by principal | the name it points at, never the id | — |
 | Published at | 1 Oct 2026, 14:30 | — |
 | Locale | text | — |
 
@@ -1453,7 +1398,7 @@ Errors to draw in the form: 403 The caller lacks `ANNOUNCEMENT_PUBLISH` at the t
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the notification settings untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No notification settings yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on unacknowledgedOnly and the notification settings are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORKFORCE_VIEW`, which `listAnnouncements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORKFORCE_VIEW`, which `listAnnouncements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ANNOUNCEMENT_PUBLISH` for `publishAnnouncement`. |
 | Offline (`?state=offline`) | online only |
 
 #### Consistency with other screens
@@ -1482,7 +1427,7 @@ announcements:
 - `publishAnnouncement` → `ANNOUNCEMENT_PUBLISH` (configure) · staff
 - `getAnnouncementReach` → `WORKFORCE_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `WORKFORCE_VIEW`, which `listAnnouncements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `WORKFORCE_VIEW`, which `listAnnouncements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ANNOUNCEMENT_PUBLISH` for `publishAnnouncement`.
 
 #### Requirements it meets
 
@@ -1512,7 +1457,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (12), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (29 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (23 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-066?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Publish announcement, What publishing changes.
 - [ ] No transition is declared; back returns where the user came from.
@@ -1554,7 +1499,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Assigned to me | toggle | optional | — | — | — | Sends `?assignedToMe=` to `listApprovalRequests`. | `listApprovalRequests` ?assignedToMe |
 | Raised by me | toggle | optional | — | — | — | Sends `?raisedByMe=` to `listApprovalRequests`. | `listApprovalRequests` ?raisedByMe |
 | Status | select | optional | — | Draft · Pending · Escalated · Returned · Information requested · Approved · Rejected · Withdrawn · Expired · Cancelled | — | The request status values in words, as chips; free text matched nothing. | `ApprovalRequest.status` |
-| Kind | select | optional | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; Each is an existing kind … | — | The request kind values in words, as chips; free text matched nothing. | `ApprovalRequest.kind` |
+| Kind | select | optional | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; - Publishing white-label … | — | The request kind values in words, as chips; free text matched nothing. | `ApprovalRequest.kind` |
 | Breaching within minutes | number field (minutes) | optional | — | — | — | Sends `?breachingWithinMinutes=` to `listApprovalRequests`. | `listApprovalRequests` ?breachingWithinMinutes |
 
 **Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
@@ -1562,7 +1507,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Filter | Drawn as | Default | Allowed values, rules | Source |
 |---|---|---|---|---|
 | Status | select | — | Draft · Pending · Escalated · Returned · Information requested · Approved · Rejected · Withdrawn · Expired · Cancelled | `listApprovalRequests` ?status |
-| Kind | select | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; Each is an existing kind … | `listApprovalRequests` ?kind |
+| Kind | select | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; - Publishing white-label … | `listApprovalRequests` ?kind |
 | Sort | segmented control | Sla proximity | Sla proximity · AI priority | `listApprovalRequests` ?sort |
 
 **Form: Decide approval request** (modal, opened by *Decide approval request*; *Decide approval request* calls `decideApprovalRequest`, *Cancel* sends nothing)
@@ -1609,22 +1554,14 @@ Errors to draw in the form: 403 The approver may not decide this request. Always
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | text | — |
 | Kind | chip: Refund, Price override, Discount override, Complimentary ticket, Membership … | 11.1.7 and 11.1.30–11.1.37. The first four already exist as bespoke implementations and this contract is what they collapse into. |
 | Reroute on no approver | yes / no (icon or chip) | BL-154. An approver on leave is an approval that waits for them to come back. |
-| Out of office delegate | the name it points at, never the id | — |
 | Allow email approval | yes / no (icon or chip) | Approving from an email link with no second factor is the weakest path in the system, so it is off by default and available only below a … |
 | Reopened from | the name it points at, never the id | Reopening a decided approval creates a new one that points back. Editing a decision in place destroys the record of what was originally … |
 | Status | chip: Draft, Pending, Escalated, Returned, Information requested, Approved… | — |
 | Subject contract | text | — |
 | Subject type | text | — |
-| Subject | text | — |
-| Scope path | text | — |
-| Summary | text | — |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Justification | text | — |
-| Requested by principal | the name it points at, never the id | — |
-| Matrix version | 1,234 | — |
 
 **Actions and what each produces**
 
@@ -1650,8 +1587,8 @@ Errors to draw in the form: 403 The approver may not decide this request. Always
 - → `BO-052` Goods Receipt: *The goods arrive and are received*
 - → `BO-087` Approval Delegations: *Approval Delegations*
 - → `BO-364` Approval Command Center Dashboard: *Back to the approval command centre*
-- → `BO-085` Approval Request: *Approves it*; carries `requestId`; calls `listApprovalRequests`
 - → `ADM-248` Workflow Operations Command Center: *Returns to the board's landing screen*
+- → `BO-085` Approval Request: *Approves it*; carries `requestId`; calls `listApprovalRequests`
 
 #### States
 
@@ -1661,7 +1598,7 @@ Errors to draw in the form: 403 The approver may not decide this request. Always
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the approval untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | **Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on assignedToMe, raisedByMe, status, kind, breachingWithinMinutes and the approval are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalRequests` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalRequests` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE` for `decideApprovalRequest`; `APPROVAL_REQUEST` for `escalateApprovalRequest`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 The request is no longer open for a decision. `refusedReason` says which: `alreadyDecided` (approved or rejected), `withdrawn`, `expired` or `cancelled`, and … (ApprovalStateProblem) |
 
@@ -1713,7 +1650,7 @@ rows:
 - `escalateApprovalRequest` → `APPROVAL_REQUEST` (operate) · staff
 - `getApprovalRequestScore` → `APPROVAL_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalRequests` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalRequests` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE` for `decideApprovalRequest`; `APPROVAL_REQUEST` for `escalateApprovalRequest`.
 
 #### Requirements it meets
 
@@ -1755,15 +1692,15 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 - Flow F15 *A part is needed and ordered*, step 3: A manager approves it → Value-based routing — a bearing and a compressor are not the same decision
 - Flow F165 *Rules Workflow Approval Automation Engine board 2: Workflow Operations Command …*, step 2: Works in Unified Approval Inbox & Decision Workspace → Provide users with one approval inbox across all TICVAI modules. This is extremely important. A manager should not need to open Finance for one approval, Pricing for another, Procurement for another …
 - Flow F14 branch at step 3 (recoverable): when The manager is on the shop floor, Mobile approval — `EMP-037` on the staff app. A manager who must return to an office to approve a discount is a queue at the till.
-- Flow F15 branch at step 3 (recoverable): when The requisition is returned for more information, **Not a rejection.** The technician amends and resubmits without starting again, which is the whole reason `returnRequisition` exists.
+- Flow F15 branch at step 3 (recoverable): when The requisition is returned for more information, **Not a rejection.** The technician amends and resubmits without starting again, which is why `approveRequisition` has a return decision (CHG-SPF-010).
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (11), with its required mark, default, format and its error state (403, 404, 409).
-- [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-084?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Decide approval request, Escalate approval request.
-- [ ] Every transition is wired: `BO-052`, `BO-087`, `BO-364`, `BO-085`, `ADM-248`.
+- [ ] Every transition is wired: `BO-052`, `BO-087`, `BO-364`, `ADM-248`, `BO-085`.
 - [ ] Every gated control is gated: `APPROVAL_DECIDE`, `APPROVAL_REQUEST`, `APPROVAL_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 6 edge case(s) from the process notes are drawn.
@@ -1804,7 +1741,7 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 | Assigned to me | toggle | — | — | `listApprovalRequests` ?assignedToMe |
 | Raised by me | toggle | — | — | `listApprovalRequests` ?raisedByMe |
 | Status | select | — | Draft · Pending · Escalated · Returned · Information requested · Approved · Rejected · Withdrawn · Expired · Cancelled | `listApprovalRequests` ?status |
-| Kind | select | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; Each is an existing kind … | `listApprovalRequests` ?kind |
+| Kind | select | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; - Publishing white-label … | `listApprovalRequests` ?kind |
 | Breaching within minutes | number field (minutes) | — | — | `listApprovalRequests` ?breachingWithinMinutes |
 | Sort | segmented control | Sla proximity | Sla proximity · AI priority | `listApprovalRequests` ?sort |
 
@@ -1898,7 +1835,7 @@ Errors to draw in the form: 403 The approver may not decide this request. Always
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the approval request untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | **Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: the screen opens one request. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalRequests` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalRequests` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE` for `decideApprovalRequest`; `APPROVAL_REQUEST` for `resubmitApprovalRequest`, `withdrawApprovalRequest`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Already decided. `refusedReason` is `alreadyDecided` and `currentStatus` says whether it was approved or rejected. (ApprovalStateProblem); 409 The request is no longer open for a decision. `refusedReason` says which: `alreadyDecided` (approved or rejected), `withdrawn`, `expired` or `cancelled`, and … (ApprovalStateProblem) |
 
@@ -1941,7 +1878,7 @@ chain:
 - `resubmitApprovalRequest` → `APPROVAL_REQUEST` (operate) · staff
 - `withdrawApprovalRequest` → `APPROVAL_REQUEST` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalRequests` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalRequests` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE` for `decideApprovalRequest`; `APPROVAL_REQUEST` for `resubmitApprovalRequest`, `withdrawApprovalRequest`.
 
 #### Requirements it meets
 
@@ -2024,16 +1961,16 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 
 | Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
 |---|---|---|---|---|---|---|---|
-| Kind | select | optional | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; Each is an existing kind … | — | Sends `?kind=` to `listApprovalMatrices`. | `listApprovalMatrices` ?kind |
+| Kind | select | optional | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; - Publishing white-label … | — | Sends `?kind=` to `listApprovalMatrices`. | `listApprovalMatrices` ?kind |
 | Effective | toggle | optional | off | — | — | Sends `?effective=` to `listApprovalMatrices`. | `listApprovalMatrices` ?effective |
 
 **Form: Save approval matrix** (modal, opened by *Save approval matrix*; *Save approval matrix* calls `setApprovalMatrix`, *Cancel* sends nothing)
 
-**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`, `rules`. Optional: `id`, `scopePath`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`, `rules`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
-| Kind `kind` | select | required | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; Each is an existing kind … | — | 11.1.7 and 11.1.30–11.1.37. The first four already exist as bespoke implementations and this contract is what they collapse into. | `setApprovalMatrix` body |
+| Kind `kind` | select | required | — | Refund · Price override · Discount override · Complimentary ticket · Membership cancellation · Access permission change · Configuration change · AI recommendation · Release promotion · Requisition · Stock write off · Journal entry …; - Publishing white-label … | — | 11.1.7 and 11.1.30–11.1.37. The first four already exist as bespoke implementations and this contract is what they collapse into. | `setApprovalMatrix` body |
 | Scope level `scopeLevel` | segmented control | required | — | Tenant · Region · Venue | — | — | `setApprovalMatrix` body |
 | Rules `rules` | repeatable rows | required | — | — | — | — | `setApprovalMatrix` body |
 | Order `rules[].order` | number field | required | — | — | — | First match wins. Explicit ordering is what makes a matrix reviewable — an unordered set of overlapping rules is one nobody can reason about. | `setApprovalMatrix` body |
@@ -2215,7 +2152,7 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 2 · needs the `core` module |
-| Block | Block A · ticket #17817 (APP-SETUP-BO-087) |
+| Block | Block B · task APP-SETUP-BO-087 |
 | Who uses it | venue staff holding `APPROVAL_DECIDE`, `APPROVAL_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listApprovalDelegations` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2237,7 +2174,7 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 
 **Form: Create approval delegation** (modal, opened by *Create approval delegation*; *Create approval delegation* calls `createApprovalDelegation`, *Cancel* sends nothing)
 
-**Collects what `createApprovalDelegation` sends before it is called.** Required: `delegatorPrincipalId`, `delegatePrincipalId`, `from`, `to`. Optional: `id`, `kinds`, `maxAmount`, `reason`, `isActive`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `createApprovalDelegation` sends before it is called.** Required: `delegatorPrincipalId`, `delegatePrincipalId`, `from`, `to`. Optional: `kinds`, `maxAmount`, `reason`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `isActive` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -2275,16 +2212,12 @@ Errors to draw in the form: 400 The delegation is malformed. `refusedReason` is 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Delegator principal | the name it points at, never the id | A principal id (`identity.Principal.id`). This contract stores the id only; the name to show, and the people to pick from, come from … |
-| Delegate principal | the name it points at, never the id | A principal id, resolved to a name the same way as `delegatorPrincipalId`. |
 | Kinds | list or chips (count when long) | Absent means everything the delegator may approve. |
 | Max amount | AED 1,234.50 | A delegate may be given less authority than the delegator, never more. |
 | From | 1 Oct 2026, 14:30 | — |
 | To | 1 Oct 2026, 14:30 | Required. An open-ended delegation is an approver who quietly stopped approving and a delegate who does not know they still hold it. |
 | Reason | text | — |
 | Is active | yes / no (icon or chip) | — |
-| Scope path | text | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it … |
 
 **Actions and what each produces**
 
@@ -2321,7 +2254,7 @@ Errors to draw in the form: 400 The delegation is malformed. `refusedReason` is 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the approval delegations untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No approval delegations yet. Offers Create approval delegation (`createApprovalDelegation`). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listApprovalDelegations` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalDelegations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalDelegations` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE` for `createApprovalDelegation`, `revokeApprovalDelegation`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 The delegation is malformed. `refusedReason` is `invalidWindow` where `to` is not after `from`, or `delegateIsDelegator` where both principals are the same … (DelegationRefusedProblem) |
 
@@ -2360,7 +2293,7 @@ delegations:
 - `createApprovalDelegation` → `APPROVAL_DECIDE` (operate) · staff
 - `revokeApprovalDelegation` → `APPROVAL_DECIDE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalDelegations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalDelegations` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE` for `createApprovalDelegation`, `revokeApprovalDelegation`.
 
 #### Requirements it meets
 
@@ -2390,7 +2323,7 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (8), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-087?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create approval delegation, Revoke approval delegation.
 - [ ] Every transition is wired: `BO-084`, `BO-085`.
@@ -2512,7 +2445,7 @@ Method, path, parameters, request and response for every operation these screens
 "getPrincipal": {"method":"GET","path":"/principals/{principalId}","contract":"identity","summary":"Read a principal","permission":"USER_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"Principal"},
 "listAccessReviewCampaigns": {"method":"GET","path":"/access-review-campaigns","contract":"identity","summary":"Access review campaigns, open first","permission":"PERMISSION_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listAccessReviewItems": {"method":"GET","path":"/access-review-campaigns/{campaignId}/items","contract":"identity","summary":"The grants a campaign asks somebody to certify or revoke","permission":"PERMISSION_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"status","in":"query","required":null},{"name":"assignedToMe","in":"query","required":null},{"name":"findingKind","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
-"listActiveSessions": {"method":"GET","path":"/auth/sessions","contract":"identity","summary":"List active sessions","permission":"SESSION_FORCE_LOGOUT","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"principalId","in":"query","required":null},{"name":"workstationId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listActiveSessions": {"method":"GET","path":"/auth/sessions","contract":"identity","summary":"List active sessions","permission":"SESSION_FORCE_LOGOUT","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"X-Supervisor-Principal-Id","in":"header","required":false},{"name":"X-Supervisor-Pin","in":"header","required":false},{"name":"venueId","in":"query","required":null},{"name":"principalId","in":"query","required":null},{"name":"workstationId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listAnnouncements": {"method":"GET","path":"/announcements","contract":"workforce","summary":"What staff have been told","permission":"WORKFORCE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"unacknowledgedOnly","in":"query","required":null}],"requestBody":null,"responds":"Announcement"},
 "listApprovalDelegations": {"method":"GET","path":"/delegations","contract":"approvals","summary":"Who is standing in for whom","permission":"APPROVAL_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"ApprovalDelegation"},
 "listApprovalMatrices": {"method":"GET","path":"/approval-matrices","contract":"approvals","summary":"What requires approval here","permission":"APPROVAL_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"kind","in":"query","required":null},{"name":"effective","in":"query","required":null}],"requestBody":null,"responds":"ApprovalMatrix"},
@@ -2528,7 +2461,6 @@ Method, path, parameters, request and response for every operation these screens
 "listTrainingRecords": {"method":"GET","path":"/training-records","contract":"workforce","summary":"Training completed and what is expiring","permission":"WORKFORCE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[],"requestBody":null,"responds":"TrainingRecord"},
 "listWorkAssignments": {"method":"GET","path":"/work-assignments","contract":"workforce","summary":"Where each person is posted, and from when","permission":"WORKFORCE_VIEW","offlineCapable":null,"conflictPolicy":null,"scopeLevel":"venue","parameters":[{"name":"employeeId","in":"query","required":null},{"name":"venueId","in":"query","required":null},{"name":"activeOn","in":"query","required":null}],"requestBody":null,"responds":"WorkforceWorkAssignment"},
 "publishAnnouncement": {"method":"POST","path":"/announcements","contract":"workforce","summary":"Tell staff something","permission":"ANNOUNCEMENT_PUBLISH","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"Announcement","responds":"Announcement"},
-"recordAttendance": {"method":"POST","path":"/attendance/clock","contract":"workforce","summary":"Clock in, clock out, or take a break","permission":"ATTENDANCE_RECORD","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"AttendanceRecord"},
 "requestShiftSwap": {"method":"POST","path":"/rota-assignments/{assignmentId}/swap","contract":"workforce","summary":"Ask someone to take your shift","permission":"WORKFORCE_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "resetPrincipalCredential": {"method":"POST","path":"/principals/{principalId}/credential-reset","contract":"identity","summary":"Reset a member of staff's password or PIN","permission":"USER_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ResetCredentialRequest","responds":null},
 "resolvePermissions": {"method":"POST","path":"/permissions/resolve","contract":"identity","summary":"Simulate a principal's effective permissions","permission":"PERMISSION_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
@@ -2561,7 +2493,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AnnouncementReach": {"type":"object","x-ticvai-persistence":"none — computed from workforce.announcement_receipt","properties":{"announcementId":{"type":"string","format":"uuid"},"targeted":{"type":"integer"},"delivered":{"type":"integer"},"acknowledged":{"type":"integer"},"outstanding":{"type":"array","description":"**The list that matters.** For an operational notice it measures whether anyone read it; during an emergency it is the roll call.\n","items":{"type":"object","properties":{"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"onShift":{"type":"boolean"}}}}}},
 "ApprovalDecision": {"type":"object","x-ticvai-persistence":"approvals.decision","required":["level","principalId","decision","decidedAt"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"level":{"type":"integer"},"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"},"delegatedFrom":{"type":"string","format":"uuid","nullable":true},"decision":{"type":"string","enum":["approve","reject"]},"comment":{"type":"string","nullable":true},"reason":{"type":"string","nullable":true},"usedMfa":{"type":"boolean"},"signatureRef":{"type":"string","nullable":true},"decidedAt":{"type":"string","format":"date-time"}}},
 "ApprovalDelegation": {"type":"object","x-ticvai-persistence":"approvals.delegation","required":["delegatorPrincipalId","delegatePrincipalId","from","to"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"delegatorPrincipalId":{"type":"string","format":"uuid","description":"A principal id (`identity.Principal.id`). This contract stores the id only; the name to show, and the people to pick from, come from `identity.listPrincipals` and `identity.getPrincipal`.\n"},"delegatePrincipalId":{"type":"string","format":"uuid","description":"A principal id, resolved to a name the same way as `delegatorPrincipalId`."},"kinds":{"type":"array","description":"Absent means everything the delegator may approve.","items":{"$ref":"#/components/schemas/ApprovalKind"}},"maxAmount":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"A delegate may be given less authority than the delegator, never more."},"from":{"type":"string","format":"date-time"},"to":{"type":"string","format":"date-time","description":"**Required.** An open-ended delegation is an approver who quietly stopped approving and a delegate who does not know they still hold it.\n"},"reason":{"type":"string"},"isActive":{"type":"boolean","readOnly":true},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
-"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
+"ApprovalKind": {"type":"string","description":"11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations** and this contract is what they collapse into.\n**Which actions route here — decided 28 September, audit R144.** Finance and procurement acts go through this engine to a **finance approver**: closing a fiscal period (`periodClose`), reopening one (`periodReopen`), cancelling a purchase order (`purchaseOrderCancel`) and closing one short (`purchaseOrderShortClose`). The tenant default matrix for each of these names the finance approver role; a venue may tighten it and never loosen it. Starting a release rollout routes through `releasePromotion` to the platform release manager (a holder of `PLATFORM_RELEASE_PROMOTE`). **Not every `requiresApproval` goes here:** reopening a shift, recounting a stock count and a retail return above the venue threshold take a supervisor's step-up on the same device instead, and never raise a request.\n**Catalogue change requests route through `productChange` and `pricingChange`** (decided 29 September, writers pass): a product change and a price or pricing change raised in `catalogue` ask for approval under these two kinds, so a venue can route product edits and price edits to different approvers.\n\n**Optional review steps a venue switches on, decided 2 October 2026** (Chinmay; CHG-CSP-036, CHG-CSP-028, CHG-CSP-031). Each is an existing kind narrowed by the rule's `subjectTypes`, so no kind is added (a new value here would be a breaking change against r1) and each is off until the venue saves an active matrix for it:\n- **A purchase order** (`requisition`, subject `purchaseOrder`; Chinmay, 3 October 2026, Block A business rules; CHG-RUL-004): the PO approval matrix. Blanket and RFQ-award orders are raised without a requisition and are approved here instead; `inventory.createPurchaseOrder` asks for every order, by kind and value. - **Publishing white-label content** (`configurationChange`, subject `whiteLabelPublication`): simulate, then a single publish by a holder of the permission; a review step only where the venue sets one up (batch 1, CMS-014; DEC-156). - **Recording F&B waste above a value** (`stockWriteOff`, subject `fnbWaste`): the venue's waste-approval policy, value bands as `minAmount` and `maxAmount`, photo evidence above a value held by fnb (batch 6 #192, BO-139; DEC-192; R144). - **Publishing an access topology** (`configurationChange`, subject `topologyPublication`): second-person approval when the venue switches it on (batch 6 #230, BO-153; DEC-230). - **A permanent identity lock, a whitelist entry, or releasing a full-identity or permanent lock** (`accessPermissionChange`, subjects `identityLock`, `whitelistEntry`, `identityLockRelease`): always a second approver, never for an until-end-of-day lock (critical set 1, BO-229 and BO-247; DEC-254, DEC-260); the tenant default matrix names the security approver role and a venue may tighten it, never remove it.\n","enum":["refund","priceOverride","discountOverride","complimentaryTicket","membershipCancellation","accessPermissionChange","configurationChange","aiRecommendation","releasePromotion","requisition","stockWriteOff","journalEntry","periodClose","periodReopen","purchaseOrderCancel","purchaseOrderShortClose","tenantMigration","productChange","pricingChange"]},
 "ApprovalMatrix": {"type":"object","x-ticvai-persistence":"approvals.matrix","required":["kind","scopeLevel","rules"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"scopeLevel":{"type":"string","enum":["tenant","region","venue"]},"scopePath":{"type":"string","readOnly":true},"version":{"type":"integer","readOnly":true,"description":"11.1.80. **A request is decided by the rules it was raised under.** Changing the matrix mid-flight would mean an approver answering a question that changed while they read it.\n**(`kind`, `scopePath`, `version`) is unique**, and a stored version is never edited: a request's `matrixVersion` names exactly one rule set (decided 28 September, audit R129 (2)).\n"},"rules":{"type":"array","items":{"$ref":"#/components/schemas/ApprovalRule"}},"isActive":{"type":"boolean"}}},
 "ApprovalMode": {"type":"string","description":"11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once, **consensus** needs all of them, **majority** needs more than half.\nParallel and consensus differ in when it completes: parallel completes on the first approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a one-eye rule.\n","enum":["sequential","parallel","consensus","majority"]},
 "ApprovalRequest": {"type":"object","x-ticvai-persistence":"approvals.request","required":["id","kind","status","requestedByPrincipalId","requestedAt"],"properties":{"id":{"type":"string"},"kind":{"$ref":"#/components/schemas/ApprovalKind"},"rerouteOnNoApprover":{"type":"boolean","default":true,"description":"BL-154. **An approver on leave is an approval that waits for them to come back.** Reroutes to the next in the chain rather than stalling — `workforce` already knows who is on leave, and an approval queue nobody is watching is the thing that stops a venue.\n"},"outOfOfficeDelegateId":{"type":"string","format":"uuid","nullable":true},"allowEmailApproval":{"type":"boolean","default":false,"description":"**Approving from an email link with no second factor is the weakest path in the system**, so it is off by default and available only below a configured value.\n"},"reopenedFrom":{"type":"string","format":"uuid","nullable":true,"description":"**Reopening a decided approval creates a new one that points back.** Editing a decision in place destroys the record of what was originally approved, which is the only thing an audit wants.\n"},"status":{"$ref":"#/components/schemas/ApprovalStatus"},"subjectContract":{"type":"string"},"subjectType":{"type":"string"},"subjectId":{"type":"string"},"scopePath":{"type":"string"},"summary":{"type":"string"},"amount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"justification":{"type":"string","nullable":true},"requestedByPrincipalId":{"type":"string","format":"uuid"},"matrixVersion":{"type":"integer"},"mode":{"$ref":"#/components/schemas/ApprovalMode"},"currentLevel":{"type":"integer"},"totalLevels":{"type":"integer"},"pendingApprovers":{"type":"array","items":{"type":"object","properties":{"principalId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"isDelegate":{"type":"boolean"}}}},"decisions":{"type":"array","description":"Every decision at every level, in order. **Immutable once the request completes** (11.1.56) — an approval is evidence, and amending one is a different fact.\n","items":{"$ref":"#/components/schemas/ApprovalDecision"}},"escalations":{"type":"array","description":"11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver rather than replacing one**, so the original stays in the record.\n","items":{"type":"object","properties":{"at":{"type":"string","format":"date-time"},"reason":{"type":"string"},"fromLevel":{"type":"integer"},"toLevel":{"type":"integer"},"wasAutomatic":{"type":"boolean"}}}},"resubmittedFromId":{"type":"string","nullable":true},"reopenedFromId":{"type":"string","nullable":true},"slaDueAt":{"type":"string","format":"date-time","nullable":true},"slaBreached":{"type":"boolean"},"expiresAt":{"type":"string","format":"date-time","nullable":true},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"Who claimed or was assigned the request in a shared queue (`assignApprovalRequest`; DI-723; CHG-CSP-042). Null while it sits in the queue."},"assignedToDepartmentId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The department queue it was assigned to, where it went to a department rather than a person (CHG-CSP-042)."},"assignedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true},"requestedAt":{"type":"string","format":"date-time"},"completedAt":{"type":"string","format":"date-time","nullable":true},"aiAssessment":{"type":"object","nullable":true,"readOnly":true,"description":"**AI context for the reviewer, never an input to the decision** (11.1.73 to 11.1.75; MoM 8 September; 29 September, build pass, group G2). Written by approvals from `ai.scoreApprovalRequest` on submit and on each SLA tick; null where AI is off or has not answered. Shown on the request labelled as AI; orders the inbox only when `sort=aiPriority` is asked for.","properties":{"riskScore":{"type":"integer","minimum":0,"maximum":100},"riskBand":{"type":"string","enum":["low","medium","high","critical"]},"priorityScore":{"type":"integer","minimum":0,"maximum":100},"escalationSuggestion":{"type":"object","description":"A suggestion a person may act on through `escalateApprovalRequest`, or the tenant's own SLA policy may; nothing escalates because of it.","properties":{"action":{"type":"string","enum":["escalate","addBackupApprover","none"]},"reason":{"type":"string","nullable":true}}},"signals":{"type":"array","maxItems":10,"description":"The signals behind the scores, largest first, as `ai.AiApprovalRequestScore.signals`.","items":{"type":"object","properties":{"code":{"type":"string"},"contribution":{"type":"number"},"detail":{"type":"string","nullable":true}}}},"scoreId":{"type":"string","format":"uuid","description":"The `ai.approval_request_score` row it was copied from; `ai.getApprovalRequestScore` gives the full context. Not a foreign key (the score lives in the AI service)."},"decisionRecordId":{"type":"string","description":"The ai decision record, for the audit of what the AI said and why."},"assessedAt":{"type":"string","format":"date-time"}}}}},
@@ -2591,6 +2523,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "Session": {"type":"object","required":["sessionId","principalId","roleId","scope","effectivePermissions"],"properties":{"sessionId":{"type":"string","format":"uuid"},"principalId":{"type":"string","format":"uuid"},"roleId":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"scope":{"type":"array","description":"Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. Clients filter navigation against this — they never compute it.\n","items":{"$ref":"../shared/common.yaml#/components/schemas/ScopeRef"}},"effectivePermissions":{"allOf":[{"$ref":"../shared/permissions.yaml#/components/schemas/PermissionSet"}],"description":"Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. Anything scope-sensitive must use `permissionsByScope`.\n"},"permissionsByScope":{"type":"array","description":"Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves.\n","items":{"$ref":"../shared/permissions.yaml#/components/schemas/ScopedPermissions"}},"saleBoardId":{"type":"string","format":"uuid","description":"Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board.\n\n**Optional since 2 October 2026: only a till session carries it** (Chinmay, door follow-ups; CHG-CSP-002; breaking change against r1 approved as BC-001 to BC-005 in `docs/active/breaking-changes.yaml`). A browser door (ADM-001, SUP-001, PTR-001) and a staff handheld (EMP-001) sign in with no workstation since CHG-DOOR-001, so they have no board to land on and the field is absent. On a till it is the workstation's effective board: the outlet's board unless the till overrides it (`tenancy.Workstation.saleBoardSource`; CHG-CSP-006). A client reads its landing from this field when present and from its own platform otherwise.\n"},"workstation":{"$ref":"#/components/schemas/WorkstationContext"},"openedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time"}}},
 "SessionStatus": {"type":"string","description":"**The life of one signed-in session, which is not the life of a shift.** A shift holds the float and survives a break; a session holds the person and does not. `ShiftStatus.suspended` is where a break lives — *break cover; float intact, workstation released* — and the release of the workstation is exactly why the session ends rather than pausing: the next person opens their own.\n**One principal, one active session per workstation.** Enforced by the `ActiveSession` registry rather than by a state, because it is a fact about the set of sessions and not about any one of them.\n","enum":["active","signedOut","terminated","expired"]},
 "SuggestionBasis": {"type":"string","description":"**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n","enum":["heuristic","statistical","model","hybrid","manual"]},
+"SupervisorStepUp": {"type":"object","description":"**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n","required":["principalId","credential"],"properties":{"principalId":{"type":"string","format":"uuid","description":"The supervisor signing. Recorded against the act."},"credential":{"type":"string","maxLength":512,"writeOnly":true,"description":"The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."}}},
 "TrainingRecord": {"type":"object","x-ticvai-persistence":"workforce.training_record","description":"**Drafted 4 September.** One person, one course, one outcome. **The field that matters is the expiry** - a lapsed food-safety or first-aid certificate is a person who may not work a station, and a list without it is a list nobody can roster from.","required":["id"],"properties":{"id":{"type":"string","format":"uuid"},"principalId":{"type":"string","format":"uuid"},"courseName":{"type":"string"},"required":{"type":"boolean"},"completedAt":{"type":"string","format":"date-time"},"expiresAt":{"type":"string","format":"date-time"},"state":{"type":"string","enum":["notStarted","inProgress","passed","failed","expired"]},"evidenceRef":{"type":"string"}}},
 "WorkforceJobTitle": {"type":"object","x-ticvai-persistence":"workforce.job_title","description":"**Taken from the backend workbook, 20 September.** Stores job/designation definitions such as Cashier, Manager, Chef or Technician.","required":["tenantId","code","name","isActive","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"tenantId":{"type":"string","format":"uuid"},"code":{"type":"string","maxLength":50},"name":{"type":"string","maxLength":150},"description":{"type":"string","maxLength":500,"nullable":true},"isActive":{"type":"boolean"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time","nullable":true}}},
 "WorkforceWorkAssignment": {"type":"object","x-ticvai-persistence":"workforce.work_assignment","description":"**Taken from the backend workbook, 20 September.** Assigns an employee to a job and operational location/scope for an effective period.","required":["employeeId","jobTitleId","effectiveFrom","isPrimary","status","createdAt"],"properties":{"id":{"type":"string","format":"uuid"},"employeeId":{"type":"string","format":"uuid"},"jobTitleId":{"type":"string","format":"uuid"},"scopePath":{"type":"string","nullable":true},"venueId":{"type":"string","format":"uuid","nullable":true},"departmentId":{"type":"string","format":"uuid","nullable":true},"outletId":{"type":"string","format":"uuid","nullable":true},"effectiveFrom":{"type":"string","format":"date"},"effectiveTo":{"type":"string","format":"date","nullable":true},"isPrimary":{"type":"boolean"},"status":{"type":"string","maxLength":30},"createdAt":{"type":"string","format":"date-time"}}},

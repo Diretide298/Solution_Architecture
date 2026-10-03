@@ -43,17 +43,26 @@
     {
      "to": "BO-626",
      "trigger": "Accreditation Holder Profile",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "holderId"
+     ]
     },
     {
      "to": "BO-627",
      "trigger": "Identity Details & Verification",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+     "provenance": "authored 3 October 2026 (CHG-SPF-004): BO-625 holds holderId and BO-627 cannot load without it, so the edge carries it; was: structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "holderId"
+     ]
     },
     {
      "to": "BO-628",
      "trigger": "Photo Management",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+     "provenance": "authored 3 October 2026 (CHG-SPF-004): BO-625 holds holderId and BO-628 cannot load without it, so the edge carries it; was: structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "holderId"
+     ]
     },
     {
      "to": "BO-629",
@@ -73,12 +82,18 @@
     {
      "to": "BO-632",
      "trigger": "Organization & Affiliation Management",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "holderId"
+     ]
     },
     {
      "to": "BO-633",
      "trigger": "Profile Completeness & Compliance Monitor",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "holderId"
+     ]
     },
     {
      "to": "BO-634",
@@ -330,7 +345,9 @@
    "params": [
     {
      "name": "holderId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getAccreditationHolder` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -887,7 +904,9 @@
    "params": [
     {
      "name": "documentId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAccreditationDocuments` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1055,7 +1074,9 @@
    "params": [
     {
      "name": "conflictId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAccreditationIdentityConflicts` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1187,7 +1208,9 @@
    "params": [
     {
      "name": "holderId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updateAccreditationHolder` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1306,7 +1329,9 @@
    "params": [
     {
      "name": "holderId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getAccreditationHolder` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

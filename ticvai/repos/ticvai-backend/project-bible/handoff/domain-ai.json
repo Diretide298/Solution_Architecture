@@ -2515,7 +2515,7 @@
    "name": "Add-ons & Upsell",
    "platform": "P01",
    "platformName": "Guest Web",
-   "wave": 2,
+   "wave": 1,
    "operations": [
     "decideRecommendations",
     "recordRecommendationEvents"
@@ -2526,7 +2526,7 @@
    "name": "Loyalty & Rewards",
    "platform": "P01",
    "platformName": "Guest Web",
-   "wave": 2,
+   "wave": 1,
    "operations": [
     "decideRecommendations",
     "recordRecommendationEvents"
@@ -2537,7 +2537,7 @@
    "name": "AI Concierge \u2013 Home",
    "platform": "P01",
    "platformName": "Guest Web",
-   "wave": 2,
+   "wave": 1,
    "operations": [
     "createAiConversation",
     "listAiConversations",
@@ -2562,7 +2562,7 @@
    "name": "AI Concierge \u2013 Home",
    "platform": "P02",
    "platformName": "Guest App",
-   "wave": 2,
+   "wave": 1,
    "operations": [
     "createAiConversation",
     "listAiConversations",
@@ -2576,7 +2576,7 @@
    "name": "AI Concierge \u2013 Chat",
    "platform": "P02",
    "platformName": "Guest App",
-   "wave": 2,
+   "wave": 1,
    "operations": [
     "recordAnswerFeedback",
     "sendAiMessage"
@@ -2587,7 +2587,7 @@
    "name": "AI Concierge \u2013 Contextual Help",
    "platform": "P02",
    "platformName": "Guest App",
-   "wave": 2,
+   "wave": 1,
    "operations": [
     "createAiConversation",
     "recordAnswerFeedback",
@@ -2599,7 +2599,7 @@
    "name": "Loyalty & Rewards",
    "platform": "P02",
    "platformName": "Guest App",
-   "wave": 2,
+   "wave": 1,
    "operations": [
     "decideRecommendations",
     "recordRecommendationEvents"
@@ -2610,7 +2610,7 @@
    "name": "Upsell / Cross-Sell",
    "platform": "P02",
    "platformName": "Guest App",
-   "wave": 2,
+   "wave": 1,
    "operations": [
     "decideRecommendations",
     "recordRecommendationEvents"
@@ -2633,7 +2633,7 @@
    "name": "Help & My Cases",
    "platform": "P02",
    "platformName": "Guest App",
-   "wave": 2,
+   "wave": 1,
    "operations": [
     "listAiConversations"
    ]
@@ -2643,7 +2643,7 @@
    "name": "Reports",
    "platform": "P04",
    "platformName": "Venue POS",
-   "wave": 2,
+   "wave": 1,
    "operations": [
     "askReportingQuestion"
    ]
@@ -2653,7 +2653,7 @@
    "name": "Assistant",
    "platform": "P05",
    "platformName": "Guest Kiosk",
-   "wave": 2,
+   "wave": 1,
    "operations": [
     "createAiConversation",
     "recordAnswerFeedback",
@@ -2731,7 +2731,7 @@
    "name": "Report Builder",
    "platform": "P08",
    "platformName": "Venue Management",
-   "wave": 2,
+   "wave": 1,
    "operations": [
     "askReportingQuestion",
     "saveNaturalLanguageQuery"
@@ -2805,7 +2805,7 @@
    "name": "Map Import & Labelling",
    "platform": "P08",
    "platformName": "Venue Management",
-   "wave": 2,
+   "wave": 1,
    "operations": [
     "proposeVenueLabels"
    ]
@@ -2825,7 +2825,7 @@
    "name": "Product Import, Governance & AI Configuration Assistant",
    "platform": "P08",
    "platformName": "Venue Management",
-   "wave": 2,
+   "wave": 1,
    "operations": [
     "generateConfiguration"
    ]
@@ -2949,7 +2949,7 @@
    "name": "Campaign Builder",
    "platform": "P08",
    "platformName": "Venue Management",
-   "wave": 3,
+   "wave": 1,
    "operations": [
     "proposeMarketingContent"
    ]
@@ -2959,7 +2959,7 @@
    "name": "A/B & AI Optimization",
    "platform": "P08",
    "platformName": "Venue Management",
-   "wave": 3,
+   "wave": 1,
    "operations": [
     "decideAiInsight",
     "listMarketingRecommendations",
@@ -2984,7 +2984,7 @@
    "name": "Template Library",
    "platform": "P08",
    "platformName": "Venue Management",
-   "wave": 3,
+   "wave": 1,
    "operations": [
     "proposeMarketingContent",
     "proposeTranslations"
@@ -3037,7 +3037,7 @@
    "name": "Intent & Knowledge Management",
    "platform": "P08",
    "platformName": "Venue Management",
-   "wave": 3,
+   "wave": 1,
    "operations": [
     "ingestKnowledgeDocument",
     "listKnowledgeCollections",
@@ -3049,7 +3049,7 @@
    "name": "AI Event Resource Forecasting",
    "platform": "P08",
    "platformName": "Venue Management",
-   "wave": 3,
+   "wave": 1,
    "operations": [
     "createForecastScenario",
     "getForecast",
@@ -3083,7 +3083,7 @@
    "name": "AI Staffing Requirement Forecast",
    "platform": "P08",
    "platformName": "Venue Management",
-   "wave": 3,
+   "wave": 1,
    "operations": [
     "decideOperationalRequirement",
     "getAiVenueSettings",
@@ -3741,7 +3741,7 @@
    "name": "Forecast Configuration & Forecasting Strategy",
    "platform": "P09",
    "platformName": "TICVAI Web",
-   "wave": 3,
+   "wave": 1,
    "operations": [
     "listForecastDefinitions",
     "runForecast",
@@ -3807,7 +3807,7 @@
    "name": "Forecast Drivers, Confidence & Explainability",
    "platform": "P09",
    "platformName": "TICVAI Web",
-   "wave": 3,
+   "wave": 1,
    "operations": [
     "explainMetricChange",
     "getForecast",
@@ -3832,7 +3832,7 @@
    "name": "Forecast Accuracy, Review & Publication Center",
    "platform": "P09",
    "platformName": "TICVAI Web",
-   "wave": 3,
+   "wave": 1,
    "operations": [
     "exportForecastVersion",
     "getForecastAccuracy",
@@ -4008,7 +4008,7 @@
    "name": "AI Action & Permission Policy Builder",
    "platform": "P09",
    "platformName": "TICVAI Web",
-   "wave": 3,
+   "wave": 1,
    "operations": [
     "createAiGovernancePolicyDraft",
     "listAiGovernancePolicyVersions",
@@ -4055,7 +4055,7 @@
    "name": "AI Policy Testing & Governance Simulation",
    "platform": "P09",
    "platformName": "TICVAI Web",
-   "wave": 3,
+   "wave": 1,
    "operations": [
     "listAiGovernancePolicyVersions",
     "simulateAiGovernancePolicy"
@@ -4066,7 +4066,7 @@
    "name": "AI Governance Policy Publication & Effective Policy Map",
    "platform": "P09",
    "platformName": "TICVAI Web",
-   "wave": 3,
+   "wave": 1,
    "operations": [
     "getEffectiveAiPolicy",
     "listAiGovernancePolicyVersions",
@@ -4362,7 +4362,7 @@
    "name": "AI Quality, Behavior & Governance Drift Monitoring",
    "platform": "P09",
    "platformName": "TICVAI Web",
-   "wave": 3,
+   "wave": 1,
    "operations": [
     "listAiEvaluations",
     "listAiGovernanceAlerts",
@@ -4389,7 +4389,7 @@
    "name": "AI Incident & Remediation Management",
    "platform": "P09",
    "platformName": "TICVAI Web",
-   "wave": 3,
+   "wave": 1,
    "operations": [
     "closeAiIncident",
     "containAiIncident",
@@ -4471,7 +4471,7 @@
    "name": "Page Builder",
    "platform": "P13",
    "platformName": "Venue CMS",
-   "wave": 2,
+   "wave": 1,
    "operations": [
     "decideProposedAction",
     "proposeMarketingContent"
@@ -4482,7 +4482,7 @@
    "name": "Content Blocks",
    "platform": "P13",
    "platformName": "Venue CMS",
-   "wave": 2,
+   "wave": 1,
    "operations": [
     "decideProposedAction",
     "proposeMarketingContent"
@@ -4493,7 +4493,7 @@
    "name": "Media Library",
    "platform": "P13",
    "platformName": "Venue CMS",
-   "wave": 2,
+   "wave": 1,
    "operations": [
     "semanticSearch"
    ]
@@ -4503,7 +4503,7 @@
    "name": "Translations",
    "platform": "P13",
    "platformName": "Venue CMS",
-   "wave": 2,
+   "wave": 1,
    "operations": [
     "getTranslationProposals"
    ]
@@ -4523,7 +4523,7 @@
    "name": "Help Me Choose",
    "platform": "P13",
    "platformName": "Venue CMS",
-   "wave": 2,
+   "wave": 1,
    "operations": [
     "getGuidedChoiceSuggestion",
     "suggestGuidedChoice"
@@ -4545,7 +4545,7 @@
    "name": "Kitchen Performance, AI & Operational Optimization",
    "platform": "P15",
    "platformName": "Kitchen Display",
-   "wave": 2,
+   "wave": 1,
    "operations": [
     "askReportingQuestion"
    ]

@@ -95,16 +95,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-509` | Operational Forecasting Command Center | B–D | 8 | 6 | 7 | 47 | 0 | 0 | — | notStarted (—) |
-| `ADM-510` | Capacity & Occupancy Forecast | B–D | 6 | 6 | 7 | 51 | 0 | 0 | — | notStarted (—) |
-| `ADM-511` | Attraction Utilization & Queue Forecast | B–D | 6 | 6 | 7 | 58 | 0 | 6 | — | notStarted (—) |
-| `ADM-512` | Entry, Access & Guest Flow Forecast | B–D | 6 | 6 | 7 | 47 | 0 | 0 | — | notStarted (—) |
-| `ADM-513` | Workforce Demand & Staffing Forecast | B–D | 6 | 24 | 7 | 48 | 0 | 0 | — | notStarted (—) |
-| `ADM-514` | POS, Kiosk & Frontline Service Forecast | B–D | 6 | 22 | 7 | 47 | 0 | 0 | — | notStarted (—) |
-| `ADM-515` | F&B, Retail & Inventory Demand Forecast | B–D | 6 | 6 | 7 | 47 | 1 | 4 | — | notStarted (—) |
-| `ADM-516` | Resource, Equipment & Facility Requirement Forecast | B–D | 6 | 6 | 7 | 47 | 0 | 0 | — | notStarted (—) |
-| `ADM-517` | Operational Scenario & Readiness Simulator | B–D | 6 | 6 | 7 | 10 | 1 | 0 | — | notStarted (—) |
-| `ADM-518` | Operational Forecast Review, Recommendations & Handover | B–D | 6 | 6 | 7 | 9 | 0 | 0 | — | notStarted (—) |
+| `ADM-509` | Operational Forecasting Command Center | D | 8 | 6 | 7 | 47 | 0 | 0 | — | notStarted (—) |
+| `ADM-510` | Capacity & Occupancy Forecast | D | 6 | 6 | 7 | 51 | 0 | 0 | — | notStarted (—) |
+| `ADM-511` | Attraction Utilization & Queue Forecast | D | 6 | 6 | 7 | 58 | 0 | 6 | — | notStarted (—) |
+| `ADM-512` | Entry, Access & Guest Flow Forecast | D | 6 | 6 | 7 | 47 | 0 | 0 | — | notStarted (—) |
+| `ADM-513` | Workforce Demand & Staffing Forecast | D | 6 | 24 | 7 | 48 | 0 | 0 | — | notStarted (—) |
+| `ADM-514` | POS, Kiosk & Frontline Service Forecast | D | 6 | 22 | 7 | 47 | 0 | 0 | — | notStarted (—) |
+| `ADM-515` | F&B, Retail & Inventory Demand Forecast | D | 6 | 6 | 7 | 47 | 1 | 4 | — | notStarted (—) |
+| `ADM-516` | Resource, Equipment & Facility Requirement Forecast | D | 6 | 6 | 7 | 47 | 0 | 0 | — | notStarted (—) |
+| `ADM-517` | Operational Scenario & Readiness Simulator | D | 6 | 6 | 7 | 10 | 1 | 0 | — | notStarted (—) |
+| `ADM-518` | Operational Forecast Review, Recommendations & Handover | D | 6 | 6 | 7 | 9 | 0 | 0 | — | notStarted (—) |
 
 ## Design inputs from the client meetings
 

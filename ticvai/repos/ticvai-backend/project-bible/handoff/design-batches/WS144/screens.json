@@ -217,7 +217,7 @@
   "name": "Challenge Builder",
   "module": "Engagement & Support",
   "requiresModule": "marketing",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "10",
@@ -411,7 +411,9 @@
    "params": [
     {
      "name": "challengeId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listChallenges` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -443,7 +445,7 @@
   "name": "Achievement & Badge Engine",
   "module": "Engagement & Support",
   "requiresModule": "marketing",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "10",
@@ -558,7 +560,9 @@
    "params": [
     {
      "name": "customerId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `awardBadge` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ],
    "coldEntry": "Opened from BO-824 with the guest picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says plainly if the guest no longer exists."
@@ -597,7 +601,7 @@
   "name": "Points & Activity Rules",
   "module": "Engagement & Support",
   "requiresModule": "marketing",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "10",
@@ -751,7 +755,7 @@
   "name": "Milestones & Reward Rules",
   "module": "Engagement & Support",
   "requiresModule": "marketing",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Marketing_CRM_Configuration_Reference v1.0.pdf",
    "board": "10",
@@ -1461,7 +1465,9 @@
    "params": [
     {
      "name": "guestId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getGuestIntelligence` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1511,7 +1517,8 @@
     "BO-824"
    ],
    "exitTo": [
-    "BO-824"
+    "BO-824",
+    "BO-827"
    ],
    "transitions": [
     {
@@ -1519,6 +1526,14 @@
      "trigger": "Back to Gamification Command Center",
      "provenance": "structural — pack board 10 wiring, 19 September 2026",
      "back": true
+    },
+    {
+     "to": "BO-827",
+     "trigger": "Points & Activity Rules",
+     "carries": [
+      "programmeId"
+     ],
+     "provenance": "authored 3 October 2026 (CHG-SPF-004): BO-833 lists them, and BO-827 cannot load without the one the user picks"
     }
    ]
   },

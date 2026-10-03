@@ -21,7 +21,10 @@
     {
      "to": "BO-055",
      "trigger": "Rota & Scheduling",
-     "provenance": "design-note correction, 2 October 2026 (CHG-SBO)"
+     "provenance": "design-note correction, 2 October 2026 (CHG-SBO)",
+     "carries": [
+      "assignmentId"
+     ]
     }
    ],
    "notes": "A top-level Venue Management menu entry (People & Access Rights); it opens the rota (BO-055) and each person's record."
@@ -82,13 +85,11 @@
        "label": "The selected principal",
        "bindsTo": "Principal",
        "columns": [
-        "Principal.id",
         "Principal.username",
         "Principal.displayName",
         "Principal.isActive",
         "Principal.validFrom",
         "Principal.validTo",
-        "Principal.primaryRoleId",
         "Principal.roles",
         "Principal.lastLoginAt"
        ],
@@ -173,7 +174,7 @@
    "error": "Could not load. Names which read failed and leaves the staff untouched.",
    "emptyFirstRun": "No staff yet. Offers Create principal (`createPrincipal`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on scopePath, isActive and the staff are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `USER_MANAGE`, which `listPrincipals` requires to show this screen, and names that permission (the screen's other reads need `SESSION_FORCE_LOGOUT`, `WORKFORCE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PERMISSION_VIEW` for `suggestRoleAssignment`; `WORKFORCE_MANAGE` for `setJobTitle`, `setWorkAssignment`."
   },
   "apis": [
    {
@@ -295,7 +296,9 @@
    "params": [
     {
      "name": "challengeId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`; a link or an edge that holds one opens it instead."
     },
     {
      "name": "sessionId",
@@ -323,7 +326,7 @@
    "derivedFrom": "wireframes/reference/Marketing Board 1.dc.html",
    "note": "**Drawn by Claude Design on `Marketing Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "confirmResetPrincipalCredential",
@@ -550,7 +553,7 @@
    "error": "Could not load. Names which read failed and leaves the role assignment untouched.",
    "emptyFirstRun": "No role assignment yet. Offers Create role (`createRole`).",
    "emptyNoResults": "Never shown: `listRoles` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `ROLE_MANAGE`, which `listRoles` requires to show this screen, and names that permission (the screen's other reads need `PERMISSION_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `USER_MANAGE` for `updatePrincipal`."
   },
   "apis": [
    {
@@ -646,15 +649,21 @@
    "params": [
     {
      "name": "principalId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPermissionFindings` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "campaignId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAccessReviewCampaigns` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "roleId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRoles` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -663,7 +672,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-054"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetRolePermissions",
@@ -757,7 +766,7 @@
   "name": "Rota & Scheduling",
   "module": "People & Access Rights",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -850,14 +859,8 @@
         "RotaAssignment.restPeriodBefore",
         "RotaAssignment.breachesWorkingHourLimit",
         "RotaAssignment.labourCost",
-        "RotaAssignment.id",
-        "RotaAssignment.principalId",
         "RotaAssignment.displayName",
-        "RotaAssignment.venueId",
-        "RotaAssignment.departmentId",
-        "RotaAssignment.position",
-        "RotaAssignment.requiredRoleId",
-        "RotaAssignment.workstationId"
+        "RotaAssignment.position"
        ],
        "operation": "listRotaAssignments",
        "provenance": "contract workforce.yaml GET /rota-assignments"
@@ -875,16 +878,8 @@
        "columns": [
         "RotaAssignment.overtimeMinutes",
         "RotaAssignment.restPeriodBefore",
-        "RotaAssignment.breachesWorkingHourLimit",
         "RotaAssignment.labourCost",
-        "RotaAssignment.id",
-        "RotaAssignment.principalId",
         "RotaAssignment.displayName",
-        "RotaAssignment.venueId",
-        "RotaAssignment.departmentId",
-        "RotaAssignment.position",
-        "RotaAssignment.requiredRoleId",
-        "RotaAssignment.workstationId",
         "RotaAssignment.startsAt",
         "RotaAssignment.endsAt",
         "RotaAssignment.status",
@@ -926,7 +921,7 @@
    "error": "Could not load. Names which read failed and leaves the rota scheduling untouched.",
    "emptyFirstRun": "No rota scheduling yet. Offers Create rota assignment (`createRotaAssignment`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on from, to, principalId, departmentId and the rota scheduling are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `listRotaAssignments` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `listRotaAssignments` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WORKFORCE_MANAGE` for `createRotaAssignment`, `updateRotaAssignment`."
   },
   "apis": [
    {
@@ -974,7 +969,9 @@
    "params": [
     {
      "name": "assignmentId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRotaAssignments` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `assignmentId`.",
@@ -991,13 +988,13 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-055"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateRotaAssignment",
     "component": "modal",
     "trigger": "Create rota assignment",
-    "body": "**Collects what `createRotaAssignment` sends before it is called.** Required: `principalId`, `venueId`, `position`, `startsAt`, `endsAt`. Optional: `overtimeMinutes`, `restPeriodBefore`, `breachesWorkingHourLimit`, `labourCost`, `id`, `displayName`, `departmentId`, `requiredRoleId`, `workstationId`, `status`, `breakMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createRotaAssignment` sends before it is called.** Required: `principalId`, `venueId`, `position`, `startsAt`, `endsAt`. Optional: `restPeriodBefore`, `labourCost`, `departmentId`, `requiredRoleId`, `workstationId`, `status`, `breakMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `breachesWorkingHourLimit`, `displayName`, `id`, `overtimeMinutes` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "RotaAssignment",
     "confirm": {
      "label": "Create rota assignment",
@@ -1011,12 +1008,8 @@
       "position",
       "startsAt",
       "endsAt",
-      "overtimeMinutes",
       "restPeriodBefore",
-      "breachesWorkingHourLimit",
       "labourCost",
-      "id",
-      "displayName",
       "departmentId",
       "requiredRoleId",
       "workstationId",
@@ -1031,7 +1024,7 @@
     "id": "formUpdateRotaAssignment",
     "component": "modal",
     "trigger": "Save rota assignment",
-    "body": "**Collects what `updateRotaAssignment` sends before it is called.** Required: `principalId`, `venueId`, `position`, `startsAt`, `endsAt`. Optional: `overtimeMinutes`, `restPeriodBefore`, `breachesWorkingHourLimit`, `labourCost`, `id`, `displayName`, `departmentId`, `requiredRoleId`, `workstationId`, `status`, `breakMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `updateRotaAssignment` sends before it is called.** Required: `principalId`, `venueId`, `position`, `startsAt`, `endsAt`. Optional: `restPeriodBefore`, `labourCost`, `departmentId`, `requiredRoleId`, `workstationId`, `status`, `breakMinutes`, `note`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `breachesWorkingHourLimit`, `displayName`, `id`, `overtimeMinutes` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "RotaAssignment",
     "confirm": {
      "label": "Save rota assignment",
@@ -1045,12 +1038,8 @@
       "position",
       "startsAt",
       "endsAt",
-      "overtimeMinutes",
       "restPeriodBefore",
-      "breachesWorkingHourLimit",
       "labourCost",
-      "id",
-      "displayName",
       "departmentId",
       "requiredRoleId",
       "workstationId",
@@ -1122,7 +1111,7 @@
     "BO-055"
    ]
   },
-  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.",
+  "notes": "Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition at all. States derived from the screen pattern on 17 August, not individually considered — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\n**Attendance is self clock-in only** (decided by Chinmay, 3 October 2026 (CHG-SPF-009), not the recommendation): staff clock in and out themselves on the staff app (`recordAttendance`, EMP-024 and EMP-025); a supervisor corrects a record afterwards here with Amend attendance (`amendAttendance`). Record attendance left this screen.",
   "density": "compact",
   "pattern": "listDetail",
   "patternReason": "`listAttendance` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -1160,18 +1149,12 @@
        "label": "Every attendance",
        "bindsTo": "AttendanceRecord",
        "columns": [
-        "AttendanceRecord.id",
-        "AttendanceRecord.principalId",
-        "AttendanceRecord.assignmentId",
-        "AttendanceRecord.venueId",
         "AttendanceRecord.kind",
         "AttendanceRecord.occurredAt",
         "AttendanceRecord.recordedAt",
-        "AttendanceRecord.accessPointId",
         "AttendanceRecord.latitude",
         "AttendanceRecord.longitude",
-        "AttendanceRecord.isAmended",
-        "AttendanceRecord.amendedByPrincipalId"
+        "AttendanceRecord.isAmended"
        ],
        "operation": "listAttendance",
        "provenance": "contract workforce.yaml GET /attendance"
@@ -1187,22 +1170,14 @@
        "label": "The selected attendance",
        "bindsTo": "AttendanceRecord",
        "columns": [
-        "AttendanceRecord.id",
-        "AttendanceRecord.principalId",
-        "AttendanceRecord.assignmentId",
-        "AttendanceRecord.venueId",
         "AttendanceRecord.kind",
         "AttendanceRecord.occurredAt",
         "AttendanceRecord.recordedAt",
-        "AttendanceRecord.accessPointId",
         "AttendanceRecord.latitude",
         "AttendanceRecord.longitude",
-        "AttendanceRecord.isAmended",
-        "AttendanceRecord.amendedByPrincipalId",
         "AttendanceRecord.amendmentReason",
         "AttendanceRecord.originalOccurredAt",
-        "AttendanceRecord.amendments",
-        "AttendanceRecord.exception"
+        "AttendanceRecord.amendments"
        ],
        "operation": "listAttendance",
        "provenance": "contract workforce.yaml GET /attendance"
@@ -1233,12 +1208,6 @@
        "label": "Amend attendance",
        "operation": "amendAttendance",
        "provenance": "contract workforce.yaml POST /attendance/{recordId}/amend"
-      },
-      {
-       "kind": "secondaryButton",
-       "label": "Record attendance",
-       "operation": "recordAttendance",
-       "provenance": "contract workforce.yaml POST /attendance/clock"
       }
      ]
     }
@@ -1249,7 +1218,7 @@
    "error": "Could not load. Names which read failed and leaves the time attendance untouched.",
    "emptyFirstRun": "No time attendance yet. Offers Record attendance (`recordAttendance`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on date, principalId, exceptionsOnly and the time attendance are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `listAttendance` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `listAttendance` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WORKFORCE_MANAGE` for `amendAttendance`."
   },
   "apis": [
    {
@@ -1266,22 +1235,15 @@
     "invalidates": [
      "listAttendance"
     ]
-   },
-   {
-    "operationId": "recordAttendance",
-    "contract": "workforce",
-    "purpose": "Clock in, clock out, or take a break",
-    "trigger": "onAction",
-    "invalidates": [
-     "listAttendance"
-    ]
    }
   ],
   "entryState": {
    "params": [
     {
      "name": "recordId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAttendance` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `recordId`.",
@@ -1298,7 +1260,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-056"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formAmendAttendance",
@@ -1317,28 +1279,6 @@
      ]
     },
     "provenance": "contract workforce.yaml POST /attendance/{recordId}/amend"
-   },
-   {
-    "id": "formRecordAttendance",
-    "component": "modal",
-    "trigger": "Record attendance",
-    "body": "**Collects what `recordAttendance` sends before it is called.** Required: `kind`, `occurredAt`. Optional: `assignmentId`, `accessPointId`, `latitude`, `longitude`. Dismissing sends nothing; the screen behind is unchanged.",
-    "confirm": {
-     "label": "Record attendance",
-     "operation": "recordAttendance"
-    },
-    "dismiss": {
-     "label": "Cancel",
-     "discards": [
-      "kind",
-      "occurredAt",
-      "assignmentId",
-      "accessPointId",
-      "latitude",
-      "longitude"
-     ]
-    },
-    "provenance": "contract workforce.yaml POST /attendance/clock"
    }
   ],
   "_platform": {
@@ -1440,13 +1380,11 @@
        "label": "The selected principal",
        "bindsTo": "Principal",
        "columns": [
-        "Principal.id",
         "Principal.username",
         "Principal.displayName",
         "Principal.isActive",
         "Principal.validFrom",
         "Principal.validTo",
-        "Principal.primaryRoleId",
         "Principal.roles",
         "Principal.lastLoginAt"
        ],
@@ -1493,7 +1431,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-057"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -1557,16 +1495,10 @@
        "label": "Every announcement",
        "bindsTo": "Announcement",
        "columns": [
-        "Announcement.id",
         "Announcement.title",
         "Announcement.body",
         "Announcement.kind",
-        "Announcement.venueIds",
-        "Announcement.departmentIds",
-        "Announcement.roleIds",
-        "Announcement.requiresAcknowledgement",
         "Announcement.expiresAt",
-        "Announcement.publishedByPrincipalId",
         "Announcement.publishedAt",
         "Announcement.locale"
        ],
@@ -1647,7 +1579,7 @@
    "error": "Could not load. Names which read failed and leaves the notification settings untouched.",
    "emptyFirstRun": "No notification settings yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on unacknowledgedOnly and the notification settings are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `listAnnouncements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `WORKFORCE_VIEW`, which `listAnnouncements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ANNOUNCEMENT_PUBLISH` for `publishAnnouncement`."
   },
   "apis": [
    {
@@ -1676,7 +1608,9 @@
    "params": [
     {
      "name": "announcementId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAnnouncements` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `announcementId`.",
@@ -1693,13 +1627,13 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-066"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formPublishAnnouncement",
     "component": "modal",
     "trigger": "Publish announcement",
-    "body": "**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`, `kind`, `publishedAt`. Optional: `id`, `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`, `expiresAt`, `publishedByPrincipalId`, `locale`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `publishAnnouncement` sends before it is called.** Required: `title`, `body`, `kind`, `publishedAt`. Optional: `venueIds`, `departmentIds`, `roleIds`, `requiresAcknowledgement`, `expiresAt`, `locale`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `publishedByPrincipalId` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "Announcement",
     "confirm": {
      "label": "Publish announcement",
@@ -1712,13 +1646,11 @@
       "body",
       "kind",
       "publishedAt",
-      "id",
       "venueIds",
       "departmentIds",
       "roleIds",
       "requiresAcknowledgement",
       "expiresAt",
-      "publishedByPrincipalId",
       "locale"
      ]
     },
@@ -1797,6 +1729,11 @@
      "provenance": "wiring fix, 2 October 2026 (CHG-WIR-022): inherited from BO-365 (merged), flow F123 step 2→3"
     },
     {
+     "to": "ADM-248",
+     "trigger": "Returns to the board's landing screen",
+     "provenance": "flow F165 step 2→3"
+    },
+    {
      "to": "BO-085",
      "trigger": "Approves it",
      "provenance": "flow F14 step 3→4",
@@ -1804,11 +1741,6 @@
      "carries": [
       "requestId"
      ]
-    },
-    {
-     "to": "ADM-248",
-     "trigger": "Returns to the board's landing screen",
-     "provenance": "flow F165 step 2→3"
     }
    ],
    "entryFrom": [
@@ -1888,22 +1820,14 @@
        "label": "The selected approval request",
        "bindsTo": "ApprovalRequest",
        "columns": [
-        "ApprovalRequest.id",
         "ApprovalRequest.kind",
         "ApprovalRequest.rerouteOnNoApprover",
-        "ApprovalRequest.outOfOfficeDelegateId",
         "ApprovalRequest.allowEmailApproval",
         "ApprovalRequest.reopenedFrom",
         "ApprovalRequest.status",
         "ApprovalRequest.subjectContract",
         "ApprovalRequest.subjectType",
-        "ApprovalRequest.subjectId",
-        "ApprovalRequest.scopePath",
-        "ApprovalRequest.summary",
-        "ApprovalRequest.amount",
-        "ApprovalRequest.justification",
-        "ApprovalRequest.requestedByPrincipalId",
-        "ApprovalRequest.matrixVersion"
+        "ApprovalRequest.amount"
        ],
        "operation": "listApprovalRequests",
        "provenance": "contract approvals.yaml GET /approval-requests"
@@ -1935,7 +1859,7 @@
    "error": "Could not load. Names which read failed and leaves the approval untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
    "emptyNoResults": "Nothing matches the filter on assignedToMe, raisedByMe, status, kind, breachingWithinMinutes and the approval are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalRequests` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalRequests` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE` for `decideApprovalRequest`; `APPROVAL_REQUEST` for `escalateApprovalRequest`."
   },
   "apis": [
    {
@@ -1995,7 +1919,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-084"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formDecideApprovalRequest",
@@ -2221,7 +2145,7 @@
    "error": "Could not load. Names which read failed and leaves the approval request untouched.",
    "emptyFirstRun": "**Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs.",
    "emptyNoResults": "Never shown: the screen opens one request.",
-   "emptyNoAccess": "Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalRequests` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalRequests` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE` for `decideApprovalRequest`; `APPROVAL_REQUEST` for `resubmitApprovalRequest`, `withdrawApprovalRequest`."
   },
   "apis": [
    {
@@ -2279,7 +2203,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-085"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "evaluateApprovalRequirement",
@@ -2472,13 +2396,13 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-086"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetApprovalMatrix",
     "component": "modal",
     "trigger": "Save approval matrix",
-    "body": "**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`, `rules`. Optional: `id`, `scopePath`, `isActive`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setApprovalMatrix` sends before it is called.** Required: `kind`, `scopeLevel`, `rules`. Optional: `isActive`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "ApprovalMatrix",
     "confirm": {
      "label": "Save approval matrix",
@@ -2490,8 +2414,6 @@
       "kind",
       "scopeLevel",
       "rules",
-      "id",
-      "scopePath",
       "isActive"
      ]
     },
@@ -2592,16 +2514,12 @@
        "label": "The selected approval delegation",
        "bindsTo": "ApprovalDelegation",
        "columns": [
-        "ApprovalDelegation.id",
-        "ApprovalDelegation.delegatorPrincipalId",
-        "ApprovalDelegation.delegatePrincipalId",
         "ApprovalDelegation.kinds",
         "ApprovalDelegation.maxAmount",
         "ApprovalDelegation.from",
         "ApprovalDelegation.to",
         "ApprovalDelegation.reason",
-        "ApprovalDelegation.isActive",
-        "ApprovalDelegation.scopePath"
+        "ApprovalDelegation.isActive"
        ],
        "operation": "listApprovalDelegations",
        "provenance": "contract approvals.yaml GET /delegations"
@@ -2640,7 +2558,7 @@
     "id": "formCreateApprovalDelegation",
     "component": "modal",
     "trigger": "Create approval delegation",
-    "body": "**Collects what `createApprovalDelegation` sends before it is called.** Required: `delegatorPrincipalId`, `delegatePrincipalId`, `from`, `to`. Optional: `id`, `kinds`, `maxAmount`, `reason`, `isActive`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createApprovalDelegation` sends before it is called.** Required: `delegatorPrincipalId`, `delegatePrincipalId`, `from`, `to`. Optional: `kinds`, `maxAmount`, `reason`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `isActive` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "ApprovalDelegation",
     "confirm": {
      "label": "Create approval delegation",
@@ -2653,11 +2571,9 @@
       "delegatePrincipalId",
       "from",
       "to",
-      "id",
       "kinds",
       "maxAmount",
       "reason",
-      "isActive",
       "scopePath"
      ]
     },
@@ -2669,7 +2585,7 @@
    "error": "Could not load. Names which read failed and leaves the approval delegations untouched.",
    "emptyFirstRun": "No approval delegations yet. Offers Create approval delegation (`createApprovalDelegation`).",
    "emptyNoResults": "Never shown: `listApprovalDelegations` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalDelegations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `APPROVAL_VIEW`, which `listApprovalDelegations` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE` for `createApprovalDelegation`, `revokeApprovalDelegation`."
   },
   "apis": [
    {
@@ -2701,7 +2617,9 @@
    "params": [
     {
      "name": "delegationId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listApprovalDelegations` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent redirect — a supervisor following a link from an alert needs to know whether the record moved, closed or never existed, because those are three different next actions. **The scope is resolved from the session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives with `delegationId`.",
@@ -2718,7 +2636,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-087"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P08",
    "audience": "staff",

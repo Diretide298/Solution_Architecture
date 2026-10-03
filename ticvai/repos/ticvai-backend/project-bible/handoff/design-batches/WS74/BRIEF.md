@@ -96,16 +96,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `CMS-061` | Digital Asset Management Command Center | B–D | 0 | 72 | 6 | 5 | 1 | 0 | — | notStarted (—) |
-| `CMS-062` | Central Digital Asset Library | B–D | 3 | 18 | 6 | 9 | 1 | 0 | — | notStarted (—) |
-| `CMS-063` | Upload & Asset Ingestion Workspace | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `CMS-064` | Folder, Collection & Workspace Management | B–D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `CMS-065` | Metadata & Taxonomy Management | B–D | 18 | 17 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `CMS-066` | Tags, Keywords & Classification | B–D | 4 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `CMS-067` | Advanced Search & Discovery | B–D | 0 | 0 | 6 | 5 | 1 | 0 | — | notStarted (—) |
-| `CMS-068` | Digital Asset 360° Profile | B–D | 0 | 36 | 6 | 1 | 2 | 0 | — | notStarted (—) |
-| `CMS-069` | Bulk Asset Management Workspace | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `CMS-070` | Asset Activity, Recent Assets & Library Health | B–D | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `CMS-061` | Digital Asset Management Command Center | B | 0 | 72 | 6 | 5 | 1 | 0 | — | notStarted (—) |
+| `CMS-062` | Central Digital Asset Library | B | 3 | 18 | 6 | 9 | 1 | 0 | — | notStarted (—) |
+| `CMS-063` | Upload & Asset Ingestion Workspace | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `CMS-064` | Folder, Collection & Workspace Management | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `CMS-065` | Metadata & Taxonomy Management | B | 18 | 17 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `CMS-066` | Tags, Keywords & Classification | B | 4 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `CMS-067` | Advanced Search & Discovery | B | 0 | 0 | 6 | 5 | 1 | 0 | — | notStarted (—) |
+| `CMS-068` | Digital Asset 360° Profile | B | 0 | 36 | 6 | 1 | 2 | 0 | — | notStarted (—) |
+| `CMS-069` | Bulk Asset Management Workspace | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `CMS-070` | Asset Activity, Recent Assets & Library Health | B | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

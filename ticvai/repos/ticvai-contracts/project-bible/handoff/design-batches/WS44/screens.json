@@ -760,7 +760,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/product-detail-variants/product-version-management-adm-131",
    "component": "apps/venue-management-web/src/routes/venue-operations/ProductDetailVariantsDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-008"
   },
   "navigation": {
    "entryFrom": [

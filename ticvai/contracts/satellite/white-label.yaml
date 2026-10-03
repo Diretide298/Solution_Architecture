@@ -2371,7 +2371,6 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFaqs
-      x-ticvai-consumed-by: []
       x-ticvai-audience:
       - staff
       summary: Set FAQ categories and entries
@@ -3554,8 +3553,6 @@ paths:
     get:
       operationId: listAnalyticsProviders
       x-ticvai-consumed-by:
-        - "P01 WEB-001 Home / Landing"
-        - "P02 GST-001 Home"
         - "P13 CMS-016 Site Settings"
       x-ticvai-audience:
       - staff

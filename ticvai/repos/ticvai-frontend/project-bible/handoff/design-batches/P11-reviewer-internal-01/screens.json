@@ -118,7 +118,9 @@
     },
     {
      "name": "applicationId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAccreditationApplications` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "preloaded": [],
@@ -352,7 +354,10 @@
     {
      "to": "ACC-006",
      "trigger": "Reviewer Queue",
-     "provenance": "derived — ACC-006 declares entryState.params  and ACC-007 holds none of them. The edge carries nothing: ACC-007 is opened from ACC-006, so this edge is the way back and ACC-006 keeps its own state"
+     "carries": [
+      "applicationId"
+     ],
+     "provenance": "derived — ACC-006 declares entryState.params applicationId and ACC-007 holds applicationId, so an edge into it carries them"
     },
     {
      "to": "ACC-008",
@@ -562,7 +567,7 @@
     {
      "to": "ACC-006",
      "trigger": "Reviewer Queue",
-     "provenance": "derived — ACC-006 declares entryState.params  and ACC-008 holds none of them. The edge carries nothing: ACC-008 is opened from ACC-006, so this edge is the way back and ACC-006 keeps its own state"
+     "provenance": "derived — ACC-006 declares entryState.params applicationId and ACC-008 holds none of them. The edge carries nothing: ACC-008 is opened from ACC-006, so this edge is the way back and ACC-006 keeps its own state"
     },
     {
      "to": "ACC-007",

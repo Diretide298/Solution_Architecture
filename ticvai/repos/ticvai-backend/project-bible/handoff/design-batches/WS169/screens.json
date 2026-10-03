@@ -310,7 +310,9 @@
    "params": [
     {
      "name": "performanceId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createSeatHold`; a link or an edge that holds one opens it instead."
     }
    ]
   },
@@ -575,7 +577,9 @@
    "params": [
     {
      "name": "performanceId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getSeatAvailability` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -947,7 +951,9 @@
    "params": [
     {
      "name": "holdId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getSeatHold`, `relinquishSeatHold` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1076,7 +1082,9 @@
    "params": [
     {
      "name": "performanceId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getSeatAvailability` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

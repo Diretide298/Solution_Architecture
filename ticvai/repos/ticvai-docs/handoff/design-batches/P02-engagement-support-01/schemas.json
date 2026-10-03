@@ -1725,6 +1725,62 @@
    }
   }
  },
+ "GuestConversationMessage": {
+  "x-ticvai-persistence": "none — a guest view of marketing.conversation_message",
+  "description": "**One message as the guest sees it.** `sender` says whether a person, the assistant or the system wrote it, so the assistant is never taken for a person; which agent wrote it is not shown.\n",
+  "type": "object",
+  "required": [
+   "id",
+   "sender",
+   "body",
+   "sentAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sender": {
+    "type": "string",
+    "enum": [
+     "guest",
+     "agent",
+     "assistant",
+     "system"
+    ]
+   },
+   "body": {
+    "type": "string"
+   },
+   "attachments": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "assetId": {
+       "type": "string",
+       "format": "uuid"
+      },
+      "kind": {
+       "type": "string",
+       "enum": [
+        "image",
+        "video",
+        "document",
+        "ticket",
+        "qr",
+        "paymentLink"
+       ]
+      }
+     }
+    }
+   },
+   "sentAt": {
+    "type": "string",
+    "format": "date-time"
+   }
+  }
+ },
  "GuestListing": {
   "type": "string",
   "enum": [
@@ -3809,6 +3865,15 @@
     "readOnly": true,
     "description": "The anonymous device session that owns the plan until sign-in."
    },
+   "ownership": {
+    "type": "string",
+    "enum": [
+     "anonymous",
+     "account"
+    ],
+    "readOnly": true,
+    "description": "`anonymous` while the plan belongs to a device session (built and changed only; it lapses with the session), `account` once the guest signed in and the plan moved to their account, where it is saved and can be shared and booked (CHG-RUL-003).\n"
+   },
    "status": {
     "type": "string",
     "enum": [
@@ -4235,6 +4300,15 @@
     "type": "boolean",
     "default": false
    },
+   "addOnProductIds": {
+    "type": "array",
+    "readOnly": true,
+    "description": "Add-ons the guest put on this stop with `addAddOn` (CHG-RUL-009), beside an accepted suggestion, as catalogue product ids. No price: priced at booking.\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
    "pinned": {
     "type": "boolean",
     "default": false,
@@ -4423,6 +4497,8 @@
         "pin",
         "acceptAddOn",
         "declineAddOn",
+        "addAddOn",
+        "removeAddOn",
         "revertTo"
        ]
       },
@@ -4450,6 +4526,12 @@
        "type": "string",
        "format": "date-time",
        "nullable": true
+      },
+      "addOnProductId": {
+       "type": "string",
+       "format": "uuid",
+       "nullable": true,
+       "description": "For `addAddOn` and `removeAddOn` (CHG-RUL-009): the add-on product (a catalogue product sold for the item's stop, e.g. Fast Track). Priced at booking, not here.\n"
       },
       "version": {
        "type": "integer",

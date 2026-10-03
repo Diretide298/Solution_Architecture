@@ -262,8 +262,14 @@ paths:
         inventory link, the catalogue variant, the stock count and the serial-number flag, and
         says only whether the item can be bought. The server chooses by the caller's
         audience; the client does not ask for one.
+
+        **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026,
+        Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets active merchandise that
+        is on sale, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as
+        not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
       tags: [merchandise]
       x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-guest-callable: true
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-offline-note: >
@@ -461,8 +467,14 @@ paths:
         on the web shop or app) names the outlet with `outletId`; a workstation caller's own
         outlet always wins. **An inactive item is not found**: it answers `404`, exactly as
         an unknown barcode does.
+
+        **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026,
+        Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets active merchandise that
+        is on sale, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as
+        not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
       tags: [floor]
       x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-guest-callable: true
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1159,8 +1171,14 @@ paths:
       description: >
         Scanned at the collection point. Accepts the entitlement, the drop reference, or the
         original receipt — a guest arrives with whichever they still have.
+
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for goods they
+        dropped themselves; another guest's goods is refused exactly as one that does not exist, never
+        returned. `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
       tags: [floor]
       x-ticvai-permission: ORDER_VIEW
+      x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1287,8 +1305,14 @@ paths:
         collection with `createShopAndDrop`. This holds unpaid stock only: in the guest app
         (GST-026) it is offered as a hold the guest pays for at the shop, and staff use it
         at a till or an outlet. A held item is never collected unpaid.
+
+        **A guest does this within their own session** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-003;
+        `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own
+        cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to
+        do it for a guest at a till or in the back office (ADR-0025).
       tags: [floor]
       x-ticvai-permission: ORDER_CREATE
+      x-ticvai-guest-callable: true
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins

@@ -101,7 +101,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-061` | Menu Item Detail | A | 1 | 7 | 5 | 1 | 2 | 2 | guest | notStarted (client-verified) |
+| `GST-061` | Menu Item Detail | A | 1 | 4 | 5 | 1 | 2 | 2 | guest | notStarted (client-verified) |
 | `GST-062` | Shop & Drop Collection | A | 0 | 20 | 5 | 0 | 2 | 0 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch

@@ -94,9 +94,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-005` | Inventory & Allocation View | B–D | 8 | 76 | 6 | 30 | 3 | 4 | — | notStarted (generated) |
-| `PTR-006` | Product Catalog (B2B Pricing) | B–D | 3 | 66 | 6 | 24 | 2 | 0 | — | notStarted (generated) |
-| `PTR-007` | Availability Search | B–D | 0 | 15 | 5 | 5 | 0 | 0 | — | notStarted (generated) |
+| `PTR-005` | Inventory & Allocation View | C | 8 | 48 | 6 | 30 | 3 | 4 | — | notStarted (generated) |
+| `PTR-006` | Product Catalog (B2B Pricing) | B | 3 | 48 | 6 | 24 | 2 | 0 | — | notStarted (generated) |
+| `PTR-007` | Availability Search | B | 0 | 15 | 5 | 5 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -116,7 +116,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Inventory & Pricing · wave 2 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-PARTNER-PTR-005 |
 | Who uses it | partner staff holding `CAPACITY_CONFIGURE`, `ORDER_REPRINT`, `ORDER_VIEW`, `PRODUCT_VIEW` (1 configure, 1 operate, 2 read) |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listChannelCapacities` reads the population and `getChannelAllocations` reads one of them — list, select, act |
@@ -184,48 +184,32 @@ Errors to draw in the form: 400 Validation failed
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Performance | the name it points at, never the id | — |
 | Name | text | — |
-| Seat category | the name it points at, never the id | — |
 | Oversell allowance | 1,234 | BL-046, 1.3.13. The guard existed in one direction — an envelope could be raised freely and refused reduction below what had sold. |
 | Oversell basis | chip: Fixed count, Historic no show rate, Percentage | — |
 | Capacity | 1,234 | — |
 | Sold | 1,234 | Units sold. Maintained on write (decided 29 September, SD-023): raised by `convertInventoryHold` in the order transaction and by … |
-| Leased | 1,234 | Units in `active` holds, not yet sold. Raised at acquire, lowered at conversion, release, force-release and expiry (SD-023). |
 | Remaining | 1,234 | What can still be held. Decremented at the hold with a guarded statement (`remaining >= n`) under the row lock, never at the sale, so two … |
-| Has channel allocations | yes / no (icon or chip) | True where capacity is divided across channels. Leases then draw from a channel allocation rather than from raw capacity. |
-| Is seated | yes / no (icon or chip) | Seated envelopes cannot be leased and are blocked offline. A seat map is not a count. |
 
 **Every refund** (data table, from `listOrderRefunds`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | — |
-| Batch | the name it points at, never the id | The `RefundBatch` that raised this refund, where `createBulkRefund` did. Null for a refund raised on its own. |
 | FX rate | text | The rate on the original payment, not today's (BL-087, CF-118). `Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the … |
-| Tax reversal entry | the name it points at, never the id | A refund reverses the tax entry it created, and this is where that is stated rather than implied. |
 | Settle to | chip: Original tender, Advance balance, Wire transfer, Store credit | BL-086. A refund could only go back the way it came. |
 | FX variance | AED 1,234.50 | Where the sale rate and the current rate differ, the difference is booked as an FX variance rather than hidden in the refund. |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Applied percentage | 1,234.5 | From the venue's time bands, or an approver override. |
 | Status | chip: Pending approval, Pending gateway, Completed, Declined, Failed | — |
-| Reason | text | — |
-| Requested by principal | the name it points at, never the id | — |
 
 **Every order** (data table, from `listOrders`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Order number | text | — |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
-| Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | The same vocabulary as `Order.channel`, which this projects. |
 | Line count | 1,234 | — |
-| Principal | the name it points at, never the id | The cashier who raised it — what the held-orders list shows. |
 | Hold label | text | As `Order.holdLabel`. |
 | Held until | 1 Oct 2026, 14:30 | As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse. |
 
@@ -233,10 +217,7 @@ Errors to draw in the form: 400 Validation failed
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Performance | the name it points at, never the id | — |
 | Name | text | — |
-| Seat category | the name it points at, never the id | — |
 | Oversell allowance | 1,234 | BL-046, 1.3.13. The guard existed in one direction — an envelope could be raised freely and refused reduction below what had sold. |
 | Oversell basis | chip: Fixed count, Historic no show rate, Percentage | — |
 | Capacity | 1,234 | — |
@@ -244,28 +225,19 @@ Errors to draw in the form: 400 Validation failed
 | Leased | 1,234 | Units in `active` holds, not yet sold. Raised at acquire, lowered at conversion, release, force-release and expiry (SD-023). |
 | Remaining | 1,234 | What can still be held. Decremented at the hold with a guarded statement (`remaining >= n`) under the row lock, never at the sale, so two … |
 | Has channel allocations | yes / no (icon or chip) | True where capacity is divided across channels. Leases then draw from a channel allocation rather than from raw capacity. |
-| Is seated | yes / no (icon or chip) | Seated envelopes cannot be leased and are blocked offline. A seat map is not a count. |
 
 **The order** (detail panel, from `getOrder`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The client UUIDv7 from `CreateOrderRequest.id`. |
 | Order number | text | The number a guest reads and a cashier types. Server-assigned: the venue prefix and a sequence per venue, for example `DXB1-000123` … |
 | Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Net amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Total price variance | AED 1,234.50 | Sum across lines. Zero on a normal order. |
-| Lines | list or chips (count when long) | — |
-| Payments | list or chips (count when long) | — |
-| Principal | the name it points at, never the id | — |
 
 **The order statement** (detail panel, from `getOrderStatement`)
 
@@ -319,7 +291,7 @@ Errors to draw in the form: 400 Validation failed
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the inventory allocation untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No inventory allocation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on performanceId and the inventory allocation are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getChannelAllocations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE` for `relinquishChannelAllocation` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
@@ -340,9 +312,9 @@ row: Desert Nights · Sat 10 Oct · allocated 120 · sold 86 · left 34
 - `listOrderRefunds` → `ORDER_VIEW` (read) · staff, partner
 - `listOrders` → `ORDER_VIEW` (read) · staff, guest, partner
 - `relinquishChannelAllocation` → `CAPACITY_CONFIGURE` (configure) · staff, partner
-- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner
+- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner, device
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getChannelAllocations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE` for `relinquishChannelAllocation` …
 
 #### Requirements it meets
 
@@ -384,11 +356,12 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 #### References
 
 - Wireframe frame: `wireframes/P10 Partner Web.dc.html#ptr-005` · status **notStarted** · provenance generated
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (8), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (76 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (48 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-005?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Release channel allocation, Reprint order.
 - [ ] Every transition is wired: `PTR-002`, `PTR-003`, `PTR-008`.
@@ -406,7 +379,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Inventory & Pricing · wave 2 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-SETUP-PTR-006 |
 | Who uses it | partner staff holding `PRICE_VIEW`, `PRODUCT_VIEW` (2 read) |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listProducts` reads the population and `getPriceList` reads one of them — list, select, act |
@@ -449,16 +422,10 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
 | Kind | chip: Admission, Timed admission, Dated admission, Open dated, Seated, Membership… | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Created by principal | the name it points at, never the id | 1.4.18. The approval gate refuses an approver who is the author, and nothing recorded either. |
-| Approved by principal | the name it points at, never the id | — |
-| Responsible department | the name it points at, never the id | Who owns this product commercially. A scope node at `department` level. |
 | On sale from | 1 Oct 2026, 14:30 | 1.4.8. A seasonal product should not need somebody awake at midnight. |
 | On sale to | 1 Oct 2026, 14:30 | Retires the product automatically. Retirement is not deletion — the product stops selling and every order that referenced it still resolves. |
 
@@ -476,15 +443,11 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
 | Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overridable below, so a row in a UAE region is AED and … |
 | Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overridable below, so a row in a UAE region is AED and … |
-| Channels | list or chips (count when long) | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
-| Valid to | 1 Oct 2026, 14:30 | — |
 | Priority | 1,234 | Where lists overlap, higher priority wins. |
 
 **Every price** (data table, from `listPrices`)
@@ -514,22 +477,14 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
 | Kind | chip: Admission, Timed admission, Dated admission, Open dated, Seated, Membership… | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Created by principal | the name it points at, never the id | 1.4.18. The approval gate refuses an approver who is the author, and nothing recorded either. |
-| Approved by principal | the name it points at, never the id | — |
-| Responsible department | the name it points at, never the id | Who owns this product commercially. A scope node at `department` level. |
 | On sale from | 1 Oct 2026, 14:30 | 1.4.8. A seasonal product should not need somebody awake at midnight. |
 | On sale to | 1 Oct 2026, 14:30 | Retires the product automatically. Retirement is not deletion — the product stops selling and every order that referenced it still resolves. |
-| Category | the name it points at, never the id | Taken from their `fnb.product` and `retail.product`, 20 September. `catalogue.product_category` has existed since 20 August with two … |
 | Lifecycle state | chip: Draft, In review, Approved, Live, Withdrawn, Archived | — |
 | Is sellable | yes / no (icon or chip) | True only when live and carried by a published bundle. Approval and publication are different acts. |
-| Is stock tracked | yes / no (icon or chip) | Taken from their `fnb.product`, 20 September. Whether a sale decrements stock, which is not what `isSellable` asks. |
 
 **The price list** (detail panel, from `getPriceList`)
 
@@ -631,12 +586,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### References
 
 - Wireframe frame: `wireframes/P10 Partner Web.dc.html#ptr-006` · status **notStarted** · provenance generated
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (3), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (66 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (48 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-006?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Resolve product by code.
 - [ ] Every transition is wired: `PTR-003`.
@@ -655,7 +611,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Inventory & Pricing · wave 2 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-PARTNER-PTR-007 |
 | Who uses it | partner staff holding `PRODUCT_VIEW` (1 read); in the flows as partner |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | statusTracker (compact density): `getAvailability` reads one record and nothing reads a population — the screen is about that one thing |
@@ -772,6 +728,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Wireframe frame: `wireframes/P10 Partner Web.dc.html#ptr-007` · status **notStarted** · provenance generated
 - Flow F03 *Partner books on credit*, step 2: Searches availability → Sees the allocation reserved for the B2B channel, not the total
 - Flow F03 branch at step 2 (recoverable): when The B2B channel allocation is exhausted, Shows sold out for this channel while other channels may still have capacity. Correct under channel allocation, and worth saying plainly in the portal.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 

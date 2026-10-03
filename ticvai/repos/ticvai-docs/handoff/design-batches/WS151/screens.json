@@ -478,15 +478,11 @@
        "label": "Every payment allocation rule",
        "bindsTo": "PaymentAllocationRule",
        "columns": [
-        "PaymentAllocationRule.id",
         "PaymentAllocationRule.channel",
-        "PaymentAllocationRule.terminalId",
-        "PaymentAllocationRule.productId",
         "PaymentAllocationRule.orderType",
         "PaymentAllocationRule.customerType",
         "PaymentAllocationRule.allocationLevel",
-        "PaymentAllocationRule.isActive",
-        "PaymentAllocationRule.scopePath"
+        "PaymentAllocationRule.isActive"
        ],
        "operation": "listPaymentAllocationRules",
        "provenance": "contract orders.yaml GET /payment-allocation-rules"
@@ -579,7 +575,8 @@
     "ADM-599"
    ],
    "exitTo": [
-    "ADM-599"
+    "ADM-599",
+    "ADM-603"
    ],
    "transitions": [
     {
@@ -587,6 +584,14 @@
      "trigger": "Back to Mixed Tender & Credit Command Center\\t93",
      "provenance": "structural — pack board 5 wiring, 19 September 2026",
      "back": true
+    },
+    {
+     "to": "ADM-603",
+     "trigger": "B2B Invoice, On-Account & Payment Terms Configuration",
+     "carries": [
+      "accountId"
+     ],
+     "provenance": "authored 3 October 2026 (CHG-SPF-004): ADM-602 lists them, and ADM-603 cannot load without the one the user picks"
     }
    ]
   },
@@ -708,7 +713,7 @@
   "name": "B2B Invoice, On-Account & Payment Terms Configuration",
   "module": "Commercial",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "5",
@@ -1376,7 +1381,9 @@
    "params": [
     {
      "name": "caseId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listDunningCases` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

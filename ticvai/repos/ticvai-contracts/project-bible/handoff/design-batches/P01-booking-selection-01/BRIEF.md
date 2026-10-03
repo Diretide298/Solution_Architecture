@@ -177,7 +177,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `WEB-005` | Ticket Type Selection | A | 2 | 71 | 6 | 27 | 31 | 6 | guest | review (client-verified) |
 | `WEB-006` | Date & Performance Selection | A | 40 | 19 | 6 | 17 | 32 | 6 | guest | review (client-verified) |
 | `WEB-007` | Interactive Seat Selection | A | 8 | 39 | 6 | 30 | 22 | 6 | guest | review (client-verified) |
-| `WEB-008` | Add-ons & Upsell | A | 19 | 22 | 5 | 47 | 16 | 0 | guest | review (client-verified) |
+| `WEB-008` | Add-ons & Upsell | A | 19 | 14 | 5 | 47 | 16 | 0 | guest | review (client-verified) |
 | `WEB-009` | Wishlist | A | 0 | 15 | 5 | 1 | 2 | 0 | guest | review (client-verified) |
 | `WEB-047` | Map Booking — Cabanas & Spots | A | 24 | 38 | 6 | 5 | 4 | 6 | guest | notStarted (client-verified) |
 | `WEB-048` | Book a Space by the Hour | A | 23 | 40 | 6 | 25 | 7 | 0 | guest | notStarted (client-verified) |

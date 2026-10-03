@@ -97,7 +97,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-354` | Credential Operations Command Center | B–D | 2 | 28 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-354` | Credential Operations Command Center | B–D | 2 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-355` | Virtual Ticket & Credential 360° Workspace | B–D | 0 | 46 | 6 | 2 | 3 | 0 | — | notStarted (generated) |
 | `BO-356` | Credential Generation & Issuance Monitor | B–D | 10 | 28 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-357` | Credential Delivery & Distribution Operations | B–D | 5 | 20 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
@@ -211,27 +211,17 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Shows | Format | Notes |
 |---|---|---|
-| Virtual ticket | text | Virtual Ticket ID |
-| Credential | text | Credential ID |
 | Media type | text | Media Type |
 | Customer participant | text | Customer / Participant |
-| Product | text | Product |
-| Event | text | Event |
 | Credential status | chip: Pending generation, Generated, Pending activation, Active, Suspended, Revoked… | Credential status |
 | Delivery status | chip: Not required, Pending, Sent, Delivered, Opened downloaded, Completed… | Delivery status (15.3.4) |
 | Activation status | chip: Pending, Scheduled, Active, Not required | Activation status |
 | Binding status | chip: Pending, Bound, Unbound, Failed | Binding status |
-| Provider | text | Provider |
-| Last activity | 1 Oct 2026, 14:30 | Last Activity |
-| Exception | text | Exception |
-| Owner | text | Owner |
 
 **The selected credential operations** (detail panel): The pack groups this record's detail under its own headings: “Display credentials by”, “Provide indicators such as”.
 
 | Shows | Format | Notes |
 |---|---|---|
-| Virtual ticket | text | Virtual Ticket ID |
-| Credential | text | Credential ID |
 | Media type | text | Media Type |
 | Customer participant | text | Customer / Participant |
 | Product | text | Product |
@@ -240,10 +230,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Delivery status | chip: Not required, Pending, Sent, Delivered, Opened downloaded, Completed… | Delivery status (15.3.4) |
 | Activation status | chip: Pending, Scheduled, Active, Not required | Activation status |
 | Binding status | chip: Pending, Bound, Unbound, Failed | Binding status |
-| Provider | text | Provider |
-| Last activity | 1 Oct 2026, 14:30 | Last Activity |
-| Exception | text | Exception |
-| Owner | text | Owner |
 
 **Permissions this screen separates** (banner): **The pack separates these permissions and no action on the screen claims them yet:** Open Virtual Ticket, Generate Credential, Resend, Activate, Suspend Media, Replace, Revoke, Diagnose, View History. Each needs attaching to the control it gates, or the screen needs the control.
 
@@ -381,7 +367,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (2), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-354?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `BO-355`, `BO-356`, `BO-358`, `BO-360`, `BO-361`, `BO-362`, `BO-363`, `BO-357`, `BO-359`.
@@ -508,7 +494,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Expires at | 1 Oct 2026, 14:30 | — |
 | Rotation | grouped details | The time-based seed the rotating code is derived from (audit R230). Null for a credential that does not rotate (a wristband serial, a … |
 | Secret | text | Base32 shared secret. Held on the device and in the gates' offline package; replaced by `rotate=true`. |
-| Time step seconds | 1,234 | — |
+| Time step seconds | 1,234 | 30 seconds for an admission QR (Chinmay, 3 October 2026, Block A business rules: GST-055's admission QR rotates every 30 seconds … |
 | Digits | 1,234 | — |
 | Algorithm | chip: SHA1, SHA256, SHA512 | — |
 | Valid from | 1 Oct 2026, 14:30 | — |

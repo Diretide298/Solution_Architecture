@@ -126,11 +126,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `WEB-021` | Wallet & Gift Cards | A | 4 | 37 | 6 | 37 | 13 | 6 | guest | review (client-verified) |
-| `WEB-022` | Membership Plans | A | 0 | 20 | 6 | 16 | 4 | 0 | guest | review (client-verified) |
-| `WEB-023` | Membership Management | A | 3 | 31 | 6 | 6 | 5 | 0 | guest | review (client-verified) |
-| `WEB-024` | Devices, Wishlist & Consent | A | 4 | 92 | 6 | 59 | 2 | 4 | guest | review (client-verified) |
-| `WEB-043` | Loyalty & Rewards | A | 9 | 62 | 6 | 54 | 2 | 2 | guest | review (client-verified) |
+| `WEB-021` | Wallet & Gift Cards | A | 4 | 36 | 6 | 37 | 13 | 6 | guest | review (client-verified) |
+| `WEB-022` | Membership Plans | A | 0 | 17 | 6 | 16 | 4 | 0 | guest | review (client-verified) |
+| `WEB-023` | Membership Management | A | 3 | 28 | 6 | 6 | 5 | 0 | guest | review (client-verified) |
+| `WEB-024` | Devices, Wishlist & Consent | A | 4 | 74 | 6 | 59 | 2 | 4 | guest | review (client-verified) |
+| `WEB-043` | Loyalty & Rewards | A | 9 | 51 | 6 | 54 | 2 | 2 | guest | review (client-verified) |
 
 ## Thin screens in this batch
 
@@ -149,8 +149,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | Membership, Loyalty & Value · wave 2 · needs the `retail` module |
-| Block | Block A · ticket #18188 (APP-WEB-WEB-021) |
+| Module | Membership, Loyalty & Value · wave 1 · needs the `retail` module |
+| Block | Block A · task APP-WEB-WEB-021 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listWalletTransactions` reads the population and `getWallet` reads one of them — list, select, act |
@@ -223,7 +223,6 @@ Errors to draw in the form: 409 Insufficient cash credit, distinct from insuffic
 | Face value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Balance | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Status | chip: Issued, Active, Partially redeemed, Redeemed, Expired, Blocked | — |
-| Blocked reason | text | — |
 | Issued at | 1 Oct 2026, 14:30 | — |
 | Activated at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
@@ -397,7 +396,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (4), with its required mark, default, format and its error state (404, 409, 412, 422).
-- [ ] Every output is drawn (37 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (36 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-021?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Add a card, Transfer wallet balance.
 - [ ] Every transition is wired: `WEB-022`, `WEB-023`, `WEB-024`.
@@ -416,8 +415,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | Membership, Loyalty & Value · wave 2 · needs the `ticketing` module |
-| Block | Block A · ticket #18189 (APP-WEB-WEB-022) |
+| Module | Membership, Loyalty & Value · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-WEB-WEB-022 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listProducts` reads the population and `getProduct` reads one of them — list, select, act |
@@ -475,8 +474,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| Entitlement | the name it points at, never the id | The `access.Entitlement.id` this membership is — a UUIDv7, like every entitlement id. |
-| Product | the name it points at, never the id | — |
 | Name | text | — |
 | Tier | text | — |
 | Status | chip: Active, Frozen, Suspended, Expired, Cancelled | Derived from the entitlement, not held here. This schema is a view assembled from the entitlement, the product that granted it and the … |
@@ -485,7 +482,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Frozen days | 1,234 | Days lost to a freeze and added back to `validTo`. Shown because a guest who paused a pass will check the maths, and a validity date that … |
 | Benefits | list or chips (count when long) | 5.4.31. From the product's entitlement template. |
 | Renews on | 1 Oct 2026 | — |
-| Previous terms | list or chips (count when long) | Prior terms, including lapsed ones. |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
 
@@ -598,7 +594,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (17 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-022?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `WEB-021`, `WEB-023`, `WEB-024`.
@@ -616,8 +612,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | Membership, Loyalty & Value · wave 2 · needs the `ticketing` module |
-| Block | Block A · ticket #18190 (APP-WEB-WEB-023) |
+| Module | Membership, Loyalty & Value · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-WEB-WEB-023 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listGuestMemberships` reads the population and `getMyMemberships` reads one of them — list, select, act |
@@ -705,8 +701,6 @@ Errors to draw in the form: 409 The case is already resolved, or the decline is 
 
 | Shows | Format | Notes |
 |---|---|---|
-| Entitlement | the name it points at, never the id | The `access.Entitlement.id` this membership is — a UUIDv7, like every entitlement id. |
-| Product | the name it points at, never the id | — |
 | Name | text | — |
 | Tier | text | — |
 | Status | chip: Active, Frozen, Suspended, Expired, Cancelled | Derived from the entitlement, not held here. This schema is a view assembled from the entitlement, the product that granted it and the … |
@@ -715,7 +709,6 @@ Errors to draw in the form: 409 The case is already resolved, or the decline is 
 | Frozen days | 1,234 | Days lost to a freeze and added back to `validTo`. Shown because a guest who paused a pass will check the maths, and a validity date that … |
 | Benefits | list or chips (count when long) | 5.4.31. From the product's entitlement template. |
 | Renews on | 1 Oct 2026 | — |
-| Previous terms | list or chips (count when long) | Prior terms, including lapsed ones. |
 
 **Actions and what each produces**
 
@@ -823,7 +816,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (3), with its required mark, default, format and its error state (409, 422).
-- [ ] Every output is drawn (31 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-023?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Retry the payment.
 - [ ] Every transition is wired: `WEB-021`, `WEB-022`, `WEB-024`.
@@ -841,14 +834,14 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | Membership, Loyalty & Value · wave 3 · needs the `marketing` module |
-| Block | Block A · ticket #18225 (APP-WEB-WEB-024) |
+| Module | Membership, Loyalty & Value · wave 1 · needs the `marketing` module |
+| Block | Block A · task APP-WEB-WEB-024 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act |
 | Offline | **Nothing here is offered offline, and the banner says so.** An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in. |
 | Opens with | `deviceId` (deepLink), `itemId` (deepLink), `subjectId` (session), `enrolmentId` (navigation), `methodId` (navigation) · cold entry: **A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation … |
-| Route | `/membership-loyalty-and-value/loyalty-and-rewards` |
+| Route | `/membership-loyalty-and-value/devices-wishlist-consent` |
 
 **What the spec says about it.** Purpose derived from the screen name and its operations on 17 August, not from a requirement. **Renamed 31 August** from *Loyalty & Rewards*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Rev 3 (decided 29 September).** **Security (GAP-D1):** the devices list and signing out a lost device are here (`listGuestDevices`, `revokeGuestDevice`, already declared). **Face Pass stays mobile-only** (GST-069) until the facial-reader vendor SDK is named and supports web capture; viewing and withdrawing an enrolment stay here. **Two-step verification (GAP-B1, per venue):** enrolment appears only when a venue of the tenant enabled it. **One implementation, several ids (GAP-D3):** WEB-009 and WEB-024 are built as one account area; both ids are kept.
 
@@ -903,14 +896,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
 | Platform | chip: Ios, Android, Web | — |
 | Token fingerprint | text | Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support … |
-| App version | text | — |
-| Os version | text | — |
-| Device model | text | — |
-| Locale | text | — |
 | Status | chip: Active, Revoked, Failed | — |
 | Failure count | 1,234 | Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is … |
 | Registered at | 1 Oct 2026, 14:30 | — |
@@ -920,17 +907,11 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
-| Role | the name it points at, never the id | — |
 | Permission | text | From the permission enum. `*` permitted on DENY only. |
-| Subject | the name it points at, never the id | CF-132, CL-05. A grant held by a guest rather than a staff principal. |
-| Over subject | the name it points at, never the id | Whose behalf. Null for a staff grant, which is the existing behaviour — every grant written before 18 August means exactly what it meant … |
 | Over object ref | text | Where the authority is over a thing rather than a scope — a wallet, an entitlement, a booking. |
 | Delegation kind | chip: Primary holder, Family member, Group leader, Attendee, Corporate admin, Corporate … | What kind of relationship this expresses, for display and for reporting. The mechanism does not branch on it — a family member and a group … |
 | Quota | 1,234 | 2.14.15 and 4.3.11. How many the holder may assign. |
 | Is revocable by subject | yes / no (icon or chip) | Whether the person it is over can end it. A guest who linked a family member should be able to unlink them; a corporate member should not … |
-| Scope path | text | — |
 | Effect | chip: ALLOW, DENY | — |
 
 **Purposes and notices** (card list, from `listConsentPurposes`): The configured purposes with their plain-language description, channels and the notice version in force.
@@ -952,15 +933,9 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
 | Platform | chip: Ios, Android, Web | — |
 | Token fingerprint | text | Hash of the token, not the token. The token itself is write-only — returning it would put a push credential in every response a support … |
 | Token ref | text | A vault reference to the push token, written by the server from `registerGuestDevice.token` — the same pattern as … |
-| App version | text | — |
-| Os version | text | — |
-| Device model | text | — |
-| Locale | text | — |
 | Status | chip: Active, Revoked, Failed | — |
 | Failure count | 1,234 | Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is … |
 | Registered at | 1 Oct 2026, 14:30 | — |
@@ -1226,7 +1201,7 @@ Also set there, as content the tenant writes: theme, buttons, links.
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (4), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (92 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (74 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-024?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Stop notifications on this device, Delete my account, Get a copy of my data, Revoke face pass.
 - [ ] Every transition is wired: `WEB-021`, `WEB-022`, `WEB-023`, `GST-037`.
@@ -1245,8 +1220,8 @@ Also set there, as content the tenant writes: theme, buttons, links.
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | Membership, Loyalty & Value · wave 2 · needs the `marketing` module |
-| Block | Block A · ticket #18208 (APP-WEB-WEB-043) |
+| Module | Membership, Loyalty & Value · wave 1 · needs the `marketing` module |
+| Block | Block A · task APP-WEB-WEB-043 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listLoyaltyProgrammes` reads the population and `getLoyaltyPosition` reads one of them — list, select, act |
@@ -1329,13 +1304,8 @@ The nickname shown on the leaderboard.
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | Unique per tenant (decided 28 September, audit R108). A code already used by any loyalty programme in the tenant, at any venue, is refused … |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Points liability account | the name it points at, never the id | Points post here on accrual. They are a liability from the moment they are earned, not from the moment they are spent. |
-| Earn rules | list or chips (count when long) | — |
-| Tiers | list or chips (count when long) | Rows of `marketing.programme_tier`, the same shape `MarketingProgrammeTier` has — one definition of a tier, not a second copy that cannot … |
 | Points expire after months | 1,234 | — |
 | Is active | yes / no (icon or chip) | — |
 
@@ -1346,15 +1316,9 @@ The nickname shown on the leaderboard.
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Venue | the name it points at, never the id | — |
 | Discount | grouped details | — |
-| Conditions | grouped details | All conditions must hold. An empty object matches everything. |
-| Stacking mode | chip: Exclusive, Stackable, Best only, Stack with group | How this promotion combines with others. Declared, never inferred from creation order — two reasonable promotions can otherwise combine … |
-| Stacking group | text | — |
-| Precedence | 1,234 | Higher evaluates first where several could apply. |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | — |
-| Max redemptions | 1,234 | — |
 
 **Loyalty & Rewards** (card list)
 
@@ -1535,7 +1499,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (9), with its required mark, default, format and its error state (403, 409).
-- [ ] Every output is drawn (62 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (51 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-043?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Invite a friend, Redeem, Choose my name.
 - [ ] No transition is declared; back returns where the user came from.

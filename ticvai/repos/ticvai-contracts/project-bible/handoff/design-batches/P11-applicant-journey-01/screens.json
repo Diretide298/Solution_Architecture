@@ -844,7 +844,9 @@
     },
     {
      "name": "credentialId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMyAccreditationCredentials` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "holderId",
@@ -869,9 +871,10 @@
      "to": "ACC-004",
      "trigger": "Application Status Tracking",
      "carries": [
+      "applicationId",
       "applicationRef"
      ],
-     "provenance": "derived — ACC-004 declares entryState.params applicationId, applicationRef and ACC-005 holds applicationRef, so an edge into it carries them"
+     "provenance": "derived — ACC-004 declares entryState.params applicationId, applicationRef and ACC-005 holds applicationId, applicationRef, so an edge into it carries them"
     },
     {
      "to": "SCN-003",

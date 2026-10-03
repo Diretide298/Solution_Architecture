@@ -61,7 +61,7 @@ servicesCalled:
 - service: VenueOpsService
   operationCalls: 519
 - service: TenancyService
-  operationCalls: 484
+  operationCalls: 483
 - service: OrderService
   operationCalls: 422
 - service: AccessService
@@ -81,7 +81,7 @@ servicesCalled:
 - service: FnbService
   operationCalls: 87
 - service: InventoryService
-  operationCalls: 83
+  operationCalls: 81
 - service: IdentityService
   operationCalls: 65
 - service: RetailService
@@ -90,7 +90,7 @@ servicesCalled:
   operationCalls: 14
 coverage:
   screens: 1661
-  inAFlow: 1561
+  inAFlow: 1562
   drawn: 1661
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
@@ -263,7 +263,7 @@ screens:
   name: Parking Configuration
   module: Access & Venue
   requiresModule: access
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - listParkingFacilities
@@ -410,7 +410,7 @@ screens:
   name: Promotions & Coupons
   module: Sell
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - analysePromotionConflicts
@@ -471,7 +471,7 @@ screens:
   name: Packages & Bundles
   module: Sell
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createBundle
@@ -511,7 +511,7 @@ screens:
   name: Membership Products
   module: Sell
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createEntitlementTemplate
@@ -546,7 +546,7 @@ screens:
   name: Channel & Distribution
   module: Sell
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createChannelCapacity
@@ -1068,7 +1068,7 @@ screens:
   name: Report Builder
   module: Orders & Money
   requiresModule: analytics
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - askReportingQuestion
@@ -1323,7 +1323,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - rejectionId<-navigation
   goesTo: []
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-038
@@ -1460,6 +1461,7 @@ screens:
   offlineState: false
   entryParams:
   - settlementId<-deepLink
+  - shiftId<-session
   goesTo:
   - BO-008
   - BO-074
@@ -1472,7 +1474,7 @@ screens:
   name: F&B Outlets
   module: Venue Operations
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - closeCorrectiveAction
@@ -1640,7 +1642,7 @@ screens:
   name: Retail Products
   module: Orders & Money
   requiresModule: retail
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createMerchandise
@@ -1856,6 +1858,8 @@ screens:
   offlineState: false
   entryParams:
   - principalId<-navigation
+  - campaignId<-navigation
+  - roleId<-navigation
   goesTo: []
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-054
@@ -1864,7 +1868,7 @@ screens:
   name: Rota & Scheduling
   module: People & Access Rights
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createRotaAssignment
@@ -1895,7 +1899,6 @@ screens:
   operations:
   - amendAttendance
   - listAttendance
-  - recordAttendance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -2105,7 +2108,7 @@ screens:
   offlineState: false
   entryParams:
   - venueId<-session
-  - outletId<-deepLink
+  - outletId<-session
   goesTo:
   - BO-007
   - BO-009
@@ -2250,7 +2253,7 @@ screens:
   name: Asset Register
   module: Access & Venue
   requiresModule: maintenance
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createAsset
@@ -2334,7 +2337,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - planId<-navigation
   goesTo:
   - BO-070
   boardFrames: null
@@ -2528,8 +2532,6 @@ screens:
   - getSuggestedRequisitions
   - listRequisitions
   - listStockLocations
-  - rejectRequisition
-  - returnRequisition
   - updateRequisitionLines
   states:
   - emptyFirstRun
@@ -2630,6 +2632,8 @@ screens:
   entryParams:
   - transferId<-deepLink
   goesTo:
+  - BO-049
+  - BO-051
   - BO-052
   - BO-078
   - BO-079
@@ -2647,7 +2651,7 @@ screens:
   name: Inventory Items
   module: Stock & Supply
   requiresModule: inventory
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createInventoryItem
@@ -2772,6 +2776,7 @@ screens:
   - requestId<-deepLink
   - approvalRequestId<-navigation
   goesTo:
+  - ADM-248
   - BO-052
   - BO-085
   - BO-086
@@ -2830,6 +2835,7 @@ screens:
   offlineState: false
   entryParams: []
   goesTo:
+  - ADM-238
   - BO-084
   - BO-085
   - BO-087
@@ -2986,7 +2992,7 @@ screens:
   name: Venue Maps
   module: Access & Venue
   requiresModule: seating
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createVenueMap
@@ -3011,7 +3017,7 @@ screens:
   name: Map Import & Labelling
   module: Access & Venue
   requiresModule: seating
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - acceptVenueLabelProposals
@@ -3041,7 +3047,7 @@ screens:
   name: Map Editor & Publish
   module: Access & Venue
   requiresModule: seating
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - getVenueMap
@@ -3098,7 +3104,7 @@ screens:
   name: Resource Calendar
   module: Access & Venue
   requiresModule: resources
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - bookResource
@@ -3123,7 +3129,7 @@ screens:
   name: Check Out & Check In
   module: Access & Venue
   requiresModule: resources
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - authoriseStoredValue
@@ -3735,7 +3741,7 @@ screens:
   name: Menu Builder & POS Layout Designer
   module: Sell
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createSaleBoard
@@ -3753,6 +3759,7 @@ screens:
   entryParams:
   - venueId<-session
   - menuId<-BO-045
+  - saleBoardId<-navigation
   goesTo:
   - BO-102
   boardFrames:
@@ -3784,7 +3791,7 @@ screens:
   name: Ingredient Substitution, Allergen & Nutrition
   module: Sell
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - getAllergenVerification
@@ -3818,7 +3825,7 @@ screens:
   name: Production Planning & Production Sheets
   module: Sell
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - buildProductionPlan
@@ -3837,8 +3844,11 @@ screens:
   offlineState: false
   entryParams:
   - venueId<-session
+  - planId<-navigation
+  - runId<-navigation
   goesTo:
   - BO-102
+  - BO-137
   boardFrames:
   - FnB Board 2.dc.html#fnb-2m
   wireframe: wireframes/P08 Venue Management.dc.html#bo-112
@@ -3952,7 +3962,7 @@ screens:
   name: Product Import, Governance & AI Configuration Assistant
   module: Sell
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - commitCatalogueImport
@@ -4306,9 +4316,11 @@ screens:
   offlineState: false
   entryParams:
   - venueId<-session
+  - rejectionId<-navigation
   goesTo:
   - BO-108
   - BO-129
+  - BO-131
   boardFrames:
   - POS Board 5.dc.html#pos-5e
   wireframe: wireframes/P08 Venue Management.dc.html#bo-130
@@ -4332,6 +4344,7 @@ screens:
   entryParams:
   - venueId<-session
   goesTo:
+  - BO-037
   - BO-108
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-131
@@ -4385,6 +4398,7 @@ screens:
   - venueId<-session
   - reportId<-deepLink
   - requestId<-deepLink
+  - rejectionId<-navigation
   goesTo:
   - BO-108
   boardFrames:
@@ -4450,7 +4464,7 @@ screens:
   name: F&B Global Settings & Controls
   module: Food & Beverage
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - getVenueSettings
@@ -4465,7 +4479,7 @@ screens:
   offlineState: false
   entryParams:
   - venueId<-session
-  - outletId<-navigation
+  - outletId<-session
   goesTo:
   - BO-104
   - BO-137
@@ -4545,7 +4559,7 @@ screens:
   offlineState: false
   entryParams:
   - venueId<-session
-  - outletId<-deepLink
+  - outletId<-session
   goesTo:
   - BO-105
   boardFrames:
@@ -4658,7 +4672,7 @@ screens:
   entryParams:
   - venueId<-session
   - dropId<-navigation
-  - outletId<-navigation
+  - outletId<-session
   goesTo:
   - BO-102
   boardFrames:
@@ -4784,7 +4798,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - accessPointId<-navigation
   goesTo:
   - BO-144
   boardFrames: null
@@ -4839,7 +4854,7 @@ screens:
   name: Access Location Grouping
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - deleteAccessPointGroup
@@ -4945,7 +4960,7 @@ screens:
   name: Visual Access Rule Builder
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listAdmissionRules
@@ -5087,7 +5102,7 @@ screens:
   name: Guest, Companion & Eligibility Rules
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - getProductEligibilityRule
@@ -5209,7 +5224,7 @@ screens:
   name: Credential Activation & Display Rules
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listCredentialActivationDisplay
@@ -5232,7 +5247,7 @@ screens:
   name: Device Binding & Session Security
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listDeviceBindingSession
@@ -5257,7 +5272,7 @@ screens:
   name: BLE Beacon & Geofence Configuration
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - setBleBeaconGeofence
@@ -5652,7 +5667,7 @@ screens:
   name: Biometric Verification Profile Builder
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - setBiometricVerificationProfile
@@ -5673,7 +5688,7 @@ screens:
   name: Face Pass Enrollment Configuration
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - setFacePassEnrollment
@@ -5718,7 +5733,7 @@ screens:
   name: Face Tag Temporary Enrollment
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listFaceTagTemporary
@@ -5740,7 +5755,7 @@ screens:
   name: Face Matching & Verification Thresholds
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listFaceMatchingVerification
@@ -6025,7 +6040,7 @@ screens:
   name: Gate Modes, Free Spin & Emergency Controls
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listGateModeFree
@@ -6703,7 +6718,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - lockId<-navigation
   goesTo:
   - BO-224
   boardFrames: null
@@ -6714,7 +6730,7 @@ screens:
   name: Live Gate Mode & Lane Control
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - cancelGateModeChange
@@ -8031,7 +8047,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - challengeId<-navigation
   goesTo:
   - BO-100
   - BO-285
@@ -8248,7 +8265,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - challengeId<-navigation
   goesTo:
   - BO-284
   boardFrames: null
@@ -8844,7 +8862,7 @@ screens:
   - loading
   offlineState: false
   entryParams:
-  - venueId<-navigation
+  - venueId<-session
   goesTo:
   - BO-314
   boardFrames: null
@@ -9220,7 +9238,7 @@ screens:
   name: Virtual Ticket Identity & Master Record Configuration
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - setVirtualTicketIdentity
@@ -9476,7 +9494,7 @@ screens:
   name: PDF, Printable & POS Ticket Designer
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - createTicketTemplate
@@ -10006,7 +10024,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - approvalRequestId<-navigation
   goesTo:
   - BO-364
   boardFrames: null
@@ -10144,7 +10163,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - requestId<-navigation
   goesTo:
   - BO-100
   - BO-375
@@ -10648,7 +10668,7 @@ screens:
   name: Game & Ride Directory
   module: Games & Rides
   requiresModule: games
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - cloneGame
@@ -10934,6 +10954,7 @@ screens:
   offlineState: false
   entryParams:
   - deviceId<-navigation
+  - readerId<-navigation
   goesTo:
   - BO-404
   boardFrames: null
@@ -11980,7 +12001,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - prizeId<-navigation
   goesTo:
   - BO-444
   boardFrames: null
@@ -15960,7 +15982,7 @@ screens:
   name: Accreditation Form Builder
   module: Access & Venue
   requiresModule: accreditation
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - createForm
@@ -15976,6 +15998,7 @@ screens:
   offlineState: false
   entryParams:
   - programmeId<-navigation
+  - formId<-navigation
   goesTo:
   - BO-615
   boardFrames: null
@@ -15998,7 +16021,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - programmeId<-navigation
   goesTo:
   - BO-615
   boardFrames: null
@@ -16381,6 +16405,7 @@ screens:
   offlineState: false
   entryParams:
   - instanceId<-navigation
+  - applicationId<-navigation
   goesTo:
   - BO-100
   - BO-636
@@ -16416,6 +16441,7 @@ screens:
   offlineState: false
   entryParams:
   - applicationId<-navigation
+  - documentId<-navigation
   goesTo:
   - BO-635
   boardFrames: null
@@ -16750,7 +16776,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - credentialId<-navigation
   goesTo:
   - BO-644
   boardFrames: null
@@ -17797,7 +17824,7 @@ screens:
   name: Event Duplication & Clone Configuration
   module: Sell
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - cloneEvent
@@ -18296,7 +18323,7 @@ screens:
   name: Event Lifecycle & Change Command Center
   module: Sell
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - getEvent
@@ -18679,7 +18706,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - outletId<-session
   goesTo:
   - BO-727
   boardFrames: null
@@ -18703,7 +18731,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - deviceId<-session
   goesTo:
   - BO-727
   boardFrames: null
@@ -19281,7 +19310,7 @@ screens:
   name: Dynamic Segment Builder
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - createSegment
@@ -19342,7 +19371,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - segmentId<-navigation
   goesTo:
   - BO-754
   boardFrames: null
@@ -19365,7 +19395,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - segmentId<-navigation
   goesTo:
   - BO-754
   boardFrames: null
@@ -19410,7 +19441,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - segmentId<-navigation
   goesTo:
   - BO-754
   boardFrames: null
@@ -19548,7 +19580,7 @@ screens:
   name: Campaign Builder
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - createCampaign
@@ -19563,7 +19595,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - campaignId<-navigation
   goesTo:
   - BO-764
   boardFrames: null
@@ -19692,7 +19725,7 @@ screens:
   name: A/B & AI Optimization
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - decideAiInsight
@@ -19756,7 +19789,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - journeyId<-navigation
   goesTo:
   - BO-100
   - BO-775
@@ -19973,7 +20007,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - journeyId<-navigation
   goesTo:
   - BO-774
   boardFrames: null
@@ -20015,7 +20050,7 @@ screens:
   name: Template Library
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - createMessageTemplate
@@ -20326,7 +20361,7 @@ screens:
   name: Intent & Knowledge Management
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - ingestKnowledgeDocument
@@ -20340,7 +20375,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - collectionId<-navigation
   goesTo:
   - BO-794
   boardFrames: null
@@ -20968,7 +21004,7 @@ screens:
   name: Challenge Builder
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - activateChallenge
@@ -20982,7 +21018,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - challengeId<-navigation
   goesTo:
   - BO-824
   boardFrames: null
@@ -20993,7 +21030,7 @@ screens:
   name: Achievement & Badge Engine
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - awardBadge
@@ -21018,7 +21055,7 @@ screens:
   name: Points & Activity Rules
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - getLoyaltyRules
@@ -21043,7 +21080,7 @@ screens:
   name: Milestones & Reward Rules
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - createLoyaltyProgramme
@@ -21173,6 +21210,7 @@ screens:
   - dashboardId<-navigation
   goesTo:
   - BO-824
+  - BO-827
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-833
   inFlows:
@@ -21731,7 +21769,7 @@ screens:
   name: Resource Creation & Profile
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - cloneResource
@@ -21831,7 +21869,7 @@ screens:
   name: Resource Package & Bundle Configuration
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - createResourcePackage
@@ -21961,7 +21999,7 @@ screens:
   name: Resource Availability Schedule Configuration
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - getResourceAvailability
@@ -22060,7 +22098,7 @@ screens:
   name: Operational Time & Resource Blocking
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - createResourceBlock
@@ -22240,7 +22278,7 @@ screens:
   name: Qualification & Assignment Rule Engine
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - setExperienceResourceRequirements
@@ -22707,7 +22745,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - packageId<-navigation
   goesTo:
   - BO-893
   boardFrames: null
@@ -23066,7 +23105,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - blockId<-navigation
   goesTo:
   - BO-903
   boardFrames: null
@@ -23077,7 +23117,7 @@ screens:
   name: Inspection, Condition & Compliance Management
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - createInspectionTemplate
@@ -23265,7 +23305,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - packageId<-navigation
   goesTo:
   - BO-913
   boardFrames: null
@@ -23276,7 +23317,7 @@ screens:
   name: AI Event Resource Forecasting
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - createForecastScenario
@@ -23469,7 +23510,7 @@ screens:
   name: AI Staffing Requirement Forecast
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - decideOperationalRequirement
@@ -27242,7 +27283,8 @@ screens:
   - BO-100
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-1081
-  inFlows: null
+  inFlows:
+  - 'F303 TICVAI Finance Backend Structure Reference v1.0 board 1: Finance Dashboard'
 - screen: BO-1082
   name: Admissions Revenue
   module: Orders & Money
@@ -28336,6 +28378,7 @@ screens:
   offlineState: false
   entryParams:
   - giftCardId<-navigation
+  - cardCode<-navigation
   goesTo:
   - BO-1123
   boardFrames: null
@@ -30421,7 +30464,7 @@ screens:
   name: Tax Profile & Jurisdiction Configuration
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listEInvoicingProviders
@@ -30606,7 +30649,7 @@ screens:
   name: Calculation Validation, Reconciliation & Service Interface
   module: Commercial
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listCalculationValidationReconciliation
@@ -32674,7 +32717,7 @@ screens:
   name: Code Distribution & Assignment Manager
   module: Commercial
   requiresModule: marketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listCouponCodes
@@ -34408,6 +34451,7 @@ screens:
   - ADM-245
   - ADM-246
   - ADM-247
+  - BO-086
   - BO-100
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#adm-238
@@ -34502,7 +34546,7 @@ screens:
   name: Roles, Authority, Delegation & Approval Limits
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - createApprovalDelegation
@@ -34605,7 +34649,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - challengeId<-navigation
   goesTo:
   - ADM-238
   boardFrames: null
@@ -34638,6 +34683,7 @@ screens:
   - ADM-255
   - ADM-256
   - ADM-257
+  - BO-084
   - BO-100
   - BO-391
   boardFrames: null
@@ -36525,7 +36571,7 @@ screens:
   name: Gateway, PSP & Acquirer Directory
   module: Commercial
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - createPaymentProviderConnection
@@ -37314,6 +37360,7 @@ screens:
   entryParams: []
   goesTo:
   - ADM-599
+  - ADM-603
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#adm-602
   inFlows:
@@ -37322,7 +37369,7 @@ screens:
   name: B2B Invoice, On-Account & Payment Terms Configuration
   module: Commercial
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - getB2bPaymentTerms
@@ -37534,7 +37581,7 @@ screens:
   - loading
   offlineState: false
   entryParams:
-  - venueId<-navigation
+  - venueId<-session
   goesTo:
   - ADM-609
   - BO-1146
@@ -38397,7 +38444,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-639
   boardFrames: null
@@ -38957,7 +39005,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - strategyId<-navigation
   goesTo:
   - ADM-669
   boardFrames: null
@@ -40375,7 +40424,7 @@ screens:
   name: Authentication & MFA Policy Manager
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - getGuestVerificationPolicy
@@ -40658,7 +40707,7 @@ screens:
   name: External Workflow System Integration
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listApprovalExternalDispatches
@@ -40716,7 +40765,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - clientId<-navigation
   goesTo:
   - ADM-349
   boardFrames: null
@@ -41041,6 +41091,7 @@ screens:
   offlineState: false
   entryParams:
   - partnerId<-navigation
+  - challengeId<-navigation
   goesTo:
   - BO-100
   boardFrames: null
@@ -41066,6 +41117,7 @@ screens:
   offlineState: false
   entryParams:
   - agreementId<-navigation
+  - challengeId<-navigation
   goesTo:
   - BO-100
   boardFrames: null
@@ -41090,6 +41142,7 @@ screens:
   offlineState: false
   entryParams:
   - agreementId<-navigation
+  - challengeId<-navigation
   goesTo:
   - BO-100
   boardFrames: null
@@ -41186,6 +41239,7 @@ screens:
   entryParams:
   - lineId<-navigation
   - batchId<-navigation
+  - challengeId<-navigation
   goesTo:
   - BO-100
   boardFrames: null

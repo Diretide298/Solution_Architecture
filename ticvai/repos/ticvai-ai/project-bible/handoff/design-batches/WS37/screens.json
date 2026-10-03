@@ -1756,7 +1756,9 @@
    "params": [
     {
      "name": "actionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPricingRollbackEmergency` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1772,7 +1774,7 @@
     "id": "formRequestPricingRollback",
     "component": "modal",
     "trigger": "Request pricing rollback",
-    "body": "**Collects what `requestPricingRollback` sends before it is called.** Required: `id`, `scopePath`, `subject`, `actionType`, `reason`, `status`, `requestedByPrincipalId`, `requestedAt`. Optional: `productId`, `priceListId`, `fromVersion`, `toVersion`, `productScope`, `rollbackTarget`, `rollbackScope`, `scopeIds`, `dependencies`, `executionMode`, `isEmergency`, `scheduledAt` and 6 more. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `requestPricingRollback` sends before it is called.** Required: `subject`, `actionType`, `reason`, `status`. Optional: `productId`, `priceListId`, `fromVersion`, `toVersion`, `productScope`, `rollbackTarget`, `rollbackScope`, `scopeIds`, `dependencies`, `executionMode`, `isEmergency`, `scheduledAt` and 6 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `requestedAt`, `requestedByPrincipalId`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "CatalogueRollbackAction",
     "confirm": {
      "label": "Request pricing rollback",
@@ -1781,14 +1783,10 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
-      "scopePath",
       "subject",
       "actionType",
       "reason",
       "status",
-      "requestedByPrincipalId",
-      "requestedAt",
       "productId",
       "priceListId",
       "fromVersion",

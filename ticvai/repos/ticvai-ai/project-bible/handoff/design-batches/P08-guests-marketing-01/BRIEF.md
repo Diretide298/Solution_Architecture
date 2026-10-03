@@ -151,9 +151,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-068` | Audit Log | B–D | 9 | 9 | 6 | 6 | 1 | 0 | — | notStarted (generated) |
-| `BO-073` | Lost & Found Register | B–D | 4 | 30 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
+| `BO-073` | Lost & Found Register | B–D | 4 | 18 | 6 | 1 | 1 | 0 | — | notStarted (generated) |
 | `BO-091` | AI Policy & Spend | A | 40 | 38 | 6 | 37 | 1 | 0 | — | notStarted (generated) |
-| `BO-107` | Guests & Marketing | B–D | 42 | 43 | 6 | 25 | 0 | 0 | — | notStarted (generated) |
+| `BO-107` | Guests & Marketing | B–D | 42 | 28 | 6 | 25 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

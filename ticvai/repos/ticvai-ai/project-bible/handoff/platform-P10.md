@@ -10,7 +10,7 @@
 | Modules | 9 |
 | Undrawn | 0 |
 | Operations with no screen | 4 |
-| Waves | wave2 11 · wave3 32 |
+| Waves | wave1 1 · wave2 10 · wave3 32 |
 
 ## Gaps
 
@@ -29,7 +29,7 @@
 
 **A platform that sells in one wave and cannot refund until a later one can take money and not give it back.** Not always wrong — worth a look each time.
 
-- **Access & Account** — waves 2, 3
+- **Access & Account** — waves 1, 2, 3
 - **Booking & Quotes** — waves 2, 3
 
 ## Modules
@@ -37,7 +37,7 @@
 | Module | Screens | Waves |
 |---|---|---|
 | Partners | 22 | 3 |
-| Access & Account | 5 | 2, 3 |
+| Access & Account | 5 | 1, 2, 3 |
 | Booking & Quotes | 4 | 2, 3 |
 | Inventory & Pricing | 3 | 2 |
 | Reports & Settlement | 3 | 3 |
@@ -50,7 +50,7 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `PTR-001` | Partner Login / MFA | Access & Account | 2 | 11 | yes |
+| `PTR-001` | Partner Login / MFA | Access & Account | 1 | 11 | yes |
 | `PTR-002` | Partner Dashboard | Overview | 2 | 12 | yes |
 | `PTR-003` | Profile & Company Details | Access & Account | 2 | 4 | yes |
 | `PTR-004` | Notifications | Access & Account | 3 | 2 | yes |

@@ -108,7 +108,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-599` | Mixed Tender & Credit Command Center | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-600` | Mixed Tender Rule & Combination Builder | B–D | 0 | 15 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-601` | Split Payment & Tender Allocation Manager | B–D | 4 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-601` | Split Payment & Tender Allocation Manager | B–D | 4 | 5 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-602` | B2B Credit Account & Limit Manager | B–D | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-603` | B2B Invoice, On-Account & Payment Terms Configuration | A | 10 | 8 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-604` | Stored Value, Gift Card & Voucher Tender Controls | B–D | 11 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
@@ -459,15 +459,11 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Channel | text | — |
-| Terminal | the name it points at, never the id | — |
-| Product | the name it points at, never the id | — |
 | Order type | text | — |
 | Customer type | text | — |
 | Allocation level | chip: Order level, Order line level, Product level, Tax fee component, Specific ticket … | — |
 | Is active | yes / no (icon or chip) | — |
-| Scope path | text | The partition key (ADR-0005). Operations write it at `venue` scope. |
 
 **Actions and what each produces**
 
@@ -536,7 +532,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (4), with its required mark, default, format and its error state (403, 412).
-- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-601?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save multi payment split, Cancel.
 - [ ] Every transition is wired: `ADM-599`.
@@ -605,6 +601,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 **Where the user goes next**
 
 - → `ADM-599` Mixed Tender & Credit Command Center: *Back to Mixed Tender & Credit Command Center\t93*
+- → `ADM-603` B2B Invoice, On-Account & Payment Terms Configuration: *B2B Invoice, On-Account & Payment Terms Configuration*; carries `accountId`
 
 #### States
 
@@ -666,7 +663,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-602?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, emptyNoResults, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `ADM-599`.
+- [ ] Every transition is wired: `ADM-599`, `ADM-603`.
 - [ ] Every gated control is gated: `CREDIT_MANAGE`, `PAYMENT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
@@ -681,8 +678,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Commercial · wave 3 · needs the `core` module |
-| Block | Block A · ticket #20691 (APP-SETUP-ADM-603) |
+| Module | Commercial · wave 1 · needs the `core` module |
+| Block | Block A · task APP-SETUP-ADM-603 |
 | Who uses it | venue staff holding `CREDIT_MANAGE`, `PAYMENT_CONFIGURE`, `PAYMENT_VIEW` (2 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Define) and no display directory — it is settings, not a population |

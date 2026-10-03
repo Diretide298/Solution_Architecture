@@ -43,47 +43,74 @@
     {
      "to": "BO-545",
      "trigger": "Voucher Scan & Reservation Retrieval",
-     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "BO-546",
      "trigger": "Checkout Readiness Validation",
-     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "BO-547",
      "trigger": "Equipment Assignment Workspace",
-     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "BO-548",
      "trigger": "Equipment Scan & Validation",
-     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "BO-549",
      "trigger": "Pre-Rental Condition Inspection",
-     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "BO-550",
      "trigger": "Safety & Handover Checklist",
-     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "BO-551",
      "trigger": "Deposit & Financial Handover Validation",
-     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "BO-552",
      "trigger": "Group & Multi-Item Checkout",
-     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "BO-553",
      "trigger": "Checkout Confirmation & Rental Activation",
-     "provenance": "structural — pack board 6 wiring, 11 September 2026"
+     "provenance": "structural — pack board 6 wiring, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     }
    ]
   },
@@ -315,7 +342,9 @@
    "params": [
     {
      "name": "bookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -434,7 +463,9 @@
    "params": [
     {
      "name": "bookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -578,7 +609,9 @@
    "params": [
     {
      "name": "bookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assignRentalEquipment` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -722,7 +755,9 @@
    "params": [
     {
      "name": "bookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assignRentalEquipment` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -858,7 +893,9 @@
    "params": [
     {
      "name": "bookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `recordRentalInspection` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -989,7 +1026,9 @@
    "params": [
     {
      "name": "bookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `checkOutRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1120,7 +1159,9 @@
    "params": [
     {
      "name": "bookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `checkOutRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1250,7 +1291,9 @@
    "params": [
     {
      "name": "bookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assignRentalEquipment` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1367,7 +1410,9 @@
    "params": [
     {
      "name": "bookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `checkOutRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

@@ -7,7 +7,7 @@
  "audience": "platformAdmin",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-02",
+ "generated": "2026-10-03",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 211,
@@ -15,12 +15,12 @@
   "contracts": 14,
   "modules": 13,
   "undrawn": 0,
-  "operationsWithNoScreen": 109
+  "operationsWithNoScreen": 110
  },
  "waves": {
-  "wave1": 13,
-  "wave2": 17,
-  "wave3": 181
+  "wave1": 28,
+  "wave2": 13,
+  "wave3": 170
  },
  "modules": [
   {
@@ -36,6 +36,7 @@
    "module": "Platform",
    "screens": 70,
    "waves": [
+    1,
     3
    ]
   },
@@ -43,6 +44,7 @@
    "module": "Analytics",
    "screens": 19,
    "waves": [
+    1,
     3
    ]
   },
@@ -82,6 +84,7 @@
    "module": "Branding & Localisation",
    "screens": 4,
    "waves": [
+    1,
     2
    ]
   },
@@ -89,6 +92,7 @@
    "module": "Security & Compliance",
    "screens": 2,
    "waves": [
+    1,
     3
    ]
   },
@@ -103,8 +107,7 @@
    "module": "AI",
    "screens": 2,
    "waves": [
-    1,
-    3
+    1
    ]
   },
   {
@@ -164,19 +167,19 @@
    "operations": 4
   },
   {
-   "contract": "catalogue",
-   "operations": 1
-  },
-  {
-   "contract": "payments",
-   "operations": 1
-  },
-  {
    "contract": "orders",
    "operations": 1
   },
   {
+   "contract": "catalogue",
+   "operations": 1
+  },
+  {
    "contract": "workforce",
+   "operations": 1
+  },
+  {
+   "contract": "payments",
    "operations": 1
   }
  ],
@@ -203,7 +206,7 @@
    "id": "ADM-003",
    "name": "Cross-Tenant Health Dashboard",
    "module": "Overview & Health",
-   "wave": 2,
+   "wave": 1,
    "route": "/general/cross-tenant-health-dashboard",
    "operations": 7,
    "drawn": true
@@ -320,7 +323,7 @@
    "id": "ADM-016",
    "name": "White-Label Branding Management",
    "module": "Branding & Localisation",
-   "wave": 2,
+   "wave": 1,
    "route": "/general/white-label-branding-management",
    "operations": 16,
    "drawn": true
@@ -329,7 +332,7 @@
    "id": "ADM-017",
    "name": "Domain & Certificate Management",
    "module": "Branding & Localisation",
-   "wave": 2,
+   "wave": 1,
    "route": "/general/domain-and-certificate-management",
    "operations": 10,
    "drawn": true
@@ -338,7 +341,7 @@
    "id": "ADM-018",
    "name": "Interface Languages",
    "module": "Branding & Localisation",
-   "wave": 2,
+   "wave": 1,
    "route": "/general/localisation-and-language-pack",
    "operations": 5,
    "drawn": true
@@ -455,7 +458,7 @@
    "id": "ADM-031",
    "name": "Security & Compliance Dashboard",
    "module": "Security & Compliance",
-   "wave": 3,
+   "wave": 1,
    "route": "/general/security-and-compliance-dashboard",
    "operations": 8,
    "drawn": true
@@ -923,7 +926,7 @@
    "id": "ADM-412",
    "name": "Payment Method & Settlement Setup",
    "module": "Tenants & Licensing",
-   "wave": 3,
+   "wave": 1,
    "route": "/tenants-licensing/payment-method-settlement-setup-adm-412",
    "operations": 5,
    "drawn": true
@@ -1031,7 +1034,7 @@
    "id": "ADM-424",
    "name": "Module Activation & Dependency Validation",
    "module": "Tenants & Licensing",
-   "wave": 3,
+   "wave": 1,
    "route": "/tenants-licensing/module-activation-dependency-validation-adm-424",
    "operations": 7,
    "drawn": true
@@ -1526,7 +1529,7 @@
    "id": "ADM-500",
    "name": "Forecast Configuration & Forecasting Strategy",
    "module": "Analytics",
-   "wave": 3,
+   "wave": 1,
    "route": "/analytics/forecast-configuration-forecasting-strategy-adm-500",
    "operations": 6,
    "drawn": true
@@ -1580,7 +1583,7 @@
    "id": "ADM-506",
    "name": "Forecast Drivers, Confidence & Explainability",
    "module": "Analytics",
-   "wave": 3,
+   "wave": 1,
    "route": "/analytics/forecast-drivers-confidence-explainability-adm-506",
    "operations": 7,
    "drawn": true
@@ -1598,7 +1601,7 @@
    "id": "ADM-508",
    "name": "Forecast Accuracy, Review & Publication Center",
    "module": "AI",
-   "wave": 3,
+   "wave": 1,
    "route": "/analytics/forecast-accuracy-review-publication-center-adm-508",
    "operations": 8,
    "drawn": true
@@ -1733,7 +1736,7 @@
    "id": "ADM-523",
    "name": "AI Action & Permission Policy Builder",
    "module": "Platform",
-   "wave": 3,
+   "wave": 1,
    "route": "/platform/ai-action-permission-policy-builder-adm-523",
    "operations": 6,
    "drawn": true
@@ -1769,7 +1772,7 @@
    "id": "ADM-527",
    "name": "AI Policy Testing & Governance Simulation",
    "module": "Platform",
-   "wave": 3,
+   "wave": 1,
    "route": "/platform/ai-policy-testing-governance-simulation-adm-527",
    "operations": 5,
    "drawn": true
@@ -1778,7 +1781,7 @@
    "id": "ADM-528",
    "name": "AI Governance Policy Publication & Effective Policy Map",
    "module": "Platform",
-   "wave": 3,
+   "wave": 1,
    "route": "/platform/ai-governance-policy-publication-effective-policy-map-adm-528",
    "operations": 6,
    "drawn": true
@@ -2012,7 +2015,7 @@
    "id": "ADM-554",
    "name": "AI Quality, Behavior & Governance Drift Monitoring",
    "module": "Platform",
-   "wave": 3,
+   "wave": 1,
    "route": "/platform/ai-quality-behavior-governance-drift-monitoring-adm-554",
    "operations": 9,
    "drawn": true
@@ -2030,7 +2033,7 @@
    "id": "ADM-556",
    "name": "AI Incident & Remediation Management",
    "module": "Platform",
-   "wave": 3,
+   "wave": 1,
    "route": "/platform/ai-incident-remediation-management-adm-556",
    "operations": 9,
    "drawn": true
@@ -2432,6 +2435,12 @@
     "summary": "Rename a role or change its description"
    },
    {
+    "operation": "cancelPaymentLink",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Cancel a live payment link"
+   },
+   {
     "operation": "convertToTermProduct",
     "contract": "orders",
     "verb": "POST",
@@ -2740,10 +2749,17 @@
   ],
   "modulesSplitAcrossWaves": [
    {
-    "module": "AI",
+    "module": "Analytics",
     "waves": [
      1,
      3
+    ]
+   },
+   {
+    "module": "Branding & Localisation",
+    "waves": [
+     1,
+     2
     ]
    },
    {
@@ -2761,10 +2777,24 @@
     ]
    },
    {
+    "module": "Platform",
+    "waves": [
+     1,
+     3
+    ]
+   },
+   {
     "module": "Releases & Environments",
     "waves": [
      1,
      2,
+     3
+    ]
+   },
+   {
+    "module": "Security & Compliance",
+    "waves": [
+     1,
      3
     ]
    },

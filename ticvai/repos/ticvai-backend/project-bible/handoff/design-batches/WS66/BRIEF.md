@@ -147,15 +147,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ANL-012` | Live Operations Dashboard | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ANL-013` | Revenue Pulse | B–D | 0 | 36 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-014` | Attendance & Footfall Intelligence | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ANL-015` | Capacity & Utilization Monitor | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `ANL-016` | Sales & Channel Performance | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `ANL-017` | Customer, Membership & Loyalty Pulse | B–D | 2 | 30 | 6 | 0 | 2 | 2 | — | notStarted (—) |
-| `ANL-018` | Alerts & Exception Center | B–D | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-019` | AI Management Insights | A | 11 | 44 | 6 | 3 | 2 | 0 | — | notStarted (—) |
-| `ANL-020` | Multi-Site & Performance Comparison | B–D | 3 | 8 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-012` | Live Operations Dashboard | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-013` | Revenue Pulse | D | 0 | 36 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-014` | Attendance & Footfall Intelligence | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-015` | Capacity & Utilization Monitor | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ANL-016` | Sales & Channel Performance | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ANL-017` | Customer, Membership & Loyalty Pulse | D | 2 | 30 | 6 | 0 | 2 | 2 | — | notStarted (—) |
+| `ANL-018` | Alerts & Exception Center | C | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-019` | AI Management Insights | D | 11 | 41 | 6 | 3 | 2 | 0 | — | notStarted (—) |
+| `ANL-020` | Multi-Site & Performance Comparison | D | 3 | 6 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

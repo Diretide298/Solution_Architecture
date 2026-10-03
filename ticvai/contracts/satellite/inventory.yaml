@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Inventory & Procurement
   version: 0.1.0
-  x-ticvai-screen-count: 57
+  x-ticvai-screen-count: 55
   x-ticvai-tier: satellite
   x-ticvai-module: 15 — Inventory Management
   x-ticvai-requirements: 98
@@ -389,7 +389,6 @@ paths:
       operationId: bulkUpdateProducts
       deprecated: true
       x-ticvai-superseded-by: 'bulkUpdateCatalogueProducts'
-      x-ticvai-consumed-by: []
       summary: Change many products at once, with a preview
       description: '**Deprecated on 2 October; retired at the next major version** (Chinmay, contract follow-ups:
         "catalogue.bulkUpdateProducts is added; the inventory one is deprecated"; CHG-FUP-011). A bulk edit of
@@ -1977,8 +1976,6 @@ paths:
       operationId: rejectRequisition
       deprecated: true
       x-ticvai-superseded-by: 'approveRequisition'
-      x-ticvai-consumed-by:
-        - "P08 BO-078 Requisitions"
       x-ticvai-audience:
       - staff
       summary: Reject a requisition
@@ -2042,8 +2039,6 @@ paths:
       operationId: returnRequisition
       deprecated: true
       x-ticvai-superseded-by: 'approveRequisition'
-      x-ticvai-consumed-by:
-        - "P08 BO-078 Requisitions"
       x-ticvai-audience:
       - staff
       summary: Return a requisition for more information

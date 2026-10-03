@@ -18,6 +18,25 @@
   "requestBody": null,
   "responds": "CaseMessage"
  },
+ "addIncidentPerson": {
+  "method": "POST",
+  "path": "/incidents/{incidentId}/people",
+  "contract": "maintenance",
+  "summary": "Add a person involved in an incident",
+  "permission": "INCIDENT_REPORT",
+  "offlineCapable": true,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "AddIncidentPersonRequest",
+  "responds": "IncidentInvolvedParty"
+ },
  "applyManualDiscount": {
   "method": "POST",
   "path": "/orders/{orderId}/discounts",
@@ -935,6 +954,45 @@
   "requestBody": null,
   "responds": "OrderResumeResult"
  },
+ "searchGuests": {
+  "method": "GET",
+  "path": "/guests",
+  "contract": "marketing-crm",
+  "summary": "Search guest profiles",
+  "permission": "GUEST_VIEW",
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "search",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "segmentId",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "hasConsentFor",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "setQueueStatus": {
   "method": "PUT",
   "path": "/queues/{queueId}/status",
@@ -1015,7 +1073,7 @@
   "method": "PATCH",
   "path": "/incidents/{incidentId}",
   "contract": "maintenance",
-  "summary": "Investigate, escalate or close an incident",
+  "summary": "Investigate, escalate, close or reopen an incident",
   "permission": "INCIDENT_MANAGE",
   "offlineCapable": false,
   "conflictPolicy": "append",
@@ -1029,6 +1087,25 @@
   ],
   "requestBody": null,
   "responds": "Incident"
+ },
+ "uploadIncidentMedia": {
+  "method": "POST",
+  "path": "/incidents/{incidentId}/media",
+  "contract": "maintenance",
+  "summary": "Add a photo, video or document to an incident",
+  "permission": "INCIDENT_REPORT",
+  "offlineCapable": false,
+  "conflictPolicy": "append",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": "UploadIncidentMediaRequest",
+  "responds": "IncidentMedia"
  },
  "voidOrder": {
   "method": "POST",

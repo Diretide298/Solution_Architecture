@@ -115,7 +115,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-989` | Sales & Allocation Tracker | B–D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `BO-990` | Maintenance & Out of Service | B–D | 0 | 10 | 6 | 20 | 0 | 2 | — | notStarted (—) |
 | `BO-991` | Seat History | B–D | 0 | 0 | 6 | 3 | 0 | 6 | — | notStarted (—) |
-| `BO-992` | Audit & Reconciliation | B–D | 2 | 21 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-992` | Audit & Reconciliation | B–D | 2 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -704,6 +704,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS143 Seat Management Venue Mapping Reference v1.0 Board 4.dc.html#bo-986`
 - Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 4
 - Flow F277 *Seat Management Venue Mapping Reference v1.0 board 4: Inventory Command Center*, step 6: Works in Availability Tracker → Analyze current and historical seat availability. Show available quantity by venue, performance, section, row, category, price band and sales channel. Graph availability over time and identify …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1462,13 +1463,10 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 
 | Shows | Format | Notes |
 |---|---|---|
-| Seat | the name it points at, never the id | — |
 | Label | text | — |
 | Kind | chip: Sold twice, Sold not marked, Marked not sold, Held and sold, Orphaned hold | — |
 | Map state | text | — |
 | Order state | text | — |
-| Orders | list or chips (count when long) | — |
-| Detected at | 1 Oct 2026, 14:30 | — |
 | Cart state | text | not in the schema: `Cart state` |
 | Payment state | text | not in the schema: `Payment state` |
 | Ticket state | text | not in the schema: `Ticket state` |
@@ -1544,7 +1542,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (2), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-992?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Correct with reason.
 - [ ] Every transition is wired: `BO-983`.

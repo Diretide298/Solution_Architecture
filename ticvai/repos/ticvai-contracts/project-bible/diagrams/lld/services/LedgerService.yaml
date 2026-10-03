@@ -12,8 +12,8 @@ ifDown: '**Correctness over availability.** A ledger that is briefly unavailable
   that is briefly wrong is not.'
 coverage:
   operations: 72
-  inAFlow: 33
-  percent: 46%
+  inAFlow: 36
+  percent: 50%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
@@ -1028,6 +1028,7 @@ screens:
 flows:
 - F13 Month end closes
 - F16 A venue opens for the first time
+- 'F303 TICVAI Finance Backend Structure Reference v1.0 board 1: Finance Dashboard'
 - F32 A till opens, trades and settles
 - F82 A month is analysed from incrementality to a scheduled report
 - F98 A day is reconciled from takings to the ledger

@@ -96,15 +96,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-248` | Workflow Operations Command Center | B–D | 0 | 262 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-248` | Workflow Operations Command Center | B–D | 0 | 254 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-249` | Unified Approval Inbox & Decision Workspace | B–D | 0 | 18 | 6 | 7 | 1 | 3 | — | notStarted (generated) |
 | `ADM-250` | Workflow Instance Monitor & Process Timeline | B–D | 9 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-251` | Workflow Exception, Failure & Recovery Center | B–D | 10 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-252` | SLA, Escalation & Bottleneck Monitor | B–D | 0 | 28 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-252` | SLA, Escalation & Bottleneck Monitor | B–D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-253` | Automation Execution & Autonomous Action Monitor | B–D | 0 | 34 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-254` | Cross-Module Orchestration Monitor | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-255` | Workflow Analytics & Process Performance | B–D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-256` | Process Optimization & Automation Opportunity Center | B–D | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-256` | Process Optimization & Automation Opportunity Center | B–D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-257` | AI Workflow Intelligence & Autonomous Governance Center | B–D | 0 | 22 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
@@ -459,32 +459,24 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| Workflow instance | text | Workflow Instance ID |
 | Workflow | text | Workflow |
 | Module | chip: Ticketing, Pricing, Finance, Procurement, Crm, Resource management… | Module the workflow originates from |
 | Business object | text | Business Object |
 | Initiated by | text | Initiated By |
-| Started | 1 Oct 2026, 14:30 | Started |
-| Current step | text | Current Step |
-| Owner | text | Owner |
 | Priority | text | Priority |
-| Sla | text | SLA |
 | Status | chip: Running, Waiting approval, Waiting task, Waiting system, Escalated, Failed… | Status |
 
 **The selected workflow operations** (detail panel): The pack groups this record's detail under its own headings: “Show activity originating from”, “Use”, “Refund Approval Workflow”.
 
 | Shows | Format | Notes |
 |---|---|---|
-| Workflow instance | text | Workflow Instance ID |
 | Workflow | text | Workflow |
 | Module | chip: Ticketing, Pricing, Finance, Procurement, Crm, Resource management… | Module the workflow originates from |
 | Business object | text | Business Object |
 | Initiated by | text | Initiated By |
 | Started | 1 Oct 2026, 14:30 | Started |
 | Current step | text | Current Step |
-| Owner | text | Owner |
 | Priority | text | Priority |
-| Sla | text | SLA |
 | Status | chip: Running, Waiting approval, Waiting task, Waiting system, Escalated, Failed… | Status |
 
 **Data it reads**: `listWorkflow` (onLoad, Workflow Operations Command Center)
@@ -575,7 +567,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (262 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (254 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-248?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-100`, `ADM-249`, `ADM-250`, `ADM-251`, `ADM-252`, `ADM-253`, `ADM-254`, `ADM-255`, `ADM-256`, `ADM-257`, `BO-391`, `BO-084`.
@@ -1188,16 +1180,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Workflow | text | Workflow |
 | Instance | text | Instance |
 | Current step | text | Current Step |
-| Owner | text | Owner |
-| Started | 1 Oct 2026, 14:30 | Started |
-| Target | 1 Oct 2026, 14:30 | SLA deadline |
 | Time remaining | 1,234 | Minutes until breach; negative once breached |
-| Risk | text | Risk |
 | Escalation level | text | Escalation Level |
-| First reminder | 1 Oct 2026, 14:30 | First Reminder |
-| Second reminder | 1 Oct 2026, 14:30 | Second Reminder |
-| Manager escalation | 1 Oct 2026, 14:30 | Manager Escalation |
-| Executive escalation | 1 Oct 2026, 14:30 | Executive Escalation |
 | Final outcome | text | Final Outcome |
 
 **The selected sla escalation bottleneck** (detail panel): The pack groups this record's detail under its own headings: “Purchase Order Approval”, “Breakdown”.
@@ -1209,14 +1193,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Current step | text | Current Step |
 | Owner | text | Owner |
 | Started | 1 Oct 2026, 14:30 | Started |
-| Target | 1 Oct 2026, 14:30 | SLA deadline |
 | Time remaining | 1,234 | Minutes until breach; negative once breached |
-| Risk | text | Risk |
 | Escalation level | text | Escalation Level |
-| First reminder | 1 Oct 2026, 14:30 | First Reminder |
-| Second reminder | 1 Oct 2026, 14:30 | Second Reminder |
-| Manager escalation | 1 Oct 2026, 14:30 | Manager Escalation |
-| Executive escalation | 1 Oct 2026, 14:30 | Executive Escalation |
 | Final outcome | text | Final Outcome |
 
 **Permissions this screen separates** (banner): **The pack separates these permissions and no action on the screen claims them yet:** Reassign, Escalate, Extend SLA, Add Backup Approver, Change Priority. Each needs attaching to the control it gates, or the screen needs the control.
@@ -1294,7 +1272,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-252?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Act on workflow instance.
 - [ ] Every transition is wired: `ADM-248`, `BO-391`.
@@ -1777,14 +1755,9 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Opportunity type | chip: Repetitive approval, Unnecessary approval, High manual work, Excessive rework, Long … | Kind of improvement opportunity |
 | Duplicate steps | text | not in the schema: `Duplicate Steps` |
 | Process | text | Process |
-| Module | text | Module |
-| Monthly volume | 1,234 | Monthly Volume |
-| Current steps | 1,234 | Current Steps |
 | Average duration | 1,234 | Minutes |
-| Manual steps | 1,234 | Manual Steps |
 | Approval rate | 12.5% | Approval Rate |
 | Exception rate | 12.5% | Exception Rate |
-| Estimated opportunity | text | Estimated Opportunity |
 
 **The selected process optimization automation** (detail panel): The pack groups this record's detail under its own headings: “Low-Value Refund Approval”, “Before changing anything”, “Estimated result”.
 
@@ -1795,12 +1768,9 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Process | text | Process |
 | Module | text | Module |
 | Monthly volume | 1,234 | Monthly Volume |
-| Current steps | 1,234 | Current Steps |
 | Average duration | 1,234 | Minutes |
-| Manual steps | 1,234 | Manual Steps |
 | Approval rate | 12.5% | Approval Rate |
 | Exception rate | 12.5% | Exception Rate |
-| Estimated opportunity | text | Estimated Opportunity |
 
 **Data it reads**: `listProcessAutomationOpportunity` (onLoad, Process Optimization & Automation Opportunity Center)
 
@@ -1869,7 +1839,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-256?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-248`.

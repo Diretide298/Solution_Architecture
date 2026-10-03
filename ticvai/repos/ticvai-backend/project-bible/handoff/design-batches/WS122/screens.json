@@ -843,7 +843,9 @@
    "params": [
     {
      "name": "actionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `decideProposedAction` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "planId",
@@ -1110,7 +1112,9 @@
    "params": [
     {
      "name": "actionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `decideProposedAction` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "planId",
@@ -1369,7 +1373,9 @@
    "params": [
     {
      "name": "conversationId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getAiDecisionTrace`; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "decisionRecordId",
@@ -2314,11 +2320,15 @@
    "params": [
     {
      "name": "capabilityKey",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiCapabilities` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "decisionRecordId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `searchAiDecisions` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "planId",
@@ -2620,7 +2630,9 @@
    "params": [
     {
      "name": "decisionRecordId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `searchAiDecisions` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "tenantId",
@@ -2876,7 +2888,9 @@
     },
     {
      "name": "versionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `simulateAiGovernancePolicy` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "tenantId",

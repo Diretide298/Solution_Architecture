@@ -1,4 +1,3 @@
-
 platform:
   code: P05
   audience: guest
@@ -48,8 +47,8 @@ platform:
     - P01
     - P02
     note: '**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations;
-      the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower
-      rather than different.'
+      the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather
+      than different.'
     decided: 10 September 2026
 screens:
 - id: KSK-001
@@ -84,9 +83,9 @@ screens:
     - to: KSK-014
       trigger: Out of service
       provenance: structural — KSK-001 is P05's home screen and its exits are its launcher
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. **The attract loop is the entry.** A kiosk has no login and nobody navigates
-    to it — it is what the screen shows when nobody is standing there. **Declared 20 August** — `isEntryPoint`
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. **The attract loop is the entry.** A kiosk has no login and nobody navigates to it
+    — it is what the screen shows when nobody is standing there. **Declared 20 August** — `isEntryPoint`
     existed in the schema and five platforms used none, so every screen in them read as unreachable.
   density: touchLarge
   boardFrames:
@@ -118,8 +117,8 @@ screens:
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-001
     derivedFrom: wireframes/reference/Kiosk Board 1.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not
-      starting from nothing.'
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
   apisNote: 'Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -147,17 +146,17 @@ screens:
       provenance: flow F07 step 2→3, F75 step 2→3
     - to: KSK-004
       trigger: Choose tickets
-      provenance: 'derived — KSK-004 declares entryState.params productId and KSK-002 holds none of
-        them. The edge carries nothing: productId only pre-selects (deep link or optional), and KSK-004
-        opens on its own'
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+      provenance: 'derived — KSK-004 declares entryState.params productId and KSK-002 holds none of them.
+        The edge carries nothing: productId only pre-selects (deep link or optional), and KSK-004 opens
+        on its own'
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written.
   density: touchLarge
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-002
   pattern: statusTracker
-  patternReason: '`getTenantAppStatus` reads one record and nothing reads a population — the screen
-    is about that one thing'
+  patternReason: '`getTenantAppStatus` reads one record and nothing reads a population — the screen is
+    about that one thing'
   purpose: Ask the only question that changes everything else.
   layout:
     template: detail
@@ -184,9 +183,9 @@ screens:
     emptyFirstRun: No language select yet. **Offers no create action** — this screen declares no operation
       that makes one — and says so rather than showing an empty table.
     emptyNoAccess: '**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block
-      A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the
-      tenant has published like any visitor. A kiosk whose device registration is revoked goes out of
-      service (KSK-014); it never shows a sign-in or names a permission.'
+      A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant
+      has published like any visitor. A kiosk whose device registration is revoked goes out of service
+      (KSK-014); it never shows a sign-in or names a permission.'
     offline: '**From the cached configuration.** The languages the kiosk last read stay on screen; buying
       waits for the connection.'
   apis:
@@ -205,8 +204,8 @@ screens:
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-002
     derivedFrom: wireframes/reference/Kiosk Board 1.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not
-      starting from nothing.'
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -256,14 +255,14 @@ screens:
       operation: listProducts
       carries:
       - productId
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written.
   density: touchLarge
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-003
   pattern: listDetail
-  patternReason: '`listProducts` reads a population and nothing reads one of them; the detail is the
-    row until a `get` exists'
+  patternReason: '`listProducts` reads a population and nothing reads one of them; the detail is the row
+    until a `get` exists'
   purpose: Get to a product in one touch.
   layout:
     template: split
@@ -291,9 +290,9 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: the kiosk sends no filter a guest chose; the venue is the kiosk''s.'
     emptyNoAccess: '**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block
-      A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the
-      tenant has published like any visitor. A kiosk whose device registration is revoked goes out of
-      service (KSK-014); it never shows a sign-in or names a permission.'
+      A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant
+      has published like any visitor. A kiosk whose device registration is revoked goes out of service
+      (KSK-014); it never shows a sign-in or names a permission.'
     offline: Not available
   apis:
   - operationId: listProducts
@@ -313,10 +312,10 @@ screens:
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-003
     derivedFrom: wireframes/reference/Kiosk Board 1.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not
-      starting from nothing.'
-  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
-    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: KSK-004
   name: Choose tickets
@@ -345,24 +344,23 @@ screens:
     - to: KSK-015
       trigger: Assistant
       provenance: 'derived — KSK-015 declares entryState.params conversationId, messageId and KSK-004
-        holds none of them. The edge carries nothing: conversationId only pre-selects (deep link or
-        optional); KSK-015 finds messageId (sendAiMessage) itself, and KSK-015 opens on its own'
+        holds none of them. The edge carries nothing: conversationId, messageId only pre-select (deep
+        link or optional), and KSK-015 opens on its own'
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written.
 
 
     **Tickets first, then date and time (decided by Chinmay, 2 October 2026; DEC-170).** The kiosk differs
-    from the web and the app, which pick the date and time first (REV3-2); REV3-2 is superseded for
-    the kiosk only. The order is KSK-003, KSK-004 (tickets), KSK-005 (session), as F07 already walks
-    it (CHG-SGU-015).'
+    from the web and the app, which pick the date and time first (REV3-2); REV3-2 is superseded for the
+    kiosk only. The order is KSK-003, KSK-004 (tickets), KSK-005 (session), as F07 already walks it (CHG-SGU-015).'
   density: touchLarge
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-004
   pattern: listDetail
-  patternReason: '`listProductVariants` reads the population and `getAvailability` reads one of them
-    — list, select, act'
-  purpose: 'Choose the tickets first, then the date and time: quantities, with targets a gloved hand
-    can hit.'
+  patternReason: '`listProductVariants` reads the population and `getAvailability` reads one of them —
+    list, select, act'
+  purpose: 'Choose the tickets first, then the date and time: quantities, with targets a gloved hand can
+    hit.'
   gaps:
   - operation: getAvailability
     why: '**`getAvailability` declares its response inline**, so the component that shows it names fields
@@ -397,12 +395,12 @@ screens:
     error: Could not load. Names which read failed and leaves the choose tickets untouched.
     emptyFirstRun: No choose tickets yet. **Offers no create action** — this screen declares no operation
       that makes one — and says so rather than showing an empty table.
-    emptyNoResults: 'Never shown: `listProductVariants` takes no filter, so an empty list is always
-      the first-run state above.'
+    emptyNoResults: 'Never shown: `listProductVariants` takes no filter, so an empty list is always the
+      first-run state above.'
     emptyNoAccess: '**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block
-      A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the
-      tenant has published like any visitor. A kiosk whose device registration is revoked goes out of
-      service (KSK-014); it never shows a sign-in or names a permission.'
+      A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant
+      has published like any visitor. A kiosk whose device registration is revoked goes out of service
+      (KSK-014); it never shows a sign-in or names a permission.'
     offline: Not available
   apis:
   - operationId: getAvailability
@@ -417,8 +415,8 @@ screens:
     params:
     - name: productId
       from: deepLink
-    coldEntry: '**A shared product link after the product retired.** Shows what replaced it where a
-      successor exists, and the catalogue where none does.'
+    coldEntry: '**A shared product link after the product retired.** Shows what replaced it where a successor
+      exists, and the catalogue where none does.'
     preloaded: []
   wireframe:
     status: notStarted
@@ -426,8 +424,8 @@ screens:
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-004
     derivedFrom: wireframes/reference/Kiosk Board 1.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not
-      starting from nothing.'
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -454,14 +452,14 @@ screens:
     - to: KSK-006
       trigger: Reviews the order
       provenance: flow F07 step 5→6
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written.
   density: touchLarge
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-005
   pattern: statusTracker
-  patternReason: '`getAvailability` reads one record and nothing reads a population — the screen is
-    about that one thing'
+  patternReason: '`getAvailability` reads one record and nothing reads a population — the screen is about
+    that one thing'
   purpose: Pick a time that still has room.
   gaps:
   - operation: getAvailability
@@ -484,8 +482,8 @@ screens:
       - kind: cardList
         label: Times
         operation: addCartLine
-        notes: A tap on a time adds the chosen tickets for it (`addCartLine`), which takes the hold;
-          the guest never sees the word hold.
+        notes: A tap on a time adds the chosen tickets for it (`addCartLine`), which takes the hold; the
+          guest never sees the word hold.
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
   states:
     loading: The choose session list.
@@ -493,9 +491,9 @@ screens:
     emptyFirstRun: No choose session yet. **Offers no create action** — this screen declares no operation
       that makes one — and says so rather than showing an empty table.
     emptyNoAccess: '**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block
-      A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the
-      tenant has published like any visitor. A kiosk whose device registration is revoked goes out of
-      service (KSK-014); it never shows a sign-in or names a permission.'
+      A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant
+      has published like any visitor. A kiosk whose device registration is revoked goes out of service
+      (KSK-014); it never shows a sign-in or names a permission.'
     offline: Not available
   apis:
   - operationId: addCartLine
@@ -512,8 +510,8 @@ screens:
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-005
     derivedFrom: wireframes/reference/Kiosk Board 1.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not
-      starting from nothing.'
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -523,8 +521,7 @@ screens:
       from: navigation
       optional: true
       notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `addCartLine` takes
-        the id from the record the user acts on, and an edge or link that holds one only pre-selects
-        it.'
+        the id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
 - id: KSK-006
   name: Review
   module: Sell
@@ -556,8 +553,8 @@ screens:
       - paymentId
     entryFrom:
     - KSK-003
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written.
   density: touchLarge
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-006
@@ -611,9 +608,9 @@ screens:
     error: Could not load. Names which read failed and leaves the review untouched.
     emptyFirstRun: No review yet. Offers Add cart line (`addCartLine`).
     emptyNoAccess: '**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block
-      A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the
-      tenant has published like any visitor. A kiosk whose device registration is revoked goes out of
-      service (KSK-014); it never shows a sign-in or names a permission.'
+      A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant
+      has published like any visitor. A kiosk whose device registration is revoked goes out of service
+      (KSK-014); it never shows a sign-in or names a permission.'
     offline: Not available
   apis:
   - operationId: getCart
@@ -645,8 +642,8 @@ screens:
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-006
     derivedFrom: wireframes/reference/Kiosk Board 1.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not
-      starting from nothing.'
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -687,29 +684,29 @@ screens:
     still to be written. **Card only. No foreign cash** — a kiosk accepting foreign notes needs a note
     reader and a per-currency float, and neither is specified. A guest paying by card in a foreign currency
     is converted by their own issuer, which is not our rate. **Card only. No foreign cash** — a kiosk
-    accepting notes needs a note reader and a per-currency float, and neither is specified. Dynamic
-    currency conversion by the terminal is recorded as `fxRateSource: cardScheme`, because that rate
-    is the scheme''s rather than ours.
+    accepting notes needs a note reader and a per-currency float, and neither is specified. Dynamic currency
+    conversion by the terminal is recorded as `fxRateSource: cardScheme`, because that rate is the scheme''s
+    rather than ours.
 
 
-    **The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001;
-    reverses the display-only rule, CF-37 and "payment will be processed in AED", in favour of option
-    (b) of MoM 10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`,
+    **The guest selects the currency and pays in it** (decided 2 October 2026, Chinmay; CHG-FIN-001; reverses
+    the display-only rule, CF-37 and "payment will be processed in AED", in favour of option (b) of MoM
+    10 Aug 2026 4.7, DI-211). The venue lists the currencies a guest may pay in (`VenueSettings.chargeCurrencies`,
     a subset of the currencies it shows); `listFxRates` with `chargeable=true` returns them, each marked
     `chargeable`. The selected currency is sent at checkout (`checkoutCart.chargeCurrency`), the rate
-    is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and
-    the payment request goes to the payment partner in that currency. The ledger stays in the venue''s
-    base currency, with the rate recorded on the order, the payment and any refund. **Refunds go back
-    in the currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency
-    the venue shows but does not charge is still an approximate price, marked "approx.", with "You pay
-    in <base currency>" beside it. **At the kiosk:** the guest may pick a chargeable currency before
-    paying by card.'
+    is locked on the order (`Order.chargeFxRate`, `chargeTotal`, until `chargeRateLockedUntil`), and the
+    payment request goes to the payment partner in that currency. The ledger stays in the venue''s base
+    currency, with the rate recorded on the order, the payment and any refund. **Refunds go back in the
+    currency paid**, at the sale rate, so a full refund returns exactly what was charged. A currency the
+    venue shows but does not charge is still an approximate price, marked "approx.", with "You pay in
+    <base currency>" beside it. **At the kiosk:** the guest may pick a chargeable currency before paying
+    by card.'
   density: touchLarge
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-007
   pattern: configEditor
-  patternReason: the screen declares only writes (`createPayment`) and no read of a population — it
-    is settings, not a list
+  patternReason: the screen declares only writes (`createPayment`) and no read of a population — it is
+    settings, not a list
   purpose: Take a card, and nothing else.
   layout:
     template: form
@@ -719,9 +716,8 @@ screens:
       - kind: paymentTerminal
         label: Tap, insert or scan to pay
         operation: createPayment
-        notes: 'The amount due and the card terminal''s prompt. The kiosk and the terminal fill the
-          payment (`createPayment`): order, tender, amount and device are never typed. Card only (F75
-          step 5).'
+        notes: 'The amount due and the card terminal''s prompt. The kiosk and the terminal fill the payment
+          (`createPayment`): order, tender, amount and device are never typed. Card only (F75 step 5).'
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
       - kind: primaryButton
         derived: true
@@ -739,9 +735,9 @@ screens:
     emptyFirstRun: No payment configured. The form opens empty and `createPayment` saves the first one;
       it says what the platform does in the meantime.
     emptyNoAccess: '**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block
-      A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the
-      tenant has published like any visitor. A kiosk whose device registration is revoked goes out of
-      service (KSK-014); it never shows a sign-in or names a permission.'
+      A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant
+      has published like any visitor. A kiosk whose device registration is revoked goes out of service
+      (KSK-014); it never shows a sign-in or names a permission.'
     offline: Not available. **Card only, and card needs the acquirer**
   apis:
   - operationId: createPayment
@@ -754,10 +750,10 @@ screens:
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-007
     derivedFrom: wireframes/reference/Kiosk Board 1.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not
-      starting from nothing.'
-  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
-    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: KSK-008
   name: Payment unresolved
@@ -781,8 +777,7 @@ screens:
     - KSK-006
     - KSK-007
     notes: '**Reached from KSK-007** — the payment screen is the one that fails. Stated on 4 September:
-      this screen exited somewhere and nothing exited to it, so it was outside the navigation graph
-      entirely.'
+      this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
     transitions:
     - to: KSK-010
       trigger: Or it resolves and the printer fails
@@ -790,8 +785,8 @@ screens:
       operation: inquirePaymentStatus
       carries:
       - orderId
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written.
   density: touchLarge
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-008
@@ -824,12 +819,12 @@ screens:
   states:
     loading: The saved payment unresolved.
     error: Could not load. Names which read failed and leaves the payment unresolved untouched.
-    emptyFirstRun: No payment unresolved configured. The form opens empty and `inquirePaymentStatus`
-      saves the first one; it says what the platform does in the meantime.
+    emptyFirstRun: No payment unresolved configured. The form opens empty and `inquirePaymentStatus` saves
+      the first one; it says what the platform does in the meantime.
     emptyNoAccess: '**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block
-      A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the
-      tenant has published like any visitor. A kiosk whose device registration is revoked goes out of
-      service (KSK-014); it never shows a sign-in or names a permission.'
+      A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant
+      has published like any visitor. A kiosk whose device registration is revoked goes out of service
+      (KSK-014); it never shows a sign-in or names a permission.'
     offline: Not applicable
   apis:
   - operationId: inquirePaymentStatus
@@ -840,21 +835,21 @@ screens:
     params:
     - name: paymentId
       from: deepLink
-    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and
-      one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification
-      opened three weeks late all land here, and the person holding the link did nothing wrong. **The
-      screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came
-      from.** Arrives with `paymentId`.'
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `paymentId`.'
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-008
     derivedFrom: wireframes/reference/Kiosk Board 1.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not
-      starting from nothing.'
-  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
-    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: KSK-009
   name: Ticket issued
@@ -883,10 +878,10 @@ screens:
       trigger: Print failure
       carries:
       - orderId
-      provenance: derived — KSK-010 declares entryState.params orderId and KSK-009 holds orderId, so
-        an edge into it carries them
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+      provenance: derived — KSK-010 declares entryState.params orderId and KSK-009 holds orderId, so an
+        edge into it carries them
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written.
   density: touchLarge
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-009
@@ -929,38 +924,37 @@ screens:
     emptyFirstRun: No ticket issued yet. **Offers no create action** — this screen declares no operation
       that makes one — and says so rather than showing an empty table.
     emptyNoAccess: '**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block
-      A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the
-      tenant has published like any visitor. A kiosk whose device registration is revoked goes out of
-      service (KSK-014); it never shows a sign-in or names a permission.'
+      A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant
+      has published like any visitor. A kiosk whose device registration is revoked goes out of service
+      (KSK-014); it never shows a sign-in or names a permission.'
     offline: Not applicable
   apis:
   - operationId: reprintOrder
     contract: orders
-    purpose: Send the guest's own tickets again, or print them (`reprintOrder`); a kiosk changes no
-      owner (GFIX-3)
+    purpose: Send the guest's own tickets again, or print them (`reprintOrder`); a kiosk changes no owner
+      (GFIX-3)
     trigger: onAction
     provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
   - operationId: getOrder
     contract: orders
     purpose: 'Read an order With the guest session the device already holds: signed in, or the anonymous
-      cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay,
-      fix before Block A starts (GFIX-6)).'
+      cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix
+      before Block A starts (GFIX-6)).'
     trigger: onLoad
   entryState:
     params:
     - name: orderId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-009
     derivedFrom: wireframes/reference/Kiosk Board 1.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not
-      starting from nothing.'
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -968,8 +962,8 @@ screens:
   - id: sendTickets
     component: modal
     trigger: Send to my phone
-    body: '**Email or SMS, then the address.** `reprintOrder` with `delivery` email or sms for this
-      order''s tickets; nobody else becomes their owner.'
+    body: '**Email or SMS, then the address.** `reprintOrder` with `delivery` email or sms for this order''s
+      tickets; nobody else becomes their owner.'
     confirm:
       label: Send to my phone
       operation: reprintOrder
@@ -981,8 +975,8 @@ screens:
   gaps:
   - operation: transferOrderTickets
     removed: true
-    why: A transfer changes the tickets' owner; at a kiosk the guest is resending or printing their
-      own tickets, which is `reprintOrder` by email, SMS or print.
+    why: A transfer changes the tickets' owner; at a kiosk the guest is resending or printing their own
+      tickets, which is `reprintOrder` by email, SMS or print.
     source: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
 - id: KSK-010
   name: Print failure
@@ -1006,15 +1000,14 @@ screens:
     - KSK-008
     - KSK-009
     notes: '**Reached from KSK-009** — printing fails after the ticket is issued. Stated on 4 September:
-      this screen exited somewhere and nothing exited to it, so it was outside the navigation graph
-      entirely.'
+      this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
     transitions:
     - to: KSK-013
       trigger: They call for help
       provenance: flow F57 step 3→4
       operation: reprintOrder
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written.
   density: touchLarge
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-010
@@ -1042,40 +1035,39 @@ screens:
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
   states:
     loading: Sending by email and rendering the QR
-    error: '**The order is paid and the ticket exists.** Email and on-screen QR, and the kiosk marks
-      itself degraded rather than dead'
+    error: '**The order is paid and the ticket exists.** Email and on-screen QR, and the kiosk marks itself
+      degraded rather than dead'
     emptyFirstRun: Not applicable
     offline: Not applicable
   apis:
   - operationId: reprintOrder
     contract: orders
-    purpose: Send the guest's own tickets again, or print them (`reprintOrder`); a kiosk changes no
-      owner (GFIX-3)
+    purpose: Send the guest's own tickets again, or print them (`reprintOrder`); a kiosk changes no owner
+      (GFIX-3)
     trigger: onAction
     provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
   entryState:
     params:
     - name: orderId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-010
     derivedFrom: wireframes/reference/Kiosk Board 2.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not
-      starting from nothing.'
-  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
-    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: transferOrderTickets
     removed: true
-    why: A transfer changes the tickets' owner; at a kiosk the guest is resending or printing their
-      own tickets, which is `reprintOrder` by email, SMS or print.
+    why: A transfer changes the tickets' owner; at a kiosk the guest is resending or printing their own
+      tickets, which is `reprintOrder` by email, SMS or print.
     source: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
 - id: KSK-011
   name: Collect a booking
@@ -1097,18 +1089,18 @@ screens:
     inferred: false
     entryFrom:
     - KSK-003
-    notes: '**Reached from KSK-003** — collecting is an alternative to buying, offered at the start.
-      Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside
-      the navigation graph entirely.'
+    notes: '**Reached from KSK-003** — collecting is an alternative to buying, offered at the start. Stated
+      on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation
+      graph entirely.'
     transitions:
     - to: KSK-012
       trigger: Booking found
       carries:
       - orderId
-      provenance: derived — KSK-012 declares entryState.params orderId and KSK-011 holds orderId, so
-        an edge into it carries them
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+      provenance: derived — KSK-012 declares entryState.params orderId and KSK-011 holds orderId, so an
+        edge into it carries them
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written.
   density: touchLarge
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-011
@@ -1155,9 +1147,9 @@ screens:
     emptyFirstRun: No collect booking yet. **Offers no create action** — this screen declares no operation
       that makes one — and says so rather than showing an empty table.
     emptyNoAccess: '**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block
-      A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the
-      tenant has published like any visitor. A kiosk whose device registration is revoked goes out of
-      service (KSK-014); it never shows a sign-in or names a permission.'
+      A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant
+      has published like any visitor. A kiosk whose device registration is revoked goes out of service
+      (KSK-014); it never shows a sign-in or names a permission.'
     offline: Not available
   apis:
   - operationId: lookupShopAndDrop
@@ -1167,24 +1159,23 @@ screens:
   - operationId: getOrder
     contract: orders
     purpose: 'Read an order With the guest session the device already holds: signed in, or the anonymous
-      cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay,
-      fix before Block A starts (GFIX-6)).'
+      cart session a visitor gets with the first line (ADR-0045) (decided 2 October 2026 by Chinmay, fix
+      before Block A starts (GFIX-6)).'
     trigger: onLoad
   entryState:
     params:
     - name: orderId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-011
     derivedFrom: wireframes/reference/Kiosk Board 2.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not
-      starting from nothing.'
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -1210,8 +1201,8 @@ screens:
     notes: '**Reached from KSK-011** — a booking is found by the search that looked for it. Stated on
       4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation
       graph entirely.'
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written.
   density: touchLarge
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-012
@@ -1233,8 +1224,8 @@ screens:
       components:
       - kind: selectField
         label: Send to
-        notes: 'Email or SMS, then the address on the kiosk keyboard. `reprintOrder` with `delivery`
-          `print`, or email or SMS: collecting is printing, not a transfer (DI-637).'
+        notes: 'Email or SMS, then the address on the kiosk keyboard. `reprintOrder` with `delivery` `print`,
+          or email or SMS: collecting is printing, not a transfer (DI-637).'
         operation: reprintOrder
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
   states:
@@ -1245,33 +1236,32 @@ screens:
   apis:
   - operationId: reprintOrder
     contract: orders
-    purpose: Send the guest's own tickets again, or print them (`reprintOrder`); a kiosk changes no
-      owner (GFIX-3)
+    purpose: Send the guest's own tickets again, or print them (`reprintOrder`); a kiosk changes no owner
+      (GFIX-3)
     trigger: onAction
     provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
   entryState:
     params:
     - name: orderId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-012
     derivedFrom: wireframes/reference/Kiosk Board 2.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not
-      starting from nothing.'
-  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
-    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: transferOrderTickets
     removed: true
-    why: A transfer changes the tickets' owner; at a kiosk the guest is resending or printing their
-      own tickets, which is `reprintOrder` by email, SMS or print.
+    why: A transfer changes the tickets' owner; at a kiosk the guest is resending or printing their own
+      tickets, which is `reprintOrder` by email, SMS or print.
     source: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
 - id: KSK-013
   name: Call staff
@@ -1292,18 +1282,18 @@ screens:
     inferred: true
     entryFrom:
     - KSK-009
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. **Device audience on a guest surface.** `endKioskAssist` is called by the kiosk,
-    not by the guest — **the guest presses a button and the device raises the call**, which is why the
-    operation authenticates as a device and authorises nothing. A guest cannot end an assist session
-    they did not start.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. **Device audience on a guest surface.** `endKioskAssist` is called by the kiosk, not
+    by the guest — **the guest presses a button and the device raises the call**, which is why the operation
+    authenticates as a device and authorises nothing. A guest cannot end an assist session they did not
+    start.
   density: touchLarge
   audience: device
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-013
   pattern: configEditor
-  patternReason: the screen declares only writes (`endKioskAssist`) and no read of a population — it
-    is settings, not a list
+  patternReason: the screen declares only writes (`endKioskAssist`) and no read of a population — it is
+    settings, not a list
   purpose: Get a human, without leaving the kiosk.
   gaps:
   - operation: endKioskAssist
@@ -1348,10 +1338,10 @@ screens:
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-013
     derivedFrom: wireframes/reference/Kiosk Board 2.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not
-      starting from nothing.'
-  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop
-    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: KSK-014
   name: Out of service
@@ -1375,8 +1365,8 @@ screens:
     notes: '**Reached from KSK-001** — the attract loop is what an out-of-service kiosk replaces. Stated
       on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation
       graph entirely.'
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written.
   density: touchLarge
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-014
@@ -1406,8 +1396,8 @@ screens:
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-014
     derivedFrom: wireframes/reference/Kiosk Board 2.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not
-      starting from nothing.'
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
   apisNote: 'Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -1430,8 +1420,7 @@ screens:
     entryFrom:
     - KSK-004
     notes: '**Reached from KSK-004** — help is asked for at the point of confusion. Stated on 4 September:
-      this screen exited somewhere and nothing exited to it, so it was outside the navigation graph
-      entirely.'
+      this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
     transitions:
     - to: SUP-004
       trigger: The conversation appears in the queue
@@ -1441,15 +1430,15 @@ screens:
       back: false
       carries:
       - conversationId
-  notes: 'Added 17 August for 2.1.28, which names the kiosk explicitly and was the only surface with
-    no AI screen. **Scoped to `guestCapabilityScope`** — ticket selection, promotions, FAQs, recommendations
+  notes: 'Added 17 August for 2.1.28, which names the kiosk explicitly and was the only surface with no
+    AI screen. **Scoped to `guestCapabilityScope`** — ticket selection, promotions, FAQs, recommendations
     and checkout, and nothing else. **No keyboard**: voice or a constrained touch interface, which is
     why the app chat pattern does not transfer. Depends on CF-14. **Not on the wireframe board.** **Built
-    with the kiosk''s selection and checkout screens** (17 August): an assistant that guides a guest
-    through ticket selection and checkout cannot ship before the screens that do the selecting and the
-    checking out. **Cross-platform navigation removed 24 August**: SUP-004. **A till does not navigate
-    to a back office and a guest app does not navigate to either** — those are device handovers, and
-    a flow declares them with `crossesDevice` rather than a screen pretending there is a link.'
+    with the kiosk''s selection and checkout screens** (17 August): an assistant that guides a guest through
+    ticket selection and checkout cannot ship before the screens that do the selecting and the checking
+    out. **Cross-platform navigation removed 24 August**: SUP-004. **A till does not navigate to a back
+    office and a guest app does not navigate to either** — those are device handovers, and a flow declares
+    them with `crossesDevice` rather than a screen pretending there is a link.'
   density: touchLarge
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-015
@@ -1470,9 +1459,9 @@ screens:
       - kind: assistantPanel
         label: Ask for help
         operation: sendAiMessage
-        notes: 'Voice or a constrained touch interface, no keyboard. Products appear as cards inside
-          the conversation (from `listProducts`, guest projection: name, price, what it includes), never
-          as a table or a venue-id filter; tapping one returns the guest to the ticket step.'
+        notes: 'Voice or a constrained touch interface, no keyboard. Products appear as cards inside the
+          conversation (from `listProducts`, guest projection: name, price, what it includes), never as
+          a table or a venue-id filter; tapping one returns the guest to the ticket step.'
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
       - kind: cardList
         label: Products Sahli suggests
@@ -1481,8 +1470,8 @@ screens:
         - Product.name
         - Product.description
         operation: listProducts
-        notes: Cards inside the conversation with the price for today; tapping one returns the guest
-          to the ticket step (KSK-004).
+        notes: Cards inside the conversation with the price for today; tapping one returns the guest to
+          the ticket step (KSK-004).
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
       - kind: banner
         label: Available today
@@ -1502,9 +1491,9 @@ screens:
     error: Could not load. Names which read failed and leaves the assistant untouched.
     emptyFirstRun: The ask prompt with three starter questions (tickets, timings, what is included).
     emptyNoAccess: '**A kiosk holds no permission and needs none** (decided by Chinmay, fix before Block
-      A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the
-      tenant has published like any visitor. A kiosk whose device registration is revoked goes out of
-      service (KSK-014); it never shows a sign-in or names a permission.'
+      A starts, 2 October 2026 (GFIX-4)): it sells to whoever is standing at it, and reads what the tenant
+      has published like any visitor. A kiosk whose device registration is revoked goes out of service
+      (KSK-014); it never shows a sign-in or names a permission.'
   apis:
   - operationId: sendAiMessage
     contract: ai
@@ -1556,8 +1545,8 @@ screens:
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-015
     derivedFrom: wireframes/reference/Kiosk Board 2.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not
-      starting from nothing.'
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -1565,8 +1554,8 @@ screens:
   - id: confirmHandover
     component: confirmDialog
     trigger: Talk to a person
-    body: Ask a person to help? The conversation so far goes with it (reason guestRequested, Sahli's
-      own summary); the guest types nothing.
+    body: Ask a person to help? The conversation so far goes with it (reason guestRequested, Sahli's own
+      summary); the guest types nothing.
     confirm:
       label: Ask a person
       operation: handoverToAgent
@@ -1593,20 +1582,20 @@ screens:
       trigger: Shop
       carries:
       - outletId
-      provenance: derived — KSK-017 declares entryState.params outletId and KSK-016 holds outletId,
-        so an edge into it carries them
+      provenance: derived — KSK-017 declares entryState.params outletId and KSK-016 holds outletId, so
+        an edge into it carries them
   notes: "BL-066. **Every operation existed and no screen called them** — `getGuestMenu` and `createGuestFnbOrder`\
     \ are contracted and guest-callable, and P05 had fifteen screens selling neither food nor merchandise.\n\
-    \ \n**Where the outlet is (decided by Chinmay, 2 October 2026; DEC-070, DEC-206).** An outlet is\
-    \ *Inside the venue (needs an admission ticket)* or *Standalone (no ticket)* (`Outlet.admissionContext`).\
+    \ \n**Where the outlet is (decided by Chinmay, 2 October 2026; DEC-070, DEC-206).** An outlet is *Inside\
+    \ the venue (needs an admission ticket)* or *Standalone (no ticket)* (`Outlet.admissionContext`).\
     \ Ordering from an inside-the-venue outlet needs admission: a ticket, or a location claimed inside\
-    \ the venue; `createGuestFnbOrder` refuses 403 `entry-ticket-required` otherwise, and the screen\
-    \ says so and offers the tickets. A standalone restaurant sells takeaway and delivery without a\
-    \ ticket. **F&B keeps its own payment step and its own receipt** (DEC-071, DEC-052): DI-293's one\
-    \ cart and one receipt does not apply to F&B, so the food order is paid on its own pay step and\
-    \ its receipt does not join the guest's ticket receipt (CHG-SGU-001). **At a kiosk (DEC-206):**\
-    \ a kiosk inside the venue sells food to admitted guests; food and tickets bought together at a\
-    \ kiosk are two payments and two receipts, not one."
+    \ the venue; `createGuestFnbOrder` refuses 403 `entry-ticket-required` otherwise, and the screen says\
+    \ so and offers the tickets. A standalone restaurant sells takeaway and delivery without a ticket.\
+    \ **F&B keeps its own payment step and its own receipt** (DEC-071, DEC-052): DI-293's one cart and\
+    \ one receipt does not apply to F&B, so the food order is paid on its own pay step and its receipt\
+    \ does not join the guest's ticket receipt (CHG-SGU-001). **At a kiosk (DEC-206):** a kiosk inside\
+    \ the venue sells food to admitted guests; food and tickets bought together at a kiosk are two payments\
+    \ and two receipts, not one."
   density: touchLarge
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-016
@@ -1655,10 +1644,10 @@ screens:
         provenance: contract fnb.yaml POST /guest-orders
   states:
     loading: The menu, with the first category open
-    error: Could not load the menu. **The kiosk still sells tickets** — one outlet being unreachable
-      does not close the kiosk.
-    emptyFirstRun: Nothing is being served right now. **The state names the next service time** — a
-      guest at a kiosk at 4pm needs to know whether to wait twenty minutes or go elsewhere.
+    error: Could not load the menu. **The kiosk still sells tickets** — one outlet being unreachable does
+      not close the kiosk.
+    emptyFirstRun: Nothing is being served right now. **The state names the next service time** — a guest
+      at a kiosk at 4pm needs to know whether to wait twenty minutes or go elsewhere.
     emptyNoResults: Nothing matches that filter. **Allergen filters narrow hard** — a guest filtering
       for nut-free at a nut-heavy outlet should be told that plainly rather than shown a blank menu.
     emptyNoAccess: Not applicable — a kiosk menu is public.
@@ -1676,19 +1665,19 @@ screens:
     params:
     - name: outletId
       from: deepLink
-    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and
-      one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification
-      opened three weeks late all land here, and the person holding the link did nothing wrong. **The
-      screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came
-      from.** Arrives with `outletId`.'
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `outletId`.'
   wireframe:
     status: notStarted
     provenance: generated
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-016
     derivedFrom: wireframes/reference/Kiosk Board 2.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not
-      starting from nothing.'
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
   apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -1733,16 +1722,16 @@ screens:
     - KSK-006
     - KSK-007
     inferred: false
-    notes: '**Returns to KSK-016.** Stated on 4 September: this screen declared where it is reached
-      from and no way to leave, so whoever landed on it was stuck. The return path is the same edge
-      travelled the other way, not a guess about the product.'
+    notes: '**Returns to KSK-016.** Stated on 4 September: this screen declared where it is reached from
+      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
+      the other way, not a guess about the product.'
     transitions:
     - to: KSK-016
       trigger: Order Food
       carries:
       - outletId
-      provenance: derived — KSK-016 declares entryState.params outletId and KSK-017 holds outletId,
-        so an edge into it carries them
+      provenance: derived — KSK-016 declares entryState.params outletId and KSK-017 holds outletId, so
+        an edge into it carries them
     - to: KSK-006
       trigger: Review the basket
       provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
@@ -1751,8 +1740,8 @@ screens:
       provenance: corrected 2 October 2026 (CHG-SGU-018, design-notes correction)
   notes: 'BL-066, BL-019. **A guest can browse and reserve and not buy**, which is where retail stops
     for a guest surface — `createRetailSale` is a till operation. **Cross-surface parity, 31 August**:
-    added addCartLine, lookupMerchandise. **A guest does not know which surface they are on** — the
-    same named screen on web and app now calls the same guest-callable operations.
+    added addCartLine, lookupMerchandise. **A guest does not know which surface they are on** — the same
+    named screen on web and app now calls the same guest-callable operations.
 
 
     **Buying goes through the kiosk basket and its payment steps (KSK-006, KSK-007)**; the hold is the
@@ -1762,8 +1751,8 @@ screens:
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-017
   pattern: listDetail
-  patternReason: '`listMerchandise` reads a population and nothing reads one of them; the detail is
-    the row until a `get` exists'
+  patternReason: '`listMerchandise` reads a population and nothing reads one of them; the detail is the
+    row until a `get` exists'
   purpose: Buy merchandise at the kiosk in the same basket as tickets and food, or hold an item to pay
     for at the shop until the end of the visit day.
   layout:
@@ -1826,8 +1815,8 @@ screens:
         label: Lookup merchandise
         operation: lookupMerchandise
         notes: The kiosk is a workstation, so the price check is at its own outlet and sends no `outletId`
-          (a workstation caller's own outlet always wins); an inactive item is not found (decided 28
-          September, audit R215 (1)).
+          (a workstation caller's own outlet always wins); an inactive item is not found (decided 28 September,
+          audit R215 (1)).
         provenance: contract retail.yaml GET /merchandise/lookup
   states:
     loading: Products with stock, in-stock first
@@ -1878,8 +1867,8 @@ screens:
     board: wireframes/P05 Guest Kiosk.dc.html#ksk-017
     derivedFrom: wireframes/reference/Kiosk Board 2.dc.html
     note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
-      The frame it points at now is the generated one. This screen has been designed once and is not
-      starting from nothing.'
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
   apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
     pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
@@ -1887,8 +1876,8 @@ screens:
   - id: formReserveMerchandise
     component: modal
     trigger: Hold to pay at the shop
-    body: The item and quantity, held to pay for at the shop until the end of the visit day (R169).
-      No ids are asked.
+    body: The item and quantity, held to pay for at the shop until the end of the visit day (R169). No
+      ids are asked.
     confirm:
       label: Hold to pay at the shop
       operation: reserveMerchandise

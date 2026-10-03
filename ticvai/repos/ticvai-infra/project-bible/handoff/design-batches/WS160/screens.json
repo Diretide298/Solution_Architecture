@@ -482,7 +482,9 @@
    "params": [
     {
      "name": "productId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalProduct`, `setRentalInventoryModel` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -620,7 +622,9 @@
    "params": [
     {
      "name": "productId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getRentalAvailability`; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -795,7 +799,9 @@
    "params": [
     {
      "name": "bookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `checkOutRental`, `getRentalBooking` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -967,7 +973,9 @@
    "params": [
     {
      "name": "bookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assignRentalEquipment`, `checkOutResource` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1158,7 +1166,9 @@
    "params": [
     {
      "name": "bookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `extendRental`, `returnRental` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1556,7 +1566,7 @@
     "id": "formCreateResourceCost",
     "component": "modal",
     "trigger": "Create resource cost",
-    "body": "**Collects what `createResourceCost` sends before it is called.** Required: `id`, `resourceId`, `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createResourceCost` sends before it is called.** Required: `resourceId`, `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "ResourceCostEntry",
     "confirm": {
      "label": "Create resource cost",
@@ -1565,15 +1575,13 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "resourceId",
       "kind",
       "amount",
       "incurredOn",
       "fromVenueId",
       "toVenueId",
-      "note",
-      "scopePath"
+      "note"
      ]
     },
     "provenance": "contract resources.yaml POST /resource-costs"
@@ -1583,7 +1591,9 @@
    "params": [
     {
      "name": "blockId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createResourceBlock`; a link or an edge that holds one opens it instead."
     }
    ]
   },
@@ -1615,7 +1625,7 @@
   "name": "Inspection, Condition & Compliance Management",
   "module": "Rentals",
   "requiresModule": "resources",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "6",
@@ -1930,15 +1940,10 @@
        "label": "Every resource cost entry",
        "bindsTo": "ResourceCostEntry",
        "columns": [
-        "ResourceCostEntry.id",
-        "ResourceCostEntry.resourceId",
         "ResourceCostEntry.kind",
         "ResourceCostEntry.amount",
         "ResourceCostEntry.incurredOn",
-        "ResourceCostEntry.fromVenueId",
-        "ResourceCostEntry.toVenueId",
-        "ResourceCostEntry.note",
-        "ResourceCostEntry.scopePath"
+        "ResourceCostEntry.note"
        ],
        "operation": "listResourceCosts",
        "provenance": "contract resources.yaml GET /resource-costs"
@@ -2077,7 +2082,7 @@
     "id": "formCreateResourceCost",
     "component": "modal",
     "trigger": "Create resource cost",
-    "body": "**Collects what `createResourceCost` sends before it is called.** Required: `id`, `resourceId`, `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `createResourceCost` sends before it is called.** Required: `resourceId`, `kind`, `amount`, `incurredOn`. Optional: `fromVenueId`, `toVenueId`, `note`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "ResourceCostEntry",
     "confirm": {
      "label": "Create resource cost",
@@ -2086,15 +2091,13 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "resourceId",
       "kind",
       "amount",
       "incurredOn",
       "fromVenueId",
       "toVenueId",
-      "note",
-      "scopePath"
+      "note"
      ]
     },
     "provenance": "contract resources.yaml POST /resource-costs"

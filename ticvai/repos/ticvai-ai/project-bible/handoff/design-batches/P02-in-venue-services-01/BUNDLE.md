@@ -1,6 +1,6 @@
 # P02-in-venue-services-01 — P02 · In-venue Services
 
-**10 screens · 26 operations · 69 schemas · 6 permissions**
+**10 screens · 28 operations · 71 schemas · 6 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -51,7 +51,7 @@ convincingly. It is never a caption.
 - **Every control that can be refused must be gated.** 6 permissions apply here:
   `ORDER_MODIFY, ORDER_VIEW, PARKING_CONFIGURE, PRODUCT_VIEW, QUEUE_VIEW, VENUE_MAP_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
-- **9 of these operations work offline**: getOrder, getTenantAppStatus, getVenueMap, getVenueMapGraph, getWaitTimes, joinRestaurantWaitlist, listParkingFacilities, listProducts
+- **10 of these operations work offline**: getOrder, getTenantAppStatus, getVenueMap, getVenueMapGraph, getWaitTimes, joinRestaurantWaitlist, listMyTableReservations, listParkingFacilities
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
@@ -176,16 +176,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-021` | Interactive Map | A | 0 | 18 | 8 | 17 | 6 | 0 | guest | notStarted (client-verified) |
-| `GST-022` | Attraction Wait Times | A | 0 | 10 | 4 | 4 | 5 | 6 | guest | notStarted (client-verified) |
-| `GST-023` | Virtual Queue | A | 8 | 28 | 5 | 11 | 4 | 6 | guest | notStarted (client-verified) |
-| `GST-024` | F&B – Browse & Order | A | 27 | 43 | 6 | 7 | 11 | 1 | guest | notStarted (client-verified) |
-| `GST-025` | F&B – Order Tracking | A | 0 | 14 | 4 | 0 | 1 | 1 | guest | notStarted (client-verified) |
+| `GST-021` | Interactive Map | A | 0 | 16 | 8 | 17 | 6 | 0 | guest | notStarted (client-verified) |
+| `GST-022` | Attraction Wait Times | A | 0 | 5 | 4 | 4 | 5 | 6 | guest | notStarted (client-verified) |
+| `GST-023` | Virtual Queue | A | 8 | 11 | 5 | 11 | 4 | 6 | guest | notStarted (client-verified) |
+| `GST-024` | F&B – Browse & Order | A | 27 | 40 | 6 | 7 | 11 | 1 | guest | notStarted (client-verified) |
+| `GST-025` | F&B – Order Tracking | A | 0 | 10 | 4 | 0 | 1 | 1 | guest | notStarted (client-verified) |
 | `GST-027` | Parking – Reserve & Pay | A | 22 | 2 | 7 | 7 | 2 | 2 | guest | notStarted (client-verified) |
 | `GST-028` | Parking – Reservation Confirmed | A | 0 | 2 | 6 | 7 | 1 | 2 | guest | notStarted (client-verified) |
 | `GST-029` | Venue Info & Services | A | 2 | 24 | 5 | 0 | 0 | 0 | guest | notStarted (client-verified) |
-| `GST-038` | At the Venue | A | 1 | 41 | 8 | 16 | 3 | 0 | guest | notStarted (client-verified) |
-| `GST-070` | Reserve a Table | A | 43 | 0 | 6 | 15 | 7 | 1 | guest | notStarted (client-verified) |
+| `GST-038` | At the Venue | A | 1 | 39 | 8 | 16 | 3 | 0 | guest | notStarted (client-verified) |
+| `GST-070` | Reserve a Table | A | 44 | 20 | 6 | 15 | 7 | 1 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch
 
@@ -204,8 +204,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | In-venue Services · wave 2 · needs the `seating` module |
-| Block | Block A · ticket #18148 (APP-MOB-GST-021) |
+| Module | In-venue Services · wave 1 · needs the `seating` module |
+| Block | Block A · task APP-MOB-GST-021 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest, venue manager |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listProducts` reads the population and `getWaitTimes` reads one of them — list, select, act |
@@ -279,10 +279,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Queue name | in the reader's language | — |
 | Status | chip: Open, Paused, Closed, At capacity | — |
 | Wait minutes | 1,234 | Null where the queue is closed or no estimate is available. |
-| Is stale | yes / no (icon or chip) | The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as … |
 | Height requirement cm | 1,234 | — |
 | Zone | text | — |
-| As of | 1 Oct 2026, 14:30 | When the figure was produced — the queue's `waitTimeAsOf`. |
 
 **Rules for what is shown** (from the Ticketing & Guest Commerce (guest web, guest app, kiosk, partner portal, POS ticket sale) process; these refine the tables above and win where they differ)
 
@@ -403,7 +401,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (400, 403).
-- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-021?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline, map3dUnavailable, weakGps.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `GST-022`, `GST-001`, `BO-096`.
@@ -422,8 +420,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | In-venue Services · wave 2 · needs the `queue` module |
-| Block | Block A · ticket #18149 (APP-MOB-GST-022) |
+| Module | In-venue Services · wave 1 · needs the `queue` module |
+| Block | Block A · task APP-MOB-GST-022 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): `getWaitTimes` reads one record and nothing reads a population — the screen is about that one thing |
@@ -431,7 +429,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | Opens with | nothing: it opens on its own |
 | Route | `/general/attraction-wait-times` |
 
-**What the spec says about it.** States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Pulled to Wave 2 (CF-101) with the queue platform F21 runs on. **Mobile v4 (decided 29 September, MOB-1).** The **Waits** view of GST-038 At the Venue: **one implementation with GST-038, the ids kept** (as GAP-D3).
+**What the spec says about it.** States derived from the screen pattern on 17 August, not individually considered. Purpose derived from the screen name and its operations on 17 August, not from a requirement. Pulled forward (CF-101) with the queue platform F21 runs on; in Block A since the 1 October plan. **Mobile v4 (decided 29 September, MOB-1).** The **Waits** view of GST-038 At the Venue: **one implementation with GST-038, the ids kept** (as GAP-D3).
 
 **From the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process.** The Waits view of At the Venue: every ride's current wait with where the number comes from and how old it is, filtered by area and suitability, leading to joining a virtual queue or picking something shorter. The one thing to get right: a manual or stale figure is labelled as such, because a guest who waits forty minutes for a fifteen-minute estimate stops trusting the app.
 
@@ -459,15 +457,10 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| Queue | the name it points at, never the id | — |
 | Queue name | in the reader's language | — |
-| Attraction product | the name it points at, never the id | — |
 | Status | chip: Open, Paused, Closed, At capacity | — |
 | Wait minutes | 1,234 | Null where the queue is closed or no estimate is available. |
-| Source | chip: Sensor, Throughput, Manual, Unavailable | Where the estimate came from. Surfaced so an operator knows whether a figure is measured or guessed. |
 | Is stale | yes / no (icon or chip) | The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as … |
-| Height requirement cm | 1,234 | — |
-| Zone | text | — |
 | As of | 1 Oct 2026, 14:30 | When the figure was produced — the queue's `waitTimeAsOf`. |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
@@ -585,7 +578,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-022?state=<state>`: loading, error, emptyFirstRun, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `GST-003`, `GST-023`, `GST-001`, `GST-059`.
@@ -604,8 +597,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | In-venue Services · wave 3 · needs the `queue` module |
-| Block | Block A · ticket #18214 (APP-MOB-GST-023) |
+| Module | In-venue Services · wave 1 · needs the `queue` module |
+| Block | Block A · task APP-MOB-GST-023 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): `getWaitingGuest` reads one record and nothing reads a population — the screen is about that one thing |
@@ -657,38 +650,21 @@ Errors to draw in the form: 409 Already in this queue, at the cross-queue limit,
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The client-generated UUIDv7 from `JoinQueueRequest.id`, and the `entryId` every entry path takes. |
-| Queue | the name it points at, never the id | — |
 | Queue name | in the reader's language | — |
-| Subject | the name it points at, never the id | — |
 | Party number | 1,234 | What the guest sees and what appears on signage. |
-| Party size | 1,234 | — |
 | Status | chip: Waiting, Called, Redeemed, Expired, No show, Cancelled… | — |
-| Position in queue | 1,234 | — |
-| Parties ahead | 1,234 | — |
 | Estimated call at | 1 Oct 2026, 14:30 | — |
-| Is fast pass | yes / no (icon or chip) | — |
-| Entitlement | text | — |
-| Called at | 1 Oct 2026, 14:30 | — |
-| Return window ends at | 1 Oct 2026, 14:30 | — |
-| Redeemed at | 1 Oct 2026, 14:30 | — |
 | Admitted count | 1,234 | — |
 
 **The wait time** (detail panel, from `getWaitTimes`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Queue | the name it points at, never the id | — |
 | Queue name | in the reader's language | — |
-| Attraction product | the name it points at, never the id | — |
-| Attraction category | the name it points at, never the id | The catalogue `ProductCategory` the attraction product is filed under — the value the `category` filter on `getWaitTimes` matches. |
 | Status | chip: Open, Paused, Closed, At capacity | — |
 | Wait minutes | 1,234 | Null where the queue is closed or no estimate is available. |
-| Source | chip: Sensor, Throughput, Manual, Unavailable | Where the estimate came from. Surfaced so an operator knows whether a figure is measured or guessed. |
-| Is stale | yes / no (icon or chip) | The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as … |
 | Height requirement cm | 1,234 | — |
 | Zone | text | — |
-| As of | 1 Oct 2026, 14:30 | When the figure was produced — the queue's `waitTimeAsOf`. |
 
 **Rides with a virtual queue** (card list, from `listQueues`): Each ride by name with its current wait (`getWaitTimes`) and Join; no codes, asset or access-point ids, operating windows or load-balance lists.
 
@@ -814,13 +790,13 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Flow F48 *A guest finds it, queues for it, and eats*, step 3: They join a virtual queue rather than stand in it. → **The point of the whole feature**: the guest walks away and the place is kept. `redeemWaitingGuest` at the attraction closes it.
 - Flow F48 *A guest finds it, queues for it, and eats*, step 6: Their queue place comes up and the queue screen shows it. → **The queue screen tells them, by polling its own status**, and a push reaches a guest who has the app closed. The call also lands in the in-venue notifications feed (GST-030), which is back in the …
 - Flow F48 branch at step 3 (medium): when The queue is full or paused., **Told why and when it reopens.** *Unavailable* is the answer that sends a guest to a member of staff.
-- ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
+- ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (8), with its required mark, default, format and its error state (403, 404, 409).
-- [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-023?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Join queue, Leave queue.
 - [ ] Every transition is wired: `GST-024`, `GST-001`.
@@ -839,8 +815,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | In-venue Services · wave 2 · needs the `fnb` module |
-| Block | Block A · ticket #18150 (APP-MOB-GST-024) |
+| Module | In-venue Services · wave 1 · needs the `fnb` module |
+| Block | Block A · task APP-MOB-GST-024 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): Location, menu, basket, pay: the guest picks an outlet, then orders from its menu (CHG-SGU-018) |
@@ -929,10 +905,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Name | text | — |
 | Zone | text | — |
 | Cuisine | list or chips (count when long) | — |
-| Ordering method | chip: Table service, App to table, App to collect, Counter only, Not available | How a guest may order at this outlet. Varies within one venue, so it is per outlet rather than a venue setting. |
-| Closes at | 1 Oct 2026, 14:30 | — |
 | Estimated wait minutes | 1,234 | From current kitchen ticket volume, not a fixed figure. Null where the outlet has no kitchen display reporting ticket status — an invented … |
-| Image | the image or video | — |
 
 **Menu** (detail panel, from `getGuestMenu`): Sections in the outlet's order, "Lunch menu until 16:00" from `inForceUntil`; each dish with photo, price and allergens; a dish's modifier groups come inside the menu (no venue-wide modifier list). Sold out stays in place, greyed.
 
@@ -1013,6 +986,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 **Where the user goes next**
 
 - → `GST-001` Home: *Home – Default*
+- → `GST-061` Menu Item Detail: *Menu Item Detail*; carries `outletId`
 - → `GST-009` Review & Payment: *Pays for the food order on its own*; carries `orderId`; calls `createGuestFnbOrder`
 - → `GST-025` F&B – Order Tracking: *They watch the order progress*; carries `orderId`
 
@@ -1131,10 +1105,10 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (27), with its required mark, default, format and its error state (400, 402, 403, 404, 409, 422).
-- [ ] Every output is drawn (43 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-024?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Pay.
-- [ ] Every transition is wired: `GST-001`, `GST-009`, `GST-025`.
+- [ ] Every transition is wired: `GST-001`, `GST-061`, `GST-009`, `GST-025`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 11 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
@@ -1151,8 +1125,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | In-venue Services · wave 2 · needs the `fnb` module |
-| Block | Block A · ticket #18151 (APP-MOB-GST-025) |
+| Module | In-venue Services · wave 1 · needs the `fnb` module |
+| Block | Block A · task APP-MOB-GST-025 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): `getGuestOrderStatus` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1182,7 +1156,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| Order | text | — |
 | Order number | text | — |
 | Status | chip: Ordered, Accepted, In preparation, Ready, Served, Collected… | The full lifecycle from 4.6.35. Nine states, not six — the earlier enum collapsed `accepted` into `placed` and had no `collected` or … |
 | Estimated ready at | 1 Oct 2026, 14:30 | — |
@@ -1193,11 +1166,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| Visit | text | — |
 | Covers | 1,234 | — |
-| Lines | list or chips (count when long) | — |
 | Subtotal | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Service charge | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Discount amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
@@ -1285,7 +1255,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-025?state=<state>`: loading, error, emptyFirstRun, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `GST-030`, `GST-001`, `GST-023`, `BO-021`.
@@ -1304,8 +1274,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | In-venue Services · wave 3 · needs the `access` module |
-| Block | Block A · ticket #18220 (APP-MOB-GST-027) |
+| Module | In-venue Services · wave 1 · needs the `access` module |
+| Block | Block A · task APP-MOB-GST-027 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listParkingFacilities` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1502,8 +1472,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | In-venue Services · wave 3 · needs the `access` module |
-| Block | Block A · ticket #18221 (APP-MOB-GST-028) |
+| Module | In-venue Services · wave 1 · needs the `access` module |
+| Block | Block A · task APP-MOB-GST-028 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listParkingFacilities` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1641,8 +1611,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | In-venue Services · wave 2 · needs the `core` module |
-| Block | Block A · ticket #18152 (APP-MOB-GST-029) |
+| Module | In-venue Services · wave 1 · needs the `core` module |
+| Block | Block A · task APP-MOB-GST-029 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listDiningOutlets` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1841,14 +1811,14 @@ Also set there, as content the tenant writes: is in maintenance, minimum app ver
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | In-venue Services · wave 3 · needs the `queue` module |
-| Block | Block A · ticket #18215 (APP-MOB-GST-038) |
+| Module | In-venue Services · wave 1 · needs the `queue` module |
+| Block | Block A · task APP-MOB-GST-038 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listProducts` reads the population and `getTenantAppStatus` reads one of them — list, select, act |
 | Offline | **The offline banner shows.** What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
 | Opens with | nothing: it opens on its own |
-| Route | `/general/digital-companion-mode` |
+| Route | `/general/at-the-venue` |
 
 **What the spec says about it.** **Mobile v4 (decided 29 September, MOB-1).** Retitled **At the Venue**, the in-venue mode and the optional Map tab: views Map, Waits, Food, Shows, Shop and Services, plus a *Happening now* panel (live orders and queues). **GST-021 Interactive Map and GST-022 Attraction Wait Times are its Map and Waits views: one implementation, three ids** (as GAP-D3). Food opens GST-024, Shop GST-026, Services GST-029, a queue GST-023. This answers CF-92: it is a real screen. (Was: *Not minuted and not in the matrix* — the only unsourced screen of the eight audited on 17 August.) **The Map view's in-park 3D navigation is ADR-0069** (client meeting 30 September, MoM 4.8): venue GLB model, pathway and location file, live GPS, built natively; 2D until a venue supplies a model.
 
@@ -1935,10 +1905,8 @@ Also set there, as content the tenant writes: is in maintenance, minimum app ver
 | Queue name | in the reader's language | — |
 | Status | chip: Open, Paused, Closed, At capacity | — |
 | Wait minutes | 1,234 | Null where the queue is closed or no estimate is available. |
-| Is stale | yes / no (icon or chip) | The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as … |
 | Height requirement cm | 1,234 | — |
 | Zone | text | — |
-| As of | 1 Oct 2026, 14:30 | When the figure was produced — the queue's `waitTimeAsOf`. |
 
 **Rules for what is shown** (from the White Label & CMS process; these refine the tables above and win where they differ)
 
@@ -2072,7 +2040,7 @@ Also set there, as content the tenant writes: is in maintenance, minimum app ver
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (1), with its required mark, default, format and its error state (400, 403).
-- [ ] Every output is drawn (41 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (39 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-038?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline, map3dUnavailable, weakGps.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `GST-001`, `GST-021`, `GST-022`, `GST-024`, `GST-026`, `GST-029`, `GST-023`.
@@ -2091,13 +2059,13 @@ Also set there, as content the tenant writes: is in maintenance, minimum app ver
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | In-venue Services · wave 2 · needs the `fnb` module |
-| Block | Block A · ticket #18155 (APP-MOB-GST-070) |
+| Module | In-venue Services · wave 1 · needs the `fnb` module |
+| Block | Block A · task APP-MOB-GST-070 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | form (comfortable density): A booking form (outlet, party size, time) and the restaurant waitlist, each one act; no guest-callable read of table availability exists, so `createTableReservation` is what says a time is full. … |
 | Offline | **The offline banner shows.** Availability already loaded stays with its age. **Booking is not offered** — a table held offline is a table two people think they have. |
-| Opens with | `entryId` (deepLink), `reservationId` (deepLink), `subjectId` (session), `cartId` (session) · cold entry: **Resolves from the session.** A guest arriving cold is asked to sign in and returned here afterwards — never a 404, and never a screen that silently shows … |
+| Opens with | `entryId` (deepLink), `reservationId` (deepLink), `subjectId` (session), `cartId` (session), `venueId` (session) · cold entry: **Resolves from the session.** A guest arriving cold is asked to sign in and returned here afterwards — never a 404, and never a screen that silently shows … |
 | Route | `/reserve-table` |
 
 **What the spec says about it.** **Staff could book a table and a guest could not.** Seven guest-callable operations with no guest surface — reservations, cabanas, and both waitlists. **Table-only since 28 September** (decided 28 September, audit R073 (c)): the cabana wording, the `bookResource` button and `getResourceAvailability` left and the screen was renamed from *Reserve a Table or Cabana*. **R073 (c) is superseded on 29 September for resources on a venue map** (rev 3 REV3-15 and GAP-C2): guests pick a specific cabana, lounger or other spot — including non-dining tables placed on the map, sold like cabanas — on the map booking screen GST-074 and buy it. This screen stays the restaurant table reservation, the F&B flow. **Leave waitlist** is `leaveRestaurantWaitlist` (audit R073 (d)). **A table deposit is a venue option, off by default** (decided 29 September, rev 3 REV3-8b, superseding audit R077 (a)): with it off, no card is needed and cancelling is free; with it on, the venue's `DepositPolicy.dining` sets the amount, the basis and the late-cancel and no-show terms. **Leaving a waitlist matters as much as joining one.** A guest who has given up and walked away still holds a place, and a queue full of people who left is a queue nobody trusts. **Rev 3 (decided 29 September).** **No basket without a deposit (REV3-8):** a table reservation and a waitlist place confirm straight after `createTableReservation` / `joinRestaurantWaitlist` with a *No card needed* confirmation; the prototype's basket line is prototype-only. **Deposit (REV3-8b):** when the venue enabled one, `createTableReservation` answers …
@@ -2118,6 +2086,20 @@ Answered questions: draw the decision, not the old default. Where a decision and
 - **The party size from which a deposit applies (prototype 6+, contract default 1, "client to correct").** → Drawn default stands (answer: "Default / recommended accepted"): Show the rule as the venue sets it ("Deposit for parties of 6 or more"). *(decided by Chinmay, 2026-10-02; DEC-054 / CHG-NOTE-004)*
 
 #### Inputs: what the user enters or picks
+
+**On the screen**
+
+| Control | Drawn as | Required | Default | Allowed values, rules | Format | Notes | Source |
+|---|---|---|---|---|---|---|---|
+| Restaurant | picker: choose an outlet | optional | — | — | shows names, sends the id | Only the restaurants that take bookings, as published; the choice scopes Reserve and Join the waitlist. | `TableReservation.outletId` |
+
+**Filters and search the reads accept** (draw the ones a person would use; the rest are set by the screen)
+
+| Filter | Drawn as | Default | Allowed values, rules | Source |
+|---|---|---|---|---|
+| Include | segmented control | — | Reservations · Waitlist | `listMyTableReservations` ?include |
+| Upcoming only | toggle | on | — | `listMyTableReservations` ?upcomingOnly |
+| Date | date picker | — | — | `listBookableOutlets` ?date |
 
 **Form: Reserve** (modal, opened by *Reserve*; *Reserve* calls `createTableReservation`, *Cancel* sends nothing)
 
@@ -2202,6 +2184,33 @@ Party size and seating (Any, Indoor, Outdoor, Bar, Booth, High chair needed). Na
 
 #### Outputs: what the screen shows and produces
 
+**Shown**
+
+**Your reservations and waitlist places** (card list, from `listMyTableReservations`): The guest's own, upcoming first; each opens Change or cancel, or Leave the waitlist. Empty: *No reservations yet* with Reserve.
+
+| Shows | Format | Notes |
+|---|---|---|
+| Items | list or chips (count when long) | — |
+| Kind | chip: Reservation, Waitlist | — |
+| Outlet | the name it points at, never the id | — |
+| Outlet name | text | — |
+| Reservation | grouped details | — |
+| ID | the name it points at, never the id | — |
+| Outlet | the name it points at, never the id | — |
+| Subject | the name it points at, never the id | — |
+| Guest name | text | — |
+| Contact point | text | — |
+| Party size | 1,234 | — |
+| Starts at | 1 Oct 2026, 14:30 | — |
+| Duration minutes | 1,234 | How long the cover is held. An outlet turning tables twice an evening needs this to be real, or the second sitting cannot be booked. |
+| Tables | list or chips (count when long) | The dining tables assigned to this reservation, one row each. Usually empty until seating. |
+| Status | chip: Awaiting deposit, Booked, Confirmed, Seated, Completed, Cancelled… | `awaitingDeposit` only where the venue's dining deposit applies (decided 29 September, rev 3 REV3-8b); a booking with no deposit starts … |
+| Group | the name it points at, never the id | 5.1.2. Several bookings managed as one party across adjacent tables. |
+| Notes | text | Allergies, accessibility needs and other requests, as the guest wrote them. |
+| Seating preference | text | The seating area the guest asked for, e.g. indoor, terrace, majlis (Chinmay, 2 October, workbook Q204; DI-791; CHG-CSA-018). |
+| Occasion | chip: Birthday, Anniversary, Business, Celebration, Other | The occasion the guest named (workbook Q204, DI-337; CHG-CSA-018). Shown to the host and the server; never a price. |
+| Taken by principal | the name it points at, never the id | The staff member who took the booking (`createTableReservationForGuest`); null for a guest's own booking (CHG-CSA-045). |
+
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
@@ -2223,6 +2232,8 @@ Party size and seating (Any, Indoor, Outdoor, Bar, Booth, High chair needed). Na
 - **Reserve**: No deposit: confirmed at once. Deposit: the deposit line goes into the cart, the guest pays at GST-041, and the booking turns Booked when the payment is authorised. *(source: contracts/satellite/fnb.yaml#createTableReservation / REV3-8b / contracts/spine/orders.yaml#checkoutCart)*
 - **Cancel booking**: The confirmation says the consequence first: "Free to cancel", or "Your AED 600.00 deposit is released", or "Your deposit is kept (less than 24 hours before)". A smaller party releases seats at once. *(source: contracts/satellite/fnb.yaml#updateTableReservation / REV3-8b)*
 - **Leave the waitlist**: Confirm: "Give up your place? The next party moves up." Leaving after being called frees the table at once. *(source: contracts/satellite/fnb.yaml#leaveRestaurantWaitlist / R073)*
+
+**Data it reads**: `listMyTableReservations` (onLoad, The guest's own table reservations and waitlist places …); `listBookableOutlets` (onLoad, The restaurants that take bookings, published data)
 
 **Where the user goes next**
 
@@ -2284,6 +2295,8 @@ reservation:
 - `joinRestaurantWaitlist` → `ORDER_MODIFY` (operate) · staff, guest
 - `leaveRestaurantWaitlist` → `ORDER_MODIFY` (operate) · staff, guest
 - `addCartLine` → no permission · guest, partner, staff
+- `listMyTableReservations` → no permission · guest
+- `listBookableOutlets` → no permission · guest
 
 **A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025). A guest who is not signed in is offered sign-in and brought back here.
 
@@ -2342,8 +2355,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (43), with its required mark, default, format and its error state (403, 404, 409, 412, 422).
-- [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (44), with its required mark, default, format and its error state (403, 404, 409, 412, 422).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-070?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Reserve, Change or cancel, Join the waitlist, Leave the waitlist.
 - [ ] Every transition is wired: `GST-039`, `GST-041`.
@@ -2570,9 +2583,11 @@ Method, path, parameters, request and response for every operation these screens
 "joinRestaurantWaitlist": {"method":"POST","path":"/waitlist","contract":"fnb","summary":"Add a party to an outlet's waitlist","permission":"ORDER_MODIFY","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"RestaurantWaitlist","responds":"RestaurantWaitlist"},
 "leaveQueue": {"method":"DELETE","path":"/waiting-guests/{entryId}","contract":"queue","summary":"Leave a queue","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "leaveRestaurantWaitlist": {"method":"POST","path":"/waitlist/{entryId}/leave","contract":"fnb","summary":"Take a party off an outlet's waitlist","permission":"ORDER_MODIFY","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"RestaurantWaitlist"},
+"listBookableOutlets": {"method":"GET","path":"/venues/{venueId}/bookable-outlets","contract":"fnb","summary":"The restaurants a guest can book a table at","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"date","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listDeliveryLocations": {"method":"GET","path":"/venues/{venueId}/delivery-locations","contract":"fnb","summary":"Where an order can be delivered","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"kind","in":"query","required":null},{"name":"servingOutletId","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listDiningOutlets": {"method":"GET","path":"/venues/{venueId}/dining","contract":"fnb","summary":"Where a guest can eat, right now","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"openNow","in":"query","required":null},{"name":"orderingMethod","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listFulfilmentSlots": {"method":"GET","path":"/outlets/{outletId}/fulfilment-slots","contract":"fnb","summary":"Collection times or delivery windows still open","permission":null,"offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"outletId","in":"path","required":true},{"name":"mode","in":"query","required":true},{"name":"date","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
+"listMyTableReservations": {"method":"GET","path":"/me/table-reservations","contract":"fnb","summary":"The guest's own table bookings and waitlist places","permission":null,"offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"tenant","parameters":[{"name":"include","in":"query","required":null},{"name":"upcomingOnly","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listParkingFacilities": {"method":"GET","path":"/parking-facilities","contract":"access","summary":"Car parks at a venue, and how each integrates","permission":"PARKING_CONFIGURE","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":false},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listProducts": {"method":"GET","path":"/products","contract":"catalogue","summary":"List products","permission":"PRODUCT_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"kind","in":"query","required":null},{"name":"isSellable","in":"query","required":null},{"name":"categoryId","in":"query","required":null},{"name":"segmentTag","in":"query","required":null},{"name":"guidedAnswerIds","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "listQueues": {"method":"GET","path":"/queues","contract":"queue","summary":"List queues","permission":"QUEUE_VIEW","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"venueId","in":"query","required":null},{"name":"openOnly","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
@@ -2591,6 +2606,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "AllergenCode": {"type":"string","description":"**The fourteen declarable allergens, as one closed list.** Every allergen field in this contract uses it — the menu claim, the ticket line, a substitution's delta, a modifier option, the label on a bag — so a declared set and an actual set compare without anybody normalising case or synonyms. It was the `Allergen.contains` enum; the other fields were free text.\n","enum":["gluten","crustaceans","eggs","fish","peanuts","soybeans","milk","nuts","celery","mustard","sesame","sulphites","lupin","molluscs"]},
 "AppAvailability": {"type":"string","description":"**The sold-out or closed signal (decided 28 September, audit R073).** `open` is the normal state. `soldOut` shows WEB-029's sold-out state across the app while browsing still works; `closed` shows the closed state (a weather closure, a private event). Neither refuses a request on its own: it is what the guest is told, and a sale is still refused by availability where it applies. Set with `setMaintenanceMode`.\n","enum":["open","soldOut","closed"],"default":"open"},
 "Bill": {"x-ticvai-persistence":"none — computed from visit orders","type":"object","required":["visitId","lines","subtotal","taxAmount","total"],"properties":{"visitId":{"type":"string"},"covers":{"type":"integer"},"lines":{"type":"array","items":{"type":"object","required":["lineId","name","quantity","lineTotal"],"properties":{"lineId":{"type":"string"},"orderId":{"type":"string"},"name":{"type":"string"},"quantity":{"type":"integer"},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"lineTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"categoryCode":{"type":"string","nullable":true},"seatNumber":{"type":"integer","nullable":true}}}},"subtotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"serviceCharge":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"discountAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"total":{"$ref":"../shared/common.yaml#/components/schemas/Money"}}},
+"BookableOutlet": {"type":"object","x-ticvai-persistence":"none — projection over the published outlet, its tables and its reservation policy","description":"One restaurant a guest can book (`listBookableOutlets`; CHG-RUL-013). Published data only.","required":["outletId","venueId","name"],"properties":{"outletId":{"type":"string","format":"uuid"},"venueId":{"type":"string","format":"uuid"},"name":{"type":"string"},"kind":{"type":"string","nullable":true},"cuisine":{"type":"array","items":{"type":"string"}},"zone":{"type":"string","nullable":true},"imageAssetRef":{"type":"string","nullable":true},"depositMayApply":{"type":"boolean","description":"The venue's `orders.DepositPolicy.dining` is on, so a booking from its party size takes a deposit (rev 3 REV3-8b). Shown before the guest picks a time; the amount comes with the booking."},"waitlistOpen":{"type":"boolean","description":"The outlet takes walk-in waitlist places today (`joinRestaurantWaitlist`)."}}},
 "BookedWindow": {"type":"object","nullable":true,"x-ticvai-persistence":"none — embedded as window_starts_at and window_ends_at on orders.cart_line and orders.order_line","description":"**The booked time window of an hourly product, such as a meeting room** (decided 29 September, rev 3 REV3-13: meeting rooms by the hour are in scope). The guest picks a date, a length and a start time from `resources.listProductStartTimes`; the length is the product's `length` variant (1 hour, 2 hours, half day, full day), priced per variant, so the price is the variant's. **`endsAt` minus `startsAt` must equal the chosen variant's length** (its `length` dimension value's `durationMinutes`), or the line is refused 422 `windowLengthMismatch`. Required on a product with `catalogue.Product.requiresTimeWindow` true and refused on any other (`windowRequired`, `windowNotAllowed`). The room itself is not named here: the window holds capacity of the room type, and `resources.allocateResources` picks the room at checkout (26 August minute: a guest books a meeting room product, never a raw room).\n","required":["startsAt","endsAt"],"properties":{"startsAt":{"type":"string","format":"date-time"},"endsAt":{"type":"string","format":"date-time","description":"After `startsAt`, on the same venue day."}}},
 "Cart": {"type":"object","x-ticvai-persistence":"orders.cart","required":["id","venueId","channel","status","lines"],"properties":{"id":{"type":"string","format":"uuid"},"token":{"type":"string","readOnly":true,"description":"**How an anonymous guest returns to their cart**, including from a recovery email. Rotated on claim, so a link shared before signing in does not reach the account after.\n"},"venueId":{"type":"string","format":"uuid"},"channel":{"$ref":"../shared/common.yaml#/components/schemas/SalesChannel"},"subjectId":{"type":"string","format":"uuid","nullable":true,"description":"Null while anonymous. Set by `claimCart`."},"status":{"$ref":"#/components/schemas/CartStatus"},"lines":{"type":"array","items":{"$ref":"#/components/schemas/CartLine"}},"conflicts":{"type":"array","items":{"$ref":"#/components/schemas/CartConflict"}},"consentQuestions":{"type":"array","readOnly":true,"description":"**The consent questions this cart's products and flow ask** (decided 29 September, rev 3 REV3-26), computed on read at their current version as **the union of each line's published booking flow's `white-label.BookingFlow.settings.consentQuestionIds`** (the flow `getPublishedBookingFlow` resolves for the line's product: product, then category, then the venue's flow for the kind; moved from `BookingFlowConfig`, 29 September W12) **and every line's `catalogue.Product.consentQuestionIds`, each question once**: the flow's first, in its order, then each product's in cart-line order, a question already listed not repeated (its `lineIds` gain the line). The client asks them, in the order given, and sends the answers to `marketing.recordConsentAnswers`; `answered` then turns true. One or several, as the venue chose. `checkoutCart` refuses while a required one is unanswered.\n","items":{"allOf":[{"$ref":"../satellite/marketing-crm.yaml#/components/schemas/ConsentQuestion"},{"type":"object","properties":{"lineIds":{"type":"array","description":"The cart lines that ask it. Empty for a question the flow asks.","items":{"type":"string","format":"uuid"}},"answered":{"type":"boolean","description":"Every person (for `perPerson`) or the booking (for `perBooking`) has an answer."}}}]}},"subtotal":{"x-ticvai-column":"net_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"discountTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxTotal":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"total":{"x-ticvai-column":"gross_amount","$ref":"../shared/common.yaml#/components/schemas/Money"},"appliedPromotionIds":{"type":"array","description":"**Re-evaluated on every read.** A promotion that expired while the cart sat must not still be applied at checkout, and a promotion that became applicable should be.\n","items":{"type":"string","format":"uuid"}},"couponCodes":{"type":"array","readOnly":true,"description":"The promo codes the guest entered through `applyCartPromoCode` (decided 28 September, audit R073 (e)). **Sent as `couponCodes` on every promotions evaluation of this cart**, so a code is re-checked on each read like any promotion; a code that stops qualifying stays listed here and its promotion drops out of `appliedPromotionIds`.\n","items":{"type":"string","maxLength":100}},"expiresAt":{"type":"string","format":"date-time","description":"The earliest lease expiry in the cart, or the cart's own window where it holds none."},"extensionsUsed":{"type":"integer","readOnly":true},"maxExtensions":{"type":"integer","readOnly":true},"locale":{"type":"string"},"createdAt":{"type":"string","format":"date-time"},"updatedAt":{"type":"string","format":"date-time"}}},
 "CartConflict": {"type":"object","x-ticvai-persistence":"none — computed on read","description":"2.9.5. Golf at 13:00 and karting at 13:00 for the same guest. **A prompt, not a refusal** — a party of four may legitimately split, and refusing would be wrong more often than right.\n","properties":{"kind":{"type":"string","enum":["overlappingTime","sameSessionDifferentVenue","exceedsPartySize","requiresPrerequisite","consentBlocksBooking"]},"lineIds":{"type":"array","items":{"type":"string","format":"uuid"}},"message":{"type":"string"},"isBlocking":{"type":"boolean","description":"Most are not. `requiresPrerequisite` is — an add-on with no ticket to attach to cannot be sold. So is `consentBlocksBooking`: a consent question answered with the answer the venue set to block the booking (decided 29 September, rev 3 REV3-26).\n"}}},
@@ -2620,6 +2636,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "LocationSession": {"type":"object","x-ticvai-persistence":"fnb.location_session","required":["id","locationId","kind","label","expiresAt"],"properties":{"id":{"type":"string","format":"uuid"},"locationId":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/DeliveryLocationKind"},"label":{"type":"string"},"outletId":{"type":"string","format":"uuid","nullable":true,"description":"The outlet serving this location. Where several serve it, the guest chooses and this is set on the first order.\n"},"visitId":{"type":"string","format":"uuid","nullable":true,"description":"The table visit this session orders onto, where the location is a table. Absent for a cabana or a seat, which have no visit concept — the order stands alone.\n"},"joinedExistingVisit":{"type":"boolean"},"subjectId":{"type":"string","format":"uuid"},"expiresAt":{"type":"string","format":"date-time","description":"Sessions expire so a guest who leaves cannot order to a lounger now occupied by someone else.\n"}}},
 "MinimumAppVersion": {"x-ticvai-persistence":"none — embedded in tenant_config","type":"object","nullable":true,"description":"**The oldest guest app build still allowed to run (decided 28 September, audit R073).** A guest app whose own version is below the one for its platform shows the forced-upgrade screen (GST-047) and nothing else. Null, or a platform left null, forces nothing. Live at once through `setMaintenanceMode`, because an upgrade that must wait for a publish is not forced.\n","properties":{"ios":{"type":"string","nullable":true,"pattern":"^\\d+\\.\\d+\\.\\d+$"},"android":{"type":"string","nullable":true,"pattern":"^\\d+\\.\\d+\\.\\d+$"}}},
 "ModifierGroup": {"x-ticvai-persistence":"fnb.modifier_group + fnb.modifier_option","type":"object","description":"**An F&B modifier is a choice added to a dish at the moment of ordering** — *no onions*, *extra cheese*, *cooked medium*. **It is not an Attribute**, the axis that generates catalogue variants (naming-and-style §3 lists *Modifier* as a banned synonym for that), and the two must not be merged: a variant is a different product with its own stock, a modifier is an instruction on a line with at most a price delta.\n","required":["id","code","name","minSelections","maxSelections","options"],"properties":{"id":{"type":"string","format":"uuid"},"code":{"type":"string"},"name":{"type":"string"},"minSelections":{"type":"integer","minimum":0,"description":"Greater than zero makes the group required."},"maxSelections":{"type":"integer","minimum":1},"options":{"type":"array","minItems":1,"items":{"type":"object","required":["id","name","priceDelta"],"properties":{"id":{"type":"string","format":"uuid"},"name":{"type":"string"},"priceDelta":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"isDefault":{"type":"boolean"},"isAvailable":{"type":"boolean"},"allergens":{"type":"array","description":"What choosing this option adds to the dish. `attachModifierGroup` refuses a group that adds one the item does not declare, and `verifyAllergens` reports it as `via` `modifier`.","items":{"$ref":"#/components/schemas/AllergenCode"}}}}},"scopePath":{"type":"string","description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"}}},
+"MyTableBooking": {"type":"object","x-ticvai-persistence":"none — projection over fnb.table_reservation and fnb.waitlist_entry","description":"One row of the guest's own list (`listMyTableReservations`; CHG-RUL-013): a reservation or a waitlist place, as `kind` says; exactly one of `reservation` and `waitlistEntry` is set.","required":["kind","outletId"],"properties":{"kind":{"type":"string","enum":["reservation","waitlist"]},"outletId":{"type":"string","format":"uuid"},"outletName":{"type":"string"},"reservation":{"allOf":[{"$ref":"#/components/schemas/TableReservation"}],"nullable":true},"waitlistEntry":{"allOf":[{"$ref":"#/components/schemas/RestaurantWaitlist"}],"nullable":true}}},
 "Order": {"x-ticvai-persistence":"orders.sales_order + orders.order_line","type":"object","required":["id","venueId","scopePath","channel","status","currency","currencyScale","grossAmount","taxAmount","netAmount","lines","createdAt","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"The client UUIDv7 from `CreateOrderRequest.id`."},"orderNumber":{"type":"string","readOnly":true,"description":"The number a guest reads and a cashier types. **Server-assigned: the venue prefix and a sequence per venue**, for example `DXB1-000123` (decided 28 September, audit R152). A till holds a reserved range of the venue sequence, so an order taken offline gets its number on the till and keeps it through `syncOrders`. **Not gapless**: an unused reserved range leaves a gap, and that is allowed. Only tax invoices are gapless, per legal entity. The receipt carries this number.\n"},"channel":{"allOf":[{"$ref":"#/components/schemas/OrderChannel"}],"description":"Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for within a month of launch.\n"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"status":{"$ref":"#/components/schemas/OrderStatus"},"currency":{"type":"string","pattern":"^[A-Z]{3}$","x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"},"currencyScale":{"type":"integer","minimum":0,"maximum":4,"x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"},"grossAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"netAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"refundedAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"chargeCurrency":{"type":"string","pattern":"^[A-Z]{3}$","nullable":true,"readOnly":true,"description":"**The currency the guest selected and is charged in** (CHG-FIN-001, 2 October 2026). Null or equal to `currency` for a sale in the base currency. Everything else on the order, and every ledger posting, stays in the base currency `currency`."},"chargeFxRate":{"allOf":[{"$ref":"#/components/schemas/ExchangeRateDecimal"}],"nullable":true,"readOnly":true,"description":"Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`), stored on the order so the payment, the receipt, the tax invoice and any refund use the same rate (CHG-FIN-001)."},"chargeFxRateId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The `finance.FxRate` row the rate was taken from, for audit."},"chargeTotal":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"readOnly":true,"description":"`grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to the provider asks for (CHG-FIN-001)."},"chargeRateLockedUntil":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"The quote holds until then (the cart lease). After it, the next payment attempt re-quotes at the rate then in force and the guest confirms the new amount (CHG-FIN-001)."},"droppedPromotions":{"type":"array","readOnly":true,"x-ticvai-persisted":false,"description":"**Promotions left off this order at checkout because their budget cap would have been exceeded** (decided 28 September, audit R101 (8)). Empty when none was dropped. Returned by `checkoutCart` and `createOrder`, not stored.\n","items":{"type":"object","required":["promotionId"],"properties":{"promotionId":{"type":"string","format":"uuid"},"name":{"type":"string"},"reason":{"type":"string","enum":["budgetCapReached"]}}}},"totalPriceVariance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Sum across lines. Zero on a normal order."},"lines":{"type":"array","items":{"$ref":"#/components/schemas/OrderLine"}},"payments":{"type":"array","items":{"$ref":"#/components/schemas/Payment"}},"principalId":{"type":"string","format":"uuid"},"workstationId":{"type":"string","format":"uuid"},"shiftId":{"type":"string","format":"uuid","nullable":true},"subjectId":{"type":"string","format":"uuid","nullable":true},"holdLabel":{"type":"string","maxLength":60,"nullable":true,"readOnly":true,"description":"The `label` a cashier gave when parking it with `holdOrder` — how they find it again. Null on an order never held."},"heldUntil":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"When a held order expires and is voided (states/order.yaml), from `holdOrder`'s `holdUntil`. Null on an order not currently held."},"createdAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
 "OrderChannel": {"type":"string","description":"Where the order originated. Added when guest self-ordering was contracted — an order a guest placed on their own phone is commercially and operationally different from one a cashier typed, and reporting that cannot separate them cannot answer whether self-ordering is working.\n","enum":["pos","kiosk","guestApp","guestWeb","callCentre","partner","api","backOffice"]},
 "OrderLine": {"x-ticvai-persistence":"orders.order_line + orders.order_line_eligibility + orders.order_line_discount","x-ticvai-retired-columns":["promotion_id","name","reason"],"allOf":[{"$ref":"#/components/schemas/CreateOrderLine"},{"type":"object","required":["serverUnitPrice","taxAmount","netAmount","grossAmount"],"properties":{"serverUnitPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"What the server computed on ingest."},"priceVariance":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Server minus quoted. Non-zero means the quoted price was honoured and the difference posted to the variance account.\n"},"taxAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"netAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"grossAmount":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"entitlementIds":{"type":"array","description":"The entitlements this line issued. **These are the ticket ids** — `transferOrderTickets.ticketIds` and `reprintOrder.reissuedTicketIds` take and return them.","items":{"type":"string","format":"uuid"}},"crossRegionRightIds":{"type":"array","items":{"type":"string"},"description":"Redemption rights propagated to other cells for this line."},"reprintCount":{"type":"integer","minimum":0,"default":0,"readOnly":true,"description":"How many times this line's tickets were reprinted or resent. `reprintOrder` increments it; repeated reprints are the signal worth surfacing."},"venueId":{"type":"string","format":"uuid","readOnly":true,"description":"The order's venue, copied onto the line (ADR-0044's own example; system-design review SD-008, 29 September) so a line is scoped and partitionable without its order."},"discounts":{"type":"array","readOnly":true,"description":"**The discounts applied to this line, one row each** (system-design review SD-008, 29 September). Until then a discount object was flattened into the line as `promotion_id NOT NULL`, so a line with no promotion could not be inserted. A line with no discount has none.","items":{"$ref":"#/components/schemas/OrderLineDiscount"}}}}]},

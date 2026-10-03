@@ -244,20 +244,12 @@
        "kind": "dataTable",
        "label": "Every credential operations",
        "columns": [
-        "CredentialOperationsCommandCenterView.virtualTicketId",
-        "CredentialOperationsCommandCenterView.credentialId",
         "CredentialOperationsCommandCenterView.mediaType",
         "CredentialOperationsCommandCenterView.customerParticipant",
-        "CredentialOperationsCommandCenterView.product",
-        "CredentialOperationsCommandCenterView.event",
         "CredentialOperationsCommandCenterView.credentialStatus",
         "CredentialOperationsCommandCenterView.deliveryStatus",
         "CredentialOperationsCommandCenterView.activationStatus",
-        "CredentialOperationsCommandCenterView.bindingStatus",
-        "CredentialOperationsCommandCenterView.provider",
-        "CredentialOperationsCommandCenterView.lastActivity",
-        "CredentialOperationsCommandCenterView.exception",
-        "CredentialOperationsCommandCenterView.owner"
+        "CredentialOperationsCommandCenterView.bindingStatus"
        ],
        "bindsTo": "CredentialOperationsCommandCenterView",
        "operation": "listCredential",
@@ -274,8 +266,6 @@
        "label": "The selected credential operations",
        "bindsTo": "CredentialOperationsCommandCenterView",
        "columns": [
-        "CredentialOperationsCommandCenterView.virtualTicketId",
-        "CredentialOperationsCommandCenterView.credentialId",
         "CredentialOperationsCommandCenterView.mediaType",
         "CredentialOperationsCommandCenterView.customerParticipant",
         "CredentialOperationsCommandCenterView.product",
@@ -283,11 +273,7 @@
         "CredentialOperationsCommandCenterView.credentialStatus",
         "CredentialOperationsCommandCenterView.deliveryStatus",
         "CredentialOperationsCommandCenterView.activationStatus",
-        "CredentialOperationsCommandCenterView.bindingStatus",
-        "CredentialOperationsCommandCenterView.provider",
-        "CredentialOperationsCommandCenterView.lastActivity",
-        "CredentialOperationsCommandCenterView.exception",
-        "CredentialOperationsCommandCenterView.owner"
+        "CredentialOperationsCommandCenterView.bindingStatus"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Display credentials by”, “Provide indicators such as”.",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 41 §Each record should show"
@@ -844,7 +830,9 @@
    "params": [
     {
      "name": "exceptionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `resolveCredentialException` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ],
    "preloaded": [
@@ -1652,7 +1640,9 @@
    "params": [
     {
      "name": "exceptionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listFailedGenerationDelivery` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "preloaded": [

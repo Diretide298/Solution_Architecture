@@ -101,7 +101,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-061` | Menu Item Detail | A | 1 | 7 | 5 | 1 | 2 | 2 | guest | notStarted (client-verified) |
+| `GST-061` | Menu Item Detail | A | 1 | 4 | 5 | 1 | 2 | 2 | guest | notStarted (client-verified) |
 | `GST-062` | Shop & Drop Collection | A | 0 | 20 | 5 | 0 | 2 | 0 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch
@@ -121,8 +121,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | In-Venue Experience · wave 2 · needs the `fnb` module |
-| Block | Block A · ticket #18154 (APP-MOB-GST-061) |
+| Module | In-Venue Experience · wave 1 · needs the `fnb` module |
+| Block | Block A · task APP-MOB-GST-061 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): One dish from the outlet's guest menu, with its modifiers and allergens (CHG-SGU-018) |
@@ -169,12 +169,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Shows | Format | Notes |
 |---|---|---|
-| Outlet | the name it points at, never the id | — |
-| Menu | the name it points at, never the id | — |
 | Name | text | — |
 | In force until | 1 Oct 2026, 14:30 | When this menu stops applying. The client shows it, because a guest browsing breakfast at 10:55 should know. |
 | Currency | text | — |
-| Currency scale | 1,234 | — |
 | Sections | list or chips (count when long) | — |
 
 **Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
@@ -267,7 +264,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (1), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (7 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (4 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-061?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `GST-001`, `GST-024`, `GST-041`.
@@ -286,8 +283,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | In-Venue Experience · wave 2 · needs the `retail` module |
-| Block | Block A · ticket #18230 (APP-MOB-GST-062) |
+| Module | In-Venue Experience · wave 1 · needs the `retail` module |
+| Block | Block A · task APP-MOB-GST-062 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): A status list of every shop-and-drop waiting for the guest, read by `lookupShopAndDrop` (a GET with query identifiers, so no request body) (CHG-SGU-018) |
@@ -363,7 +360,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Where the user goes next**
 
 - → `GST-001` Home: *Home – Default*
-- → `POS-012` Omnichannel Order & Fulfilment Center: *Collected on the way out, at the exit desk*; carries `orderId`; calls `lookupShopAndDrop`
+- → `POS-012` Omnichannel Order & Fulfilment Center: *Collected on the way out, at the exit desk*; carries `dropId`, `orderId`; calls `lookupShopAndDrop`
 
 #### States
 

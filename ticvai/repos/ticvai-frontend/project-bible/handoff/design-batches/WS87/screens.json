@@ -445,7 +445,9 @@
    "params": [
     {
      "name": "cardCode",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getGameCard` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -604,11 +606,15 @@
    "params": [
     {
      "name": "subjectId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getWallet` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "walletId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getWallet`; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -916,19 +922,14 @@
        "label": "The selected game or benefit",
        "bindsTo": "GameEligibility",
        "columns": [
-        "GameEligibility.gameId",
         "GameEligibility.name",
         "GameEligibility.playable",
         "GameEligibility.costKind",
         "GameEligibility.price",
-        "GameEligibility.entitlementId",
         "GameEligibility.remainingPlays",
         "GameEligibility.blockedReason",
         "GameEligibility.ticketsTypicallyEarned",
-        "Benefit name",
-        "Valid until",
-        "Can be used at",
-        "Cannot be used at"
+        "Benefit name"
        ],
        "operation": "getGameEligibility",
        "notes": "The benefit name (e.g. Birthday Free Play), its validity and where bonus value is accepted are pack labels.",

@@ -168,7 +168,7 @@
     "minLength": 3,
     "maxLength": 3,
     "readOnly": true,
-    "description": "**The tenant's selected currency, USD by default** (Chinmay, 2 October, workbook Q8; CHG-CSA-004). Every `cost` here is in it; token counts sit beside each cost."
+    "description": "**The tenant's selected currency, by default its billing currency (AED for a UAE tenant), not USD** (CHG-RUL-017; Chinmay, 2 October, workbook Q8; CHG-CSA-004). Every `cost` here is in it; token counts sit beside each cost."
    },
    "ceiling": {
     "type": "object",

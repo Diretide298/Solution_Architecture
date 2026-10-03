@@ -127,7 +127,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-031` | Security & Compliance Dashboard | A | 42 | 26 | 7 | 19 | 0 | 0 | — | notStarted (generated) |
-| `ADM-032` | WAF & Security Policy View | B–D | 9 | 6 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-032` | WAF & Security Policy View | B | 9 | 6 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -146,8 +146,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Security & Compliance · wave 3 · needs the `core` module |
-| Block | Block A · ticket #18117 (APP-SETUP-ADM-031) |
+| Module | Security & Compliance · wave 1 · needs the `core` module |
+| Block | Block A · task APP-SETUP-ADM-031 |
 | Who uses it | ticvai staff holding `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`, `REPORT_MANAGE`, `REPORT_VIEW_VENUE` (2 operate, 1 read, 1 configure); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listDashboards` reads the population and `getDashboard` reads one of them — list, select, act |
@@ -254,7 +254,7 @@ Errors to draw in the form: 400 The tiles' refreshes per minute exceed `VenueSet
 | Width `tiles[].position.width` | number field | required | — | — | — | — | `updateDashboard` body |
 | Height `tiles[].position.height` | number field | required | — | — | — | — | `updateDashboard` body |
 
-Errors to draw in the form: 409 Moving a dashboard to a module the caller is not entitled to. The same guard as `createDashboard` — without it, an update would be the way round the create …; 422 A tile's report lacks the column encodings its visualisation needs (problem type `tile-encoding-missing`, CHG-FIN-007), as `createDashboard`.
+Errors to draw in the form: 400 The tiles' refreshes per minute exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (proposed default 24, audit R094), as on `createDashboard` …; 409 Moving a dashboard to a module the caller is not entitled to. The same guard as `createDashboard` — without it, an update would be the way round the create …; 422 A tile's report lacks the column encodings its visualisation needs (problem type `tile-encoding-missing`, CHG-FIN-007), as `createDashboard`.
 
 **Rules for these inputs** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
 
@@ -317,7 +317,7 @@ Errors to draw in the form: 409 Moving a dashboard to a module the caller is not
 |---|---|---|---|---|---|
 | Open access grant (primary button) | `openPlatformStaffGrant` POST `/platform-staff-grants` | inline | PlatformStaffGrant | 400 Validation failed; 403 Authenticated but not permitted at the requested scope | step-up: mfa (Opens a platform operator's access into a tenant's data.); opens modal first |
 | Create dashboard (primary button) | `createDashboard` POST `/dashboards` | CreateDashboardRequest | Dashboard | 400 The tiles' refreshes per minute exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (proposed default 24, audit R094); 409 The caller is not entitled to the dashboard's module — the tenant has not … | opens modal first |
-| Save dashboard (secondary button) | `updateDashboard` PUT `/dashboards/{dashboardId}` | CreateDashboardRequest | Dashboard | 409 Moving a dashboard to a module the caller is not entitled to. The same guard as `createDashboard` — without it, an update would be the way round the create …; 422 A tile's report lacks the column encodings its … | opens modal first |
+| Save dashboard (secondary button) | `updateDashboard` PUT `/dashboards/{dashboardId}` | CreateDashboardRequest | Dashboard | 400 The tiles' refreshes per minute exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (proposed default 24, audit R094), as on `createDashboard` …; 409 Moving a dashboard to a module the caller is not … | opens modal first |
 
 **Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
 
@@ -332,9 +332,9 @@ Errors to draw in the form: 409 Moving a dashboard to a module the caller is not
 
 **Where the user goes next**
 
-- → `ADM-004` Platform Audit Log: *Platform Audit Log*; carries `tenantId`
 - → `ADM-001` Platform Login / MFA: *Platform Login / MFA*
 - → `ADM-002` Platform Dashboard: *Platform Dashboard*
+- → `ADM-004` Platform Audit Log: *Platform Audit Log*; carries `tenantId`
 
 #### States
 
@@ -344,10 +344,10 @@ Errors to draw in the form: 409 Moving a dashboard to a module the caller is not
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the security compliance untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No security compliance yet. Offers Create dashboard (`createDashboard`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on module, includeArchived and the security compliance are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listDashboards` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_VENUE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant` … |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098). |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 The tiles' refreshes per minute exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (proposed default 24, audit R094); 400 Validation failed; 409 Moving a dashboard to a module the caller is not entitled to. The same guard as `createDashboard` — without it, an update would be the way round the create …; 409 The caller is not entitled to the dashboard's module — the tenant has not … |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 The tiles' refreshes per minute exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (proposed default 24, audit R094); 400 The tiles' refreshes per minute exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (proposed default 24, audit R094), as on `createDashboard` …; 400 Validation failed; 409 Moving a dashboard to a module the caller is not entitled to. The same … |
 
 #### Edge cases to draw
 
@@ -383,7 +383,7 @@ tiles:
 - `recordDashboardView` → `REPORT_VIEW_VENUE` (operate) · staff
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listDashboards` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_VENUE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant` …
 
 #### Requirements it meets
 
@@ -427,7 +427,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-031?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, Create dashboard, Save dashboard.
-- [ ] Every transition is wired: `ADM-004`, `ADM-001`, `ADM-002`.
+- [ ] Every transition is wired: `ADM-001`, `ADM-002`, `ADM-004`.
 - [ ] Every gated control is gated: `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW`, `REPORT_MANAGE`, `REPORT_VIEW_VENUE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 1 edge case(s) from the process notes are drawn.
@@ -444,7 +444,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Security & Compliance · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-032 |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCellJobs` reads the population and `getCellHealth` reads one of them — list, select, act |
@@ -519,7 +519,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the waf security policy untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No waf security policy yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellHealth` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listWafRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `setWafPolicy`. |
 | Offline (`?state=offline`) | online only |
 
 #### Edge cases to draw
@@ -556,7 +556,7 @@ Every cell job:
 - `listWafRules` → `PLATFORM_CELL_VIEW` (read) · staff
 - `setWafPolicy` → `PLATFORM_CELL_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellHealth` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listWafRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `setWafPolicy`.
 
 #### Requirements it meets
 

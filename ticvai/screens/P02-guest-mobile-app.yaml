@@ -253,9 +253,8 @@ screens:
     - to: GST-015
       trigger: Memberships
       provenance: 'derived — GST-015 declares entryState.params caseId, guestLinkId, statementId and GST-001
-        holds none of them. The edge carries nothing: guestLinkId only pre-selects (deep link or optional);
-        GST-015 finds statementId (listBillingStatements) itself; GST-015 opens on listBillingStatements,
-        and caseId has no source on GST-015 yet (a gap in GST-015, not in this edge)'
+        holds none of them. The edge carries nothing: guestLinkId, caseId, statementId only pre-select
+        (deep link or optional), and GST-015 opens on its own'
     - to: GST-016
       trigger: My Reservations
       provenance: 'derived — GST-016 declares entryState.params reservationId and GST-001 holds none of
@@ -2315,17 +2314,17 @@ screens:
       provenance: corrected 2 October 2026 (CHG-SGU-020, design-notes correction)
       carries:
       - orderId
+    - to: GST-028
+      trigger: It is confirmed with a facility
+      provenance: flow F50 step 2→3
+      carries:
+      - orderId
     - to: BO-020
       trigger: Kitchen accepts and prepares
       provenance: flow F11 step 4→5
       operation: createPayment
       crossesDevice: true
       back: false
-      carries:
-      - orderId
-    - to: GST-028
-      trigger: It is confirmed with a facility
-      provenance: flow F50 step 2→3
       carries:
       - orderId
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
@@ -5100,6 +5099,12 @@ screens:
       provenance: 'derived — GST-001 declares entryState.params  and GST-024 holds none of them. The edge
         carries nothing: GST-024 is opened from GST-001, so this edge is the way back and GST-001 keeps
         its own state'
+    - to: GST-061
+      trigger: Menu Item Detail
+      carries:
+      - outletId
+      provenance: 'authored 3 October 2026 (CHG-SPF-004): GST-024 lists them, and GST-061 cannot load
+        without the one the user picks'
     - to: GST-009
       trigger: Pays for the food order on its own
       provenance: flow F11 step 3→4
@@ -5111,12 +5116,6 @@ screens:
       provenance: flow F48 step 4→5
       carries:
       - orderId
-    - to: GST-061
-      trigger: Menu Item Detail
-      carries:
-      - outletId
-      provenance: 'authored 3 October 2026 (CHG-SPF-004): GST-024 lists them, and GST-061 cannot load
-        without the one the user picks'
   notes: 'The inventory cited `GET /menu`, which never existed. Now getGuestMenu. Ordering to a cabana
     or a seat uses the same claimLocationSession as a table (4.6.26). States derived from the screen pattern
     on 17 August, not individually considered. **Cross-surface parity, 31 August**: added claimTableSession,
@@ -5473,9 +5472,10 @@ screens:
     - to: GST-041
       trigger: Checkout Entry
       carries:
+      - lineId
       - performanceId
       provenance: derived — GST-041 declares entryState.params holdId, lineId, performanceId, productId
-        and GST-026 holds performanceId, so an edge into it carries them
+        and GST-026 holds lineId, performanceId, so an edge into it carries them
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation
     removed 24 August**: BO-048, BO-069. **Buying to collect goes through the cart** (decided 28 September,
@@ -7780,14 +7780,13 @@ screens:
     - to: GST-071
       trigger: Payment Methods
       provenance: 'derived — GST-071 declares entryState.params cardCode, walletId and GST-039 holds none
-        of them. The edge carries nothing: walletId only pre-selects (deep link or optional); GST-071
-        opens on listPaymentTokens, and cardCode has no source on GST-071 yet (a gap in GST-071, not in
-        this edge)'
+        of them. The edge carries nothing: walletId, cardCode only pre-select (deep link or optional),
+        and GST-071 opens on its own'
     - to: GST-073
       trigger: Security & Sign-in
       provenance: 'derived — GST-073 declares entryState.params challengeId, methodId and GST-039 holds
-        none of them. The edge carries nothing: GST-073 finds challengeId (createMfaChallenge), methodId
-        (enrolMfaMethod) itself, and GST-073 opens on its own'
+        none of them. The edge carries nothing: challengeId, methodId only pre-select (deep link or optional),
+        and GST-073 opens on its own'
   notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
 
@@ -11665,6 +11664,7 @@ screens:
       crossesDevice: true
       back: false
       carries:
+      - dropId
       - orderId
   notes: 4.4.7. Claimed by the entitlement the guest is already carrying, not a paper slip.
   density: comfortable
@@ -12803,6 +12803,8 @@ screens:
     - name: cartId
       from: session
       optional: true
+    - name: venueId
+      from: session
     coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
       here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
   wireframe:

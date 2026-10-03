@@ -249,14 +249,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Where the user goes next**
 
 - → `BO-100` Venue Home: *Back to Venue Home*
-- → `BO-626` Accreditation Holder Profile: *Accreditation Holder Profile*
-- → `BO-627` Identity Details & Verification: *Identity Details & Verification*
-- → `BO-628` Photo Management: *Photo Management*
+- → `BO-626` Accreditation Holder Profile: *Accreditation Holder Profile*; carries `holderId`
+- → `BO-627` Identity Details & Verification: *Identity Details & Verification*; carries `holderId`
+- → `BO-628` Photo Management: *Photo Management*; carries `holderId`
 - → `BO-629` Document Repository: *Document Repository*
 - → `BO-630` Document Verification Queue: *Document Verification Queue*
 - → `BO-631` Duplicate & Identity Conflict Detection: *Duplicate & Identity Conflict Detection*
-- → `BO-632` Organization & Affiliation Management: *Organization & Affiliation Management*
-- → `BO-633` Profile Completeness & Compliance Monitor: *Profile Completeness & Compliance Monitor*
+- → `BO-632` Organization & Affiliation Management: *Organization & Affiliation Management*; carries `holderId`
+- → `BO-633` Profile Completeness & Compliance Monitor: *Profile Completeness & Compliance Monitor*; carries `holderId`
 - → `BO-634` Profile History & Audit Timeline: *Profile History & Audit Timeline*
 
 #### States

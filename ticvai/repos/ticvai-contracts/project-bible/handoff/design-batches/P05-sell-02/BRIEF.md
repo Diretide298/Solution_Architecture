@@ -152,12 +152,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `KSK-011` | Collect a booking | B–D | 1 | 16 | 5 | 4 | 2 | 6 | guest | notStarted (generated) |
-| `KSK-012` | Booking found | B–D | 6 | 0 | 4 | 6 | 0 | 6 | guest | notStarted (generated) |
-| `KSK-013` | Call staff | B–D | 0 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-014` | Out of service | B–D | 0 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-016` | Order Food | B–D | 23 | 27 | 6 | 2 | 0 | 0 | guest | notStarted (generated) |
-| `KSK-017` | Shop | B–D | 31 | 5 | 6 | 8 | 1 | 0 | guest | notStarted (generated) |
+| `KSK-011` | Collect a booking | C | 1 | 8 | 5 | 4 | 2 | 6 | guest | notStarted (generated) |
+| `KSK-012` | Booking found | C | 6 | 0 | 4 | 6 | 0 | 6 | guest | notStarted (generated) |
+| `KSK-013` | Call staff | D | 0 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-014` | Out of service | C | 0 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-016` | Order Food | C | 23 | 27 | 6 | 2 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-017` | Shop | C | 31 | 5 | 6 | 8 | 1 | 0 | guest | notStarted (generated) |
 
 ## Thin screens in this batch
 

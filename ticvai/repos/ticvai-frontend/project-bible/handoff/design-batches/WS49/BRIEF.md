@@ -107,13 +107,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-178` | Bundle & Combo Command Center | B–D | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-179` | Bundle Definition & Setup | A | 15 | 10 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-180` | Bundle Component Builder | A | 5 | 20 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-181` | Guest Choice & Build-Your-Own Bundle Designer | A | 3 | 20 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-179` | Bundle Definition & Setup | B–D | 15 | 5 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-180` | Bundle Component Builder | B–D | 5 | 20 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-181` | Guest Choice & Build-Your-Own Bundle Designer | B–D | 3 | 20 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-182` | Bundle Pricing & Commercial Model | B–D | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-183` | Bundle Availability, Capacity & Validation | B–D | 0 | 4 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-184` | Bundle Validity, Scheduling & Redemption Rules | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-185` | Partner & External Product Bundle Manager | B–D | 13 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-185` | Partner & External Product Bundle Manager | B–D | 13 | 8 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-186` | Revenue Allocation, Cost & Settlement Rules | B–D | 8 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-187` | Bundle Preview, Simulation & AI Recommendation | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 

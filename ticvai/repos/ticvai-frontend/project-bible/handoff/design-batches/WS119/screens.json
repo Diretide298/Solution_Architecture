@@ -349,7 +349,7 @@
   "name": "Forecast Configuration & Forecasting Strategy",
   "module": "Analytics",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "1",
@@ -910,7 +910,9 @@
     },
     {
      "name": "signalKey",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listForecastSignals` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "tenantId",
@@ -1146,7 +1148,9 @@
    "params": [
     {
      "name": "detectorKey",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `configureAnomalyDetector` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "tenantId",
@@ -1931,7 +1935,7 @@
   "name": "Forecast Drivers, Confidence & Explainability",
   "module": "Analytics",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "1",
@@ -2459,7 +2463,7 @@
   "name": "Forecast Accuracy, Review & Publication Center",
   "module": "AI",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "AI_Forecasting_and_Predictive_Intelligence_Reference.pdf",
    "board": "1",
@@ -2551,13 +2555,9 @@
        "columns": [
         "AiForecastVersion.versionNumber",
         "AiForecastVersion.status",
-        "AiForecastVersion.basis",
-        "AiForecastVersion.maturity",
         "AiForecastVersion.modelVersion",
         "AiForecastVersion.dataCutoffAt",
         "AiForecastVersion.horizonStart",
-        "AiForecastVersion.horizonEnd",
-        "AiForecastVersion.qualityChecks",
         "AiForecastVersion.publishedAt"
        ],
        "operation": "listForecastVersions",

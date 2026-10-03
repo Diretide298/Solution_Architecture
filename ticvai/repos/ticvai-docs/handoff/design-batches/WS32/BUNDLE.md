@@ -264,13 +264,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 - → `BO-100` Venue Home: *Venue Home*
 - → `BO-318` Refund Policy & Refund Calculation Configuration: *Refund Policy & Refund Calculation Configuration*
-- → `BO-315` Order Amendment Workspace: *Works in Order Amendment Workspace*; carries `orderId`; calls `listAmendmentAfterSale`
 - → `BO-316` Amendment Eligibility & Policy Rule Builder: *Works in Amendment Eligibility & Policy Rule Builder*; calls `listAmendmentAfterSale`
 - → `BO-317` Cancellation & Partial Cancellation Policy Configuration: *Works in Cancellation & Partial Cancellation Policy Configuration*; calls `listAmendmentAfterSale`
 - → `BO-321` After-Sales Financial Settlement & Adjustment Workspace: *Works in After-Sales Financial Settlement & Adjustment Workspace*; calls `listAmendmentAfterSale`
 - → `BO-322` Approval, Exception & Service Recovery Management: *Works in Approval, Exception & Service Recovery Management*; calls `listAmendmentAfterSale`
 - → `BO-323` Amendment History, Audit & After-Sales Analytics: *Works in Amendment History, Audit & After-Sales Analytics*; calls `listAmendmentAfterSale`
 - → `BO-027` Reissue & Media Replacement: *Works in Reissue & Media Replacement (Ticket Reissue & Fulfillment Regeneration, merged into it on 28…*; calls `listAmendmentAfterSale`
+- → `BO-315` Order Amendment Workspace: *Works in Order Amendment Workspace*; carries `orderId`; calls `listAmendmentAfterSale`
 - → `BO-319` Void, Reversal & Same-Day Correction Management: *Works in Void, Reversal & Same-Day Correction Management*; carries `orderId`; calls `listAmendmentAfterSale`
 
 #### States
@@ -342,7 +342,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (48 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-314?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Order Amendment, Reservation Amendment, Date Change, Timeslot Change, Performance Change, Quantity Change, Attendee Change, Refund.
-- [ ] Every transition is wired: `BO-100`, `BO-318`, `BO-315`, `BO-316`, `BO-317`, `BO-321`, `BO-322`, `BO-323`, `BO-027`, `BO-319`.
+- [ ] Every transition is wired: `BO-100`, `BO-318`, `BO-316`, `BO-317`, `BO-321`, `BO-322`, `BO-323`, `BO-027`, `BO-315`, `BO-319`.
 - [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 1 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.
@@ -598,6 +598,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS85 Order   Reservation Management Board 2.dc.html#bo-315`
 - Workshop pack: Order___Reservation_Management_Reference.pdf board 2
 - Flow F141 *Order Reservation Management board 2: Amendment & After-Sales Command Center*, step 2: Works in Order Amendment Workspace → Provide agents with a controlled workspace for modifying an existing order without directly editing historical transaction records. The original order must always remain reconstructable.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -870,7 +871,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure separately) and no display directory — it is settings, not a population |
 | Offline | online only |
-| Opens with | `venueId` (navigation) · cold entry: **Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that … |
+| Opens with | `venueId` (session) · cold entry: **Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that … |
 | Route | `/orders-money/refund-policy-refund-calculation-configuration-bo-318` |
 
 **From the Ticketing & Guest Commerce, as the venue and TICVAI configure and run it process.** How a refund is calculated and where it goes: full, partial, percentage, pro rata, less fees; to original payment, wallet or credit note; with authority limits and time bands.

@@ -131,12 +131,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-834` | Digital Experience Center | B–D | 1 | 33 | 6 | 6 | 1 | 0 | — | notStarted (—) |
+| `BO-834` | Digital Experience Center | B–D | 1 | 26 | 6 | 6 | 1 | 0 | — | notStarted (—) |
 | `BO-835` | Site, Brand & Domain Setup | B–D | 0 | 0 | 6 | 0 | 3 | 6 | — | notStarted (—) |
 | `BO-836` | Design System & Components | B–D | 0 | 0 | 6 | 2 | 2 | 0 | — | notStarted (—) |
 | `BO-837` | Page & Landing Builder | B–D | 0 | 0 | 6 | 3 | 4 | 0 | — | notStarted (—) |
 | `BO-838` | Content, Media & Forms | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-839` | Dynamic Product Pages | A | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
+| `BO-839` | Dynamic Product Pages | B | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
 | `BO-840` | Mobile App CMS | B–D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `BO-841` | Personalization & Localization | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-842` | SEO Management | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |

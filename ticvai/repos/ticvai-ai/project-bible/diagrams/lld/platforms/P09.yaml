@@ -177,7 +177,7 @@ screens:
   name: Cross-Tenant Health Dashboard
   module: Overview & Health
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - cancelDecommission
@@ -627,7 +627,7 @@ screens:
   name: White-Label Branding Management
   module: Branding & Localisation
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createPreview
@@ -656,6 +656,8 @@ screens:
   offlineState: false
   entryParams:
   - tenantId<-navigation
+  - packageId<-navigation
+  - version<-navigation
   goesTo:
   - ADM-001
   - ADM-002
@@ -666,7 +668,7 @@ screens:
   name: Domain & Certificate Management
   module: Branding & Localisation
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - claimCustomDomain
@@ -701,7 +703,7 @@ screens:
   name: Interface Languages
   module: Branding & Localisation
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - getTenantConfig
@@ -843,7 +845,10 @@ screens:
   - loading
   - stepUp
   offlineState: false
-  entryParams: []
+  entryParams:
+  - challengeId<-navigation
+  - methodId<-navigation
+  - sessionId<-session
   goesTo:
   - ADM-001
   - ADM-002
@@ -1063,6 +1068,7 @@ screens:
   offlineState: false
   entryParams:
   - packageId<-navigation
+  - challengeId<-navigation
   goesTo:
   - ADM-028
   boardFrames: null
@@ -1133,7 +1139,7 @@ screens:
   name: Security & Compliance Dashboard
   module: Security & Compliance
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - createDashboard
@@ -1671,7 +1677,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - challengeId<-navigation
   goesTo:
   - ADM-379
   boardFrames: null
@@ -2403,7 +2410,7 @@ screens:
   name: Payment Method & Settlement Setup
   module: Tenants & Licensing
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listOrgUnits
@@ -2705,7 +2712,7 @@ screens:
   name: Module Activation & Dependency Validation
   module: Tenants & Licensing
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - getModuleEnablement
@@ -3384,7 +3391,7 @@ screens:
   offlineState: false
   entryParams:
   - sessionId<-session
-  - venueId<-navigation
+  - venueId<-session
   - tenantId<-navigation
   goesTo:
   - ADM-469
@@ -4276,7 +4283,7 @@ screens:
   name: Forecast Configuration & Forecasting Strategy
   module: Analytics
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listForecastDefinitions
@@ -4448,7 +4455,7 @@ screens:
   name: Forecast Drivers, Confidence & Explainability
   module: Analytics
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - explainMetricChange
@@ -4507,7 +4514,7 @@ screens:
   name: Forecast Accuracy, Review & Publication Center
   module: AI
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - exportForecastVersion
@@ -4966,7 +4973,7 @@ screens:
   name: AI Action & Permission Policy Builder
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - createAiGovernancePolicyDraft
@@ -5085,7 +5092,7 @@ screens:
   name: AI Policy Testing & Governance Simulation
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listAiGovernancePolicyVersions
@@ -5114,7 +5121,7 @@ screens:
   name: AI Governance Policy Publication & Effective Policy Map
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - getEffectiveAiPolicy
@@ -5919,7 +5926,7 @@ screens:
   name: AI Quality, Behavior & Governance Drift Monitoring
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listAiEvaluations
@@ -5982,7 +5989,7 @@ screens:
   name: AI Incident & Remediation Management
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - closeAiIncident

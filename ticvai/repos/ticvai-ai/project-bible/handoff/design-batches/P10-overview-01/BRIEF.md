@@ -94,7 +94,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-002` | Partner Dashboard | B–D | 105 | 66 | 6 | 71 | 0 | 0 | — | notStarted (generated) |
+| `PTR-002` | Partner Dashboard | C | 105 | 47 | 6 | 71 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

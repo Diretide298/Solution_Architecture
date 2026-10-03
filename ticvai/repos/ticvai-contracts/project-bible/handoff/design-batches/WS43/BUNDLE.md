@@ -109,7 +109,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-118` | Product Lifecycle Command Center | B–D | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
 | `ADM-119` | Product Creation Workspace | B–D | 0 | 0 | 6 | 25 | 8 | 3 | — | notStarted (generated) |
 | `ADM-120` | Lifecycle Status & Workflow Configuration | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-121` | Bulk Product Creation & Catalogue Import | A | 0 | 0 | 6 | 0 | 2 | 3 | — | notStarted (generated) |
+| `ADM-121` | Bulk Product Creation & Catalogue Import | B–D | 0 | 0 | 6 | 0 | 2 | 3 | — | notStarted (generated) |
 | `ADM-122` | Product Import / Export & Environment Transfer | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-123` | Product Context, Ownership & Assignment | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-124` | Channel Publication & Availability | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
@@ -544,7 +544,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Catalogue · wave 3 · needs the `ticketing` module |
-| Block | Block A · ticket #20646 (APP-SETUP-ADM-121) |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1220,7 +1220,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save configuration template** (modal, opened by *Save configuration template*; *Save configuration template* calls `setConfigurationTemplate`, *Cancel* sends nothing)
 
-**Collects what `setConfigurationTemplate` sends before it is called.** Required: `id`, `scopePath`, `subject`, `name`, `status`. Optional: `description`, `templateKind`, `productKind`, `venueId`, `sourceProductId`, `sourcePriceListId`, `includedComponents`, `reviewFields`, `isAiDrafted`, `ownerPrincipalId`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setConfigurationTemplate` sends before it is called.** Required: `subject`, `name`, `status`. Optional: `description`, `templateKind`, `productKind`, `venueId`, `sourceProductId`, `sourcePriceListId`, `includedComponents`, `reviewFields`, `isAiDrafted`, `ownerPrincipalId`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

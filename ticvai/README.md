@@ -2,7 +2,7 @@
 
 Generated 17 August 2026
 
-**2731 operations · 1112 tables · 2450 screens · 207 state models · 77 events · 97 flows · 70 ADRs**
+**2738 operations · 1113 tables · 2450 screens · 207 state models · 77 events · 97 flows · 70 ADRs**
 
 **Conflicts: 92 raised, 0 blocking.** See `conflict-status.md`.
 
@@ -20,7 +20,7 @@ provenance and what each one rules out — including the six that were wrong fir
 | **`wireframes/TICVAI Wireframe Boards.dc.html`** | 218 boards, 2450 screens. Open in a browser |
 | **`handoff/platforms-and-apps.md`** | Twelve platforms, ten apps, named by who operates them |
 | **`handoff/build-order.md`** | Which apps can be built, and in what order |
-| **`handoff/TICVAI_Schema_Reference.xlsx`** | 1112 tables, 3,911 columns, nine sheets |
+| **`handoff/TICVAI_Schema_Reference.xlsx`** | 1113 tables, 3,911 columns, nine sheets |
 | **`handoff/ai-index.md`** | Where every AI artefact lives |
 | **`docs/active/workshop-packs.md`** | The three blocked domains, prepared |
 
@@ -28,7 +28,7 @@ provenance and what each one rules out — including the six that were wrong fir
 
 | | |
 |---|---|
-| `contracts/` | **2731 operations** across 25 files — 267 spine, 470 satellite |
+| `contracts/` | **2738 operations** across 25 files — 267 spine, 470 satellite |
 | `screens/` | 364 definitions across 16 platforms, all specified |
 | `frontend/` | 10 app manifests, with build readiness |
 | `states/` · `events/` | 207 state models · 77 events, cross-checked |
@@ -52,7 +52,7 @@ fixed**, and they are under-specified rather than wrong.
 
 ## What this is
 
-A design package. **2731 operations, 1112 tables and 2450 screens are specified and none of it
+A design package. **2738 operations, 1113 tables and 2450 screens are specified and none of it
 has been executed** — no SQL is written, no code is built, and every number above is an
 assertion until something runs.
 

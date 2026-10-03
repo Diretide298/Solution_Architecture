@@ -46,7 +46,7 @@
     {
      "to": "WEB-008",
      "trigger": "Add-ons & Upsell",
-     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-005 holds none of them, so the edge carries nothing and WEB-008 opens cold"
+     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-005 holds none of them. The edge carries nothing: bundleId only pre-selects (deep link or optional), and WEB-008 opens on its own"
     },
     {
      "to": "WEB-010",
@@ -259,7 +259,7 @@
     "differences": "Ticket choice is on the same step as date and time and comes last: 'Date → time → ticket' (Config 'Performance reveal', Rev 3 item 2), whereas YAML goes WEB-005 → WEB-006. Prototype adds category → subcategory browsing, info-only (not bookable) products, 'Help me choose' questions, location switcher ('Booking at' bar), quick tour. Promo codes are entered in the cart, not on this step (YAML keeps evaluatePromotions here). 30 September: the guest counters take their price from the ticket chosen (2 park ticket, three adults: one line, AED 1,425), and Group / school booking starts from four group tickets with a typed headcount. The same flow's Read more panel still prices guests at single-park rates (Adult AED 325, Infant AED 475): a prototype defect; the counters on the page are the reference. **Do not copy the Read more panel's prices on the multi-park flow** (Adult AED 325, Infant AED 475 are single-park rates): a prototype defect; the counters on the page are the reference (CHG-SGU-020)."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "helpMeChoose",
@@ -360,7 +360,7 @@
     {
      "to": "WEB-008",
      "trigger": "Add-ons & Upsell",
-     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-006 holds none of them, so the edge carries nothing and WEB-008 opens cold"
+     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-006 holds none of them. The edge carries nothing: bundleId only pre-selects (deep link or optional), and WEB-008 opens on its own"
     },
     {
      "to": "WEB-010",
@@ -573,7 +573,7 @@
     "differences": "Merged into the ticket step (date first, time revealed after the date, tickets after the time). Prototype adds morning/afternoon/evening filters, times-per-page paging, sold-out greying, per-guest age/height eligibility dialog with 'Remove this guest', and the water-park 'Are you able to swim?' pop-up. YAML's separate hold call (addCartLine / inventory hold) is implicit. 30 September: a session's tickets (Surfer, Junior surfer, Spectator) appear once the session is chosen, and choosing it adds nothing to the cart."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "entryState": {
    "params": [
     {
@@ -667,7 +667,7 @@
   "name": "Interactive Seat Selection",
   "module": "Booking & Selection",
   "requiresModule": "seating",
-  "wave": 2,
+  "wave": 1,
   "capability": "C51",
   "implementation": {
    "app": "guest-web",
@@ -697,7 +697,7 @@
     {
      "to": "WEB-008",
      "trigger": "Add-ons & Upsell",
-     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-007 holds none of them, so the edge carries nothing and WEB-008 opens cold"
+     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-007 holds none of them. The edge carries nothing: bundleId only pre-selects (deep link or optional), and WEB-008 opens on its own"
     },
     {
      "to": "WEB-006",
@@ -872,7 +872,9 @@
     },
     {
      "name": "holdId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createSeatHold`; a link or an edge that holds one opens it instead."
     },
     {
      "name": "venueId",
@@ -895,7 +897,7 @@
    "derivedFrom": "wireframes/reference/Seat Board 3.dc.html",
    "note": "**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRecommendSeats",
@@ -976,7 +978,7 @@
   "name": "Add-ons & Upsell",
   "module": "Booking & Selection",
   "requiresModule": "ticketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C86",
   "implementation": {
    "app": "guest-web",
@@ -1018,9 +1020,10 @@
      "carries": [
       "cartId",
       "code",
+      "lineId",
       "performanceId"
      ],
-     "provenance": "derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-008 holds cartId, code, performanceId, so an edge into it carries them"
+     "provenance": "derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId and WEB-008 holds cartId, code, lineId, performanceId, so an edge into it carries them"
     },
     {
      "to": "WEB-016",
@@ -1068,19 +1071,11 @@
         "Bundle.code",
         "Bundle.name",
         "Bundle.description",
-        "Bundle.venueId",
         "Bundle.kind",
         "Bundle.price",
-        "Bundle.components",
-        "Bundle.choiceGroups",
-        "Bundle.allocation",
-        "Bundle.validFrom",
-        "Bundle.validTo",
-        "Bundle.id",
         "Bundle.savingsAmount",
         "Bundle.savingsPercentage",
-        "Bundle.hasBeenSold",
-        "Bundle.isActive"
+        "Bundle.hasBeenSold"
        ],
        "operation": "getBundle",
        "provenance": "contract promotions.yaml GET /bundles/{bundleId}",
@@ -1163,7 +1158,9 @@
     },
     {
      "name": "bundleId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getBundle` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "venueId",
@@ -1185,7 +1182,7 @@
     "differences": "Sign-in is asked when leaving Add-ons (Config 'Ask to sign in: After add-ons', Rev 3 item 3), so WEB-008 → WEB-016 is a transition YAML does not have. Add-ons also appear on the payment step (combo) and confirmation (upsells). 28 Sep flow review: all add-ons live here only."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the operations this screen then declared (six since the rev 3 build of 29 September), not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen. The suggestion panel reads `getUpsellSuggestions`, which `apis` does not declare yet.",
+  "apisNote": "Rebuilt 9 September 2026 from the operations this screen then declared (six since the rev 3 build of 29 September), not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself. The suggestion panel reads `getUpsellSuggestions`, which `apis` does not declare yet.",
   "overlays": [
    {
     "id": "formAddCartLine",
@@ -1247,7 +1244,7 @@
   "name": "Wishlist",
   "module": "Booking & Selection",
   "requiresModule": "marketing",
-  "wave": 3,
+  "wave": 1,
   "capability": "C79",
   "implementation": {
    "app": "guest-web",
@@ -1380,7 +1377,9 @@
    "params": [
     {
      "name": "itemId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getWishlist`; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "subjectId",
@@ -1402,7 +1401,7 @@
     "differences": "No 'withdrawn product stays marked unavailable' state (YAML note). Prototype adds 'Restore removed' and live queue times."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -1439,7 +1438,7 @@
   "name": "Map Booking — Cabanas & Spots",
   "module": "Booking & Selection",
   "requiresModule": "resources",
-  "wave": 3,
+  "wave": 1,
   "implementation": {
    "app": "guest-web",
    "route": "/booking-and-selection/map-booking",
@@ -1687,7 +1686,9 @@
     },
     {
      "name": "holdId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createResourceHold`; a link or an edge that holds one opens it instead."
     }
    ],
    "coldEntry": "**A link to a map that is no longer published, or a day that has passed,** says which and offers today on the current map. Nothing is held on arrival."
@@ -1760,7 +1761,7 @@
   "name": "Book a Space by the Hour",
   "module": "Booking & Selection",
   "requiresModule": "resources",
-  "wave": 3,
+  "wave": 1,
   "implementation": {
    "app": "guest-web",
    "route": "/booking-and-selection/space-by-the-hour",

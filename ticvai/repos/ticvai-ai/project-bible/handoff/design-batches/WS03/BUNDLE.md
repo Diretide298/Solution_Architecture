@@ -97,10 +97,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-164` | Digital Credential Security Command Center | A | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-164` | Digital Credential Security Command Center | C | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-165` | Dynamic QR Security Profile Builder | B–D | 13 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-166` | Credential Activation & Display Rules | A | 6 | 4 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `BO-167` | Device Binding & Session Security | B–D | 5 | 18 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-167` | Device Binding & Session Security | A | 5 | 18 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-168` | BLE Beacon & Geofence Configuration | A | 21 | 13 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-169` | Credential Transfer & Rebinding | B–D | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-170` | Credential Revocation & Lifecycle Events | B–D | 7 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
@@ -126,7 +126,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | Block A · ticket #20673 (APP-SETUP-BO-164) |
+| Block | Block C · task APP-SETUP-BO-164 |
 | Who uses it | venue staff holding `AUDIT_VIEW`, `SCOPE_VIEW` (2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Show) — counts over a population, then the population |
@@ -490,8 +490,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | Block A · ticket #20674 (APP-SETUP-BO-166) |
+| Module | Access & Venue · wave 1 · needs the `access` module |
+| Block | Block A · task APP-SETUP-BO-166 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -660,8 +660,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Access & Venue · wave 1 · needs the `access` module |
+| Block | Block A · task APP-SETUP-BO-167 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `GUEST_MANAGE`, `SCOPE_VIEW` (2 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -873,8 +873,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | Block A · ticket #20675 (APP-SETUP-BO-168) |
+| Module | Access & Venue · wave 1 · needs the `access` module |
+| Block | Block A · task APP-SETUP-BO-168 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Map-Based Configuration; Configure) and no display directory — it is settings, not a population |

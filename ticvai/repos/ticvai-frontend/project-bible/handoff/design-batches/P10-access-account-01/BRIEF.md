@@ -127,11 +127,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-001` | Partner Login / MFA | B–D | 16 | 51 | 10 | 6 | 2 | 0 | — | notStarted (generated) |
-| `PTR-003` | Profile & Company Details | B–D | 12 | 16 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
-| `PTR-004` | Notifications | B–D | 4 | 10 | 5 | 10 | 0 | 0 | — | notStarted (generated) |
-| `PTR-019` | API Credentials & Integration | B–D | 15 | 33 | 6 | 17 | 4 | 0 | — | notStarted (generated) |
-| `PTR-020` | Sub-Agent Management | B–D | 9 | 21 | 6 | 56 | 2 | 0 | — | notStarted (generated) |
+| `PTR-001` | Partner Login / MFA | A | 16 | 51 | 10 | 6 | 2 | 0 | — | notStarted (generated) |
+| `PTR-003` | Profile & Company Details | B | 12 | 14 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
+| `PTR-004` | Notifications | D | 4 | 10 | 5 | 10 | 0 | 0 | — | notStarted (generated) |
+| `PTR-019` | API Credentials & Integration | B | 15 | 33 | 6 | 17 | 4 | 0 | — | notStarted (generated) |
+| `PTR-020` | Sub-Agent Management | B | 9 | 14 | 6 | 56 | 2 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

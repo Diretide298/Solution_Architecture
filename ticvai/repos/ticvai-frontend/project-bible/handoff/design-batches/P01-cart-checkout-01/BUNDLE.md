@@ -128,7 +128,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `WEB-010` | Shopping Cart | A | 13 | 70 | 5 | 35 | 12 | 6 | guest | review (client-verified) |
 | `WEB-011` | Guest Details & Attendee Forms | A | 12 | 21 | 6 | 7 | 15 | 0 | guest | review (client-verified) |
-| `WEB-012` | Checkout — Payment | A | 14 | 38 | 5 | 24 | 17 | 6 | guest | review (client-verified) |
+| `WEB-012` | Checkout — Payment | A | 14 | 32 | 5 | 24 | 17 | 6 | guest | review (client-verified) |
 | `WEB-013` | Booking Confirmation | A | 7 | 10 | 5 | 11 | 4 | 6 | guest | review (client-verified) |
 | `WEB-014` | Pay for a Booking | A | 3 | 3 | 5 | 0 | 2 | 6 | guest | review (designed) |
 
@@ -146,7 +146,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Cart & Checkout · wave 1 · needs the `ticketing` module |
-| Block | Block A · ticket #18014 (APP-WEB-WEB-010) |
+| Block | Block A · task APP-WEB-WEB-010 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getCart` reads one record and nothing reads a population — the screen is about that one thing |
@@ -529,6 +529,7 @@ Also set there, as content the tenant writes: settings.
 - Flow F55 branch at step 1 (medium): when The cart expires while they decide., `abandonCart` releases the lease. **Recorded** — abandonment against cart age is what sizes the expiry window.
 - ADR-0045 *Every order carries a proven contact, and the gate is the checkout page* (`docs/adr/0045-every-order-carries-a-proven-contact.md`)
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0066 *The on-sale waiting room sits at the edge, apart from the ride queue* (`docs/adr/0066-the-on-sale-waiting-room-is-separate-from-the-ride-queue.md`)
 - ADR-0018 *— Configuration scope* (`docs/adr/0018-configuration-scope.md`)
 
@@ -555,7 +556,7 @@ Also set there, as content the tenant writes: settings.
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Cart & Checkout · wave 1 · needs the `marketing` module |
-| Block | Block A · ticket #17988 (APP-WEB-WEB-011) |
+| Block | Block A · task APP-WEB-WEB-011 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act |
@@ -681,7 +682,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 - → `WEB-016` Login / Register: *Chooses to sign in rather than continue as a guest*; carries `cartId`; only when no verified guest session — this is the fork of matrix 2.6.1 §2.4, offered here rather than in front of the cart
 - → `WEB-012` Checkout — Payment: *Pays*
 - → `WEB-012` Checkout — Payment: *Skipped: nothing to ask (guest code proved, or signed in, and no attendee forms)*
-- → `WEB-010` Shopping Cart: *They check out*; carries `cartId`, `performanceId`
+- → `WEB-010` Shopping Cart: *They check out*; carries `cartId`, `lineId`, `performanceId`
 
 #### States
 
@@ -849,8 +850,8 @@ Also set there, as content the tenant writes: settings.
 - Flow F55 *A guest buys on the web and transfers to a friend*, step 2: Attendee details are captured. → **Consent per attendee, not per purchase.** A guest buying for three friends cannot consent on their behalf (CF-160 again, and this is where it bites). The marketing opt-ins ticked here travel with …
 - Flow F01 branch at step 6 (abandonsFlow): when The guest abandons at the details form, **The cart's capacity holds lapse on their own.** `addCartLine` took a cart hold (catalogue `acquireInventoryHold`, holder kind `cart`, 15 minutes, extended while the guest is active); left alone …
 - Flow F02 branch at step 4 (requiresStaff): when The hold expires while the guest fills in the details form, The most likely place to lose it — a form takes longer than a cart. Extension is offered proactively as the countdown nears zero, not after it passes.
-- ADR-0045 *Every order carries a proven contact, and the gate is the checkout page* (`docs/adr/0045-every-order-carries-a-proven-contact.md`)
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
+- ADR-0045 *Every order carries a proven contact, and the gate is the checkout page* (`docs/adr/0045-every-order-carries-a-proven-contact.md`)
 
 #### Acceptance for the design
 
@@ -876,7 +877,7 @@ Also set there, as content the tenant writes: settings.
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Cart & Checkout · wave 1 · needs the `ticketing` module |
-| Block | Block A · ticket #17989 (APP-WEB-WEB-012) |
+| Block | Block A · task APP-WEB-WEB-012 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getOrder` reads one record and nothing reads a population — the screen is about that one thing |
@@ -954,15 +955,9 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Shows | Format | Notes |
 |---|---|---|
 | Order number | text | The number a guest reads and a cashier types. Server-assigned: the venue prefix and a sequence per venue, for example `DXB1-000123` … |
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for … |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
 | Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Net amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Lines | list or chips (count when long) | — |
-| Payments | list or chips (count when long) | — |
 | Charge currency | text | The currency the guest selected and is charged in (CHG-FIN-001, 2 October 2026). |
 | Charge total | AED 1,234.50 | `grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to … |
 | Charge FX rate | text | Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`) … |
@@ -1028,7 +1023,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Where the user goes next**
 
-- → `WEB-010` Shopping Cart: *Shopping Cart*; carries `performanceId`
+- → `WEB-010` Shopping Cart: *Shopping Cart*; carries `lineId`, `performanceId`
 - → `WEB-011` Guest Details & Attendee Forms: *Guest Details & Attendee Forms*
 - → `WEB-016` Login / Register: *Sign in or use a guest code (when sign-in is asked at payment)*; carries `cartId`; only when the guest is not signed in
 - → `WEB-013` Booking Confirmation: *Receives confirmation and tickets*; carries `orderId`
@@ -1201,13 +1196,13 @@ Also set there, as content the tenant writes: settings.
 - Flow F01 branch at step 7 (recoverable): when Payment declined, Retry reuses the same idempotency key. The order persists in an unpaid state rather than being torn down, so a second attempt does not rebuild the cart.
 - Flow F01 branch at step 7 (requiresStaff): when Payment taken but no response received. The card is charged and the platform does not know it., **The failure to build for.** The screen offers inquiry, never a retry — a retry double-charges and the guest is the one who discovers it. A background reconciler resolves any inquiry the guest …
 - Flow F02 branch at step 5 (requiresStaff): when The hold expires between cart and payment, Extension is offered before expiry rather than after. Where it has already lapsed and the seats are gone, the guest is told which seats and offered the nearest equivalent.
-- ADR-0045 *Every order carries a proven contact, and the gate is the checkout page* (`docs/adr/0045-every-order-carries-a-proven-contact.md`)
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
+- ADR-0045 *Every order carries a proven contact, and the gate is the checkout page* (`docs/adr/0045-every-order-carries-a-proven-contact.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (14), with its required mark, default, format and its error state (400, 402, 403, 404, 409, 422).
-- [ ] Every output is drawn (38 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (32 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-012?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Pay now.
 - [ ] Every transition is wired: `WEB-010`, `WEB-011`, `WEB-016`, `WEB-013`.
@@ -1228,7 +1223,7 @@ Also set there, as content the tenant writes: settings.
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Cart & Checkout · wave 1 · needs the `ticketing` module |
-| Block | Block A · ticket #17921 (APP-WEB-WEB-013) |
+| Block | Block A · task APP-WEB-WEB-013 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getOrder` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1357,7 +1352,7 @@ sentTo: f•••@example.ae
 #### Permissions
 
 - `getOrder` → `ORDER_VIEW` (read) · staff, guest, partner
-- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner
+- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner, device
 - `linkGuestCheckout` → no permission · guest
 
 **A refused user sees:** **There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the …
@@ -1438,7 +1433,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Cart & Checkout · wave 1 · needs the `ticketing` module |
-| Block | Block A · ticket #17922 (APP-WEB-WEB-014) |
+| Block | Block A · task APP-WEB-WEB-014 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getPaymentLink` reads one record and nothing reads a population — the screen is about that one thing |

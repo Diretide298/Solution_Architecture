@@ -2096,6 +2096,35 @@
     "format": "uuid",
     "nullable": true
    },
+   "escalation": {
+    "type": "object",
+    "nullable": true,
+    "readOnly": true,
+    "description": "**Set while the incident is escalated** (the optional Escalated step of the 3 October flow; CHG-RUL-011). Screens show \"Escalated\" when `status` is `underInvestigation` and this is set. Cleared when the incident closes.\n",
+    "properties": {
+     "toPrincipalId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "byPrincipalId": {
+      "type": "string",
+      "format": "uuid"
+     },
+     "reason": {
+      "type": "string"
+     },
+     "escalatedAt": {
+      "type": "string",
+      "format": "date-time"
+     }
+    }
+   },
+   "reopenCount": {
+    "type": "integer",
+    "minimum": 0,
+    "readOnly": true,
+    "description": "How many times the incident was reopened (CHG-RUL-011). Each reopen is a logged row."
+   },
    "occurredAt": {
     "type": "string",
     "format": "date-time"

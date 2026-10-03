@@ -139,23 +139,6 @@
      ]
     },
     {
-     "to": "ADM-020",
-     "trigger": "Creates the first principal and grants it the role",
-     "provenance": "flow F109 step 4→5",
-     "operation": "listTenants",
-     "carries": [
-      "tenantId"
-     ]
-    },
-    {
-     "to": "ADM-021",
-     "trigger": "Defines the role the first administrator will hold",
-     "provenance": "flow F109 step 2→3",
-     "carries": [
-      "tenantId"
-     ]
-    },
-    {
      "to": "ADM-369",
      "trigger": "Commercial Command Center",
      "provenance": "structural — pack board 1 wiring, 11 September 2026"
@@ -335,7 +318,7 @@
      "carries": [
       "tenantId"
      ],
-     "provenance": "derived — ADM-016 declares entryState.params tenantId and ADM-002 holds tenantId, so an edge into it carries them"
+     "provenance": "derived — ADM-016 declares entryState.params packageId, tenantId, version and ADM-002 holds tenantId, so an edge into it carries them"
     },
     {
      "to": "ADM-017",
@@ -437,7 +420,7 @@
     {
      "to": "ADM-318",
      "trigger": "Dead Letters",
-     "provenance": "derived — ADM-318 declares entryState.params deadLetterId, republishId and ADM-002 holds none of them. The edge carries nothing: deadLetterId only pre-selects (deep link or optional); ADM-318 finds republishId (listOutboxRepublishes) itself, and ADM-318 opens on its own"
+     "provenance": "derived — ADM-318 declares entryState.params deadLetterId, republishId and ADM-002 holds none of them. The edge carries nothing: deadLetterId, republishId only pre-select (deep link or optional), and ADM-318 opens on its own"
     },
     {
      "to": "ADM-024",
@@ -476,6 +459,23 @@
      "to": "ADM-699",
      "trigger": "My account & security",
      "provenance": "new screen, 2 October 2026 (CHG-SBO-022)"
+    },
+    {
+     "to": "ADM-020",
+     "trigger": "Creates the first principal and grants it the role",
+     "provenance": "flow F109 step 4→5",
+     "operation": "listTenants",
+     "carries": [
+      "tenantId"
+     ]
+    },
+    {
+     "to": "ADM-021",
+     "trigger": "Defines the role the first administrator will hold",
+     "provenance": "flow F109 step 2→3",
+     "carries": [
+      "tenantId"
+     ]
     }
    ],
    "entryFrom": []
@@ -517,12 +517,9 @@
         "Tenant.code",
         "Tenant.name",
         "Tenant.status",
-        "Tenant.suspensionMode",
-        "Tenant.suspensionReason",
         "Tenant.planName",
         "Tenant.cellCount",
-        "Tenant.venueCount",
-        "Tenant.billingEmail"
+        "Tenant.venueCount"
        ],
        "operation": "listTenants",
        "provenance": "contract subscription.yaml GET /tenants"
@@ -534,13 +531,10 @@
        "columns": [
         "Cell.name",
         "Cell.kind",
-        "Cell.isReachable",
         "Cell.lastContactAt",
         "Cell.licenceExpiresAt",
-        "Cell.participatesInCrossCell",
         "Cell.regionName",
-        "Cell.countryCode",
-        "Cell.tier"
+        "Cell.countryCode"
        ],
        "operation": "listTenantCells",
        "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
@@ -556,19 +550,11 @@
        "label": "The selected tenant",
        "bindsTo": "Tenant",
        "columns": [
-        "Tenant.id",
         "Tenant.code",
         "Tenant.name",
         "Tenant.status",
         "Tenant.suspensionMode",
-        "Tenant.suspensionReason",
         "Tenant.suspensionEffectiveAt",
-        "Tenant.suspensionNoticeMessage",
-        "Tenant.terminationScheduledAt",
-        "Tenant.terminationRetentionUntil",
-        "Tenant.terminationReason",
-        "Tenant.terminationRequestedByPrincipalId",
-        "Tenant.planId",
         "Tenant.planName",
         "Tenant.cellCount",
         "Tenant.venueCount"
@@ -581,19 +567,11 @@
        "label": "The tenant",
        "bindsTo": "TenantDetail",
        "columns": [
-        "TenantDetail.id",
         "TenantDetail.code",
         "TenantDetail.name",
         "TenantDetail.status",
         "TenantDetail.suspensionMode",
-        "TenantDetail.suspensionReason",
         "TenantDetail.suspensionEffectiveAt",
-        "TenantDetail.suspensionNoticeMessage",
-        "TenantDetail.terminationScheduledAt",
-        "TenantDetail.terminationRetentionUntil",
-        "TenantDetail.terminationReason",
-        "TenantDetail.terminationRequestedByPrincipalId",
-        "TenantDetail.planId",
         "TenantDetail.planName",
         "TenantDetail.cellCount",
         "TenantDetail.venueCount"
@@ -690,7 +668,7 @@
    "derivedFrom": "wireframes/reference/Dashboards Board.dc.html",
    "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "getSsoConfig",
@@ -728,7 +706,7 @@
   "name": "Cross-Tenant Health Dashboard",
   "module": "Overview & Health",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "C95",
   "implementation": {
    "app": "ticvai-web",
@@ -751,7 +729,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-003 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-003 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -761,7 +739,7 @@
     {
      "to": "ADM-004",
      "trigger": "Platform Audit Log",
-     "provenance": "derived — ADM-004 declares entryState.params decisionRecordId, tenantId and ADM-003 holds none of them. The edge carries nothing: tenantId only pre-selects (deep link or optional); ADM-004 finds decisionRecordId (listAiInteractions) itself, and ADM-004 opens on its own"
+     "provenance": "derived — ADM-004 declares entryState.params decisionRecordId, tenantId and ADM-003 holds none of them. The edge carries nothing: decisionRecordId, tenantId only pre-select (deep link or optional), and ADM-004 opens on its own"
     },
     {
      "to": "SCN-003",
@@ -831,22 +809,14 @@
        "label": "The cell",
        "bindsTo": "CellDetail",
        "columns": [
-        "CellDetail.id",
         "CellDetail.name",
         "CellDetail.kind",
-        "CellDetail.clusterId",
-        "CellDetail.isReachable",
         "CellDetail.lastContactAt",
         "CellDetail.licenceExpiresAt",
-        "CellDetail.participatesInCrossCell",
-        "CellDetail.regionId",
         "CellDetail.regionName",
         "CellDetail.countryCode",
         "CellDetail.tier",
-        "CellDetail.status",
-        "CellDetail.cloudProvider",
-        "CellDetail.cloudRegion",
-        "CellDetail.apiEndpoint"
+        "CellDetail.status"
        ],
        "operation": "getCell",
        "provenance": "contract subscription.yaml GET /cells/{cellId}"
@@ -960,7 +930,7 @@
    "error": "Could not load. Names which read failed and leaves the cross-tenant health untouched.",
    "emptyFirstRun": "No cross-tenant health yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellHealth` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellHealth` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `cancelDecommission`, `decommissionCell`, `updateCellTier`."
   },
   "apis": [
    {
@@ -1038,7 +1008,7 @@
    "derivedFrom": "wireframes/reference/Dashboards Board.dc.html",
    "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "getCrossRegionEntitlement",
@@ -1124,7 +1094,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-004 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-004 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -1223,17 +1193,10 @@
        "label": "Every AI interaction",
        "bindsTo": "AiInteraction",
        "columns": [
-        "AiInteraction.id",
-        "AiInteraction.conversationId",
-        "AiInteraction.principalId",
         "AiInteraction.audience",
-        "AiInteraction.subjectId",
-        "AiInteraction.billableToTenantId",
-        "AiInteraction.scopePath",
         "AiInteraction.capability",
         "AiInteraction.prompt",
         "AiInteraction.response",
-        "AiInteraction.sources",
         "AiInteraction.outcome"
        ],
        "operation": "listAiInteractions",
@@ -1256,22 +1219,14 @@
        "label": "The selected AI interaction",
        "bindsTo": "AiInteraction",
        "columns": [
-        "AiInteraction.id",
-        "AiInteraction.conversationId",
-        "AiInteraction.principalId",
         "AiInteraction.audience",
-        "AiInteraction.subjectId",
-        "AiInteraction.billableToTenantId",
-        "AiInteraction.scopePath",
         "AiInteraction.capability",
         "AiInteraction.prompt",
         "AiInteraction.response",
         "AiInteraction.sources",
         "AiInteraction.outcome",
         "AiInteraction.refusalReason",
-        "AiInteraction.provider",
-        "AiInteraction.model",
-        "AiInteraction.promptTokens"
+        "AiInteraction.provider"
        ],
        "operation": "listAiInteractions",
        "provenance": "contract ai.yaml GET /interactions"
@@ -1285,7 +1240,7 @@
    "error": "Could not load. Names which read failed and leaves the platform audit log untouched.",
    "emptyFirstRun": "No platform audit log yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on principalId, outcome, from and the platform audit log are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `AI_AUDIT_VIEW`, which `listAiInteractions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `AI_AUDIT_VIEW`, which `listAiInteractions` requires to show this screen, and names that permission (the screen's other reads need `AUDIT_VIEW`, `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`, `openPlatformStaffGrant`.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_AUDIT_VIEW`, `AUDIT_VIEW`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
@@ -1342,7 +1297,9 @@
    "params": [
     {
      "name": "decisionRecordId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiInteractions` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "tenantId",
@@ -1356,7 +1313,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-004"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formOpenPlatformStaffGrant",
@@ -1432,7 +1389,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-013 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-013 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -1513,22 +1470,14 @@
        "label": "The cell",
        "bindsTo": "CellDetail",
        "columns": [
-        "CellDetail.id",
         "CellDetail.name",
         "CellDetail.kind",
-        "CellDetail.clusterId",
-        "CellDetail.isReachable",
         "CellDetail.lastContactAt",
         "CellDetail.licenceExpiresAt",
-        "CellDetail.participatesInCrossCell",
-        "CellDetail.regionId",
         "CellDetail.regionName",
         "CellDetail.countryCode",
         "CellDetail.tier",
-        "CellDetail.status",
-        "CellDetail.cloudProvider",
-        "CellDetail.cloudRegion",
-        "CellDetail.apiEndpoint"
+        "CellDetail.status"
        ],
        "operation": "getCell",
        "provenance": "contract subscription.yaml GET /cells/{cellId}"
@@ -1628,7 +1577,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-013"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "cancelDecommission",
@@ -1702,7 +1651,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-029 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-029 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -1792,22 +1741,14 @@
        "label": "The cell",
        "bindsTo": "CellDetail",
        "columns": [
-        "CellDetail.id",
         "CellDetail.name",
         "CellDetail.kind",
-        "CellDetail.clusterId",
-        "CellDetail.isReachable",
         "CellDetail.lastContactAt",
         "CellDetail.licenceExpiresAt",
-        "CellDetail.participatesInCrossCell",
-        "CellDetail.regionId",
         "CellDetail.regionName",
         "CellDetail.countryCode",
         "CellDetail.tier",
-        "CellDetail.status",
-        "CellDetail.cloudProvider",
-        "CellDetail.cloudRegion",
-        "CellDetail.apiEndpoint"
+        "CellDetail.status"
        ],
        "operation": "getCell",
        "provenance": "contract subscription.yaml GET /cells/{cellId}"
@@ -1849,19 +1790,14 @@
        "label": "The rollout",
        "bindsTo": "RolloutDetail",
        "columns": [
-        "RolloutDetail.id",
-        "RolloutDetail.releaseId",
         "RolloutDetail.environment",
         "RolloutDetail.status",
         "RolloutDetail.cellsTotal",
         "RolloutDetail.cellsComplete",
         "RolloutDetail.cellsFailed",
-        "RolloutDetail.startedByPrincipalId",
-        "RolloutDetail.approvedByPrincipalId",
         "RolloutDetail.pausedReason",
         "RolloutDetail.startedAt",
-        "RolloutDetail.completedAt",
-        "RolloutDetail.cells"
+        "RolloutDetail.completedAt"
        ],
        "operation": "getRollout",
        "provenance": "contract platform-ops.yaml GET /rollouts/{rolloutId}"
@@ -1955,7 +1891,7 @@
    "error": "Could not load. Names which read failed and leaves the deployment untouched.",
    "emptyFirstRun": "No deployment yet. Offers Start rollout (`startRollout`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listCellJobs` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listCellJobs` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_RELEASE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_PROMOTE` for `pauseRollout`, `rollbackRollout`, `startRollout`.",
    "rolloutPendingApproval": "**Requested, not moved.** `startRollout` answered 202: the rollout shows the stage it has reached, the stage requested and that a `releasePromotion` approval is pending with the platform release manager. The requester sees no approve action for their own request (decided 28 September, audit R144)."
   },
   "apis": [
@@ -2042,7 +1978,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-029"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 12 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "cancelDecommission",

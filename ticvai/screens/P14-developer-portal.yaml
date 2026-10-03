@@ -384,6 +384,7 @@ screens:
       operation: requestProductionAccess
       carries:
       - listingId
+      - requestId
   notes: 'CF-135a. **The one credential model** — 2.7.52, 7.1.25 and 7.1.30 each asserted their own. **Rotation
     carries an overlap window and revocation does not**: one is hygiene, the other is what you reach for
     when a secret has leaked, and a grace period defeats it.
@@ -1171,6 +1172,8 @@ screens:
       trigger: TICVAI reviews the integration and certifies it
       provenance: flow F36 step 2→3
       operation: submitIntegrationListing
+      carries:
+      - listingId
   notes: '13.1.49 and 13.1.50, decision D1. **A listing, not an installation** — the integration runs
     on the developer''s own infrastructure, and third-party code does not execute inside TICVAI.
 

@@ -1,6 +1,6 @@
 # P06-operations-03 — P06 · Operations (3 of 5)
 
-**10 screens · 47 operations · 73 schemas · 22 permissions**
+**10 screens · 50 operations · 77 schemas · 23 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -48,10 +48,10 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 22 permissions apply here:
-  `AI_USE, ATTENDANCE_RECORD, CAPACITY_CONFIGURE, CASE_MANAGE, CASE_VIEW, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE, ORDER_MODIFY`…. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 23 permissions apply here:
+  `AI_USE, ATTENDANCE_RECORD, CAPACITY_CONFIGURE, CASE_MANAGE, CASE_VIEW, GUEST_VIEW, INCIDENT_MANAGE, INCIDENT_REPORT, INCIDENT_VIEW, ORDER_CREATE, ORDER_DISCOUNT, ORDER_EXCHANGE`…. A control nobody can use must say so,
   not sit enabled and fail.
-- **21 of these operations work offline**: addCaseMessage, applyManualDiscount, createCase, createOrder, getOrder, getProduct, getQueue, getVenueMap
+- **22 of these operations work offline**: addCaseMessage, addIncidentPerson, applyManualDiscount, createCase, createOrder, getOrder, getProduct, getQueue
   — and the rest do not. A surface that looks the same online and off is lying.
 - **Do not invent an operation.** If a screen needs something `operations.json` does not have, that
   is a finding worth reporting, not a gap to fill with a plausible endpoint.
@@ -178,16 +178,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `EMP-031` | Queue monitor | B–D | 10 | 56 | 6 | 19 | 1 | 6 | — | notStarted (generated) |
-| `EMP-032` | Manual wait entry | B–D | 3 | 16 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
-| `EMP-033` | Capacity view | B–D | 3 | 30 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
-| `EMP-034` | Walk-up sale | B–D | 127 | 87 | 6 | 93 | 1 | 0 | — | notStarted (generated) |
-| `EMP-025` | Break management | B–D | 9 | 27 | 6 | 4 | 2 | 0 | — | notStarted (generated) |
-| `EMP-026` | Incident report | B–D | 18 | 44 | 6 | 10 | 1 | 0 | — | notStarted (generated) |
-| `EMP-027` | Incident detail | B–D | 16 | 44 | 7 | 1 | 0 | 0 | — | notStarted (generated) |
-| `EMP-028` | Lost & found | B–D | 32 | 44 | 6 | 13 | 1 | 0 | — | notStarted (generated) |
-| `EMP-029` | Guest assistance | B–D | 60 | 72 | 6 | 23 | 1 | 0 | — | notStarted (generated) |
-| `EMP-030` | Venue map | B–D | 0 | 3 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
+| `EMP-031` | Queue monitor | D | 10 | 23 | 6 | 19 | 1 | 6 | — | notStarted (generated) |
+| `EMP-032` | Manual wait entry | A | 3 | 10 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
+| `EMP-033` | Capacity view | B | 3 | 14 | 6 | 3 | 0 | 0 | — | notStarted (generated) |
+| `EMP-034` | Walk-up sale | C | 127 | 34 | 6 | 93 | 1 | 0 | — | notStarted (generated) |
+| `EMP-025` | Break management | D | 9 | 9 | 6 | 4 | 2 | 0 | — | notStarted (generated) |
+| `EMP-026` | Incident report | A | 29 | 14 | 6 | 10 | 1 | 0 | — | notStarted (generated) |
+| `EMP-027` | Incident detail | D | 20 | 14 | 7 | 1 | 0 | 0 | — | notStarted (generated) |
+| `EMP-028` | Lost & found | D | 32 | 14 | 6 | 13 | 1 | 0 | — | notStarted (generated) |
+| `EMP-029` | Guest assistance | D | 64 | 23 | 6 | 23 | 1 | 0 | — | notStarted (generated) |
+| `EMP-030` | Venue map | C | 0 | 3 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -207,7 +207,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `queue` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-031 |
 | Who uses it | venue staff holding `AI_USE`, `QUEUE_MANAGE`, `QUEUE_VIEW` (1 operate, 1 configure, 1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listQueues` reads the population and `getQueue` reads one of them — list, select, act |
@@ -281,33 +281,17 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 |---|---|---|
 | Code | text | — |
 | Name | in the reader's language | — |
-| Venue | the name it points at, never the id | — |
-| Attraction product | the name it points at, never the id | — |
-| Asset | the image or video | The ride. Taking it out of service closes this queue rather than leaving guests holding positions for something that is not running. |
-| Access point | the name it points at, never the id | — |
 | Kind | chip: Standby, Single rider, Fast pass, Virtual, Accessible, Group only… | 5.6.x. A ride has several queues and the model had one. |
-| Operating windows | list or chips (count when long) | When the queue runs, which is not when the venue is open. A ride closing an hour early for maintenance leaves a queue accepting guests for … |
-| Parent queue | the name it points at, never the id | Where several queues share one capacity. The standby and single-rider lines at one ride draw from the same cycles, and a parent is how that … |
-| Load balance with queues | list or chips (count when long) | BL-137. Two rides with the same theme and different waits, and nothing directed a guest to the shorter one. |
-| In queue offer enabled | yes / no (icon or chip) | A guest with twenty minutes to wait is a guest with twenty minutes to buy something. |
 | Notify before call minutes | 1,234 | BL-017, 19.2.61. A guest was not told their turn was approaching, which makes a virtual queue worse than a physical one — at least a line … |
 
 **Every waiting guest** (data table, from `listQueueEntries`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The client-generated UUIDv7 from `JoinQueueRequest.id`, and the `entryId` every entry path takes. |
-| Queue | the name it points at, never the id | — |
 | Queue name | in the reader's language | — |
-| Subject | the name it points at, never the id | — |
 | Party number | 1,234 | What the guest sees and what appears on signage. |
-| Party size | 1,234 | — |
 | Status | chip: Waiting, Called, Redeemed, Expired, No show, Cancelled… | — |
-| Position in queue | 1,234 | — |
-| Parties ahead | 1,234 | — |
 | Estimated call at | 1 Oct 2026, 14:30 | — |
-| Is fast pass | yes / no (icon or chip) | — |
-| Entitlement | text | — |
 
 **The selected queue** (detail panel, from `listQueues`)
 
@@ -315,36 +299,19 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 |---|---|---|
 | Code | text | — |
 | Name | in the reader's language | — |
-| Venue | the name it points at, never the id | — |
-| Attraction product | the name it points at, never the id | — |
-| Asset | the image or video | The ride. Taking it out of service closes this queue rather than leaving guests holding positions for something that is not running. |
-| Access point | the name it points at, never the id | — |
-| Kind | chip: Standby, Single rider, Fast pass, Virtual, Accessible, Group only… | 5.6.x. A ride has several queues and the model had one. |
-| Operating windows | list or chips (count when long) | When the queue runs, which is not when the venue is open. A ride closing an hour early for maintenance leaves a queue accepting guests for … |
-| Parent queue | the name it points at, never the id | Where several queues share one capacity. The standby and single-rider lines at one ride draw from the same cycles, and a parent is how that … |
-| Load balance with queues | list or chips (count when long) | BL-137. Two rides with the same theme and different waits, and nothing directed a guest to the shorter one. |
-| In queue offer enabled | yes / no (icon or chip) | A guest with twenty minutes to wait is a guest with twenty minutes to buy something. |
 | Notify before call minutes | 1,234 | BL-017, 19.2.61. A guest was not told their turn was approaching, which makes a virtual queue worse than a physical one — at least a line … |
 | Capacity per cycle | 1,234 | — |
 | Cycle minutes | 1,234.5 | — |
-| Max party size | 1,234 | — |
-| Return window minutes | 1,234 | How long a called party has to arrive before the entry expires. |
 
 **The wait time** (detail panel, from `getWaitTimes`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Queue | the name it points at, never the id | — |
 | Queue name | in the reader's language | — |
-| Attraction product | the name it points at, never the id | — |
-| Attraction category | the name it points at, never the id | The catalogue `ProductCategory` the attraction product is filed under — the value the `category` filter on `getWaitTimes` matches. |
 | Status | chip: Open, Paused, Closed, At capacity | — |
 | Wait minutes | 1,234 | Null where the queue is closed or no estimate is available. |
 | Source | chip: Sensor, Throughput, Manual, Unavailable | Where the estimate came from. Surfaced so an operator knows whether a figure is measured or guessed. |
-| Is stale | yes / no (icon or chip) | The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as … |
 | Height requirement cm | 1,234 | — |
-| Zone | text | — |
-| As of | 1 Oct 2026, 14:30 | When the figure was produced — the queue's `waitTimeAsOf`. |
 
 **The queue** (detail panel, from `getQueue`)
 
@@ -389,7 +356,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the queue untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No queue yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, openOnly and the queue are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `requestSuggestion`; `QUEUE_MANAGE` for `callNextParties`, `setQueueStatus`, `setWaitTime`. |
 | Offline (`?state=offline`) | Last synced view with its age |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 A setting the answer cannot do without is missing (29 September, AI functions review). (AiMissingSettingProblem) |
 
@@ -425,7 +392,7 @@ cards:
 - `setWaitTime` → `QUEUE_MANAGE` (configure) · staff
 - `requestSuggestion` → `AI_USE` (operate) · staff, guest
 
-**A refused user sees:** Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `QUEUE_VIEW`, which `listQueues` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `requestSuggestion`; `QUEUE_MANAGE` for `callNextParties`, `setQueueStatus`, `setWaitTime`.
 
 #### Requirements it meets
 
@@ -468,13 +435,14 @@ Also apply: 1 for P06 · Operations, 12 for all of P06, 29 for every app (sectio
 
 - Wireframe frame: `wireframes/P06 Venue Staff App.dc.html#emp-031` · status **notStarted** · provenance generated
 - Flow F67 *A queue is monitored and capacity is held*, step 1: The supervisor reads the queue. → **Adaptor-first** (ADR-0012): the reading comes from whatever queue system the venue runs, and the platform holds what it reports.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0020 *— Where AI runs, and what it is isolated from* (`docs/adr/0020-ai-isolation-boundary.md`)
 - ADR-0012 *Queue Integration — Adaptor-First, Vendor Deferred* (`docs/adr/0012-queue-integration-adaptor-first.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (10), with its required mark, default, format and its error state (403, 404, 422).
-- [ ] Every output is drawn (56 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (23 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-031?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Call next parties, Save queue status, Save wait time.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`, `EMP-032`.
@@ -493,8 +461,8 @@ Also apply: 1 for P06 · Operations, 12 for all of P06, 29 for every app (sectio
 | | |
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
-| Module | Operations · wave 2 · needs the `queue` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Operations · wave 1 · needs the `queue` module |
+| Block | Block A · task APP-STAFF-EMP-032 |
 | Who uses it | venue staff holding `QUEUE_MANAGE`, `QUEUE_VIEW` (1 configure, 1 read); in the flows as guest, supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listQueueEntries` reads the population and `getWaitTimes` reads one of them — list, select, act |
@@ -552,17 +520,11 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 
 | Shows | Format | Notes |
 |---|---|---|
-| Queue | the name it points at, never the id | — |
 | Queue name | in the reader's language | — |
-| Attraction product | the name it points at, never the id | — |
-| Attraction category | the name it points at, never the id | The catalogue `ProductCategory` the attraction product is filed under — the value the `category` filter on `getWaitTimes` matches. |
 | Status | chip: Open, Paused, Closed, At capacity | — |
 | Wait minutes | 1,234 | Null where the queue is closed or no estimate is available. |
 | Source | chip: Sensor, Throughput, Manual, Unavailable | Where the estimate came from. Surfaced so an operator knows whether a figure is measured or guessed. |
-| Is stale | yes / no (icon or chip) | The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as … |
 | Height requirement cm | 1,234 | — |
-| Zone | text | — |
-| As of | 1 Oct 2026, 14:30 | When the figure was produced — the queue's `waitTimeAsOf`. |
 
 **Actions and what each produces**
 
@@ -652,7 +614,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (3), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-032?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save wait time.
 - [ ] Every transition is wired: `EMP-033`, `EMP-001`, `EMP-002`, `EMP-003`, `BO-005`.
@@ -671,7 +633,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-STAFF-EMP-033 |
 | Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listChannelCapacities` reads the population and `getChannelAllocations` reads one of them — list, select, act |
@@ -712,41 +674,25 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Performance | the name it points at, never the id | — |
 | Name | text | — |
-| Seat category | the name it points at, never the id | — |
-| Oversell allowance | 1,234 | BL-046, 1.3.13. The guard existed in one direction — an envelope could be raised freely and refused reduction below what had sold. |
-| Oversell basis | chip: Fixed count, Historic no show rate, Percentage | — |
 | Capacity | 1,234 | — |
 | Sold | 1,234 | Units sold. Maintained on write (decided 29 September, SD-023): raised by `convertInventoryHold` in the order transaction and by … |
-| Leased | 1,234 | Units in `active` holds, not yet sold. Raised at acquire, lowered at conversion, release, force-release and expiry (SD-023). |
 | Remaining | 1,234 | What can still be held. Decremented at the hold with a guarded statement (`remaining >= n`) under the row lock, never at the sale, so two … |
-| Has channel allocations | yes / no (icon or chip) | True where capacity is divided across channels. Leases then draw from a channel allocation rather than from raw capacity. |
-| Is seated | yes / no (icon or chip) | Seated envelopes cannot be leased and are blocked offline. A seat map is not a count. |
 
 **The selected channel capacity** (detail panel, from `listChannelCapacities`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Performance | the name it points at, never the id | — |
 | Name | text | — |
-| Seat category | the name it points at, never the id | — |
 | Oversell allowance | 1,234 | BL-046, 1.3.13. The guard existed in one direction — an envelope could be raised freely and refused reduction below what had sold. |
-| Oversell basis | chip: Fixed count, Historic no show rate, Percentage | — |
 | Capacity | 1,234 | — |
 | Sold | 1,234 | Units sold. Maintained on write (decided 29 September, SD-023): raised by `convertInventoryHold` in the order transaction and by … |
-| Leased | 1,234 | Units in `active` holds, not yet sold. Raised at acquire, lowered at conversion, release, force-release and expiry (SD-023). |
 | Remaining | 1,234 | What can still be held. Decremented at the hold with a guarded statement (`remaining >= n`) under the row lock, never at the sale, so two … |
-| Has channel allocations | yes / no (icon or chip) | True where capacity is divided across channels. Leases then draw from a channel allocation rather than from raw capacity. |
-| Is seated | yes / no (icon or chip) | Seated envelopes cannot be leased and are blocked offline. A seat map is not a count. |
 
 **The channel allocation set** (detail panel, from `getChannelAllocations`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Channel capacity | the name it points at, never the id | — |
 | Capacity | 1,234 | — |
 | Allocations | list or chips (count when long) | — |
 | General pool units | 1,234 | Unallocated remainder. Any channel may draw from it once its own allocation is exhausted. |
@@ -779,7 +725,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the capacity untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No capacity yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on performanceId and the capacity are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE` for `relinquishChannelAllocation`. |
 | Offline (`?state=offline`) | Last synced, with age |
 
 #### Sample data for the mock-up
@@ -798,7 +744,7 @@ sessions:
 - `getChannelAllocations` → `PRODUCT_VIEW` (read) · staff, partner
 - `relinquishChannelAllocation` → `CAPACITY_CONFIGURE` (configure) · staff, partner
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE` for `relinquishChannelAllocation`.
 
 #### Requirements it meets
 
@@ -829,7 +775,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (3), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-033?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Release channel allocation.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`.
@@ -847,7 +793,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-034 |
 | Who uses it | venue staff holding `ORDER_CREATE`, `ORDER_DISCOUNT`, `ORDER_EXCHANGE`, `ORDER_MODIFY`, `ORDER_REFUND`, `ORDER_REPRINT`… (8 operate, 2 read); in the flows as cashier |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listProducts` reads the population and `getOrder` reads one of them — list, select, act |
@@ -1107,104 +1053,62 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Kind | chip: Admission, Timed admission, Dated admission, Open dated, Seated, Membership… | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Created by principal | the name it points at, never the id | 1.4.18. The approval gate refuses an approver who is the author, and nothing recorded either. |
-| Approved by principal | the name it points at, never the id | — |
-| Responsible department | the name it points at, never the id | Who owns this product commercially. A scope node at `department` level. |
 | On sale from | 1 Oct 2026, 14:30 | 1.4.8. A seasonal product should not need somebody awake at midnight. |
-| On sale to | 1 Oct 2026, 14:30 | Retires the product automatically. Retirement is not deletion — the product stops selling and every order that referenced it still resolves. |
 
 **Every alternative code** (data table, from `listAlternativeCodes`)
 
 | Shows | Format | Notes |
 |---|---|---|
 | Code | text | — |
-| Partner | the name it points at, never the id | — |
 | Partner name | text | — |
-| Variant | the name it points at, never the id | — |
 | Note | text | — |
 
 **Every refund** (data table, from `listOrderRefunds`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | — |
-| Batch | the name it points at, never the id | The `RefundBatch` that raised this refund, where `createBulkRefund` did. Null for a refund raised on its own. |
 | FX rate | text | The rate on the original payment, not today's (BL-087, CF-118). `Payment` records `tenderCurrency`, `fxRate` and `fxRateSource` at the … |
-| Tax reversal entry | the name it points at, never the id | A refund reverses the tax entry it created, and this is where that is stated rather than implied. |
-| Settle to | chip: Original tender, Advance balance, Wire transfer, Store credit | BL-086. A refund could only go back the way it came. |
-| FX variance | AED 1,234.50 | Where the sale rate and the current rate differ, the difference is booked as an FX variance rather than hidden in the refund. |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Applied percentage | 1,234.5 | From the venue's time bands, or an approver override. |
 | Status | chip: Pending approval, Pending gateway, Completed, Declined, Failed | — |
-| Reason | text | — |
-| Requested by principal | the name it points at, never the id | — |
 
 **Every order** (data table, from `listOrders`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Order number | text | — |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
-| Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | The same vocabulary as `Order.channel`, which this projects. |
 | Line count | 1,234 | — |
-| Principal | the name it points at, never the id | The cashier who raised it — what the held-orders list shows. |
 | Hold label | text | As `Order.holdLabel`. |
-| Held until | 1 Oct 2026, 14:30 | As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse. |
 
 **Every product variant** (data table, from `listProductVariants`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Product | the name it points at, never the id | — |
 | SKU | text | — |
 | Axis values | grouped details | — |
 | Name | text | Taken from their variant tables, 20 September. `axisValues` gives `{size: L}` and no string a guest can read. |
 | Barcode | text | Taken from their variant tables, 20 September. `catalogue.alternative_code` is a partner's own code for a variant and requires `partnerId` … |
-| Is default | yes / no (icon or chip) | Taken from their variant tables. Which variant a product page opens on. |
-| Is active | yes / no (icon or chip) | False when retired. Retired variants are never deleted — orders reference them. |
 
 **The selected product** (detail panel, from `getProduct`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
 | Kind | chip: Admission, Timed admission, Dated admission, Open dated, Seated, Membership… | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Created by principal | the name it points at, never the id | 1.4.18. The approval gate refuses an approver who is the author, and nothing recorded either. |
-| Approved by principal | the name it points at, never the id | — |
-| Responsible department | the name it points at, never the id | Who owns this product commercially. A scope node at `department` level. |
-| On sale from | 1 Oct 2026, 14:30 | 1.4.8. A seasonal product should not need somebody awake at midnight. |
-| On sale to | 1 Oct 2026, 14:30 | Retires the product automatically. Retirement is not deletion — the product stops selling and every order that referenced it still resolves. |
-| Category | the name it points at, never the id | Taken from their `fnb.product` and `retail.product`, 20 September. `catalogue.product_category` has existed since 20 August with two … |
 | Lifecycle state | chip: Draft, In review, Approved, Live, Withdrawn, Archived | — |
-| Is sellable | yes / no (icon or chip) | True only when live and carried by a published bundle. Approval and publication are different acts. |
-| Is stock tracked | yes / no (icon or chip) | Taken from their `fnb.product`, 20 September. Whether a sale decrements stock, which is not what `isSellable` asks. |
 
 **The order statement** (detail panel, from `getOrderStatement`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Order | the name it points at, never the id | — |
 | Order number | text | — |
 | Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Entries | list or chips (count when long) | Sequential. What an agent reads to a guest asking about a charge. |
 | Total paid | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Total refunded | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Current balance | AED 1,234.50 | Positive means the guest owes; negative means a refund is outstanding. |
@@ -1213,22 +1117,11 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The client UUIDv7 from `CreateOrderRequest.id`. |
 | Order number | text | The number a guest reads and a cashier types. Server-assigned: the venue prefix and a sequence per venue, for example `DXB1-000123` … |
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Net amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Total price variance | AED 1,234.50 | Sum across lines. Zero on a normal order. |
-| Lines | list or chips (count when long) | — |
-| Payments | list or chips (count when long) | — |
-| Principal | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
@@ -1270,7 +1163,7 @@ Errors to draw in the form: 409 Target performance is unavailable (`targetUnavai
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the walk-up sale untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No walk-up sale yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, kind, isSellable and the walk-up sale are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createOrder`; `ORDER_DISCOUNT` for … |
 | Offline (`?state=offline`) | **Cash only offline.** Card completes nowhere the acquirer saw it |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 400 Validation failed; 409 A lease covering a line has expired (`leaseExpired`), capacity is exhausted (`capacityExhausted`), or the catalogue bundle the client priced from is beyond its … (OrderRefusedProblem); 409 A targeted line's … |
 
@@ -1306,14 +1199,14 @@ sale: Day Pass · Adult × 2 · AED 490 · card
 - `listOrders` → `ORDER_VIEW` (read) · staff, guest, partner
 - `listProductVariants` → `PRODUCT_VIEW` (read) · staff, guest, partner
 - `modifyOrder` → `ORDER_MODIFY` (operate) · staff, partner
-- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner
+- `reprintOrder` → `ORDER_REPRINT` (operate) · staff, guest, partner, device
 - `rescheduleOrder` → `ORDER_RESCHEDULE` (operate) · staff, partner
 - `resolveProductByCode` → `PRODUCT_VIEW` (read) · staff, partner
 - `resumeOrder` → `ORDER_MODIFY` (operate) · staff, partner
 - `voidOrder` → `ORDER_VOID` (operate) · staff, partner
 - `splitOrder` → `ORDER_MODIFY` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createOrder`; `ORDER_DISCOUNT` for …
 
 #### Requirements it meets
 
@@ -1351,12 +1244,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 - Wireframe frame: `wireframes/P06 Venue Staff App.dc.html#emp-034` · status **notStarted** · provenance generated
 - Flow F66 *A walk-up sale is taken on a handheld*, step 1: The seller finds the product and takes the order. → **The same catalogue bundle the tills hold.** A roaming seller quoting a different price from the window ten metres away is a complaint.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (127), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (87 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (34 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-034?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Create order, Apply manual discount, Create refund, Exchange order lines, Hold order, Modify order, Reprint order, Reschedule order, Resolve product by code, Resume order, Void order, Split order.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`, `EMP-036`, `EMP-035`.
@@ -1375,7 +1269,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-025 |
 | Who uses it | venue staff holding `ATTENDANCE_RECORD`, `WORKFORCE_VIEW` (1 operate, 1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listAttendance` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1436,38 +1330,20 @@ Errors to draw in the form: 409 Out of sequence — a clock-out with no clock-in
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
-| Assignment | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
 | Kind | chip: Clock in, Clock out, Break start, Break end | — |
 | Occurred at | 1 Oct 2026, 14:30 | Device time — when it happened. |
 | Recorded at | 1 Oct 2026, 14:30 | When the server received it. Both are kept: a steward clocking in offline at a gate is not late because the sync was. |
-| Access point | the name it points at, never the id | — |
 | Latitude | 1,234.5 | — |
-| Longitude | 1,234.5 | — |
-| Is amended | yes / no (icon or chip) | — |
-| Amended by principal | the name it points at, never the id | Who made the latest amendment. The full history is `amendments` (audit R129 (7)). |
 
 **The selected attendance** (detail panel, from `listAttendance`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
-| Assignment | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
 | Kind | chip: Clock in, Clock out, Break start, Break end | — |
 | Occurred at | 1 Oct 2026, 14:30 | Device time — when it happened. |
 | Recorded at | 1 Oct 2026, 14:30 | When the server received it. Both are kept: a steward clocking in offline at a gate is not late because the sync was. |
-| Access point | the name it points at, never the id | — |
 | Latitude | 1,234.5 | — |
-| Longitude | 1,234.5 | — |
-| Is amended | yes / no (icon or chip) | — |
-| Amended by principal | the name it points at, never the id | Who made the latest amendment. The full history is `amendments` (audit R129 (7)). |
-| Amendment reason | text | The latest amendment's reason. The full history is `amendments` (audit R129 (7)). |
 | Original occurred at | 1 Oct 2026, 14:30 | The original is never overwritten. Attendance feeds pay, and a record that can be quietly rewritten is not evidence. |
-| Exception | chip: Late, Early leave, Missing clock out, No show, Out of geofence, Unscheduled | Computed against the rota. Null where the record matches what was expected. |
 
 **Actions and what each produces**
 
@@ -1503,7 +1379,7 @@ Errors to draw in the form: 409 Out of sequence — a clock-out with no clock-in
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the break untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No break yet. Offers Record attendance (`recordAttendance`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on date, principalId, exceptionsOnly and the break are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORKFORCE_VIEW`, which `listAttendance` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORKFORCE_VIEW`, which `listAttendance` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ATTENDANCE_RECORD` for `recordAttendance`. |
 | Offline (`?state=offline`) | Queues locally |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Out of sequence — a clock-out with no clock-in, or a second clock-in. Reported rather than silently corrected. |
 
@@ -1536,7 +1412,7 @@ breaks:
 - `recordAttendance` → `ATTENDANCE_RECORD` (operate) · staff
 - `listAttendance` → `WORKFORCE_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `WORKFORCE_VIEW`, which `listAttendance` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `WORKFORCE_VIEW`, which `listAttendance` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ATTENDANCE_RECORD` for `recordAttendance`.
 
 #### Requirements it meets
 
@@ -1570,7 +1446,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (9), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-025?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Record attendance.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`.
@@ -1591,8 +1467,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `maintenance` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `INCIDENT_REPORT`, `INCIDENT_VIEW` (1 operate, 1 read); in the flows as supervisor, technician |
+| Block | Block A · task APP-STAFF-EMP-026 |
+| Who uses it | venue staff holding `GUEST_VIEW`, `INCIDENT_REPORT`, `INCIDENT_VIEW` (2 read, 1 operate); in the flows as supervisor, technician |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listIncidents` reads the population and `getIncident` reads one of them — list, select, act |
 | Offline | Queues locally with the highest sync priority |
@@ -1629,6 +1505,8 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Severity | radio group | optional | — | Near miss · Minor · Moderate · Major · Critical | — | Sends `?severity=` to `listIncidents`. | `listIncidents` ?severity |
 | Status | radio group | optional | — | Reported · Under investigation · Action required · Closed | — | Sends `?status=` to `listIncidents`. | `listIncidents` ?status |
 | Is reportable | toggle | optional | — | — | — | Sends `?isReportable=` to `listIncidents`. | `listIncidents` ?isReportable |
+| Photos | text area | optional | — | max length 256 | — | From the camera or the gallery, several at once; each uploads as it is added and can be removed before the report is sent. | `UploadIncidentMediaRequest.filename` |
+| Find the guest involved | text field | optional | — | Requires `GUEST_VIEW_PII`: matching on personal data discloses it, so a caller without that permission who passes `search` is refused with 403 rather than having the parameter ignored. | — | Sends `?search=` to `searchGuests`. Optional, inside Add a person involved: a guest found here fills name and contact from the guest's record, so the person is linked rather than typed again. | `searchGuests` ?search |
 
 **Form: Report incident** (modal, opened by *Report incident*; *Report incident* calls `reportIncident`, *Cancel* sends nothing)
 
@@ -1654,6 +1532,24 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 Errors to draw in the form: 400 Validation failed
 
+**Form: Add a person involved** (modal, opened by *Add a person involved*; *Add person* calls `addIncidentPerson`, *Cancel* sends nothing)
+
+**A person involved in the incident** (decided by Chinmay, 3 October 2026 (CHG-SPF-013)): name, role (guest, staff, contractor, other) and contact, with an optional guest lookup (`searchGuests`) that fills them from the guest's record. Stored as a PII subject; the consent rules apply, so contact details are asked only with the purpose shown. Dismissing sends nothing; the screen behind is unchanged.
+
+| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
+|---|---|---|---|---|---|---|---|
+| Role `role` | radio group | required | — | Injured · Involved · Witness · Reporter | — | The person's part in the incident. | `addIncidentPerson` body |
+| Party type `partyType` | radio group | optional | Guest | Guest · Public member · Staff · Contractor | — | — | `addIncidentPerson` body |
+| Name `name` | text field | optional | — | max length 200 | — | Written to the erasable store (`pii.subject`), never to the incident (ADR-0023). | `addIncidentPerson` body |
+| Phone `phone` | phone field | optional | — | max length 32 | +971 5X XXX XXXX (E.164) | Stored only with `contactConsent` true. | `addIncidentPerson` body |
+| Email `email` | email field | optional | — | max length 254 | name@example.ae | Stored only with `contactConsent` true. | `addIncidentPerson` body |
+| Contact consent `contactConsent` | toggle | optional | off | — | — | The person agreed to be contacted about this incident (consent rules apply; CHG-RUL-013). | `addIncidentPerson` body |
+| Guest subject `guestSubjectId` | picker: choose a guest subject | optional | — | — | shows names, sends the id | A known guest, from the optional guest lookup; links their existing subject. | `addIncidentPerson` body |
+| Principal `principalId` | picker: choose a principal | optional | — | — | shows names, sends the id | A member of staff; a principal, not a PII subject. | `addIncidentPerson` body |
+| Note `note` | text area | optional | — | max length 2000 | — | — | `addIncidentPerson` body |
+
+Errors to draw in the form: 400 Neither a name, a guest nor a member of staff given, or more than one of `guestSubjectId` and `principalId`.; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path.; 409 The incident is closed (`incident-closed`); reopen it first (CHG-RUL-011).
+
 **Rules for these inputs** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
 - **Kind**: Large tiles with icons, in this order - Guest injured, Staff injured, Near miss, Property damage, Equipment failure, Security, Fire or evacuation, Food safety, Environmental, Other. Equipment failure offers "Also raise a fault for repair" after sending. *(source: contracts/satellite/maintenance.yaml#/components/schemas/IncidentKind / F69 step 1)*
@@ -1672,66 +1568,37 @@ Errors to draw in the form: 400 Validation failed
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Incident number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Kind | chip: Guest injury, Staff injury, Near miss, Property damage, Equipment failure, Security … | — |
 | Severity | chip: Near miss, Minor, Moderate, Major, Critical | — |
 | Status | chip: Reported, Under investigation, Action required, Closed | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Location description | text | — |
-| Is reportable | yes / no (icon or chip) | Requires notification to an external authority within a statutory window. |
-| Notification due at | 1 Oct 2026, 14:30 | — |
-| Notified at | 1 Oct 2026, 14:30 | The earliest `notifiedAt` among this incident's authority notifications. Maintained on write by `recordAuthorityNotification`; each … |
-| Assigned to principal | the name it points at, never the id | — |
 
 **The selected incident** (detail panel, from `listIncidents`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Incident number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | Kind | chip: Guest injury, Staff injury, Near miss, Property damage, Equipment failure, Security … | — |
 | Severity | chip: Near miss, Minor, Moderate, Major, Critical | — |
 | Status | chip: Reported, Under investigation, Action required, Closed | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Location description | text | — |
-| Is reportable | yes / no (icon or chip) | Requires notification to an external authority within a statutory window. |
-| Notification due at | 1 Oct 2026, 14:30 | — |
-| Notified at | 1 Oct 2026, 14:30 | The earliest `notifiedAt` among this incident's authority notifications. Maintained on write by `recordAuthorityNotification`; each … |
-| Assigned to principal | the name it points at, never the id | — |
-| Reported by principal | the name it points at, never the id | — |
-| Corrective work order | the name it points at, never the id | — |
-| Occurred at | 1 Oct 2026, 14:30 | — |
-| Recorded at | 1 Oct 2026, 14:30 | — |
 
 **The incident** (detail panel, from `getIncident`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Incident number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | Kind | chip: Guest injury, Staff injury, Near miss, Property damage, Equipment failure, Security … | — |
 | Severity | chip: Near miss, Minor, Moderate, Major, Critical | — |
 | Status | chip: Reported, Under investigation, Action required, Closed | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Location description | text | — |
-| Is reportable | yes / no (icon or chip) | Requires notification to an external authority within a statutory window. |
-| Notification due at | 1 Oct 2026, 14:30 | — |
-| Notified at | 1 Oct 2026, 14:30 | The earliest `notifiedAt` among this incident's authority notifications. Maintained on write by `recordAuthorityNotification`; each … |
-| Assigned to principal | the name it points at, never the id | — |
-| Reported by principal | the name it points at, never the id | — |
-| Corrective work order | the name it points at, never the id | — |
-| Occurred at | 1 Oct 2026, 14:30 | — |
-| Recorded at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Report incident (primary button) | `reportIncident` POST `/incidents` | ReportIncidentRequest | Incident | 400 Validation failed | works offline; opens modal first |
+| Add a person involved (secondary button) | `addIncidentPerson` POST `/incidents/{incidentId}/people` | AddIncidentPersonRequest | IncidentInvolvedParty | 400 Neither a name, a guest nor a member of staff given, or more than one of `guestSubjectId` and `principalId`.; 404 The resource does not exist, or is outside the caller's scope. This includes a parent in the path. … | works offline; opens modal first |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
 
@@ -1761,9 +1628,9 @@ Errors to draw in the form: 400 Validation failed
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the incident report untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | Nothing reported yet by you today. Offers Report incident. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on severity, status, isReportable and the incident report are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `INCIDENT_VIEW`, which `getIncident` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `INCIDENT_VIEW`, which `listIncidents` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_REPORT` for `reportIncident`. |
 | Offline (`?state=offline`) | Queues locally with the highest sync priority |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Content type not permitted, or size beyond the media store's limit for that kind.; 400 Neither a name, a guest nor a member of staff given, or more than one of `guestSubjectId` and `principalId`.; 400 Validation failed; 409 The incident is closed (`incident-closed`); reopen it first (CHG-RUL-011). |
 
 #### Edge cases to draw
 
@@ -1801,8 +1668,11 @@ report:
 - `reportIncident` → `INCIDENT_REPORT` (operate) · staff
 - `getIncident` → `INCIDENT_VIEW` (read) · staff
 - `listIncidents` → `INCIDENT_VIEW` (read) · staff
+- `uploadIncidentMedia` → `INCIDENT_REPORT` (operate) · staff
+- `addIncidentPerson` → `INCIDENT_REPORT` (operate) · staff
+- `searchGuests` → `GUEST_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `INCIDENT_VIEW`, which `getIncident` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `INCIDENT_VIEW`, which `listIncidents` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_REPORT` for `reportIncident`.
 
 #### Requirements it meets
 
@@ -1844,12 +1714,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (400, 404).
-- [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (29), with its required mark, default, format and its error state (400, 403, 404, 409).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-026?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Report incident.
+- [ ] Every action is wired with its success and its failure: Report incident, Add a person involved.
 - [ ] Every transition is wired: `EMP-004`, `EMP-001`, `EMP-002`, `EMP-003`, `EMP-027`.
-- [ ] Every gated control is gated: `INCIDENT_REPORT`, `INCIDENT_VIEW`.
+- [ ] Every gated control is gated: `GUEST_VIEW`, `INCIDENT_REPORT`, `INCIDENT_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 3 edge case(s) from the process notes are drawn.
 - [ ] The 2 decision(s) taken on this screen are drawn as decided, not as the old default.
@@ -1865,7 +1735,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `maintenance` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-027 |
 | Who uses it | venue staff holding `INCIDENT_MANAGE`, `INCIDENT_VIEW` (1 configure, 1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listIncidents` reads the population and `getIncident` reads one of them — list, select, act |
@@ -1915,8 +1785,12 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Corrective actions `correctiveActions` | text area | optional | — | max length 5000 | — | — | `updateIncident` body |
 | Corrective work order `correctiveWorkOrderId` | picker: choose a corrective work order | optional | — | — | shows names, sends the id | — | `updateIncident` body |
 | Attachment refs `attachmentRefs` | list of values (chips) | optional | — | — | — | — | `updateIncident` body |
+| Escalate `escalate` | group | optional | — | — | — | Escalate an incident under investigation (the optional Escalated step; CHG-RUL-011). | `updateIncident` body |
+| To principal `escalate.toPrincipalId` | picker: choose a to principal | required | — | — | shows names, sends the id | — | `updateIncident` body |
+| Reason `escalate.reason` | text area | required | — | min length 3; max length 1000 | — | — | `updateIncident` body |
+| Reason `reason` | text area | optional | — | min length 3; max length 1000 | — | Why the status changes. Required to reopen a closed incident (back to `underInvestigation`) and to close a `reported` one straight away (CHG-RUL-011). | `updateIncident` body |
 
-Errors to draw in the form: 400 Closure attempted without findings or a corrective action; 403 A critical incident closed by the person who completed its corrective action (`closer-completed-action`; workbook Q530; CHG-CSA-033).
+Errors to draw in the form: 400 Closure attempted without findings or a corrective action; 403 A critical incident closed by the person who completed its corrective action (`closer-completed-action`; workbook Q530; CHG-CSA-033).; 422 A move outside the incident flow (`incident-transition-not-allowed`; CHG-RUL-011): to `actionRequired`, from `closed` to anything but `underInvestigation`, a …
 
 **Form: Record authority notification** (modal, opened by *Record authority notification*; *Record authority notification* calls `recordAuthorityNotification`, *Cancel* sends nothing)
 
@@ -1948,66 +1822,36 @@ Errors to draw in the form: 409 The incident is not reportable (`isReportable` f
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Incident number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Kind | chip: Guest injury, Staff injury, Near miss, Property damage, Equipment failure, Security … | — |
 | Severity | chip: Near miss, Minor, Moderate, Major, Critical | — |
 | Status | chip: Reported, Under investigation, Action required, Closed | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Location description | text | — |
-| Is reportable | yes / no (icon or chip) | Requires notification to an external authority within a statutory window. |
-| Notification due at | 1 Oct 2026, 14:30 | — |
-| Notified at | 1 Oct 2026, 14:30 | The earliest `notifiedAt` among this incident's authority notifications. Maintained on write by `recordAuthorityNotification`; each … |
-| Assigned to principal | the name it points at, never the id | — |
 
 **The selected incident** (detail panel, from `listIncidents`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Incident number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | Kind | chip: Guest injury, Staff injury, Near miss, Property damage, Equipment failure, Security … | — |
 | Severity | chip: Near miss, Minor, Moderate, Major, Critical | — |
 | Status | chip: Reported, Under investigation, Action required, Closed | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Location description | text | — |
-| Is reportable | yes / no (icon or chip) | Requires notification to an external authority within a statutory window. |
-| Notification due at | 1 Oct 2026, 14:30 | — |
-| Notified at | 1 Oct 2026, 14:30 | The earliest `notifiedAt` among this incident's authority notifications. Maintained on write by `recordAuthorityNotification`; each … |
-| Assigned to principal | the name it points at, never the id | — |
-| Reported by principal | the name it points at, never the id | — |
-| Corrective work order | the name it points at, never the id | — |
-| Occurred at | 1 Oct 2026, 14:30 | — |
-| Recorded at | 1 Oct 2026, 14:30 | — |
 
 **The incident** (detail panel, from `getIncident`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Incident number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | Kind | chip: Guest injury, Staff injury, Near miss, Property damage, Equipment failure, Security … | — |
 | Severity | chip: Near miss, Minor, Moderate, Major, Critical | — |
 | Status | chip: Reported, Under investigation, Action required, Closed | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Location description | text | — |
-| Is reportable | yes / no (icon or chip) | Requires notification to an external authority within a statutory window. |
-| Notification due at | 1 Oct 2026, 14:30 | — |
-| Notified at | 1 Oct 2026, 14:30 | The earliest `notifiedAt` among this incident's authority notifications. Maintained on write by `recordAuthorityNotification`; each … |
-| Assigned to principal | the name it points at, never the id | — |
-| Reported by principal | the name it points at, never the id | — |
-| Corrective work order | the name it points at, never the id | — |
-| Occurred at | 1 Oct 2026, 14:30 | — |
-| Recorded at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Save incident (primary button) | `updateIncident` PATCH `/incidents/{incidentId}` | inline | Incident | 400 Closure attempted without findings or a corrective action; 403 A critical incident closed by the person who completed its corrective action (`closer-completed-action`; workbook Q530; CHG-CSA-033). | opens modal first |
+| Save incident (primary button) | `updateIncident` PATCH `/incidents/{incidentId}` | inline | Incident | 400 Closure attempted without findings or a corrective action; 403 A critical incident closed by the person who completed its corrective action (`closer-completed-action`; workbook Q530; CHG-CSA-033).; 422 A move … | opens modal first |
 | Record authority notification (secondary button) | `recordAuthorityNotification` POST `/incidents/{incidentId}/notify-authority` | inline | Incident | 409 The incident is not reportable (`isReportable` false, audit R106 (6)). | opens modal first |
 
 **Rules for what is shown** (from the Venue Operations (admission and access, accreditation, resources and capacity, workforce, maintenance and safety, games and rides, virtual queue) process; these refine the tables above and win where they differ)
@@ -2043,10 +1887,10 @@ Errors to draw in the form: 409 The incident is not reportable (`isReportable` f
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the incident untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No incident yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on severity, status, isReportable and the incident are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `INCIDENT_VIEW`, which `getIncident` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `INCIDENT_VIEW`, which `listIncidents` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_MANAGE` for `updateIncident`, `recordAuthorityNotification`. |
 | Offline (`?state=offline`) | Cached; updates queue |
 | Denied (`?state=denied`) | Closing was refused: you completed the corrective action on this critical incident, so another supervisor closes it (403 closer-completed-action; DEC-530). |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Closure attempted without findings or a corrective action; 409 The incident is not reportable (`isReportable` false, audit R106 (6)). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Closure attempted without findings or a corrective action; 409 The incident is not reportable (`isReportable` false, audit R106 (6)).; 422 A move outside the incident flow (`incident-transition-not-allowed`; CHG-RUL-011): to `actionRequired`, from `closed` to anything but `underInvestigation`, a … |
 
 #### Edge cases to draw
 
@@ -2084,7 +1928,7 @@ incident:
 - `listIncidents` → `INCIDENT_VIEW` (read) · staff
 - `recordAuthorityNotification` → `INCIDENT_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `INCIDENT_VIEW`, which `getIncident` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `INCIDENT_VIEW`, which `listIncidents` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_MANAGE` for `updateIncident`, `recordAuthorityNotification`.
 
 #### Requirements it meets
 
@@ -2113,8 +1957,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (16), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (20), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-027?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline, denied.
 - [ ] Every action is wired with its success and its failure: Save incident, Record authority notification.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`, `EMP-050`, `EMP-038`.
@@ -2135,7 +1979,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-028 |
 | Who uses it | venue staff holding `CASE_MANAGE`, `CASE_VIEW` (1 configure, 1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listCases` reads the population and `getCase` reads one of them — list, select, act |
@@ -2247,60 +2091,30 @@ Errors to draw in the form: 400 Resolving without a resolution note
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
 | Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
 | Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
-| Category | the name it points at, never the id | — |
 | Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
-| Priority | chip: Low, Normal, High, Urgent | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Related order | text | — |
-| Sla due at | 1 Oct 2026, 14:30 | — |
 
 **The selected case** (detail panel, from `listCases`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
 | Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
 | Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
-| Kind | chip: Lost property, Complaint, Question, Accessibility, Refund request, Other | What the guest said it was about, where the guest raised it. |
-| Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`. |
-| Recorded at | 1 Oct 2026, 14:30 | Device time the case was raised — the start of the SLA clock. |
-| Synced at | 1 Oct 2026, 14:30 | Server time the case arrived. Equal to `recordedAt` for a case raised online. |
-| Category | the name it points at, never the id | — |
 | Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
 | Priority | chip: Low, Normal, High, Urgent | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Related order | text | — |
-| Sla due at | 1 Oct 2026, 14:30 | — |
 
 **The case** (detail panel, from `getCase`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
 | Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
 | Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
-| Kind | chip: Lost property, Complaint, Question, Accessibility, Refund request, Other | What the guest said it was about, where the guest raised it. |
-| Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`. |
-| Recorded at | 1 Oct 2026, 14:30 | Device time the case was raised — the start of the SLA clock. |
-| Synced at | 1 Oct 2026, 14:30 | Server time the case arrived. Equal to `recordedAt` for a case raised online. |
-| Category | the name it points at, never the id | — |
 | Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
 | Priority | chip: Low, Normal, High, Urgent | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Related order | text | — |
-| Sla due at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -2332,7 +2146,7 @@ Errors to draw in the form: 400 Resolving without a resolution note
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the lost found untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No lost found yet. Offers Create case (`createCase`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority and the lost found are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `CASE_VIEW`, which `getCase` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `CASE_VIEW`, which `listCases` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASE_MANAGE` for `createCase`, `addCaseMessage`, `escalateCase`, `reopenCase` and 1 more. |
 | Offline (`?state=offline`) | Queues locally and syncs on reconnect. The pending count is always current because it is local |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Resolving without a resolution note; 409 The case is not `resolved` — a `closed` case is past its reopen window, and an open one has nothing to reopen. (StateTransitionProblem) |
 
@@ -2364,7 +2178,7 @@ item:
 - `reopenCase` → `CASE_MANAGE` (configure) · staff, partner
 - `updateCase` → `CASE_MANAGE` (configure) · staff, partner
 
-**A refused user sees:** Shown when the caller lacks `CASE_VIEW`, which `getCase` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `CASE_VIEW`, which `listCases` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASE_MANAGE` for `createCase`, `addCaseMessage`, `escalateCase`, `reopenCase` and 1 more.
 
 #### Requirements it meets
 
@@ -2409,7 +2223,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (32), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-028?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create case, Add case message, Escalate case, Reopen case, Save case.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`.
@@ -2428,7 +2242,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-029 |
 | Who uses it | venue staff holding `CASE_MANAGE`, `CASE_VIEW`, `INCIDENT_MANAGE`, `INCIDENT_REPORT`, `INCIDENT_VIEW` (2 configure, 2 read, 1 operate); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listCases` reads the population and `getCase` reads one of them — list, select, act |
@@ -2583,8 +2397,12 @@ Errors to draw in the form: 400 Resolving without a resolution note
 | Corrective actions `correctiveActions` | text area | optional | — | max length 5000 | — | — | `updateIncident` body |
 | Corrective work order `correctiveWorkOrderId` | picker: choose a corrective work order | optional | — | — | shows names, sends the id | — | `updateIncident` body |
 | Attachment refs `attachmentRefs` | list of values (chips) | optional | — | — | — | — | `updateIncident` body |
+| Escalate `escalate` | group | optional | — | — | — | Escalate an incident under investigation (the optional Escalated step; CHG-RUL-011). | `updateIncident` body |
+| To principal `escalate.toPrincipalId` | picker: choose a to principal | required | — | — | shows names, sends the id | — | `updateIncident` body |
+| Reason `escalate.reason` | text area | required | — | min length 3; max length 1000 | — | — | `updateIncident` body |
+| Reason `reason` | text area | optional | — | min length 3; max length 1000 | — | Why the status changes. Required to reopen a closed incident (back to `underInvestigation`) and to close a `reported` one straight away (CHG-RUL-011). | `updateIncident` body |
 
-Errors to draw in the form: 400 Closure attempted without findings or a corrective action; 403 A critical incident closed by the person who completed its corrective action (`closer-completed-action`; workbook Q530; CHG-CSA-033).
+Errors to draw in the form: 400 Closure attempted without findings or a corrective action; 403 A critical incident closed by the person who completed its corrective action (`closer-completed-action`; workbook Q530; CHG-CSA-033).; 422 A move outside the incident flow (`incident-transition-not-allowed`; CHG-RUL-011): to `actionRequired`, from `closed` to anything but `underInvestigation`, a …
 
 #### Outputs: what the screen shows and produces
 
@@ -2594,98 +2412,49 @@ Errors to draw in the form: 400 Closure attempted without findings or a correcti
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
 | Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
 | Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
-| Category | the name it points at, never the id | — |
 | Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
-| Priority | chip: Low, Normal, High, Urgent | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Related order | text | — |
-| Sla due at | 1 Oct 2026, 14:30 | — |
 
 **Every incident** (data table, from `listIncidents`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Incident number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Kind | chip: Guest injury, Staff injury, Near miss, Property damage, Equipment failure, Security … | — |
 | Severity | chip: Near miss, Minor, Moderate, Major, Critical | — |
 | Status | chip: Reported, Under investigation, Action required, Closed | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Location description | text | — |
-| Is reportable | yes / no (icon or chip) | Requires notification to an external authority within a statutory window. |
-| Notification due at | 1 Oct 2026, 14:30 | — |
-| Notified at | 1 Oct 2026, 14:30 | The earliest `notifiedAt` among this incident's authority notifications. Maintained on write by `recordAuthorityNotification`; each … |
-| Assigned to principal | the name it points at, never the id | — |
 
 **The selected case** (detail panel, from `listCases`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
 | Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
 | Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
-| Kind | chip: Lost property, Complaint, Question, Accessibility, Refund request, Other | What the guest said it was about, where the guest raised it. |
-| Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`. |
-| Recorded at | 1 Oct 2026, 14:30 | Device time the case was raised — the start of the SLA clock. |
-| Synced at | 1 Oct 2026, 14:30 | Server time the case arrived. Equal to `recordedAt` for a case raised online. |
-| Category | the name it points at, never the id | — |
 | Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
 | Priority | chip: Low, Normal, High, Urgent | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Related order | text | — |
-| Sla due at | 1 Oct 2026, 14:30 | — |
 
 **The incident** (detail panel, from `getIncident`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Incident number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | Kind | chip: Guest injury, Staff injury, Near miss, Property damage, Equipment failure, Security … | — |
 | Severity | chip: Near miss, Minor, Moderate, Major, Critical | — |
 | Status | chip: Reported, Under investigation, Action required, Closed | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Location description | text | — |
-| Is reportable | yes / no (icon or chip) | Requires notification to an external authority within a statutory window. |
-| Notification due at | 1 Oct 2026, 14:30 | — |
-| Notified at | 1 Oct 2026, 14:30 | The earliest `notifiedAt` among this incident's authority notifications. Maintained on write by `recordAuthorityNotification`; each … |
-| Assigned to principal | the name it points at, never the id | — |
-| Reported by principal | the name it points at, never the id | — |
-| Corrective work order | the name it points at, never the id | — |
-| Occurred at | 1 Oct 2026, 14:30 | — |
-| Recorded at | 1 Oct 2026, 14:30 | — |
 
 **The case** (detail panel, from `getCase`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Created on the device (`CreateCaseRequest.id`, `raiseMyCase`), so a UUIDv7. |
 | Case number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Subject | the name it points at, never the id | — |
 | Guest name | text | Resolved from `pii.subject` when the case is read, never stored on the case. A name copied onto a case row is personal data outside the … |
 | Subject | text | The case's one-line title, not a person. Stored as `title` so the table does not hold `subject` beside `subject_id`; the wire keeps … |
-| Kind | chip: Lost property, Complaint, Question, Accessibility, Refund request, Other | What the guest said it was about, where the guest raised it. |
-| Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | How the guest reached the venue — `CreateCaseRequest.channel`, or `inApp` for a case raised through `raiseMyCase`. |
-| Recorded at | 1 Oct 2026, 14:30 | Device time the case was raised — the start of the SLA clock. |
-| Synced at | 1 Oct 2026, 14:30 | Server time the case arrived. Equal to `recordedAt` for a case raised online. |
-| Category | the name it points at, never the id | — |
 | Status | chip: Open, In progress, Awaiting guest, Escalated, Resolved, Closed | — |
 | Priority | chip: Low, Normal, High, Urgent | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Related order | text | — |
-| Sla due at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -2698,7 +2467,7 @@ Errors to draw in the form: 400 Closure attempted without findings or a correcti
 | Record authority notification (secondary button) | `recordAuthorityNotification` POST `/incidents/{incidentId}/notify-authority` | inline | Incident | 409 The incident is not reportable (`isReportable` false, audit R106 (6)). | opens modal first |
 | Reopen case (secondary button) | `reopenCase` POST `/cases/{caseId}/reopen` | inline | Case | 409 The case is not `resolved` — a `closed` case is past its reopen window, and an open one has nothing to reopen. (StateTransitionProblem) | opens modal first |
 | Save case (secondary button) | `updateCase` PATCH `/cases/{caseId}` | inline | Case | 400 Resolving without a resolution note | opens modal first |
-| Save incident (secondary button) | `updateIncident` PATCH `/incidents/{incidentId}` | inline | Incident | 400 Closure attempted without findings or a corrective action; 403 A critical incident closed by the person who completed its corrective action (`closer-completed-action`; workbook Q530; CHG-CSA-033). | opens modal first |
+| Save incident (secondary button) | `updateIncident` PATCH `/incidents/{incidentId}` | inline | Incident | 400 Closure attempted without findings or a corrective action; 403 A critical incident closed by the person who completed its corrective action (`closer-completed-action`; workbook Q530; CHG-CSA-033).; 422 A move … | opens modal first |
 
 **Rules for what is shown** (from the Customer & Marketing (CRM, guest profiles, consent, segments, campaigns, journeys, loyalty, gamification, cases, voice of customer, waivers) process; these refine the tables above and win where they differ)
 
@@ -2726,7 +2495,7 @@ Errors to draw in the form: 400 Closure attempted without findings or a correcti
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the guest assistance untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No guest assistance yet. Offers Create case (`createCase`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status, assignedToPrincipalId, breachedSla, priority and the guest assistance are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `CASE_VIEW`, which `getCase` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `CASE_VIEW`, which `listCases` requires to show this screen, and names that permission (the screen's other reads need `INCIDENT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASE_MANAGE` for `createCase`, `addCaseMessage`, `escalateCase` … |
 | Offline (`?state=offline`) | Queues locally and syncs on reconnect. The pending count is always current because it is local |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Closure attempted without findings or a corrective action; 400 Resolving without a resolution note; 400 Validation failed; 409 The case is not `resolved` — a `closed` case is past its reopen window, and an open one has nothing to reopen. (StateTransitionProblem) |
 
@@ -2753,7 +2522,7 @@ case: CA-1088 - Question - Is the wave pool open? - resolved on the spot
 - `updateCase` → `CASE_MANAGE` (configure) · staff, partner
 - `updateIncident` → `INCIDENT_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `CASE_VIEW`, which `getCase` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `CASE_VIEW`, which `listCases` requires to show this screen, and names that permission (the screen's other reads need `INCIDENT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASE_MANAGE` for `createCase`, `addCaseMessage`, `escalateCase` …
 
 #### Requirements it meets
 
@@ -2795,8 +2564,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (60), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (72 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (64), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
+- [ ] Every output is drawn (23 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-029?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Report incident, Create case, Add case message, Escalate case, Record authority notification, Reopen case, Save case, Save incident.
 - [ ] Every transition is wired: `EMP-030`, `EMP-001`, `EMP-002`, `EMP-003`.
@@ -2815,7 +2584,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `ticketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-030 |
 | Who uses it | venue staff holding `VENUE_MAP_VIEW` (1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listDiningOutlets` reads the population and `getVenueMap` reads one of them — list, select, act |
@@ -3053,6 +2822,7 @@ Method, path, parameters, request and response for every operation these screens
 ```json
 {
 "addCaseMessage": {"method":"POST","path":"/cases/{caseId}/messages","contract":"marketing-crm","summary":"Add a message or internal note","permission":"CASE_MANAGE","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"CaseMessage"},
+"addIncidentPerson": {"method":"POST","path":"/incidents/{incidentId}/people","contract":"maintenance","summary":"Add a person involved in an incident","permission":"INCIDENT_REPORT","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"AddIncidentPersonRequest","responds":"IncidentInvolvedParty"},
 "applyManualDiscount": {"method":"POST","path":"/orders/{orderId}/discounts","contract":"orders","summary":"Apply a discount a cashier chose","permission":"ORDER_DISCOUNT","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ManualDiscountRequest","responds":"Order"},
 "callNextParties": {"method":"POST","path":"/queues/{queueId}/call-next","contract":"queue","summary":"Call the next parties forward","permission":"QUEUE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "createCase": {"method":"POST","path":"/cases","contract":"marketing-crm","summary":"Raise a service case","permission":"CASE_MANAGE","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateCaseRequest","responds":"Case"},
@@ -3093,11 +2863,13 @@ Method, path, parameters, request and response for every operation these screens
 "rescheduleOrder": {"method":"POST","path":"/orders/{orderId}/reschedule","contract":"orders","summary":"Move an order to another performance","permission":"ORDER_RESCHEDULE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"OrderExchangeResult"},
 "resolveProductByCode": {"method":"GET","path":"/products/resolve","contract":"catalogue","summary":"Resolve a partner code to a product","permission":"PRODUCT_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"code","in":"query","required":true},{"name":"partnerId","in":"query","required":null}],"requestBody":null,"responds":"ProductVariant"},
 "resumeOrder": {"method":"POST","path":"/orders/{orderId}/resume","contract":"orders","summary":"Bring a parked sale back to a till","permission":"ORDER_MODIFY","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"OrderResumeResult"},
+"searchGuests": {"method":"GET","path":"/guests","contract":"marketing-crm","summary":"Search guest profiles","permission":"GUEST_VIEW","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":"search","in":"query","required":null},{"name":"segmentId","in":"query","required":null},{"name":"hasConsentFor","in":"query","required":null},{"name":null,"in":null,"required":null},{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Page"},
 "setQueueStatus": {"method":"PUT","path":"/queues/{queueId}/status","contract":"queue","summary":"Open, pause or close a queue","permission":"QUEUE_MANAGE","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"QueueStatusResult"},
 "setWaitTime": {"method":"PUT","path":"/queues/{queueId}/wait-time","contract":"queue","summary":"Manually set a wait time","permission":"QUEUE_MANAGE","offlineCapable":true,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WaitTime"},
 "splitOrder": {"method":"POST","path":"/orders/{orderId}/split","contract":"orders","summary":"Break one order into independent orders","permission":"ORDER_MODIFY","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":null},
 "updateCase": {"method":"PATCH","path":"/cases/{caseId}","contract":"marketing-crm","summary":"Assign, reprioritise or resolve a case","permission":"CASE_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Case"},
-"updateIncident": {"method":"PATCH","path":"/incidents/{incidentId}","contract":"maintenance","summary":"Investigate, escalate or close an incident","permission":"INCIDENT_MANAGE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Incident"},
+"updateIncident": {"method":"PATCH","path":"/incidents/{incidentId}","contract":"maintenance","summary":"Investigate, escalate, close or reopen an incident","permission":"INCIDENT_MANAGE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Incident"},
+"uploadIncidentMedia": {"method":"POST","path":"/incidents/{incidentId}/media","contract":"maintenance","summary":"Add a photo, video or document to an incident","permission":"INCIDENT_REPORT","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"UploadIncidentMediaRequest","responds":"IncidentMedia"},
 "voidOrder": {"method":"POST","path":"/orders/{orderId}/voids","contract":"orders","summary":"Void an order","permission":"ORDER_VOID","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Order"}
 }
 ```
@@ -3108,6 +2880,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 
 ```json
 {
+"AddIncidentPersonRequest": {"x-ticvai-persistence":"none — request only; the person goes to pii.subject, the link to maintenance.incident_involved_party","type":"object","required":["role"],"properties":{"role":{"type":"string","enum":["injured","involved","witness","reporter"],"description":"The person's part in the incident."},"partyType":{"type":"string","enum":["guest","publicMember","staff","contractor"],"default":"guest"},"name":{"type":"string","maxLength":200,"writeOnly":true,"description":"Written to the erasable store (`pii.subject`), never to the incident (ADR-0023)."},"phone":{"type":"string","maxLength":32,"writeOnly":true,"description":"Stored only with `contactConsent` true."},"email":{"type":"string","format":"email","maxLength":254,"writeOnly":true,"description":"Stored only with `contactConsent` true."},"contactConsent":{"type":"boolean","default":false,"description":"The person agreed to be contacted about this incident (consent rules apply; CHG-RUL-013). Recorded as a consent with who took it and when.\n"},"guestSubjectId":{"type":"string","format":"uuid","nullable":true,"description":"A known guest, from the optional guest lookup; links their existing subject."},"principalId":{"type":"string","format":"uuid","nullable":true,"description":"A member of staff; a principal, not a PII subject."},"note":{"type":"string","maxLength":2000}}},
 "AiMaturity": {"type":"object","x-ticvai-persistence":"none — embedded as jsonb on ai.suggestion and ai.forecast_version","description":"**Where an answer stands, on every answer** (29 September, AI functions review; baseline then learn). The customer sees a stage badge and a \"Based on\" chip, never a bare percentage (design 5.6), and \"Limited historical data\" while the starting pattern carries more than half the weight.","required":["stage","basedOn"],"properties":{"stage":{"type":"string","enum":["starting","learning","established","learned"],"description":"`starting`: the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, weather). `learning`: own data carries short-range patterns (about 4 weeks). `established`: own level and trend lead, the baseline fills gaps such as a holiday not yet seen (about 3 months, or at once with 12+ months imported). `learned`: a model trained on this tenant's data, promoted by an admin (AI-D16)."},"basedOn":{"type":"string","description":"The \"Based on\" line, in words, e.g. *Based on: your venue profile, UAE calendar, weather, 23 days of your sales*. Always present."},"sources":{"type":"array","items":{"type":"object","required":["source"],"properties":{"source":{"type":"string","enum":["venueSettings","startingPattern","calendar","weather","bookingsOnHand","ownHistory","importedHistory","configuration","trainedModel"]},"detail":{"type":"string","nullable":true,"description":"e.g. *23 days*, *water park pattern v3*, *Eid al-Adha 2027*."},"observations":{"type":"integer","nullable":true}}}},"ownDataShare":{"type":"number","minimum":0,"maximum":1,"description":"The weight own data carries, `n / (k + n)`. Below 0.5 the answer is marked \"Limited historical data\"."},"limitedHistory":{"type":"boolean"},"nextStage":{"type":"object","nullable":true,"description":"What the next stage needs, e.g. *8 more Saturdays of sales*, or *an admin promotion*.","properties":{"stage":{"type":"string","enum":["learning","established","learned"]},"needs":{"type":"string"},"expectedBy":{"type":"string","format":"date","nullable":true}}}}},
 "AlternativeCode": {"x-ticvai-persistence":"catalogue.alternative_code","type":"object","required":["code","partnerId"],"properties":{"code":{"type":"string","maxLength":128},"partnerId":{"type":"string","format":"uuid"},"partnerName":{"type":"string"},"variantId":{"type":"string","format":"uuid"},"note":{"type":"string","maxLength":200}}},
 "AttendanceAmendment": {"type":"object","x-ticvai-persistence":"workforce.attendance_amendment","description":"One correction to an attendance record, appended by `amendAttendance` and never updated (decided 28 September, audit R129 (7)).\n","required":["id","attendanceRecordId","amendedByPrincipalId","amendedAt","occurredAtBefore","occurredAtAfter","reason"],"properties":{"id":{"type":"string","format":"uuid"},"attendanceRecordId":{"type":"string","format":"uuid"},"amendedByPrincipalId":{"type":"string","format":"uuid"},"amendedAt":{"type":"string","format":"date-time"},"occurredAtBefore":{"type":"string","format":"date-time","description":"The record's time before this correction."},"occurredAtAfter":{"type":"string","format":"date-time","description":"The time this correction set (`correctedAt` on the request)."},"reason":{"type":"string","maxLength":300}}},
@@ -3130,12 +2903,14 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "ExchangeOrderRequest": {"type":"object","required":["id","outgoingLineIds","incomingLines","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7 of this exchange, and its idempotency key — it must equal the `Idempotency-Key` header."},"outgoingLineIds":{"type":"array","minItems":1,"items":{"type":"string","format":"uuid"}},"incomingLines":{"type":"array","minItems":1,"items":{"$ref":"#/components/schemas/CreateOrderLine"}},"waiveFee":{"type":"boolean","default":false},"reason":{"type":"string","maxLength":500},"recordedAt":{"type":"string","format":"date-time"}}},
 "ExchangeRateDecimal": {"type":"string","x-ticvai-persistence-kind":"valueObject","x-ticvai-persistence-column":"numeric(18,6)","description":"**An exchange rate: a decimal string, never a float**, for the reason `Money.amount` is one — a JavaScript client must not round a rate in transit. **Six decimal places**, the precision `finance.FxRate.rate` asks for, and stored at that precision.\n","pattern":"^\\d+(\\.\\d{1,6})?$"},
 "GuestListing": {"type":"string","enum":["bookable","infoOnly","hidden"],"default":"bookable","description":"**How a product appears to a guest** (decided 29 September, rev 3 REV3-14). `bookable`: listed and searched while it is on sale, and added to the basket. `infoOnly`: listed and searched with its details, photo and `notBookableLabel` whether or not it is on sale, and **never added to a basket** (`addCartLine` refuses it with `409`); the screen opens its details instead. `hidden`: never listed or searched for a guest, and reachable only where a staff channel sells it. Independent of `isSellable`, which says whether a channel may sell it at all.\n"},
-"Incident": {"x-ticvai-persistence":"maintenance.incident","type":"object","required":["id","incidentNumber","kind","severity","status","venueId","occurredAt","reportedByPrincipalId"],"properties":{"id":{"type":"string","format":"uuid"},"incidentNumber":{"type":"string","readOnly":true,"description":"**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"},"kind":{"$ref":"#/components/schemas/IncidentKind"},"severity":{"$ref":"#/components/schemas/IncidentSeverity"},"status":{"$ref":"#/components/schemas/IncidentStatus"},"venueId":{"type":"string","format":"uuid"},"assetId":{"type":"string","format":"uuid","nullable":true},"locationDescription":{"type":"string","nullable":true},"isReportable":{"type":"boolean","description":"Requires notification to an external authority within a statutory window."},"notificationDueAt":{"type":"string","format":"date-time","nullable":true},"notifiedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"The earliest `notifiedAt` among this incident's authority notifications. **Maintained on write** by `recordAuthorityNotification`; each notification itself is a row of `maintenance.incident_authority_notification`.\n"},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true},"reportedByPrincipalId":{"type":"string","format":"uuid"},"correctiveWorkOrderId":{"type":"string","format":"uuid","nullable":true},"occurredAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"},"closedAt":{"type":"string","format":"date-time","nullable":true},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
+"GuestProfile": {"x-ticvai-persistence":"marketing.guest_profile","type":"object","required":["subjectId","isActive"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true,"description":"**Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.\n"},"subjectId":{"type":"string","format":"uuid","description":"Opaque reference. Personal data lives in the separately erasable store, which is what makes erasure possible against an append-only ledger.\n"},"displayName":{"type":"string","nullable":true},"email":{"type":"string","nullable":true},"phone":{"type":"string","nullable":true},"preferredLanguage":{"type":"string","nullable":true},"preferredChannel":{"$ref":"#/components/schemas/MessageChannel"},"guestLinkId":{"type":"string","nullable":true,"description":"Present where the guest is linked across cells. Marketing acts locally."},"tags":{"type":"array","items":{"type":"string"}},"engagementScore":{"type":"integer","nullable":true,"minimum":0,"maximum":100,"description":"22.2.20 and 22.2.21. **`lifetimeValue` and `visitCount` existed, so value was a stored figure and engagement was not.** They are different questions: a guest who spent a lot once and a guest who visits monthly have the same LTV and need opposite treatment.\n**Recency, frequency and breadth, not spend** — spend is already `lifetimeValue`, and folding it in here would make one number twice.\n"},"engagementTier":{"type":"string","nullable":true,"enum":["new","active","occasional","lapsing","lapsed","dormant"],"description":"5.3.19. **Automatic classification, computed rather than assigned.** `lapsing` is the tier the whole field exists for — **a guest who has not been for a while and still might is the only one marketing can change**, and lumping them with `lapsed` wastes the window.\n"},"lifetimeValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"visitCount":{"type":"integer"},"lastVisitAt":{"type":"string","format":"date-time","nullable":true},"isActive":{"type":"boolean"},"mergedIntoSubjectId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"**Set on the absorbed profile by `mergeGuestProfiles` and `mergeGuests`**, which retain it as a redirect rather than deleting it. A read that lands here follows it; a second merge of a profile that has one is refused as `alreadyMerged`.\n"},"mergedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true}}},
+"Incident": {"x-ticvai-persistence":"maintenance.incident","type":"object","required":["id","incidentNumber","kind","severity","status","venueId","occurredAt","reportedByPrincipalId"],"properties":{"id":{"type":"string","format":"uuid"},"incidentNumber":{"type":"string","readOnly":true,"description":"**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"},"kind":{"$ref":"#/components/schemas/IncidentKind"},"severity":{"$ref":"#/components/schemas/IncidentSeverity"},"status":{"$ref":"#/components/schemas/IncidentStatus"},"venueId":{"type":"string","format":"uuid"},"assetId":{"type":"string","format":"uuid","nullable":true},"locationDescription":{"type":"string","nullable":true},"isReportable":{"type":"boolean","description":"Requires notification to an external authority within a statutory window."},"notificationDueAt":{"type":"string","format":"date-time","nullable":true},"notifiedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"The earliest `notifiedAt` among this incident's authority notifications. **Maintained on write** by `recordAuthorityNotification`; each notification itself is a row of `maintenance.incident_authority_notification`.\n"},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true},"reportedByPrincipalId":{"type":"string","format":"uuid"},"correctiveWorkOrderId":{"type":"string","format":"uuid","nullable":true},"escalation":{"type":"object","nullable":true,"readOnly":true,"description":"**Set while the incident is escalated** (the optional Escalated step of the 3 October flow; CHG-RUL-011). Screens show \"Escalated\" when `status` is `underInvestigation` and this is set. Cleared when the incident closes.\n","properties":{"toPrincipalId":{"type":"string","format":"uuid"},"byPrincipalId":{"type":"string","format":"uuid"},"reason":{"type":"string"},"escalatedAt":{"type":"string","format":"date-time"}}},"reopenCount":{"type":"integer","minimum":0,"readOnly":true,"description":"How many times the incident was reopened (CHG-RUL-011). Each reopen is a logged row."},"occurredAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"},"closedAt":{"type":"string","format":"date-time","nullable":true},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
 "IncidentAuthorityNotification": {"x-ticvai-persistence":"maintenance.incident_authority_notification","type":"object","description":"**One notification to an external authority, appended by `recordAuthorityNotification`.** An incident may be reported to more than one authority, or to the same one twice, and each is the evidence that an obligation was met — so each is a row, not an overwrite of `maintenance.incident.notified_at`.\n","required":["id","incidentId","authority","notifiedAt"],"properties":{"id":{"type":"string","format":"uuid"},"incidentId":{"type":"string","format":"uuid"},"authority":{"type":"string","maxLength":200},"reference":{"type":"string","maxLength":128,"nullable":true},"notifiedAt":{"type":"string","format":"date-time"},"notifiedByPrincipalId":{"type":"string","format":"uuid"},"attachmentRefs":{"type":"array","items":{"type":"string"}},"recordedAt":{"type":"string","format":"date-time"}}},
 "IncidentDetail": {"x-ticvai-persistence":"maintenance.incident","allOf":[{"$ref":"#/components/schemas/Incident"},{"type":"object","properties":{"description":{"type":"string","description":"The original report. Never edited — investigation adds to the record."},"investigationNote":{"type":"string","nullable":true,"readOnly":true,"description":"The latest entry of `investigationNotes`, kept for readers that show one line."},"investigationNotes":{"type":"array","readOnly":true,"description":"**Every investigation note, oldest first** (decided 28 September, audit R106 (5)). Read from `maintenance.incident_investigation_note`; appended by `updateIncident`.\n","items":{"$ref":"#/components/schemas/IncidentInvestigationNote"}},"rootCause":{"type":"string","nullable":true},"correctiveActions":{"type":"string","nullable":true},"firstAidGiven":{"type":"boolean"},"emergencyServicesCalled":{"type":"boolean"},"witnessCount":{"type":"integer"},"attachmentRefs":{"type":"array","items":{"type":"string"}},"involvedParties":{"type":"array","description":"Who was involved, as given in `ReportIncidentRequest.involvedSubjectIds` and `involvedStaffPrincipalIds`. Read from `maintenance.incident_involved_party`.\n","items":{"$ref":"#/components/schemas/IncidentInvolvedParty"}},"authorityNotifications":{"type":"array","description":"Read from `maintenance.incident_authority_notification`, oldest first.","items":{"$ref":"#/components/schemas/IncidentAuthorityNotification"}}}}]},
-"IncidentInvestigationNote": {"x-ticvai-persistence":"maintenance.incident_investigation_note","type":"object","description":"**One investigation note, appended by `updateIncident`** (decided 28 September, audit R106 (5)). A history rather than a field, so what an investigator thought on Tuesday survives what they found on Thursday.\n","required":["id","incidentId","note","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"incidentId":{"type":"string","format":"uuid"},"note":{"type":"string","maxLength":10000},"writtenByPrincipalId":{"type":"string","format":"uuid"},"recordedAt":{"type":"string","format":"date-time"}}},
-"IncidentInvolvedParty": {"x-ticvai-persistence":"maintenance.incident_involved_party","type":"object","description":"**One person involved in an incident, by opaque reference.** A guest or member of the public is a `pii.subject` id — personal details live there, the erasable store of ADR-0023, so the incident record survives an erasure request intact. A member of staff is a principal id. Exactly one of the two is set, as `kind` says.\n","required":["id","incidentId","kind"],"properties":{"id":{"type":"string","format":"uuid"},"incidentId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["subject","staff"]},"subjectId":{"type":"string","format":"uuid","nullable":true,"description":"A `pii.subject` id where `kind` is `subject`."},"principalId":{"type":"string","format":"uuid","nullable":true,"description":"The staff principal where `kind` is `staff`."}}},
+"IncidentInvestigationNote": {"x-ticvai-persistence":"maintenance.incident_investigation_note","type":"object","description":"**One investigation note, appended by `updateIncident`** (decided 28 September, audit R106 (5)). A history rather than a field, so what an investigator thought on Tuesday survives what they found on Thursday.\n","required":["id","incidentId","note","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"incidentId":{"type":"string","format":"uuid"},"note":{"type":"string","maxLength":10000},"kind":{"type":"string","enum":["note","statusChange","escalation","reopen"],"default":"note","description":"**Every change is logged here** (CHG-RUL-011): an investigator's note, or a row the server writes for a status change, an escalation or a reopen, with `note` as its reason.\n"},"fromStatus":{"allOf":[{"$ref":"#/components/schemas/IncidentStatus"}],"nullable":true},"toStatus":{"allOf":[{"$ref":"#/components/schemas/IncidentStatus"}],"nullable":true},"writtenByPrincipalId":{"type":"string","format":"uuid"},"recordedAt":{"type":"string","format":"date-time"}}},
+"IncidentInvolvedParty": {"x-ticvai-persistence":"maintenance.incident_involved_party","type":"object","description":"**One person involved in an incident, by opaque reference.** A guest or member of the public is a `pii.subject` id — personal details live there, the erasable store of ADR-0023, so the incident record survives an erasure request intact. A member of staff is a principal id. Exactly one of the two is set, as `kind` says.\n","required":["id","incidentId","kind"],"properties":{"id":{"type":"string","format":"uuid"},"incidentId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["subject","staff"]},"subjectId":{"type":"string","format":"uuid","nullable":true,"description":"A `pii.subject` id where `kind` is `subject`."},"principalId":{"type":"string","format":"uuid","nullable":true,"description":"The staff principal where `kind` is `staff`."},"role":{"type":"string","nullable":true,"enum":["injured","involved","witness","reporter",null],"description":"The person's part in the incident, from `addIncidentPerson` (CHG-RUL-013)."},"contactStored":{"type":"boolean","readOnly":true,"description":"Whether a contact is held for the person: only with their consent to be contacted (`AddIncidentPersonRequest.contactConsent`; CHG-RUL-013).\n"}}},
 "IncidentKind": {"type":"string","enum":["guestInjury","staffInjury","nearMiss","propertyDamage","equipmentFailure","securityIncident","fireOrEvacuation","foodSafety","environmental","other"]},
+"IncidentMedia": {"x-ticvai-persistence":"maintenance.incident_media","type":"object","description":"**One photo, video or document on an incident** (`uploadIncidentMedia`; CHG-RUL-013). The file is in the media store; this row links it to the incident.\n","required":["id","incidentId","kind","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"incidentId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["photo","video","document"]},"status":{"type":"string","enum":["awaitingUpload","stored"],"readOnly":true,"description":"`stored` once the media store confirmed the transfer and `assetRef` is set."},"assetRef":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"x-ticvai-references":"assets.media_asset"},"caption":{"type":"string","nullable":true},"capturedAt":{"type":"string","format":"date-time","nullable":true},"uploadedByPrincipalId":{"type":"string","format":"uuid","readOnly":true},"createdAt":{"type":"string","format":"date-time","readOnly":true},"upload":{"type":"object","readOnly":true,"x-ticvai-persisted":false,"description":"The signed upload, as `assets.createUpload` returns it; only on the 201.","properties":{"uploadUrl":{"type":"string"},"method":{"type":"string","enum":["PUT","POST"]},"headers":{"type":"object","additionalProperties":{"type":"string"}},"expiresAt":{"type":"string","format":"date-time"}}}}},
 "IncidentSeverity": {"type":"string","enum":["nearMiss","minor","moderate","major","critical"]},
 "IncidentStatus": {"type":"string","enum":["reported","underInvestigation","actionRequired","closed"]},
 "LocalisedText": {"x-ticvai-persistence":"none — jsonb column","type":"object","additionalProperties":{"type":"string"}},
@@ -3173,6 +2948,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "SuggestionBasis": {"type":"string","description":"**How the answer was reached, and this is the field the whole design exists for.**\nA venue must be able to see that today's price suggestion is a margin rule and next quarter's is a trained model — **the same operation, the same screen, a different basis** — and a screen that cannot say which is a screen that asks a manager to trust arithmetic it will not show.\n**Swapping a heuristic for a model is a provider change, not a contract change.** That is the point of the abstraction: the frontend, the audit record and the outcome capture all stay exactly as they are.\n","enum":["heuristic","statistical","model","hybrid","manual"]},
 "SuggestionKind": {"type":"string","description":"What is being suggested. **A closed set, and the reason it is closed is the swap.** Every entry here is a question a venue asks that a model could answer better than a rule — and each one starts as a heuristic and becomes a model when there is data.\n**Six of these were drawn as their own endpoints on the client F&B boards** — `suggestPrice`, `simulateScenario`, `simulateSlaPolicy`, `suggestRequisition`, `suggestReplenishment`, `publishDemandPlan`. **Building six endpoints means six places to change when a model changes**, and the model will change more often than the venue's question does.\n**What each kind is based on, and when the venue's own data takes over. Proposed, client to correct (decided 28 September, audit R213; re-read 29 September, AI functions review).** The figure after each rule is **the point where own data takes over from the baseline, not a refusal**: below it the kind answers from the baseline (venue AI settings, the starting pattern for the venue type, the UAE calendar, the weather) with `maturity.stage` `starting`, and between it and about three months it blends the two (`learning`). The day-one baseline per kind: `replenishment`, `requisition`, `prepPlan`, `staffing`, `demandForecast` and `scenario` from the baseline forecast (typical attendance from the venue AI settings x the venue-type month curve x the calendar x weather, bookings on hand as a floor); `menuEngineering` ranked by margin with popularity marked learning; `slaTarget` a standard default; `waitTime` people ahead / configured capacity; `upsell` the relationship map and business priority; `segmentation` known guest attributes; `anomaly` the venue's configured thresholds and actual against the forecast's low end; `sendTime` the channel's typical hour; `wasteRisk` shelf life and par against the forecast; `queueBalancing` configured capacity per queue. Only a missing setting refuses (422 `AiMissingSettingProblem`).\n- `price`: unit cost plus the category's target margin, held inside the price band. Minimum: a current cost, no history.\n- `replenishment`: par level minus on-hand plus expected use over the supplier lead time. Minimum: 14 days of stock movements.\n- `requisition`: the next service's prep-plan ingredient needs minus kitchen stock. Minimum: 14 days of sales.\n- `demandForecast`: the average of the same weekday over the last 8 weeks, adjusted by admissions already booked. Minimum: 8 weeks of sales.\n- `prepPlan`: forecast covers for the service times each item's share of the last 4 same weekdays. Minimum: 4 weeks of sales.\n- `menuEngineering`: each item placed by popularity against margin, over 90 days. Minimum: 90 days of sales.\n- `staffing`: forecast demand divided by the role's standard covers per staff hour. Minimum: 8 weeks of sales (the forecast it rests on).\n- `slaTarget`: the 80th percentile of actual times over the last 30 days. Minimum: 30 days of timed events.\n- `waitTime`: people ahead divided by the throughput of the last 30 minutes. Minimum: 30 minutes of throughput today.\n- `upsell`: the item most often bought with the basket's items over 90 days. Minimum: 90 days of orders.\n- `segmentation`: recency, frequency and spend scores over 12 months. Minimum: 90 days of orders.\n- `anomaly`: a value outside three standard deviations of the same weekday over 8 weeks. Minimum: 8 weeks of the measure.\n- `scenario`: the demand forecast re-run with the stated changes. Minimum: as `demandForecast`.\n- `sendTime` (added 29 September): per recipient, the hour inside `context.sendWindow` in which they have most often opened or clicked over the last 90 days (marketing-crm attribution touches), and where `context.channel` is `best`, the consented channel with the highest engagement. A recipient with fewer than three touches gets their segment's modal hour, and one with none the window's start. Asked with `subjectRef` a segment id or `context.subjectIds` (at most 10,000). `value` is `{recommendations: [{subjectId, sendAt, channel, basisTouches}]}`. Minimum: 90 days of message touches at the scope.\n- `wasteRisk` (added 29 September): per item at an outlet or store location, planned production and stock on hand minus forecast demand over the item's shelf life, plus batches expiring inside the horizon (`inventory.listExpiringBatches`). `value` is `{items: [{itemRef, quantityAtRisk, valueAtCost, expiresAt, recommendedAction (reducePrep, promote, transfer, useInRecipe), transferTo}]}`. Minimum: 14 days of recorded waste and of sales.\n- `queueBalancing` (added 29 September): per queue or attraction at `subjectRef` (a venue) over `horizon`, the forecast wait (the `queue` forecast definition) against throughput capacity, a recommended virtual-queue return-slot allocation by queue type, and guest redirection from over-used to under-used attractions. `value` is `{queues: [{queueId, forecastWaitMinutes, capacityPerHour, returnSlotsPerInterval, redirectTo}]}`. Minimum: 14 days of queue readings.\n- `itinerary` (added 29 September, MOB-6, guest-allowed): refines a `venue-map` visit plan the guest owns. `subjectRef` is the plan id; `value` is `{planId, baseVersion, changes, rationale}`, applied with `updateVisitPlan` as the guest. Minimum: none; the rules plan is the baseline. Every change names a point or performance of that day's venue only, rides, dining and retail alike (30 September client meeting, MoM 4.7).\n","enum":["price","replenishment","requisition","demandForecast","prepPlan","menuEngineering","staffing","slaTarget","waitTime","upsell","segmentation","anomaly","scenario","sendTime","wasteRisk","queueBalancing","itinerary"]},
 "TenderKind": {"type":"string","description":"`wallet` is a **digital wallet** (Apple Pay, Google Pay and the like, taken through the gateway), the value the guest channels accept beside `card` (decided 28 September, audit R080 (a)). **The stored-value TICVAI wallet is a separate tender**: it is spent through `authoriseStoredValue` and `captureStoredValue` (`StoredValueKind` `wallet`), never as this value, so the client can see which of the two the decision meant.\n","enum":["cash","card","wallet","voucher","bankTransfer","hotelCharge","installment","giftCard","complimentary"]},
+"UploadIncidentMediaRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["kind","filename","contentType","sizeBytes"],"properties":{"kind":{"type":"string","enum":["photo","video","document"]},"filename":{"type":"string","maxLength":256},"contentType":{"type":"string"},"sizeBytes":{"type":"integer","minimum":1},"capturedAt":{"type":"string","format":"date-time","description":"Device time the photo or video was taken."},"caption":{"type":"string","maxLength":500}}},
 "VenueMap": {"type":"object","x-ticvai-persistence":"venuemap.map","description":"A park map, or a floor plan. **Several per venue** — a guest on the second floor should not be shown the ground floor's toilets.\n","required":["id","name","venueId","status"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"name":{"type":"string"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string","readOnly":true,"description":"Derived from `venueId`. Not sent by a client."},"kind":{"type":"string","enum":["park","floor","zone","parking"]},"floorLevel":{"type":"integer","nullable":true},"status":{"type":"string","enum":["draft","published","archived"],"readOnly":true,"description":"`draft` on create. Moves through `publishVenueMap` (`states/venue-map.yaml`), never by sending a value.\n"},"publishedVersion":{"type":"integer","nullable":true,"readOnly":true,"description":"The `VenueMapVersion.version` guests are served. Null until the first publish.\n"},"graphVersion":{"type":"integer","readOnly":true,"description":"**Bumped by a publish or a closure**, and returned as `VenueMapGraph.version`. Separate from `publishedVersion` because a closure changes the routes without creating a map version, and a closure that looked like a publish would lie about what changed.\n"},"isGeoreferenced":{"type":"boolean","readOnly":true,"description":"**Whether a guest can be located on it.** Without a georeference the map is a picture — useful, and not navigable.\n"},"baseAssetId":{"type":"string","format":"uuid","nullable":true,"description":"**The illustrated map a guest actually sees**, held in `assets` like any other media.\n**This is not the CAD drawing.** The drawing gives geometry — where things are, and how they connect. The base image is a designed illustration with the venue's own styling, and the two are different artefacts that happen to describe the same place. A park hands you an architect's plan and a beautiful painted map, and **the guest wants the second while the platform needs the first.**\nNull is valid. A map with geometry and no illustration renders as shapes — plain, and navigable.\n","x-ticvai-references":"assets.MediaAsset"},"baseImageAlignment":{"type":"object","nullable":true,"description":"**How the illustration lines up with the geometry.** They are drawn at different scales by different people, and a point placed on the plan lands in the wrong place on the painting unless something reconciles them.\nTwo known points is enough. **Without this the illustration is a picture behind the map rather than the map itself.**\n","properties":{"imageWidthPx":{"type":"integer"},"imageHeightPx":{"type":"integer"},"anchors":{"type":"array","minItems":2,"maxItems":4,"items":{"type":"object","properties":{"planX":{"type":"number"},"planY":{"type":"number"},"imageX":{"type":"number"},"imageY":{"type":"number"}}}}}},"tileSetRef":{"type":"string","nullable":true,"readOnly":true,"description":"Where a base image is large enough to need zoom levels. **A 12,000-pixel park map is not something a phone downloads on arrival**, and a guest opening the map on venue wifi at the gate is the worst moment to send twenty megabytes.\nGenerated from the base asset. Null means the image is small enough to serve whole.\n"},"boundsGeoJson":{"type":"string","nullable":true},"graphStatus":{"type":"string","readOnly":true,"enum":["notBuilt","connected","disconnected","partial"],"description":"**Whether every public point can actually be reached.** Computed at publish.\n`disconnected` means a point has no path to it at all — a toilet nobody can walk to is a toilet that does not exist. `partial` means every point is reachable and at least one only by steps, which is a different and quieter failure: **the map works until a wheelchair user opens it.**\n"}}},
 "VenueMapDetail": {"type":"object","description":"19.2.55. **The whole map in one call**, so a client caches it and filters locally.","properties":{"version":{"type":"integer","nullable":true,"readOnly":true,"description":"**The published version these points and paths belong to**, which is the number a client caches and sends back as `version`. It can differ from `map.publishedVersion` when an older version was asked for. Null when the draft was read.\n"},"map":{"$ref":"#/components/schemas/VenueMap"},"points":{"type":"array","items":{"$ref":"#/components/schemas/VenuePoint"}},"paths":{"type":"array","items":{"$ref":"#/components/schemas/VenuePath"}},"resources":{"type":"array","description":"The bookable resources placed on this version of the map (rev 3 REV3-15). Empty on a map that carries none.\n","items":{"$ref":"#/components/schemas/PlacedResource"}}}},
 "VenuePath": {"type":"object","x-ticvai-persistence":"venuemap.path","description":"19.2.56. **The navigation graph.** The map supplies it; routing over it is a client concern, because a phone with the map cached routes offline and a server round-trip per step does not.\n","required":["id","mapId","fromPointId","toPointId"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"mapId":{"type":"string","format":"uuid","readOnly":true,"description":"From the path of the operation that writes the path."},"fromPointId":{"type":"string","format":"uuid"},"toPointId":{"type":"string","format":"uuid"},"geometry":{"type":"string","nullable":true,"description":"The centreline this edge follows, as an encoded polyline. **A walkway in a drawing is a polygon and a route is a line down the middle of it**, so extraction thins the polygon to a centreline and splits it at every fork.\nNull where the path was drawn on screen as a straight connection, which is normal for a venue with no walkway layer.\n"},"distanceMetres":{"type":"number","nullable":true,"readOnly":true,"description":"Computed by the server from `geometry` and the georeference. **Along the centreline, not point to point.** A path that curves round a lake is longer than the distance between its ends, and a guest told 80 metres who walks 200 stops trusting the map.\nRequires a georeference for real units; without one, distances are in drawing units and routing still works because **only the ratios matter to a shortest path.**\n"},"isStepFree":{"type":"boolean","default":true,"description":"**The single most important attribute on this object.** A wheelchair user routed up a staircase has been failed by the map, not by the venue.\n"},"isIndoor":{"type":"boolean","default":false},"restrictedByPointId":{"type":"string","format":"uuid","nullable":true,"description":"**Where a path is one-way, it is because of a thing on it — not because of the path.** Removed `isOneWay` on 18 August: a pedestrian walkway has no direction, and the three cases that look one-way are all a gate or a queue.\nA turnstile is one-way and `access.AccessPoint.direction` already says so. A queue line is one-way and `queue` owns it. **Putting the restriction on the path duplicated both and would have drifted from them** — a gate reconfigured to bidirectional would leave a path still marked one-way, and nothing would have noticed.\nSet where a path passes through an access point. The router reads the direction from the point.\n"},"closedReason":{"type":"string","nullable":true,"readOnly":true,"description":"Set by `setPathClosure` during works or an incident, never by sending it here. **A closed path removes routes rather than hiding the path**, so a guest sees why rather than wondering where it went.\n"}}},

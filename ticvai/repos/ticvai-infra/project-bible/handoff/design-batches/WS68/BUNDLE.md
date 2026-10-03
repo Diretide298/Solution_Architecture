@@ -102,16 +102,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ANL-031` | Report Catalogue & Library | B–D | 0 | 26 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `ANL-032` | Report Creation Wizard | B–D | 9 | 0 | 5 | 82 | 1 | 0 | — | notStarted (—) |
-| `ANL-033` | Data Domain & Dataset Selector | B–D | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-034` | Field & Column Selector | B–D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `ANL-035` | Filter & Parameter Builder | B–D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-036` | Grouping, Aggregation & Calculation Builder | B–D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-037` | Cross-Domain Report Composer | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-038` | Report Layout & Formatting Designer | B–D | 7 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
-| `ANL-039` | Report Preview, Test & Validation | B–D | 0 | 16 | 6 | 5 | 0 | 0 | — | notStarted (—) |
-| `ANL-040` | Save, Run & Report Results Viewer | B–D | 0 | 4 | 6 | 5 | 2 | 0 | — | notStarted (—) |
+| `ANL-031` | Report Catalogue & Library | D | 0 | 26 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ANL-032` | Report Creation Wizard | D | 9 | 0 | 5 | 82 | 1 | 0 | — | notStarted (—) |
+| `ANL-033` | Data Domain & Dataset Selector | D | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-034` | Field & Column Selector | D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `ANL-035` | Filter & Parameter Builder | D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-036` | Grouping, Aggregation & Calculation Builder | D | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-037` | Cross-Domain Report Composer | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-038` | Report Layout & Formatting Designer | D | 7 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-039` | Report Preview, Test & Validation | D | 0 | 16 | 6 | 5 | 0 | 0 | — | notStarted (—) |
+| `ANL-040` | Save, Run & Report Results Viewer | D | 0 | 4 | 6 | 5 | 2 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -131,7 +131,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-031 |
 | Who uses it | venue staff holding `REPORT_VIEW_VENUE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Each report shall display) and no metric row |
@@ -349,7 +349,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-032 |
 | Who uses it | venue staff holding `REPORT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Select one or multiple domains) and no display directory — it is settings, not a population |
@@ -503,7 +503,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-033 |
 | Who uses it | venue staff holding `REPORT_VIEW_TENANT` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -669,7 +669,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-034 |
 | Who uses it | venue staff holding `REPORT_VIEW_VENUE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -823,7 +823,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-035 |
 | Who uses it | venue staff holding `REPORT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -966,7 +966,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-036 |
 | Who uses it | venue staff holding `REPORT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1120,7 +1120,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-037 |
 | Who uses it | venue staff holding `REPORT_MANAGE`, `REPORT_VIEW_TENANT` (1 configure, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1258,7 +1258,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-038 |
 | Who uses it | venue staff holding `REPORT_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -1415,7 +1415,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-039 |
 | Who uses it | venue staff holding `REPORT_VIEW_VENUE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1588,7 +1588,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-040 |
 | Who uses it | venue staff holding `REPORT_VIEW_VENUE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§Display; Dashboard Designer Report Builder) and a per-row directory (§KPI cards/charts Rows, columns, matrices) — counts over a population, then … |

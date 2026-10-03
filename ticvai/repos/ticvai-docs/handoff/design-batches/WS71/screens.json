@@ -552,7 +552,9 @@
    "params": [
     {
      "name": "kpiId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getKpiValues`; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -685,8 +687,6 @@
        "label": "Every site normalisation basis",
        "bindsTo": "SiteNormalisationBasis",
        "columns": [
-        "SiteNormalisationBasis.id",
-        "SiteNormalisationBasis.scopePath",
         "SiteNormalisationBasis.periodStart",
         "SiteNormalisationBasis.periodEnd",
         "SiteNormalisationBasis.visitors",
@@ -966,7 +966,7 @@
   "name": "Semantic Model & Business Data Catalogue",
   "module": "Analytics",
   "requiresModule": "analytics",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf",
    "board": "10",
@@ -1074,7 +1074,7 @@
    "error": "Could not load. Names which read failed and leaves the model untouched.",
    "emptyFirstRun": "No model published yet. Offers Publish model (`setSemanticModel`); until then reports read the seeded catalogue.",
    "emptyNoResults": "Nothing in the model matches the search. Names it and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_TENANT`, which `getSemanticModel` requires, and names that permission."
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_TENANT`, which `getSemanticModel` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REPORT_MANAGE` for `setSemanticModel`."
   },
   "apis": [
    {

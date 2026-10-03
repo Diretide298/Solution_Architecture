@@ -43,17 +43,26 @@
     {
      "to": "BO-525",
      "trigger": "Pricing Profile Builder",
-     "provenance": "structural — pack board 4 wiring, 11 September 2026"
+     "provenance": "structural — pack board 4 wiring, 11 September 2026",
+     "carries": [
+      "profileId"
+     ]
     },
     {
      "to": "BO-526",
      "trigger": "Duration & Tiered Pricing Configuration",
-     "provenance": "structural — pack board 4 wiring, 11 September 2026"
+     "provenance": "structural — pack board 4 wiring, 11 September 2026",
+     "carries": [
+      "profileId"
+     ]
     },
     {
      "to": "BO-527",
      "trigger": "Calendar, Peak & Seasonal Pricing",
-     "provenance": "structural — pack board 4 wiring, 11 September 2026"
+     "provenance": "structural — pack board 4 wiring, 11 September 2026",
+     "carries": [
+      "profileId"
+     ]
     },
     {
      "to": "BO-528",
@@ -380,7 +389,9 @@
    "params": [
     {
      "name": "profileId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createRentalPricingProfile`; a link or an edge that holds one opens it instead."
     }
    ]
   },
@@ -520,7 +531,9 @@
    "params": [
     {
      "name": "profileId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updateRentalPricingProfile` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -650,7 +663,9 @@
    "params": [
     {
      "name": "profileId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updateRentalPricingProfile` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

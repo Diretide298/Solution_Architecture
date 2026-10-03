@@ -135,9 +135,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-824` | Gamification Command Center | B–D | 0 | 5 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-825` | Challenge Builder | A | 15 | 35 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-826` | Achievement & Badge Engine | B–D | 0 | 10 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-826` | Achievement & Badge Engine | A | 0 | 10 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-827` | Points & Activity Rules | A | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-828` | Milestones & Reward Rules | B–D | 31 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-828` | Milestones & Reward Rules | A | 31 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `BO-829` | Family, Team & Event Challenges | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-830` | Referral & Streak Management | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-831` | Progress, Leaderboards & Hub | B–D | 3 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |

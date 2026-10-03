@@ -550,8 +550,8 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `BO-200` Handheld & Mobile Access Device Configuration: *Works in Handheld & Mobile Access Device Configuration*; calls `listDeviceGate`
 - → `BO-201` Gate Modes, Free Spin & Emergency Controls: *Works in Gate Modes, Free Spin & Emergency Controls*; calls `listDeviceGate`
 - → `BO-202` Device Software, Content & Remote Configuration: *Works in Device Software, Content & Remote Configuration*; calls `listDeviceGate`
-- → `BO-203` Hardware Compatibility, Health, Testing & Deployment: *Works in Hardware Compatibility, Health, Testing & Deployment*; carries `deviceId`; calls `listDeviceGate`
 - → `BO-196` Physical Device Registration & Provisioning: *Works in Physical Device Registration & Provisioning*; carries `placementId`; calls `listDeviceGate`
+- → `BO-203` Hardware Compatibility, Health, Testing & Deployment: *Works in Hardware Compatibility, Health, Testing & Deployment*; carries `deviceId`; calls `listDeviceGate`
 
 #### States
 
@@ -675,7 +675,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (294 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-194?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `BO-100`, `BO-195`, `BO-197`, `BO-198`, `BO-199`, `BO-200`, `BO-201`, `BO-202`, `BO-203`, `BO-196`.
+- [ ] Every transition is wired: `BO-100`, `BO-195`, `BO-197`, `BO-198`, `BO-199`, `BO-200`, `BO-201`, `BO-202`, `BO-196`, `BO-203`.
 - [ ] Every gated control is gated: `DEVICE_VIEW`, `SCOPE_VIEW`.
 - [ ] The 6 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 2 edge case(s) from the process notes are drawn.
@@ -1827,8 +1827,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | Block A · ticket #20679 (APP-SETUP-BO-201) |
+| Module | Access & Venue · wave 1 · needs the `access` module |
+| Block | Block A · task APP-SETUP-BO-201 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |

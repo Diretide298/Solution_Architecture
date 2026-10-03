@@ -61,7 +61,10 @@
     {
      "to": "BO-937",
      "trigger": "Resource Collection, Handover & Return",
-     "provenance": "structural — pack board 9 wiring, 19 September 2026"
+     "provenance": "structural — pack board 9 wiring, 19 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "BO-938",
@@ -599,7 +602,9 @@
     },
     {
      "name": "bookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listResourceBookings` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -894,7 +899,9 @@
    "params": [
     {
      "name": "bookingId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `checkOutResource`, `checkInResource` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1198,7 +1205,9 @@
    "params": [
     {
      "name": "assignmentId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listShiftSwapRequests` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1343,7 +1352,9 @@
    "params": [
     {
      "name": "requestId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listApprovalRequests` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

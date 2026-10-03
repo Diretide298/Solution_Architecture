@@ -9,12 +9,12 @@
 | Contracts | 8 |
 | Modules | 5 |
 | Undrawn | 0 |
-| Operations with no screen | 88 |
-| Waves | wave2 2 · wave3 26 |
+| Operations with no screen | 89 |
+| Waves | wave1 4 · wave3 24 |
 
 ## Gaps
 
-### 88 operations with no screen here
+### 89 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -60,27 +60,34 @@
 | `getGuestExtraValues` | marketing-crm | GET | What a guest answered |
 | `getSuppressionList` | marketing-crm | GET | Addresses suppressed from all sending |
 | `getWaiverTesting` | marketing-crm | GET | Checklist, rule simulation and approval record of a waiver version |
-| … | | | 48 more |
+| … | | | 49 more |
+
+### 2 modules split across waves
+
+**A platform that sells in one wave and cannot refund until a later one can take money and not give it back.** Not always wrong — worth a look each time.
+
+- **Access & Availability** — waves 1, 3
+- **Overview** — waves 1, 3
 
 ## Modules
 
 | Module | Screens | Waves |
 |---|---|---|
 | Support | 20 | 3 |
-| Access & Availability | 2 | 3 |
-| Overview | 2 | 3 |
-| Conversations | 2 | 2 |
+| Access & Availability | 2 | 1, 3 |
+| Overview | 2 | 1, 3 |
+| Conversations | 2 | 1 |
 | Knowledge & Responses | 2 | 3 |
 
 ## Screens
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `SUP-001` | Venue Management Sign In | Access & Availability | 3 | 11 | yes |
-| `SUP-002` | Agent Dashboard | Overview | 3 | 9 | yes |
+| `SUP-001` | Venue Management Sign In | Access & Availability | 1 | 11 | yes |
+| `SUP-002` | Agent Dashboard | Overview | 1 | 9 | yes |
 | `SUP-003` | Availability & Routing Settings | Access & Availability | 3 | 1 | yes |
-| `SUP-004` | Conversation Queue | Conversations | 2 | 3 | yes |
-| `SUP-005` | Live Chat Workspace | Conversations | 2 | 11 | yes |
+| `SUP-004` | Conversation Queue | Conversations | 1 | 3 | yes |
+| `SUP-005` | Live Chat Workspace | Conversations | 1 | 11 | yes |
 | `SUP-006` | Knowledge Base Search | Knowledge & Responses | 3 | 3 | yes |
 | `SUP-007` | Canned Response Management | Knowledge & Responses | 3 | 2 | yes |
 | `SUP-008` | Agent Performance & SLA View | Overview | 3 | 10 | yes |

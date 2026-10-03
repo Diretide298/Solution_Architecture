@@ -1,6 +1,6 @@
 # P04-not-in-v2-01 — P04 · Screens the v2 build does not draw
 
-**7 screens · 18 operations · 37 schemas · 12 permissions**
+**7 screens · 18 operations · 38 schemas · 12 permissions**
 
 Platform P04 Venue POS · ships as **venue-pos** ·
 staff audience · posTerminal ·
@@ -150,12 +150,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `POS-009` | Staff Roster | A | 8 | 24 | 6 | 18 | 1 | 0 | — | notStarted (designed) |
-| `POS-010` | Add to Existing Ticket | A | 37 | 39 | 5 | 44 | 3 | 0 | — | notStarted (designed) |
-| `POS-015` | Cash Operations Dashboard | A | 0 | 54 | 6 | 0 | 2 | 6 | — | notStarted (designed) |
+| `POS-009` | Staff Roster | A | 8 | 12 | 6 | 18 | 1 | 0 | — | notStarted (designed) |
+| `POS-010` | Add to Existing Ticket | A | 37 | 23 | 5 | 44 | 3 | 0 | — | notStarted (designed) |
+| `POS-015` | Cash Operations Dashboard | A | 0 | 41 | 6 | 0 | 2 | 6 | — | notStarted (designed) |
 | `POS-017` | Cash In / Cash Out Operations | A | 21 | 0 | 5 | 0 | 2 | 6 | — | notStarted (designed) |
-| `POS-018` | Safe Drop & Cash Transfer Management | A | 24 | 20 | 6 | 1 | 1 | 6 | — | notStarted (designed) |
-| `POS-019` | Shift Templates & Policies | A | 10 | 32 | 6 | 1 | 1 | 6 | — | notStarted (designed) |
+| `POS-018` | Safe Drop & Cash Transfer Management | A | 27 | 20 | 6 | 1 | 1 | 6 | — | notStarted (designed) |
+| `POS-019` | Shift Templates & Policies | A | 10 | 24 | 6 | 1 | 1 | 6 | — | notStarted (designed) |
 | `POS-024` | Outlet Setup | A | 20 | 18 | 6 | 3 | 0 | 0 | — | notStarted (designed) |
 
 ---
@@ -171,8 +171,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI POS · P04 Venue POS (terminal) |
-| Module | Shift · wave 2 · needs the `core` module |
-| Block | Block A · ticket #18136 (APP-POS-POS-009) |
+| Module | Shift · wave 1 · needs the `core` module |
+| Block | Block A · task APP-POS-POS-009 |
 | Who uses it | venue staff holding `ATTENDANCE_RECORD`, `REPORT_VIEW_WORKSTATION`, `WORKFORCE_VIEW` (2 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is a touch terminal, 1366 x 768 landscape; the kitchen display is a wall screen at 1920 x 1080. · LTR and RTL · light, dark theme |
 | Pattern | approvalInbox (touchLarge density): `approveShiftOpen` decides items that `listShifts` queues — every row is waiting for a person, so the empty state is success |
@@ -235,13 +235,7 @@ Errors to draw in the form: 409 Out of sequence — a clock-out with no clock-in
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. Also the idempotency key. |
-| Workstation | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Principal | the name it points at, never the id | Who opened it. Cash reconciles to a person and a drawer. |
 | Principal display name | text | — |
-| Incidents | list or chips (count when long) | BL-097. A till has exceptions and there was nowhere to write them — a no-sale, a drawer opened without a transaction, a manager override, a … |
 | Status | chip: Pending approval, Open, Suspended, Pending variance, Pending closure, Closed… | — |
 | Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
@@ -256,14 +250,8 @@ Errors to draw in the form: 409 Out of sequence — a clock-out with no clock-in
 | Rest period before | 1,234 | Minutes since the previous shift ended. The check that stops a closing shift followed by an opening one, which is legal in most places and … |
 | Breaches working hour limit | yes / no (icon or chip) | Flagged at assignment, not discovered at payroll. A rota that breaches a statutory limit is a rota somebody has to redo, and finding out a … |
 | Labour cost | AED 1,234.50 | Cost at the point of scheduling. A manager building a rota without seeing its cost is a manager who finds out from finance. |
-| ID | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
 | Display name | text | — |
-| Venue | the name it points at, never the id | — |
-| Department | the name it points at, never the id | — |
 | Position | text | What they are rostered to do — gate steward, cashier, lifeguard, technician. Most positions never touch a till, which is why a rota … |
-| Required role | the name it points at, never the id | Checked on assignment. A rota naming someone unqualified is a rota that gets overridden. |
-| Workstation | the name it points at, never the id | Where the position needs a till. The link between a rota and a cash session, without merging the two. |
 
 **Data table** (data table): Staff, role and terminal, shift, sales, status — the columns in the design
 
@@ -299,7 +287,7 @@ Errors to draw in the form: 409 Out of sequence — a clock-out with no clock-in
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the staff roster untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | **Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on workstationId, status, openedFrom, openedTo and the staff roster are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires to show this screen, and names that permission (the screen's other reads need `WORKFORCE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ATTENDANCE_RECORD` for `recordAttendance`. |
 | Offline (`?state=offline`) | Last known roster, with its age shown |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Out of sequence — a clock-out with no clock-in, or a second clock-in. Reported rather than silently corrected. |
 
@@ -342,7 +330,7 @@ roster:
 - `listRotaAssignments` → `WORKFORCE_VIEW` (read) · staff
 - `recordAttendance` → `ATTENDANCE_RECORD` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires to show this screen, and names that permission (the screen's other reads need `WORKFORCE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ATTENDANCE_RECORD` for `recordAttendance`.
 
 #### Requirements it meets
 
@@ -388,7 +376,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (8), with its required mark, default, format and its error state (403, 409).
-- [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#POS-009?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Clock in, clock out, start or end a …, Export roster.
 - [ ] Every transition is wired: `POS-001`, `POS-007`, `BO-043`.
@@ -407,7 +395,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI POS · P04 Venue POS (terminal) |
 | Module | Sell · wave 1 · needs the `ticketing` module |
-| Block | Block A · ticket #18001 (APP-POS-POS-010) |
+| Block | Block A · task APP-POS-POS-010 |
 | Who uses it | venue staff holding `ASSET_LIBRARY_VIEW`, `ORDER_CREATE`, `ORDER_EXCHANGE`, `ORDER_VIEW` (2 read, 2 operate); in the flows as cashier |
 | Device and orientation | This is a touch terminal, 1366 x 768 landscape; the kitchen display is a wall screen at 1920 x 1080. · LTR and RTL · light, dark theme |
 | Pattern | statusTracker (touchLarge density): `getMediaEntitlements` reads one record and nothing reads a population — the screen is about that one thing |
@@ -509,7 +497,6 @@ Errors to draw in the form: 409 Replacement unavailable (`replacementUnavailable
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Kind | chip: Image, Video, Audio, Document, Vector, Font… | — |
 | Status | chip: Processing, Ready, Quarantined, Failed, Archived | — |
 | Filename | text | — |
@@ -517,35 +504,20 @@ Errors to draw in the form: 409 Replacement unavailable (`replacementUnavailable
 | Size bytes | 1,234 | — |
 | Title | in the reader's language | — |
 | Description | in the reader's language | Set by `updateMediaAsset` and matched by `searchMedia`'s `search`. It was accepted and searched on before it had anywhere to be stored. |
-| Alt text | in the reader's language | Required before use in a guest-facing surface. WCAG 2.2 AA. |
-| Width | 1,234 | — |
-| Height | 1,234 | — |
 | Duration seconds | 1,234.5 | — |
-| Custom metadata | grouped details | BL-178. `assets` is a strong contract and its metadata was fixed — kind, title, alt text, dimensions, rights. |
-| Shared with tenants | list or chips (count when long) | BL-178. Cross-tenant sharing, and it is refused by default for a reason. |
-| Tags | list or chips (count when long) | — |
-| Venue | the name it points at, never the id | — |
 
 **The cart** (detail panel, from `getCart`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Token | text | How an anonymous guest returns to their cart, including from a recovery email. Rotated on claim, so a link shared before signing in does … |
-| Venue | the name it points at, never the id | — |
 | Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where a sale came from. Restored 24 August — this was lost in the `Money` rewrite and nine references across four contracts were pointing … |
-| Subject | the name it points at, never the id | Null while anonymous. Set by `claimCart`. |
 | Status | chip: Active, Expiring, Expired, Abandoned, Checked out | — |
-| Lines | list or chips (count when long) | — |
-| Conflicts | list or chips (count when long) | — |
 | Subtotal | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Discount total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Applied promotions | list or chips (count when long) | Re-evaluated on every read. A promotion that expired while the cart sat must not still be applied at checkout, and a promotion that became … |
 | Expires at | 1 Oct 2026, 14:30 | The earliest lease expiry in the cart, or the cart's own window where it holds none. |
-| Extensions used | 1,234 | — |
-| Max extensions | 1,234 | — |
 
 **Detail panel** (detail panel): What they already hold — so a cashier does not sell a locker to someone who has one
 
@@ -582,7 +554,7 @@ Errors to draw in the form: 409 Replacement unavailable (`replacementUnavailable
 | Loading (`?state=loading`) | The add existing ticket, read by `getMediaEntitlements`. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the add existing ticket untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No add existing ticket yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ASSET_LIBRARY_VIEW`, which `getMediaAsset` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_VIEW` for `getMediaEntitlements`. |
 | Offline (`?state=offline`) | **Not available.** The entitlement set must be read live; appending to a stale picture double-sells a locker |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Media expired (`mediaExpired`), blocked (`mediaBlocked`), already surrendered at exit (`mediaSurrendered`), or the entitlement cannot share media … (AppendRefusedProblem); 409 Replacement unavailable (`replacementUnavailable`), outside the exchange window (`outsideExchangeWindow`), or the original is redeemed (`lineRedeemed`). (OrderRefusedProblem) |
 
@@ -611,7 +583,7 @@ addOn: Locker · Large · AED 45
 - `getCart` → no permission · guest, partner, staff
 - `exchangeOrderLines` → `ORDER_EXCHANGE` (operate) · staff, partner
 
-**A refused user sees:** Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `ASSET_LIBRARY_VIEW`, which `getMediaAsset` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_VIEW` for `getMediaEntitlements`.
 
 #### Requirements it meets
 
@@ -656,7 +628,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (37), with its required mark, default, format and its error state (404, 409, 410).
-- [ ] Every output is drawn (39 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (23 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#POS-010?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Append entitlement to media, Exchange order lines, Add and pay.
 - [ ] Every transition is wired: `POS-002`, `POS-003`, `POS-004`, `POS-005`, `POS-011`.
@@ -675,7 +647,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI POS · P04 Venue POS (terminal) |
 | Module | Sell · wave 1 · needs the `core` module |
-| Block | Block A · ticket #17886 (APP-POS-POS-015) |
+| Block | Block A · task APP-POS-POS-015 |
 | Who uses it | venue staff holding `REPORT_VIEW_WORKSTATION`, `SHIFT_OPEN` (2 operate); in the flows as venue manager |
 | Device and orientation | This is a touch terminal, 1366 x 768 landscape; the kitchen display is a wall screen at 1920 x 1080. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (touchLarge density): `listCashMovements` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -707,33 +679,20 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. |
 | Kind | chip: Opening float, Lift, Add | `openingFloat` is written by `openShift`; `lift` by `createCashMovement` and by `withdrawFromDepositBox`, which is a lift from one … |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Denominations | list or chips (count when long) | Stored as `orders.cash_count_line` rows with `countKind: movement` and this movement's `cashMovementId`, not as a column. |
 | Reference | text | Safe drop reference or bag number. |
 | Reason | text | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
-| Shift | the name it points at, never the id | — |
-| Authorised by principal | the name it points at, never the id | The principal who authorised the movement, recorded for audit. |
-| Sequence | 1,234 | Monotonic within the shift. Preserves order across an offline batch. |
 | Synced at | 1 Oct 2026, 14:30 | — |
 
 **Every deposit box** (data table, from `listDepositBoxes`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Cashier principal | the name it points at, never the id | — |
 | Cashier name | text | — |
-| Venue | the name it points at, never the id | — |
-| Workstation | the name it points at, never the id | Where it is being used now. Changes during a shift; the box does not. |
-| Shift | the name it points at, never the id | The shift trading from this box. A UUIDv7, as `Shift.id` is. |
 | Status | chip: Allocated, Open, Suspended, Closing, Closed, Reconciled | — |
-| Opening float | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Opening denominations | list or chips (count when long) | 5.8.3. Either this or a total — a supervisor handing over a counted bag should not have to re-count it into fields. |
 | Withdrawn total | AED 1,234.50 | Reduces the expected close figure. Cash skimmed for banking is not a shortfall, and a system that treats it as one makes every busy cashier … |
-| Foreign holdings | list or chips (count when long) | 4.6.11 and 6.1.10. Foreign cash accepted at this till, counted separately by currency. |
 | Expected total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **Drawers over their limit** (banner, from `listDepositBoxes`): The supervisor's view (DEC-179; CHG-CSP-016): boxes over the drawer limit, with a lift to offer. **Expected cash per till is a supervisor figure**: shown only to a holder of OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER, never on a cashier's screen (DI-273, audit R080, POSV2-3).
@@ -794,7 +753,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Where the user goes next**
 
 - → `POS-001` Begin Shift: *Begin Shift*; carries `shiftId`
-- → `POS-018` Safe Drop & Cash Transfer Management: *Safe drop destinations are allocated*; carries `shiftId`
+- → `POS-018` Safe Drop & Cash Transfer Management: *Safe drop destinations are allocated*; carries `boxId`, `shiftId`
 
 #### States
 
@@ -878,7 +837,7 @@ Also apply: 5 for P04 · Sell, 41 for all of P04, 29 for every app (section *Des
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (54 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (41 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#POS-015?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm.
 - [ ] Every transition is wired: `POS-001`, `POS-018`.
@@ -897,7 +856,7 @@ Also apply: 5 for P04 · Sell, 41 for all of P04, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI POS · P04 Venue POS (terminal) |
 | Module | Sell · wave 1 · needs the `core` module |
-| Block | Block A · ticket #17888 (APP-POS-POS-017) |
+| Block | Block A · task APP-POS-POS-017 |
 | Who uses it | venue staff holding `CASH_LIFT` (1 operate) |
 | Device and orientation | This is a touch terminal, 1366 x 768 landscape; the kitchen display is a wall screen at 1920 x 1080. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (touchLarge density): the screen declares only writes (`createCashMovement`) and no read of a population — it is settings, not a list |
@@ -1054,7 +1013,7 @@ Also apply: 5 for P04 · Sell, 41 for all of P04, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI POS · P04 Venue POS (terminal) |
 | Module | Sell · wave 1 · needs the `core` module |
-| Block | Block A · ticket #17889 (APP-POS-POS-018) |
+| Block | Block A · task APP-POS-POS-018 |
 | Who uses it | venue staff holding `CASH_LIFT`, `SHIFT_OPEN` (2 operate); in the flows as cashier, venue manager |
 | Device and orientation | This is a touch terminal, 1366 x 768 landscape; the kitchen display is a wall screen at 1920 x 1080. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (touchLarge density): `listPrincipals` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1090,8 +1049,11 @@ Also apply: 5 for P04 · Sell, 41 for all of P04, 29 for every app (section *Des
 | Reason `reason` | radio group | optional | — | Banking · Safe drop · Change order · Other | — | Why a supervisor took cash out of a box. Set only on lifts `withdrawFromDepositBox` records. | `withdrawFromDepositBox` body |
 | Note `note` | text area | optional | — | max length 300 | — | — | `withdrawFromDepositBox` body |
 | Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `withdrawFromDepositBox` body |
+| Witness step up `witnessStepUp` | group | optional | — | — | — | The witnessing cashier's countersignature on this device (CHG-RUL-019): `principalId` is `witnessPrincipalId`, `credential` their PIN. | `withdrawFromDepositBox` body |
+| Principal `witnessStepUp.principalId` | picker: choose a principal | required | — | — | shows names, sends the id | The supervisor signing. Recorded against the act. | `withdrawFromDepositBox` body |
+| Credential `witnessStepUp.credential` | text area | required | — | max length 512 | — | The supervisor's staff PIN, as they sign in at a till with it. A PIN, never a password (audit R123 (7)). | `withdrawFromDepositBox` body |
 
-Errors to draw in the form: 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 The box is being counted or has been counted — `closing`, `closed` or `reconciled` (problem type `deposit-box-not-open`).
+Errors to draw in the form: 400 Validation failed; 403 The caller lacks CASH_LIFT, or the witness's step-up is missing, failed, or is not `witnessPrincipalId` (`supervisor-step-up-refused`; CHG-RUL-019).; 409 The box is being counted or has been counted — `closing`, `closed` or `reconciled` (problem type `deposit-box-not-open`).
 
 **Form: Create cash movement** (modal, opened by *Create cash movement*; *Create cash movement* calls `createCashMovement`, *Cancel* sends nothing)
 
@@ -1162,7 +1124,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 |---|---|---|---|---|---|
 | Confirm (primary button) | navigation or local | — | — | — | — |
 | Create cash movement (primary button) | `createCashMovement` POST `/shifts/{shiftId}/cash-movements` | CreateCashMovementRequest | CashMovement | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 Shift is not open (problem type `shift-not-open`), or the lift exceeds the float counted at the last count less lifts since … | works offline; opens modal first |
-| Withdraw from deposit box (destructive button) | `withdrawFromDepositBox` POST `/deposit-boxes/{boxId}/withdraw` | inline | DepositBox | 400 Validation failed; 403 Authenticated but not permitted at the requested scope; 409 The box is being counted or has been counted — `closing`, `closed` or `reconciled` (problem type `deposit-box-not-open`). | step-up: pin (The cashier the cash came from countersigns the withdrawal with their own PIN on the same device (DEC-178; CHG-CSP-015).); works offline; opens confirmDialog first |
+| Withdraw from deposit box (destructive button) | `withdrawFromDepositBox` POST `/deposit-boxes/{boxId}/withdraw` | inline | DepositBox | 400 Validation failed; 403 The caller lacks CASH_LIFT, or the witness's step-up is missing, failed, or is not `witnessPrincipalId` (`supervisor-step-up-refused`; CHG-RUL-019).; 409 The box is being counted or has been … | step-up: pin (The cashier the cash came from countersigns the withdrawal with their own PIN on the same device (DEC-178; CHG-CSP-015).); works offline; opens confirmDialog first |
 
 **Data it reads**: `listDepositBoxes` (onLoad, The open drawers and boxes to drop from)
 
@@ -1179,7 +1141,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the safe drop cash untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No safe drop cash yet. Offers Create cash movement (`createCashMovement`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on scopePath, isActive and the safe drop cash are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `createCashMovement`, `withdrawFromDepositBox`. |
 | Offline (`?state=offline`) | **Working from the local journal.** The till keeps taking money; this reconciles on sync. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Shift is not open (problem type `shift-not-open`), or the lift exceeds the float counted at the last count less lifts since (`lift-exceeds-float`, audit R123 …; 409 The box is being counted or has been counted — `closing`, `closed` or `reconciled` (problem type `deposit-box-not-open`). |
 
@@ -1206,7 +1168,7 @@ drop: Omar Ziad takes AED 3,000.00 from J. Smith's drawer (Till 14) · Safe drop
 - `withdrawFromDepositBox` → `CASH_LIFT` (operate) · staff · step-up pin
 - `listDepositBoxes` → `SHIFT_OPEN` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `createCashMovement`, `withdrawFromDepositBox`.
 
 #### Requirements it meets
 
@@ -1245,7 +1207,7 @@ Also apply: 5 for P04 · Sell, 41 for all of P04, 29 for every app (section *Des
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (24), with its required mark, default, format and its error state (400, 403, 409).
+- [ ] Every input above is drawn (27), with its required mark, default, format and its error state (400, 403, 409).
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#POS-018?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Create cash movement, Withdraw from deposit box.
@@ -1265,7 +1227,7 @@ Also apply: 5 for P04 · Sell, 41 for all of P04, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI POS · P04 Venue POS (terminal) |
 | Module | Sell · wave 1 · needs the `core` module |
-| Block | Block A · ticket #17915 (APP-POS-POS-019) |
+| Block | Block A · task APP-POS-POS-019 |
 | Who uses it | venue staff holding `REPORT_VIEW_WORKSTATION`, `SCOPE_VIEW`, `WORKSTATION_CONFIGURE` (1 operate, 1 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is a touch terminal, 1366 x 768 landscape; the kitchen display is a wall screen at 1920 x 1080. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (touchLarge density): `listShifts` reads the population and `getVenueSettings` reads one of them — list, select, act |
@@ -1344,19 +1306,11 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. Also the idempotency key. |
-| Workstation | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Principal | the name it points at, never the id | Who opened it. Cash reconciles to a person and a drawer. |
 | Principal display name | text | — |
 | Incidents | list or chips (count when long) | BL-097. A till has exceptions and there was nowhere to write them — a no-sale, a drawer opened without a transaction, a manager override, a … |
 | Status | chip: Pending approval, Open, Suspended, Pending variance, Pending closure, Closed… | — |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Deposit box code | text | — |
 | Bag number | text | — |
-| Opening float | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Sales total | AED 1,234.50 | What the till took in sales, as the guest paid it — tax included: the shift's takings, not Gross sales (CHG-FIN-002, CHG-FIN-010). |
 | Refunds total | AED 1,234.50 | What the till paid back, as the guest was refunded it — tax included. |
 | Lifts total | AED 1,234.50 | Cash taken out mid-shift by lifts and withdrawals. Cash, so neither gross nor net. |
@@ -1402,7 +1356,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the shift templates policies untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No shift templates policies yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on workstationId, status, openedFrom, openedTo and the shift templates policies are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WORKSTATION_CONFIGURE` for `setTillShiftPolicy`. |
 | Offline (`?state=offline`) | **Working from the local journal.** The till keeps taking money; this reconciles on sync. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
@@ -1439,7 +1393,7 @@ shifts:
 - `getTillShiftPolicy` → `SCOPE_VIEW` (read) · staff
 - `setTillShiftPolicy` → `WORKSTATION_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WORKSTATION_CONFIGURE` for `setTillShiftPolicy`.
 
 #### Requirements it meets
 
@@ -1480,7 +1434,7 @@ Also apply: 5 for P04 · Sell, 41 for all of P04, 29 for every app (section *Des
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (10), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (32 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#POS-019?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Edit the till rules.
 - [ ] Every transition is wired: `POS-001`, `POS-015`.
@@ -1500,7 +1454,7 @@ Also apply: 5 for P04 · Sell, 41 for all of P04, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI POS · P04 Venue POS (terminal) |
 | Module | Sell · wave 1 · needs the `fnb` module |
-| Block | Block A · ticket #17952 (APP-POS-POS-024) |
+| Block | Block A · task APP-POS-POS-024 |
 | Who uses it | venue staff holding `ORDER_VIEW`, `PRODUCT_CONFIGURE` (1 read, 1 configure) |
 | Device and orientation | This is a touch terminal, 1366 x 768 landscape; the kitchen display is a wall screen at 1920 x 1080. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (touchLarge density): `listOutlets` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1907,6 +1861,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "RotaStatus": {"type":"string","enum":["planned","published","confirmed","swapPending","cancelled","completed","noShow"]},
 "Shift": {"x-ticvai-persistence":"orders.pos_shift + orders.pos_shift_approval + orders.pos_shift_incident","description":"**`approvals` and `incidents` are child rows** (26 September, pull audit R099): `orders.pos_shift_approval` and `orders.pos_shift_incident`, one row per item, keyed to the shift. Until then the contract carried both and `orders.pos_shift` had nowhere to put either.\n","type":"object","required":["id","workstationId","venueId","scopePath","principalId","status","currency","currencyScale","openedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7. Also the idempotency key."},"workstationId":{"type":"string","format":"uuid"},"venueId":{"type":"string","format":"uuid"},"scopePath":{"type":"string"},"principalId":{"type":"string","format":"uuid","description":"Who opened it. Cash reconciles to a person and a drawer."},"principalDisplayName":{"type":"string"},"incidents":{"type":"array","description":"BL-097. **A till has exceptions and there was nowhere to write them** — a no-sale, a drawer opened without a transaction, a manager override, a guest dispute.\n**This is the log a cash-up investigation starts from**, and a shift that balances with four unexplained no-sales is not a shift that balanced.\n","items":{"type":"object","properties":{"kind":{"type":"string","enum":["noSale","drawerOpen","override","voidAfterPayment","guestDispute","tillJam","priceQuery","other"]},"at":{"type":"string","format":"date-time"},"principalId":{"type":"string","format":"uuid"},"note":{"type":"string","nullable":true}}}},"status":{"$ref":"#/components/schemas/ShiftStatus"},"currency":{"type":"string","pattern":"^[A-Z]{3}$","x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else. **Kept on the wire , removed from the table** — a client should not walk a hierarchy to read a figure, and the  database should not hold nine million copies of AED. Four tables genuinely differ from their\n region and keep a stored currency: `orders.payment.tender_currency`, `inventory.supplier`, \n`ledger.account`, `control.partner_agreement`.\n"},"currencyScale":{"type":"integer","minimum":0,"maximum":4,"x-ticvai-persisted":false,"description":"**Resolved from the region, not stored** (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and cannot be anything else — storing it per ro w is a copy of a fact that cannot differ. **Kept on the wire, removed from the table**: a cl ient reading a figure should not walk a hierarchy to know what it means, and the database sh ould not hold nine million copies of AED. Four tables genuinely differ from their region and\n keep a stored currency — `orders.payment.tender_currency`, `inventory.supplier`, `ledger.ac\ncount`, `control.partner_agreement`. **A guest paying USD at an AED venue is a real row; a w orkstation with its own currency is a misconfiguration.**\n"},"depositBoxCode":{"type":"string","nullable":true},"bagNumber":{"type":"string","nullable":true},"openingFloat":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"salesTotal":{"x-ticvai-column":"gross_sales_amount","$ref":"../shared/common.yaml#/components/schemas/Money","description":"What the till took in sales, as the guest paid it — tax included: the shift's takings, not Gross sales (CHG-FIN-002, CHG-FIN-010). **Never shown to the shift's own cashier before the count is in** (CHG-FIN-003): with the float and the lifts it gives away the expected cash.\n"},"refundsTotal":{"x-ticvai-column":"gross_refunded_amount","$ref":"../shared/common.yaml#/components/schemas/Money","description":"What the till paid back, as the guest was refunded it — tax included."},"liftsTotal":{"x-ticvai-column":"lifted_amount","$ref":"../shared/common.yaml#/components/schemas/Money","description":"Cash taken out mid-shift by lifts and withdrawals. Cash, so neither gross nor net."},"expectedCash":{"x-ticvai-column":"expected_cash_amount","allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"readOnly":true,"nullable":true,"description":"26 September, pull audit R207. **The figure the blind count was measured against**, revealed once the count is in — null until then. Until this date only `ShiftCloseResult` carried it, returned once by `closeShift`, so BO-040 could not show the over/short it exists to accept. **Null to the shift's own cashier on every read** (CHG-FIN-003, 2 October): returned only to a caller holding OVERSHORT_ACCEPT or SHIFT_CLOSE_OTHER at the venue.\n"},"countedCash":{"x-ticvai-column":"counted_cash_amount","allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"readOnly":true,"nullable":true,"description":"What the close count found. Null until the shift is counted."},"variance":{"x-ticvai-column":"variance_amount","allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"readOnly":true,"nullable":true,"description":"Counted minus expected, as `ShiftCloseResult.variance`. Negative is short. Null to the shift's own cashier, as `expectedCash` (CHG-FIN-003)."},"cashierReason":{"type":"string","nullable":true,"readOnly":true,"enum":["tillError","unrecordedRefund","miscount","other"],"description":"What the cashier said went wrong, given with the blind count (`CloseShiftRequest.cashierReason`, DI-803) without seeing the variance; the supervisor reads it beside the variance on BO-040 (CHG-FIN-003).\n"},"cashierNote":{"type":"string","nullable":true,"readOnly":true,"maxLength":1000,"description":"The cashier's note with the count (`CloseShiftRequest.notes`; CHG-FIN-003)."},"heldLeaseCount":{"type":"integer","description":"Inventory leases currently held by this workstation. Surfaced so an operator closing a shift can see what will be returned.\n"},"openedAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time","description":"When the device recorded the open. `openedAt` is the server's time."},"suspendedAt":{"type":"string","format":"date-time","nullable":true},"suspendReason":{"type":"string","maxLength":200,"nullable":true,"description":"The `reason` given to `suspendShift`. Cleared on resume."},"closedAt":{"type":"string","format":"date-time","nullable":true},"closedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"description":"Who submitted the close count. `reopenShift` refuses an approver who is this principal, and until 26 September there was nothing to compare against (pull audit R099).\n"},"recountRequestedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"description":"**Set by `rejectShiftVariance`, cleared by the cashier's recount** (decided 2 October 2026, Chinmay; DEC-175; CHG-CSP-013; DI-804). While set, the shift is `pendingVariance` waiting for the cashier rather than the supervisor: the cashier's view says \"Recount requested\" instead of \"Under review\".\n"},"recountRequestedByPrincipalId":{"type":"string","format":"uuid","nullable":true,"readOnly":true,"description":"The supervisor who sent the count back (CHG-CSP-013)."},"recountReason":{"type":"string","nullable":true,"readOnly":true,"maxLength":500,"description":"The supervisor's reason, shown to the cashier; never an amount (CHG-CSP-013, CHG-FIN-003)."},"countNumber":{"type":"integer","minimum":0,"readOnly":true,"description":"How many close counts the shift has had: 0 before the first, 1 after it, 2 after a recount (CHG-CSP-013). The latest is the one measured.\n"},"syncedAt":{"type":"string","format":"date-time","nullable":true,"description":"Null while the shift has unsynced operations."},"approvals":{"type":"array","items":{"type":"object","required":["kind","principalId","at"],"properties":{"kind":{"type":"string","enum":["open","close","variance"],"description":"`open` from `approveShiftOpen`, `close` from `approveShiftClose`, `variance` from `acceptShiftVariance`.\n"},"principalId":{"type":"string","format":"uuid"},"at":{"type":"string","format":"date-time"},"reason":{"type":"string"}}}}}},
 "ShiftStatus": {"type":"string","enum":["pendingApproval","open","suspended","pendingVariance","pendingClosure","closed","autoClosed"]},
+"SupervisorStepUp": {"type":"object","description":"**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n","required":["principalId","credential"],"properties":{"principalId":{"type":"string","format":"uuid","description":"The supervisor signing. Recorded against the act."},"credential":{"type":"string","maxLength":512,"writeOnly":true,"description":"The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."}}},
 "TableCombination": {"type":"object","x-ticvai-persistence":"fnb.table_combination","description":"**Tables that can be pushed together, and what they seat together.** Declared by a host rather than inferred from a floor plan — a pillar, a step or a service run stops two adjacent tables combining. `setTableCombinations` writes the outlet's set.\n","required":["tableIds","combinedCovers"],"properties":{"id":{"type":"string","format":"uuid","readOnly":true},"outletId":{"type":"string","format":"uuid","readOnly":true,"description":"The outlet in the path."},"tableIds":{"type":"array","minItems":2,"items":{"type":"string","format":"uuid"}},"combinedCovers":{"type":"integer","minimum":1},"setupMinutes":{"type":"integer","default":5},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Operations write it at `outlet` scope."}}},
 "TableDefinition": {"x-ticvai-persistence":"fnb.dining_table","type":"object","description":"A restaurant (dining) table, reserved with `createTableReservation`. Not a map-bookable `resources` table, which is a non-dining spot sold like a cabana (decided 29 September, rev 3 GAP-C2).","required":["id","label","capacity"],"properties":{"id":{"type":"string","format":"uuid"},"label":{"type":"string","maxLength":32,"x-ticvai-unique":"venue","description":"**The table code, unique per venue** (decided 28 September, audit R108). Two tables in one venue never share a label, across all its outlets, so *T12* names one table wherever it is read. `createTable` and `updateTable` refuse a duplicate with `409` `duplicate-code`.\n"},"capacity":{"type":"integer","minimum":1},"zone":{"type":"string","nullable":true},"position":{"type":"object","properties":{"x":{"type":"number"},"y":{"type":"number"}}},"shape":{"type":"string","enum":["round","square","rectangle","booth","bar"]},"isOutOfService":{"type":"boolean","default":false,"description":"**Damaged, or its section closed.** `getTableMap` shows it as `outOfService` and a claim on it is refused with `tableOutOfService`."}}},
 "TableMap": {"x-ticvai-persistence":"none — projection","type":"object","required":["outletId","tables"],"properties":{"outletId":{"type":"string","format":"uuid"},"zones":{"type":"array","items":{"type":"string"}},"tables":{"type":"array","items":{"$ref":"#/components/schemas/TableState"}}}},

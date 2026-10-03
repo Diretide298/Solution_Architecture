@@ -97,11 +97,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ACC-001` | Landing / Programme Overview | B–D | 0 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ACC-002` | Registration Form | B–D | 6 | 0 | 5 | 1 | 6 | 0 | — | notStarted (generated) |
-| `ACC-003` | Application Review & Submit | B–D | 0 | 0 | 6 | 1 | 2 | 0 | — | notStarted (generated) |
-| `ACC-004` | Application Status Tracking | B–D | 0 | 0 | 6 | 9 | 2 | 0 | — | notStarted (generated) |
-| `ACC-005` | Accreditation Badge | B–D | 0 | 0 | 5 | 2 | 2 | 6 | — | notStarted (generated) |
+| `ACC-001` | Landing / Programme Overview | D | 0 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ACC-002` | Registration Form | D | 6 | 0 | 5 | 1 | 6 | 0 | — | notStarted (generated) |
+| `ACC-003` | Application Review & Submit | D | 0 | 0 | 6 | 1 | 2 | 0 | — | notStarted (generated) |
+| `ACC-004` | Application Status Tracking | D | 0 | 0 | 6 | 9 | 2 | 0 | — | notStarted (generated) |
+| `ACC-005` | Accreditation Badge | D | 0 | 0 | 5 | 2 | 2 | 6 | — | notStarted (generated) |
 
 ---
 
@@ -117,7 +117,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P11 Accreditation Web (web) |
 | Module | Applicant Journey · wave 3 · needs the `accreditation` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ACCRED-ACC-001 |
 | Who uses it | public |
 | Device and orientation | This is a public web form flow, 1440 desktop and 390 phone widths; reviewer screens as a desktop back office. · LTR and RTL · light theme |
 | Pattern | publicPortalLanding (compact density):  |
@@ -275,7 +275,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P11 Accreditation Web (web) |
 | Module | Applicant Journey · wave 3 · needs the `accreditation` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ACCRED-ACC-002 |
 | Who uses it | public staff holding `ACCREDITATION_APPLY` (1 operate); in the flows as contractor |
 | Device and orientation | This is a public web form flow, 1440 desktop and 390 phone widths; reviewer screens as a desktop back office. · LTR and RTL · light theme |
 | Pattern | multiStepForm (compact density):  |
@@ -477,7 +477,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P11 Accreditation Web (web) |
 | Module | Applicant Journey · wave 3 · needs the `accreditation` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ACCRED-ACC-003 |
 | Who uses it | public staff holding `ACCREDITATION_APPLY` (1 operate) |
 | Device and orientation | This is a public web form flow, 1440 desktop and 390 phone widths; reviewer screens as a desktop back office. · LTR and RTL · light theme |
 | Pattern | multiStepForm (compact density):  |
@@ -640,7 +640,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P11 Accreditation Web (web) |
 | Module | Applicant Journey · wave 3 · needs the `accreditation` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ACCRED-ACC-004 |
 | Who uses it | public staff holding `ACCREDITATION_APPLY` (1 operate) |
 | Device and orientation | This is a public web form flow, 1440 desktop and 390 phone widths; reviewer screens as a desktop back office. · LTR and RTL · light theme |
 | Pattern | statusTracker (compact density):  |
@@ -836,7 +836,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P11 Accreditation Web (web) |
 | Module | Applicant Journey · wave 3 · needs the `accreditation` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ACCRED-ACC-005 |
 | Who uses it | public staff holding `ACCREDITATION_APPLY` (1 operate); in the flows as contractor |
 | Device and orientation | This is a public web form flow, 1440 desktop and 390 phone widths; reviewer screens as a desktop back office. · LTR and RTL · light theme |
 | Pattern | credentialView (touchLarge density):  |
@@ -908,7 +908,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Where the user goes next**
 
-- → `ACC-004` Application Status Tracking: *Application Status Tracking*; carries `applicationRef`
+- → `ACC-004` Application Status Tracking: *Application Status Tracking*; carries `applicationId`, `applicationRef`
 - → `SCN-003` Ready to scan: *A steward scans it at a service gate*; calls `listMyAccreditationCredentials`
 
 #### States

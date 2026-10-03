@@ -4,7 +4,7 @@
   "name": "Newsletter & Preferences",
   "module": "Marketing",
   "requiresModule": "marketing",
-  "wave": 3,
+  "wave": 1,
   "capability": "C00",
   "implementation": {
    "app": "guest-app",
@@ -173,7 +173,7 @@
     "view": "Account → All screens → Wave 3 → Newsletter & preferences"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",

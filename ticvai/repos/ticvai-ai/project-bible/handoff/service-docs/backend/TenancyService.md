@@ -33,7 +33,7 @@
 |---|---|---|---|---|---|---|
 | approvals | [`approveMatrixMultiLevel`](#approvematrixmultilevel) | PUT | `/matrix-multi-level` | setup | 1 |  |
 | approvals | [`approveRoleAuthorityDelegation`](#approveroleauthoritydelegation) | PUT | `/role-authority-delegation` | setup | 1 |  |
-| attendance | [`recordAttendance`](#recordattendance) | POST | `/attendance/clock` | core | 2 | BO-056, BO-889, BO-935, BO-936, EMP-024, EMP-025 … |
+| attendance | [`recordAttendance`](#recordattendance) | POST | `/attendance/clock` | core | 1 | BO-889, BO-935, BO-936, EMP-024, EMP-025, POS-009 |
 | delegation | [`createApprovalDelegation`](#createapprovaldelegation) | POST | `/delegations` | setup | 1 | ADM-243, ADM-534, BO-087, BO-385 |
 | devices | [`setDeviceAssignment`](#setdeviceassignment) | PUT | `/devices/{deviceId}/assignment` | core | 1 | ADM-582, BO-732, POS-016 |
 | matrix | [`setApprovalExternalProvider`](#setapprovalexternalprovider) | PUT | `/approval-external-providers` | setup | 1 | ADM-354 |
@@ -43,11 +43,11 @@
 | request | [`createApprovalRequest`](#createapprovalrequest) | POST | `/approval-requests` | core | 1 | ADM-567, BO-045, BO-1010, BO-1031, BO-1080, BO-1181 … |
 | request | [`decideApprovalRequest`](#decideapprovalrequest) | POST | `/approval-requests/{requestId}/decide` | core | 1 | ADM-145, BO-084, BO-085, BO-243, BO-367, BO-374 … |
 | request | [`evaluateApprovalRequirement`](#evaluateapprovalrequirement) | POST | `/approval-requests/evaluate` | core | 1 | ADM-337, ADM-530, ADM-532, POS-002 |
-| rota | [`createRotaAssignment`](#createrotaassignment) | POST | `/rota-assignments` | setup | 2 | BO-055, BO-712, BO-714, BO-884, BO-917 |
-| rota | [`listRotaAssignments`](#listrotaassignments) | GET | `/rota-assignments` | core | 2 | BO-055, BO-712, BO-714, BO-883, BO-884, EMP-021 … |
-| rota | [`updateRotaAssignment`](#updaterotaassignment) | PATCH | `/rota-assignments/{assignmentId}` | setup | 2 | BO-055 |
+| rota | [`createRotaAssignment`](#createrotaassignment) | POST | `/rota-assignments` | setup | 1 | BO-055, BO-712, BO-714, BO-884, BO-917 |
+| rota | [`listRotaAssignments`](#listrotaassignments) | GET | `/rota-assignments` | core | 1 | BO-055, BO-712, BO-714, BO-883, BO-884, EMP-021 … |
+| rota | [`updateRotaAssignment`](#updaterotaassignment) | PATCH | `/rota-assignments/{assignmentId}` | setup | 1 | BO-055 |
 | scope | [`createOrgUnit`](#createorgunit) | POST | `/org-units` | setup | 1 | ADM-006, ADM-420, ADM-421, BO-064, BO-145 |
-| scope | [`listOrgUnits`](#listorgunits) | GET | `/org-units` | core | 2 | ADM-006, ADM-412, BO-055, BO-064, BO-068, BO-145 … |
+| scope | [`listOrgUnits`](#listorgunits) | GET | `/org-units` | core | 1 | ADM-006, ADM-412, BO-055, BO-064, BO-068, BO-145 … |
 | scope | [`updateOrgUnit`](#updateorgunit) | PATCH | `/org-units/{orgUnitId}` | setup | 1 | BO-064, BO-145 |
 | tenancy | [`getWorkstationHealth`](#getworkstationhealth) | GET | `/workstations/{workstationId}/health` | core | 1 | BO-036, BO-128, BO-129, POS-001, POS-025 |
 | tenancy | [`setVenueSettings`](#setvenuesettings) | PUT | `/venues/{venueId}/settings` | setup | 1 | BO-065, BO-1063, BO-136, BO-187, BO-600 |
@@ -260,18 +260,19 @@ Who actually turned up
 18.9.1 and `EMP-024`, `EMP-025`. **Offline-capable and timestamped on the device**, then reconciled. A steward clocking in at a gate with no signal must not be marked absent.
 Where the venue requires it, the record carries the access point or geofence the clock happened at — **a clock-in from a car park is a different fact from one at the staff entrance**, and the difference is what makes attendance evidence rather than self-report.
 A missing clock-out is not corrected automatically. It is flagged, because guessing when someone left is how a payroll dispute starts.
+**Self clock-in only** (Chinmay, 3 October 2026, Block A business rules: "self clock-in only"; CHG-RUL-016). The record is always the caller's own: the principal comes from the session and the body names nobody, so a supervisor cannot clock a member of staff in or out here, from a till, the staff app or the back office. A supervisor corrects a record afterwards with `amendAttendance` (`WORKFORCE_MANAGE`), which keeps the original. BO-056's "Record attendance" becomes "Amend attendance".
 
 |  |  |
 |---|---|
 | Permission | `ATTENDANCE_RECORD` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
 | Reads | `access.access_point`, `cache:idempotency`, `workforce.attendance`, `workforce.attendance_amendment`, `workforce.rota_assignment` |
 | Writes | `cache:idempotency`, `workforce.attendance` |
-| Called by | BO-056, BO-889, BO-935, BO-936, EMP-024, EMP-025, POS-009 |
+| Called by | BO-889, BO-935, BO-936, EMP-024, EMP-025, POS-009 |
 
 **Parameters**
 
@@ -1210,7 +1211,7 @@ Where the position needs a till, the assignment names the workstation their shif
 | Permission | `WORKFORCE_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, makes `workforce.rota_assignment` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `identity.delegated_access`, `identity.principal`, `platform.workstation`, `workforce.rota_assignment` |
@@ -1293,7 +1294,7 @@ Where the position needs a till, the assignment names the workstation their shif
 | Permission | `WORKFORCE_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -1356,7 +1357,7 @@ Where the position needs a till, the assignment names the workstation their shif
 | Permission | `WORKFORCE_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, changes rows of `workforce.rota_assignment` that another operation creates |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `workforce.rota_assignment` |
@@ -1494,7 +1495,7 @@ Where the position needs a till, the assignment names the workstation their shif
 | Permission | `SCOPE_VIEW` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -2693,7 +2694,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no | Added 20 August. |
+| id | uuid | yes | Added 20 August. |
 | level | integer | yes |  |
 | principal_id | uuid | yes |  |
 | display_name | text | no |  |
@@ -2711,7 +2712,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | delegator_principal_id | uuid | yes | A principal id (identity.Principal.id). |
 | delegate_principal_id | uuid | yes | A principal id, resolved to a name the same way as delegatorPrincipalId. |
 | kinds | text[] | no | Absent means everything the delegator may approve. |
@@ -2726,7 +2727,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | code | text | yes | The provider's stable name, and the key setApprovalExternalProvider upserts on. |
 | name | text | yes |  |
 | endpoint_url | text | yes | https only. |
@@ -2745,7 +2746,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | kind | text | yes |  |
 | scope_level | text | yes |  |
 | scope_path | text | no |  |
@@ -2791,7 +2792,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no | Added 20 August. |
+| id | uuid | yes | Added 20 August. |
 | sort_order | integer | yes | First match wins. |
 | min_amount | numeric(18,4) | no |  |
 | max_amount | numeric(18,4) | no |  |
@@ -2973,7 +2974,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no | Added 20 August. |
+| id | uuid | yes | Added 20 August. |
 | venue_id | uuid | no | From the path of setVenueSettings. |
 | calendar_day_start_hour | integer | no | Where the venue's calendar day starts (17 September minutes M17-03, added 30 September): the first hour row of every day and week calendar view (calendarView in screens/_components.yaml), so a venue… |
 | currency_code | text | no | readOnly is the freeze. |
@@ -3087,7 +3088,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | rest_period_before | integer | no | Minutes since the previous shift ended. |
 | breaches_working_hour_limit | boolean | no | Flagged at assignment, not discovered at payroll. |
 | labour_cost | numeric(18,4) | no | Cost at the point of scheduling. |
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | principal_id | uuid | yes |  |
 | display_name | text | no |  |
 | venue_id | uuid | yes |  |

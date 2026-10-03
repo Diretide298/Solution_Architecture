@@ -95,16 +95,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-499` | Forecasting Command Center | B–D | 6 | 6 | 7 | 39 | 0 | 0 | — | notStarted (—) |
-| `ADM-500` | Forecast Configuration & Forecasting Strategy | B–D | 39 | 6 | 7 | 10 | 1 | 0 | — | notStarted (—) |
-| `ADM-501` | Forecast Data & Signal Configuration | B–D | 6 | 6 | 7 | 9 | 0 | 0 | — | notStarted (—) |
-| `ADM-502` | Attendance & Visitation Forecast | B–D | 6 | 6 | 7 | 43 | 0 | 0 | — | notStarted (—) |
-| `ADM-503` | Ticket, Product & Timeslot Demand Forecast | B–D | 6 | 18 | 7 | 39 | 1 | 0 | — | notStarted (—) |
-| `ADM-504` | Channel & Booking Pace Forecast | B–D | 6 | 30 | 7 | 39 | 0 | 6 | — | notStarted (—) |
-| `ADM-505` | Revenue & Commercial Forecast | B–D | 6 | 6 | 7 | 39 | 0 | 0 | — | notStarted (—) |
-| `ADM-506` | Forecast Drivers, Confidence & Explainability | B–D | 6 | 30 | 7 | 44 | 0 | 0 | — | notStarted (—) |
-| `ADM-507` | Forecast Scenario & What-If Simulator | B–D | 6 | 20 | 7 | 40 | 0 | 0 | — | notStarted (—) |
-| `ADM-508` | Forecast Accuracy, Review & Publication Center | A | 13 | 28 | 7 | 6 | 0 | 0 | — | notStarted (—) |
+| `ADM-499` | Forecasting Command Center | D | 6 | 6 | 7 | 39 | 0 | 0 | — | notStarted (—) |
+| `ADM-500` | Forecast Configuration & Forecasting Strategy | A | 39 | 6 | 7 | 10 | 1 | 0 | — | notStarted (—) |
+| `ADM-501` | Forecast Data & Signal Configuration | D | 6 | 6 | 7 | 9 | 0 | 0 | — | notStarted (—) |
+| `ADM-502` | Attendance & Visitation Forecast | D | 6 | 6 | 7 | 43 | 0 | 0 | — | notStarted (—) |
+| `ADM-503` | Ticket, Product & Timeslot Demand Forecast | B | 6 | 18 | 7 | 39 | 1 | 0 | — | notStarted (—) |
+| `ADM-504` | Channel & Booking Pace Forecast | B | 6 | 30 | 7 | 39 | 0 | 6 | — | notStarted (—) |
+| `ADM-505` | Revenue & Commercial Forecast | B | 6 | 6 | 7 | 39 | 0 | 0 | — | notStarted (—) |
+| `ADM-506` | Forecast Drivers, Confidence & Explainability | A | 6 | 30 | 7 | 44 | 0 | 0 | — | notStarted (—) |
+| `ADM-507` | Forecast Scenario & What-If Simulator | D | 6 | 20 | 7 | 40 | 0 | 0 | — | notStarted (—) |
+| `ADM-508` | Forecast Accuracy, Review & Publication Center | A | 13 | 24 | 7 | 6 | 0 | 0 | — | notStarted (—) |
 
 ---
 
@@ -120,7 +120,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Analytics · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CONSOLE-ADM-499 |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Header KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -356,8 +356,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Analytics · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Analytics · wave 1 · needs the `core` module |
+| Block | Block A · task APP-SETUP-ADM-500 |
 | Who uses it | ticvai staff holding `AI_CONFIGURE`, `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (1 configure, 2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Fields; Options conceptually) and no display directory — it is settings, not a population |
@@ -577,7 +577,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Analytics · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CONSOLE-ADM-501 |
 | Who uses it | ticvai staff holding `AI_CONFIGURE`, `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (1 configure, 2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -766,7 +766,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Analytics · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CONSOLE-ADM-502 |
 | Who uses it | ticvai staff holding `AI_CONFIGURE`, `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (1 configure, 2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -960,7 +960,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Analytics · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-503 |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -1164,7 +1164,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Analytics · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-504 |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Forecast) and no metric row |
@@ -1383,7 +1383,7 @@ Also apply: 9 for all of P09, 29 for every app (section *Design inputs from the 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Analytics · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-505 |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§Revenue KPIs) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -1574,8 +1574,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Analytics · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Analytics · wave 1 · needs the `core` module |
+| Block | Block A · task APP-SETUP-ADM-506 |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -1809,7 +1809,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Analytics · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CONSOLE-ADM-507 |
 | Who uses it | ticvai staff holding `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |
@@ -2014,8 +2014,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | AI · wave 3 · needs the `core` module |
-| Block | Block A · ticket #20751 (APP-SETUP-ADM-508) |
+| Module | AI · wave 1 · needs the `core` module |
+| Block | Block A · task APP-SETUP-ADM-508 |
 | Who uses it | ticvai staff holding `AI_CONFIGURE`, `AI_USE`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (1 configure, 2 operate, 1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Analyze) and no metric row |
@@ -2124,13 +2124,9 @@ Errors to draw in the form: 403 The version is not published and the caller does
 |---|---|---|
 | Version number | 1,234 | — |
 | Status | chip: Running, Draft, Awaiting approval, Published, Superseded, Rejected… | — |
-| Basis | chip: Heuristic, Statistical, Model, Hybrid, Manual | How the answer was reached, and this is the field the whole design exists for. A venue must be able to see that today's price suggestion is … |
-| Maturity | grouped details | Where an answer stands, on every answer (29 September, AI functions review; baseline then learn). |
 | Model version | text | — |
 | Data cutoff at | 1 Oct 2026, 14:30 | The analytical replica watermark the snapshot was taken at. |
 | Horizon start | 1 Oct 2026, 14:30 | — |
-| Horizon end | 1 Oct 2026, 14:30 | — |
-| Quality checks | grouped details | Each gate and whether it passed. |
 | Published at | 1 Oct 2026, 14:30 | — |
 
 **Measured accuracy** (detail panel, from `getForecastAccuracy`)
@@ -2278,7 +2274,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (13), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-508?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant, , Run forecast, Publish forecast version, Export forecast version.
 - [ ] Every transition is wired: `ADM-499`.

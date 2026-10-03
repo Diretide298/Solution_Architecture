@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-02",
+ "generated": "2026-10-03",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 71,
@@ -15,16 +15,18 @@
   "contracts": 10,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 121
+  "operationsWithNoScreen": 124
  },
  "waves": {
-  "wave3": 71
+  "wave1": 3,
+  "wave3": 68
  },
  "modules": [
   {
    "module": "Analytics",
    "screens": 71,
    "waves": [
+    1,
     3
    ]
   }
@@ -39,15 +41,15 @@
    "operations": 30
   },
   {
-   "contract": "tenancy",
-   "operations": 4
-  },
-  {
    "contract": "finance",
    "operations": 4
   },
   {
    "contract": "identity",
+   "operations": 4
+  },
+  {
+   "contract": "tenancy",
    "operations": 4
   },
   {
@@ -59,7 +61,7 @@
    "operations": 3
   },
   {
-   "contract": "catalogue",
+   "contract": "orders",
    "operations": 1
   },
   {
@@ -67,7 +69,7 @@
    "operations": 1
   },
   {
-   "contract": "orders",
+   "contract": "catalogue",
    "operations": 1
   }
  ],
@@ -265,9 +267,9 @@
    "id": "ANL-023",
    "name": "Drag-and-Drop Dashboard Canvas",
    "module": "Analytics",
-   "wave": 3,
+   "wave": 1,
    "route": "/analytics/drag-and-drop-dashboard-canvas-anl-023",
-   "operations": 6,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -283,7 +285,7 @@
    "id": "ANL-025",
    "name": "KPI Builder",
    "module": "Analytics",
-   "wave": 3,
+   "wave": 1,
    "route": "/analytics/kpi-builder-anl-025",
    "operations": 2,
    "drawn": true
@@ -652,7 +654,7 @@
    "id": "ANL-066",
    "name": "Semantic Model & Business Data Catalogue",
    "module": "Analytics",
-   "wave": 3,
+   "wave": 1,
    "route": "/analytics/semantic-model-business-data-catalogue-anl-066",
    "operations": 2,
    "drawn": true
@@ -1009,6 +1011,18 @@
     "summary": "Change many products at once, with a preview"
    },
    {
+    "operation": "rejectRequisition",
+    "contract": "inventory",
+    "verb": "POST",
+    "summary": "Reject a requisition"
+   },
+   {
+    "operation": "returnRequisition",
+    "contract": "inventory",
+    "verb": "POST",
+    "summary": "Return a requisition for more information"
+   },
+   {
     "operation": "actOnWaiverRequirements",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -1237,6 +1251,12 @@
     "summary": "Store a guest photo, ID or signed document"
    },
    {
+    "operation": "cancelPaymentLink",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Cancel a live payment link"
+   },
+   {
     "operation": "convertToTermProduct",
     "contract": "orders",
     "verb": "POST",
@@ -1441,7 +1461,15 @@
     "summary": "A device reports interference"
    }
   ],
-  "modulesSplitAcrossWaves": [],
+  "modulesSplitAcrossWaves": [
+   {
+    "module": "Analytics",
+    "waves": [
+     1,
+     3
+    ]
+   }
+  ],
   "screensNotDrawn": [],
   "flowsNamingAMissingScreen": []
  }

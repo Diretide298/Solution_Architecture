@@ -194,6 +194,7 @@ Not a reservation. `reserveMerchandise` holds unsold stock for someone who has n
 The most-used operation on a shop floor. Returns price after any live promotion, stock at this outlet, and stock at sibling outlets — so a colleague can be sent to fetch a size rather than losing the sale.
 
 **"This outlet" is the outlet of the workstation asking** (decided 28 September, audit R215): price and `onHand` are that outlet's row. A caller with no workstation (a guest on the web shop or app) names the outlet with `outletId`; a workstation caller's own outlet always wins. **An inactive item is not found**: it answers `404`, exactly as an unknown barcode does.
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets active merchandise that is on sale, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
 |  |  |
 |---|---|
@@ -204,6 +205,7 @@ The most-used operation on a shop floor. Returns price after any live promotion,
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
+| Guest callable | True |
 | Reads | `retail.merchandise` |
 | Writes | - |
 | Called by | BO-114, EMP-062, EMP-069, GST-026, KSK-017, POS-002, POS-023, WEB-033 |
@@ -255,6 +257,7 @@ The most-used operation on a shop floor. Returns price after any live promotion,
 **`GET /shop-and-drop/lookup`**: Find a guest's dropped goods
 
 Scanned at the collection point. Accepts the entitlement, the drop reference, or the original receipt — a guest arrives with whichever they still have.
+**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for goods they dropped themselves; another guest's goods is refused exactly as one that does not exist, never returned. `ORDER_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
 
 |  |  |
 |---|---|
@@ -294,6 +297,7 @@ A guest who cannot carry a purchase around a venue collects it on the way out. T
 **`expiresAt` is at least 15 minutes ahead and no later than the end of the visit day** (decided 28 September, audit R215): the close of the venue's operating day on which the reservation is made. Outside that window the request is a `400`. **Left out, the reservation holds until the end of the visit day** (decided 28 September, audit R169).
 
 **Not the guest path for buying to collect, on the web or in the app** (decided 28 September, audit R236). A guest buying to collect pays online at checkout (`addCartLine`, `checkoutCart`, `createPayment`), and the order service creates the collection with `createShopAndDrop`. This holds unpaid stock only: in the guest app (GST-026) it is offered as a hold the guest pays for at the shop, and staff use it at a till or an outlet. A held item is never collected unpaid.
+**A guest does this within their own session** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-003; `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to do it for a guest at a till or in the back office (ADR-0025).
 
 |  |  |
 |---|---|
@@ -303,6 +307,7 @@ A guest who cannot carry a purchase around a venue collects it on the way out. T
 | Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
+| Guest callable | True |
 | Reads | `cache:idempotency`, `retail.reservation`, `retail.reservation_line` |
 | Writes | `cache:idempotency`, `retail.reservation`, `retail.reservation_line` |
 | Called by | EMP-068, GST-026, KSK-017, POS-012 |
@@ -437,6 +442,7 @@ Links a sellable catalogue variant to an inventory item. That link is what makes
 Two callers. **The back office** lists and manages the range. **The guest shop screens** (web, guest app, kiosk) browse it. A terminal does not call this: it reads its merchandise catalogue from the local bundle and checks live stock with `lookupMerchandise` before completing a sale.
 
 **A guest gets the guest projection, not the stock record.** A staff caller receives `MerchandiseItem`. A guest caller receives `GuestMerchandiseItem`, which leaves out the inventory link, the catalogue variant, the stock count and the serial-number flag, and says only whether the item can be bought. The server chooses by the caller's audience; the client does not ask for one.
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets active merchandise that is on sale, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
 |  |  |
 |---|---|
@@ -447,6 +453,7 @@ Two callers. **The back office** lists and manages the range. **The guest shop s
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
+| Guest callable | True |
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `retail.merchandise` |
 | Writes | - |
@@ -1270,7 +1277,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no | Added 20 August. |
+| id | uuid | yes | Added 20 August. |
 | outlet_id | uuid | yes |  |
 | default_window_days | integer | yes |  |
 | requires_receipt | boolean | yes |  |

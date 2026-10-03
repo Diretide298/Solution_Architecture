@@ -757,7 +757,9 @@
    "params": [
     {
      "name": "subjectId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getWallet` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1156,7 +1158,9 @@
    "params": [
     {
      "name": "prizeId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPrizes` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1311,7 +1315,9 @@
    "params": [
     {
      "name": "prizeId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createPrize`; a link or an edge that holds one opens it instead."
     }
    ]
   },
@@ -1737,7 +1743,9 @@
    "params": [
     {
      "name": "subjectId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `listWalletTransactions` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

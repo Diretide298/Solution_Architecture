@@ -605,10 +605,18 @@ paths:
         **`recordedAt` is the device's time** (offline-and-sync: offline data keeps both
         `recorded_at` and `synced_at`), and `id` is the client UUIDv7 that doubles as the
         idempotency key.
+
+        **The step-up travels in the body** (Chinmay, 3 October 2026, defaults taken; CHG-RUL-019), as on
+        `reopenShift` and `rejectShiftVariance`: `witnessStepUp` carries the principal and PIN of the cashier the cash came from (`witnessPrincipalId`), who countersigns, entered on the
+        device making this call, verified as `common.yaml` `SupervisorStepUp` says. Optional in the schema so a
+        client built at r1 still validates, **refused without it** (`403 supervisor-step-up-refused`). The step-up's
+        principal must be `witnessPrincipalId`; it is the witness's PIN, not a supervisor's, so the field is named
+        for the witness.
       tags: [shift]
       x-ticvai-permission: CASH_LIFT
       x-ticvai-step-up: pin
       x-ticvai-step-up-reason: The cashier the cash came from countersigns the withdrawal with their own PIN on the same device (DEC-178; CHG-CSP-015).
+      x-ticvai-step-up-carrier: body:witnessStepUp
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: append
@@ -634,6 +642,13 @@ paths:
                 reason: { $ref: '#/components/schemas/WithdrawalReason' }
                 note: { type: string, maxLength: 300 }
                 recordedAt: { type: string, format: date-time }
+                witnessStepUp:
+                  allOf:
+                    - $ref: '../shared/common.yaml#/components/schemas/SupervisorStepUp'
+                  description: >
+                    The witnessing cashier's countersignature on this device (CHG-RUL-019): `principalId` is
+                    `witnessPrincipalId`, `credential` their PIN. Refused without it (`403
+                    supervisor-step-up-refused`). Captured offline, it is verified when the withdrawal syncs.
       responses:
         '201':
           headers:
@@ -644,7 +659,13 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/DepositBox' }
         '400': { $ref: '../shared/common.yaml#/components/responses/BadRequest' }
-        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '403':
+          description: The caller lacks CASH_LIFT, or the witness's step-up is missing, failed, or is not
+            `witnessPrincipalId` (`supervisor-step-up-refused`; CHG-RUL-019).
+          x-ticvai-problem-types: [supervisor-step-up-refused]
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
         '409':
           description: >
             The box is being counted or has been counted — `closing`, `closed` or `reconciled`
@@ -920,6 +941,7 @@ paths:
       x-ticvai-permission: SHIFT_REOPEN
       x-ticvai-step-up: pin
       x-ticvai-step-up-reason: Reopening a counted shift is a reversal; a supervisor signs it in place (audit R144).
+      x-ticvai-step-up-carrier: body:supervisorStepUp
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1140,11 +1162,17 @@ paths:
         closed here, a counted shift waiting for review is accepted (`acceptShiftVariance`) or sent back
         for a recount (`rejectShiftVariance`). The supervisor presents their own PIN on the device in
         use; the cashier's own count stays `submitShiftCount`.
+
+        **The step-up travels in the body** (Chinmay, 3 October 2026, defaults taken; CHG-RUL-019), as on
+        `reopenShift` and `rejectShiftVariance`: `supervisorStepUp` carries the principal and PIN of the supervisor closing the shift, entered on the
+        device making this call, verified as `common.yaml` `SupervisorStepUp` says. Optional in the schema so a
+        client built at r1 still validates, **refused without it** (`403 supervisor-step-up-refused`).
       tags: [shift]
       x-ticvai-permission: SHIFT_CLOSE
       x-ticvai-permission-escalated: SHIFT_CLOSE_OTHER   # where the shift belongs to somebody else
       x-ticvai-step-up: pin
       x-ticvai-step-up-reason: A supervisor closes a cashier's shift and sees the expected cash and the variance (CHG-FIN-003); their own PIN on the device in use proves who did it (pre-apply round, 2 October; CHG-CSP-012).
+      x-ticvai-step-up-carrier: body:supervisorStepUp
       x-ticvai-scope-level: venue   # was workstation; the supervisor closes from any till or the back office (CHG-CSP-012)
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
@@ -1154,7 +1182,18 @@ paths:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/CloseShiftRequest' }
+            schema:
+              allOf:
+                - $ref: '#/components/schemas/CloseShiftRequest'
+                - type: object
+                  properties:
+                    supervisorStepUp:
+                      allOf:
+                        - $ref: '../shared/common.yaml#/components/schemas/SupervisorStepUp'
+                      description: >
+                        The supervisor closing the shift, signing on this device (CHG-RUL-019). Refused without
+                        it (`403 supervisor-step-up-refused`). Not on `submitShiftCount`, which shares the count
+                        schema and asks no step-up.
       responses:
         '200':
           headers:
@@ -1170,8 +1209,9 @@ paths:
             type `blind-count-required`): their count goes through `submitShiftCount`, which never
             returns the expected figure (CHG-FIN-003). Or the caller lacks SHIFT_CLOSE, or
             SHIFT_CLOSE_OTHER for somebody else's shift (`forbidden`). One `403` since 2 October 2026:
-            the second key this response map carried made YAML drop the first (CHG-CSP-012).
-          x-ticvai-problem-types: [blind-count-required, forbidden]
+            the second key this response map carried made YAML drop the first (CHG-CSP-012). Or the
+            supervisor step-up is missing or failed (`supervisor-step-up-refused`; CHG-RUL-019).
+          x-ticvai-problem-types: [blind-count-required, forbidden, supervisor-step-up-refused]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -1228,10 +1268,16 @@ paths:
         shift was counted on may already be another cashier's, so the supervisor accepts from whichever
         till they are at, or from BO-043. The PIN step-up stays: still one mechanism, still a supervisor
         in person. The alternative is `rejectShiftVariance`: send it back for a recount (DEC-175).
+
+        **The step-up travels in the body** (Chinmay, 3 October 2026, defaults taken; CHG-RUL-019), as on
+        `reopenShift` and `rejectShiftVariance`: `supervisorStepUp` carries the principal and PIN of the supervisor accepting the variance (who must not be the cashier), entered on the
+        device making this call, verified as `common.yaml` `SupervisorStepUp` says. Optional in the schema so a
+        client built at r1 still validates, **refused without it** (`403 supervisor-step-up-refused`).
       tags: [shift]
       x-ticvai-permission: OVERSHORT_ACCEPT
       x-ticvai-step-up: pin
       x-ticvai-step-up-reason: A supervisor signs off a cashier's over/short in person, with their own PIN on the device they use (audit R080 (e); any till or the daily reconciliation since 2 October, CHG-CSP-012).
+      x-ticvai-step-up-carrier: body:supervisorStepUp
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
@@ -1250,6 +1296,12 @@ paths:
                   minLength: 3
                   maxLength: 500
                   description: Retained for audit. The accepting principal is recorded.
+                supervisorStepUp:
+                  allOf:
+                    - $ref: '../shared/common.yaml#/components/schemas/SupervisorStepUp'
+                  description: >
+                    The supervisor accepting, signing on this device (CHG-RUL-019). Refused without it
+                    (`403 supervisor-step-up-refused`). May not be the cashier whose shift it is.
       responses:
         '200':
           headers:
@@ -1263,7 +1315,9 @@ paths:
           description: >
             The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is
             (problem type `approver-is-cashier`) — a cashier signing off their own shortfall is not
-            a control (`states/variance-review.yaml`).
+            a control (`states/variance-review.yaml`). Or the supervisor step-up is missing or failed
+            (`supervisor-step-up-refused`; CHG-RUL-019).
+          x-ticvai-problem-types: [approver-is-cashier, supervisor-step-up-refused]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -1306,10 +1360,17 @@ paths:
         replace (`CashCountLine.recountOf`), the latest count is the one measured, and the request flags
         clear. Still blind: the rejection carries the supervisor's reason and never the expected figure
         or the variance (CHG-FIN-003).
+
+        **The supervisor's step-up travels in the body, as on `reopenShift`** (Chinmay, 3 October 2026,
+        Block A business rules; CHG-RUL-014). `supervisorStepUp` carries the supervisor's principal and PIN,
+        entered on the till or the BO-043 browser making this call. The rule is `SupervisorStepUp` in
+        `common.yaml`: the PIN is verified against the principal, who must hold `OVERSHORT_ACCEPT` at this
+        venue and must not be the cashier whose shift it is; otherwise a `403` and nothing is written.
       tags: [shift]
       x-ticvai-permission: OVERSHORT_ACCEPT
       x-ticvai-step-up: pin
       x-ticvai-step-up-reason: The same supervisor act as accepting a variance, in person with their own PIN (audit R080 (e); DEC-175).
+      x-ticvai-step-up-carrier: body:supervisorStepUp
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
@@ -1330,6 +1391,14 @@ paths:
                   description: >
                     Why a recount is needed, shown to the cashier. Never the amount: "Count the AED 100 notes
                     again", not "you are AED 100 short". Retained for audit with the rejecting principal.
+                supervisorStepUp:
+                  allOf:
+                    - $ref: '../shared/common.yaml#/components/schemas/SupervisorStepUp'
+                  description: >
+                    The supervisor sending the shift back, signing on this device (CHG-RUL-014, as `reopenShift`).
+                    Optional in the schema so a client built at r1 still validates, **refused without it**
+                    (`403 supervisor-step-up-refused`): the step-up is required, the field carries it. May not be
+                    the cashier whose shift it is.
       responses:
         '200':
           headers:
@@ -1342,8 +1411,10 @@ paths:
         '403':
           description: >
             The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is
-            (`approver-is-cashier`).
-          x-ticvai-problem-types: [approver-is-cashier]
+            (`approver-is-cashier`); or the supervisor step-up is missing or failed: no
+            `supervisorStepUp`, the PIN did not verify, or the principal does not hold `OVERSHORT_ACCEPT`
+            here (`supervisor-step-up-refused`; CHG-RUL-014).
+          x-ticvai-problem-types: [approver-is-cashier, supervisor-step-up-refused]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }

@@ -967,6 +967,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS63 Game and Ride Board 6.dc.html#bo-448`
 - Workshop pack: Game_and_Ride_Module.pdf board 6
 - Flow F192 *Game and Ride board 6: Redemption Operations Dashboard*, step 8: Works in Redemption Wallet & Balance View → Allow operators and systems to view the redemption-credit balance stored within a customer wallet. The source requires redemption credits stored in the wallet to be viewable from operator kiosks and …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -2061,6 +2062,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS63 Game and Ride Board 6.dc.html#bo-453`
 - Workshop pack: Game_and_Ride_Module.pdf board 6
 - Flow F192 *Game and Ride board 6: Redemption Operations Dashboard*, step 18: Works in Redemption Transaction Ledger, Reconciliation & Audit → Provide complete traceability of redemption credits earned, redeemed, adjusted and associated inventory movements.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 

@@ -1597,7 +1597,6 @@ paths:
         schema: { type: string, format: uuid }
     get:
       operationId: getOutlet
-      x-ticvai-consumed-by: []
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: Read an outlet

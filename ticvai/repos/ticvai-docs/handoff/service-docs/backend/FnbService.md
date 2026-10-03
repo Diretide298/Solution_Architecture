@@ -7,7 +7,7 @@
 | Tier | operations: What a venue does with what it sold. Licensed per module. |
 | Contracts | `fnb` |
 | Schemas owned | `fnb` |
-| Operations in the slice | 73 of 131 |
+| Operations in the slice | 75 of 133 |
 | Scale | Write-heavy during service, idle between. Two peaks a day, sharply. |
 | If it is down | Down means the kitchen falls back to paper. Offline-capable by design. |
 
@@ -32,67 +32,69 @@
 | bill | [`closeTableVisit`](#closetablevisit) | POST | `/table-visits/{visitId}/close` | core | 1 | EMP-059, POS-028 |
 | bill | [`getBill`](#getbill) | GET | `/table-visits/{visitId}/bill` | core | 1 | EMP-059, POS-028 |
 | bill | [`splitBill`](#splitbill) | POST | `/table-visits/{visitId}/bill/split` | core | 1 | EMP-059, POS-028 |
-| fnb | [`attachModifierGroup`](#attachmodifiergroup) | PUT | `/menu-items/{menuItemId}/modifier-groups` | setup | 2 | BO-045 |
+| fnb | [`attachModifierGroup`](#attachmodifiergroup) | PUT | `/menu-items/{menuItemId}/modifier-groups` | setup | 1 | BO-045 |
 | fnb | [`buildProductionPlan`](#buildproductionplan) | POST | `/production-plans` | setup | 1 | BO-112 |
-| fnb | [`chaseStation`](#chasestation) | POST | `/kitchen-stations/{stationId}/chase` | core | 2 | KIT-006 |
-| fnb | [`createTableReservation`](#createtablereservation) | POST | `/table-reservations` | core | 2 | GST-070, WEB-036 |
+| fnb | [`chaseStation`](#chasestation) | POST | `/kitchen-stations/{stationId}/chase` | core | 1 | KIT-006 |
+| fnb | [`createTableReservation`](#createtablereservation) | POST | `/table-reservations` | core | 1 | GST-070, WEB-036 |
 | fnb | [`createTableReservationForGuest`](#createtablereservationforguest) | POST | `/outlets/{outletId}/table-reservations` | core | 1 | EMP-055, POS-028 |
-| fnb | [`escalateCorrectiveAction`](#escalatecorrectiveaction) | POST | `/food-safety/corrective-actions/{actionId}/escalate` | setup | 2 | BO-044 |
-| fnb | [`fireCourse`](#firecourse) | POST | `/kitchen-tickets/{ticketId}/fire` | core | 2 | EMP-058, KIT-003 |
-| fnb | [`getCourseRules`](#getcourserules) | GET | `/outlets/{outletId}/course-rules` | core | 2 | KIT-009 |
-| fnb | [`getHaccpStatus`](#gethaccpstatus) | GET | `/food-safety/status` | core | 2 | BO-044, BO-140, EMP-067, KIT-008 |
-| fnb | [`getKitchenSla`](#getkitchensla) | GET | `/outlets/{outletId}/kitchen-sla` | core | 2 | KIT-009 |
-| fnb | [`holdCourse`](#holdcourse) | POST | `/kitchen-tickets/{ticketId}/hold` | core | 2 | EMP-058, KIT-003 |
-| fnb | [`joinRestaurantWaitlist`](#joinrestaurantwaitlist) | POST | `/waitlist` | core | 2 | EMP-056, GST-070, WEB-036 |
-| fnb | [`leaveRestaurantWaitlist`](#leaverestaurantwaitlist) | POST | `/waitlist/{entryId}/leave` | core | 2 | EMP-056, GST-070, WEB-036 |
-| fnb | [`list86Events`](#list86events) | GET | `/outlets/{outletId}/86-events` | core | 2 | BO-140, KIT-008 |
+| fnb | [`escalateCorrectiveAction`](#escalatecorrectiveaction) | POST | `/food-safety/corrective-actions/{actionId}/escalate` | setup | 1 | BO-044 |
+| fnb | [`fireCourse`](#firecourse) | POST | `/kitchen-tickets/{ticketId}/fire` | core | 1 | EMP-058, KIT-003 |
+| fnb | [`getCourseRules`](#getcourserules) | GET | `/outlets/{outletId}/course-rules` | core | 1 | KIT-009 |
+| fnb | [`getHaccpStatus`](#gethaccpstatus) | GET | `/food-safety/status` | core | 1 | BO-044, BO-140, EMP-067, KIT-008 |
+| fnb | [`getKitchenSla`](#getkitchensla) | GET | `/outlets/{outletId}/kitchen-sla` | core | 1 | KIT-009 |
+| fnb | [`holdCourse`](#holdcourse) | POST | `/kitchen-tickets/{ticketId}/hold` | core | 1 | EMP-058, KIT-003 |
+| fnb | [`joinRestaurantWaitlist`](#joinrestaurantwaitlist) | POST | `/waitlist` | core | 1 | EMP-056, GST-070, WEB-036 |
+| fnb | [`leaveRestaurantWaitlist`](#leaverestaurantwaitlist) | POST | `/waitlist/{entryId}/leave` | core | 1 | EMP-056, GST-070, WEB-036 |
+| fnb | [`list86Events`](#list86events) | GET | `/outlets/{outletId}/86-events` | core | 1 | BO-140, KIT-008 |
+| fnb | [`listMyTableReservations`](#listmytablereservations) | GET | `/me/table-reservations` | core | 1 | GST-070 |
 | fnb | [`listTableReservations`](#listtablereservations) | GET | `/table-reservations` | core | 1 | EMP-051, EMP-054, EMP-060, POS-028 |
-| fnb | [`logColdChain`](#logcoldchain) | POST | `/food-safety/cold-chain` | setup | 2 | EMP-065 |
-| fnb | [`logKitchenException`](#logkitchenexception) | POST | `/kitchen-exceptions` | core | 2 | KIT-008 |
-| fnb | [`logTemperature`](#logtemperature) | POST | `/food-safety/temperature-logs` | setup | 2 | EMP-067 |
+| fnb | [`logColdChain`](#logcoldchain) | POST | `/food-safety/cold-chain` | setup | 1 | EMP-065 |
+| fnb | [`logKitchenException`](#logkitchenexception) | POST | `/kitchen-exceptions` | core | 1 | KIT-008 |
+| fnb | [`logTemperature`](#logtemperature) | POST | `/food-safety/temperature-logs` | setup | 1 | EMP-067 |
 | fnb | [`markOrderCollected`](#markordercollected) | POST | `/orders/{orderId}/collected` | core | 1 | KIT-006, POS-022 |
-| fnb | [`notifyServer`](#notifyserver) | POST | `/table-visits/{visitId}/notify-server` | core | 2 | KIT-002 |
-| fnb | [`printOrderLabel`](#printorderlabel) | POST | `/kitchen-tickets/{ticketId}/label` | core | 2 | KIT-006 |
-| fnb | [`publishMenu`](#publishmenu) | POST | `/menus/{menuId}/publish` | setup | 2 | BO-045 |
-| fnb | [`rebalanceStationLoad`](#rebalancestationload) | POST | `/kitchen-stations/rebalance` | core | 2 | KIT-005 |
-| fnb | [`recallKitchenTicket`](#recallkitchenticket) | POST | `/kitchen-tickets/{ticketId}/recall` | core | 2 | KIT-002 |
-| fnb | [`refireItem`](#refireitem) | POST | `/kitchen-tickets/{ticketId}/refire` | core | 2 | KIT-002 |
+| fnb | [`notifyServer`](#notifyserver) | POST | `/table-visits/{visitId}/notify-server` | core | 1 | KIT-002 |
+| fnb | [`printOrderLabel`](#printorderlabel) | POST | `/kitchen-tickets/{ticketId}/label` | core | 1 | KIT-006 |
+| fnb | [`publishMenu`](#publishmenu) | POST | `/menus/{menuId}/publish` | setup | 1 | BO-045 |
+| fnb | [`rebalanceStationLoad`](#rebalancestationload) | POST | `/kitchen-stations/rebalance` | core | 1 | KIT-005 |
+| fnb | [`recallKitchenTicket`](#recallkitchenticket) | POST | `/kitchen-tickets/{ticketId}/recall` | core | 1 | KIT-002 |
+| fnb | [`refireItem`](#refireitem) | POST | `/kitchen-tickets/{ticketId}/refire` | core | 1 | KIT-002 |
 | fnb | [`releaseProductionPlan`](#releaseproductionplan) | POST | `/production-plans/{planId}/release` | setup | 1 | BO-112 |
 | fnb | [`requestBill`](#requestbill) | POST | `/table-visits/{visitId}/request-bill` | core | 1 | EMP-059, POS-028 |
-| fnb | [`rollbackMenu`](#rollbackmenu) | POST | `/menus/{menuId}/rollback` | setup | 2 | BO-045 |
-| fnb | [`scheduleMenuPublish`](#schedulemenupublish) | POST | `/menus/{menuId}/schedule` | setup | 2 | BO-045 |
+| fnb | [`rollbackMenu`](#rollbackmenu) | POST | `/menus/{menuId}/rollback` | setup | 1 | BO-045 |
+| fnb | [`scheduleMenuPublish`](#schedulemenupublish) | POST | `/menus/{menuId}/schedule` | setup | 1 | BO-045 |
 | fnb | [`seatTableReservation`](#seattablereservation) | POST | `/table-reservations/{reservationId}/seat` | core | 1 | EMP-058, POS-028 |
-| fnb | [`setCourseRules`](#setcourserules) | PUT | `/outlets/{outletId}/course-rules` | setup | 2 | BO-136 |
-| fnb | [`setKitchenSla`](#setkitchensla) | PUT | `/outlets/{outletId}/kitchen-sla` | core | 2 | BO-134, KIT-009 |
+| fnb | [`setCourseRules`](#setcourserules) | PUT | `/outlets/{outletId}/course-rules` | setup | 1 | BO-136 |
+| fnb | [`setKitchenSla`](#setkitchensla) | PUT | `/outlets/{outletId}/kitchen-sla` | core | 1 | BO-134, KIT-009 |
 | fnb | [`setTableCombinations`](#settablecombinations) | PUT | `/outlets/{outletId}/table-combinations` | core | 1 | EMP-053, POS-024 |
-| fnb | [`signCorrectiveAction`](#signcorrectiveaction) | POST | `/food-safety/corrective-actions/{actionId}/sign` | setup | 2 | BO-044, EMP-067 |
+| fnb | [`signCorrectiveAction`](#signcorrectiveaction) | POST | `/food-safety/corrective-actions/{actionId}/sign` | setup | 1 | BO-044, EMP-067 |
 | fnb | [`transferTableVisit`](#transfertablevisit) | POST | `/table-visits/{visitId}/transfer` | core | 1 | EMP-058, POS-028 |
-| fnb | [`updateTableReservation`](#updatetablereservation) | PATCH | `/table-reservations/{reservationId}` | core | 2 | GST-070, WEB-031, WEB-036 |
-| guestOrdering | [`claimLocationSession`](#claimlocationsession) | POST | `/location-sessions` | core | 2 | GST-024, WEB-036 |
+| fnb | [`updateTableReservation`](#updatetablereservation) | PATCH | `/table-reservations/{reservationId}` | core | 1 | GST-070, WEB-031, WEB-036 |
+| guestOrdering | [`claimLocationSession`](#claimlocationsession) | POST | `/location-sessions` | core | 1 | GST-024, WEB-036 |
 | guestOrdering | [`createDeliveryLocation`](#createdeliverylocation) | POST | `/delivery-locations` | setup | 1 | BO-065 |
-| guestOrdering | [`createGuestFnbOrder`](#createguestfnborder) | POST | `/guest-orders` | core | 2 | GST-024, GST-032, KSK-016, WEB-036 |
-| guestOrdering | [`getFnbDeliveryPolicy`](#getfnbdeliverypolicy) | GET | `/fnb-delivery-policy` | core | 2 | BO-044, GST-024, WEB-036 |
-| guestOrdering | [`getGuestBill`](#getguestbill) | GET | `/table-sessions/{sessionId}/bill` | core | 2 | GST-025, WEB-038 |
+| guestOrdering | [`createGuestFnbOrder`](#createguestfnborder) | POST | `/guest-orders` | core | 1 | GST-024, GST-032, KSK-016, WEB-036 |
+| guestOrdering | [`getFnbDeliveryPolicy`](#getfnbdeliverypolicy) | GET | `/fnb-delivery-policy` | core | 1 | BO-044, GST-024, WEB-036 |
+| guestOrdering | [`getGuestBill`](#getguestbill) | GET | `/table-sessions/{sessionId}/bill` | core | 1 | GST-025, WEB-038 |
 | guestOrdering | [`getGuestMenu`](#getguestmenu) | GET | `/outlets/{outletId}/guest-menu` | core | 1 | GST-024, GST-031, GST-061, KSK-016, POS-021, WEB-036 … |
-| guestOrdering | [`getGuestOrderStatus`](#getguestorderstatus) | GET | `/guest-orders/{orderId}` | core | 2 | GST-024, GST-025, GST-032, WEB-036, WEB-038 |
-| guestOrdering | [`listDeliveryLocations`](#listdeliverylocations) | GET | `/venues/{venueId}/delivery-locations` | core | 2 | GST-024, GST-029, WEB-036 |
-| guestOrdering | [`listDiningOutlets`](#listdiningoutlets) | GET | `/venues/{venueId}/dining` | core | 2 | GST-024, GST-029, WEB-036 |
-| guestOrdering | [`listFulfilmentSlots`](#listfulfilmentslots) | GET | `/outlets/{outletId}/fulfilment-slots` | core | 2 | GST-024, WEB-036 |
-| guestOrdering | [`recordOrderHandover`](#recordorderhandover) | POST | `/guest-orders/{orderId}/delivery` | core | 1 | BO-021, KIT-006, KIT-007, POS-012 |
+| guestOrdering | [`getGuestOrderStatus`](#getguestorderstatus) | GET | `/guest-orders/{orderId}` | core | 1 | GST-024, GST-025, GST-032, WEB-036, WEB-038 |
+| guestOrdering | [`listBookableOutlets`](#listbookableoutlets) | GET | `/venues/{venueId}/bookable-outlets` | core | 1 | GST-070 |
+| guestOrdering | [`listDeliveryLocations`](#listdeliverylocations) | GET | `/venues/{venueId}/delivery-locations` | core | 1 | GST-024, GST-029, WEB-036 |
+| guestOrdering | [`listDiningOutlets`](#listdiningoutlets) | GET | `/venues/{venueId}/dining` | core | 1 | GST-024, GST-029, WEB-036 |
+| guestOrdering | [`listFulfilmentSlots`](#listfulfilmentslots) | GET | `/outlets/{outletId}/fulfilment-slots` | core | 1 | GST-024, WEB-036 |
+| guestOrdering | [`recordOrderHandover`](#recordorderhandover) | POST | `/guest-orders/{orderId}/delivery` | core | 1 | BO-021, KIT-006, POS-012 |
 | guestOrdering | [`setDeliveryLocationOutletMapping`](#setdeliverylocationoutletmapping) | PUT | `/venues/{venueId}/delivery-location-outlets` | setup | 1 | BO-044, BO-065 |
-| guestOrdering | [`setFnbDeliveryPolicy`](#setfnbdeliverypolicy) | PUT | `/fnb-delivery-policy` | setup | 2 | BO-044 |
+| guestOrdering | [`setFnbDeliveryPolicy`](#setfnbdeliverypolicy) | PUT | `/fnb-delivery-policy` | setup | 1 | BO-044 |
 | guestOrdering | [`updateDeliveryLocation`](#updatedeliverylocation) | PATCH | `/delivery-locations/{locationId}` | setup | 1 | BO-065 |
-| kitchen | [`listKitchenStations`](#listkitchenstations) | GET | `/kitchen/stations` | core | 2 | BO-134, KIT-001, KIT-005 |
+| kitchen | [`listKitchenStations`](#listkitchenstations) | GET | `/kitchen/stations` | core | 1 | BO-134, KIT-001, KIT-005 |
 | kitchen | [`listKitchenTickets`](#listkitchentickets) | GET | `/kitchen/tickets` | core | 1 | BO-020, BO-046, KIT-001, KIT-002, KIT-003, KIT-004 … |
-| kitchen | [`prioritiseKitchenTicket`](#prioritisekitchenticket) | POST | `/kitchen/tickets/{ticketId}/prioritise` | core | 2 | BO-020, BO-046, KIT-003 |
+| kitchen | [`prioritiseKitchenTicket`](#prioritisekitchenticket) | POST | `/kitchen/tickets/{ticketId}/prioritise` | core | 1 | BO-020, BO-046, KIT-003 |
 | kitchen | [`setKitchenTicketStatus`](#setkitchenticketstatus) | PUT | `/kitchen/tickets/{ticketId}/status` | core | 1 | BO-020, BO-046, KIT-002, KIT-003, KIT-006, POS-022 |
-| menu | [`createMenu`](#createmenu) | POST | `/menus` | setup | 2 | BO-045 |
+| menu | [`createMenu`](#createmenu) | POST | `/menus` | setup | 1 | BO-045 |
 | menu | [`setItemAvailability`](#setitemavailability) | PUT | `/menu-items/{itemId}/availability` | core | 1 | BO-140, KIT-008, POS-021, POS-024 |
-| menu | [`setMenuSections`](#setmenusections) | PUT | `/menus/{menuId}/sections` | setup | 2 | BO-045, BO-109 |
-| menu | [`updateMenu`](#updatemenu) | PATCH | `/menus/{menuId}` | setup | 2 | BO-045 |
+| menu | [`setMenuSections`](#setmenusections) | PUT | `/menus/{menuId}/sections` | setup | 1 | BO-045, BO-109 |
+| menu | [`updateMenu`](#updatemenu) | PATCH | `/menus/{menuId}` | setup | 1 | BO-045 |
 | modifier | [`createModifierGroup`](#createmodifiergroup) | POST | `/modifier-groups` | setup | 1 | BO-045 |
 | order | [`createFnbOrder`](#createfnborder) | POST | `/fnb-orders` | core | 1 | EMP-058, EMP-059, POS-022 |
-| order | [`getFnbOrder`](#getfnborder) | GET | `/fnb-orders/{orderId}` | core | 2 | BO-020, KIT-004 |
+| order | [`getFnbOrder`](#getfnborder) | GET | `/fnb-orders/{orderId}` | core | 1 | BO-020, KIT-004 |
 | order | [`listFnbOrders`](#listfnborders) | GET | `/fnb-orders` | core | 1 | BO-020, BO-021, EMP-051, KIT-001, POS-029 |
 | production | [`setRecipe`](#setrecipe) | PUT | `/recipes` | setup | 1 | BO-111 |
 | service | [`cancelFnbOrder`](#cancelfnborder) | POST | `/fnb-orders/{orderId}/cancel` | core | 1 | BO-020, POS-022 |
@@ -110,6 +112,10 @@
 **`POST /table-visits/{visitId}/close`**: Settle and close a visit
 
 Converts the visit into one or more sales orders and posts to the ledger. The table moves to `needsClearing`, not `free` — clearing is a separate act by a separate person.
+
+**An unsplit bill closes as one sub-bill** (Chinmay, 3 October 2026, Block A business rules; CHG-RUL-001). Where `splitBill` was never called, payments carry no `subBillId`: the server makes the one sub-bill for the whole bill and the payments settle it. Where the bill was split, every payment names its sub-bill, and a payment without one is refused 400.
+
+**Payment timing follows the outlet** (`tenancy.Outlet.paymentTiming`, as POS-021; CHG-CSA-010). At a `sendFirst` outlet, the default, the payments here settle the bill. At a `payFirst` outlet each round was charged before it reached the kitchen, so the payments here settle only what is still unpaid, and a visit with nothing outstanding closes with `payments` empty.
 
 |  |  |
 |---|---|
@@ -135,8 +141,8 @@ Converts the visit into one or more sales orders and posts to the ledger. The ta
 
 | Field | Type | Required | Notes |
 |---|---|---|---|
-| payments | array of object | yes | (min items 1) |
-| payments[].subBillId | string | yes |  |
+| payments | array of object | yes | Empty only at a payFirst outlet with nothing left to pay (CHG-RUL-001). (min items 0) |
+| payments[].subBillId | string |  | The sub-bill this payment settles. (nullable) |
 | payments[].tender | string | yes |  |
 | payments[].amount | Money | yes | On the wire this is three fields; in the database it is one column. |
 | payments[].amount.amount | string | yes | Decimal string, never a float. (pattern ^-?\d+(\.\d{1,4})?$) |
@@ -284,6 +290,10 @@ Every line across every order in the visit, with tax and service charge. Present
 By amount, by covers, or by category (03 Aug §5). Splitting happens **at close, not at order time** — a split computed while the party is still ordering falls apart the moment someone orders another drink.
 Remainders are distributed to the minor unit. A split that does not sum to the total is rejected rather than rounded away.
 
+**Five methods, one request** (Chinmay, 3 October 2026, Block A business rules; CHG-RUL-001): `method` is `byAmount` (`amounts`), `byCovers` (`parts`, default the visit's covers), `byCategory` (`categoryAssignments`), `byLine`, the item split (`lineAssignments`), or `bySeat` (`lineAssignments`, each line going to the part of its `seatNumber`). POS-028 and EMP-059 send this one request with the method the server picked; there is no operation per method. **A bill that is never split closes as one sub-bill**: `closeTableVisit` takes its payments without a `subBillId`.
+
+**Payment timing follows the outlet, as on POS-021** (`tenancy.Outlet.paymentTiming`, CHG-CSA-010; both configurations): at a `sendFirst` outlet, the default, the party orders, the kitchen cooks, and the bill is split and paid at close. At a `payFirst` outlet each round is charged before it reaches the kitchen (`createFnbOrder`), so the split divides only what is still unpaid at close (the bill's lines with no payment against them) and `amounts` sum to that outstanding total.
+
 |  |  |
 |---|---|
 | Permission | `ORDER_MODIFY` |
@@ -370,7 +380,7 @@ Board 2E. **Attachment is separate from definition** because that is what makes 
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `fnb.menu_item_modifier` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.menu_item`, `fnb.modifier_group` |
@@ -505,7 +515,7 @@ Board 3. **A ticket waiting on one station while the rest of the table is plated
 | Permission | `ORDER_MODIFY` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | lastWriterWins |
 | Reads | `cache:idempotency`, `fnb.kitchen_station`, `fnb.kitchen_ticket` |
@@ -549,7 +559,7 @@ Board 3. **A ticket waiting on one station while the rest of the table is plated
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.dining_table`, `fnb.reservation_table`, `fnb.table_reservation` |
@@ -768,7 +778,7 @@ Raised above the person who found it — a critical reading, or one nobody actio
 | Permission | `INCIDENT_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, changes rows of `fnb.corrective_action` that another operation creates |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.corrective_action`, `identity.principal` |
@@ -823,7 +833,7 @@ Board 3 of the client F&B pack. **`KitchenTicket.coursing` carried the policy �
 | Permission | `ORDER_MODIFY` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | lastWriterWins |
 | Reads | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line` |
@@ -896,7 +906,7 @@ The outlet's coursing default as `setCourseRules` stored it (contract gap logged
 | Permission | `PRODUCT_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Config scope | outlet |
 | Conflict policy | serverWins |
@@ -942,7 +952,7 @@ Checks due, checks missed, open corrective actions and unsigned findings. **A mi
 | Permission | `INCIDENT_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -979,7 +989,7 @@ The outlet's ticket targets and priority weights as `setKitchenSla` stored them 
 | Permission | `PRODUCT_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Config scope | outlet |
 | Conflict policy | serverWins |
@@ -1028,7 +1038,7 @@ Board 3. **The other half of firing, and the one that gets forgotten.** A table 
 | Permission | `ORDER_MODIFY` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | lastWriterWins |
 | Reads | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line` |
@@ -1105,7 +1115,7 @@ BL-130. **Distinct from `queue`, which is for rides.** A restaurant waitlist has
 | Permission | `ORDER_MODIFY` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Guest callable | True |
@@ -1172,7 +1182,7 @@ BL-130. **Distinct from `queue`, which is for rides.** A restaurant waitlist has
 | Permission | `ORDER_MODIFY` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
@@ -1231,7 +1241,7 @@ Board 5J. **`setItemAvailability` records the current state and not the history.
 | Permission | `PRODUCT_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -1271,6 +1281,84 @@ Board 5J. **`setItemAvailability` records the current state and not the history.
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Events |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
+### listMyTableReservations
+
+**`GET /me/table-reservations`**: The guest's own table bookings and waitlist places
+
+**What GST-070 lists under "Your reservations"** (Chinmay, 3 October 2026, Block A business rules; CHG-RUL-013). The caller's own table reservations (`createTableReservation`) and restaurant waitlist entries (`joinRestaurantWaitlist`), across the venues of the tenant. **Ordered by** the booking's time, soonest first (a waitlist entry by when it was joined), the row's id as the tiebreak. **Self-scoped**: the subject is the session's, never a parameter, so the list cannot be asked for anybody else; `listTableReservations` stays the host's list under `ORDER_MODIFY`. A signed-out guest has no list (401).
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | tenant |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | yes |
+| Conflict policy | serverWins |
+| Read routing | primary |
+| Reads | `fnb.reservation_table`, `fnb.table_reservation`, `fnb.waitlist_entry` |
+| Writes | - |
+| Called by | GST-070 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| include | query |  | enum (reservations, waitlist) | Which kinds to list. |
+| upcomingOnly | query |  | boolean | Only bookings from today and live waitlist places (waiting, notified). |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of MyTableBooking | yes |  |
+| items[].kind | enum (reservation, waitlist) | yes |  |
+| items[].outletId | string (uuid) | yes |  |
+| items[].outletName | string |  |  |
+| items[].reservation | object |  | (nullable) |
+| items[].reservation.id | string (uuid) |  | (read-only) |
+| items[].reservation.outletId | string (uuid) | yes |  |
+| items[].reservation.subjectId | string (uuid) |  | (nullable) |
+| items[].reservation.guestName | string |  |  |
+| items[].reservation.contactPoint | string |  |  |
+| items[].reservation.partySize | integer | yes | (min 1) |
+| items[].reservation.startsAt | string (date-time) | yes |  |
+| items[].reservation.durationMinutes | integer |  | How long the cover is held. |
+| items[].reservation.tables | array of FnbReservationTable |  | The dining tables assigned to this reservation, one row each. |
+| items[].reservation.status | TableReservationStatus: enum (awaitingDeposit, booked, confirmed, seated, completed, cancelled, noShow) |  | awaitingDeposit only where the venue's dining deposit applies (decided 29 September, rev 3 REV3-8b); a booking with no deposit starts booked. |
+| items[].reservation.groupId | string (uuid) |  | 5.1.2. (nullable) |
+| items[].reservation.notes | string |  | Allergies, accessibility needs and other requests, as the guest wrote them. |
+| items[].reservation.seatingPreference | string |  | The seating area the guest asked for, e.g. (max length 64; nullable) |
+| items[].reservation.occasion | enum (birthday, anniversary, business, celebration, other) |  | The occasion the guest named (workbook Q204, DI-337; CHG-CSA-018). (nullable) |
+| items[].reservation.takenByPrincipalId | string (uuid) |  | The staff member who took the booking (createTableReservationForGuest); null for a guest's own booking (CHG-CSA-045). (read-only; nullable) |
+| items[].reservation.actualPartySize | integer |  | (read-only; nullable) |
+| items[].reservation.tableVisitId | string (uuid) |  | (read-only; nullable) |
+| items[].reservation.deposit | TableReservationDeposit |  | The deposit this booking holds, snapshotted from orders.DepositPolicy.dining when it was made (decided 29 September, rev 3 REV3-8b). (read-only; nullable) |
+| items[].reservation.createdAt | string (date-time) |  | (read-only) |
+| items[].waitlistEntry | object |  | (nullable) |
+| items[].waitlistEntry.id | string (uuid) | yes |  |
+| items[].waitlistEntry.outletId | string (uuid) | yes |  |
+| items[].waitlistEntry.subjectId | string (uuid) |  | (nullable) |
+| items[].waitlistEntry.partySize | integer | yes |  |
+| items[].waitlistEntry.quotedWaitMinutes | integer |  | (nullable) |
+| items[].waitlistEntry.seatingPreference | enum (any, indoor, outdoor, bar, booth, highChair) |  | (nullable) |
+| items[].waitlistEntry.status | enum (waiting, notified, seated, walkedAway, noShow, cancelled) | yes |  |
+| items[].waitlistEntry.notifiedAt | string (date-time) |  | (nullable) |
+| items[].waitlistEntry.recordedAt | string (date-time) | yes | When the party joined, on the device. |
+| items[].waitlistEntry.syncedAt | string (date-time) |  | (read-only; nullable) |
+| items[].waitlistEntry.holdExpiresAt | string (date-time) |  | How long a table waits for somebody who was called. (nullable) |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | The guest's reservations and waitlist places |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
 ### listTableReservations
@@ -1358,7 +1446,7 @@ Board 5G. **A delivery arriving warm is a rejection decision made at the door**,
 | Permission | `INCIDENT_REPORT` |
 | Scope level | venue |
 | Part of slice | setup, makes `fnb.cold_chain_event`, `fnb.corrective_action` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `fnb.cold_chain_event`, `inventory.goods_receipt` |
@@ -1418,7 +1506,7 @@ Board 3. **Equipment down, an item run out mid-ticket, a delivery late, a statio
 | Permission | `INCIDENT_REPORT` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | lastWriterWins |
 | Reads | `cache:idempotency`, `fnb.kitchen_exception`, `fnb.kitchen_station` |
@@ -1479,7 +1567,7 @@ Board 5J. **HACCP records are a UAE regulatory obligation and nothing in the pac
 | Permission | `INCIDENT_REPORT` |
 | Scope level | venue |
 | Part of slice | setup, makes `fnb.corrective_action`, `fnb.temperature_log` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `fnb.corrective_action`, `fnb.temperature_log`, `platform.scope` |
@@ -1674,7 +1762,7 @@ Board 3 and Board 4. **Food ready and nobody collecting it is the commonest reas
 | Permission | `ORDER_MODIFY` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.table_visit`, `identity.principal` |
@@ -1713,7 +1801,7 @@ A label that omits an allergen on a sealed bag is the failure mode this exists t
 | Permission | `ORDER_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Reads | `fnb.kitchen_ticket` |
@@ -1764,7 +1852,7 @@ Board 2. **`updateMenu` existed, so a menu edited was a menu live** — no draft
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `fnb.menu` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | outlet |
 | Conflict policy | serverWins |
@@ -1851,7 +1939,7 @@ Board 3. **A grill twenty tickets deep and a cold section idle.** The routing ru
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.kitchen_station` |
@@ -1905,7 +1993,7 @@ Board 3. **A bumped ticket disappears from the rail**, and a bump is a single ta
 | Permission | `ORDER_MODIFY` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | lastWriterWins |
 | Reads | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line` |
@@ -1979,7 +2067,7 @@ Board 3. **A refire is not a new order and it must not be.** It is the same line
 | Permission | `ORDER_MODIFY` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line` |
@@ -2225,7 +2313,7 @@ Board 2. **The reason to version a menu at all.** A price published wrong at 11a
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `fnb.menu` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.menu`, `fnb.menu_item`, `fnb.menu_section`, `fnb.menu_version` |
@@ -2310,7 +2398,7 @@ Board 2J. **`publishMenu` took an `effectiveAt` and nothing listed or cancelled 
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `fnb.menu` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | outlet |
 | Conflict policy | serverWins |
@@ -2447,7 +2535,7 @@ Board 3. **Coursing was a per-ticket field with no default**, so every table was
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `fnb.course_rule` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | outlet |
 | Conflict policy | serverWins |
@@ -2506,7 +2594,7 @@ Board 3. **`getKitchenSla` was drawn on the board and nothing set the target.** 
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | outlet |
 | Conflict policy | serverWins |
@@ -2631,7 +2719,7 @@ Board 5J. **The signature is the record.** *Discarded and reset* with nobody aga
 | Permission | `INCIDENT_MANAGE` |
 | Scope level | venue |
 | Part of slice | setup, makes `fnb.corrective_action` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.corrective_action`, `identity.principal` |
@@ -2813,7 +2901,7 @@ Party size, time, or cancelled. **A reduced party size releases cover immediatel
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.reservation_table`, `fnb.table_reservation` |
@@ -2927,7 +3015,7 @@ Codes rotate. A static code photographed once lets someone order to a cabana the
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.location_session` |
@@ -3051,7 +3139,7 @@ Payment is required before the kitchen sees it, unless the outlet runs a tab —
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.delivery_policy`, `fnb.location_session`, `fnb.menu_item`, `fnb.menu_item_modifier`, `inventory.stock_level` |
@@ -3142,7 +3230,7 @@ Payment is required before the kitchen sees it, unless the outlet runs a tab —
 | Permission | `PRODUCT_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3206,7 +3294,7 @@ Everything ordered at the table this sitting, whether ordered through the app or
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
@@ -3345,7 +3433,7 @@ The order's `FnbOrderStatus` — ordered, accepted, inPreparation, ready, then s
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
@@ -3381,6 +3469,59 @@ The order's `FnbOrderStatus` — ordered, accepted, inPreparation, ready, then s
 | 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
 
+### listBookableOutlets
+
+**`GET /venues/{venueId}/bookable-outlets`**: The restaurants a guest can book a table at
+
+**The published list GST-070 Reserve a Table picks from** (Chinmay, 3 October 2026, Block A business rules; CHG-RUL-013). Different from `listDiningOutlets`, which answers *where can I eat right now* and drops an outlet that is closed: a booking is for another time, so an outlet is listed whether or not it is open now. **Published data only**: an outlet is listed when it is active, takes table reservations (it has tables, `setTableLayout`, and its reservation policy, `getFnbReservationPolicy`, is active) and is on the venue's published guest app. A draft outlet, or one with no tables, is never listed. Ordered by the outlet's display order, then `name`. Readable before sign-in: a guest chooses a restaurant and signs in to book (`createTableReservation`).
+
+|  |  |
+|---|---|
+| Permission | `None` |
+| Scope level | venue |
+| Part of slice | core |
+| Wave | 1 |
+| Offline | no |
+| Conflict policy | serverWins |
+| Read routing | replica |
+| Reads | - |
+| Writes | - |
+| Called by | GST-070 |
+
+**Parameters**
+
+| Name | In | Required | Type | Notes |
+|---|---|---|---|---|
+| venueId | path | yes | string (uuid) |  |
+| date | query |  | string (date) | Only outlets open on this calendar day (the region's time zone). |
+| pageSize | query |  | integer |  |
+| cursor | query |  | string | Opaque cursor: the nextCursor of the previous page. |
+
+**Response**: `object`
+
+| Field | Type | Required | Notes |
+|---|---|---|---|
+| items | array of BookableOutlet | yes |  |
+| items[].outletId | string (uuid) | yes |  |
+| items[].venueId | string (uuid) | yes |  |
+| items[].name | string | yes |  |
+| items[].kind | string |  | (nullable) |
+| items[].cuisine | array of string |  |  |
+| items[].zone | string |  | (nullable) |
+| items[].imageAssetRef | string |  | (nullable) |
+| items[].depositMayApply | boolean |  | The venue's orders.DepositPolicy.dining is on, so a booking from its party size takes a deposit (rev 3 REV3-8b). |
+| items[].waitlistOpen | boolean |  | The outlet takes walk-in waitlist places today (joinRestaurantWaitlist). |
+| nextCursor | string |  |  |
+| hasMore | boolean | yes |  |
+
+**Responses**
+
+| Code | Shape | Meaning |
+|---|---|---|
+| 200 |  | Bookable outlets |
+| 404 | NotFound | The resource does not exist, or is outside the caller's scope. |
+| 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
+
 ### listDeliveryLocations
 
 **`GET /venues/{venueId}/delivery-locations`**: Where an order can be delivered
@@ -3394,7 +3535,7 @@ They are one concept because a runner needs one instruction, and a guest needs o
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3450,7 +3591,7 @@ Ordering method is stated per outlet, because it varies within one venue: a tabl
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3508,7 +3649,7 @@ Computed from the outlet's `FnbDeliveryPolicy` and its current load: ASAP plus f
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3563,7 +3704,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `fnb.delivery_location`, `fnb.delivery_location_outlet`, `fnb.service_order` |
 | Writes | `cache:idempotency`, `fnb.service_order` |
-| Called by | BO-021, KIT-006, KIT-007, POS-012 |
+| Called by | BO-021, KIT-006, POS-012 |
 | State model | F&B order ([states/fnb-order.yaml](../../../states/fnb-order.yaml)): moves `ready` -> `served`, `ready` -> `collected`, `ready` -> `delivered`<br/>Kitchen ticket ([states/kitchen-ticket.yaml](../../../states/kitchen-ticket.yaml)): moves `ready` -> `served` |
 
 **Parameters**
@@ -3663,7 +3804,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `fnb.delivery_policy` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
@@ -3821,7 +3962,7 @@ Offline-capable. A runner crossing a venue loses signal, and an order that canno
 | Permission | `PRODUCT_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3947,7 +4088,7 @@ Supervisor override, and the mechanism behind Fast Pass order prioritisation (4.
 | Permission | `ORDER_MODIFY` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `fnb.kitchen_ticket`, `fnb.kitchen_ticket_line` |
@@ -4097,7 +4238,7 @@ Called by P15 Kitchen Display, or the back-office and till views of the rail. St
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `fnb.menu` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | outlet |
 | Conflict policy | serverWins |
@@ -4256,7 +4397,7 @@ Ordering matters at a counter. The sequence here is the sequence on the sale boa
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `fnb.menu` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | outlet |
 | Conflict policy | serverWins |
@@ -4358,7 +4499,7 @@ Ordering matters at a counter. The sequence here is the sequence on the sale boa
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, changes rows of `fnb.menu` that another operation creates |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | outlet |
 | Conflict policy | serverWins |
@@ -4656,7 +4797,7 @@ Offline behaviour depends on the items: an order containing only untracked items
 | Permission | `ORDER_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -5601,7 +5742,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no | Added 20 August. |
+| id | uuid | yes | Added 20 August. |
 | visit_id | uuid | yes |  |
 | method | text | yes |  |
 
@@ -5677,7 +5818,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | outlet_id | uuid | yes |  |
 | is_collection_enabled | boolean | no |  |
 | is_delivery_enabled | boolean | no |  |
@@ -5853,7 +5994,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | code | text | yes |  |
 | name | text | yes |  |
 | sort_order | integer | yes |  |
@@ -5903,7 +6044,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | service_order_id | uuid | no | The guest order this fulfils (FnbOrder.id). |
 | mode | text | yes | collection from a counter, delivery to an address outside the venue, inVenue to a table, seat, cabana or named location (the location session). |
 | collection_at | timestamptz | no |  |
@@ -6056,7 +6197,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | outlet_id | uuid | no | The outlet in the path. |
 | table_ids | text[] | yes |  |
 | combined_covers | integer | yes |  |
@@ -6067,7 +6208,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | outlet_id | uuid | yes |  |
 | subject_id | uuid | no |  |
 | guest_name | text | no |  |

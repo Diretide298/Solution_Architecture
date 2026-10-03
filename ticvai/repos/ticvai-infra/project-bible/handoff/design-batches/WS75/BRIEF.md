@@ -121,16 +121,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `CMS-071` | AI Asset Intelligence Command Center | B–D | 0 | 171 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `CMS-072` | AI Auto-Tagging & Content Understanding | B–D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `CMS-073` | Semantic & Natural-Language Asset Search | B–D | 0 | 14 | 6 | 5 | 1 | 0 | — | notStarted (—) |
-| `CMS-074` | Visual Similarity & Related Asset Discovery | B–D | 2 | 11 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `CMS-075` | Duplicate & Near-Duplicate Management | B–D | 19 | 0 | 6 | 0 | 1 | 2 | — | notStarted (—) |
-| `CMS-076` | Asset Version Control & Revision History | B–D | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `CMS-077` | Version Comparison & Replacement Impact | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `CMS-078` | Transformation & Rendition Management | B–D | 1 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `CMS-079` | Rendition Processing & Delivery Readiness | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `CMS-080` | AI Quality, Intelligence Review & Recommendations | B–D | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `CMS-071` | AI Asset Intelligence Command Center | B | 0 | 171 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `CMS-072` | AI Auto-Tagging & Content Understanding | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `CMS-073` | Semantic & Natural-Language Asset Search | B | 0 | 14 | 6 | 5 | 1 | 0 | — | notStarted (—) |
+| `CMS-074` | Visual Similarity & Related Asset Discovery | B | 2 | 11 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `CMS-075` | Duplicate & Near-Duplicate Management | B | 19 | 0 | 6 | 0 | 1 | 2 | — | notStarted (—) |
+| `CMS-076` | Asset Version Control & Revision History | B | 0 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
+| `CMS-077` | Version Comparison & Replacement Impact | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `CMS-078` | Transformation & Rendition Management | B | 1 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `CMS-079` | Rendition Processing & Delivery Readiness | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `CMS-080` | AI Quality, Intelligence Review & Recommendations | B | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

@@ -96,7 +96,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-318` | Dead Letters | B–D | 9 | 39 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-318` | Dead Letters | B | 9 | 33 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

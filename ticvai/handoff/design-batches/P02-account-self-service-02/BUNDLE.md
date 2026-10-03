@@ -146,9 +146,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `GST-067` | Refunds & Resale | A | 6 | 0 | 6 | 10 | 7 | 6 | guest | notStarted (client-verified) |
-| `GST-069` | Face Pass | A | 14 | 10 | 7 | 36 | 5 | 6 | guest | notStarted (client-verified) |
-| `GST-071` | Payment Methods | A | 9 | 13 | 6 | 7 | 1 | 0 | guest | notStarted (client-verified) |
-| `GST-073` | Security & Sign-in | A | 5 | 19 | 5 | 3 | 2 | 0 | guest | notStarted (designed) |
+| `GST-069` | Face Pass | A | 14 | 5 | 7 | 36 | 5 | 6 | guest | notStarted (client-verified) |
+| `GST-071` | Payment Methods | A | 9 | 9 | 6 | 7 | 1 | 0 | guest | notStarted (client-verified) |
+| `GST-073` | Security & Sign-in | A | 5 | 15 | 5 | 3 | 2 | 0 | guest | notStarted (designed) |
 
 ## Thin screens in this batch
 
@@ -167,8 +167,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Account & Self-Service · wave 2 · needs the `core` module |
-| Block | Block A · ticket #18176 (APP-MOB-GST-067) |
+| Module | Account & Self-Service · wave 1 · needs the `core` module |
+| Block | Block A · task APP-MOB-GST-067 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): Refund and resale of one order: its state and what happens next (CHG-SGU-020) |
@@ -339,8 +339,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Account & Self-Service · wave 2 · needs the `core` module |
-| Block | Block A · ticket #18178 (APP-MOB-GST-069) |
+| Module | Account & Self-Service · wave 1 · needs the `core` module |
+| Block | Block A · task APP-MOB-GST-069 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): `getFacePassEnrolment` reads one record and nothing reads a population — the screen is about that one thing |
@@ -410,14 +410,9 @@ Errors to draw in the form: 403 A guest enrolling a subject who is neither thems
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | — |
-| Entitlement | the name it points at, never the id | The `Entitlement.id`, a UUIDv7 (`pii.subject_biometric.entitlement_id`). |
 | Source | chip: Guest app, Ticket counter, Annual pass counter, Entry gate | `entryGate` is valid for `faceTag` only, and 3.2.43's omission of it from Face Pass is deliberate: an enduring enrolment is a considered … |
 | Captured at | 1 Oct 2026, 14:30 | — |
-| Consent purpose | the name it points at, never the id | — |
 | Consent given at | 1 Oct 2026, 14:30 | — |
-| Guardian subject | the name it points at, never the id | Where the subject is a minor (3.2.12). |
 | Is active | yes / no (icon or chip) | — |
 | Expires at | 1 Oct 2026, 14:30 | Bounded by whatever `retentionAnchor` names, and a face outliving it is a biometric held for no stated purpose. |
 
@@ -550,7 +545,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (14), with its required mark, default, format and its error state (403, 404, 409, 422).
-- [ ] Every output is drawn (10 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-069?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline, subjectNotLinked.
 - [ ] Every action is wired with its success and its failure: Enrol face pass, Revoke face pass.
 - [ ] Every transition is wired: `GST-039`.
@@ -570,8 +565,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Account & Self-Service · wave 2 · needs the `core` module |
-| Block | Block A · ticket #18179 (APP-MOB-GST-071) |
+| Module | Account & Self-Service · wave 1 · needs the `core` module |
+| Block | Block A · task APP-MOB-GST-071 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listPaymentTokens` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -646,10 +641,6 @@ Errors to draw in the form: 409 The balance does not cover `points` (`insufficie
 | Face value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Balance | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Status | chip: Issued, Active, Partially redeemed, Redeemed, Expired, Blocked | — |
-| Blocked reason | text | — |
-| Issued at | 1 Oct 2026, 14:30 | — |
-| Activated at | 1 Oct 2026, 14:30 | — |
-| Expires at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
 
@@ -753,7 +744,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (9), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-071?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Add a card, Transfer wallet balance, Redeem loyalty points.
 - [ ] Every transition is wired: `GST-039`.
@@ -771,8 +762,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Account & Self-Service · wave 2 · needs the `core` module |
-| Block | Block A · ticket #18180 (APP-MOB-GST-073) |
+| Module | Account & Self-Service · wave 1 · needs the `core` module |
+| Block | Block A · task APP-MOB-GST-073 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | configEditor (comfortable density): settings for the guest's own sign-in — the linked sign-in methods (`getGuestSession`) and the devices that hold the account (`listGuestDevices`), each with one act; not a list to browse |
@@ -833,10 +824,6 @@ Errors to draw in the form: 410 The token expired or was already used. Distinct 
 | Shows | Format | Notes |
 |---|---|---|
 | Platform | chip: Ios, Android, Web | — |
-| App version | text | — |
-| Os version | text | — |
-| Device model | text | — |
-| Locale | text | — |
 | Status | chip: Active, Revoked, Failed | — |
 | Failure count | 1,234 | Consecutive delivery failures. Past the threshold the device is marked failed and stops being targeted — a dead token retried forever is … |
 | Registered at | 1 Oct 2026, 14:30 | — |
@@ -996,7 +983,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (5), with its required mark, default, format and its error state (403, 404, 409, 410, 422).
-- [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-073?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Sign out on this device, Stop notifications on this device, Verify guest email, Set up two-step verification.
 - [ ] Every transition is wired: `GST-039`.

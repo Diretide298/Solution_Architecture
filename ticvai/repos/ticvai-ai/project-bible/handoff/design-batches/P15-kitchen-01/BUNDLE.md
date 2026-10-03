@@ -130,16 +130,20 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `KIT-001` | Kitchen Operations Command Center | A | 0 | 65 | 6 | 6 | 1 | 3 | — | notStarted (generated) |
-| `KIT-002` | Kitchen Display System (KDS) | A | 11 | 27 | 6 | 6 | 2 | 3 | — | notStarted (generated) |
+| `KIT-001` | Kitchen Operations Command Center | A | 0 | 59 | 6 | 6 | 1 | 3 | — | notStarted (generated) |
+| `KIT-002` | Kitchen Display System (KDS) | A | 11 | 14 | 6 | 6 | 2 | 3 | — | notStarted (generated) |
 | `KIT-003` | Order Firing & Course Management | A | 18 | 0 | 6 | 4 | 3 | 0 | — | notStarted (generated) |
-| `KIT-004` | Active Order Management & Fulfilment Journey | A | 0 | 41 | 6 | 8 | 1 | 6 | — | notStarted (generated) |
+| `KIT-004` | Active Order Management & Fulfilment Journey | A | 0 | 22 | 6 | 8 | 1 | 6 | — | notStarted (generated) |
 | `KIT-005` | Kitchen Station Workload & Dynamic Routing | A | 2 | 16 | 6 | 3 | 1 | 6 | — | notStarted (generated) |
-| `KIT-006` | Expeditor & Order Assembly | A | 14 | 27 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
-| `KIT-007` | Guest Collection, Buzzer & Digital Notification | A | 5 | 20 | 6 | 7 | 2 | 0 | — | notStarted (generated) |
+| `KIT-006` | Expeditor & Order Assembly | A | 14 | 14 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
+| `KIT-007` | Guest Collection, Buzzer & Digital Notification | A | 0 | 20 | 6 | 6 | 2 | 0 | — | notStarted (generated) |
 | `KIT-008` | Exceptions, Re-Fire & Unavailable Items | A | 14 | 14 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
 | `KIT-009` | SLA, Priority & Service Rules | A | 0 | 14 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `KIT-010` | Kitchen Performance, AI & Operational Optimization | A | 3 | 1 | 6 | 1 | 0 | 3 | — | notStarted (generated) |
+
+## Thin screens in this batch
+
+**KIT-007 declare fewer than four components.** There is not enough here to build them faithfully. Build what is declared and say what is missing — **an invented screen comes back looking finished**, which is worse than an honest gap.
 
 ---
 
@@ -154,8 +158,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
-| Module | Kitchen · wave 2 · needs the `fnb` module |
-| Block | Block A · ticket #18156 (APP-POS-KIT-001) |
+| Module | Kitchen · wave 1 · needs the `fnb` module |
+| Block | Block A · task APP-POS-KIT-001 |
 | Who uses it | venue staff holding `ORDER_VIEW`, `PRODUCT_VIEW` (2 read); in the flows as supervisor |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | commandCentre (touchLarge density): 3 independent reads and no read of one record — the screen watches a population rather than working one |
@@ -261,18 +265,12 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | The F&B order the ticket was created from on acceptance (`FnbOrder.id`). |
 | Order number | text | — |
-| Outlet | the name it points at, never the id | — |
 | Table label | text | — |
 | Service mode | chip: Quick service, Table service, Room service, Collection, Delivery | — |
-| Coursing | chip: Fire and forget, Hold and fire, Phased, Timed, Delayed | BL-131. Starters before mains is the entire job of a kitchen pass, and the model fired everything at once. |
 | Buzzer code | text | BL-128. The pager number handed to a guest at a counter. |
 | Status | chip: Received, Preparing, Ready, Served, Recalled, Cancelled | — |
 | Priority | 1,234 | Higher fires sooner. Raised by Fast Pass or supervisor override. |
-| Prioritised by principal | the name it points at, never the id | — |
-| Prioritise reason | text | — |
 
 **Card list** (card list): **One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes sits above one that arrived first, because a kitchen works to when food is wanted.
 
@@ -292,13 +290,13 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 **Where the user goes next**
 
-- → `KIT-002` Kitchen Display System (KDS): *Kitchen Display System (KDS)*
-- → `KIT-003` Order Firing & Course Management: *Order Firing & Course Management*
+- → `KIT-002` Kitchen Display System (KDS): *Kitchen Display System (KDS)*; carries `ticketId`
+- → `KIT-003` Order Firing & Course Management: *Order Firing & Course Management*; carries `ticketId`
 - → `KIT-004` Active Order Management & Fulfilment Journey: *Active Order Management & Fulfilment Journey*; carries `orderId`
 - → `KIT-005` Kitchen Station Workload & Dynamic Routing: *Kitchen Station Workload & Dynamic Routing*
-- → `KIT-006` Expeditor & Order Assembly: *Expeditor & Order Assembly*
+- → `KIT-006` Expeditor & Order Assembly: *Expeditor & Order Assembly*; carries `ticketId`
 - → `KIT-007` Guest Collection, Buzzer & Digital Notification: *Guest Collection, Buzzer & Digital Notification*; carries `orderId`
-- → `KIT-008` Exceptions, Re-Fire & Unavailable Items: *Exceptions, Re-Fire & Unavailable Items*
+- → `KIT-008` Exceptions, Re-Fire & Unavailable Items: *Exceptions, Re-Fire & Unavailable Items*; carries `ticketId`
 - → `KIT-009` SLA, Priority & Service Rules: *SLA, Priority & Service Rules*
 - → `KIT-010` Kitchen Performance, AI & Operational Optimization: *Kitchen Performance, AI & Operational Optimization*
 
@@ -392,7 +390,7 @@ Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (65 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (59 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KIT-001?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `KIT-002`, `KIT-003`, `KIT-004`, `KIT-005`, `KIT-006`, `KIT-007`, `KIT-008`, `KIT-009`, `KIT-010`.
@@ -410,8 +408,8 @@ Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the 
 | | |
 |---|---|
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
-| Module | Kitchen · wave 2 · needs the `fnb` module |
-| Block | Block A · ticket #18181 (APP-POS-KIT-002) |
+| Module | Kitchen · wave 1 · needs the `fnb` module |
+| Block | Block A · task APP-POS-KIT-002 |
 | Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW` (1 operate, 1 read); in the flows as cashier, supervisor |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | listDetail (touchLarge density): `listKitchenTickets` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -495,18 +493,12 @@ Errors to draw in the form: 409 Past the recall window (`VenueSettings.fnb.recal
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | The F&B order the ticket was created from on acceptance (`FnbOrder.id`). |
 | Order number | text | — |
-| Outlet | the name it points at, never the id | — |
 | Table label | text | — |
 | Service mode | chip: Quick service, Table service, Room service, Collection, Delivery | — |
-| Coursing | chip: Fire and forget, Hold and fire, Phased, Timed, Delayed | BL-131. Starters before mains is the entire job of a kitchen pass, and the model fired everything at once. |
 | Buzzer code | text | BL-128. The pager number handed to a guest at a counter. |
 | Status | chip: Received, Preparing, Ready, Served, Recalled, Cancelled | — |
 | Priority | 1,234 | Higher fires sooner. Raised by Fast Pass or supervisor override. |
-| Prioritised by principal | the name it points at, never the id | — |
-| Prioritise reason | text | — |
 
 **Card list** (card list): **One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes sits above one that arrived first, because a kitchen works to when food is wanted.
 
@@ -516,19 +508,12 @@ Errors to draw in the form: 409 Past the recall window (`VenueSettings.fnb.recal
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | The F&B order the ticket was created from on acceptance (`FnbOrder.id`). |
 | Order number | text | — |
-| Outlet | the name it points at, never the id | — |
 | Table label | text | — |
 | Service mode | chip: Quick service, Table service, Room service, Collection, Delivery | — |
-| Coursing | chip: Fire and forget, Hold and fire, Phased, Timed, Delayed | BL-131. Starters before mains is the entire job of a kitchen pass, and the model fired everything at once. |
 | Buzzer code | text | BL-128. The pager number handed to a guest at a counter. |
 | Status | chip: Received, Preparing, Ready, Served, Recalled, Cancelled | — |
 | Priority | 1,234 | Higher fires sooner. Raised by Fast Pass or supervisor override. |
-| Prioritised by principal | the name it points at, never the id | — |
-| Prioritise reason | text | — |
-| Lines | list or chips (count when long) | — |
 | Target ready at | 1 Oct 2026, 14:30 | — |
 | Elapsed seconds | 1,234 | — |
 
@@ -575,7 +560,7 @@ Errors to draw in the form: 409 Past the recall window (`VenueSettings.fnb.recal
 | Error (`?state=error`) | Could not reach the platform. **The rail is still live from cache** and every bump is queued. |
 | Empty, first run (`?state=emptyFirstRun`) | **No tickets. The kitchen is clear**, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches this station or course filter. **The rail is not empty** — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| Permission denied (`?state=emptyNoAccess`) | This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
+| Permission denied (`?state=emptyNoAccess`) | This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission … |
 | Offline (`?state=offline`) | **Amber, and it keeps working.** The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Past the recall window (`VenueSettings.fnb.recallWindowMinutes`, proposed default 10, audit R094).; 409 The move is not one of the four above. Names the ticket's current status. |
 
@@ -621,7 +606,7 @@ tickets:
 - `recallKitchenTicket` → `ORDER_MODIFY` (operate) · staff
 - `notifyServer` → `ORDER_MODIFY` (operate) · staff
 
-**A refused user sees:** This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission.
+**A refused user sees:** This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission …
 
 Screen guard: `ORDER_VIEW`
 
@@ -669,7 +654,7 @@ Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (11), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KIT-002?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Bump, Save kitchen ticket status, Refire item, Recall kitchen ticket, Notify server.
 - [ ] Every transition is wired: `KIT-001`, `KIT-003`, `EMP-058`, `EMP-059`, `POS-022`.
@@ -687,8 +672,8 @@ Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the 
 | | |
 |---|---|
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
-| Module | Kitchen · wave 2 · needs the `fnb` module |
-| Block | Block A · ticket #18182 (APP-POS-KIT-003) |
+| Module | Kitchen · wave 1 · needs the `fnb` module |
+| Block | Block A · task APP-POS-KIT-003 |
 | Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW` (1 operate, 1 read); in the flows as supervisor |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | configEditor (touchLarge density): the screen declares only writes (`setKitchenTicketStatus`, `prioritiseKitchenTicket`, `fireCourse`) and no read of a population — it is settings, not a list |
@@ -814,7 +799,7 @@ Errors to draw in the form: 400 Validation failed
 | Error (`?state=error`) | Could not reach the platform. **The rail is still live from cache** and every bump is queued. |
 | Empty, first run (`?state=emptyFirstRun`) | **No tickets. The kitchen is clear**, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches this course filter. **The rail is not empty** — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic (audit R277). |
-| Permission denied (`?state=emptyNoAccess`) | This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_MODIFY` gets this state naming `ORDER_MODIFY`**, the screen's `permission` and the one its fire, hold, status and prioritise actions need (the screen has no read); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
+| Permission denied (`?state=emptyNoAccess`) | Without `ORDER_VIEW`, which `listKitchenTickets` requires, the screen does not load and this state names that permission. This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_MODIFY` gets this state naming `ORDER_MODIFY`**, the screen's `permission` and the one its fire, hold, status and prioritise actions need (the screen has no read); a button whose own `permission` the principal lacks is … |
 | Offline (`?state=offline`) | **Amber, and it keeps working.** The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 The move is not one of the four above. Names the ticket's current status. |
 
@@ -852,7 +837,7 @@ policy: Hold & fire for dine-in · Fire all at once for room service
 - `fireCourse` → `ORDER_MODIFY` (operate) · staff
 - `holdCourse` → `ORDER_MODIFY` (operate) · staff
 
-**A refused user sees:** This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_MODIFY` gets this state naming `ORDER_MODIFY`**, the screen's `permission` and the one its fire, hold, status and prioritise actions need (the screen has no read); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission.
+**A refused user sees:** Without `ORDER_VIEW`, which `listKitchenTickets` requires, the screen does not load and this state names that permission. This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_MODIFY` gets this state naming `ORDER_MODIFY`**, the screen's `permission` and the one its fire, hold, status and prioritise actions need (the screen has no read); a button whose own `permission` the principal lacks is …
 
 Screen guard: `ORDER_MODIFY`
 
@@ -911,8 +896,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
-| Module | Kitchen · wave 2 · needs the `fnb` module |
-| Block | Block A · ticket #18157 (APP-POS-KIT-004) |
+| Module | Kitchen · wave 1 · needs the `fnb` module |
+| Block | Block A · task APP-POS-KIT-004 |
 | Who uses it | venue staff holding `ORDER_VIEW` (1 read); in the flows as supervisor |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | listDetail (touchLarge density): `listKitchenTickets` reads the population and `getFnbOrder` reads one of them — list, select, act |
@@ -946,18 +931,12 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | The F&B order the ticket was created from on acceptance (`FnbOrder.id`). |
 | Order number | text | — |
-| Outlet | the name it points at, never the id | — |
 | Table label | text | — |
 | Service mode | chip: Quick service, Table service, Room service, Collection, Delivery | — |
-| Coursing | chip: Fire and forget, Hold and fire, Phased, Timed, Delayed | BL-131. Starters before mains is the entire job of a kitchen pass, and the model fired everything at once. |
 | Buzzer code | text | BL-128. The pager number handed to a guest at a counter. |
 | Status | chip: Received, Preparing, Ready, Served, Recalled, Cancelled | — |
 | Priority | 1,234 | Higher fires sooner. Raised by Fast Pass or supervisor override. |
-| Prioritised by principal | the name it points at, never the id | — |
-| Prioritise reason | text | — |
 
 **Card list** (card list): **One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes sits above one that arrived first, because a kitchen works to when food is wanted.
 
@@ -967,19 +946,12 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | The F&B order the ticket was created from on acceptance (`FnbOrder.id`). |
 | Order number | text | — |
-| Outlet | the name it points at, never the id | — |
 | Table label | text | — |
 | Service mode | chip: Quick service, Table service, Room service, Collection, Delivery | — |
-| Coursing | chip: Fire and forget, Hold and fire, Phased, Timed, Delayed | BL-131. Starters before mains is the entire job of a kitchen pass, and the model fired everything at once. |
 | Buzzer code | text | BL-128. The pager number handed to a guest at a counter. |
 | Status | chip: Received, Preparing, Ready, Served, Recalled, Cancelled | — |
 | Priority | 1,234 | Higher fires sooner. Raised by Fast Pass or supervisor override. |
-| Prioritised by principal | the name it points at, never the id | — |
-| Prioritise reason | text | — |
-| Lines | list or chips (count when long) | — |
 | Target ready at | 1 Oct 2026, 14:30 | — |
 | Elapsed seconds | 1,234 | — |
 
@@ -987,17 +959,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Order number | text | — |
-| Outlet | the name it points at, never the id | — |
 | Service mode | chip: Quick service, Table service, Room service, Collection, Delivery | — |
-| Table visit | the name it points at, never the id | — |
 | Status | chip: Ordered, Accepted, In preparation, Ready, Served, Collected… | The full lifecycle from 4.6.35. Nine states, not six — the earlier enum collapsed `accepted` into `placed` and had no `collected` or … |
-| Lines | list or chips (count when long) | — |
-| Sales order | the name it points at, never the id | Retyped 29 September (SD-046), and `format: uuid` since ADR-0056 (30 September): every id is a uuid, so this joins `orders.sales_order.id`. |
 | Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Kitchen ticket | the name it points at, never the id | — |
 | Estimated ready at | 1 Oct 2026, 14:30 | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
 | Synced at | 1 Oct 2026, 14:30 | — |
@@ -1012,7 +978,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Where the user goes next**
 
 - → `KIT-001` Kitchen Operations Command Center: *Kitchen Operations Command Center*
-- → `KIT-008` Exceptions, Re-Fire & Unavailable Items: *Exceptions, Re-Fire & Unavailable Items*
+- → `KIT-008` Exceptions, Re-Fire & Unavailable Items: *Exceptions, Re-Fire & Unavailable Items*; carries `ticketId`
 
 #### States
 
@@ -1099,7 +1065,7 @@ Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (41 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KIT-004?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `KIT-001`, `KIT-008`.
@@ -1117,8 +1083,8 @@ Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the 
 | | |
 |---|---|
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
-| Module | Kitchen · wave 2 · needs the `fnb` module |
-| Block | Block A · ticket #18158 (APP-POS-KIT-005) |
+| Module | Kitchen · wave 1 · needs the `fnb` module |
+| Block | Block A · task APP-POS-KIT-005 |
 | Who uses it | venue staff holding `ORDER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 read, 1 configure) |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | listDetail (touchLarge density): `listKitchenStations` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1223,7 +1189,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Error (`?state=error`) | Could not reach the platform. **The rail is still live from cache** and every bump is queued. |
 | Empty, first run (`?state=emptyFirstRun`) | **No tickets. The kitchen is clear**, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches this station or course filter. **The rail is not empty** — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| Permission denied (`?state=emptyNoAccess`) | This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `PRODUCT_VIEW` gets this state naming `PRODUCT_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
+| Permission denied (`?state=emptyNoAccess`) | This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `PRODUCT_VIEW` gets this state naming `PRODUCT_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission … |
 | Offline (`?state=offline`) | **Amber, and it keeps working.** The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
 
 #### Edge cases to draw
@@ -1252,7 +1218,7 @@ move: Burgers Grill → Fryer line until 23:30
 - `listKitchenStations` → `PRODUCT_VIEW` (read) · staff
 - `rebalanceStationLoad` → `PRODUCT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `PRODUCT_VIEW` gets this state naming `PRODUCT_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission.
+**A refused user sees:** This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `PRODUCT_VIEW` gets this state naming `PRODUCT_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission …
 
 Screen guard: `PRODUCT_VIEW`
 
@@ -1312,8 +1278,8 @@ Also apply: 5 for all of P15, 29 for every app (section *Design inputs from the 
 | | |
 |---|---|
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
-| Module | Kitchen · wave 2 · needs the `fnb` module |
-| Block | Block A · ticket #18183 (APP-POS-KIT-006) |
+| Module | Kitchen · wave 1 · needs the `fnb` module |
+| Block | Block A · task APP-POS-KIT-006 |
 | Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW` (1 operate, 1 read); in the flows as supervisor |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | listDetail (touchLarge density): `listKitchenTickets` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1391,18 +1357,12 @@ Errors to draw in the form: 409 Order is not ready, or already closed; 422 The o
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | The F&B order the ticket was created from on acceptance (`FnbOrder.id`). |
 | Order number | text | — |
-| Outlet | the name it points at, never the id | — |
 | Table label | text | — |
 | Service mode | chip: Quick service, Table service, Room service, Collection, Delivery | — |
-| Coursing | chip: Fire and forget, Hold and fire, Phased, Timed, Delayed | BL-131. Starters before mains is the entire job of a kitchen pass, and the model fired everything at once. |
 | Buzzer code | text | BL-128. The pager number handed to a guest at a counter. |
 | Status | chip: Received, Preparing, Ready, Served, Recalled, Cancelled | — |
 | Priority | 1,234 | Higher fires sooner. Raised by Fast Pass or supervisor override. |
-| Prioritised by principal | the name it points at, never the id | — |
-| Prioritise reason | text | — |
 
 **Card list** (card list): **One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes sits above one that arrived first, because a kitchen works to when food is wanted.
 
@@ -1412,19 +1372,12 @@ Errors to draw in the form: 409 Order is not ready, or already closed; 422 The o
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Order | the name it points at, never the id | The F&B order the ticket was created from on acceptance (`FnbOrder.id`). |
 | Order number | text | — |
-| Outlet | the name it points at, never the id | — |
 | Table label | text | — |
 | Service mode | chip: Quick service, Table service, Room service, Collection, Delivery | — |
-| Coursing | chip: Fire and forget, Hold and fire, Phased, Timed, Delayed | BL-131. Starters before mains is the entire job of a kitchen pass, and the model fired everything at once. |
 | Buzzer code | text | BL-128. The pager number handed to a guest at a counter. |
 | Status | chip: Received, Preparing, Ready, Served, Recalled, Cancelled | — |
 | Priority | 1,234 | Higher fires sooner. Raised by Fast Pass or supervisor override. |
-| Prioritised by principal | the name it points at, never the id | — |
-| Prioritise reason | text | — |
-| Lines | list or chips (count when long) | — |
 | Target ready at | 1 Oct 2026, 14:30 | — |
 | Elapsed seconds | 1,234 | — |
 
@@ -1464,7 +1417,7 @@ Errors to draw in the form: 409 Order is not ready, or already closed; 422 The o
 | Error (`?state=error`) | Could not reach the platform. **The rail is still live from cache** and every bump is queued. |
 | Empty, first run (`?state=emptyFirstRun`) | **No tickets. The kitchen is clear**, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches this station or course filter. **The rail is not empty** — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| Permission denied (`?state=emptyNoAccess`) | This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
+| Permission denied (`?state=emptyNoAccess`) | This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission … |
 | Offline (`?state=offline`) | **Amber, and it keeps working.** The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Order is not ready, or already closed; 409 The move is not one of the four above. Names the ticket's current status.; 422 The outcome does not close this order's service mode, or a delivery names no location (audit R125 (1)). |
 
@@ -1495,7 +1448,7 @@ label: 'BNG-004131 · Aisha Rahman · 1 × Loaded Fries · 1 × Smash Burger (no
 - `printOrderLabel` → `ORDER_VIEW` (read) · staff
 - `recordOrderHandover` → `ORDER_MODIFY` (operate) · staff
 
-**A refused user sees:** This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission.
+**A refused user sees:** This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission …
 
 Screen guard: `ORDER_VIEW`
 
@@ -1535,7 +1488,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (14), with its required mark, default, format and its error state (409, 422).
-- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KIT-006?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save kitchen ticket status, Chase station, Mark order collected, Print order label, Delivered.
 - [ ] Every transition is wired: `KIT-001`, `KIT-002`.
@@ -1553,16 +1506,16 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
-| Module | Kitchen · wave 2 · needs the `fnb` module |
-| Block | Block A · ticket #18159 (APP-POS-KIT-007) |
-| Who uses it | venue staff holding `ORDER_MODIFY`, `ORDER_VIEW` (1 operate, 1 read) |
+| Module | Kitchen · wave 1 · needs the `fnb` module |
+| Block | Block A · task APP-POS-KIT-007 |
+| Who uses it | venue staff holding `ORDER_VIEW` (1 read) |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | listDetail (touchLarge density): `listKitchenTickets` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
 | Offline | **Amber, and it keeps working.** The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
-| Opens with | `venueId` (session), `stationId` (session), `orderId` (KIT-002) · cold entry: **Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen is open, and it resolves its station from the device assignment … |
+| Opens with | `venueId` (session), `stationId` (session) · cold entry: **Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen is open, and it resolves its station from the device assignment … |
 | Route | `/kitchen/guest-collection-buzzer-digital-notification` |
 
-**What the spec says about it.** **Built 20 August from board 3 of the client F&B design set.** **`buzzerCode` exists and nothing dispatches to a physical pager.** The digital half works; the buzzer half assumes a device driver the package does not model. **Board repointed 24 August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3g` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer. **The customer-facing order status board is this screen's** (decided 1 October 2026, POS v2 decision POSV2-7, docs/registers/pos-v2-decisions.md): the board the guests read, order numbers only under Preparing and Ready for pickup, never a name. The till's Order Queue (POS-029) shows a mirror of it, not a board of its own. **The guest board is an unattended customer display** (POSV2-7; design-notes correction fnb-retail KIT-007; CHG-SPO-017): order numbers only, under Preparing and Ready for pickup, never a name and no staff control. Handover is recorded at the pass (KIT-006). The buzzer number is on the ticket, but nothing writes it from the till or dispatches to a pager yet (open entry CHG-SPO-019).
+**What the spec says about it.** **Built 20 August from board 3 of the client F&B design set.** **`buzzerCode` exists and nothing dispatches to a physical pager.** The digital half works; the buzzer half assumes a device driver the package does not model. **Board repointed 24 August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3g` — a frame in the client pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer. **The customer-facing order status board is this screen's** (decided 1 October 2026, POS v2 decision POSV2-7, docs/registers/pos-v2-decisions.md): the board the guests read, order numbers only under Preparing and Ready for pickup, never a name. The till's Order Queue (POS-029) shows a mirror of it, not a board of its own. **The guest board is an unattended customer display** (POSV2-7; design-notes correction fnb-retail KIT-007; CHG-SPO-017): order numbers only, under Preparing and Ready for pickup, never a name and no staff control. Handover is recorded at the pass (KIT-006). The buzzer number is on the ticket, but nothing writes it from the till or dispatches to a pager yet (open entry CHG-SPO-019). **An unattended guest display, read-only** (decided by Chinmay, 3 October 2026 (CHG-SPF-008)): `recordOrderHandover`, its button and form left this screen; a handover is recorded on KIT-006 Expo …
 
 **From the Food, Beverage & Retail process.** Two faces of collection. (1) The **guest status board**: a customer-facing screen in the dining area showing order numbers only, under Preparing and Ready for pickup, readable across the room; this screen owns it and the till's queue mirrors it (POSV2-7). (2) The collection point's staff view: call the number, hand over, record it. The one thing to get right: the guest board shows numbers only — never a name — and is an unattended display with no buttons.
 
@@ -1588,27 +1541,13 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Status | select | — | Received · Preparing · Ready · Served · Recalled · Cancelled | `listKitchenTickets` ?status |
 | Course | number field | — | min 1 | `listKitchenTickets` ?course |
 
-**Form: Record order handover** (modal, opened by *Record order handover*; *Record order handover* calls `recordOrderHandover`, *Cancel* sends nothing)
-
-**Collects what `recordOrderHandover` sends before it is called.** Required: `outcome`, `recordedAt`. Optional: `deliveredToLocationId`, `runnerPrincipalId`, `note`. **Only the outcome that fits the order's service mode is offered**: tableService `served`; quickService or collection `collected`; delivery or roomService `delivered`, with `deliveredToLocationId` required. `guestNotFound` and `refused` are offered for every mode. Any other pairing is refused 422 `outcomeNotForServiceMode` (decided 28 September, audit R125 (1)). Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Outcome `outcome` | radio group | required | — | Served · Collected · Delivered · Guest not found · Refused | — | `served`, `collected` and `delivered` move the order to the `FnbOrderStatus` of the same name. | `recordOrderHandover` body |
-| Delivered to location `deliveredToLocationId` | picker: choose a delivered to location | optional | — | — | shows names, sends the id | Required where `outcome` is `delivered` (audit R125 (1)). | `recordOrderHandover` body |
-| Runner principal `runnerPrincipalId` | picker: choose a runner principal | optional | — | — | shows names, sends the id | — | `recordOrderHandover` body |
-| Note `note` | text area | optional | — | max length 500 | — | Required for guestNotFound and refused. | `recordOrderHandover` body |
-| Recorded at `recordedAt` | date and time picker | required | — | — | 1 Oct 2026, 14:30 (venue time zone) | — | `recordOrderHandover` body |
-
-Errors to draw in the form: 409 Order is not ready, or already closed; 422 The outcome does not close this order's service mode, or a delivery names no location (audit R125 (1)).
+Nothing to enter: the screen reads and acts, and every action sends what the screen already holds.
 
 #### Outputs: what the screen shows and produces
 
 **Shown**
 
-**Card list** (card list): **One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes sits above one that arrived first, because a kitchen works to when food is wanted.
-
-**Guest status board — Preparing and Ready for pickup** (card list, from `listKitchenTickets`): **Order numbers only, never a name**, in two columns, Preparing and Ready for pickup, readable from across the room. **Owned here** (decided 1 October 2026, POSV2-7); the till's Order Queue (POS-029) mirrors it. The look is the v2 build's queue status board.
+**Guest status board — Preparing and Ready for pickup** (card list, from `listKitchenTickets`): **Order numbers only, never a name**, in two columns, Preparing and Ready for pickup, readable from across the room. **Owned here** (decided 1 October 2026, POSV2-7); the till's Order Queue (POS-029) mirrors it. The look is the v2 build's queue status board. **Read-only, in the order the server returns** (decided by Chinmay, 3 October 2026 (CHG-SPF-008)): order numbers, Preparing and Ready for …
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -1635,12 +1574,6 @@ Errors to draw in the form: 409 Order is not ready, or already closed; 422 The o
 
 **Metric tile** (metric tile): Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read is a number they will not read. The station-load tile is not in the first release (decided 28 September, audit R277).
 
-**Actions and what each produces**
-
-| Action | Calls | Sends | On success returns | Errors to show | Notes |
-|---|---|---|---|---|---|
-| Record order handover (primary button) | `recordOrderHandover` POST `/guest-orders/{orderId}/delivery` | inline | GuestOrderStatus | 409 Order is not ready, or already closed; 422 The outcome does not close this order's service mode, or a delivery names no location (audit R125 (1)). | works offline; gated `ORDER_MODIFY`; opens modal first |
-
 **Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
 - **Guest status board**: Two columns, Preparing and Ready for pickup, large order numbers; a number moving to Ready animates once and may chime; numbers leave the board when collected. Only counter, takeaway and app-collection orders — never dine-in, delivery or partner orders. Venue branding allowed on this guest-facing display. *(source: POSV2-7 / DI-790 / DI-794 / screens/P15-kitchen-display.yaml#KIT-007)*
@@ -1666,7 +1599,6 @@ Errors to draw in the form: 409 Order is not ready, or already closed; 422 The o
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches this station or course filter. **The rail is not empty** — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
 | Permission denied (`?state=emptyNoAccess`) | Never shown on the board: it is an unattended guest display and carries no staff state. |
 | Offline (`?state=offline`) | **Amber, and it keeps working.** The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
-| Validation and conflict | the form keeps what was entered and marks the problem: 409 Order is not ready, or already closed; 422 The outcome does not close this order's service mode, or a delivery names no location (audit R125 (1)). |
 
 #### Edge cases to draw
 
@@ -1696,7 +1628,6 @@ board:
 #### Permissions
 
 - `listKitchenTickets` → `ORDER_VIEW` (read) · staff
-- `recordOrderHandover` → `ORDER_MODIFY` (operate) · staff
 
 **A refused user sees:** Never shown on the board: it is an unattended guest display and carries no staff state.
 
@@ -1704,14 +1635,13 @@ Screen guard: `ORDER_VIEW`
 
 #### Requirements it meets
 
-7 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
+6 rows of the client's requirements matrix (`sources/requirements/Ticvai_matrix_20260621_2.xlsx`) trace to this screen's operations or data (`handoff/traceability.json`). The matrix carries no priority; the screen's block is its delivery priority.
 
 | Ref | Requirement (shortened) | Domain | Verdict | Via |
 |---|---|---|---|---|
 | 4.6.20 | The system should be able to create a new Check with table numbers and guest numbers, add items to print in kitchen or on QSR(Quick service restaurants). | Bundles and Promotions | CONTRACTED | `listKitchenTickets` |
 | 4.6.21 | The system should be able to send order information consisting of table number and guest count and added items with condiments to multiple parts of the restaurant with additional prints (being … | Bundles and Promotions | CONTRACTED | `listKitchenTickets` |
 | 4.7.1 | The system should be able to create a new Check with table and guest numbers, add items to print in kitchen or on QSR(Quick service restaurants), void items and ensure they don't appear in kitchen. | Bundles and Promotions | CONTRACTED | `listKitchenTickets` |
-| 19.2.49 | Pickup Ordering - System shall support pickup ordering. | Guest Mobile App & Branding | CONTRACTED | `recordOrderHandover` |
 | 4.7.5 | The system should support usage of buzzers for notifying guests when their order is ready. A buzzer would be assigned to the guests at the time of taking their order. | Bundles and Promotions | CONTRACTED | data `KitchenTicket` |
 | 5.2.3 | The system should be able to have options as Fire & forget and Hold & fire orders(modifications should including the manual time adjustment). | F&B & Guest Management | CONTRACTED | data `KitchenTicket` |
 | 5.2.4 | The system should be able to have options as phased, timed, delayed ordering (used in fine dine options). | F&B & Guest Management | CONTRACTED | data `KitchenTicket` |
@@ -1738,12 +1668,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (5), with its required mark, default, format and its error state (409, 422).
+- [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
 - [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#KIT-007?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Record order handover.
+- [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `KIT-001`.
-- [ ] Every gated control is gated: `ORDER_MODIFY`, `ORDER_VIEW`.
+- [ ] Every gated control is gated: `ORDER_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 2 edge case(s) from the process notes are drawn.
 - [ ] The 1 decision(s) taken on this screen are drawn as decided, not as the old default.
@@ -1758,8 +1688,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
-| Module | Kitchen · wave 2 · needs the `fnb` module |
-| Block | Block A · ticket #18184 (APP-POS-KIT-008) |
+| Module | Kitchen · wave 1 · needs the `fnb` module |
+| Block | Block A · task APP-POS-KIT-008 |
 | Who uses it | venue staff holding `INCIDENT_REPORT`, `INCIDENT_VIEW`, `ORDER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 operate, 3 read, 1 configure); in the flows as supervisor |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | listDetail (touchLarge density): `list86Events` reads the population and `getHaccpStatus` reads one of them — list, select, act |
@@ -1889,7 +1819,7 @@ Errors to draw in the form: 400 Validation failed
 | Error (`?state=error`) | Could not reach the platform. **The rail is still live from cache** and every bump is queued. |
 | Empty, first run (`?state=emptyFirstRun`) | **No tickets. The kitchen is clear**, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches this station or course filter. **The rail is not empty** — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| Permission denied (`?state=emptyNoAccess`) | This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `PRODUCT_VIEW` gets this state naming `PRODUCT_VIEW`**, the screen's `permission` and the one `list86Events`, the population it reads, enforces (`getHaccpStatus` needs `INCIDENT_VIEW` and reaches no component yet, see `gaps`); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
+| Permission denied (`?state=emptyNoAccess`) | This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `PRODUCT_VIEW` gets this state naming `PRODUCT_VIEW`**, the screen's `permission` and the one `list86Events`, the population it reads, enforces (`getHaccpStatus` needs `INCIDENT_VIEW` and reaches no component yet, see `gaps`); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's … |
 | Offline (`?state=offline`) | **Amber, and it keeps working.** The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
@@ -1922,7 +1852,7 @@ foodSafety: Checks due 3 · missed 1 · open actions 2 · oldest 5 h
 - `list86Events` → `PRODUCT_VIEW` (read) · staff
 - `logKitchenException` → `INCIDENT_REPORT` (operate) · staff
 
-**A refused user sees:** This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `PRODUCT_VIEW` gets this state naming `PRODUCT_VIEW`**, the screen's `permission` and the one `list86Events`, the population it reads, enforces (`getHaccpStatus` needs `INCIDENT_VIEW` and reaches no component yet, see `gaps`); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission.
+**A refused user sees:** This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `PRODUCT_VIEW` gets this state naming `PRODUCT_VIEW`**, the screen's `permission` and the one `list86Events`, the population it reads, enforces (`getHaccpStatus` needs `INCIDENT_VIEW` and reaches no component yet, see `gaps`); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's …
 
 Screen guard: `PRODUCT_VIEW`
 
@@ -1976,8 +1906,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
-| Module | Kitchen · wave 2 · needs the `fnb` module |
-| Block | Block A · ticket #18160 (APP-POS-KIT-009) |
+| Module | Kitchen · wave 1 · needs the `fnb` module |
+| Block | Block A · task APP-POS-KIT-009 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read) |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | configEditor (touchLarge density): the screen declares only writes (`prioritiseKitchenTicket`, `setVenueSettings`) and no read of a population — it is settings, not a list |
@@ -2054,7 +1984,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Loading (`?state=loading`) | The rail, oldest ticket first. **The count renders before the tickets** — a kitchen wants to know how deep it is before it reads anything. |
 | Error (`?state=error`) | Could not reach the platform. **The rail is still live from cache** and every bump is queued. |
 | Empty, first run (`?state=emptyFirstRun`) | **No tickets. The kitchen is clear**, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
-| Permission denied (`?state=emptyNoAccess`) | This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_MODIFY` gets this state naming `ORDER_MODIFY`**, the screen's `permission` and the one prioritising needs (the screen has no read); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
+| Permission denied (`?state=emptyNoAccess`) | This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. Shown when the caller lacks `PRODUCT_VIEW`, which `getKitchenSla` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` … |
 | Offline (`?state=offline`) | **Amber, and it keeps working.** The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
 
 #### Edge cases to draw
@@ -2085,7 +2015,7 @@ weights: Age 3 · Promise time 5 · Table stage 2 · VIP 4
 - `getKitchenSla` → `PRODUCT_VIEW` (read) · staff
 - `getCourseRules` → `PRODUCT_VIEW` (read) · staff
 
-**A refused user sees:** This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_MODIFY` gets this state naming `ORDER_MODIFY`**, the screen's `permission` and the one prioritising needs (the screen has no read); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission.
+**A refused user sees:** This display is not assigned to a station. **Assignment is a back-office act** — a kitchen screen does not choose what it shows. Shown when the caller lacks `PRODUCT_VIEW`, which `getKitchenSla` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` …
 
 Screen guard: `ORDER_MODIFY`
 
@@ -2131,8 +2061,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI POS · P15 Kitchen Display (display) |
-| Module | Kitchen · wave 2 · needs the `fnb` module |
-| Block | Block A · ticket #18116 (APP-POS-KIT-010) |
+| Module | Kitchen · wave 1 · needs the `fnb` module |
+| Block | Block A · task APP-POS-KIT-010 |
 | Who uses it | venue staff holding `REPORT_VIEW_VENUE` (1 operate) |
 | Device and orientation | kiosk · LTR · dark theme |
 | Pattern | statusTracker (touchLarge density): `getDashboard` reads one record and nothing reads a population — the screen is about that one thing |

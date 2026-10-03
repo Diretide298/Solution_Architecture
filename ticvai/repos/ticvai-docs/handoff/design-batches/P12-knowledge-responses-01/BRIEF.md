@@ -126,8 +126,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SUP-006` | Knowledge Base Search | B–D | 3 | 5 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
-| `SUP-007` | Canned Response Management | B–D | 10 | 18 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
+| `SUP-006` | Knowledge Base Search | D | 3 | 5 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
+| `SUP-007` | Canned Response Management | D | 10 | 12 | 6 | 7 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

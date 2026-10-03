@@ -4,7 +4,7 @@
   "name": "SEO & Metadata",
   "module": "White Label",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -140,7 +140,7 @@
    "loading": "Detail loads",
    "error": "Could not load",
    "emptyFirstRun": "No metadata saved for this page yet: the generated title and description are shown with the \"Generated\" badge.",
-   "emptyNoAccess": "Shown when the caller lacks `MARKETING_MANAGE`, which `setSeoMetadata` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `MARKETING_VIEW`, which `getSeoMetadata` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `setSeoMetadata`, `createUrlRedirect`."
   },
   "apis": [
    {
@@ -169,7 +169,7 @@
    "provenance": "generated",
    "board": "wireframes/P13 Venue CMS.dc.html#cms-013"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateUrlRedirect",
@@ -215,7 +215,7 @@
   "name": "Translations",
   "module": "White Label",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -350,7 +350,7 @@
    "provenance": "generated",
    "board": "wireframes/P13 Venue CMS.dc.html#cms-011"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "proposeTranslations",
@@ -387,7 +387,7 @@
   "name": "RTL Preview",
   "module": "White Label",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -487,7 +487,7 @@
    "provenance": "generated",
    "board": "wireframes/P13 Venue CMS.dc.html#cms-012"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P13",
    "audience": "staff",
@@ -516,7 +516,7 @@
   "name": "Publishing Workflow",
   "module": "White Label",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -695,7 +695,7 @@
    "loading": "The publishing workflow, read by `getTenantAppStatus`.",
    "error": "Could not load. Names which read failed and leaves the publishing workflow untouched.",
    "emptyFirstRun": "No publishing workflow yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
-   "emptyNoAccess": "Shown when the caller lacks `TENANT_PUBLISH`, which `publishTenantConfig` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listBookingFlows` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TENANT_PUBLISH` for `publishTenantConfig`, `setPublishReviewPolicy`, `exportSitePackage`, `getSitePackage`."
   },
   "apis": [
    {
@@ -766,7 +766,7 @@
    "provenance": "generated",
    "board": "wireframes/P13 Venue CMS.dc.html#cms-014"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formPublishTenantConfig",
@@ -827,7 +827,9 @@
     },
     {
      "name": "packageId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getSitePackage` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -859,7 +861,7 @@
   "name": "Version History",
   "module": "White Label",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -923,14 +925,10 @@
        "bindsTo": "ConfigVersion",
        "columns": [
         "ConfigVersion.publishedAt",
-        "ConfigVersion.publishedByPrincipalId",
         "ConfigVersion.publishedByName",
         "ConfigVersion.note",
         "ConfigVersion.isCurrent",
-        "ConfigVersion.scheduledFor",
-        "ConfigVersion.contentHash",
-        "ConfigVersion.pendingBuildTimeChanges",
-        "ConfigVersion.scopePath"
+        "ConfigVersion.scheduledFor"
        ],
        "operation": "listConfigVersions",
        "provenance": "contract white-label.yaml GET /tenant-config/versions"
@@ -1035,7 +1033,7 @@
    "provenance": "generated",
    "board": "wireframes/P13 Venue CMS.dc.html#cms-015"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "confirmRestoreConfigVersion",
@@ -1080,7 +1078,7 @@
   "name": "Site Settings",
   "module": "White Label",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -1123,12 +1121,12 @@
     {
      "to": "CMS-017",
      "trigger": "Domain & Certificate",
-     "provenance": "derived — CMS-017 declares entryState.params domainId and CMS-016 holds none of them. The edge carries nothing: CMS-017 finds domainId (listCustomDomains) itself, and CMS-017 opens on its own"
+     "provenance": "derived — CMS-017 declares entryState.params domainId and CMS-016 holds none of them. The edge carries nothing: domainId only pre-selects (deep link or optional), and CMS-017 opens on its own"
     },
     {
      "to": "CMS-018",
      "trigger": "Consent & Legal",
-     "provenance": "derived — CMS-018 declares entryState.params policyKind, questionId and CMS-016 holds none of them. The edge carries nothing: CMS-018 finds policyKind (listPolicies), questionId (listConsentAnswers) itself, and CMS-018 opens on its own"
+     "provenance": "derived — CMS-018 declares entryState.params policyKind, questionId and CMS-016 holds none of them. The edge carries nothing: policyKind, questionId only pre-select (deep link or optional), and CMS-018 opens on its own"
     },
     {
      "to": "CMS-103",
@@ -1159,35 +1157,14 @@
        "label": "The booking flow config",
        "bindsTo": "BookingFlowConfig",
        "columns": [
-        "BookingFlowConfig.preset",
-        "BookingFlowConfig.stepIndicator",
         "BookingFlowConfig.cartLayout",
         "BookingFlowConfig.cardLayout",
-        "BookingFlowConfig.cardSize",
-        "BookingFlowConfig.seatPicker",
-        "BookingFlowConfig.mapView",
         "BookingFlowConfig.density",
-        "BookingFlowConfig.embedMode",
-        "BookingFlowConfig.heroBanner",
-        "BookingFlowConfig.searchInBanner",
-        "BookingFlowConfig.singleEventPage",
-        "BookingFlowConfig.quantitiesOnAddOns",
         "BookingFlowConfig.cartSideInRtl",
         "BookingFlowConfig.eventBannerDates",
         "BookingFlowConfig.timesPerPage",
-        "BookingFlowConfig.dayPartFilter",
-        "BookingFlowConfig.dayPartBoundaries",
         "BookingFlowConfig.seatViewPosition",
-        "BookingFlowConfig.seatTimeBar",
-        "BookingFlowConfig.ticketCategories",
-        "BookingFlowConfig.ticketTags",
-        "BookingFlowConfig.cardInfo",
-        "BookingFlowConfig.conciergeMascot",
-        "BookingFlowConfig.showInfoOnly",
-        "BookingFlowConfig.locationSwitcher",
-        "BookingFlowConfig.guestContactFields",
-        "BookingFlowConfig.dateStripDays",
-        "BookingFlowConfig.venueOverrides"
+        "BookingFlowConfig.seatTimeBar"
        ],
        "operation": "getBookingFlowConfig",
        "notes": "**Venue-wide booking settings only (decided 29 September, W12).** The settings that belong to one flow (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`, `quickTour`, the flow's consent questions) moved to each flow on CMS-103, and `categoryDisplay` is gone (W7, superseding 23SEP-18: `cardLayout` carries rows or grid). Here: `timesPerPage` and the day-part chips (REV3-1); `seatViewPosition` (REV3-5); `seatTimeBar` (REV3-6); `cartLayout` and `cartSideInRtl` (REV3-10); `showInfoOnly` (REV3-14); `ticketCategories` (REV3-16); `locationSwitcher` (REV3-18); `ticketTags` (23SEP-3); `cardInfo` (23SEP-6); `eventBannerDates` (23SEP-19); `conciergeMascot` (CFG-5); the card and density enums (DG-6); **`guestContactFields`**, what the guest-checkout pop-up asks: email only, + name or + mobile (W1); **`dateStripDays`**, the days on the date strip before the calendar icon, default 7 (M17-08).",
@@ -1287,7 +1264,7 @@
    "provenance": "generated",
    "board": "wireframes/P13 Venue CMS.dc.html#cms-016"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetBookingFlowConfig",
@@ -1378,7 +1355,7 @@
   "name": "Domain & Certificate",
   "module": "White Label",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -1581,7 +1558,9 @@
    "params": [
     {
      "name": "domainId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listCustomDomains` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**Verification and release act on one domain**, taken from the row. A release issued against a domain nobody can see is a site going dark with no record of who asked.",
@@ -1598,7 +1577,7 @@
    "provenance": "generated",
    "board": "wireframes/P13 Venue CMS.dc.html#cms-017"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formClaimCustomDomain",
@@ -1676,7 +1655,7 @@
   "name": "Consent & Legal",
   "module": "White Label",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -1723,7 +1702,7 @@
    "error": "Could not load. Names which read failed and leaves the consent legal untouched.",
    "emptyFirstRun": "No policy, purpose or consent question yet. Offers Save policy (`setPolicy`), Save consent purposes (`setConsentPurposes`) and New consent question (`createConsentQuestion`).",
    "emptyNoResults": "`listPolicies` takes no filter. The consent questions (kind, status) and the consent records (order, guest, question) do: an empty result names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listPolicies` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listPolicies` requires to show this screen, and names that permission (the screen's other reads need `GUEST_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_MANAGE` for `setConsentPurposes`, `createConsentQuestion`, `updateConsentQuestion`."
   },
   "apis": [
    {
@@ -1792,7 +1771,7 @@
    "provenance": "generated",
    "board": "wireframes/P13 Venue CMS.dc.html#cms-018"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "layout": {
    "template": "split",
    "regions": [
@@ -1826,7 +1805,6 @@
         "ConsentPurposeConfig.purpose",
         "ConsentPurposeConfig.displayName",
         "ConsentPurposeConfig.description",
-        "ConsentPurposeConfig.channels",
         "ConsentPurposeConfig.noticeVersion",
         "ConsentPurposeConfig.isRequiredForService",
         "ConsentPurposeConfig.expiresAfterMonths"
@@ -1860,16 +1838,10 @@
        "bindsTo": "BookingConsentRecord",
        "columns": [
         "BookingConsentRecord.answeredAt",
-        "BookingConsentRecord.questionId",
         "BookingConsentRecord.questionVersion",
         "BookingConsentRecord.answer",
         "BookingConsentRecord.scope",
         "BookingConsentRecord.personName",
-        "BookingConsentRecord.orderId",
-        "BookingConsentRecord.answeredBySubjectId",
-        "BookingConsentRecord.answeredByPrincipalId",
-        "BookingConsentRecord.source",
-        "BookingConsentRecord.blocksBooking",
         "BookingConsentRecord.supersededAt"
        ],
        "operation": "listConsentAnswers",
@@ -1970,11 +1942,15 @@
    "params": [
     {
      "name": "policyKind",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPolicies` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "questionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listConsentQuestions` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "preloaded": [
@@ -2097,7 +2073,7 @@
   "name": "User Access",
   "module": "White Label",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "capability": "C00",
   "implementation": {
    "app": "venue-management-web",
@@ -2205,13 +2181,11 @@
        "label": "The selected principal",
        "bindsTo": "Principal",
        "columns": [
-        "Principal.id",
         "Principal.username",
         "Principal.displayName",
         "Principal.isActive",
         "Principal.validFrom",
         "Principal.validTo",
-        "Principal.primaryRoleId",
         "Principal.roles",
         "Principal.lastLoginAt"
        ],
@@ -2281,7 +2255,7 @@
    "provenance": "generated",
    "board": "wireframes/P13 Venue CMS.dc.html#cms-019"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formUpdatePrincipal",
@@ -2326,7 +2300,7 @@
   "name": "Help Me Choose",
   "module": "White Label",
   "requiresModule": "core",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "venue-management-web",
    "route": "/white-label/help-me-choose",
@@ -2503,7 +2477,7 @@
    "error": "Could not load. Names which read failed and leaves the set-ups untouched.",
    "emptyFirstRun": "**No Help me choose at this venue, so guests see none.** Offers New set-up, and says that once the venue's products are uploaded the assistant proposes set-ups here as drafts for review.",
    "emptyNoResults": "The source or status filter matched nothing and the venue's other set-ups are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listGuidedChoices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `TENANT_CONFIGURE`, which `listGuidedChoices` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `suggestGuidedChoice`, `getGuidedChoiceSuggestion`; `PRODUCT_VIEW` for `listProducts`, `listProductCategories`, `listEvents`; `TENANT_PUBLISH` for `publishGuidedChoice`, `unpublishGuidedChoice`."
   },
   "apis": [
    {
@@ -2604,11 +2578,15 @@
     },
     {
      "name": "guidedChoiceId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listGuidedChoices` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "suggestionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getGuidedChoiceSuggestion` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ],
    "coldEntry": "Resolves the venue from the session and opens on the suggestions awaiting review, or on the list when there are none."

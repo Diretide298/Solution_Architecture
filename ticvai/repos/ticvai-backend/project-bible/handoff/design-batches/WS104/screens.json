@@ -432,7 +432,9 @@
    "params": [
     {
      "name": "planId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `generateConfiguration`; a link or an edge that holds one opens it instead."
     }
    ]
   },
@@ -584,11 +586,15 @@
    "params": [
     {
      "name": "planId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `generateConfiguration`; a link or an edge that holds one opens it instead."
     },
     {
      "name": "actionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `decideProposedAction` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

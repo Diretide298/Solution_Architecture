@@ -1,6 +1,6 @@
 # P08-stock-supply-01 — P08 · Stock & Supply (1 of 2)
 
-**10 screens · 54 operations · 37 schemas · 11 permissions**
+**10 screens · 52 operations · 37 schemas · 11 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -99,16 +99,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-049` | Stock Levels | B–D | 18 | 30 | 6 | 34 | 2 | 4 | — | notStarted (generated) |
-| `BO-050` | Stock Position & Valuation | B–D | 0 | 16 | 5 | 12 | 2 | 4 | — | notStarted (generated) |
-| `BO-051` | Purchase Orders | B–D | 18 | 21 | 6 | 12 | 1 | 4 | — | notStarted (generated) |
-| `BO-052` | Goods Receipt | B–D | 19 | 41 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
-| `BO-078` | Requisitions | B–D | 25 | 46 | 6 | 16 | 3 | 0 | — | notStarted (generated) |
-| `BO-079` | Stock Count | B–D | 28 | 32 | 6 | 8 | 0 | 4 | — | notStarted (generated) |
-| `BO-080` | Stock Transfers | B–D | 18 | 27 | 6 | 8 | 2 | 4 | — | notStarted (generated) |
-| `BO-081` | Inventory Items | A | 33 | 30 | 6 | 33 | 2 | 4 | — | notStarted (generated) |
-| `BO-082` | Stock Movements | B–D | 14 | 24 | 6 | 18 | 0 | 4 | — | notStarted (generated) |
-| `BO-083` | Suppliers | B–D | 36 | 19 | 6 | 7 | 1 | 4 | — | notStarted (generated) |
+| `BO-049` | Stock Levels | B–D | 18 | 23 | 6 | 34 | 2 | 4 | — | notStarted (generated) |
+| `BO-050` | Stock Position & Valuation | B–D | 0 | 12 | 5 | 12 | 2 | 4 | — | notStarted (generated) |
+| `BO-051` | Purchase Orders | B–D | 22 | 14 | 6 | 12 | 1 | 4 | — | notStarted (generated) |
+| `BO-052` | Goods Receipt | B–D | 19 | 19 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
+| `BO-078` | Requisitions | B–D | 23 | 26 | 6 | 16 | 3 | 0 | — | notStarted (generated) |
+| `BO-079` | Stock Count | B–D | 28 | 18 | 6 | 8 | 0 | 4 | — | notStarted (generated) |
+| `BO-080` | Stock Transfers | B–D | 18 | 12 | 6 | 8 | 2 | 4 | — | notStarted (generated) |
+| `BO-081` | Inventory Items | A | 33 | 18 | 6 | 33 | 2 | 4 | — | notStarted (generated) |
+| `BO-082` | Stock Movements | B–D | 14 | 16 | 6 | 18 | 0 | 4 | — | notStarted (generated) |
+| `BO-083` | Suppliers | B–D | 36 | 13 | 6 | 7 | 1 | 4 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

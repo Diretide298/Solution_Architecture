@@ -130,11 +130,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-105` | Stock & Supply | B–D | 17 | 6 | 6 | 18 | 1 | 4 | — | notStarted (generated) |
-| `BO-137` | Recipe Consumption & Theoretical Inventory | B–D | 3 | 32 | 6 | 10 | 1 | 6 | — | notStarted (generated) |
+| `BO-137` | Recipe Consumption & Theoretical Inventory | B–D | 3 | 27 | 6 | 10 | 1 | 6 | — | notStarted (generated) |
 | `BO-138` | Production Execution & Batch Management | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-139` | Wastage, Spoilage, Returns & Write-Off | B–D | 21 | 6 | 5 | 15 | 1 | 0 | — | notStarted (generated) |
 | `BO-140` | Product Availability, 86 & Operational Food Safety | B–D | 8 | 51 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
-| `BO-141` | Operational Alerts, AI Replenishment & Action Center | B–D | 18 | 24 | 6 | 6 | 0 | 0 | — | notStarted (generated) |
+| `BO-141` | Operational Alerts, AI Replenishment & Action Center | B–D | 18 | 18 | 6 | 6 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -252,12 +252,12 @@ Errors to draw in the form: 400 Validation failed; 409 SKU already in use in thi
 
 **Where the user goes next**
 
-- → `BO-049` Stock Levels: *Stock Levels*
+- → `BO-049` Stock Levels: *Stock Levels*; carries `itemId`
 - → `BO-052` Goods Receipt: *Goods Receipt*
 - → `BO-078` Requisitions: *Requisitions*
 - → `BO-079` Stock Count: *Stock Count*
 - → `BO-080` Stock Transfers: *Stock Transfers*
-- → `BO-081` Inventory Items: *Inventory Items*
+- → `BO-081` Inventory Items: *Inventory Items*; carries `itemId`
 - → `BO-083` Suppliers: *Suppliers*
 - → `BO-137` Recipe Consumption & Theoretical Inventory: *Recipe Consumption & Theoretical Inventory*
 - → `BO-138` Production Execution & Batch Management: *Production Execution & Batch Management*
@@ -446,11 +446,6 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Recipe | the name it points at, never the id | — |
-| Production plan | the name it points at, never the id | The plan whose release created this run. Null for a run planned directly. |
-| Producing outlet | the name it points at, never the id | — |
-| For outlets | list or chips (count when long) | Where it goes. A central kitchen produces for outlets that did not make it. |
 | Planned quantity | 1,234.5 | — |
 | Actual quantity | 1,234.5 | BL-126. Theoretical against actual is the whole point of recording this. |
 | Scheduled for | 1 Oct 2026, 14:30 | — |
@@ -609,7 +604,7 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (3), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (32 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-137?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-008`, `BO-105`.
@@ -776,7 +771,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`recordWaste`) and no read of a population — it is settings, not a list |
 | Offline | online only |
-| Opens with | `venueId` (session), `outletId` (deepLink) · cold entry: Resolves from the session. A principal with more than one venue is asked which first. |
+| Opens with | `venueId` (session), `outletId` (session) · cold entry: Resolves from the session. A principal with more than one venue is asked which first. |
 | Route | `/stock-supply/wastage-spoilage-returns-write-off` |
 
 **What the spec says about it.** **Added 20 August from the client design board.** The operations existed and no screen called them.
@@ -893,7 +888,7 @@ Errors to draw in the form: 400 Validation failed; 412 The row changed since the
 | Loading (`?state=loading`) | The saved wastage spoilage returns. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the wastage spoilage returns untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No wastage spoilage returns configured. The form opens empty and `recordWaste` saves the first one; it says what the platform does in the meantime. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_MODIFY`, which `recordWaste` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getWasteApprovalPolicy` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `requestSuggestion`; `ORDER_MODIFY` for `recordWaste`; `PRODUCT_CONFIGURE` for `setWasteApprovalPolicy`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 422 A setting the answer cannot do without is missing (29 September, AI functions review). (AiMissingSettingProblem); 422 The waste-approval policy is on and the value needs photo evidence that was not sent (`photo-required`, CHG-CSA-016). |
 
@@ -945,7 +940,7 @@ entries:
 - `getWasteApprovalPolicy` → `PRODUCT_VIEW` (read) · staff
 - `setWasteApprovalPolicy` → `PRODUCT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `ORDER_MODIFY`, which `recordWaste` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getWasteApprovalPolicy` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `requestSuggestion`; `ORDER_MODIFY` for `recordWaste`; `PRODUCT_CONFIGURE` for `setWasteApprovalPolicy`.
 
 #### Requirements it meets
 
@@ -1186,7 +1181,7 @@ Errors to draw in the form: 400 Validation failed; 404 The resource does not exi
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the product availability operational untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No product availability operational yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on withinDays and the product availability operational are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getMenu` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getMenu` requires to show this screen, and names that permission (the screen's other reads need `INCIDENT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setItemAvailability`, `setTemperatureCheckpoint` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
@@ -1254,7 +1249,7 @@ checkpoints:
 - `listTemperatureCheckpoints` → `PRODUCT_VIEW` (read) · staff
 - `setMenuItemDailyCount` → `PRODUCT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getMenu` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getMenu` requires to show this screen, and names that permission (the screen's other reads need `INCIDENT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setItemAvailability`, `setTemperatureCheckpoint` …
 
 #### Requirements it meets
 
@@ -1376,15 +1371,9 @@ Errors to draw in the form: 400 Validation failed
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Rule | the name it points at, never the id | — |
 | Raised at | 1 Oct 2026, 14:30 | — |
 | Severity | chip: Info, Warning, Critical | How urgent an alert rule's breach is. Shared by `AlertRule`, `Alert` and the `listAlerts` filter. |
 | Status | chip: Raised, Acknowledged, Resolved, Expired | Where a raised alert is. Shared by `Alert` and the `listAlerts` filter. |
-| Observed value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
-| Threshold | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
-| Scope path | text | — |
-| Acknowledged by principal | the name it points at, never the id | — |
 | Acknowledged at | 1 Oct 2026, 14:30 | — |
 | Resolved at | 1 Oct 2026, 14:30 | Set when the metric returns to range, automatically. An alert that only a person can close is an alert list that only grows. |
 | Escalated at | 1 Oct 2026, 14:30 | Where `VenueSettings.alerting.escalateAfterMinutes` passed with no acknowledgement. |
@@ -1437,7 +1426,7 @@ Errors to draw in the form: 400 Validation failed
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the operational alerts replenishment untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No operational alerts replenishment yet. Offers Create requisition (`createRequisition`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status, severity, workstationId, shiftId, itemId and the operational alerts replenishment are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PROCUREMENT_REQUEST` for `createRequisition`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
@@ -1465,7 +1454,7 @@ alerts:
 - `acknowledgeAlert` → `REPORT_VIEW_VENUE` (operate) · staff
 - `createRequisition` → `PROCUREMENT_REQUEST` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PROCUREMENT_REQUEST` for `createRequisition`.
 
 #### Requirements it meets
 
@@ -1499,7 +1488,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (18), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-141?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Acknowledge alert, Create requisition.
 - [ ] Every transition is wired: `BO-105`, `BO-464`.

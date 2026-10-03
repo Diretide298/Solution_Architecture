@@ -461,7 +461,9 @@
    "params": [
     {
      "name": "assetId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `analyseMediaAsset`, `setMediaAssetTags` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -986,7 +988,9 @@
    "params": [
     {
      "name": "mediaId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `deleteMediaAsset`, `updateMediaAsset` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1129,11 +1133,15 @@
    "params": [
     {
      "name": "assetId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `listMediaAssetVersions` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "mediaId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `replaceMediaAsset` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1252,7 +1260,9 @@
    "params": [
     {
      "name": "assetId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `listMediaAssetVersions` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1388,7 +1398,9 @@
    "params": [
     {
      "name": "assetId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `listMediaRenditions`, `requestMediaRendition` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1540,7 +1552,9 @@
    "params": [
     {
      "name": "assetId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `listMediaRenditions` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

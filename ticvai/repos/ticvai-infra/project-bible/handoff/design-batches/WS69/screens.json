@@ -932,11 +932,15 @@
    "params": [
     {
      "name": "executionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getReportExport`; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "exportId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getReportExport` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1223,15 +1227,9 @@
         "AuthorisationPolicy.description",
         "AuthorisationPolicy.effect",
         "AuthorisationPolicy.permissions",
-        "AuthorisationPolicy.conditions",
-        "AuthorisationPolicy.combining",
         "AuthorisationPolicy.priority",
-        "AuthorisationPolicy.appliesToRoleIds",
-        "AuthorisationPolicy.scopePath",
         "AuthorisationPolicy.status",
-        "AuthorisationPolicy.version",
-        "AuthorisationPolicy.effectiveFrom",
-        "AuthorisationPolicy.effectiveTo"
+        "AuthorisationPolicy.effectiveFrom"
        ],
        "operation": "listAuthorisationPolicies",
        "provenance": "contract identity.yaml GET /authorisation-policies"
@@ -1278,7 +1276,7 @@
    "error": "Could not load. Names which read failed and leaves the report access sharing untouched.",
    "emptyFirstRun": "No report access policy yet: reports follow the roles' own reporting permissions alone. Offers New access policy (`createAuthorisationPolicy`) to narrow or widen that by group, operating area or user; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the status filter, and the access policies are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PERMISSION_VIEW`, which `listAuthorisationPolicies` requires, and names that permission. **Never an empty table** — that reads as *there is no data*."
+   "emptyNoAccess": "Shown when the caller lacks `PERMISSION_VIEW`, which `listAuthorisationPolicies` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_TENANT` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PERMISSION_MANAGE` for `createAuthorisationPolicy`, `updateAuthorisationPolicy`."
   },
   "apis": [
    {
@@ -1327,7 +1325,7 @@
     "id": "formCreateAuthorisationPolicy",
     "component": "drawer",
     "trigger": "New access policy",
-    "body": "**Collects what `createAuthorisationPolicy` sends.** Required: `code`, `name`, `effect` (permit or deny; deny wins). Optional: `description`, `permissions` (the reporting permissions it speaks to), `conditions`, `combining`, `priority`, `scopePath` (the operating area), `appliesToRoleIds` (the groups), `effectiveFrom`, `effectiveTo`. Never `id`, `status` or `version`: the server sets them. Dismissing sends nothing.",
+    "body": "**Collects what `createAuthorisationPolicy` sends.** Required: `code`, `name`, `effect` (permit or deny; deny wins). Optional: `description`, `permissions` (the reporting permissions it speaks to), `conditions`, `combining`, `priority`, `scopePath` (the operating area), `appliesToRoleIds` (the groups), `effectiveFrom`, `effectiveTo`. Never or: the server sets them. Dismissing sends nothing. Not asked, because the server sets them (readOnly in the contract): `id`, `status`, `version` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "AuthorisationPolicy",
     "confirm": {
      "label": "Create access policy",
@@ -1386,7 +1384,9 @@
    "params": [
     {
      "name": "policyId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAuthorisationPolicies` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1963,7 +1963,9 @@
    "params": [
     {
      "name": "dataClass",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listDataRetentionSettings` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

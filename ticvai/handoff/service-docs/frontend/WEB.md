@@ -24,56 +24,56 @@
 
 | ID | Screen | Module | Wave | Operations |
 |---|---|---|---|---|
-| [WEB-001](#web-001-home-landing) | Home / Landing | Discovery & Browse | 1 | 10 |
+| [WEB-001](#web-001-home-landing) | Home / Landing | Discovery & Browse | 1 | 9 |
 | [WEB-002](#web-002-event-attraction-listing) | Event & Attraction Listing | Discovery & Browse | 1 | 6 |
 | [WEB-003](#web-003-search-results) | Search Results | Discovery & Browse | 1 | 2 |
 | [WEB-004](#web-004-attraction-details) | Attraction Details | Discovery & Browse | 1 | 5 |
 | [WEB-005](#web-005-ticket-type-selection) | Ticket Type Selection | Booking & Selection | 1 | 6 |
 | [WEB-006](#web-006-date-performance-selection) | Date & Performance Selection | Booking & Selection | 1 | 8 |
+| [WEB-007](#web-007-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 1 | 6 |
+| [WEB-008](#web-008-add-ons-upsell) | Add-ons & Upsell | Booking & Selection | 1 | 5 |
+| [WEB-009](#web-009-wishlist) | Wishlist | Booking & Selection | 1 | 3 |
 | [WEB-010](#web-010-shopping-cart) | Shopping Cart | Cart & Checkout | 1 | 14 |
 | [WEB-011](#web-011-guest-details-attendee-forms) | Guest Details & Attendee Forms | Cart & Checkout | 1 | 6 |
 | [WEB-012](#web-012-checkout-payment) | Checkout — Payment | Cart & Checkout | 1 | 6 |
 | [WEB-013](#web-013-booking-confirmation) | Booking Confirmation | Cart & Checkout | 1 | 3 |
 | [WEB-014](#web-014-pay-for-a-booking) | Pay for a Booking | Cart & Checkout | 1 | 2 |
+| [WEB-015](#web-015-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 1 | 2 |
 | [WEB-016](#web-016-login-register) | Login / Register | Account & Self-Service | 1 | 14 |
 | [WEB-017](#web-017-my-account-dashboard) | My Account Dashboard | Account & Self-Service | 1 | 7 |
 | [WEB-018](#web-018-my-tickets) | My Tickets | Account & Self-Service | 1 | 8 |
 | [WEB-019](#web-019-order-history) | Order History | Account & Self-Service | 1 | 8 |
 | [WEB-020](#web-020-profile-preferences) | Profile & Preferences | Account & Self-Service | 1 | 9 |
+| [WEB-021](#web-021-wallet-gift-cards) | Wallet & Gift Cards | Membership, Loyalty & Value | 1 | 11 |
+| [WEB-022](#web-022-membership-plans) | Membership Plans | Membership, Loyalty & Value | 1 | 3 |
+| [WEB-023](#web-023-membership-management) | Membership Management | Membership, Loyalty & Value | 1 | 7 |
+| [WEB-024](#web-024-devices-wishlist-consent) | Devices, Wishlist & Consent | Membership, Loyalty & Value | 1 | 20 |
 | [WEB-025](#web-025-help-centre-faq) | Help Centre / FAQ | Engagement & Support | 1 | 5 |
+| [WEB-026](#web-026-survey-feedback) | Survey & Feedback | Engagement & Support | 1 | 5 |
+| [WEB-027](#web-027-newsletter-subscription) | Newsletter Subscription | Engagement & Support | 1 | 5 |
 | [WEB-028](#web-028-contact-venue-information) | Contact & Venue Information | Engagement & Support | 1 | 1 |
 | [WEB-029](#web-029-error-sold-out-maintenance) | Error / Sold Out / Maintenance | System States | 1 | 2 |
 | [WEB-030](#web-030-ticket-transfer) | Ticket Transfer | Ticketing | 1 | 3 |
+| [WEB-031](#web-031-my-reservations) | My Reservations | Ticketing | 1 | 9 |
+| [WEB-032](#web-032-offers-promotions) | Offers & Promotions | Promotions | 1 | 2 |
+| [WEB-033](#web-033-shop) | Shop | Retail | 1 | 5 |
+| [WEB-034](#web-034-lost-found) | Lost & Found | Support | 1 | 4 |
 | [WEB-035](#web-035-multi-currency-pricing) | Multi-Currency & Pricing | Ticketing | 1 | 2 |
+| [WEB-036](#web-036-f-b-browse-order) | F&B – Browse & Order | In-venue Services | 1 | 13 |
+| [WEB-037](#web-037-menu-item-detail) | Menu Item Detail | In-venue Services | 1 | 1 |
+| [WEB-038](#web-038-f-b-order-tracking) | F&B – Order Tracking | In-venue Services | 1 | 2 |
+| [WEB-039](#web-039-venue-map-wait-times) | Venue Map & Wait Times | In-venue Services | 1 | 4 |
+| [WEB-040](#web-040-virtual-queue) | Virtual Queue | In-venue Services | 1 | 4 |
+| [WEB-041](#web-041-parking-reserve-pay) | Parking – Reserve & Pay | In-venue Services | 1 | 3 |
+| [WEB-042](#web-042-retail-shop-and-drop) | Retail & Shop and Drop | Retail | 1 | 3 |
+| [WEB-043](#web-043-loyalty-rewards) | Loyalty & Rewards | Membership, Loyalty & Value | 1 | 11 |
+| [WEB-044](#web-044-ai-concierge-home) | AI Concierge – Home | Engagement & Support | 1 | 8 |
+| [WEB-045](#web-045-help-centre-accessibility) | Help Centre & Accessibility | Support | 1 | 4 |
+| [WEB-046](#web-046-in-venue-notifications) | In-Venue Notifications | Engagement & Support | 1 | 2 |
+| [WEB-047](#web-047-map-booking-cabanas-spots) | Map Booking — Cabanas & Spots | Booking & Selection | 1 | 8 |
+| [WEB-048](#web-048-book-a-space-by-the-hour) | Book a Space by the Hour | Booking & Selection | 1 | 4 |
+| [WEB-049](#web-049-transport-route-schedule) | Transport — Route & Schedule | Transport | 1 | 13 |
 | [WEB-050](#web-050-plan-your-visit) | Plan Your Visit | Discovery & Browse | 1 | 7 |
-| [WEB-007](#web-007-interactive-seat-selection) | Interactive Seat Selection | Booking & Selection | 2 | 6 |
-| [WEB-008](#web-008-add-ons-upsell) | Add-ons & Upsell | Booking & Selection | 2 | 5 |
-| [WEB-015](#web-015-branded-queue-waiting-room) | Branded Queue / Waiting Room | High-Demand Access | 2 | 2 |
-| [WEB-021](#web-021-wallet-gift-cards) | Wallet & Gift Cards | Membership, Loyalty & Value | 2 | 11 |
-| [WEB-022](#web-022-membership-plans) | Membership Plans | Membership, Loyalty & Value | 2 | 3 |
-| [WEB-023](#web-023-membership-management) | Membership Management | Membership, Loyalty & Value | 2 | 7 |
-| [WEB-027](#web-027-newsletter-subscription) | Newsletter Subscription | Engagement & Support | 2 | 5 |
-| [WEB-031](#web-031-my-reservations) | My Reservations | Ticketing | 2 | 9 |
-| [WEB-032](#web-032-offers-promotions) | Offers & Promotions | Promotions | 2 | 2 |
-| [WEB-033](#web-033-shop) | Shop | Retail | 2 | 5 |
-| [WEB-036](#web-036-f-b-browse-order) | F&B – Browse & Order | In-venue Services | 2 | 13 |
-| [WEB-037](#web-037-menu-item-detail) | Menu Item Detail | In-venue Services | 2 | 1 |
-| [WEB-038](#web-038-f-b-order-tracking) | F&B – Order Tracking | In-venue Services | 2 | 2 |
-| [WEB-039](#web-039-venue-map-wait-times) | Venue Map & Wait Times | In-venue Services | 2 | 4 |
-| [WEB-040](#web-040-virtual-queue) | Virtual Queue | In-venue Services | 2 | 4 |
-| [WEB-041](#web-041-parking-reserve-pay) | Parking – Reserve & Pay | In-venue Services | 2 | 3 |
-| [WEB-042](#web-042-retail-shop-and-drop) | Retail & Shop and Drop | Retail | 2 | 3 |
-| [WEB-043](#web-043-loyalty-rewards) | Loyalty & Rewards | Membership, Loyalty & Value | 2 | 11 |
-| [WEB-044](#web-044-ai-concierge-home) | AI Concierge – Home | Engagement & Support | 2 | 8 |
-| [WEB-045](#web-045-help-centre-accessibility) | Help Centre & Accessibility | Support | 2 | 4 |
-| [WEB-046](#web-046-in-venue-notifications) | In-Venue Notifications | Engagement & Support | 2 | 2 |
-| [WEB-009](#web-009-wishlist) | Wishlist | Booking & Selection | 3 | 3 |
-| [WEB-024](#web-024-devices-wishlist-consent) | Devices, Wishlist & Consent | Membership, Loyalty & Value | 3 | 20 |
-| [WEB-026](#web-026-survey-feedback) | Survey & Feedback | Engagement & Support | 3 | 5 |
-| [WEB-034](#web-034-lost-found) | Lost & Found | Support | 3 | 4 |
-| [WEB-047](#web-047-map-booking-cabanas-spots) | Map Booking — Cabanas & Spots | Booking & Selection | 3 | 8 |
-| [WEB-048](#web-048-book-a-space-by-the-hour) | Book a Space by the Hour | Booking & Selection | 3 | 4 |
-| [WEB-049](#web-049-transport-route-schedule) | Transport — Route & Schedule | Transport | 3 | 13 |
 
 ## WEB-001 Home / Landing
 
@@ -93,12 +93,11 @@
 | Operation | Service | When | Purpose | Permission |
 |---|---|---|---|---|
 | `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | Maintenance check before rendering anything | `None` |
-| `getPublishedTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedtenantconfig) | onLoad | The published brand, theme, fonts, header, footer, navigation, homepage, booking-flow display settings and languages, read before anyone signs in (GFIX-1) | `None` |
+| `getPublishedTenantConfig` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedtenantconfig) | onLoad | The published brand, theme, fonts, header, footer, navigation, homepage, booking-flow display settings and languages, read before anyone signs in (GFIX-1)  Also the analytics providers to start once their consent category is granted, from the published config (listAnalyticsProviders needs TENANT_CONFIGURE and left the guest screens: decided by Chinmay, 3 October 2026 (CHG-SPF-007)). | `None` |
 | `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
 | `listMyEntitlements` | [AccessService](../backend/AccessService.md#listmyentitlements) | onLoad | The guest's upcoming tickets, so a visit day can suggest the ticket's venue (decided 28 September, audit R267); only when signed in | `ORDER_VIEW` |
 | `getCookieConsentRuntime` | [MarketingService](../backend/MarketingService.md#getcookieconsentruntime) | onLoad | Cookie banner on first visit and what the tag loader may load | `None` |
 | `recordDeviceConsent` | [MarketingService](../backend/MarketingService.md#recorddeviceconsent) | onAction | Accept all, reject non-essential or save preferences from the banner | `None` |
-| `listAnalyticsProviders` | [WhiteLabelService](../backend/WhiteLabelService.md#listanalyticsproviders) | onLoad | Analytics tags to inject once their consent category is granted | `TENANT_CONFIGURE` |
 | `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Recommendation slot (homepage / loyalty placement: products, offers, rewards, challenges) | `AI_USE` |
 | `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | onAction | Report impressions, clicks and declines of recommended items | `AI_USE` |
 | `recordStorefrontSessionEvents` | [WhiteLabelService](../backend/WhiteLabelService.md#recordstorefrontsessionevents) | onLoad | Runtime-shell beacon of hashed browsing behaviour for fraud prevention (every page of the session; bound on the home screen as the shell's entry) | `None` |
@@ -404,6 +403,154 @@
 | WEB-015 | Adds tickets for a performance whose on-sale waiting room is on | performanceId | `addCartLine` refused `403 admission-required`: this performance's room is on and the page holds no admission token for it |
 | WEB-007 | Selects seats on the map | eventId, performanceId |  |
 
+## WEB-007 Interactive Seat Selection
+
+**Choose specific seats.**
+
+|  |  |
+|---|---|
+| Module | Booking & Selection |
+| Wave | 1 |
+| Licensed module | seating |
+| Route | `/booking-and-selection/seat-map-selection` |
+| Component | `apps/guest-web/src/routes/booking-and-selection/SeatMapSelectionCanvas.tsx` |
+| Pattern | statusTracker |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| performanceId | deepLink |
+| eventId | WEB-006 |
+| holdId | navigation |
+| venueId | session |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `createSeatHold` | [CatalogueService](../backend/CatalogueService.md#createseathold) | onAction | Hold specific seats | `ORDER_CREATE` |
+| `getSeatAvailability` | [CatalogueService](../backend/CatalogueService.md#getseatavailability) | onLoad | Seat status for a performance | `PRODUCT_VIEW` |
+| `recommendSeats` | [CatalogueService](../backend/CatalogueService.md#recommendseats) | onAction | Recommend seats for a party | `PRODUCT_VIEW` |
+| `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | The event's other times, for the time bar and the date and time pop-up | `PRODUCT_VIEW` |
+| `relinquishSeatHold` | [CatalogueService](../backend/CatalogueService.md#relinquishseathold) | onAction | Release the seats held for the old performance when the guest switches time on the time bar (decided 29 September, rev 3 REV3-6); a guest releases only their own hold | `ORDER_CREATE` |
+| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The interactive seat selection, read by `getSeatAvailability`. |
+| error | Could not load. Names which read failed and leaves the interactive seat selection untouched. |
+| emptyFirstRun | No interactive seat selection yet. Offers Create seat hold (`createSeatHold`). |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+| emptyNoResults | The event has no other time to switch to on the time bar; the chosen performance stays. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| WEB-005 | Ticket Type Selection |  |  |
+| WEB-008 | Add-ons & Upsell |  |  |
+| WEB-006 | Date & Performance Selection | eventId, performanceId |  |
+| WEB-010 | Reviews the cart | holdId, performanceId |  |
+
+## WEB-008 Add-ons & Upsell
+
+**See add-ons & upsell for this venue.**
+
+|  |  |
+|---|---|
+| Module | Booking & Selection |
+| Wave | 1 |
+| Licensed module | ticketing |
+| Route | `/booking-and-selection/add-ons-and-upsell` |
+| Component | `apps/guest-web/src/routes/booking-and-selection/AddOnsAndUpsellDetail.tsx` |
+| Pattern | statusTracker |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| cartId | session |
+| bundleId | navigation |
+| venueId | session |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
+| `getBundle` | [CatalogueService](../backend/CatalogueService.md#getbundle) | onAction | A bundle offered as an upsell | `PRODUCT_VIEW` |
+| `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Fill the cart slot, maxItems 3 (DI-959) | `AI_USE` |
+| `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | onAction | Report what happened to recommended items | `AI_USE` |
+| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The add-ons, read by `decideRecommendations`. |
+| error | Could not load. Names which read failed and leaves the add-ons upsell untouched. |
+| emptyFirstRun | No add-ons for this booking: the step is skipped and Continue goes on to sign-in. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| WEB-005 | Ticket Type Selection |  |  |
+| WEB-006 | Date & Performance Selection | cartId, performanceId |  |
+| WEB-010 | Shopping Cart | cartId, code, lineId, performanceId |  |
+| WEB-016 | Continue — sign in or use a guest code (when sign-in is asked after add-ons) | cartId | the guest is not signed in |
+
+## WEB-009 Wishlist
+
+**Find the right one quickly, and act on it without opening it.**
+
+|  |  |
+|---|---|
+| Module | Booking & Selection |
+| Wave | 1 |
+| Licensed module | marketing |
+| Route | `/booking-and-selection/wishlist` |
+| Component | `apps/guest-web/src/routes/booking-and-selection/WishlistDetail.tsx` |
+| Pattern | statusTracker |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| itemId | deepLink |
+| subjectId | session |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getWishlist` | [MarketingService](../backend/MarketingService.md#getwishlist) | onLoad | Read a guest's saved items | `None` |
+| `addToWishlist` | [MarketingService](../backend/MarketingService.md#addtowishlist) | onAction | Undo after a remove re-saves the same variant and date (idempotent); saving itself happens on the product and date cards | `None` |
+| `removeFromWishlist` | [MarketingService](../backend/MarketingService.md#removefromwishlist) | onAction | Remove a saved item | `None` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | Saved items load |
+| error | Could not load |
+| emptyFirstRun | Nothing saved — explains what the list is for |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| WEB-005 | Ticket Type Selection |  |  |
+| WEB-006 | Date & Performance Selection | performanceId |  |
+
 ## WEB-010 Shopping Cart
 
 **Review and confirm what is being bought.**
@@ -518,7 +665,7 @@
 | WEB-016 | Chooses to sign in rather than continue as a guest | cartId | no verified guest session — this is the fork of matrix 2.6.1 §2.4, offered here rather than in front of the cart |
 | WEB-012 | Pays |  |  |
 | WEB-012 | Skipped: nothing to ask (guest code proved, or signed in, and no attendee forms) |  |  |
-| WEB-010 | They check out | cartId, performanceId |  |
+| WEB-010 | They check out | cartId, lineId, performanceId |  |
 
 ## WEB-012 Checkout — Payment
 
@@ -566,7 +713,7 @@
 
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
-| WEB-010 | Shopping Cart | performanceId |  |
+| WEB-010 | Shopping Cart | lineId, performanceId |  |
 | WEB-011 | Guest Details & Attendee Forms |  |  |
 | WEB-016 | Sign in or use a guest code (when sign-in is asked at payment) | cartId | the guest is not signed in |
 | WEB-013 | Receives confirmation and tickets | orderId |  |
@@ -659,6 +806,49 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | WEB-013 | Booking Confirmation | orderId |  |
+
+## WEB-015 Branded Queue / Waiting Room
+
+**The on-sale waiting room for one performance — the guest's place, the wait, and the way on to the sale once admitted.**
+
+|  |  |
+|---|---|
+| Module | High-Demand Access |
+| Wave | 1 |
+| Licensed module | ticketing |
+| Route | `/high-demand-access/virtual-waiting-room` |
+| Component | `apps/guest-web/src/routes/high-demand-access/VirtualWaitingRoomDetail.tsx` |
+| Pattern | statusTracker |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| performanceId | WEB-006 |
+| waitingEntryId | WEB-015 |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `enterWaitingRoom` | [CatalogueService](../backend/CatalogueService.md#enterwaitingroom) | onAction | Take a place in the performance's on-sale waiting room (ADR-0066); `notRequired` when the room is off | `None` |
+| `getWaitingRoomPosition` | [CatalogueService](../backend/CatalogueService.md#getwaitingroomposition) | onInterval | The guest's place, polled every `pollAfterSeconds`; admitted, it carries the admission token for `addCartLine` | `None` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | Taking a place in the room. *Take my place* (`enterWaitingRoom`) answers with a position, or `notRequired` and the guest goes straight on to the sale |
+| error | Lost the place. The worst failure on this screen. A retry sends the same `Idempotency-Key` and gets the same entry back, so the guest is not sent to the back, and the screen says so, because a guest who thinks they lost their place will open a second tab and make it worse. `expired` (the admission was not used in time) offers to enter again; `closed` (the room was switched off or the performance stopped selling) says so and goes back to the event |
+| emptyFirstRun | — |
+| emptyNoAccess | There is no access to refuse. The room is anonymous (ADR-0066): no sign-in, no personal data, and the guest may not have an account yet. |
+| offline | The offline banner shows. The last known position stays on screen with its age, and polling resumes with the same entry when the connection is back. Admission needs the connection. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| WEB-006 | Continue to your tickets | performanceId | `getWaitingRoomPosition` answers `admitted`. The page keeps `admission.token` and sends it as `X-Admission-Token` on `addCartLine` until `admission.expiresAt` |
 
 ## WEB-016 Login / Register
 
@@ -859,7 +1049,7 @@
 | `listTaxInvoices` | [LedgerService](../backend/LedgerService.md#listtaxinvoices) | onLoad | List tax invoices | `LEDGER_VIEW` |
 | `getTaxInvoice` | [LedgerService](../backend/LedgerService.md#gettaxinvoice) | onLoad | Show a tax invoice | `LEDGER_VIEW` |
 | `listCreditMemos` | [LedgerService](../backend/LedgerService.md#listcreditmemos) | onLoad | List credit memos | `LEDGER_VIEW` |
-| `getTaxDocumentRendition` | [LedgerService](../backend/LedgerService.md#gettaxdocumentrendition) | onLoad | Download the invoice / credit memo PDF | `LEDGER_VIEW` |
+| `getTaxDocumentRendition` | [LedgerService](../backend/LedgerService.md#gettaxdocumentrendition) | onAction | Download the invoice / credit memo PDF | `LEDGER_VIEW` |
 | `issueTaxInvoice` | [LedgerService](../backend/LedgerService.md#issuetaxinvoice) | onAction | Get a full tax invoice with a company name and TRN for one of my orders (DEC-085, CHG-FIN-011) | `LEDGER_POST` |
 
 **States**
@@ -933,6 +1123,229 @@
 | WEB-017 | My Account Dashboard |  |  |
 | WEB-018 | My Tickets |  |  |
 
+## WEB-021 Wallet & Gift Cards
+
+**See wallet & gift cards for this venue.**
+
+|  |  |
+|---|---|
+| Module | Membership, Loyalty & Value |
+| Wave | 1 |
+| Licensed module | retail |
+| Route | `/membership-loyalty-and-value/wallet-and-gift-cards` |
+| Component | `apps/guest-web/src/routes/membership-loyalty-and-value/WalletAndGiftCardsDetail.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| cardCode | deepLink |
+| subjectId | session |
+| walletId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getWallet` | [WalletService](../backend/WalletService.md#getwallet) | onLoad | Read a guest wallet | `WALLET_VIEW` |
+| `listWalletTransactions` | [WalletService](../backend/WalletService.md#listwallettransactions) | onLoad | Wallet transaction history | `WALLET_VIEW` |
+| `getGiftCard` | [WalletService](../backend/WalletService.md#getgiftcard) | onAction | Check a gift card balance | `WALLET_VIEW` |
+| `getGameCard` | [VenueOpsService](../backend/VenueOpsService.md#getgamecard) | onAction | Balance on a game card | `None` |
+| `listPaymentTokens` | [OrderService](../backend/OrderService.md#listpaymenttokens) | onLoad | Saved cards on this account | `ORDER_VIEW` |
+| `storePaymentToken` | [OrderService](../backend/OrderService.md#storepaymenttoken) | onAction | Save a card for next time | `ORDER_CREATE` |
+| `transferWalletBalance` | [WalletService](../backend/WalletService.md#transferwalletbalance) | onAction | Move value between wallets | `WALLET_OPERATE` |
+| `getWalletAutoReloadSetting` | [WalletService](../backend/WalletService.md#getwalletautoreloadsetting) | onLoad | Show auto top-up | `WALLET_VIEW` |
+| `setWalletAutoReloadSetting` | [WalletService](../backend/WalletService.md#setwalletautoreloadsetting) | onAction | Set auto top-up | `WALLET_OPERATE` |
+| `getWalletExitBalance` | [WalletService](../backend/WalletService.md#getwalletexitbalance) | onLoad | Balance due / refundable at exit | `WALLET_VIEW` |
+| `settleWalletAtExit` | [WalletService](../backend/WalletService.md#settlewalletatexit) | onAction | Settle the wallet at exit | `WALLET_OPERATE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The wallet gift cards list. |
+| error | Could not load. Names which read failed and leaves the wallet gift cards untouched. |
+| emptyFirstRun | No wallet gift cards yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Never shown: `listWalletTransactions` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| offline | The offline banner shows. Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| WEB-022 | Membership Plans |  |  |
+| WEB-023 | Membership Management | orderId |  |
+| WEB-024 | Devices, Wishlist & Consent |  |  |
+
+## WEB-022 Membership Plans
+
+**Membership Plans — the screen a person opens when they need to deal with membership plans.**
+
+|  |  |
+|---|---|
+| Module | Membership, Loyalty & Value |
+| Wave | 1 |
+| Licensed module | ticketing |
+| Route | `/membership-loyalty-and-value/membership-plans` |
+| Component | `apps/guest-web/src/routes/membership-loyalty-and-value/MembershipPlansDetail.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| productId | WEB-001 |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
+| `getProduct` | [CatalogueService](../backend/CatalogueService.md#getproduct) | onLoad | Read a product | `PRODUCT_VIEW` |
+| `getMyMemberships` | [CatalogueService](../backend/CatalogueService.md#getmymemberships) | onLoad | A guest's own memberships, benefits and history Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `PRODUCT_VIEW` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The membership plans list. |
+| error | Could not load. Names which read failed and leaves the membership plans untouched. |
+| emptyFirstRun | No membership plans yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Never shown: the plans are the venue's membership products, with no filter a guest sets. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| WEB-021 | Wallet & Gift Cards |  |  |
+| WEB-023 | Membership Management |  |  |
+| WEB-024 | Devices, Wishlist & Consent |  |  |
+
+## WEB-023 Membership Management
+
+**Work with membership management for this venue.**
+
+|  |  |
+|---|---|
+| Module | Membership, Loyalty & Value |
+| Wave | 1 |
+| Licensed module | ticketing |
+| Route | `/membership-loyalty-and-value/membership-management` |
+| Component | `apps/guest-web/src/routes/membership-loyalty-and-value/MembershipManagementForm.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| subjectId | session |
+| orderId | deepLink |
+| caseId | navigation |
+| statementId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listBillingStatements` | [OrderService](../backend/OrderService.md#listbillingstatements) | onLoad | Membership billing statements | `ORDER_VIEW` |
+| `getBillingStatement` | [OrderService](../backend/OrderService.md#getbillingstatement) | onAction | One statement, line by line | `ORDER_VIEW` |
+| `listMyPaymentIssues` | [OrderService](../backend/OrderService.md#listmypaymentissues) | onLoad | Declined renewals waiting on the guest | `None` |
+| `retryMyDunningPayment` | [OrderService](../backend/OrderService.md#retrymydunningpayment) | onAction | Retry a declined payment, on another card if needed | `None` |
+| `getMyMemberships` | [CatalogueService](../backend/CatalogueService.md#getmymemberships) | onLoad | A guest's own memberships, benefits and history | `PRODUCT_VIEW` |
+| `listInstalmentPlans` | [OrderService](../backend/OrderService.md#listinstalmentplans) | onLoad | Instalment plans and schedule | `PAYMENT_VIEW` |
+| `createInstalmentPlan` | [OrderService](../backend/OrderService.md#createinstalmentplan) | onAction | Pay in instalments | `ORDER_CREATE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | Membership and its benefits |
+| error | Could not load. Cancellation and renewal are both blocked |
+| emptyFirstRun | — |
+| emptyNoResults | Nothing matches the filter on from, to and the membership are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| WEB-021 | Wallet & Gift Cards |  |  |
+| WEB-022 | Membership Plans | productId |  |
+| WEB-024 | Devices, Wishlist & Consent |  |  |
+
+## WEB-024 Devices, Wishlist & Consent
+
+**Your devices, security, cookie choices and data rights.**
+
+|  |  |
+|---|---|
+| Module | Membership, Loyalty & Value |
+| Wave | 1 |
+| Licensed module | marketing |
+| Route | `/membership-loyalty-and-value/devices-wishlist-consent` |
+| Component | `apps/guest-web/src/routes/membership-loyalty-and-value/DevicesWishlistConsentDetail.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| deviceId | deepLink |
+| itemId | deepLink |
+| subjectId | session |
+| enrolmentId | navigation |
+| methodId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getWishlist` | [MarketingService](../backend/MarketingService.md#getwishlist) | onLoad | Read a guest's saved items | `None` |
+| `listGuestDevices` | [MarketingService](../backend/MarketingService.md#listguestdevices) | onLoad | A guest's registered devices | `None` |
+| `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | Record a consent decision | `None` |
+| `revokeGuestDevice` | [MarketingService](../backend/MarketingService.md#revokeguestdevice) | onAction | Revoke a device registration | `None` |
+| `deleteGuestAccount` | [IdentityService](../backend/IdentityService.md#deleteguestaccount) | onAction | Ask for the account to be deleted | `None` |
+| `exportSubjectData` | [IdentityService](../backend/IdentityService.md#exportsubjectdata) | onAction | Export everything held about this guest | `GUEST_VIEW_PII` |
+| `getFacePassEnrolment` | [AccessService](../backend/AccessService.md#getfacepassenrolment) | onAction | Whether a face pass is enrolled on this account | `GUEST_VIEW` |
+| `getGuestConsents` | [MarketingService](../backend/MarketingService.md#getguestconsents) | onLoad | What this guest has consented to | `GUEST_VIEW` |
+| `getWaiverStatus` | [MarketingService](../backend/MarketingService.md#getwaiverstatus) | onLoad | Which waivers are signed and which are due | `GUEST_VIEW` |
+| `listDelegations` | [IdentityService](../backend/IdentityService.md#listdelegations) | onLoad | Who may act for this guest | `GUEST_VIEW` |
+| `revokeFacePass` | [AccessService](../backend/AccessService.md#revokefacepass) | onAction | Revoke it after losing the phone that made it | `GUEST_MANAGE` |
+| `listMfaMethods` | [IdentityService](../backend/IdentityService.md#listmfamethods) | onLoad | The guest's enrolled second-factor methods | `None` |
+| `enrolMfaMethod` | [IdentityService](../backend/IdentityService.md#enrolmfamethod) | onAction | Enrol an authenticator (email code as fallback) | `None` |
+| `verifyMfaEnrolment` | [IdentityService](../backend/IdentityService.md#verifymfaenrolment) | onAction | Confirm the enrolment with a first code | `None` |
+| `removeMfaMethod` | [IdentityService](../backend/IdentityService.md#removemfamethod) | onAction | Remove a method | `None` |
+| `getCookieConsentRuntime` | [MarketingService](../backend/MarketingService.md#getcookieconsentruntime) | onLoad | Preference centre: categories and the current decision | `None` |
+| `listPublishedTrackingTechnologies` | [MarketingService](../backend/MarketingService.md#listpublishedtrackingtechnologies) | onLoad | Each cookie's name, provider, purpose, expiry and party | `None` |
+| `getDeviceConsentHistory` | [MarketingService](../backend/MarketingService.md#getdeviceconsenthistory) | onLoad | My cookie decisions so far | `None` |
+| `recordDeviceConsent` | [MarketingService](../backend/MarketingService.md#recorddeviceconsent) | onAction | Change or withdraw cookie preferences | `None` |
+| `listConsentPurposes` | [MarketingService](../backend/MarketingService.md#listconsentpurposes) | onLoad | The purposes the consent rows show | `GUEST_VIEW` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | Points and rewards |
+| error | Could not load |
+| emptyFirstRun | No points yet — explains how they accrue |
+| emptyNoResults | Nothing matches the current filters. The filters are named and clearable from here — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. Added 25 August with the derived list component: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| offline | Nothing here is offered offline, and the banner says so. An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| WEB-021 | Wallet & Gift Cards |  |  |
+| WEB-022 | Membership Plans |  |  |
+| WEB-023 | Membership Management |  |  |
+| GST-037 | Offers are shown against what they hold |  |  |
+
 ## WEB-025 Help Centre / FAQ
 
 **Answer a question without needing a person.**
@@ -979,6 +1392,100 @@
 | WEB-027 | Newsletter Subscription |  |  |
 | WEB-026 | Survey & Feedback |  |  |
 
+## WEB-026 Survey & Feedback
+
+**Tell the venue how the visit went, answer a survey it sent, or report a problem.**
+
+|  |  |
+|---|---|
+| Module | Engagement & Support |
+| Wave | 1 |
+| Licensed module | marketing |
+| Route | `/engagement-and-support/survey-and-feedback` |
+| Component | `apps/guest-web/src/routes/engagement-and-support/SurveyAndFeedbackDetail.tsx` |
+| Pattern | configEditor |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| formId | deepLink |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `submitReview` | [MarketingService](../backend/MarketingService.md#submitreview) | onAction | from page inventory | `None` |
+| `getForm` | [MarketingService](../backend/MarketingService.md#getform) | onLoad | A triggered survey opened from its link | `GUEST_VIEW` |
+| `submitForm` | [MarketingService](../backend/MarketingService.md#submitform) | onAction | Answer the survey | `GUEST_VIEW` |
+| `raiseMyCase` | [MarketingService](../backend/MarketingService.md#raisemycase) | onAction | Report a problem as a case | `None` |
+| `listMyOrders` | [OrderService](../backend/OrderService.md#listmyorders) | onLoad | The recent visits a review can be about | `None` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | Survey loads |
+| error | Could not submit. The answers are kept on the form, and the guest retries by pressing Submit again — nothing resends by itself: guest web is online-only (docs/architecture/offline-and-sync.md, *B2C web: None*), so there is no outbox behind this screen. The retry reuses the first attempt's `Idempotency-Key`, so a submit that did reach the server before the failure is not recorded as a second review. |
+| emptyFirstRun | — |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| WEB-027 | Newsletter Subscription |  |  |
+| WEB-025 | Help Centre / FAQ | caseId |  |
+
+## WEB-027 Newsletter Subscription
+
+**Choose which newsletters you receive and on which channel, or leave one from its email link.**
+
+|  |  |
+|---|---|
+| Module | Engagement & Support |
+| Wave | 1 |
+| Licensed module | marketing |
+| Route | `/engagement-and-support/newsletter-subscription` |
+| Component | `apps/guest-web/src/routes/engagement-and-support/NewsletterSubscriptionDetail.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| subjectId | session |
+| unsubscribeToken | deepLink |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | from page inventory | `None` |
+| `getMarketingSubscription` | [MarketingService](../backend/MarketingService.md#getmarketingsubscription) | onLoad | What this guest has opted into | `MARKETING_VIEW` |
+| `setMarketingSubscription` | [MarketingService](../backend/MarketingService.md#setmarketingsubscription) | onAction | Subscribe or unsubscribe | `MARKETING_VIEW` |
+| `getGuestConsents` | [MarketingService](../backend/MarketingService.md#getguestconsents) | onLoad | The current consent per channel (signed in) | `GUEST_VIEW` |
+| `listConsentPurposes` | [MarketingService](../backend/MarketingService.md#listconsentpurposes) | onLoad | The purposes the consent rows show | `GUEST_VIEW` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | — |
+| error | Could not subscribe. Consent is not recorded on a failed request, because a subscription the guest believes happened and did not is worse than a visible failure |
+| emptyFirstRun | — |
+| emptyNoResults | Nothing matches the current filters. The filters are named and clearable from here — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. Added 25 August with the derived list component: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| offline | Not available, and the offline banner says why. A consent change must reach the server to mean anything. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| WEB-026 | Survey & Feedback |  |  |
+| WEB-025 | Help Centre / FAQ |  |  |
+
 ## WEB-028 Contact & Venue Information
 
 **Find contact & venue information for this venue.**
@@ -1014,6 +1521,7 @@
 |---|---|---|---|
 | WEB-027 | Newsletter Subscription |  |  |
 | WEB-026 | Survey & Feedback |  |  |
+| WEB-025 | Help Centre / FAQ |  |  |
 
 ## WEB-029 Error / Sold Out / Maintenance
 
@@ -1095,445 +1603,6 @@
 | WEB-031 | My Reservations |  |  |
 | GST-014 | The friend claims it in the app | orderId, transferId |  |
 
-## WEB-035 Multi-Currency & Pricing
-
-**Choose the currency you see prices in and pay in.**
-
-|  |  |
-|---|---|
-| Module | Ticketing |
-| Wave | 1 |
-| Licensed module | ticketing |
-| Route | `/multi-currency-pricing` |
-| Component | `apps/guest-web/src/routes/MulticurrencyPricing.tsx` |
-| Pattern | listDetail |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listFxRates` | [LedgerService](../backend/LedgerService.md#listfxrates) | onLoad | The currencies the venue shows, each marked chargeable or approximate — called with `venueId` (audit R120 (a)) and `chargeable` (CHG-FIN-001) | `LEDGER_VIEW` |
-| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The multi-currency pricing list. |
-| error | Could not load. Names which read failed and leaves the multi-currency pricing untouched. |
-| emptyFirstRun | Not reachable: with no other currency at the venue the screen is not linked, and prices stay in the venue's currency. |
-| emptyNoResults | Never shown: the screen sends no filter a guest chose. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Last known rates stay, with their age. A rate is a number a guest may act on, and an undated one they cannot judge. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| WEB-030 | Ticket Transfer |  |  |
-| WEB-031 | My Reservations | productId |  |
-
-## WEB-050 Plan Your Visit
-
-**Plan a visit on the website: answer six questions, get a day-by-day plan, edit it, and book it in one go.**
-
-|  |  |
-|---|---|
-| Module | Discovery & Browse |
-| Wave | 1 |
-| Licensed module | ticketing |
-| Route | `/plan-your-visit` |
-| Component | `apps/guest-web/src/routes/PlanYourVisit.tsx` |
-| Pattern | multiStepForm |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| venueId | session |
-| planId | deepLink |
-| itemId | navigation |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | Interests and height limits of what the planner may include | `PRODUCT_VIEW` |
-| `generateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#generatevisitplan) | onAction | Build a rules plan from the inputs (party, heights, dates, park per day, pace, interests, shops, cuisine); each day from its own park's points only | `None` |
-| `getVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplan) | onLoad | The plan: days, timed items and add-on suggestions, at its current version Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
-| `updateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#updatevisitplan) | onAction | Swap, remove, add or undo: each change is a new version, so undo goes back one | `None` |
-| `listVisitPlanAlternatives` | [VenueOpsService](../backend/VenueOpsService.md#listvisitplanalternatives) | onAction | Swap candidates for one item that suit everyone in the party | `None` |
-| `bookVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#bookvisitplan) | onAction | Book this plan: turns the plan (and chosen add-ons) into cart lines and returns the cart | `None` |
-| `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | The tenant's active venues, for the park-per-day choice in a multi-venue tenant | `None` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The plan builds in place; the answers stay on screen. |
-| error | Could not build or load the plan. Names what failed; the answers are kept. |
-| emptyFirstRun | No plan yet: the first question is shown. |
-| emptyNoResults | Nothing suits the whole group on that day: says which answer ruled everything out and offers to change it. |
-| preferenceNotAtVenue | A preference a day's park cannot meet (client meeting 30 September, MoM 4.7): before *Make my plan* the chip is marked *Not at the parks you chose* (naming a park of the tenant that has it); after it, the day shows the *Not at this park* banner and nothing from another park is placed. *Change answers* lets the guest move that day to the park that has it. |
-| emptyNoAccess | A guest holds no permission. Anyone can build a plan; signing in is asked only to save it, and booking follows the cart's own sign-in gate. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| WEB-010 | Book this plan | cartId |  |
-| WEB-004 | Opens an item on the plan | productId |  |
-| WEB-001 | Back to tickets |  |  |
-
-## WEB-007 Interactive Seat Selection
-
-**Choose specific seats.**
-
-|  |  |
-|---|---|
-| Module | Booking & Selection |
-| Wave | 2 |
-| Licensed module | seating |
-| Route | `/booking-and-selection/seat-map-selection` |
-| Component | `apps/guest-web/src/routes/booking-and-selection/SeatMapSelectionCanvas.tsx` |
-| Pattern | statusTracker |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| performanceId | deepLink |
-| eventId | WEB-006 |
-| holdId | navigation |
-| venueId | session |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `createSeatHold` | [CatalogueService](../backend/CatalogueService.md#createseathold) | onAction | Hold specific seats | `ORDER_CREATE` |
-| `getSeatAvailability` | [CatalogueService](../backend/CatalogueService.md#getseatavailability) | onLoad | Seat status for a performance | `PRODUCT_VIEW` |
-| `recommendSeats` | [CatalogueService](../backend/CatalogueService.md#recommendseats) | onAction | Recommend seats for a party | `PRODUCT_VIEW` |
-| `listPerformances` | [CatalogueService](../backend/CatalogueService.md#listperformances) | onLoad | The event's other times, for the time bar and the date and time pop-up | `PRODUCT_VIEW` |
-| `relinquishSeatHold` | [CatalogueService](../backend/CatalogueService.md#relinquishseathold) | onAction | Release the seats held for the old performance when the guest switches time on the time bar (decided 29 September, rev 3 REV3-6); a guest releases only their own hold | `ORDER_CREATE` |
-| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The interactive seat selection, read by `getSeatAvailability`. |
-| error | Could not load. Names which read failed and leaves the interactive seat selection untouched. |
-| emptyFirstRun | No interactive seat selection yet. Offers Create seat hold (`createSeatHold`). |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-| emptyNoResults | The event has no other time to switch to on the time bar; the chosen performance stays. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| WEB-005 | Ticket Type Selection |  |  |
-| WEB-008 | Add-ons & Upsell |  |  |
-| WEB-006 | Date & Performance Selection | eventId, performanceId |  |
-| WEB-010 | Reviews the cart | holdId, performanceId |  |
-
-## WEB-008 Add-ons & Upsell
-
-**See add-ons & upsell for this venue.**
-
-|  |  |
-|---|---|
-| Module | Booking & Selection |
-| Wave | 2 |
-| Licensed module | ticketing |
-| Route | `/booking-and-selection/add-ons-and-upsell` |
-| Component | `apps/guest-web/src/routes/booking-and-selection/AddOnsAndUpsellDetail.tsx` |
-| Pattern | statusTracker |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| cartId | session |
-| bundleId | navigation |
-| venueId | session |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `addCartLine` | [OrderService](../backend/OrderService.md#addcartline) | onAction | Add something | `None` |
-| `getBundle` | [CatalogueService](../backend/CatalogueService.md#getbundle) | onAction | A bundle offered as an upsell | `PRODUCT_VIEW` |
-| `decideRecommendations` | [AiService](../backend/AiService.md#deciderecommendations) | onLoad | Fill the cart slot, maxItems 3 (DI-959) | `AI_USE` |
-| `recordRecommendationEvents` | [AiService](../backend/AiService.md#recordrecommendationevents) | onAction | Report what happened to recommended items | `AI_USE` |
-| `getPublishedBookingFlow` | [WhiteLabelService](../backend/WhiteLabelService.md#getpublishedbookingflow) | onLoad | The published booking flow for this product: which steps it has and in what order (W12) | `None` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The add-ons, read by `decideRecommendations`. |
-| error | Could not load. Names which read failed and leaves the add-ons upsell untouched. |
-| emptyFirstRun | No add-ons for this booking: the step is skipped and Continue goes on to sign-in. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| WEB-005 | Ticket Type Selection |  |  |
-| WEB-006 | Date & Performance Selection | cartId, performanceId |  |
-| WEB-010 | Shopping Cart | cartId, code, performanceId |  |
-| WEB-016 | Continue — sign in or use a guest code (when sign-in is asked after add-ons) | cartId | the guest is not signed in |
-
-## WEB-015 Branded Queue / Waiting Room
-
-**The on-sale waiting room for one performance — the guest's place, the wait, and the way on to the sale once admitted.**
-
-|  |  |
-|---|---|
-| Module | High-Demand Access |
-| Wave | 2 |
-| Licensed module | ticketing |
-| Route | `/high-demand-access/virtual-waiting-room` |
-| Component | `apps/guest-web/src/routes/high-demand-access/VirtualWaitingRoomDetail.tsx` |
-| Pattern | statusTracker |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| performanceId | WEB-006 |
-| waitingEntryId | WEB-015 |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `enterWaitingRoom` | [CatalogueService](../backend/CatalogueService.md#enterwaitingroom) | onAction | Take a place in the performance's on-sale waiting room (ADR-0066); `notRequired` when the room is off | `None` |
-| `getWaitingRoomPosition` | [CatalogueService](../backend/CatalogueService.md#getwaitingroomposition) | onInterval | The guest's place, polled every `pollAfterSeconds`; admitted, it carries the admission token for `addCartLine` | `None` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | Taking a place in the room. *Take my place* (`enterWaitingRoom`) answers with a position, or `notRequired` and the guest goes straight on to the sale |
-| error | Lost the place. The worst failure on this screen. A retry sends the same `Idempotency-Key` and gets the same entry back, so the guest is not sent to the back, and the screen says so, because a guest who thinks they lost their place will open a second tab and make it worse. `expired` (the admission was not used in time) offers to enter again; `closed` (the room was switched off or the performance stopped selling) says so and goes back to the event |
-| emptyFirstRun | — |
-| emptyNoAccess | There is no access to refuse. The room is anonymous (ADR-0066): no sign-in, no personal data, and the guest may not have an account yet. |
-| offline | The offline banner shows. The last known position stays on screen with its age, and polling resumes with the same entry when the connection is back. Admission needs the connection. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| WEB-006 | Continue to your tickets | performanceId | `getWaitingRoomPosition` answers `admitted`. The page keeps `admission.token` and sends it as `X-Admission-Token` on `addCartLine` until `admission.expiresAt` |
-
-## WEB-021 Wallet & Gift Cards
-
-**See wallet & gift cards for this venue.**
-
-|  |  |
-|---|---|
-| Module | Membership, Loyalty & Value |
-| Wave | 2 |
-| Licensed module | retail |
-| Route | `/membership-loyalty-and-value/wallet-and-gift-cards` |
-| Component | `apps/guest-web/src/routes/membership-loyalty-and-value/WalletAndGiftCardsDetail.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| cardCode | deepLink |
-| subjectId | session |
-| walletId | navigation |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `getWallet` | [WalletService](../backend/WalletService.md#getwallet) | onLoad | Read a guest wallet | `WALLET_VIEW` |
-| `listWalletTransactions` | [WalletService](../backend/WalletService.md#listwallettransactions) | onLoad | Wallet transaction history | `WALLET_VIEW` |
-| `getGiftCard` | [WalletService](../backend/WalletService.md#getgiftcard) | onAction | Check a gift card balance | `WALLET_VIEW` |
-| `getGameCard` | [VenueOpsService](../backend/VenueOpsService.md#getgamecard) | onAction | Balance on a game card | `None` |
-| `listPaymentTokens` | [OrderService](../backend/OrderService.md#listpaymenttokens) | onLoad | Saved cards on this account | `ORDER_VIEW` |
-| `storePaymentToken` | [OrderService](../backend/OrderService.md#storepaymenttoken) | onAction | Save a card for next time | `ORDER_CREATE` |
-| `transferWalletBalance` | [WalletService](../backend/WalletService.md#transferwalletbalance) | onAction | Move value between wallets | `WALLET_OPERATE` |
-| `getWalletAutoReloadSetting` | [WalletService](../backend/WalletService.md#getwalletautoreloadsetting) | onLoad | Show auto top-up | `WALLET_VIEW` |
-| `setWalletAutoReloadSetting` | [WalletService](../backend/WalletService.md#setwalletautoreloadsetting) | onAction | Set auto top-up | `WALLET_OPERATE` |
-| `getWalletExitBalance` | [WalletService](../backend/WalletService.md#getwalletexitbalance) | onLoad | Balance due / refundable at exit | `WALLET_VIEW` |
-| `settleWalletAtExit` | [WalletService](../backend/WalletService.md#settlewalletatexit) | onAction | Settle the wallet at exit | `WALLET_OPERATE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The wallet gift cards list. |
-| error | Could not load. Names which read failed and leaves the wallet gift cards untouched. |
-| emptyFirstRun | No wallet gift cards yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Never shown: `listWalletTransactions` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Balances and stored cards already loaded stay visible with their age, cards masked. Storing a card and transferring value need the server. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| WEB-022 | Membership Plans |  |  |
-| WEB-023 | Membership Management | orderId |  |
-| WEB-024 | Devices, Wishlist & Consent |  |  |
-
-## WEB-022 Membership Plans
-
-**Membership Plans — the screen a person opens when they need to deal with membership plans.**
-
-|  |  |
-|---|---|
-| Module | Membership, Loyalty & Value |
-| Wave | 2 |
-| Licensed module | ticketing |
-| Route | `/membership-loyalty-and-value/membership-plans` |
-| Component | `apps/guest-web/src/routes/membership-loyalty-and-value/MembershipPlansDetail.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| productId | WEB-001 |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
-| `getProduct` | [CatalogueService](../backend/CatalogueService.md#getproduct) | onLoad | Read a product | `PRODUCT_VIEW` |
-| `getMyMemberships` | [CatalogueService](../backend/CatalogueService.md#getmymemberships) | onLoad | A guest's own memberships, benefits and history Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `PRODUCT_VIEW` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The membership plans list. |
-| error | Could not load. Names which read failed and leaves the membership plans untouched. |
-| emptyFirstRun | No membership plans yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Never shown: the plans are the venue's membership products, with no filter a guest sets. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| WEB-021 | Wallet & Gift Cards |  |  |
-| WEB-023 | Membership Management |  |  |
-| WEB-024 | Devices, Wishlist & Consent |  |  |
-
-## WEB-023 Membership Management
-
-**Work with membership management for this venue.**
-
-|  |  |
-|---|---|
-| Module | Membership, Loyalty & Value |
-| Wave | 2 |
-| Licensed module | ticketing |
-| Route | `/membership-loyalty-and-value/membership-management` |
-| Component | `apps/guest-web/src/routes/membership-loyalty-and-value/MembershipManagementForm.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| subjectId | session |
-| orderId | deepLink |
-| caseId | navigation |
-| statementId | navigation |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listBillingStatements` | [OrderService](../backend/OrderService.md#listbillingstatements) | onLoad | Membership billing statements | `ORDER_VIEW` |
-| `getBillingStatement` | [OrderService](../backend/OrderService.md#getbillingstatement) | onAction | One statement, line by line | `ORDER_VIEW` |
-| `listMyPaymentIssues` | [OrderService](../backend/OrderService.md#listmypaymentissues) | onLoad | Declined renewals waiting on the guest | `None` |
-| `retryMyDunningPayment` | [OrderService](../backend/OrderService.md#retrymydunningpayment) | onAction | Retry a declined payment, on another card if needed | `None` |
-| `getMyMemberships` | [CatalogueService](../backend/CatalogueService.md#getmymemberships) | onLoad | A guest's own memberships, benefits and history | `PRODUCT_VIEW` |
-| `listInstalmentPlans` | [OrderService](../backend/OrderService.md#listinstalmentplans) | onLoad | Instalment plans and schedule | `PAYMENT_VIEW` |
-| `createInstalmentPlan` | [OrderService](../backend/OrderService.md#createinstalmentplan) | onAction | Pay in instalments | `ORDER_CREATE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | Membership and its benefits |
-| error | Could not load. Cancellation and renewal are both blocked |
-| emptyFirstRun | — |
-| emptyNoResults | Nothing matches the filter on from, to and the membership are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| WEB-021 | Wallet & Gift Cards |  |  |
-| WEB-022 | Membership Plans | productId |  |
-| WEB-024 | Devices, Wishlist & Consent |  |  |
-
-## WEB-027 Newsletter Subscription
-
-**Choose which newsletters you receive and on which channel, or leave one from its email link.**
-
-|  |  |
-|---|---|
-| Module | Engagement & Support |
-| Wave | 2 |
-| Licensed module | marketing |
-| Route | `/engagement-and-support/newsletter-subscription` |
-| Component | `apps/guest-web/src/routes/engagement-and-support/NewsletterSubscriptionDetail.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| subjectId | session |
-| unsubscribeToken | deepLink |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | from page inventory | `None` |
-| `getMarketingSubscription` | [MarketingService](../backend/MarketingService.md#getmarketingsubscription) | onLoad | What this guest has opted into | `MARKETING_VIEW` |
-| `setMarketingSubscription` | [MarketingService](../backend/MarketingService.md#setmarketingsubscription) | onAction | Subscribe or unsubscribe | `MARKETING_VIEW` |
-| `getGuestConsents` | [MarketingService](../backend/MarketingService.md#getguestconsents) | onLoad | The current consent per channel (signed in) | `GUEST_VIEW` |
-| `listConsentPurposes` | [MarketingService](../backend/MarketingService.md#listconsentpurposes) | onLoad | The purposes the consent rows show | `GUEST_VIEW` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | — |
-| error | Could not subscribe. Consent is not recorded on a failed request, because a subscription the guest believes happened and did not is worse than a visible failure |
-| emptyFirstRun | — |
-| emptyNoResults | Nothing matches the current filters. The filters are named and clearable from here — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. Added 25 August with the derived list component: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | Not available, and the offline banner says why. A consent change must reach the server to mean anything. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| WEB-026 | Survey & Feedback |  |  |
-
 ## WEB-031 My Reservations
 
 **What you have booked and not yet paid for.**
@@ -1541,7 +1610,7 @@
 |  |  |
 |---|---|
 | Module | Ticketing |
-| Wave | 2 |
+| Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/my-reservations` |
 | Component | `apps/guest-web/src/routes/MyReservations.tsx` |
@@ -1595,7 +1664,7 @@
 |  |  |
 |---|---|
 | Module | Promotions |
-| Wave | 2 |
+| Wave | 1 |
 | Licensed module | ticketing |
 | Route | `/offers-promotions` |
 | Component | `apps/guest-web/src/routes/OffersPromotions.tsx` |
@@ -1632,7 +1701,7 @@
 |  |  |
 |---|---|
 | Module | Retail |
-| Wave | 2 |
+| Wave | 1 |
 | Licensed module | retail |
 | Route | `/shop` |
 | Component | `apps/guest-web/src/routes/Shop.tsx` |
@@ -1672,6 +1741,90 @@
 |---|---|---|---|
 | GST-062 | On the way out they find their collection point |  |  |
 
+## WEB-034 Lost & Found
+
+**Report something you left behind.**
+
+|  |  |
+|---|---|
+| Module | Support |
+| Wave | 1 |
+| Licensed module | marketing |
+| Route | `/lost-found` |
+| Component | `apps/guest-web/src/routes/LostFound.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| subjectId | session |
+| caseId | deepLink |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listMyCases` | [MarketingService](../backend/MarketingService.md#listmycases) | onLoad | The cases this guest raised | `None` |
+| `raiseMyCase` | [MarketingService](../backend/MarketingService.md#raisemycase) | onAction | Report something — lost property, a complaint, a question | `None` |
+| `replyToMyCase` | [MarketingService](../backend/MarketingService.md#replytomycase) | onAction | Reply on a case the guest raised | `None` |
+| `recordLostItem` | [MarketingService](../backend/MarketingService.md#recordlostitem) | onAction | The lost-item record BO-073 matches, linked to the guest's case | `CASE_MANAGE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The lost found list. |
+| error | Could not load. Names which read failed and leaves the lost found untouched. |
+| emptyFirstRun | No lost found yet. Offers Raise my case (`raiseMyCase`). |
+| emptyNoResults | Never shown: `listMyCases` takes no filter, so an empty list is always the first-run state above. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| offline | The offline banner shows. Reports already loaded stay read-only with their age. Reporting a loss and replying are disabled offline — both need the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk or lost-property point, or any member of staff. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| GST-034 | They track it | caseId |  |
+
+## WEB-035 Multi-Currency & Pricing
+
+**Choose the currency you see prices in and pay in.**
+
+|  |  |
+|---|---|
+| Module | Ticketing |
+| Wave | 1 |
+| Licensed module | ticketing |
+| Route | `/multi-currency-pricing` |
+| Component | `apps/guest-web/src/routes/MulticurrencyPricing.tsx` |
+| Pattern | listDetail |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listFxRates` | [LedgerService](../backend/LedgerService.md#listfxrates) | onLoad | The currencies the venue shows, each marked chargeable or approximate — called with `venueId` (audit R120 (a)) and `chargeable` (CHG-FIN-001) | `LEDGER_VIEW` |
+| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | List products | `PRODUCT_VIEW` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The multi-currency pricing list. |
+| error | Could not load. Names which read failed and leaves the multi-currency pricing untouched. |
+| emptyFirstRun | Not reachable: with no other currency at the venue the screen is not linked, and prices stay in the venue's currency. |
+| emptyNoResults | Never shown: the screen sends no filter a guest chose. |
+| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| offline | The offline banner shows. Last known rates stay, with their age. A rate is a number a guest may act on, and an undated one they cannot judge. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| WEB-030 | Ticket Transfer |  |  |
+| WEB-031 | My Reservations | productId |  |
+
 ## WEB-036 F&B – Browse & Order
 
 **Order food from a table, a lounger or a seat.**
@@ -1679,7 +1832,7 @@
 |  |  |
 |---|---|
 | Module | In-venue Services |
-| Wave | 2 |
+| Wave | 1 |
 | Licensed module | fnb |
 | Route | `/fandb--browse-and-order` |
 | Component | `apps/guest-web/src/routes/FBBrowseOrder.tsx` |
@@ -1725,6 +1878,12 @@
 | emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data; decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
 | offline | The offline banner shows. The menu already loaded stays with its age. Ordering, claiming a table and booking wait for the connection — an order placed offline is food nobody is making. |
 
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| WEB-037 | Menu Item Detail | outletId |  |
+
 ## WEB-037 Menu Item Detail
 
 **What is in it, and what may be changed.**
@@ -1732,7 +1891,7 @@
 |  |  |
 |---|---|
 | Module | In-venue Services |
-| Wave | 2 |
+| Wave | 1 |
 | Licensed module | fnb |
 | Route | `/menu-item-detail` |
 | Component | `apps/guest-web/src/routes/MenuItemDetail.tsx` |
@@ -1768,7 +1927,7 @@
 |  |  |
 |---|---|
 | Module | In-venue Services |
-| Wave | 2 |
+| Wave | 1 |
 | Licensed module | fnb |
 | Route | `/fandb--order-tracking` |
 | Component | `apps/guest-web/src/routes/FBOrderTracking.tsx` |
@@ -1807,7 +1966,7 @@
 |  |  |
 |---|---|
 | Module | In-venue Services |
-| Wave | 2 |
+| Wave | 1 |
 | Licensed module | queue |
 | Route | `/venue-map-and-wait-times` |
 | Component | `apps/guest-web/src/routes/VenueMapWaitTimes.tsx` |
@@ -1847,7 +2006,7 @@
 |  |  |
 |---|---|
 | Module | In-venue Services |
-| Wave | 2 |
+| Wave | 1 |
 | Licensed module | queue |
 | Route | `/virtual-queue` |
 | Component | `apps/guest-web/src/routes/VirtualQueue.tsx` |
@@ -1887,7 +2046,7 @@
 |  |  |
 |---|---|
 | Module | In-venue Services |
-| Wave | 2 |
+| Wave | 1 |
 | Licensed module | access |
 | Route | `/parking--reserve-and-pay` |
 | Component | `apps/guest-web/src/routes/ParkingReservePay.tsx` |
@@ -1928,7 +2087,7 @@
 |  |  |
 |---|---|
 | Module | Retail |
-| Wave | 2 |
+| Wave | 1 |
 | Licensed module | retail |
 | Route | `/retail-and-shop-and-drop` |
 | Component | `apps/guest-web/src/routes/RetailShopAndDrop.tsx` |
@@ -1973,7 +2132,7 @@
 |  |  |
 |---|---|
 | Module | Membership, Loyalty & Value |
-| Wave | 2 |
+| Wave | 1 |
 | Licensed module | marketing |
 | Route | `/loyalty-and-rewards` |
 | Component | `apps/guest-web/src/routes/LoyaltyRewards.tsx` |
@@ -2020,7 +2179,7 @@
 |  |  |
 |---|---|
 | Module | Engagement & Support |
-| Wave | 2 |
+| Wave | 1 |
 | Licensed module | ai |
 | Route | `/ai-concierge` |
 | Component | `apps/guest-web/src/routes/AiConcierge.tsx` |
@@ -2044,7 +2203,7 @@
 | `requestSuggestion` | [AiService](../backend/AiService.md#requestsuggestion) | background | From the conversation only, kinds waitTime and upsell (prepPlan is the kitchen's production plan; an itinerary is asked on the Plan tab); never a kind picker | `AI_USE` |
 | `getGuestMenu` | [FnbService](../backend/FnbService.md#getguestmenu) | onAction | Optional "Order food" shortcut to the menu in force | `None` |
 | `listAiConversations` | [AiService](../backend/AiService.md#listaiconversations) | onLoad | Earlier conversations Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `AI_USE` |
-| `sendConversationMessage` | [MarketingService](../backend/MarketingService.md#sendconversationmessage) | onAction | Ask the concierge something | `CASE_MANAGE` |
+| `sendGuestConversationMessage` | [MarketingService](../backend/MarketingService.md#sendguestconversationmessage) | onAction | After a handover, the guest writes to the agent, as the guest: sendConversationMessage needs CASE_MANAGE (decided by Chinmay, 3 October 2026 (CHG-SPF-013)) | `None` |
 | `recordAnswerFeedback` | [AiService](../backend/AiService.md#recordanswerfeedback) | onAction | Say whether an answer helped | `AI_USE` |
 
 **States**
@@ -2065,7 +2224,7 @@
 |  |  |
 |---|---|
 | Module | Support |
-| Wave | 2 |
+| Wave | 1 |
 | Licensed module | core |
 | Route | `/help-centre-and-accessibility` |
 | Component | `apps/guest-web/src/routes/HelpCentreAccessibility.tsx` |
@@ -2098,7 +2257,7 @@
 |  |  |
 |---|---|
 | Module | Engagement & Support |
-| Wave | 2 |
+| Wave | 1 |
 | Licensed module | marketing |
 | Route | `/in-venue-notifications` |
 | Component | `apps/guest-web/src/routes/InVenueNotifications.tsx` |
@@ -2128,210 +2287,6 @@
 | offline | The offline banner shows. Notices already received stay listed. New queue calls and order updates arrive once the connection is back, and the banner is the warning that they may be late. |
 | emptyNoResults | No unread notifications. Names the Unread only filter and offers to show all; the read ones are still there. |
 
-## WEB-009 Wishlist
-
-**Find the right one quickly, and act on it without opening it.**
-
-|  |  |
-|---|---|
-| Module | Booking & Selection |
-| Wave | 3 |
-| Licensed module | marketing |
-| Route | `/booking-and-selection/wishlist` |
-| Component | `apps/guest-web/src/routes/booking-and-selection/WishlistDetail.tsx` |
-| Pattern | statusTracker |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| itemId | deepLink |
-| subjectId | session |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `getWishlist` | [MarketingService](../backend/MarketingService.md#getwishlist) | onLoad | Read a guest's saved items | `None` |
-| `addToWishlist` | [MarketingService](../backend/MarketingService.md#addtowishlist) | onAction | Undo after a remove re-saves the same variant and date (idempotent); saving itself happens on the product and date cards | `None` |
-| `removeFromWishlist` | [MarketingService](../backend/MarketingService.md#removefromwishlist) | onAction | Remove a saved item | `None` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | Saved items load |
-| error | Could not load |
-| emptyFirstRun | Nothing saved — explains what the list is for |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| WEB-005 | Ticket Type Selection |  |  |
-| WEB-006 | Date & Performance Selection | performanceId |  |
-
-## WEB-024 Devices, Wishlist & Consent
-
-**Your devices, security, cookie choices and data rights.**
-
-|  |  |
-|---|---|
-| Module | Membership, Loyalty & Value |
-| Wave | 3 |
-| Licensed module | marketing |
-| Route | `/membership-loyalty-and-value/loyalty-and-rewards` |
-| Component | `apps/guest-web/src/routes/membership-loyalty-and-value/LoyaltyAndRewardsDetail.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| deviceId | deepLink |
-| itemId | deepLink |
-| subjectId | session |
-| enrolmentId | navigation |
-| methodId | navigation |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `getWishlist` | [MarketingService](../backend/MarketingService.md#getwishlist) | onLoad | Read a guest's saved items | `None` |
-| `listGuestDevices` | [MarketingService](../backend/MarketingService.md#listguestdevices) | onLoad | A guest's registered devices | `None` |
-| `recordConsent` | [MarketingService](../backend/MarketingService.md#recordconsent) | onAction | Record a consent decision | `None` |
-| `revokeGuestDevice` | [MarketingService](../backend/MarketingService.md#revokeguestdevice) | onAction | Revoke a device registration | `None` |
-| `deleteGuestAccount` | [IdentityService](../backend/IdentityService.md#deleteguestaccount) | onAction | Ask for the account to be deleted | `None` |
-| `exportSubjectData` | [IdentityService](../backend/IdentityService.md#exportsubjectdata) | onAction | Export everything held about this guest | `GUEST_VIEW_PII` |
-| `getFacePassEnrolment` | [AccessService](../backend/AccessService.md#getfacepassenrolment) | onAction | Whether a face pass is enrolled on this account | `GUEST_VIEW` |
-| `getGuestConsents` | [MarketingService](../backend/MarketingService.md#getguestconsents) | onLoad | What this guest has consented to | `GUEST_VIEW` |
-| `getWaiverStatus` | [MarketingService](../backend/MarketingService.md#getwaiverstatus) | onLoad | Which waivers are signed and which are due | `GUEST_VIEW` |
-| `listDelegations` | [IdentityService](../backend/IdentityService.md#listdelegations) | onLoad | Who may act for this guest | `GUEST_VIEW` |
-| `revokeFacePass` | [AccessService](../backend/AccessService.md#revokefacepass) | onAction | Revoke it after losing the phone that made it | `GUEST_MANAGE` |
-| `listMfaMethods` | [IdentityService](../backend/IdentityService.md#listmfamethods) | onLoad | The guest's enrolled second-factor methods | `None` |
-| `enrolMfaMethod` | [IdentityService](../backend/IdentityService.md#enrolmfamethod) | onAction | Enrol an authenticator (email code as fallback) | `None` |
-| `verifyMfaEnrolment` | [IdentityService](../backend/IdentityService.md#verifymfaenrolment) | onAction | Confirm the enrolment with a first code | `None` |
-| `removeMfaMethod` | [IdentityService](../backend/IdentityService.md#removemfamethod) | onAction | Remove a method | `None` |
-| `getCookieConsentRuntime` | [MarketingService](../backend/MarketingService.md#getcookieconsentruntime) | onLoad | Preference centre: categories and the current decision | `None` |
-| `listPublishedTrackingTechnologies` | [MarketingService](../backend/MarketingService.md#listpublishedtrackingtechnologies) | onLoad | Each cookie's name, provider, purpose, expiry and party | `None` |
-| `getDeviceConsentHistory` | [MarketingService](../backend/MarketingService.md#getdeviceconsenthistory) | onLoad | My cookie decisions so far | `None` |
-| `recordDeviceConsent` | [MarketingService](../backend/MarketingService.md#recorddeviceconsent) | onAction | Change or withdraw cookie preferences | `None` |
-| `listConsentPurposes` | [MarketingService](../backend/MarketingService.md#listconsentpurposes) | onLoad | The purposes the consent rows show | `GUEST_VIEW` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | Points and rewards |
-| error | Could not load |
-| emptyFirstRun | No points yet — explains how they accrue |
-| emptyNoResults | Nothing matches the current filters. The filters are named and clearable from here — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone. Added 25 August with the derived list component: a screen that lists has to say what it shows when the list is empty, and this screen gained the list before it gained the sentence. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | Nothing here is offered offline, and the banner says so. An erasure request or a device change queued and never sent is worse than one that could not be made — the legal clock starts when the platform receives it, and a device signed out offline is still signed in. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| WEB-021 | Wallet & Gift Cards |  |  |
-| WEB-022 | Membership Plans |  |  |
-| WEB-023 | Membership Management |  |  |
-| GST-037 | Offers are shown against what they hold |  |  |
-
-## WEB-026 Survey & Feedback
-
-**Tell the venue how the visit went, answer a survey it sent, or report a problem.**
-
-|  |  |
-|---|---|
-| Module | Engagement & Support |
-| Wave | 3 |
-| Licensed module | marketing |
-| Route | `/engagement-and-support/survey-and-feedback` |
-| Component | `apps/guest-web/src/routes/engagement-and-support/SurveyAndFeedbackDetail.tsx` |
-| Pattern | configEditor |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| formId | deepLink |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `submitReview` | [MarketingService](../backend/MarketingService.md#submitreview) | onAction | from page inventory | `None` |
-| `getForm` | [MarketingService](../backend/MarketingService.md#getform) | onLoad | A triggered survey opened from its link | `GUEST_VIEW` |
-| `submitForm` | [MarketingService](../backend/MarketingService.md#submitform) | onAction | Answer the survey | `GUEST_VIEW` |
-| `raiseMyCase` | [MarketingService](../backend/MarketingService.md#raisemycase) | onAction | Report a problem as a case | `None` |
-| `listMyOrders` | [OrderService](../backend/OrderService.md#listmyorders) | onLoad | The recent visits a review can be about | `None` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | Survey loads |
-| error | Could not submit. The answers are kept on the form, and the guest retries by pressing Submit again — nothing resends by itself: guest web is online-only (docs/architecture/offline-and-sync.md, *B2C web: None*), so there is no outbox behind this screen. The retry reuses the first attempt's `Idempotency-Key`, so a submit that did reach the server before the failure is not recorded as a second review. |
-| emptyFirstRun | — |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| WEB-027 | Newsletter Subscription |  |  |
-
-## WEB-034 Lost & Found
-
-**Report something you left behind.**
-
-|  |  |
-|---|---|
-| Module | Support |
-| Wave | 3 |
-| Licensed module | marketing |
-| Route | `/lost-found` |
-| Component | `apps/guest-web/src/routes/LostFound.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| subjectId | session |
-| caseId | deepLink |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listMyCases` | [MarketingService](../backend/MarketingService.md#listmycases) | onLoad | The cases this guest raised | `None` |
-| `raiseMyCase` | [MarketingService](../backend/MarketingService.md#raisemycase) | onAction | Report something — lost property, a complaint, a question | `None` |
-| `replyToMyCase` | [MarketingService](../backend/MarketingService.md#replytomycase) | onAction | Reply on a case the guest raised | `None` |
-| `recordLostItem` | [MarketingService](../backend/MarketingService.md#recordlostitem) | onAction | The lost-item record BO-073 matches, linked to the guest's case | `CASE_MANAGE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The lost found list. |
-| error | Could not load. Names which read failed and leaves the lost found untouched. |
-| emptyFirstRun | No lost found yet. Offers Raise my case (`raiseMyCase`). |
-| emptyNoResults | Never shown: `listMyCases` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | There is no permission to name — a guest holds none (ADR-0025: `x-ticvai-permission` is what a staff caller must hold; a guest call resolves to the guest's own data). No access here means one of two things, told apart by the response: not signed in, where the guest is offered sign-in and brought back to this screen, or a record that is not theirs, which says so without saying whose it is. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | The offline banner shows. Reports already loaded stay read-only with their age. Reporting a loss and replying are disabled offline — both need the connection (decided 28 September, audit R148) — and the screen says how to reach staff in person instead: the guest services desk or lost-property point, or any member of staff. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| GST-034 | They track it | caseId |  |
-
 ## WEB-047 Map Booking — Cabanas & Spots
 
 **Pick a specific cabana, lounger or other spot on the venue map and hold it while you book.**
@@ -2339,7 +2294,7 @@
 |  |  |
 |---|---|
 | Module | Booking & Selection |
-| Wave | 3 |
+| Wave | 1 |
 | Licensed module | resources |
 | Route | `/booking-and-selection/map-booking` |
 | Component | `apps/guest-web/src/routes/booking-and-selection/MapBookingCanvas.tsx` |
@@ -2394,7 +2349,7 @@
 |  |  |
 |---|---|
 | Module | Booking & Selection |
-| Wave | 3 |
+| Wave | 1 |
 | Licensed module | resources |
 | Route | `/booking-and-selection/space-by-the-hour` |
 | Component | `apps/guest-web/src/routes/booking-and-selection/SpaceByTheHourWizard.tsx` |
@@ -2441,7 +2396,7 @@
 |  |  |
 |---|---|
 | Module | Transport |
-| Wave | 3 |
+| Wave | 1 |
 | Licensed module | transport |
 | Route | `/transport/route-and-schedule` |
 | Component | `apps/guest-web/src/routes/transport/RouteAndScheduleSplit.tsx` |
@@ -2492,3 +2447,56 @@
 | WEB-010 | Continue to payment | cartId |  |
 | WEB-016 | Sign in to save or see favourite routes | subjectId |  |
 | WEB-001 | Home |  |  |
+
+## WEB-050 Plan Your Visit
+
+**Plan a visit on the website: answer six questions, get a day-by-day plan, edit it, and book it in one go.**
+
+|  |  |
+|---|---|
+| Module | Discovery & Browse |
+| Wave | 1 |
+| Licensed module | ticketing |
+| Route | `/plan-your-visit` |
+| Component | `apps/guest-web/src/routes/PlanYourVisit.tsx` |
+| Pattern | multiStepForm |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| venueId | session |
+| planId | deepLink |
+| itemId | navigation |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listProducts` | [CatalogueService](../backend/CatalogueService.md#listproducts) | onLoad | Interests and height limits of what the planner may include | `PRODUCT_VIEW` |
+| `generateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#generatevisitplan) | onAction | Build a rules plan from the inputs (party, heights, dates, park per day, pace, interests, shops, cuisine); each day from its own park's points only | `None` |
+| `getVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#getvisitplan) | onLoad | The plan: days, timed items and add-on suggestions, at its current version Only when signed in (decided 2 October 2026 by Chinmay, fix before Block A starts (GFIX-6)). | `None` |
+| `updateVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#updatevisitplan) | onAction | Swap, remove, add or undo: each change is a new version, so undo goes back one | `None` |
+| `listVisitPlanAlternatives` | [VenueOpsService](../backend/VenueOpsService.md#listvisitplanalternatives) | onAction | Swap candidates for one item that suit everyone in the party | `None` |
+| `bookVisitPlan` | [VenueOpsService](../backend/VenueOpsService.md#bookvisitplan) | onAction | Book this plan: turns the plan (and chosen add-ons) into cart lines and returns the cart | `None` |
+| `getTenantAppStatus` | [WhiteLabelService](../backend/WhiteLabelService.md#gettenantappstatus) | onLoad | The tenant's active venues, for the park-per-day choice in a multi-venue tenant | `None` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The plan builds in place; the answers stay on screen. |
+| error | Could not build or load the plan. Names what failed; the answers are kept. |
+| emptyFirstRun | No plan yet: the first question is shown. |
+| emptyNoResults | Nothing suits the whole group on that day: says which answer ruled everything out and offers to change it. |
+| preferenceNotAtVenue | A preference a day's park cannot meet (client meeting 30 September, MoM 4.7): before *Make my plan* the chip is marked *Not at the parks you chose* (naming a park of the tenant that has it); after it, the day shows the *Not at this park* banner and nothing from another park is placed. *Change answers* lets the guest move that day to the park that has it. |
+| emptyNoAccess | A guest holds no permission. Anyone can build a plan; signing in is asked only to save it, and booking follows the cart's own sign-in gate. |
+| offline | The offline banner shows. What was already loaded stays on screen, marked with its age. Anything that spends money, holds capacity or changes the account waits for the connection, and its button says so rather than failing. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| WEB-010 | Book this plan | cartId |  |
+| WEB-004 | Opens an item on the plan | productId |  |
+| WEB-001 | Back to tickets |  |  |

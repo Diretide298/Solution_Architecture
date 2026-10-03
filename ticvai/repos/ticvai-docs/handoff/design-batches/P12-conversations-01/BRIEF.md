@@ -103,8 +103,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SUP-004` | Conversation Queue | B–D | 3 | 12 | 6 | 7 | 1 | 6 | — | notStarted (generated) |
-| `SUP-005` | Live Chat Workspace | B–D | 41 | 60 | 6 | 22 | 1 | 0 | — | notStarted (generated) |
+| `SUP-004` | Conversation Queue | A | 3 | 5 | 6 | 7 | 1 | 6 | — | notStarted (generated) |
+| `SUP-005` | Live Chat Workspace | A | 41 | 30 | 6 | 22 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

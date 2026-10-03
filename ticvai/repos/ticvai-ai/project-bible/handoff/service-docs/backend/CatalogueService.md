@@ -29,7 +29,7 @@
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
-| availability | [`getSeatAvailability`](#getseatavailability) | GET | `/performances/{performanceId}/seat-availability` | core | 2 | BO-015, BO-019, BO-1000, BO-1001, BO-1002, BO-1039 … |
+| availability | [`getSeatAvailability`](#getseatavailability) | GET | `/performances/{performanceId}/seat-availability` | core | 1 | BO-015, BO-019, BO-1000, BO-1001, BO-1002, BO-1039 … |
 | bundle | [`createBundle`](#createbundle) | POST | `/bundles` | setup | 1 | BO-011 |
 | bundle | [`getBundle`](#getbundle) | GET | `/bundles/{bundleId}` | core | 1 | ADM-180, ADM-181, ADM-187, GST-004, GST-056, WEB-008 |
 | bundle | [`getLatestBundle`](#getlatestbundle) | GET | `/catalogue/bundles/latest` | core | 1 | BO-011, BO-037, EMP-018, POS-002 |
@@ -40,11 +40,11 @@
 | catalogue | [`bulkChangePrices`](#bulkchangeprices) | POST | `/products/bulk-price` | setup | 1 | BO-009 |
 | catalogue | [`cloneProduct`](#cloneproduct) | POST | `/products/{productId}/clone` | setup | 1 | BO-008 |
 | catalogue | [`commitCatalogueImport`](#commitcatalogueimport) | POST | `/products/import/{jobId}/commit` | setup | 1 | BO-117 |
-| catalogue | [`getMyMemberships`](#getmymemberships) | GET | `/guests/me/memberships` | core | 2 | GST-015, WEB-022, WEB-023 |
+| catalogue | [`getMyMemberships`](#getmymemberships) | GET | `/guests/me/memberships` | core | 1 | GST-015, WEB-022, WEB-023 |
 | catalogue | [`listProductCategories`](#listproductcategories) | GET | `/product-categories` | core | 1 | BO-115, CMS-101, CMS-103, GST-001, GST-002, GST-007 … |
 | catalogue | [`searchCatalogue`](#searchcatalogue) | GET | `/search` | core | 1 | GST-001, GST-002, GST-003, GST-063, WEB-002, WEB-003 |
 | catalogue | [`setProductCategories`](#setproductcategories) | PUT | `/product-categories` | core | 1 | BO-115, CMS-103 |
-| category | [`createSeatCategory`](#createseatcategory) | POST | `/seat-categories` | setup | 2 | BO-1045, BO-985 |
+| category | [`createSeatCategory`](#createseatcategory) | POST | `/seat-categories` | setup | 1 | BO-1045, BO-985 |
 | coupon | [`createCouponCampaign`](#createcouponcampaign) | POST | `/coupon-campaigns` | setup | 1 | BO-010 |
 | coupon | [`generateCouponCodes`](#generatecouponcodes) | POST | `/coupon-campaigns/{campaignId}/codes` | setup | 1 | ADM-160, BO-010 |
 | coupon | [`getCouponCode`](#getcouponcode) | GET | `/coupon-codes/{code}` | core | 1 | GST-037, WEB-010 |
@@ -56,15 +56,15 @@
 | event | [`enterWaitingRoom`](#enterwaitingroom) | POST | `/performances/{performanceId}/waiting-room/entries` | core | 1 | GST-046, WEB-015 |
 | event | [`getPerformance`](#getperformance) | GET | `/performances/{performanceId}` | core | 1 | BO-015, BO-019, BO-726, GST-006, GST-041, POS-004 … |
 | event | [`getWaitingRoomPosition`](#getwaitingroomposition) | GET | `/performances/{performanceId}/waiting-room/entries/{waitingEntryId}` | core | 1 | GST-046, WEB-015 |
-| event | [`listEvents`](#listevents) | GET | `/events` | core | 2 | BO-015, BO-019, BO-694, CMS-101 |
+| event | [`listEvents`](#listevents) | GET | `/events` | core | 1 | BO-015, BO-019, BO-694, CMS-101 |
 | event | [`listPerformances`](#listperformances) | GET | `/events/{eventId}/performances` | core | 1 | BO-015, BO-019, BO-725, GST-003, GST-004, GST-005 … |
 | event | [`updateEvent`](#updateevent) | PATCH | `/events/{eventId}` | setup | 1 | BO-015, BO-019 |
 | event | [`updatePerformance`](#updateperformance) | PATCH | `/performances/{performanceId}` | setup | 1 | BO-015, BO-019, BO-978 |
 | events | [`cloneEvent`](#cloneevent) | POST | `/events/{eventId}/clone` | setup | 1 | BO-696 |
 | events | [`setEventLifecycleState`](#seteventlifecyclestate) | POST | `/events/{eventId}/lifecycle` | setup | 1 | BO-716, BO-717 |
-| hold | [`createSeatHold`](#createseathold) | POST | `/seat-holds` | core | 2 | BO-994, GST-049, POS-004, WEB-007 |
-| hold | [`getSeatHold`](#getseathold) | GET | `/seat-holds/{holdId}` | core | 2 | BO-987, BO-999, POS-004 |
-| hold | [`relinquishSeatHold`](#relinquishseathold) | DELETE | `/seat-holds/{holdId}` | core | 2 | BO-999, GST-049, POS-004, WEB-007 |
+| hold | [`createSeatHold`](#createseathold) | POST | `/seat-holds` | core | 1 | BO-994, GST-049, POS-004, WEB-007 |
+| hold | [`getSeatHold`](#getseathold) | GET | `/seat-holds/{holdId}` | core | 1 | BO-987, BO-999, POS-004 |
+| hold | [`relinquishSeatHold`](#relinquishseathold) | DELETE | `/seat-holds/{holdId}` | core | 1 | BO-999, GST-049, POS-004, WEB-007 |
 | lease | [`acquireInventoryHold`](#acquireinventoryhold) | POST | `/inventory-holds` | core | 1 | POS-003 |
 | lease | [`listInventoryHolds`](#listinventoryholds) | GET | `/inventory-holds` | core | 1 | BO-018, POS-003 |
 | pricing | [`copyPriceList`](#copypricelist) | POST | `/price-lists/{priceListId}/copy` | setup | 1 | BO-009 |
@@ -72,16 +72,16 @@
 | pricing | [`setPrices`](#setprices) | PUT | `/price-lists/{priceListId}/prices` | setup | 1 | BO-009, BO-291, BO-601 |
 | pricing | [`updatePriceList`](#updatepricelist) | PATCH | `/price-lists/{priceListId}` | setup | 1 | BO-009 |
 | product | [`checkBookingEligibility`](#checkbookingeligibility) | POST | `/eligibility-checks` | core | 1 | GST-007, WEB-006 |
-| product | [`getGroupPackageDefinition`](#getgrouppackagedefinition) | GET | `/products/{productId}/group-package` | core | 2 | BO-011, GST-072, WEB-031 |
+| product | [`getGroupPackageDefinition`](#getgrouppackagedefinition) | GET | `/products/{productId}/group-package` | core | 1 | BO-011, GST-072, WEB-031 |
 | product | [`getProduct`](#getproduct) | GET | `/products/{productId}` | core | 1 | BO-007, BO-008, BO-012, BO-014, EMP-034, GST-004 … |
 | product | [`getProductEligibilityRule`](#getproducteligibilityrule) | GET | `/products/{productId}/eligibility-rule` | core | 1 | BO-161, GST-004, WEB-004 |
 | product | [`listAlternativeCodes`](#listalternativecodes) | GET | `/products/{productId}/alternative-codes` | core | 1 | BO-007, BO-012, EMP-034, POS-002, POS-003, PTR-006 |
-| product | [`listGroupPackages`](#listgrouppackages) | GET | `/group-packages` | core | 2 | BO-268, GST-072, WEB-031 |
+| product | [`listGroupPackages`](#listgrouppackages) | GET | `/group-packages` | core | 1 | BO-268, GST-072, WEB-031 |
 | product | [`listProductVariants`](#listproductvariants) | GET | `/products/{productId}/variants` | core | 1 | BO-007, BO-008, BO-012, EMP-034, GST-008, GST-041 … |
 | product | [`listProducts`](#listproducts) | GET | `/products` | core | 1 | ANL-004, BO-007, BO-012, BO-013, BO-014, BO-094 … |
 | product | [`resolveProductByCode`](#resolveproductbycode) | GET | `/products/resolve` | core | 1 | BO-007, BO-012, EMP-034, POS-002, POS-003, PTR-006 |
 | product | [`setAlternativeCodes`](#setalternativecodes) | PUT | `/products/{productId}/alternative-codes` | setup | 1 | BO-007, BO-012 |
-| product | [`setGroupPackageDefinition`](#setgrouppackagedefinition) | PUT | `/products/{productId}/group-package` | setup | 2 | BO-011 |
+| product | [`setGroupPackageDefinition`](#setgrouppackagedefinition) | PUT | `/products/{productId}/group-package` | setup | 1 | BO-011 |
 | product | [`setProductEligibilityRule`](#setproducteligibilityrule) | PUT | `/products/{productId}/eligibility-rule` | setup | 1 | BO-161 |
 | product | [`updateProduct`](#updateproduct) | PATCH | `/products/{productId}` | core | 1 | BO-007, BO-008, BO-012, CMS-103 |
 | promotion | [`analysePromotionConflicts`](#analysepromotionconflicts) | GET | `/promotions/{promotionId}/conflicts` | core | 1 | BO-010, POS-002 |
@@ -92,7 +92,7 @@
 | promotion | [`publishPromotion`](#publishpromotion) | POST | `/promotions/{promotionId}/publish` | setup | 1 | ADM-141, BO-010 |
 | promotion | [`updatePromotion`](#updatepromotion) | PATCH | `/promotions/{promotionId}` | setup | 1 | BO-010 |
 | promotions | [`setPromotionVariants`](#setpromotionvariants) | PUT | `/promotions/{promotionId}/variants` | setup | 1 | ADM-226, BO-010 |
-| recommendation | [`recommendSeats`](#recommendseats) | POST | `/performances/{performanceId}/seat-recommendations` | core | 2 | BO-015, BO-019, BO-1001, BO-1002, BO-1039, GST-049 … |
+| recommendation | [`recommendSeats`](#recommendseats) | POST | `/performances/{performanceId}/seat-recommendations` | core | 1 | BO-015, BO-019, BO-1001, BO-1002, BO-1039, GST-049 … |
 
 ## Group: availability
 
@@ -102,16 +102,18 @@
 
 Every seat with its current state — available, held, sold, blocked or buffered.
 **Not offline-capable.** Seated inventory cannot be leased, so a terminal without a connection cannot sell seats.
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets the seat availability of a published performance, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
 |  |  |
 |---|---|
 | Permission | `PRODUCT_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
+| Guest callable | True |
 | Reads | `seating.seat`, `seating.seat_category`, `seating.seat_hold` |
 | Writes | - |
 | Called by | BO-015, BO-019, BO-1000, BO-1001, BO-1002, BO-1039, BO-1040, BO-986, BO-994, BO-995, BO-996, GST-049, POS-004, WEB-007 |
@@ -337,6 +339,8 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 
 **`GET /bundles/{bundleId}`**: Read a bundle with components and allocation
 
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets a published bundle, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_VIEW` |
@@ -346,6 +350,7 @@ A bundle is a product whose price differs from the sum of its parts. **The alloc
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
+| Guest callable | True |
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `promotions.allocation_component`, `promotions.bundle`, `promotions.bundle_choice_group`, `promotions.bundle_choice_option`, `promotions.bundle_component` |
 | Writes | - |
@@ -486,6 +491,7 @@ Use `since` to request a delta instead of a full bundle — a terminal on a slow
 **`GET /catalogue/bundles`**: List published catalogue bundles
 
 **A catalogue bundle is the signed snapshot of a venue's catalogue that terminals pull** (ADR-0013) — not `promotions.Bundle`, the sellable product whose price differs from the sum of its parts. `promotions.listBundles` lists those.
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets published bundles, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
 |  |  |
 |---|---|
@@ -496,6 +502,7 @@ Use `since` to request a delta instead of a full bundle — a terminal on a slow
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
+| Guest callable | True |
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.product`, `catalogue.published_bundle` |
 | Writes | - |
@@ -688,6 +695,7 @@ Components and allocation are immutable once the bundle has been sold. Historic 
 Display only. A terminal shows this to a guest but does not decide a sale on it — that is what leases are for. Under load this value is already stale by the time it renders.
 **Every performance of an event in a window, in one call** (decided 29 September, rev 3 REV3-1). A guest date-and-time step draws up to 64 time tiles at once, paged `timesPerPage` at a time (`white-label.BookingFlowConfig.timesPerPage`) with day-part chips and their counts, and one request per performance is 64 round trips before the first tile. So `eventId` with `from` and `to` returns the remaining count of every performance of the event starting in that window, ordered by `startsAt`. `from` and `to` are required with `eventId` and the window is at most 31 days, else `400`. Exactly one of `performanceId`, `channelCapacityId` or `eventId` is given.
 **The response is named** (`PerformanceAvailabilityPage` of `PerformanceAvailability`, rev 3 REV3-1), so screens bind to a schema rather than to an inline shape, and it is a `Page` like every list: a single `performanceId` is a one-page answer.
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets the availability of published products, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
 |  |  |
 |---|---|
@@ -698,6 +706,7 @@ Display only. A terminal shows this to a guest but does not decide a sale on it 
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
+| Guest callable | True |
 | Reads | `catalogue.channel_capacity`, `catalogue.inventory_hold`, `catalogue.performance` |
 | Writes | - |
 | Called by | GST-004, GST-007, GST-050, GST-058, KSK-004, KSK-005, KSK-015, POS-003, PTR-007, WEB-004, WEB-006 |
@@ -989,7 +998,7 @@ Includes lapsed terms. **A guest deciding whether to renew is comparing against 
 | Permission | `PRODUCT_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -1148,7 +1157,7 @@ Scoped to what is on sale at the venue and channel, so a guest never finds a pro
 | Permission | `CAPACITY_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `seating.seat_category` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `seating.seat_category`, `seating.seat_price_band` |
@@ -1436,6 +1445,7 @@ Up to fifty thousand at a time. Generation is asynchronous and the batch is expo
 **`GET /coupon-codes/{code}`**: Look up a code
 
 Called at point of sale before applying. Returns whether the code is valid, why not when it is not, and what it would give.
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets whether a code of a live, published promotion is valid and what it gives, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRICE_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
 |  |  |
 |---|---|
@@ -1446,6 +1456,7 @@ Called at point of sale before applying. Returns whether the code is valid, why 
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | primary |
+| Guest callable | True |
 | Reads | `promotions.coupon_code` |
 | Writes | - |
 | Called by | GST-037, WEB-010 |
@@ -1727,6 +1738,7 @@ Returns the applied discount **and the working** — which rules matched, which 
 Terminals evaluate locally from the catalogue bundle. This endpoint serves online channels and lets the back office test a rule before publishing it.
 **Reads `promotions.promotion_rule`**: a promotion whose `conditions.eligibilityRuleIds` names reusable eligibility rules is eligible only when each named rule holds (decided 29 September, writers pass).
 **Writes `promotions.promotion_evaluation_trace` only when it prices an order being confirmed.** The order service calls it with `orderId` when it prices an order for payment (createOrder, convertReservation); that call stores one trace row for the order: which promotions were evaluated, which were eligible, which applied in what order and why the others did not. A cart, till or back-office evaluation sends no `orderId` and stores nothing (decided 29 September, writers pass).
+**A guest does this within their own session** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-003; `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own cart, hold, order or payment in their own session. `PRICE_VIEW` is what a staff caller must hold to do it for a guest at a till or in the back office (ADR-0025).
 
 |  |  |
 |---|---|
@@ -1736,6 +1748,7 @@ Terminals evaluate locally from the catalogue bundle. This endpoint serves onlin
 | Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
+| Guest callable | True |
 | Reads | `cache:idempotency`, `catalogue.price_list`, `promotions.coupon_code`, `promotions.promotion`, `promotions.promotion_rule` |
 | Writes | `cache:idempotency`, `promotions.promotion_evaluation_trace` |
 | Called by | ADM-157, ADM-177, BO-010, KSK-006, POS-002, POS-021, POS-023, PTR-010, WEB-005, WEB-010 |
@@ -1994,6 +2007,8 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 
 **`GET /performances/{performanceId}`**: Read a performance
 
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets a published performance, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_VIEW` |
@@ -2003,6 +2018,7 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
+| Guest callable | True |
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.performance` |
 | Writes | - |
@@ -2099,7 +2115,7 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 | Permission | `PRODUCT_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -2141,6 +2157,8 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 
 **`GET /events/{eventId}/performances`**: List performances of an event
 
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets published performances, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_VIEW` |
@@ -2150,6 +2168,7 @@ When the performance's room is off, the answer is `state: notRequired` and the g
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
+| Guest callable | True |
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.performance`, `catalogue.product`, `catalogue.product_category` |
 | Writes | - |
@@ -2406,16 +2425,18 @@ The response carries `expiresAt` so the client can show a countdown. A selection
 Where seating rules apply, holding a seat may implicitly buffer its neighbours — those appear in `bufferedSeatIds`.
 
 **Seats per guest booking is a venue setting** (decided 29 September, rev 3 REV3-7). On a guest channel (Guest Web, Guest App), the seats in this request plus the seats the same guest already holds on the same performance may not exceed `VenueSettings.seating.maxSeatsPerGuestOrder` (default 10, bounds 1 to 50); above it the hold is refused with `422` `seat-limit-exceeded` and nothing is held. Staff and POS sales keep at most 10 seats per sale (audit R080 (c)), refused the same way.
+**A guest does this within their own session** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-003; `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own cart, hold, order or payment in their own session. `ORDER_CREATE` is what a staff caller must hold to do it for a guest at a till or in the back office (ADR-0025).
 
 |  |  |
 |---|---|
 | Permission | `ORDER_CREATE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Lock | rowExclusive |
+| Guest callable | True |
 | Reads | `cache:idempotency`, `seating.seat_hold` |
 | Writes | `cache:idempotency`, `platform.outbox`, `seating.seat_hold` |
 | Called by | BO-994, GST-049, POS-004, WEB-007 |
@@ -2474,7 +2495,7 @@ Where seating rules apply, holding a seat may implicitly buffer its neighbours �
 | Permission | `ORDER_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
@@ -2528,7 +2549,7 @@ Releases buffered neighbours alongside the held seats.
 | Permission | `ORDER_CREATE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Guest callable | True |
@@ -3088,7 +3109,7 @@ Checks a party's declared ages and heights against every product in the booking 
 | Permission | `PRODUCT_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3131,6 +3152,8 @@ Checks a party's declared ages and heights against every product in the booking 
 
 **`GET /products/{productId}`**: Read a product
 
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets a product that is published, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_VIEW` |
@@ -3140,6 +3163,7 @@ Checks a party's declared ages and heights against every product in the booking 
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
+| Guest callable | True |
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.product`, `catalogue.product_media` |
 | Writes | - |
@@ -3314,7 +3338,7 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 | Permission | `PRODUCT_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3361,6 +3385,8 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 
 **`GET /products/{productId}/variants`**: List generated variants
 
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets the published variants of a published product, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
 |  |  |
 |---|---|
 | Permission | `PRODUCT_VIEW` |
@@ -3370,6 +3396,7 @@ Partners and distributors use their own SKUs. Mapping them here means an inbound
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
+| Guest callable | True |
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.variant` |
 | Writes | - |
@@ -3415,6 +3442,7 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 **What a guest caller gets** (decided 29 September, rev 3 REV3-14). Products with `guestListing: bookable` that are on sale at the caller's channel, plus products with `guestListing: infoOnly` whose lifecycle is live, whether or not they are on sale, each carrying its `guestListing` and `notBookableLabel` so the screen shows the label and opens details instead of adding to the basket. `hidden` products are never returned to a guest, and `infoOnly` ones are left out when the venue's `BookingFlowConfig.showInfoOnly` is off. Staff and partner callers see every product, whatever its `guestListing`.
 **Category and tag filters** (decided 29 September, rev 3 REV3-16 and REV3-19). `categoryId` narrows to one category of the `listProductCategories` tree, so a guest can go from a category tile to that category's tickets; `segmentTag` narrows by tag, e.g. a surf level.
 **Help me choose filters the list** (decided 29 September, W4). `guidedAnswerIds` applies the filter of each chosen answer on the server; the guest screen offers *Show everything*, which is the same call without it. **A partner caller reads here** what is assigned to its channel (M17-04): partners never write products, prices or performances.
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets products that are published and on sale, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRODUCT_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
 |  |  |
 |---|---|
@@ -3425,6 +3453,7 @@ For guest, partner and back-office callers. **A point-of-sale terminal does not 
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
+| Guest callable | True |
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `catalogue.product`, `catalogue.product_category`, `catalogue.product_eligibility_rule`, `catalogue.product_media`, `whitelabel.guided_choice_answer` |
 | Writes | - |
@@ -3618,7 +3647,7 @@ Called on inbound distribution orders. Accepts a partner's own SKU and returns t
 | Permission | `PRODUCT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `catalogue.group_package` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
@@ -4117,6 +4146,8 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 
 **`GET /promotions/{promotionId}`**: Read a promotion
 
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets a live, published promotion, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRICE_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
 |  |  |
 |---|---|
 | Permission | `PRICE_VIEW` |
@@ -4126,6 +4157,7 @@ Created in `draft`. A draft promotion never evaluates — publishing is the act 
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
+| Guest callable | True |
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `promotions.promotion` |
 | Writes | - |
@@ -4209,6 +4241,8 @@ Also the enforcement surface for budget caps — a promotion may be configured t
 
 **`GET /promotions`**: List promotions
 
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets live, published promotions, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PRICE_VIEW` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
 |  |  |
 |---|---|
 | Permission | `PRICE_VIEW` |
@@ -4218,6 +4252,7 @@ Also the enforcement surface for budget caps — a promotion may be configured t
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
+| Guest callable | True |
 | Offline note | 24 August: servable from a local cache. |
 | Reads | `promotions.promotion` |
 | Writes | - |
@@ -4605,15 +4640,17 @@ BL-114. **Split by a stable hash of the subject, not at random per request** —
 
 Best available, best value, closest to stage, or accessible with companions.
 Returns contiguous groups where the party requires them — a family of four split across two rows is a complaint, not a booking.
+**A guest does this within their own session** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-003; `x-ticvai-guest-callable`): a guest needs no permission and acts only for themselves, on their own cart, hold, order or payment in their own session. `PRODUCT_VIEW` is what a staff caller must hold to do it for a guest at a till or in the back office (ADR-0025).
 
 |  |  |
 |---|---|
 | Permission | `PRODUCT_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
+| Guest callable | True |
 | Reads | `catalogue.performance` |
 | Writes | - |
 | Called by | BO-015, BO-019, BO-1001, BO-1002, BO-1039, GST-049, WEB-007 |
@@ -4683,7 +4720,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no | Added 20 August. |
+| id | uuid | yes | Added 20 August. |
 | channel | text | yes |  |
 | allocated_units | integer | yes |  |
 | sold_units | integer | no |  |
@@ -4823,7 +4860,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | product_id | text | no |  |
 | kind | text | yes |  |
 | max_participants | integer | yes | Pupils or children, e.g. |
@@ -5004,7 +5041,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | product_id | text | no |  |
 | min_age_years | integer | no |  |
 | max_age_years | integer | no |  |
@@ -5079,7 +5116,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | allocation_split_id | uuid | yes | The parent row. |
-| id | uuid | no | Added 20 August. |
+| id | uuid | yes | Added 20 August. |
 | variant_id | uuid | yes |  |
 | percentage | numeric | no |  |
 | fixed_amount | numeric(18,4) | no |  |
@@ -5117,7 +5154,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | label | text | yes | What the guest is asked. |
 | choose | integer | yes | How many options the guest picks. |
 | allow_duplicates | boolean | no | Whether the same option may be picked twice. |
@@ -5129,7 +5166,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | bundle_choice_group_id | uuid | yes | The parent row. |
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | variant_id | uuid | yes |  |
 | quantity | integer | no |  |
 | is_default | boolean | no |  |
@@ -5139,7 +5176,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | bundle_id | uuid | yes | The parent row. |
-| id | uuid | no | Added 20 August. |
+| id | uuid | yes | Added 20 August. |
 | variant_id | uuid | yes |  |
 | component_kind | text | no |  |
 | menu_item_id | uuid | no | The F&B menu item a fnbMenuItem component entitles the guest to (decided 29 September, MOB-4): the meal of a *meal combo with admission*. |
@@ -5305,7 +5342,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | promotion_id | uuid | no | Taken from the path. |
 | label | text | yes |  |
 | traffic_percent | integer | yes | Share of traffic. |
@@ -5360,7 +5397,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | seat_category_id | uuid | no |  |
 | code | text | yes | Unique within the category. |
 | display_label | text | yes |  |

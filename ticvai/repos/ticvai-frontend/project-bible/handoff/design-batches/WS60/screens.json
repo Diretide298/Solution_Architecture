@@ -206,19 +206,12 @@
        "kind": "dataTable",
        "label": "Every media design",
        "columns": [
-        "MediaDesignStudioCommandCenterView.templateId",
         "MediaDesignStudioCommandCenterView.templateName",
         "MediaDesignStudioCommandCenterView.mediaType",
         "MediaDesignStudioCommandCenterView.brand",
         "MediaDesignStudioCommandCenterView.venue",
-        "MediaDesignStudioCommandCenterView.productEventAssociation",
-        "MediaDesignStudioCommandCenterView.language",
-        "MediaDesignStudioCommandCenterView.version",
         "MediaDesignStudioCommandCenterView.effectiveFrom",
-        "MediaDesignStudioCommandCenterView.effectiveTo",
-        "MediaDesignStudioCommandCenterView.status",
-        "MediaDesignStudioCommandCenterView.owner",
-        "MediaDesignStudioCommandCenterView.lastModified"
+        "MediaDesignStudioCommandCenterView.status"
        ],
        "bindsTo": "MediaDesignStudioCommandCenterView",
        "operation": "listMediaDesign",
@@ -235,19 +228,14 @@
        "label": "The selected media design",
        "bindsTo": "MediaDesignStudioCommandCenterView",
        "columns": [
-        "MediaDesignStudioCommandCenterView.templateId",
         "MediaDesignStudioCommandCenterView.templateName",
         "MediaDesignStudioCommandCenterView.mediaType",
         "MediaDesignStudioCommandCenterView.brand",
         "MediaDesignStudioCommandCenterView.venue",
         "MediaDesignStudioCommandCenterView.productEventAssociation",
         "MediaDesignStudioCommandCenterView.language",
-        "MediaDesignStudioCommandCenterView.version",
         "MediaDesignStudioCommandCenterView.effectiveFrom",
-        "MediaDesignStudioCommandCenterView.effectiveTo",
-        "MediaDesignStudioCommandCenterView.status",
-        "MediaDesignStudioCommandCenterView.owner",
-        "MediaDesignStudioCommandCenterView.lastModified"
+        "MediaDesignStudioCommandCenterView.status"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Primary action”, “Digital”, “Print”, “Wallet”, “Physical”.",
        "provenance": "pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Each template should show"
@@ -579,7 +567,7 @@
   "name": "PDF, Printable & POS Ticket Designer",
   "module": "Access & Venue",
   "requiresModule": "access",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Ticket_Media___Credential_Management_Reference.pdf",
    "board": "2",

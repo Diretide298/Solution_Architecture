@@ -1021,9 +1021,6 @@
         "PartnerStatementAccountActivityView.date",
         "PartnerStatementAccountActivityView.transactionType",
         "PartnerStatementAccountActivityView.reference",
-        "PartnerStatementAccountActivityView.orderInvoice",
-        "PartnerStatementAccountActivityView.debit",
-        "PartnerStatementAccountActivityView.credit",
         "PartnerStatementAccountActivityView.runningBalance",
         "PartnerStatementAccountActivityView.dueDate",
         "PartnerStatementAccountActivityView.status"
@@ -1048,7 +1045,6 @@
         "PartnerStatementAccountActivityView.reference",
         "PartnerStatementAccountActivityView.orderInvoice",
         "PartnerStatementAccountActivityView.debit",
-        "PartnerStatementAccountActivityView.credit",
         "PartnerStatementAccountActivityView.runningBalance",
         "PartnerStatementAccountActivityView.dueDate",
         "PartnerStatementAccountActivityView.status"
@@ -1267,7 +1263,9 @@
    "params": [
     {
      "name": "caseId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPartnerDisputeCase` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

@@ -126,9 +126,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-014` | Ticket Transfer | A | 5 | 18 | 6 | 5 | 4 | 0 | guest | notStarted (client-verified) |
+| `GST-014` | Ticket Transfer | A | 5 | 16 | 6 | 5 | 4 | 0 | guest | notStarted (client-verified) |
 | `GST-016` | My Reservations | A | 0 | 8 | 6 | 1 | 2 | 0 | guest | notStarted (client-verified) |
-| `GST-017` | Reservation Details | A | 0 | 6 | 5 | 1 | 3 | 0 | guest | notStarted (client-verified) |
+| `GST-017` | Reservation Details | A | 0 | 3 | 5 | 1 | 3 | 0 | guest | notStarted (client-verified) |
 | `GST-044` | Multi-Currency & Pricing | A | 1 | 27 | 6 | 12 | 2 | 4 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch

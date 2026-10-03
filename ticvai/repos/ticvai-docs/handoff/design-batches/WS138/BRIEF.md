@@ -192,7 +192,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-769` | Schedule & Trigger Rules | B–D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `BO-770` | Campaign Approval Workflow | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-771` | Budget, Goals & Forecast | B–D | 0 | 0 | 6 | 7 | 1 | 0 | — | notStarted (—) |
-| `BO-772` | A/B & AI Optimization | B–D | 0 | 0 | 6 | 26 | 0 | 0 | — | notStarted (—) |
+| `BO-772` | A/B & AI Optimization | A | 0 | 0 | 6 | 26 | 0 | 0 | — | notStarted (—) |
 | `BO-773` | Attribution & Audit | B–D | 0 | 0 | 6 | 6 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch

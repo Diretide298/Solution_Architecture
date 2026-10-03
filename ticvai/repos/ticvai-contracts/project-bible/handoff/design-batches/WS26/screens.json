@@ -532,7 +532,7 @@
     "id": "formSetServiceQueueDefinition",
     "component": "modal",
     "trigger": "Save service queue definition",
-    "body": "**Collects what `setServiceQueueDefinition` sends before it is called.** Required: `id`, `code`, `name`, `isActive`. Optional: `overflowWaitSeconds`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setServiceQueueDefinition` sends before it is called.** Required: `code`, `name`, `isActive`. Optional: `overflowWaitSeconds`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "ServiceQueue",
     "confirm": {
      "label": "Save service queue definition",
@@ -541,12 +541,10 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "code",
       "name",
       "isActive",
-      "overflowWaitSeconds",
-      "scopePath"
+      "overflowWaitSeconds"
      ]
     },
     "provenance": "contract marketing-crm.yaml PUT /service-queues"
@@ -1099,7 +1097,9 @@
    "params": [
     {
      "name": "caseId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `updateCase` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

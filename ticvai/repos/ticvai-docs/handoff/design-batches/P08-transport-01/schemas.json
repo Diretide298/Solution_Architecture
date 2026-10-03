@@ -393,10 +393,16 @@
    "passTypeId": {
     "$ref": "../shared/common.yaml#/components/schemas/Id"
    },
+   "travelAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "**When the trip is travelled** (the departure's time; for a pass, its first valid day). The fare table in force at this instant prices the quote (CHG-RUL-012). Default `at`, else now.\n"
+   },
    "at": {
     "type": "string",
     "format": "date-time",
-    "description": "The sale instant the fare table is read at. Default now."
+    "deprecated": true,
+    "description": "Deprecated on 3 October (CHG-RUL-012): quotes price at travel time, so send `travelAt`. Kept for clients built at r1; read as `travelAt` when `travelAt` is absent.\n"
    }
   }
  },
@@ -418,6 +424,29 @@
      },
      "routeId": {
       "$ref": "../shared/common.yaml#/components/schemas/Id"
+     },
+     "effectiveTo": {
+      "type": "string",
+      "format": "date-time",
+      "nullable": true,
+      "readOnly": true,
+      "description": "When the next version takes over; null when none is set (CHG-RUL-012). Versions of a route never overlap: one table is in force at any instant.\n"
+     },
+     "upcoming": {
+      "type": "object",
+      "nullable": true,
+      "readOnly": true,
+      "x-ticvai-persisted": false,
+      "description": "The next version, set and not yet in force (CHG-RUL-012); null when none.",
+      "properties": {
+       "id": {
+        "$ref": "../shared/common.yaml#/components/schemas/Id"
+       },
+       "effectiveFrom": {
+        "type": "string",
+        "format": "date-time"
+       }
+      }
      }
     }
    }

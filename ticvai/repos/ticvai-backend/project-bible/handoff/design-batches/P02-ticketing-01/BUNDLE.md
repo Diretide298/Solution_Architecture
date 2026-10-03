@@ -126,9 +126,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-014` | Ticket Transfer | A | 5 | 18 | 6 | 5 | 4 | 0 | guest | notStarted (client-verified) |
+| `GST-014` | Ticket Transfer | A | 5 | 16 | 6 | 5 | 4 | 0 | guest | notStarted (client-verified) |
 | `GST-016` | My Reservations | A | 0 | 8 | 6 | 1 | 2 | 0 | guest | notStarted (client-verified) |
-| `GST-017` | Reservation Details | A | 0 | 6 | 5 | 1 | 3 | 0 | guest | notStarted (client-verified) |
+| `GST-017` | Reservation Details | A | 0 | 3 | 5 | 1 | 3 | 0 | guest | notStarted (client-verified) |
 | `GST-044` | Multi-Currency & Pricing | A | 1 | 27 | 6 | 12 | 2 | 4 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch
@@ -148,8 +148,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Ticketing · wave 2 · needs the `ticketing` module |
-| Block | Block A · ticket #18141 (APP-MOB-GST-014) |
+| Module | Ticketing · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-MOB-GST-014 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listOrders` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -203,8 +203,6 @@ Errors to draw in the form: 409 Ticket already redeemed (`alreadyRedeemed`), alr
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
 | Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Lines | list or chips (count when long) | — |
-| Created at | 1 Oct 2026, 14:30 | — |
 
 **Tickets sent to you** (banner, from `claimTicketTransfer`): When the app is opened from a transfer link: Accept claims the tickets (`claimTicketTransfer`) with the link's token; nothing is typed.
 
@@ -325,7 +323,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (5), with its required mark, default, format and its error state (409, 410).
-- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-014?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Transfer tickets.
 - [ ] Every transition is wired: `GST-001`.
@@ -344,8 +342,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Ticketing · wave 2 · needs the `ticketing` module |
-| Block | Block A · ticket #18134 (APP-MOB-GST-016) |
+| Module | Ticketing · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-MOB-GST-016 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listReservations` reads the population and `getReservation` reads one of them — list, select, act |
@@ -506,8 +504,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Ticketing · wave 2 · needs the `ticketing` module |
-| Block | Block A · ticket #18135 (APP-MOB-GST-017) |
+| Module | Ticketing · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-MOB-GST-017 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): `getReservation` reads one record and nothing reads a population — the screen is about that one thing |
@@ -533,12 +531,9 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
 | Status | chip: Held, Converted, Expired, Cancelled | — |
 | Lines | list or chips (count when long) | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
-| Converted order | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
@@ -635,7 +630,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (3 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-017?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Cancel reservation.
 - [ ] Every transition is wired: `GST-001`.
@@ -653,8 +648,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Ticketing · wave 2 · needs the `ticketing` module |
-| Block | Block A · ticket #18130 (APP-MOB-GST-044) |
+| Module | Ticketing · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-MOB-GST-044 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listFxRates` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

@@ -126,16 +126,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ANL-041` | Reporting Governance Command Center | B–D | 0 | 36 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-042` | Report Scheduler | B–D | 23 | 0 | 5 | 4 | 1 | 0 | — | notStarted (—) |
-| `ANL-043` | Subscription Manager | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ANL-044` | Distribution & Delivery Configuration | B–D | 14 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
-| `ANL-045` | Export & Download Center | B–D | 0 | 22 | 6 | 5 | 1 | 0 | — | notStarted (—) |
-| `ANL-046` | Report API & Data Delivery Manager | B–D | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-047` | Report Access & Sharing Control | B–D | 39 | 24 | 6 | 7 | 0 | 0 | — | notStarted (—) |
-| `ANL-048` | Delivery Monitoring & Failure Management | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-049` | Report Audit Trail & Compliance | B–D | 16 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-050` | Retention, Archive & Governance Policy | B–D | 14 | 0 | 5 | 1 | 0 | 0 | — | notStarted (—) |
+| `ANL-041` | Reporting Governance Command Center | D | 0 | 36 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-042` | Report Scheduler | D | 23 | 0 | 5 | 4 | 1 | 0 | — | notStarted (—) |
+| `ANL-043` | Subscription Manager | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-044` | Distribution & Delivery Configuration | D | 14 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-045` | Export & Download Center | D | 0 | 22 | 6 | 5 | 1 | 0 | — | notStarted (—) |
+| `ANL-046` | Report API & Data Delivery Manager | D | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-047` | Report Access & Sharing Control | B | 39 | 18 | 6 | 7 | 0 | 0 | — | notStarted (—) |
+| `ANL-048` | Delivery Monitoring & Failure Management | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-049` | Report Audit Trail & Compliance | D | 16 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-050` | Retention, Archive & Governance Policy | B | 14 | 0 | 5 | 1 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -155,7 +155,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-041 |
 | Who uses it | venue staff holding `REPORT_VIEW_TENANT`, `REPORT_VIEW_VENUE` (2 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -359,7 +359,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-042 |
 | Who uses it | venue staff holding `REPORT_SCHEDULE`, `REPORT_VIEW_VENUE` (2 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Frequency Options) and no display directory — it is settings, not a population |
@@ -553,7 +553,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-043 |
 | Who uses it | venue staff holding `REPORT_SCHEDULE`, `REPORT_VIEW_VENUE` (2 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -716,7 +716,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-044 |
 | Who uses it | venue staff holding `REPORT_SCHEDULE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Define; Configure) and no display directory — it is settings, not a population |
@@ -866,7 +866,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-045 |
 | Who uses it | venue staff holding `REPORT_EXPORT` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1047,7 +1047,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-046 |
 | Who uses it | venue staff holding `REPORT_VIEW_VENUE` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -1180,7 +1180,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-ANALYTICS-ANL-047 |
 | Who uses it | venue staff holding `PERMISSION_MANAGE`, `PERMISSION_VIEW`, `REPORT_VIEW_TENANT` (1 configure, 1 read, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAuthorisationPolicies` reads the population and the selected policy is edited in place — list, select, act. Chosen 2 October 2026 (CHG-SOT-013); the pack gave no directory. |
@@ -1211,7 +1211,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: New access policy** (drawer, opened by *New access policy*; *Create access policy* calls `createAuthorisationPolicy`, *Cancel* sends nothing)
 
-**Collects what `createAuthorisationPolicy` sends.** Required: `code`, `name`, `effect` (permit or deny; deny wins). Optional: `description`, `permissions` (the reporting permissions it speaks to), `conditions`, `combining`, `priority`, `scopePath` (the operating area), `appliesToRoleIds` (the groups), `effectiveFrom`, `effectiveTo`. Never `id`, `status` or `version`: the server sets them. Dismissing sends nothing.
+**Collects what `createAuthorisationPolicy` sends.** Required: `code`, `name`, `effect` (permit or deny; deny wins). Optional: `description`, `permissions` (the reporting permissions it speaks to), `conditions`, `combining`, `priority`, `scopePath` (the operating area), `appliesToRoleIds` (the groups), `effectiveFrom`, `effectiveTo`. Never or: the server sets them. Dismissing sends nothing. Not asked, because the server sets them (readOnly in the contract): `id`, `status`, `version` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1286,15 +1286,9 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Description | text | — |
 | Effect | chip: Permit, Deny | Deny wins over permit when two policies disagree. 3.3.32 asks for least-privilege, and a permit that can override a deny is not … |
 | Permissions | list or chips (count when long) | Which permissions this policy speaks to. A policy with an empty list speaks to all of them, which is powerful enough that it is worth being … |
-| Conditions | list or chips (count when long) | — |
-| Combining | chip: All must match, Any may match | — |
 | Priority | 1,234 | — |
-| Applies to roles | list or chips (count when long) | — |
-| Scope path | text | 3.3.40 to 3.3.43. Tenant, venue and cross-venue policies are one mechanism, because `scope_path` is prefix-comparable — `uae.dubai` … |
 | Status | chip: Draft, Pending approval, Active, Suspended, Retired | Moved only by `setAuthorisationPolicyState`. A policy is created as a `draft`, and a status sent in a create or update body is ignored — … |
-| Version | 1,234 | Set by the server; every `updateAuthorisationPolicy` writes a new version. |
 | Effective from | 1 Oct 2026, 14:30 | — |
-| Effective to | 1 Oct 2026, 14:30 | — |
 
 **Sharing and export rules** (detail panel, from `getAnalyticsGovernancePolicy`): Read-only here; edited on ANL-070 by holders of `REPORT_GOVERNANCE_MANAGE` (DEC-225, CHG-FUP-007). **Sharing, export and subscription cannot bypass the permission model** (the pack's acceptance condition).
 
@@ -1325,7 +1319,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the report access sharing untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No report access policy yet: reports follow the roles' own reporting permissions alone. Offers New access policy (`createAuthorisationPolicy`) to narrow or widen that by group, operating area or user; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the status filter, and the access policies are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PERMISSION_VIEW`, which `listAuthorisationPolicies` requires, and names that permission. **Never an empty table** — that reads as *there is no data*. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PERMISSION_VIEW`, which `listAuthorisationPolicies` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_TENANT` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PERMISSION_MANAGE` for … |
 | Offline (`?state=offline`) | online only |
 
 #### Edge cases to draw
@@ -1359,7 +1353,7 @@ listAuthorisationPolicies (AuthorisationPolicy):
 - `updateAuthorisationPolicy` → `PERMISSION_MANAGE` (configure) · staff
 - `getAnalyticsGovernancePolicy` → `REPORT_VIEW_TENANT` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `PERMISSION_VIEW`, which `listAuthorisationPolicies` requires, and names that permission. **Never an empty table** — that reads as *there is no data*.
+**A refused user sees:** Shown when the caller lacks `PERMISSION_VIEW`, which `listAuthorisationPolicies` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_TENANT` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PERMISSION_MANAGE` for …
 
 Screen guard: `PERMISSION_VIEW`
 
@@ -1398,7 +1392,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (39), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-047?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: New access policy, Save access policy.
 - [ ] Every transition is wired: `ANL-041`.
@@ -1417,7 +1411,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-048 |
 | Who uses it | venue staff holding `REPORT_VIEW_TENANT` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1612,7 +1606,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-049 |
 | Who uses it | venue staff holding `REPORT_VIEW_TENANT` (1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Capture) and no display directory — it is settings, not a population |
@@ -1767,7 +1761,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-ANALYTICS-ANL-050 |
 | Who uses it | venue staff holding `TENANT_CONFIGURE`, `TENANT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure retention separately for; Define) and no display directory — it is settings, not a population |

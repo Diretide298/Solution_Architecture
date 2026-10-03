@@ -1,6 +1,6 @@
 # P06-operations-01 — P06 · Operations (1 of 5)
 
-**10 screens · 47 operations · 48 schemas · 19 permissions**
+**10 screens · 47 operations · 49 schemas · 19 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -149,16 +149,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `EMP-001` | Sign in | B–D | 14 | 43 | 9 | 5 | 3 | 0 | — | notStarted (generated) |
-| `EMP-002` | Select venue & role | B–D | 1 | 11 | 6 | 3 | 1 | 5 | — | notStarted (generated) |
-| `EMP-003` | Home — on duty | B–D | 31 | 70 | 6 | 11 | 3 | 0 | — | notStarted (generated) |
-| `EMP-009` | End shift | B–D | 14 | 63 | 6 | 1 | 1 | 6 | — | notStarted (generated) |
-| `EMP-010` | Scan — ready | B–D | 17 | 0 | 6 | 46 | 1 | 0 | — | notStarted (generated) |
-| `EMP-004` | Task list | B–D | 4 | 44 | 6 | 15 | 6 | 0 | — | notStarted (generated) |
-| `EMP-005` | Task detail | B–D | 40 | 47 | 6 | 22 | 4 | 0 | — | notStarted (generated) |
-| `EMP-006` | Raise a task | B–D | 63 | 44 | 6 | 33 | 4 | 0 | — | notStarted (generated) |
-| `EMP-007` | Handover notes | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `EMP-008` | Shift summary | B–D | 4 | 56 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
+| `EMP-001` | Sign in | A | 14 | 43 | 9 | 5 | 3 | 0 | — | notStarted (generated) |
+| `EMP-002` | Select venue & role | B | 1 | 5 | 6 | 3 | 1 | 5 | — | notStarted (generated) |
+| `EMP-003` | Home — on duty | D | 35 | 24 | 6 | 11 | 3 | 0 | — | notStarted (generated) |
+| `EMP-009` | End shift | C | 17 | 23 | 6 | 1 | 1 | 6 | — | notStarted (generated) |
+| `EMP-010` | Scan — ready | C | 17 | 0 | 6 | 46 | 1 | 0 | — | notStarted (generated) |
+| `EMP-004` | Task list | A | 4 | 14 | 6 | 15 | 6 | 0 | — | notStarted (generated) |
+| `EMP-005` | Task detail | A | 40 | 17 | 6 | 22 | 4 | 0 | — | notStarted (generated) |
+| `EMP-006` | Raise a task | D | 63 | 14 | 6 | 33 | 4 | 0 | — | notStarted (generated) |
+| `EMP-007` | Handover notes | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `EMP-008` | Shift summary | C | 4 | 24 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

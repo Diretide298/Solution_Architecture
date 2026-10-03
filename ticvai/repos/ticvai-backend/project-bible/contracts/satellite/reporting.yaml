@@ -882,6 +882,11 @@ paths:
       - staff
       x-ticvai-read-routing: analytical
       summary: List executions
+      description: '**Report runs are visible to everyone with `REPORT_VIEW_VENUE` in the venue scope** (Chinmay,
+        3 October 2026, Block A business rules; CHG-RUL-006). `mineOnly` narrows the list to the caller''s own runs;
+        `getReportExecution` and `getReportResult` read any run this list shows.
+
+        '
       tags:
       - execution
       x-ticvai-permission: REPORT_VIEW_VENUE
@@ -900,10 +905,12 @@ paths:
           $ref: '#/components/schemas/ExecutionStatus'
       - name: mineOnly
         in: query
-        description: '**Who sees other people''s runs (decided 28 September, audit R158)**: venue managers
-          see their venue''s runs. With `mineOnly` false, runs by other principals are returned for the
-          venues where the caller holds `REPORT_MANAGE`, and nowhere else; a caller without it gets only
-          their own runs whatever this says.
+        description: '**A filter, not a permission** (Chinmay, 3 October 2026, Block A business rules;
+          CHG-RUL-006, replacing the 28 September rule of audit R158). `true` lists only the caller''s own runs;
+          `false` lists every run in the caller''s venue scope, whoever started it. Seeing other people''s runs
+          needs only this operation''s `REPORT_VIEW_VENUE` at the venue; `REPORT_MANAGE` adds editing and
+          scheduling (`updateReport`, `createReportSchedule`), not visibility. Runs of a report the caller may
+          not read (its module not licensed, or its data outside the caller''s scope) are never listed.
 
           '
         schema:
@@ -1401,6 +1408,7 @@ paths:
         - "P09 ADM-031 Security & Compliance Dashboard"
         - "P16 ANL-021 Dashboard Library"
         - "P16 ANL-022 Dashboard Creation Wizard"
+        - "P16 ANL-023 Drag-and-Drop Dashboard Canvas"
         - "P16 ANL-053 AI-Generated Dashboard Studio"
       x-ticvai-audience:
       - staff
@@ -1542,6 +1550,14 @@ paths:
         body leaves out is removed. A tile id that belongs to another dashboard is `400`. An unknown
         `dashboardId` is `404` — `createDashboard` makes dashboards.
 
+
+        **The first Save creates, every later Save updates, and the refresh budget is checked on both**
+        (Chinmay, 3 October 2026, Block A business rules, ANL-023; CHG-RUL-008). A canvas with no `dashboardId`
+        yet calls `createDashboard`; from then on it calls this. The tiles'' refreshes per minute, summed, may
+        not exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (the tenant default for a
+        tenant-wide dashboard; proposed 24, audit R094), exactly as on create: otherwise `400` and nothing is
+        saved, so an update is not the way round the budget.
+
         '
       tags:
       - dashboard
@@ -1567,6 +1583,16 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Dashboard'
+        '400':
+          description: The tiles' refreshes per minute exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute`
+            (proposed default 24, audit R094), as on `createDashboard` (CHG-RUL-008); or a tile id belongs to
+            another dashboard.
+          x-ticvai-problem-types:
+          - refresh-budget-exceeded
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
         '409':
           description: '**Moving a dashboard to a module the caller is not entitled to.** The same
             guard as `createDashboard` — without it, an update would be the way round the create

@@ -342,6 +342,35 @@
   "requestBody": null,
   "responds": "RestaurantWaitlist"
  },
+ "listBookableOutlets": {
+  "method": "GET",
+  "path": "/venues/{venueId}/bookable-outlets",
+  "contract": "fnb",
+  "summary": "The restaurants a guest can book a table at",
+  "permission": null,
+  "offlineCapable": false,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "venue",
+  "parameters": [
+   {
+    "name": "date",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
  "listDeliveryLocations": {
   "method": "GET",
   "path": "/venues/{venueId}/delivery-locations",
@@ -434,6 +463,40 @@
     "name": "date",
     "in": "query",
     "required": false
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   },
+   {
+    "name": null,
+    "in": null,
+    "required": null
+   }
+  ],
+  "requestBody": null,
+  "responds": "Page"
+ },
+ "listMyTableReservations": {
+  "method": "GET",
+  "path": "/me/table-reservations",
+  "contract": "fnb",
+  "summary": "The guest's own table bookings and waitlist places",
+  "permission": null,
+  "offlineCapable": true,
+  "conflictPolicy": "serverWins",
+  "scopeLevel": "tenant",
+  "parameters": [
+   {
+    "name": "include",
+    "in": "query",
+    "required": null
+   },
+   {
+    "name": "upcomingOnly",
+    "in": "query",
+    "required": null
    },
    {
     "name": null,

@@ -251,11 +251,15 @@
    "params": [
     {
      "name": "instanceId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `actOnWorkflowInstance` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "applicationId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAccreditationApplications` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -349,7 +353,10 @@
      "to": "BO-635",
      "trigger": "Back to Accreditation Review Queue",
      "provenance": "structural — pack board 3 wiring, 19 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "applicationId"
+     ]
     }
    ]
   },
@@ -477,7 +484,9 @@
     },
     {
      "name": "documentId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getAccreditationApplication`; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -950,7 +959,10 @@
      "to": "BO-635",
      "trigger": "Back to Accreditation Review Queue",
      "provenance": "structural — pack board 3 wiring, 19 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "applicationId"
+     ]
     }
    ]
   },
@@ -1184,7 +1196,9 @@
    "params": [
     {
      "name": "requestId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `escalateApprovalRequest` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

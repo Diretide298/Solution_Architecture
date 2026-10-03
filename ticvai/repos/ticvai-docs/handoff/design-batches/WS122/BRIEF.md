@@ -119,16 +119,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-529` | AI Human Oversight Command Center | B–D | 8 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
-| `ADM-530` | AI Approval Requirement & Routing Configuration | B–D | 32 | 26 | 7 | 56 | 1 | 3 | — | notStarted (—) |
-| `ADM-531` | AI Approval Review Workspace | B–D | 8 | 6 | 7 | 2 | 2 | 3 | — | notStarted (—) |
-| `ADM-532` | Conditional Approval & Approval Conditions | B–D | 6 | 66 | 7 | 8 | 2 | 3 | — | notStarted (—) |
-| `ADM-533` | Human Review, Challenge & AI Clarification Workspace | B–D | 6 | 22 | 7 | 12 | 1 | 0 | — | notStarted (—) |
-| `ADM-534` | Escalation, Delegation & Approval SLA Management | B–D | 31 | 52 | 7 | 5 | 2 | 3 | — | notStarted (—) |
-| `ADM-535` | Live AI Execution Oversight & Human Intervention | B–D | 11 | 26 | 7 | 1 | 3 | 0 | — | notStarted (—) |
-| `ADM-536` | Human Override & Manual Control Center | A | 12 | 38 | 7 | 5 | 1 | 0 | — | notStarted (—) |
-| `ADM-537` | Approval & Intervention History / Decision Timeline | B–D | 8 | 6 | 7 | 5 | 1 | 3 | — | notStarted (—) |
-| `ADM-538` | Human Oversight Workflow Simulator & Readiness Center | B–D | 13 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-529` | AI Human Oversight Command Center | D | 8 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-530` | AI Approval Requirement & Routing Configuration | D | 32 | 26 | 7 | 56 | 1 | 3 | — | notStarted (—) |
+| `ADM-531` | AI Approval Review Workspace | D | 8 | 6 | 7 | 2 | 2 | 3 | — | notStarted (—) |
+| `ADM-532` | Conditional Approval & Approval Conditions | D | 6 | 66 | 7 | 8 | 2 | 3 | — | notStarted (—) |
+| `ADM-533` | Human Review, Challenge & AI Clarification Workspace | D | 6 | 22 | 7 | 12 | 1 | 0 | — | notStarted (—) |
+| `ADM-534` | Escalation, Delegation & Approval SLA Management | B | 31 | 52 | 7 | 5 | 2 | 3 | — | notStarted (—) |
+| `ADM-535` | Live AI Execution Oversight & Human Intervention | D | 11 | 26 | 7 | 1 | 3 | 0 | — | notStarted (—) |
+| `ADM-536` | Human Override & Manual Control Center | D | 12 | 38 | 7 | 5 | 1 | 0 | — | notStarted (—) |
+| `ADM-537` | Approval & Intervention History / Decision Timeline | D | 8 | 6 | 7 | 5 | 1 | 3 | — | notStarted (—) |
+| `ADM-538` | Human Oversight Workflow Simulator & Readiness Center | D | 13 | 6 | 7 | 1 | 0 | 0 | — | notStarted (—) |
 
 ## Design inputs from the client meetings
 

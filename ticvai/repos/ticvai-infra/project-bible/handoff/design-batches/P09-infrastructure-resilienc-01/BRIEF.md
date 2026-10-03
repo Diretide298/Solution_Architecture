@@ -96,10 +96,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-014` | Auto-Scaling Configuration | B–D | 0 | 51 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-030` | Infrastructure Sizing & Scaling Policy | B–D | 8 | 13 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-033` | Backup & DR Status | B–D | 0 | 30 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-034` | Archival Job Monitor | B–D | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-014` | Auto-Scaling Configuration | B | 0 | 43 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-030` | Infrastructure Sizing & Scaling Policy | B | 8 | 13 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-033` | Backup & DR Status | B | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-034` | Archival Job Monitor | B | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

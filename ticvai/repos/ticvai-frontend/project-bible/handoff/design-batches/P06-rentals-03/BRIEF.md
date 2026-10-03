@@ -100,16 +100,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `EMP-091` | Rental Return Command Center | B–D | 2 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
-| `EMP-092` | Return Scan & Rental Retrieval | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-093` | Return Summary & Actual Return Time | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `EMP-094` | Post-Rental Condition Inspection | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-095` | Before vs After Condition Comparison | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-096` | Damage Assessment & Charge Workflow | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-097` | Partial Return & Missing Equipment | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-098` | Late Fees, Damage Fees & Final Settlement | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `EMP-099` | Deposit Release, Capture & Customer Confirmation | B–D | 0 | 7 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `EMP-100` | Return Completion & Equipment Disposition | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-091` | Rental Return Command Center | D | 2 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `EMP-092` | Return Scan & Rental Retrieval | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-093` | Return Summary & Actual Return Time | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `EMP-094` | Post-Rental Condition Inspection | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-095` | Before vs After Condition Comparison | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-096` | Damage Assessment & Charge Workflow | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-097` | Partial Return & Missing Equipment | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-098` | Late Fees, Damage Fees & Final Settlement | D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `EMP-099` | Deposit Release, Capture & Customer Confirmation | D | 0 | 7 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `EMP-100` | Return Completion & Equipment Disposition | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

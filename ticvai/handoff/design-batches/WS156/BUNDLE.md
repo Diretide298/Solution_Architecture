@@ -212,7 +212,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 - → `BO-867` Resource Time-Slot Configuration: *Resource Time-Slot Configuration*; carries `resourceId`
 - → `BO-868` Advance Reservation Management: *Advance Reservation Management*; carries `bookingId`
 - → `BO-869` Recurring Reservation Configuration: *Recurring Reservation Configuration*; carries `bookingId`
-- → `BO-870` Operational Time & Resource Blocking: *Operational Time & Resource Blocking*
+- → `BO-870` Operational Time & Resource Blocking: *Operational Time & Resource Blocking*; carries `blockId`
 - → `BO-871` Multi-Event Resource Planning: *Multi-Event Resource Planning*
 - → `BO-872` Smart Assignment & Drag-and-Drop Reallocation: *Smart Assignment & Drag-and-Drop Reallocation*; carries `bookingId`
 
@@ -492,8 +492,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block A · ticket #20730 (APP-SETUP-BO-866) |
+| Module | Rentals · wave 1 · needs the `resources` module |
+| Block | Block A · task APP-SETUP-BO-866 |
 | Who uses it | venue staff holding `RESOURCE_CONFIGURE`, `RESOURCE_MANAGE`, `RESOURCE_VIEW` (2 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Administrators shall configure; Availability may be configured using) and no display directory — it is settings, not a population |
@@ -1183,8 +1183,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block A · ticket #20710 (APP-SETUP-BO-870) |
+| Module | Rentals · wave 1 · needs the `resources` module |
+| Block | Block A · task APP-SETUP-BO-870 |
 | Who uses it | venue staff holding `RESOURCE_MANAGE`, `RESOURCE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Users shall configure) and no display directory — it is settings, not a population |

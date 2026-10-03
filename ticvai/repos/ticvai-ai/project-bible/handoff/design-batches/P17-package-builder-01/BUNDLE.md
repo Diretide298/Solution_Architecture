@@ -96,13 +96,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SGN-011` | Recommended Package Overview | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `SGN-012` | Commercial Model & Tier Selection | B–D | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
-| `SGN-013` | Module Marketplace | B–D | 0 | 18 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `SGN-014` | AI Module & Package Recommendations | B–D | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `SGN-015` | Module Detail & Commercial Treatment | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `SGN-016` | Module Dependency & Compatibility Manager | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `SGN-017` | Add-Ons, Capacity & Commercial Options | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `SGN-011` | Recommended Package Overview | B | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `SGN-012` | Commercial Model & Tier Selection | B | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
+| `SGN-013` | Module Marketplace | B | 0 | 18 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `SGN-014` | AI Module & Package Recommendations | B | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `SGN-015` | Module Detail & Commercial Treatment | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `SGN-016` | Module Dependency & Compatibility Manager | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `SGN-017` | Add-Ons, Capacity & Commercial Options | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -122,7 +122,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P17 TICVAI Sign-up (web) |
 | Module | Package Builder · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-SIGNUP-SGN-011 |
 | Who uses it | public staff holding `PLATFORM_PLAN_MANAGE` (1 configure) |
 | Device and orientation | This is a public marketing and sign-up web flow, 1440 desktop and 390 phone widths, in TICVAI's own brand. · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -239,7 +239,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P17 TICVAI Sign-up (web) |
 | Module | Package Builder · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-SIGNUP-SGN-012 |
 | Who uses it | public staff holding `PLATFORM_PLAN_MANAGE`, `PLATFORM_TENANT_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is a public marketing and sign-up web flow, 1440 desktop and 390 phone widths, in TICVAI's own brand. · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -374,7 +374,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P17 TICVAI Sign-up (web) |
 | Module | Package Builder · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-SIGNUP-SGN-013 |
 | Who uses it | public staff holding `PLATFORM_PLAN_MANAGE` (1 configure) |
 | Device and orientation | This is a public marketing and sign-up web flow, 1440 desktop and 390 phone widths, in TICVAI's own brand. · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Each module displays) and no metric row |
@@ -529,7 +529,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P17 TICVAI Sign-up (web) |
 | Module | Package Builder · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-SIGNUP-SGN-014 |
 | Who uses it | public staff holding `PLATFORM_PLAN_MANAGE` (1 configure) |
 | Device and orientation | This is a public marketing and sign-up web flow, 1440 desktop and 390 phone widths, in TICVAI's own brand. · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Each recommendation shows) and no metric row |
@@ -680,7 +680,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P17 TICVAI Sign-up (web) |
 | Module | Package Builder · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-SIGNUP-SGN-015 |
 | Who uses it | public staff holding `PLATFORM_PLAN_MANAGE` (1 configure) |
 | Device and orientation | This is a public marketing and sign-up web flow, 1440 desktop and 390 phone widths, in TICVAI's own brand. · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -789,7 +789,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P17 TICVAI Sign-up (web) |
 | Module | Package Builder · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-SIGNUP-SGN-016 |
 | Who uses it | public staff holding `PLATFORM_PLAN_MANAGE` (1 configure) |
 | Device and orientation | This is a public marketing and sign-up web flow, 1440 desktop and 390 phone widths, in TICVAI's own brand. · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -894,7 +894,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P17 TICVAI Sign-up (web) |
 | Module | Package Builder · wave 3 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-SIGNUP-SGN-017 |
 | Who uses it | public staff holding `PLATFORM_BILLING_MANAGE` (1 configure) |
 | Device and orientation | This is a public marketing and sign-up web flow, 1440 desktop and 390 phone widths, in TICVAI's own brand. · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

@@ -97,8 +97,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-234` | Dynamic Access Policy Command Center | A | 0 | 182 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
-| `BO-235` | Access Attribute Catalog | A | 6 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-234` | Dynamic Access Policy Command Center | C | 0 | 182 | 6 | 2 | 1 | 0 | — | notStarted (generated) |
+| `BO-235` | Access Attribute Catalog | C | 6 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-236` | Visual Dynamic Policy Builder | B–D | 0 | 20 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
 | `BO-237` | Context, Time, Event & Capacity Policy Builder | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-238` | Identity, Membership & Accreditation Policies | B–D | 0 | 0 | 6 | 7 | 0 | 6 | — | notStarted (generated) |
@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-240` | Authorization Governance & Temporary Access | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-241` | Policy Evaluation Architecture & Offline Distribution | B–D | 7 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-242` | Policy Simulation, Conflict & Impact Analysis | B–D | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `BO-243` | Policy Approval, Audit, Analytics & AI Optimization | A | 2 | 7 | 6 | 13 | 0 | 3 | — | notStarted (generated) |
+| `BO-243` | Policy Approval, Audit, Analytics & AI Optimization | C | 2 | 7 | 6 | 13 | 0 | 3 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

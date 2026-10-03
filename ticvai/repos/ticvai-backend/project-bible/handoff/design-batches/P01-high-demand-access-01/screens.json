@@ -4,7 +4,7 @@
   "name": "Branded Queue / Waiting Room",
   "module": "High-Demand Access",
   "requiresModule": "ticketing",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "guest-web",
    "route": "/high-demand-access/virtual-waiting-room",

@@ -920,7 +920,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 
 **Form: Save channel sales rule** (modal, opened by *Save channel sales rule*; *Save channel sales rule* calls `setChannelSalesRule`, *Cancel* sends nothing)
 
-**Collects what `setChannelSalesRule` sends before it is called.** Required: `id`, `scopePath`, `salesChannelId`, `ruleKind`, `isActive`. Optional: `productId`, `name`, `ruleLevel`, `overridesProductRule`, `effectiveFrom`, `effectiveTo`, `salesStartDate`, `salesStartTime`, `salesEndDate`, `salesEndTime`, `timeZone`, `daysOfWeek` and 31 more. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setChannelSalesRule` sends before it is called.** Required: `salesChannelId`, `ruleKind`, `isActive`. Optional: `productId`, `name`, `ruleLevel`, `overridesProductRule`, `effectiveFrom`, `effectiveTo`, `salesStartDate`, `salesStartTime`, `salesEndDate`, `salesEndTime`, `timeZone`, `daysOfWeek` and 31 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1278,7 +1278,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save channel sales rule** (modal, opened by *Save channel sales rule*; *Save channel sales rule* calls `setChannelSalesRule`, *Cancel* sends nothing)
 
-**Collects what `setChannelSalesRule` sends before it is called.** Required: `id`, `scopePath`, `salesChannelId`, `ruleKind`, `isActive`. Optional: `productId`, `name`, `ruleLevel`, `overridesProductRule`, `effectiveFrom`, `effectiveTo`, `salesStartDate`, `salesStartTime`, `salesEndDate`, `salesEndTime`, `timeZone`, `daysOfWeek` and 31 more. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setChannelSalesRule` sends before it is called.** Required: `salesChannelId`, `ruleKind`, `isActive`. Optional: `productId`, `name`, `ruleLevel`, `overridesProductRule`, `effectiveFrom`, `effectiveTo`, `salesStartDate`, `salesStartTime`, `salesEndDate`, `salesEndTime`, `timeZone`, `daysOfWeek` and 31 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1465,7 +1465,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save channel sales rule** (modal, opened by *Save channel sales rule*; *Save channel sales rule* calls `setChannelSalesRule`, *Cancel* sends nothing)
 
-**Collects what `setChannelSalesRule` sends before it is called.** Required: `id`, `scopePath`, `salesChannelId`, `ruleKind`, `isActive`. Optional: `productId`, `name`, `ruleLevel`, `overridesProductRule`, `effectiveFrom`, `effectiveTo`, `salesStartDate`, `salesStartTime`, `salesEndDate`, `salesEndTime`, `timeZone`, `daysOfWeek` and 31 more. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setChannelSalesRule` sends before it is called.** Required: `salesChannelId`, `ruleKind`, `isActive`. Optional: `productId`, `name`, `ruleLevel`, `overridesProductRule`, `effectiveFrom`, `effectiveTo`, `salesStartDate`, `salesStartTime`, `salesEndDate`, `salesEndTime`, `timeZone`, `daysOfWeek` and 31 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

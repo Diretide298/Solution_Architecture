@@ -131,7 +131,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-344` | Media Design Studio Command Center | B–D | 8 | 26 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-344` | Media Design Studio Command Center | B–D | 8 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-345` | Digital QR & Barcode Ticket Designer | B–D | 15 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-346` | PDF, Printable & POS Ticket Designer | A | 20 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-347` | Apple Wallet Pass Designer | B–D | 24 | 0 | 5 | 0 | 2 | 6 | — | notStarted (generated) |
@@ -242,37 +242,25 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Shows | Format | Notes |
 |---|---|---|
-| Template | text | Template ID |
 | Template name | text | Template Name |
 | Media type | chip: QR ticket, Dynamic QR ticket, Barcode ticket, Mobile ticket, Pdf, A4 A5… | Media the template is for |
 | Brand | text | Brand |
 | Venue | text | Venue |
-| Product event association | text | Product / Event association |
-| Language | text | Language |
-| Version | text | Version |
 | Effective from | 1 Oct 2026, 14:30 | Effective From |
-| Effective to | 1 Oct 2026, 14:30 | Effective To |
 | Status | chip: Draft, Pending approval, Scheduled, Published, Archived | Template status |
-| Owner | text | Owner |
-| Last modified | 1 Oct 2026, 14:30 | Last Modified |
 
 **The selected media design** (detail panel): The pack groups this record's detail under its own headings: “Primary action”, “Digital”, “Print”, “Wallet”, “Physical”.
 
 | Shows | Format | Notes |
 |---|---|---|
-| Template | text | Template ID |
 | Template name | text | Template Name |
 | Media type | chip: QR ticket, Dynamic QR ticket, Barcode ticket, Mobile ticket, Pdf, A4 A5… | Media the template is for |
 | Brand | text | Brand |
 | Venue | text | Venue |
 | Product event association | text | Product / Event association |
 | Language | text | Language |
-| Version | text | Version |
 | Effective from | 1 Oct 2026, 14:30 | Effective From |
-| Effective to | 1 Oct 2026, 14:30 | Effective To |
 | Status | chip: Draft, Pending approval, Scheduled, Published, Archived | Template status |
-| Owner | text | Owner |
-| Last modified | 1 Oct 2026, 14:30 | Last Modified |
 
 **Actions and what each produces**
 
@@ -381,7 +369,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (8), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-344?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Duplicate Existing, Use Venue Template, Use Product Template, Import supported template definition, Archive media template.
 - [ ] Every transition is wired: `BO-100`, `BO-345`, `BO-347`, `BO-348`, `BO-349`, `BO-350`, `BO-351`, `BO-352`, `BO-353`, `BO-346`.
@@ -557,8 +545,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | Block A · ticket #17985 (APP-SETUP-BO-346) |
+| Module | Access & Venue · wave 1 · needs the `access` module |
+| Block | Block A · task APP-SETUP-BO-346 |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `ORDER_REPRINT`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 configure, 1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure; Configure/reference) and no display directory — it is settings, not a population |

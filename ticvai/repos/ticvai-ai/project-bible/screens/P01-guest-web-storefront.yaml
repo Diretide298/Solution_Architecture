@@ -161,8 +161,9 @@ screens:
       provenance: structural — WEB-001 is P01's home screen and its exits are its launcher
     - to: WEB-008
       trigger: Add-ons & Upsell
-      provenance: derived — WEB-008 declares entryState.params bundleId and WEB-001 holds none of them,
-        so the edge carries nothing and WEB-008 opens cold
+      provenance: 'derived — WEB-008 declares entryState.params bundleId and WEB-001 holds none of them.
+        The edge carries nothing: bundleId only pre-selects (deep link or optional), and WEB-008 opens
+        on its own'
     - to: WEB-009
       trigger: Wishlist
       provenance: 'derived — WEB-009 declares entryState.params itemId and WEB-001 holds none of them.
@@ -183,14 +184,13 @@ screens:
     - to: WEB-019
       trigger: Order History
       provenance: 'derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-001
-        holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional);
-        WEB-019 finds invoiceId (listTaxInvoices) itself; WEB-019 opens on listMyOrders, and documentId
-        has no source on WEB-019 yet (a gap in WEB-019, not in this edge)'
+        holds none of them. The edge carries nothing: orderId, documentId, invoiceId only pre-select (deep
+        link or optional), and WEB-019 opens on its own'
     - to: WEB-021
       trigger: Wallet & Gift Cards
       provenance: 'derived — WEB-021 declares entryState.params cardCode, walletId and WEB-001 holds none
-        of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); WEB-021
-        finds walletId (getWallet) itself, and WEB-021 opens on its own'
+        of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional),
+        and WEB-021 opens on its own'
     - to: WEB-022
       trigger: Membership Plans
       carries:
@@ -200,15 +200,13 @@ screens:
     - to: WEB-023
       trigger: Membership Management
       provenance: 'derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-001
-        holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional);
-        WEB-023 finds statementId (listBillingStatements) itself; WEB-023 opens on listBillingStatements,
-        and caseId has no source on WEB-023 yet (a gap in WEB-023, not in this edge)'
+        holds none of them. The edge carries nothing: orderId, caseId, statementId only pre-select (deep
+        link or optional), and WEB-023 opens on its own'
     - to: WEB-024
       trigger: Devices, Wishlist & Consent
       provenance: 'derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId
-        and WEB-001 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep
-        link or optional); WEB-024 finds methodId (enrolMfaMethod) itself; WEB-024 opens on getWishlist,
-        and enrolmentId has no source on WEB-024 yet (a gap in WEB-024, not in this edge)'
+        and WEB-001 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId
+        only pre-select (deep link or optional), and WEB-024 opens on its own'
     - to: WEB-027
       trigger: Newsletter Subscription
       provenance: 'derived — WEB-027 declares entryState.params unsubscribeToken and WEB-001 holds none
@@ -388,8 +386,13 @@ screens:
     contract: white-label
   - operationId: getPublishedTenantConfig
     contract: white-label
-    purpose: The published brand, theme, fonts, header, footer, navigation, homepage, booking-flow display
+    purpose: 'The published brand, theme, fonts, header, footer, navigation, homepage, booking-flow display
       settings and languages, read before anyone signs in (GFIX-1)
+
+
+      Also the analytics providers to start once their consent category is granted, from the published
+      config (listAnalyticsProviders needs TENANT_CONFIGURE and left the guest screens: decided by Chinmay,
+      3 October 2026 (CHG-SPF-007)).'
     trigger: onLoad
     provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-1)
   - operationId: listProducts
@@ -410,11 +413,6 @@ screens:
     contract: marketing-crm
     purpose: Accept all, reject non-essential or save preferences from the banner
     trigger: onAction
-    provenance: build, 29 September 2026
-  - operationId: listAnalyticsProviders
-    contract: white-label
-    purpose: Analytics tags to inject once their consent category is granted
-    trigger: onLoad
     provenance: build, 29 September 2026
   - operationId: decideRecommendations
     contract: ai
@@ -458,9 +456,9 @@ screens:
         drawer. Prototype adds a resume-booking card, a video 'Tonight in the city' panel, live queue
         times on cards and footer links to Contact / Accessibility / Service status. YAML emptyNoAccess/offline
         states are not drawn on Home (offline exists only as a demo tweak).
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: getTenantConfig
     removed: true
@@ -660,9 +658,9 @@ screens:
       verified: '2026-09-29'
       match: exact
       view: Header 'What's on'
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: WEB-003
   name: Search Results
   module: Discovery & Browse
@@ -788,9 +786,9 @@ screens:
       differences: 'No separate results page: results render as a type-ahead overlay and then in the WEB-002
         listing with the query applied. Recent and popular searches are prototype additions not in the
         YAML.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: WEB-004
   name: Attraction Details
   module: Discovery & Browse
@@ -1067,9 +1065,9 @@ screens:
         rule display (getProductEligibilityRule) appears only as tags. Prototype labels it WEB-003b, not
         WEB-004. **Handoff: the screen id is WEB-004**; the prototype''s "WEB-003b" label is not an id
         (CHG-SGU-020).'
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: WEB-005
   name: Ticket Type Selection
   module: Booking & Selection
@@ -1108,8 +1106,9 @@ screens:
         holds eventId, so an edge into it carries them
     - to: WEB-008
       trigger: Add-ons & Upsell
-      provenance: derived — WEB-008 declares entryState.params bundleId and WEB-005 holds none of them,
-        so the edge carries nothing and WEB-008 opens cold
+      provenance: 'derived — WEB-008 declares entryState.params bundleId and WEB-005 holds none of them.
+        The edge carries nothing: bundleId only pre-selects (deep link or optional), and WEB-008 opens
+        on its own'
     - to: WEB-010
       trigger: Shopping Cart
       carries:
@@ -1298,9 +1297,9 @@ screens:
         the counters on the page are the reference. **Do not copy the Read more panel''s prices on the
         multi-park flow** (Adult AED 325, Infant AED 475 are single-park rates): a prototype defect; the
         counters on the page are the reference (CHG-SGU-020).'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: helpMeChoose
     component: modal
@@ -1399,8 +1398,9 @@ screens:
       - performanceId
     - to: WEB-008
       trigger: Add-ons & Upsell
-      provenance: derived — WEB-008 declares entryState.params bundleId and WEB-006 holds none of them,
-        so the edge carries nothing and WEB-008 opens cold
+      provenance: 'derived — WEB-008 declares entryState.params bundleId and WEB-006 holds none of them.
+        The edge carries nothing: bundleId only pre-selects (deep link or optional), and WEB-008 opens
+        on its own'
     - to: WEB-010
       trigger: Reviews the cart and may enter a promotion code
       provenance: flow F01 step 4→5
@@ -1630,9 +1630,9 @@ screens:
         able to swim?'' pop-up. YAML''s separate hold call (addCartLine / inventory hold) is implicit.
         30 September: a session''s tickets (Surfer, Junior surfer, Spectator) appear once the session
         is chosen, and choosing it adds nothing to the cart.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   entryState:
     params:
     - name: performanceId
@@ -1684,7 +1684,7 @@ screens:
   name: Interactive Seat Selection
   module: Booking & Selection
   requiresModule: seating
-  wave: 2
+  wave: 1
   capability: C51
   implementation:
     app: guest-web
@@ -1710,8 +1710,9 @@ screens:
         its own'
     - to: WEB-008
       trigger: Add-ons & Upsell
-      provenance: derived — WEB-008 declares entryState.params bundleId and WEB-007 holds none of them,
-        so the edge carries nothing and WEB-008 opens cold
+      provenance: 'derived — WEB-008 declares entryState.params bundleId and WEB-007 holds none of them.
+        The edge carries nothing: bundleId only pre-selects (deep link or optional), and WEB-008 opens
+        on its own'
     - to: WEB-006
       trigger: Date & Performance Selection
       carries:
@@ -1893,6 +1894,9 @@ screens:
       from: WEB-006
     - name: holdId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createSeatHold`;
+        a link or an edge that holds one opens it instead.'
     - name: venueId
       from: session
     coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
@@ -1912,9 +1916,9 @@ screens:
     note: '**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRecommendSeats
     component: modal
@@ -1955,7 +1959,7 @@ screens:
   name: Add-ons & Upsell
   module: Booking & Selection
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C86
   implementation:
     app: guest-web
@@ -1991,9 +1995,10 @@ screens:
       carries:
       - cartId
       - code
+      - lineId
       - performanceId
       provenance: derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId
-        and WEB-008 holds cartId, code, performanceId, so an edge into it carries them
+        and WEB-008 holds cartId, code, lineId, performanceId, so an edge into it carries them
     - to: WEB-016
       trigger: Continue — sign in or use a guest code (when sign-in is asked after add-ons)
       carries:
@@ -2057,19 +2062,11 @@ screens:
         - Bundle.code
         - Bundle.name
         - Bundle.description
-        - Bundle.venueId
         - Bundle.kind
         - Bundle.price
-        - Bundle.components
-        - Bundle.choiceGroups
-        - Bundle.allocation
-        - Bundle.validFrom
-        - Bundle.validTo
-        - Bundle.id
         - Bundle.savingsAmount
         - Bundle.savingsPercentage
         - Bundle.hasBeenSold
-        - Bundle.isActive
         operation: getBundle
         provenance: contract promotions.yaml GET /bundles/{bundleId}
         notes: A bundle the recommendation slot names (`kind` bundle), opened from its card; signed catalogue
@@ -2135,6 +2132,9 @@ screens:
       from: session
     - name: bundleId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getBundle` takes the
+        id from the record the user acts on, and an edge or link that holds one only pre-selects it.'
     - name: venueId
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
@@ -2151,10 +2151,11 @@ screens:
       differences: 'Sign-in is asked when leaving Add-ons (Config ''Ask to sign in: After add-ons'', Rev
         3 item 3), so WEB-008 → WEB-016 is a transition YAML does not have. Add-ons also appear on the
         payment step (combo) and confirmation (upsells). 28 Sep flow review: all add-ons live here only.'
-  apisNote: Rebuilt 9 September 2026 from the operations this screen then declared (six since the rev
-    3 build of 29 September), not from a workshop pack — it has none. Columns are every field the response
-    schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes
-    this screen. The suggestion panel reads `getUpsellSuggestions`, which `apis` does not declare yet.
+  apisNote: 'Rebuilt 9 September 2026 from the operations this screen then declared (six since the rev
+    3 build of 29 September), not from a workshop pack — it has none. Columns narrowed on 3 October 2026
+    to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and
+    foreign ids left to the record itself. The suggestion panel reads `getUpsellSuggestions`, which `apis`
+    does not declare yet.'
   overlays:
   - id: formAddCartLine
     component: modal
@@ -2180,7 +2181,7 @@ screens:
   name: Wishlist
   module: Booking & Selection
   requiresModule: marketing
-  wave: 3
+  wave: 1
   capability: C79
   implementation:
     app: guest-web
@@ -2301,6 +2302,9 @@ screens:
     params:
     - name: itemId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getWishlist`;
+        an edge that holds one may still carry it to open on that record.'
     - name: subjectId
       from: session
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
@@ -2320,9 +2324,9 @@ screens:
       view: Discover → 'Wishlist' link (discoverLinks)
       differences: No 'withdrawn product stays marked unavailable' state (YAML note). Prototype adds 'Restore
         removed' and live queue times.
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: WEB-010
   name: Shopping Cart
   module: Cart & Checkout
@@ -2630,9 +2634,9 @@ screens:
         the seat step. Exit-intent dialog (exit.open) is a prototype addition. **Draw the countdown with
         More time (`extendCart`) on the basket**, although the prototype has no extend action and times
         only the seat step (CHG-SGU-020).'
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   notes: '**Rev 3 (decided 29 September).** Visit date per line (23SEP-9). **Layout (REV3-10):** `cartLayout`
     may be `floatingIcon` (a round basket button with the count); in Arabic the cart stays on the right
     unless `cartSideInRtl` is `mirror` (default `keepRight`). **A line holding a cabana or spot from the
@@ -2706,6 +2710,7 @@ screens:
       provenance: flow F55 step 2→3
       carries:
       - cartId
+      - lineId
       - performanceId
   notes: '**Wired 24 August from review**: updateMyProfile. **The operations existed and this screen could
     not call them** — reviewers reported them as missing APIs, which is what an unreachable operation
@@ -2892,9 +2897,9 @@ screens:
       differences: Sections are driven by the flow's requires list; prototype adds a signature, diving
         certification and vehicle plate fields. Wishlist/device operations listed in the YAML apis have
         no counterpart here. Saved guests prefill is described in Account but not shown on this step.
-  apisNote: Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: uploadGuestDocument
     why: 'An identity document a ticket requires cannot be uploaded end to end: uploadGuestDocument needs
@@ -2927,9 +2932,10 @@ screens:
     - to: WEB-010
       trigger: Shopping Cart
       carries:
+      - lineId
       - performanceId
       provenance: derived — WEB-010 declares entryState.params cartId, code, holdId, lineId, performanceId
-        and WEB-012 holds performanceId, so an edge into it carries them
+        and WEB-012 holds lineId, performanceId, so an edge into it carries them
     - to: WEB-011
       trigger: Guest Details & Attendee Forms
       provenance: 'derived — WEB-011 declares entryState.params  and WEB-012 holds none of them. The edge
@@ -3012,15 +3018,9 @@ screens:
         bindsTo: Order
         columns:
         - Order.orderNumber
-        - Order.channel
         - Order.status
         - Order.currency
         - Order.grossAmount
-        - Order.taxAmount
-        - Order.netAmount
-        - Order.refundedAmount
-        - Order.lines
-        - Order.payments
         - Order.chargeCurrency
         - Order.chargeTotal
         - Order.chargeFxRate
@@ -3148,9 +3148,9 @@ screens:
         inquiry state matches the YAML (''We couldn''t confirm this payment yet… you won''t be charged
         twice''). **Draw card, Apple Pay, Google Pay and wallet only** (R080, 28 September); Tabby split-in-4,
         pay on arrival and invoice/PO are not in the first release (CHG-SGU-020).'
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   x-ticvai-make-or-break: 'M18-15: may a guest-checkout customer be sent marketing on an opt-in taken
     at checkout (law and the client''s marketing policy)? Until the client confirms, the opt-in is shown
     unticked and nothing is sent without it.'
@@ -3309,9 +3309,9 @@ screens:
       differences: 'Prototype adds editing attendee details after purchase (''Change your details'', signed-in
         only) and Reissue QR. No ''unpaid — pay now'' route to WEB-014. **Leave out** editing attendee
         details after purchase and Reissue QR: no operation on this screen declares them (CHG-SGU-020).'
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formReprintOrder
     component: modal
@@ -3456,14 +3456,14 @@ screens:
       note: 'The prototype has no view for this screen. It was drawn in Claude Design on 29 September
         in the prototype''s style and accepted as its design the same day (the frame on this screen''s
         board): build the layout from that frame.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: WEB-015
   name: Branded Queue / Waiting Room
   module: High-Demand Access
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /high-demand-access/virtual-waiting-room
@@ -3623,9 +3623,8 @@ screens:
     - to: WEB-019
       trigger: Order History
       provenance: 'derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-016
-        holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional);
-        WEB-019 finds invoiceId (listTaxInvoices) itself; WEB-019 opens on listMyOrders, and documentId
-        has no source on WEB-019 yet (a gap in WEB-019, not in this edge)'
+        holds none of them. The edge carries nothing: orderId, documentId, invoiceId only pre-select (deep
+        link or optional), and WEB-019 opens on its own'
     - to: WEB-010
       trigger: Signed in and verified — back to the cart
       precondition: arrived from the cart
@@ -3989,9 +3988,9 @@ screens:
         or mobile number'); it is a modal, not a page. Account → Security still shows 'Two-step verification'
         and passkeys, which the YAML ruled out for guests (R167). Guest checkout route belongs to WEB-012
         in the prototype.
-  apisNote: Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop
-    pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing
-    them to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: WEB-017
   name: My Account Dashboard
   module: Account & Self-Service
@@ -4079,20 +4078,14 @@ screens:
         label: The challenge
         bindsTo: Challenge
         columns:
-        - Challenge.id
         - Challenge.name
         - Challenge.kind
-        - Challenge.scope
-        - Challenge.goal
-        - Challenge.eventId
         - Challenge.rewardKind
         - Challenge.rewardValue
         - Challenge.rewardAmount
-        - Challenge.badgeAssetId
         - Challenge.startsAt
         - Challenge.endsAt
         - Challenge.status
-        - Challenge.scopePath
         operation: getMyChallenges
         provenance: contract marketing-crm.yaml GET /guests/me/challenges
       - kind: detailPanel
@@ -4204,9 +4197,9 @@ screens:
     note: '**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: WEB-018
   name: My Tickets
   module: Account & Self-Service
@@ -4329,14 +4322,6 @@ screens:
         label: The selected entitlement
         bindsTo: Entitlement
         columns:
-        - Entitlement.id
-        - Entitlement.templateId
-        - Entitlement.productId
-        - Entitlement.orderId
-        - Entitlement.orderLineId
-        - Entitlement.subjectId
-        - Entitlement.venueId
-        - Entitlement.scopePath
         - Entitlement.mediaCode
         - Entitlement.status
         - Entitlement.statusNote
@@ -4456,9 +4441,9 @@ screens:
       differences: QR is static — no rotating code with a visible countdown (YAML R230). Prototype adds
         reschedule, add guests, refund, resale and cancel on the ticket sheet (YAML routes refunds to
         WEB-019 and transfers to WEB-030).
-  apisNote: Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 6 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formIssueWalletPass
     component: modal
@@ -4617,18 +4602,13 @@ screens:
         bindsTo: Order
         columns:
         - Order.orderNumber
-        - Order.channel
         - Order.status
         - Order.currency
         - Order.grossAmount
         - Order.taxAmount
         - Order.netAmount
         - Order.refundedAmount
-        - Order.lines
-        - Order.payments
-        - Order.chargeCurrency
         - Order.chargeTotal
-        - Order.chargeFxRate
         operation: getOrder
         provenance: contract orders.yaml GET /orders/{orderId}
     - name: actionBar
@@ -4691,7 +4671,7 @@ screens:
   - operationId: getTaxDocumentRendition
     contract: finance
     purpose: Download the invoice / credit memo PDF
-    trigger: onLoad
+    trigger: onAction
     provenance: build, 29 September 2026
   - operationId: issueTaxInvoice
     contract: finance
@@ -4705,8 +4685,15 @@ screens:
       from: deepLink
     - name: documentId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getTaxDocumentRendition`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: invoiceId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listTaxInvoices`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
     preloaded:
@@ -4727,9 +4714,9 @@ screens:
       view: Account → 'Order history'
       differences: A list pane with toast-only actions; no order detail view. Refund request and transfer
         are rows, not flows.
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreateRefundRequest
     component: modal
@@ -4961,16 +4948,17 @@ screens:
       differences: Split over three panes; fields are read-only with a 'Save changes' toast. No 'which
         level the current value came from' (YAML purpose). Consent purposes appear as two marketing toggles
         rather than the configured purpose list.
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formUpdateGuestPreferences
     component: modal
     trigger: Save guest preferences
     body: '**Collects what `updateGuestPreferences` sends before it is called.** Nothing in the body is
-      required. Optional: `id`, `subjectId`, `seatingPreference`, `drinkPreferences`, `dietary`, `accessibility`,
-      `preferredChannel`. Dismissing sends nothing; the screen behind is unchanged.'
+      required. Optional: `seatingPreference`, `drinkPreferences`, `dietary`, `accessibility`, `preferredChannel`.
+      Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them
+      (readOnly in the contract): `id`, `subjectId` (3 October 2026, CHG-SPF-001).'
     bindsTo: GuestPreferences
     confirm:
       label: Save guest preferences
@@ -4978,8 +4966,6 @@ screens:
     dismiss:
       label: Cancel
       discards:
-      - id
-      - subjectId
       - seatingPreference
       - drinkPreferences
       - dietary
@@ -5024,7 +5010,7 @@ screens:
   name: Wallet & Gift Cards
   module: Membership, Loyalty & Value
   requiresModule: retail
-  wave: 2
+  wave: 1
   capability: C21
   implementation:
     app: guest-web
@@ -5055,9 +5041,8 @@ screens:
     - to: WEB-024
       trigger: Devices, Wishlist & Consent
       provenance: 'derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId
-        and WEB-021 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep
-        link or optional); WEB-024 finds methodId (enrolMfaMethod) itself; WEB-024 opens on getWishlist,
-        and enrolmentId has no source on WEB-024 yet (a gap in WEB-024, not in this edge)'
+        and WEB-021 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId
+        only pre-select (deep link or optional), and WEB-024 opens on its own'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: listDetail
@@ -5108,7 +5093,6 @@ screens:
         - GiftCard.faceValue
         - GiftCard.balance
         - GiftCard.status
-        - GiftCard.blockedReason
         - GiftCard.issuedAt
         - GiftCard.activatedAt
         - GiftCard.expiresAt
@@ -5224,10 +5208,17 @@ screens:
     params:
     - name: cardCode
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getGiftCard`, `getGameCard`
+        take the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: subjectId
       from: session
     - name: walletId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getWallet`;
+        an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
@@ -5251,9 +5242,9 @@ screens:
       view: Account → 'Wallet & gift cards' (and 'Payment methods')
       differences: Rows with toast actions; no transaction list, no gift-card balance lookup. Auto top-up
         is a prototype addition with no YAML operation. Saved payment tokens are a separate pane.
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formStorePaymentToken
     component: modal
@@ -5287,7 +5278,7 @@ screens:
   name: Membership Plans
   module: Membership, Loyalty & Value
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C31
   implementation:
     app: guest-web
@@ -5307,20 +5298,18 @@ screens:
     - to: WEB-021
       trigger: Wallet & Gift Cards
       provenance: 'derived — WEB-021 declares entryState.params cardCode, walletId and WEB-022 holds none
-        of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); WEB-021
-        finds walletId (getWallet) itself, and WEB-021 opens on its own'
+        of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional),
+        and WEB-021 opens on its own'
     - to: WEB-023
       trigger: Membership Management
       provenance: 'derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-022
-        holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional);
-        WEB-023 finds statementId (listBillingStatements) itself; WEB-023 opens on listBillingStatements,
-        and caseId has no source on WEB-023 yet (a gap in WEB-023, not in this edge)'
+        holds none of them. The edge carries nothing: orderId, caseId, statementId only pre-select (deep
+        link or optional), and WEB-023 opens on its own'
     - to: WEB-024
       trigger: Devices, Wishlist & Consent
       provenance: 'derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId
-        and WEB-022 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep
-        link or optional); WEB-024 finds methodId (enrolMfaMethod) itself; WEB-024 opens on getWishlist,
-        and enrolmentId has no source on WEB-024 yet (a gap in WEB-024, not in this edge)'
+        and WEB-022 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId
+        only pre-select (deep link or optional), and WEB-024 opens on its own'
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Wired 24 August**: getMyMemberships, listGuestMemberships. **The web surface drew the screen and
     could not fetch what it shows** — the app had these and the browser did not, and there is no reason
@@ -5368,8 +5357,6 @@ screens:
         label: Your membership
         bindsTo: GuestMembership
         columns:
-        - GuestMembership.entitlementId
-        - GuestMembership.productId
         - GuestMembership.name
         - GuestMembership.tier
         - GuestMembership.status
@@ -5378,7 +5365,6 @@ screens:
         - GuestMembership.frozenDays
         - GuestMembership.benefits
         - GuestMembership.renewsOn
-        - GuestMembership.previousTerms
         operation: getMyMemberships
         provenance: contract catalogue.yaml GET /guests/me/memberships
   states:
@@ -5435,9 +5421,9 @@ screens:
         → 'Other plans — Compare'
       differences: Plans are sold as a booking flow, not a plans page; the account 'Compare' action is
         a toast.
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: listGuestMemberships
     removed: true
@@ -5447,7 +5433,7 @@ screens:
   name: Membership Management
   module: Membership, Loyalty & Value
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C31
   implementation:
     app: guest-web
@@ -5467,8 +5453,8 @@ screens:
     - to: WEB-021
       trigger: Wallet & Gift Cards
       provenance: 'derived — WEB-021 declares entryState.params cardCode, walletId and WEB-023 holds none
-        of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); WEB-021
-        finds walletId (getWallet) itself, and WEB-021 opens on its own'
+        of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional),
+        and WEB-021 opens on its own'
     - to: WEB-022
       trigger: Membership Plans
       carries:
@@ -5478,9 +5464,8 @@ screens:
     - to: WEB-024
       trigger: Devices, Wishlist & Consent
       provenance: 'derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId
-        and WEB-023 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep
-        link or optional); WEB-024 finds methodId (enrolMfaMethod) itself; WEB-024 opens on getWishlist,
-        and enrolmentId has no source on WEB-024 yet (a gap in WEB-024, not in this edge)'
+        and WEB-023 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId
+        only pre-select (deep link or optional), and WEB-024 opens on its own'
   notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Wired 24 August**: getMyMemberships, listGuestMemberships. **The web surface drew the screen and
     could not fetch what it shows** — the app had these and the browser did not, and there is no reason
@@ -5560,8 +5545,6 @@ screens:
         label: Your membership
         bindsTo: GuestMembership
         columns:
-        - GuestMembership.entitlementId
-        - GuestMembership.productId
         - GuestMembership.name
         - GuestMembership.tier
         - GuestMembership.status
@@ -5570,7 +5553,6 @@ screens:
         - GuestMembership.frozenDays
         - GuestMembership.benefits
         - GuestMembership.renewsOn
-        - GuestMembership.previousTerms
         operation: getMyMemberships
         provenance: contract catalogue.yaml GET /guests/me/memberships
     - name: actionBar
@@ -5634,8 +5616,14 @@ screens:
       from: deepLink
     - name: caseId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMyPaymentIssues`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: statementId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listBillingStatements`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
     preloaded:
@@ -5656,9 +5644,9 @@ screens:
       view: Account → 'Membership' → 'Billing statement — View'
       differences: Billing and dunning retry are well covered. Prototype adds membership transfer to a
         family member and guest passes; YAML's transferOrderTickets on this screen has no visible use.
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRetryMyDunningPayment
     component: modal
@@ -5687,12 +5675,12 @@ screens:
   name: Devices, Wishlist & Consent
   module: Membership, Loyalty & Value
   requiresModule: marketing
-  wave: 3
+  wave: 1
   capability: C93
   implementation:
     app: guest-web
-    route: /membership-loyalty-and-value/loyalty-and-rewards
-    component: apps/guest-web/src/routes/membership-loyalty-and-value/LoyaltyAndRewardsDetail.tsx
+    route: /membership-loyalty-and-value/devices-wishlist-consent
+    component: apps/guest-web/src/routes/membership-loyalty-and-value/DevicesWishlistConsentDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -5707,8 +5695,8 @@ screens:
     - to: WEB-021
       trigger: Wallet & Gift Cards
       provenance: 'derived — WEB-021 declares entryState.params cardCode, walletId and WEB-024 holds none
-        of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); WEB-021
-        finds walletId (getWallet) itself, and WEB-021 opens on its own'
+        of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional),
+        and WEB-021 opens on its own'
     - to: WEB-022
       trigger: Membership Plans
       provenance: 'derived — WEB-022 declares entryState.params productId and WEB-024 holds none of them.
@@ -5717,9 +5705,8 @@ screens:
     - to: WEB-023
       trigger: Membership Management
       provenance: 'derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-024
-        holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional);
-        WEB-023 finds statementId (listBillingStatements) itself; WEB-023 opens on listBillingStatements,
-        and caseId has no source on WEB-023 yet (a gap in WEB-023, not in this edge)'
+        holds none of them. The edge carries nothing: orderId, caseId, statementId only pre-select (deep
+        link or optional), and WEB-023 opens on its own'
     - to: GST-037
       trigger: Offers are shown against what they hold
       provenance: flow F53 step 2→3
@@ -5751,14 +5738,8 @@ screens:
         label: Every guest device
         bindsTo: GuestDevice
         columns:
-        - GuestDevice.id
-        - GuestDevice.subjectId
         - GuestDevice.platform
         - GuestDevice.tokenFingerprint
-        - GuestDevice.appVersion
-        - GuestDevice.osVersion
-        - GuestDevice.deviceModel
-        - GuestDevice.locale
         - GuestDevice.status
         - GuestDevice.failureCount
         - GuestDevice.registeredAt
@@ -5769,17 +5750,11 @@ screens:
         label: Every delegated access
         bindsTo: DelegatedAccess
         columns:
-        - DelegatedAccess.id
-        - DelegatedAccess.principalId
-        - DelegatedAccess.roleId
         - DelegatedAccess.permission
-        - DelegatedAccess.subjectId
-        - DelegatedAccess.overSubjectId
         - DelegatedAccess.overObjectRef
         - DelegatedAccess.delegationKind
         - DelegatedAccess.quota
         - DelegatedAccess.isRevocableBySubject
-        - DelegatedAccess.scopePath
         - DelegatedAccess.effect
         operation: listDelegations
         provenance: contract identity.yaml GET /guests/{subjectId}/delegations
@@ -5824,15 +5799,9 @@ screens:
         label: The selected guest device
         bindsTo: GuestDevice
         columns:
-        - GuestDevice.id
-        - GuestDevice.subjectId
         - GuestDevice.platform
         - GuestDevice.tokenFingerprint
         - GuestDevice.tokenRef
-        - GuestDevice.appVersion
-        - GuestDevice.osVersion
-        - GuestDevice.deviceModel
-        - GuestDevice.locale
         - GuestDevice.status
         - GuestDevice.failureCount
         - GuestDevice.registeredAt
@@ -6067,14 +6036,26 @@ screens:
     params:
     - name: deviceId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listGuestDevices`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: itemId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that
+        carries it only pre-selects the record.'
     - name: subjectId
       from: session
     - name: enrolmentId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `enrolMfaMethod`;
+        a link or an edge that holds one opens it instead.'
     - name: methodId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMfaMethods`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
@@ -6100,9 +6081,9 @@ screens:
       differences: Spread across four panes rather than one screen; wishlist is its own view (WEB-009).
         Security pane includes passkeys and two-step verification, which the YAML does not have for guests.
         YAML purpose text still says 'See loyalty & rewards' (stale).
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: getWaiverStatus
     why: '**`getWaiverStatus` declares its response inline**, so the component that shows it names fields
@@ -6240,9 +6221,9 @@ screens:
       view: Header 'Help'
       differences: Also carries policies and the accessibility statement (YAML WEB-045) and the case list
         (YAML WEB-034's listMyCases) on the same page.
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRaiseMyCase
     component: modal
@@ -6269,11 +6250,14 @@ screens:
     params:
     - name: caseId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMyCases`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
 - id: WEB-026
   name: Survey & Feedback
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   capability: C33
   implementation:
     app: guest-web
@@ -6295,6 +6279,12 @@ screens:
       provenance: 'derived — WEB-027 declares entryState.params unsubscribeToken and WEB-026 holds none
         of them. The edge carries nothing: unsubscribeToken only pre-selects (deep link or optional),
         and WEB-027 opens on its own'
+    - to: WEB-025
+      trigger: Help Centre / FAQ
+      carries:
+      - caseId
+      provenance: derived — WEB-025 declares entryState.params caseId and WEB-026 holds caseId, so an
+        edge into it carries them
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   pattern: configEditor
@@ -6402,9 +6392,9 @@ screens:
       match: partial
       view: Account → 'Reviews & feedback'
       differences: List of visits to rate with toast actions; no rating form or survey questions are drawn.
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRaiseMyCase
     component: modal
@@ -6425,7 +6415,7 @@ screens:
   name: Newsletter Subscription
   module: Engagement & Support
   requiresModule: marketing
-  wave: 2
+  wave: 1
   capability: C59
   implementation:
     app: guest-web
@@ -6446,6 +6436,11 @@ screens:
       trigger: Survey & Feedback
       provenance: 'derived — WEB-026 declares entryState.params formId and WEB-027 holds none of them.
         The edge carries nothing: formId only pre-selects (deep link or optional), and WEB-026 opens on
+        its own'
+    - to: WEB-025
+      trigger: Help Centre / FAQ
+      provenance: 'derived — WEB-025 declares entryState.params caseId and WEB-027 holds none of them.
+        The edge carries nothing: caseId only pre-selects (deep link or optional), and WEB-025 opens on
         its own'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   density: compact
@@ -6569,9 +6564,9 @@ screens:
       view: Account → 'Newsletters'; Contact page → 'Choose newsletters'
       differences: Per-venue and channel toggles only for signed-in guests; no signed-out email sign-up
         form.
-  apisNote: Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: WEB-028
   name: Contact & Venue Information
   module: Engagement & Support
@@ -6602,6 +6597,11 @@ screens:
       trigger: Survey & Feedback
       provenance: 'derived — WEB-026 declares entryState.params formId and WEB-028 holds none of them.
         The edge carries nothing: formId only pre-selects (deep link or optional), and WEB-026 opens on
+        its own'
+    - to: WEB-025
+      trigger: Help Centre / FAQ
+      provenance: 'derived — WEB-025 declares entryState.params caseId and WEB-028 holds none of them.
+        The edge carries nothing: caseId only pre-selects (deep link or optional), and WEB-025 opens on
         its own'
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **Contact bound 28 September** to `getTenantAppStatus.contact` (decided 28 September, audit R073 (f)).
@@ -6651,9 +6651,9 @@ screens:
       match: exact
       view: Footer 'Contact', or Discover → 'Contact & venue info'
       differences: Links to parking and accessibility from the contact cards; otherwise matches.
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: WEB-029
   name: Error / Sold Out / Maintenance
   module: System States
@@ -6760,9 +6760,9 @@ screens:
         waitlist'' (holds a returned place for 15 minutes), which the YAML screen (getTenantAppStatus
         only) cannot call. **Do not draw "Join the waitlist" on the sold-out page**: this screen calls
         no waitlist operation; a sold-out performance waitlist belongs to the event booking screens (CHG-SGU-022).'
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: WEB-030
   name: Ticket Transfer
   module: Ticketing
@@ -6786,10 +6786,9 @@ screens:
     - to: WEB-031
       trigger: My Reservations
       provenance: 'derived — WEB-031 declares entryState.params groupBookingId, productId, reservationId,
-        resourceId and WEB-030 holds none of them. The edge carries nothing: reservationId only pre-selects
-        (deep link or optional); WEB-031 finds groupBookingId (requestGroupBooking), productId (listGroupPackages)
-        itself; WEB-031 opens on listGroupPackages, and resourceId has no source on WEB-031 yet (a gap
-        in WEB-031, not in this edge)'
+        resourceId and WEB-030 holds none of them. The edge carries nothing: reservationId, groupBookingId,
+        resourceId only pre-select (deep link or optional); WEB-031 finds productId (listGroupPackages)
+        itself, and WEB-031 opens on its own'
     - to: GST-014
       trigger: The friend claims it in the app
       provenance: flow F55 step 4→5
@@ -6874,6 +6873,9 @@ screens:
       from: deepLink
     - name: transferId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that
+        carries it only pre-selects the record.'
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
     preloaded:
@@ -6895,9 +6897,9 @@ screens:
         tickets'
       differences: List pane with toast actions; no recipient form. Prototype adds cancel transfer and
         withdraw resale listing.
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreateResaleListing
     component: modal
@@ -6946,7 +6948,7 @@ screens:
   name: My Reservations
   module: Ticketing
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: guest-web
@@ -7061,20 +7063,13 @@ screens:
         bindsTo: GroupBooking
         columns:
         - GroupBooking.kind
-        - GroupBooking.packageProductId
         - GroupBooking.yearGroup
-        - GroupBooking.accessAndDietaryNeeds
         - GroupBooking.celebrantName
-        - GroupBooking.celebrantTurningAge
-        - GroupBooking.allergiesAndRequests
         - GroupBooking.finalHeadcountDueBy
         - GroupBooking.quoteSentAt
         - GroupBooking.riskAssessmentSentAt
         - GroupBooking.preferredDate
-        - GroupBooking.orderId
-        - GroupBooking.leaderSubjectId
         - GroupBooking.organisationName
-        - GroupBooking.expectedSize
         operation: getGroupBooking
         provenance: contract orders.yaml GET /group-bookings/{groupBookingId}
       - kind: detailPanel
@@ -7224,10 +7219,20 @@ screens:
       from: session
     - name: reservationId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listReservations`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: groupBookingId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `requestGroupBooking`;
+        a link or an edge that holds one opens it instead.'
     - name: resourceId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getResourceAvailability`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: productId
       from: navigation
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
@@ -7255,14 +7260,14 @@ screens:
         / invoice quote) inside Kids Club → 'Birthday party / group' and 'School trip', which the YAML
         covers only through requestGroupBooking. 'Pay now' on a held reservation has no YAML route (WEB-014
         is pay-by-link).
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: WEB-032
   name: Offers & Promotions
   module: Promotions
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: guest-web
@@ -7353,6 +7358,9 @@ screens:
     params:
     - name: promotionId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPromotions`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
@@ -7375,14 +7383,14 @@ screens:
       match: exact
       view: Discover → 'Offers & promotions'
       differences: '''Use this offer'' returns to the listing; no personalised ''applies to you'' filter.'
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: WEB-033
   name: Shop
   module: Retail
   requiresModule: retail
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: guest-web
@@ -7521,6 +7529,9 @@ screens:
       from: session
     - name: outletId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMerchandise`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
@@ -7545,14 +7556,14 @@ screens:
         squares) and in At the venue → 'Shop & drop'
       differences: No browsable merchandise catalogue before arrival; the nearest is in-venue Shop & drop
         (WEB-042).
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: WEB-034
   name: Lost & Found
   module: Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   capability: C00
   implementation:
     app: guest-web
@@ -7615,18 +7626,10 @@ screens:
         label: Every case
         bindsTo: Case
         columns:
-        - Case.id
         - Case.caseNumber
-        - Case.subjectId
         - Case.guestName
         - Case.subject
-        - Case.categoryId
         - Case.status
-        - Case.priority
-        - Case.assignedToPrincipalId
-        - Case.venueId
-        - Case.relatedOrderId
-        - Case.slaDueAt
         operation: listMyCases
         provenance: contract marketing-crm.yaml GET /my/cases
     - name: contextPanel
@@ -7636,21 +7639,10 @@ screens:
         label: The selected case
         bindsTo: Case
         columns:
-        - Case.id
         - Case.caseNumber
-        - Case.subjectId
         - Case.guestName
         - Case.subject
-        - Case.categoryId
         - Case.status
-        - Case.priority
-        - Case.assignedToPrincipalId
-        - Case.venueId
-        - Case.relatedOrderId
-        - Case.slaDueAt
-        - Case.isSlaBreached
-        - Case.slaPausedSeconds
-        - Case.escalationCount
         - Case.resolvedAt
         operation: listMyCases
         provenance: contract marketing-crm.yaml GET /my/cases
@@ -7730,9 +7722,9 @@ screens:
       differences: 'No lost-item report form (item, where, when, photo); reported via the generic case
         form. The prototype has no lost-item form; it uses the generic case form. A prototype gap: the
         build follows this screen (kind, colour, brand, where last seen, photos), not the prototype (CHG-SGU-017).'
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formRaiseMyCase
     component: modal
@@ -7796,8 +7788,8 @@ screens:
       provenance: derived — WEB-031 declares entryState.params groupBookingId, productId, reservationId,
         resourceId and WEB-035 holds productId, so an edge into it carries them
   notes: 'Added 17 August. **The surface the matrix names** — 2.6.33 *"website should be able to display
-    multi currency"* and 2.9.1 *"in the B2C portal for guests comparison"*. Wave 1 against the app''s
-    Wave 2, because **the website is where an overseas guest compares before booking** and the app is
+    multi currency"* and 2.9.1 *"in the B2C portal for guests comparison"*. First on the website, before
+    the app, because **the website is where an overseas guest compares before booking** and the app is
     where they check after. **Display only — the sale settles in base currency** (CF-37). Not on the wireframe
     board; needs drawing. **`getRegionSettings` deliberately not called** — a guest does not need the
     venue''s scope configuration to pick a currency. `listFxRates` is the currency list: a rate exists
@@ -7934,14 +7926,14 @@ screens:
         whole storefront currency, which contradicts 'always charged in AED'. **Resolved 2 October 2026
         (CHG-FIN-001):** the guest may pay in the selected currency, so a storefront currency switch is
         right where the venue charges that currency.
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: WEB-036
   name: F&B – Browse & Order
   module: In-venue Services
   requiresModule: fnb
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /fandb--browse-and-order
@@ -7952,6 +7944,14 @@ screens:
     - WEB-001
     exitTo:
     - WEB-001
+    - WEB-037
+    transitions:
+    - to: WEB-037
+      trigger: Menu Item Detail
+      carries:
+      - outletId
+      provenance: 'authored 3 October 2026 (CHG-SPF-004): WEB-036 lists them, and WEB-037 cannot load
+        without the one the user picks'
   notes: '**A guest scans a QR on a table and lands in a browser.** That is the single most common F&B
     ordering pattern anywhere, and until 24 August it was the one thing this surface could not do — `claimTableSession`
     and `claimLocationSession` were app-only. **Nobody installs an app to order a coffee.** **Renamed
@@ -8176,10 +8176,16 @@ screens:
     params:
     - name: outletId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getFnbDeliveryPolicy`;
+        an edge that holds one may still carry it to open on that record.'
     - name: venueId
       from: session
     - name: orderId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createGuestFnbOrder`;
+        a link or an edge that holds one opens it instead.'
     - name: entryId
       from: deepLink
       optional: true
@@ -8188,6 +8194,9 @@ screens:
       optional: true
     - name: reservationId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createTableReservation`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
       here, and the person holding it did nothing wrong. Arrives with `outletId`. **`venueId` is the venue
@@ -8211,9 +8220,9 @@ screens:
         and no payment step: wrong here.** The contract takes payment before the kitchen sees a guest
         order unless the outlet runs a tab, and F11 puts the pay step (4) before the kitchen (5); the
         design shows the pay step (CHG-SGU-018).'
-  apisNote: Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formCreateTableReservation
     component: modal
@@ -8258,7 +8267,7 @@ screens:
   name: Menu Item Detail
   module: In-venue Services
   requiresModule: fnb
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /menu-item-detail
@@ -8322,6 +8331,9 @@ screens:
       from: deepLink
     - name: menuItemId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getGuestMenu`;
+        an edge that holds one may still carry it to open on that record.'
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
       here, and the person holding it did nothing wrong. Arrives with `outletId`.'
@@ -8343,9 +8355,9 @@ screens:
       view: At the venue → Order food → tap a dish; Takeaway/Delivery → 'Add' opens the modifier side
         panel
       differences: Two renderings of the same thing (dialog in-venue, side panel in takeaway/delivery).
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: modifierPanel
     component: drawer
@@ -8367,7 +8379,7 @@ screens:
   name: F&B – Order Tracking
   module: In-venue Services
   requiresModule: fnb
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /fandb--order-tracking
@@ -8453,6 +8465,9 @@ screens:
       from: session
     - name: orderId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getGuestBill`;
+        an edge that holds one may still carry it to open on that record.'
     - name: sessionId
       from: deepLink
     - name: venueId
@@ -8474,14 +8489,14 @@ screens:
       match: exact
       view: At the venue → Order food → 'Send to the kitchen'
       differences: No bill or settle-the-bill view (YAML getGuestBill, 'settle the bill').
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: WEB-039
   name: Venue Map & Wait Times
   module: In-venue Services
   requiresModule: queue
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /venue-map-and-wait-times
@@ -8633,14 +8648,14 @@ screens:
     note: '**Drawn by Claude Design on `Seat Board 3.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: WEB-040
   name: Virtual Queue
   module: In-venue Services
   requiresModule: queue
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /virtual-queue
@@ -8672,18 +8687,10 @@ screens:
         label: The waiting guest
         bindsTo: WaitingGuest
         columns:
-        - WaitingGuest.id
-        - WaitingGuest.queueId
         - WaitingGuest.queueName
-        - WaitingGuest.subjectId
         - WaitingGuest.partyNumber
-        - WaitingGuest.partySize
         - WaitingGuest.status
-        - WaitingGuest.positionInQueue
-        - WaitingGuest.partiesAhead
         - WaitingGuest.estimatedCallAt
-        - WaitingGuest.isFastPass
-        - WaitingGuest.entitlementId
         - WaitingGuest.calledAt
         - WaitingGuest.returnWindowEndsAt
         - WaitingGuest.redeemedAt
@@ -8694,13 +8701,9 @@ screens:
         label: The wait time
         bindsTo: WaitTime
         columns:
-        - WaitTime.queueId
         - WaitTime.queueName
-        - WaitTime.attractionProductId
-        - WaitTime.attractionCategoryId
         - WaitTime.status
         - WaitTime.waitMinutes
-        - WaitTime.source
         - WaitTime.isStale
         - WaitTime.heightRequirementCm
         - WaitTime.zone
@@ -8764,6 +8767,9 @@ screens:
       from: session
     - name: entryId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened from Home, the guest joins a queue here with
+        `joinQueue` and the screen follows that place; a link to a place opens it directly.'
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
       here, and the person holding it did nothing wrong. Arrives with `entryId`.'
@@ -8777,9 +8783,9 @@ screens:
       verified: '2026-10-01'
       match: exact
       view: Summit Peaks → header 'At the venue' → Virtual queue
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formJoinQueue
     component: modal
@@ -8805,7 +8811,7 @@ screens:
   name: Parking – Reserve & Pay
   module: In-venue Services
   requiresModule: access
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /parking--reserve-and-pay
@@ -8949,9 +8955,9 @@ screens:
         full = soldOutForDay). Pays directly with ''Reserve and pay'' rather than through cart and checkout
         (R166). Also a plate field in the cabana/party flows. **Do not draw live free-bay counts or "Reserve
         and pay"**: no live count in the first release, and parking goes through the basket (R166) (CHG-SGU-020).'
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formAddCartLine
     component: modal
@@ -8997,7 +9003,7 @@ screens:
   name: Retail & Shop and Drop
   module: Retail
   requiresModule: retail
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /retail-and-shop-and-drop
@@ -9113,6 +9119,9 @@ screens:
     params:
     - name: outletId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMerchandise`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: cartId
       from: session
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
@@ -9137,9 +9146,9 @@ screens:
         delivered home)
       differences: 'Pays in one tap on the page, not through the cart and checkout (YAML R236). 29 September:
         collect at the gate, at the car park kiosk, or delivered home, with a collection code after paying.'
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formAddCartLine
     component: modal
@@ -9164,7 +9173,7 @@ screens:
   name: Loyalty & Rewards
   module: Membership, Loyalty & Value
   requiresModule: marketing
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /loyalty-and-rewards
@@ -9202,13 +9211,8 @@ screens:
         label: Every loyalty programme
         bindsTo: LoyaltyProgramme
         columns:
-        - LoyaltyProgramme.id
         - LoyaltyProgramme.code
         - LoyaltyProgramme.name
-        - LoyaltyProgramme.venueId
-        - LoyaltyProgramme.pointsLiabilityAccountId
-        - LoyaltyProgramme.earnRules
-        - LoyaltyProgramme.tiers
         - LoyaltyProgramme.pointsExpireAfterMonths
         - LoyaltyProgramme.isActive
         operation: listLoyaltyProgrammes
@@ -9220,15 +9224,9 @@ screens:
         - Promotion.code
         - Promotion.name
         - Promotion.description
-        - Promotion.venueId
         - Promotion.discount
-        - Promotion.conditions
-        - Promotion.stackingMode
-        - Promotion.stackingGroup
-        - Promotion.precedence
         - Promotion.validFrom
         - Promotion.validTo
-        - Promotion.maxRedemptions
         operation: listPromotions
         provenance: contract promotions.yaml GET /promotions
       - kind: cardList
@@ -9361,9 +9359,9 @@ screens:
       view: Summit Peaks → header 'At the venue' → Loyalty
       differences: Placed inside the in-venue section; referral code appears under Account → Groups &
         invitations (YAML createReferral is here).
-  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: confirmCreateReferral
     component: confirmDialog
@@ -9401,7 +9399,7 @@ screens:
   name: AI Concierge – Home
   module: Engagement & Support
   requiresModule: ai
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /ai-concierge
@@ -9439,7 +9437,11 @@ screens:
         notes: '**The conversation is the content.** The question shows at once and the answer streams
           with its sources; on 503 (every provider failed) "Sahli can''t answer right now" with Hand over
           to a person and Try again. The conversation is opened silently (`createAiConversation`) on the
-          first message, its scope taken from the session; the guest never picks a module.'
+          first message, its scope taken from the session; the guest never picks a module.
+
+
+          **Answers stream** (decided by Chinmay, 3 October 2026 (CHG-SPF-013)): server-sent events carry
+          the tokens, then the sources and any proposed action; the full message is stored once it ends.'
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
       - kind: textField
         label: Your question
@@ -9450,7 +9452,7 @@ screens:
         bindsTo: AiMessage.content
       - kind: textField
         label: Message to the agent
-        operation: sendConversationMessage
+        operation: sendGuestConversationMessage
         notes: Replaces the ask box once a person has taken the conversation; the transcript stays above.
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
         bindsTo: ConversationMessage.body
@@ -9473,8 +9475,8 @@ screens:
         operation: handoverToAgent
         notes: One tap, always visible in the panel header. Sends reason `guestRequested` with Sahli's
           own summary; the platform sets `assistantFailed`, `outOfScope` or `negativeSentiment` itself.
-          The panel becomes the agent chat (`sendConversationMessage`) with queue position and wait; 409
-          offers to raise a case.
+          The panel becomes the agent chat (`sendGuestConversationMessage`) with queue position and wait;
+          409 offers to raise a case.
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
       - kind: secondaryButton
         label: Helpful / Not helpful
@@ -9529,9 +9531,10 @@ screens:
     purpose: Earlier conversations Only when signed in (decided 2 October 2026 by Chinmay, fix before
       Block A starts (GFIX-6)).
     trigger: onLoad
-  - operationId: sendConversationMessage
+  - operationId: sendGuestConversationMessage
     contract: marketing-crm
-    purpose: Ask the concierge something
+    purpose: 'After a handover, the guest writes to the agent, as the guest: sendConversationMessage needs
+      CASE_MANAGE (decided by Chinmay, 3 October 2026 (CHG-SPF-013))'
     trigger: onAction
   - operationId: recordAnswerFeedback
     contract: ai
@@ -9542,10 +9545,16 @@ screens:
     params:
     - name: conversationId
       from: deepLink
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiConversations`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: outletId
       from: session
     - name: messageId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `sendAiMessage`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
       here, and the person holding it did nothing wrong. Arrives with `conversationId`.'
@@ -9560,14 +9569,14 @@ screens:
       match: exact
       view: Floating 'Ask Sahli' button on every page
       differences: A floating chat panel rather than a home screen; no conversation history list (listAiConversations).
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: WEB-045
   name: Help Centre & Accessibility
   module: Support
   requiresModule: core
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /help-centre-and-accessibility
@@ -9697,9 +9706,9 @@ screens:
       match: partial
       view: Header 'Help' → 'Policies and accessibility'; footer 'Accessibility'
       differences: 'Not a separate screen: part of the WEB-025 Help centre page.'
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: listFaqs
     removed: true
@@ -9713,7 +9722,7 @@ screens:
   name: In-Venue Notifications
   module: Engagement & Support
   requiresModule: marketing
-  wave: 2
+  wave: 1
   implementation:
     app: guest-web
     route: /in-venue-notifications
@@ -9815,14 +9824,14 @@ screens:
       differences: 'Deferred in the YAML (release later, R242: no in-app feed in the first release), but
         the prototype draws it as a live section, so the client will expect it. **Superseded 29 September
         (rev 3 GAP-C1, DI-1075): the screen is in the first release** (CHG-SGU-017).'
-  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: WEB-047
   name: Map Booking — Cabanas & Spots
   module: Booking & Selection
   requiresModule: resources
-  wave: 3
+  wave: 1
   implementation:
     app: guest-web
     route: /booking-and-selection/map-booking
@@ -10031,6 +10040,9 @@ screens:
       from: session
     - name: holdId
       from: navigation
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createResourceHold`;
+        a link or an edge that holds one opens it instead.'
     coldEntry: '**A link to a map that is no longer published, or a day that has passed,** says which
       and offers today on the current map. Nothing is held on arrival.'
   wireframe:
@@ -10063,7 +10075,7 @@ screens:
   name: Book a Space by the Hour
   module: Booking & Selection
   requiresModule: resources
-  wave: 3
+  wave: 1
   implementation:
     app: guest-web
     route: /booking-and-selection/space-by-the-hour
@@ -10216,7 +10228,7 @@ screens:
   name: Transport — Route & Schedule
   module: Transport
   requiresModule: transport
-  wave: 3
+  wave: 1
   implementation:
     app: guest-web
     route: /transport/route-and-schedule

@@ -7,7 +7,7 @@
  "audience": "partner",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-10-02",
+ "generated": "2026-10-03",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 43,
@@ -18,7 +18,8 @@
   "operationsWithNoScreen": 4
  },
  "waves": {
-  "wave2": 11,
+  "wave1": 1,
+  "wave2": 10,
   "wave3": 32
  },
  "modules": [
@@ -33,6 +34,7 @@
    "module": "Access & Account",
    "screens": 5,
    "waves": [
+    1,
     2,
     3
    ]
@@ -135,7 +137,7 @@
    "id": "PTR-001",
    "name": "Partner Login / MFA",
    "module": "Access & Account",
-   "wave": 2,
+   "wave": 1,
    "route": "/general/partner-login-mfa",
    "operations": 11,
    "drawn": true
@@ -550,6 +552,7 @@
    {
     "module": "Access & Account",
     "waves": [
+     1,
      2,
      3
     ]

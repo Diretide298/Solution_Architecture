@@ -127,7 +127,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-059` | Plan in Progress | A | 9 | 31 | 6 | 4 | 0 | 1 | guest | notStarted (designed) |
+| `GST-059` | Plan in Progress | A | 10 | 31 | 6 | 4 | 0 | 1 | guest | notStarted (designed) |
 | `GST-068` | Help & My Cases | A | 8 | 7 | 5 | 2 | 3 | 0 | guest | notStarted (client-verified) |
 
 ## Design inputs from the client meetings

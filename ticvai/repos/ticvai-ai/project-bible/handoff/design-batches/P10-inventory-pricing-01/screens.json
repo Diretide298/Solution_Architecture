@@ -71,18 +71,12 @@
        "label": "Every channel capacity",
        "bindsTo": "ChannelCapacity",
        "columns": [
-        "ChannelCapacity.id",
-        "ChannelCapacity.performanceId",
         "ChannelCapacity.name",
-        "ChannelCapacity.seatCategoryId",
         "ChannelCapacity.oversellAllowance",
         "ChannelCapacity.oversellBasis",
         "ChannelCapacity.capacity",
         "ChannelCapacity.sold",
-        "ChannelCapacity.leased",
-        "ChannelCapacity.remaining",
-        "ChannelCapacity.hasChannelAllocations",
-        "ChannelCapacity.isSeated"
+        "ChannelCapacity.remaining"
        ],
        "operation": "listChannelCapacities",
        "provenance": "contract catalogue.yaml GET /channel-capacities"
@@ -92,18 +86,12 @@
        "label": "Every refund",
        "bindsTo": "Refund",
        "columns": [
-        "Refund.id",
-        "Refund.orderId",
-        "Refund.batchId",
         "Refund.fxRate",
-        "Refund.taxReversalEntryId",
         "Refund.settleTo",
         "Refund.fxVariance",
         "Refund.amount",
         "Refund.appliedPercentage",
-        "Refund.status",
-        "Refund.reason",
-        "Refund.requestedByPrincipalId"
+        "Refund.status"
        ],
        "operation": "listOrderRefunds",
        "provenance": "contract orders.yaml GET /orders/{orderId}/refunds"
@@ -113,14 +101,10 @@
        "label": "Every order",
        "bindsTo": "OrderSummary",
        "columns": [
-        "OrderSummary.id",
         "OrderSummary.orderNumber",
         "OrderSummary.status",
-        "OrderSummary.grossAmount",
-        "OrderSummary.refundedAmount",
         "OrderSummary.channel",
         "OrderSummary.lineCount",
-        "OrderSummary.principalId",
         "OrderSummary.holdLabel",
         "OrderSummary.heldUntil"
        ],
@@ -145,18 +129,14 @@
        "label": "The selected channel capacity",
        "bindsTo": "ChannelCapacity",
        "columns": [
-        "ChannelCapacity.id",
-        "ChannelCapacity.performanceId",
         "ChannelCapacity.name",
-        "ChannelCapacity.seatCategoryId",
         "ChannelCapacity.oversellAllowance",
         "ChannelCapacity.oversellBasis",
         "ChannelCapacity.capacity",
         "ChannelCapacity.sold",
         "ChannelCapacity.leased",
         "ChannelCapacity.remaining",
-        "ChannelCapacity.hasChannelAllocations",
-        "ChannelCapacity.isSeated"
+        "ChannelCapacity.hasChannelAllocations"
        ],
        "operation": "listChannelCapacities",
        "provenance": "contract catalogue.yaml GET /channel-capacities"
@@ -166,22 +146,14 @@
        "label": "The order",
        "bindsTo": "Order",
        "columns": [
-        "Order.id",
         "Order.orderNumber",
         "Order.channel",
-        "Order.venueId",
-        "Order.scopePath",
         "Order.status",
-        "Order.currency",
-        "Order.currencyScale",
         "Order.grossAmount",
         "Order.taxAmount",
         "Order.netAmount",
         "Order.refundedAmount",
-        "Order.totalPriceVariance",
-        "Order.lines",
-        "Order.payments",
-        "Order.principalId"
+        "Order.totalPriceVariance"
        ],
        "operation": "getOrder",
        "provenance": "contract orders.yaml GET /orders/{orderId}"
@@ -286,7 +258,7 @@
    "error": "Could not load. Names which read failed and leaves the inventory allocation untouched.",
    "emptyFirstRun": "No inventory allocation yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on performanceId and the inventory allocation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getChannelAllocations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE` for `relinquishChannelAllocation`; `ORDER_REPRINT` for `reprintOrder`."
   },
   "apis": [
    {
@@ -348,11 +320,15 @@
    "params": [
     {
      "name": "channelCapacityId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listChannelCapacities` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "orderId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listOrders` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
@@ -369,7 +345,7 @@
    "provenance": "generated",
    "board": "wireframes/P10 Partner Web.dc.html#ptr-005"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "applyManualDiscount",
@@ -511,16 +487,10 @@
        "label": "Every product",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
         "Product.code",
         "Product.name",
         "Product.description",
         "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
         "Product.onSaleFrom",
         "Product.onSaleTo"
        ],
@@ -546,15 +516,11 @@
        "label": "Every price list",
        "bindsTo": "PriceList",
        "columns": [
-        "PriceList.id",
         "PriceList.code",
         "PriceList.name",
-        "PriceList.venueId",
         "PriceList.currency",
         "PriceList.currencyScale",
-        "PriceList.channels",
         "PriceList.validFrom",
-        "PriceList.validTo",
         "PriceList.priority"
        ],
        "operation": "listPriceLists",
@@ -602,22 +568,14 @@
        "label": "The selected product",
        "bindsTo": "Product",
        "columns": [
-        "Product.id",
         "Product.code",
         "Product.name",
         "Product.description",
         "Product.kind",
-        "Product.venueId",
-        "Product.scopePath",
-        "Product.createdByPrincipalId",
-        "Product.approvedByPrincipalId",
-        "Product.responsibleDepartmentId",
         "Product.onSaleFrom",
         "Product.onSaleTo",
-        "Product.categoryId",
         "Product.lifecycleState",
-        "Product.isSellable",
-        "Product.isStockTracked"
+        "Product.isSellable"
        ],
        "operation": "getProduct",
        "provenance": "contract catalogue.yaml GET /products/{productId}"
@@ -718,11 +676,15 @@
    "params": [
     {
      "name": "priceListId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listPriceLists` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "productId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProducts` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A shared product link after the product retired.** Shows what replaced it where a successor exists, and the catalogue where none does.",
@@ -739,7 +701,7 @@
    "provenance": "generated",
    "board": "wireframes/P10 Partner Web.dc.html#ptr-006"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 17 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 17 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P10",
    "audience": "partner",
@@ -850,7 +812,7 @@
    "provenance": "generated",
    "board": "wireframes/P10 Partner Web.dc.html#ptr-007"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-020): The purpose was copied from the guest search (\"Find something when the guest does not know what it is called\"); the screen is availability for the partner's products (design-notes correction ticketing-guest PTR-007).",
   "_platform": {
    "code": "P10",

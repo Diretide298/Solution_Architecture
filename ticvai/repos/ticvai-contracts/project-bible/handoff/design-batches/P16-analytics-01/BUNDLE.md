@@ -125,16 +125,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ANL-001` | Executive Command Center | B–D | 15 | 31 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
-| `ANL-002` | Sales, Revenue & Channel | B–D | 6 | 1 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
-| `ANL-003` | Operational Performance | B–D | 11 | 50 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
-| `ANL-004` | Product Performance | B–D | 9 | 29 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
-| `ANL-005` | Cost, Margin & Profitability | B–D | 6 | 5 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
-| `ANL-006` | Inventory & Waste Intelligence | B–D | 7 | 25 | 6 | 23 | 1 | 4 | — | notStarted (generated) |
-| `ANL-007` | Guest & Conversion Intelligence | B–D | 28 | 19 | 6 | 18 | 2 | 0 | — | notStarted (generated) |
-| `ANL-008` | Demand Forecasting | B–D | 4 | 1 | 6 | 39 | 2 | 0 | — | notStarted (generated) |
-| `ANL-009` | AI Assistant & Action Center | B–D | 30 | 46 | 6 | 15 | 1 | 0 | — | notStarted (generated) |
-| `ANL-010` | Suggestions & Advice | B–D | 17 | 40 | 6 | 11 | 0 | 0 | — | notStarted (generated) |
+| `ANL-001` | Executive Command Center | D | 15 | 17 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
+| `ANL-002` | Sales, Revenue & Channel | D | 6 | 1 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
+| `ANL-003` | Operational Performance | D | 11 | 27 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
+| `ANL-004` | Product Performance | D | 9 | 15 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
+| `ANL-005` | Cost, Margin & Profitability | D | 6 | 5 | 6 | 5 | 1 | 0 | — | notStarted (generated) |
+| `ANL-006` | Inventory & Waste Intelligence | D | 7 | 17 | 6 | 23 | 1 | 4 | — | notStarted (generated) |
+| `ANL-007` | Guest & Conversion Intelligence | D | 28 | 15 | 6 | 18 | 2 | 0 | — | notStarted (generated) |
+| `ANL-008` | Demand Forecasting | D | 4 | 1 | 6 | 39 | 2 | 0 | — | notStarted (generated) |
+| `ANL-009` | AI Assistant & Action Center | D | 30 | 30 | 6 | 15 | 1 | 0 | — | notStarted (generated) |
+| `ANL-010` | Suggestions & Advice | D | 17 | 40 | 6 | 11 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -150,7 +150,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-001 |
 | Who uses it | venue staff holding `AI_USE`, `REPORT_VIEW_VENUE` (2 operate) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAlerts` reads the population and `getDashboard` reads one of them — list, select, act |
@@ -245,15 +245,9 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Rule | the name it points at, never the id | — |
 | Raised at | 1 Oct 2026, 14:30 | — |
 | Severity | chip: Info, Warning, Critical | How urgent an alert rule's breach is. Shared by `AlertRule`, `Alert` and the `listAlerts` filter. |
 | Status | chip: Raised, Acknowledged, Resolved, Expired | Where a raised alert is. Shared by `Alert` and the `listAlerts` filter. |
-| Observed value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
-| Threshold | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
-| Scope path | text | — |
-| Acknowledged by principal | the name it points at, never the id | — |
 | Acknowledged at | 1 Oct 2026, 14:30 | — |
 | Resolved at | 1 Oct 2026, 14:30 | Set when the metric returns to range, automatically. An alert that only a person can close is an alert list that only grows. |
 | Escalated at | 1 Oct 2026, 14:30 | Where `VenueSettings.alerting.escalateAfterMinutes` passed with no acknowledgement. |
@@ -264,8 +258,6 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Rule | the name it points at, never the id | — |
 | Rule name | text | `AlertRule.name` as it stood when the alert was raised. The line a person reads — a list of rule ids is not an alert panel, and a screen … |
 | Metric | chip: Occupancy, Capacity utilisation, Admission rate, No show rate, Conversion, Sales by … | The rule's metric, carried so the alert says what went out of range. |
 | Raised at | 1 Oct 2026, 14:30 | — |
@@ -273,13 +265,7 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 | Status | chip: Raised, Acknowledged, Resolved, Expired | Where a raised alert is. Shared by `Alert` and the `listAlerts` filter. |
 | Observed value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
 | Threshold | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
-| Scope path | text | — |
-| Workstation | the name it points at, never the id | The workstation the reading was taken for, where the metric is measured per workstation (`salesByWorkstation`). |
-| Shift | the name it points at, never the id | The till shift (`orders.pos_shift`) the reading belongs to, where it was taken for a workstation with a shift open. |
-| Item | the name it points at, never the id | The inventory item the reading is about, where the metric is measured per item (`stockAgeing`, `stockTurnover`, `wastageRate` … |
-| Acknowledged by principal | the name it points at, never the id | — |
 | Acknowledged at | 1 Oct 2026, 14:30 | — |
-| Acknowledgement note | text | The `note` given to `acknowledgeAlert`. Kept, because an acknowledgement that says what is being done about it is the one escalation can … |
 
 **The command centre** (detail panel, from `getCommandCentre`)
 
@@ -342,7 +328,7 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 - → `ANL-016` Sales & Channel Performance: *Sales & Channel Performance*
 - → `ANL-017` Customer, Membership & Loyalty Pulse: *Customer, Membership & Loyalty Pulse*; carries `dashboardId`
 - → `ANL-018` Alerts & Exception Center: *Alerts & Exception Center*
-- → `ANL-019` AI Management Insights: *AI Management Insights*
+- → `ANL-019` AI Management Insights: *AI Management Insights*; carries `insightId`
 
 #### States
 
@@ -448,7 +434,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (15), with its required mark, default, format and its error state (400, 403, 404, 422).
-- [ ] Every output is drawn (31 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (17 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-001?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Request suggestion, Run report.
 - [ ] Every transition is wired: `ANL-020`, `ANL-061`, `ANL-021`, `ANL-031`, `ANL-041`, `ANL-051`, `ANL-002`, `ANL-003`, `ANL-004`, `ANL-005`, `ANL-006`, `ANL-007`, `ANL-008`, `ANL-009`, `ANL-010`, `ANL-012`, `ANL-013`, `ANL-014`, `ANL-015`, `ANL-016`, `ANL-017`, `ANL-018`, `ANL-019`.
@@ -469,7 +455,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-002 |
 | Who uses it | venue staff holding `REPORT_VIEW_VENUE` (1 operate) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | statusTracker (compact density): `getDashboard` reads one record and nothing reads a population — the screen is about that one thing |
@@ -663,7 +649,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-003 |
 | Who uses it | venue staff holding `DEVICE_VIEW`, `REPORT_VIEW_VENUE`, `USER_MANAGE` (1 read, 1 operate, 1 configure) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAlerts` reads the population and `getDashboard` reads one of them — list, select, act |
@@ -738,15 +724,9 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Rule | the name it points at, never the id | — |
 | Raised at | 1 Oct 2026, 14:30 | — |
 | Severity | chip: Info, Warning, Critical | How urgent an alert rule's breach is. Shared by `AlertRule`, `Alert` and the `listAlerts` filter. |
 | Status | chip: Raised, Acknowledged, Resolved, Expired | Where a raised alert is. Shared by `Alert` and the `listAlerts` filter. |
-| Observed value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
-| Threshold | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
-| Scope path | text | — |
-| Acknowledged by principal | the name it points at, never the id | — |
 | Acknowledged at | 1 Oct 2026, 14:30 | — |
 | Resolved at | 1 Oct 2026, 14:30 | Set when the metric returns to range, automatically. An alert that only a person can close is an alert list that only grows. |
 | Escalated at | 1 Oct 2026, 14:30 | Where `VenueSettings.alerting.escalateAfterMinutes` passed with no acknowledgement. |
@@ -755,31 +735,22 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Kind | chip: Receipt printer, Ticket printer, Label printer, Cash drawer, Barcode scanner, RFID … | `mobileHandset` (18.1.5, added 29 September): a staff phone or tablet running the staff app, registered for push and bound to no … |
 | Driver | text | Built to an open standard where one exists — ESC/POS, UnifiedPOS, OSDP. Adding a vendor is a driver plus configuration, not a core change … |
 | Identifier | text | — |
-| Workstation | the name it points at, never the id | Required for every kind except `mobileHandset`, which is bound to no workstation (18.1.5, 29 September), and except an access-control … |
 | Model | text | — |
 | Push token | text | BL-163. Guest devices register for push and staff devices did not — `registerGuestDevice` exists with a token, platform and failure count … |
-| Push platform | chip: Ios, Android, Web, Windows | — |
 | Push failure count | 1,234 | Consecutive failures. A token that has failed repeatedly is a device that was wiped or reassigned, and continuing to push to it is how a … |
-| Offline scope | chip: None, Read only, Sell and scan, Full venue | BL-163. What this device may do with no connection, which was unstated for the staff app while `venue-pos` and `venue-scanner` had it … |
-| Firmware version | text | As the device last reported it on its heartbeat. |
-| Is required | yes / no (icon or chip) | True blocks shift open when the device is unreachable. |
 
 **Every principal** (data table, from `listPrincipals`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Username | text | — |
 | Display name | text | — |
 | Is active | yes / no (icon or chip) | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | Past this, resolution returns DENY regardless of grants. |
-| Primary role | the name it points at, never the id | Determines the landing screen when the principal holds several roles and picks one at login. |
-| Roles | list or chips (count when long) | — |
 | Last login at | 1 Oct 2026, 14:30 | — |
 
 **Chart** (chart): **Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.
@@ -788,8 +759,6 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Rule | the name it points at, never the id | — |
 | Rule name | text | `AlertRule.name` as it stood when the alert was raised. The line a person reads — a list of rule ids is not an alert panel, and a screen … |
 | Metric | chip: Occupancy, Capacity utilisation, Admission rate, No show rate, Conversion, Sales by … | The rule's metric, carried so the alert says what went out of range. |
 | Raised at | 1 Oct 2026, 14:30 | — |
@@ -797,13 +766,7 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 | Status | chip: Raised, Acknowledged, Resolved, Expired | Where a raised alert is. Shared by `Alert` and the `listAlerts` filter. |
 | Observed value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
 | Threshold | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
-| Scope path | text | — |
-| Workstation | the name it points at, never the id | The workstation the reading was taken for, where the metric is measured per workstation (`salesByWorkstation`). |
-| Shift | the name it points at, never the id | The till shift (`orders.pos_shift`) the reading belongs to, where it was taken for a workstation with a shift open. |
-| Item | the name it points at, never the id | The inventory item the reading is about, where the metric is measured per item (`stockAgeing`, `stockTurnover`, `wastageRate` … |
-| Acknowledged by principal | the name it points at, never the id | — |
 | Acknowledged at | 1 Oct 2026, 14:30 | — |
-| Acknowledgement note | text | The `note` given to `acknowledgeAlert`. Kept, because an acknowledgement that says what is being done about it is the one escalation can … |
 
 **The dashboard data** (detail panel, from `getDashboard`)
 
@@ -925,7 +888,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (11), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (50 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-003?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Run report.
 - [ ] Every transition is wired: `ANL-001`.
@@ -946,7 +909,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-004 |
 | Who uses it | venue staff holding `PRODUCT_VIEW`, `REPORT_VIEW_VENUE` (1 read, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listProducts` reads the population and `getDashboard` reads one of them — list, select, act |
@@ -1017,16 +980,10 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
 | Kind | chip: Admission, Timed admission, Dated admission, Open dated, Seated, Membership… | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Created by principal | the name it points at, never the id | 1.4.18. The approval gate refuses an approver who is the author, and nothing recorded either. |
-| Approved by principal | the name it points at, never the id | — |
-| Responsible department | the name it points at, never the id | Who owns this product commercially. A scope node at `department` level. |
 | On sale from | 1 Oct 2026, 14:30 | 1.4.8. A seasonal product should not need somebody awake at midnight. |
 | On sale to | 1 Oct 2026, 14:30 | Retires the product automatically. Retirement is not deletion — the product stops selling and every order that referenced it still resolves. |
 
@@ -1036,22 +993,14 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
 | Kind | chip: Admission, Timed admission, Dated admission, Open dated, Seated, Membership… | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Created by principal | the name it points at, never the id | 1.4.18. The approval gate refuses an approver who is the author, and nothing recorded either. |
-| Approved by principal | the name it points at, never the id | — |
-| Responsible department | the name it points at, never the id | Who owns this product commercially. A scope node at `department` level. |
 | On sale from | 1 Oct 2026, 14:30 | 1.4.8. A seasonal product should not need somebody awake at midnight. |
 | On sale to | 1 Oct 2026, 14:30 | Retires the product automatically. Retirement is not deletion — the product stops selling and every order that referenced it still resolves. |
-| Category | the name it points at, never the id | Taken from their `fnb.product` and `retail.product`, 20 September. `catalogue.product_category` has existed since 20 August with two … |
 | Lifecycle state | chip: Draft, In review, Approved, Live, Withdrawn, Archived | — |
 | Is sellable | yes / no (icon or chip) | True only when live and carried by a published bundle. Approval and publication are different acts. |
-| Is stock tracked | yes / no (icon or chip) | Taken from their `fnb.product`, 20 September. Whether a sale decrements stock, which is not what `isSellable` asks. |
 
 **The dashboard data** (detail panel, from `getDashboard`)
 
@@ -1166,11 +1115,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client design-board frames: `FnB Board 6.dc.html#fnb-6d`, `Retail Board 6.dc.html#ret-6c`
 - Flow F82 *A month is analysed from incrementality to a scheduled report*, step 3: Product Performance. → **Drawn by the client as RET-6C.** 3 operations on this step.
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (29 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-004?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Run report.
 - [ ] Every transition is wired: `ANL-001`, `ANL-006`.
@@ -1191,7 +1141,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-005 |
 | Who uses it | venue staff holding `LEDGER_VIEW`, `REPORT_VIEW_VENUE` (1 read, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | statusTracker (compact density): `getDashboard` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1392,7 +1342,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-006 |
 | Who uses it | venue staff holding `AI_USE`, `PRODUCT_VIEW`, `REPORT_VIEW_VENUE` (2 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listExpiringBatches` reads the population and `getDashboard` reads one of them — list, select, act |
@@ -1451,15 +1401,11 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Item | the name it points at, never the id | — |
-| Location | the name it points at, never the id | — |
 | Batch code | text | — |
 | Lot number | text | The supplier's own reference. A recall names a lot number, and an inventory that cannot resolve one has to discard everything. |
 | Quantity | 1,234.5 | — |
 | Received at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026 | — |
-| Supplier | the name it points at, never the id | — |
 | Status | chip: Available, Quarantined, Expired, Recalled, Consumed, Written off | — |
 
 **Chart** (chart): **Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.
@@ -1468,15 +1414,11 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Item | the name it points at, never the id | — |
-| Location | the name it points at, never the id | — |
 | Batch code | text | — |
 | Lot number | text | The supplier's own reference. A recall names a lot number, and an inventory that cannot resolve one has to discard everything. |
 | Quantity | 1,234.5 | — |
 | Received at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026 | — |
-| Supplier | the name it points at, never the id | — |
 | Status | chip: Available, Quarantined, Expired, Recalled, Consumed, Written off | — |
 
 **The count variance** (detail panel, from `getCountVariance`)
@@ -1609,7 +1551,7 @@ Also apply: 1 for P16 · Analytics, 14 for all of P16, 29 for every app (section
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (7), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (25 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (17 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-006?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Run report.
 - [ ] Every transition is wired: `ANL-001`, `BO-058`.
@@ -1629,7 +1571,7 @@ Also apply: 1 for P16 · Analytics, 14 for all of P16, 29 for every app (section
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-007 |
 | Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_VIEW`, `REPORT_VIEW_VENUE` (1 configure, 1 read, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listSegments` reads the population and `getDashboard` reads one of them — list, select, act |
@@ -1722,11 +1664,7 @@ Errors to draw in the form: 400 Criteria are contradictory or reference unknown 
 |---|---|---|
 | Name | text | — |
 | Description | text | — |
-| Venue | the name it points at, never the id | — |
 | Match | chip: All, Any | — |
-| Criteria | list or chips (count when long) | — |
-| Exclude segments | list or chips (count when long) | — |
-| ID | the name it points at, never the id | — |
 | Last evaluated size | 1,234 | — |
 | Last evaluated at | 1 Oct 2026, 14:30 | — |
 
@@ -1865,7 +1803,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (28), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-007?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Run report, Create segment, Preview segment.
 - [ ] Every transition is wired: `ANL-001`, `ANL-004`.
@@ -1886,7 +1824,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-008 |
 | Who uses it | venue staff holding `AI_USE`, `REPORT_VIEW_VENUE` (2 operate) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | statusTracker (compact density): `getDashboard` reads one record and nothing reads a population — the screen is about that one thing |
@@ -2096,7 +2034,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-009 |
 | Who uses it | venue staff holding `AI_USE`, `ORDER_VIEW`, `REPORT_MANAGE`, `REPORT_VIEW_VENUE` (2 operate, 1 read, 1 configure); in the flows as marketer |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | approvalInbox (compact density): `decideProposedAction` decides items that `listAlerts` queues — every row is waiting for a person, so the empty state is success |
@@ -2227,15 +2165,9 @@ Errors to draw in the form: 403 The caller may not decide this proposal (audit R
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Rule | the name it points at, never the id | — |
 | Raised at | 1 Oct 2026, 14:30 | — |
 | Severity | chip: Info, Warning, Critical | How urgent an alert rule's breach is. Shared by `AlertRule`, `Alert` and the `listAlerts` filter. |
 | Status | chip: Raised, Acknowledged, Resolved, Expired | Where a raised alert is. Shared by `Alert` and the `listAlerts` filter. |
-| Observed value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
-| Threshold | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
-| Scope path | text | — |
-| Acknowledged by principal | the name it points at, never the id | — |
 | Acknowledged at | 1 Oct 2026, 14:30 | — |
 | Resolved at | 1 Oct 2026, 14:30 | Set when the metric returns to range, automatically. An alert that only a person can close is an alert list that only grows. |
 | Escalated at | 1 Oct 2026, 14:30 | Where `VenueSettings.alerting.escalateAfterMinutes` passed with no acknowledgement. |
@@ -2244,14 +2176,10 @@ Errors to draw in the form: 403 The caller may not decide this proposal (audit R
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Order number | text | — |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
-| Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | The same vocabulary as `Order.channel`, which this projects. |
 | Line count | 1,234 | — |
-| Principal | the name it points at, never the id | The cashier who raised it — what the held-orders list shows. |
 | Hold label | text | As `Order.holdLabel`. |
 | Held until | 1 Oct 2026, 14:30 | As `Order.heldUntil`, so a held-orders list can warn about the ones about to lapse. |
 
@@ -2259,17 +2187,11 @@ Errors to draw in the form: 403 The caller may not decide this proposal (audit R
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Interaction | the name it points at, never the id | — |
 | Kind | chip: Pricing, Promotion, Operational, Financial, Configuration, Content… | `content` (a marketing or storefront draft from `proposeMarketingContent`) and `audience` (a lookalike segment from … |
 | Target contract | text | Which contract would perform it. The assistant never performs it itself. |
 | Target operation | text | — |
-| Payload | grouped details | The request body a person would submit, ready to review. Open on purpose: its shape is the request body of `targetOperation` in … |
-| Summary | text | — |
 | Status | chip: Proposed, Approved, Rejected, Applied, Expired | Expiry (decided 28 September, audit R213): a `proposed` action expires 7 days after `proposedAt`; an `approved` action not applied expires … |
 | Approval level | 1,234 | 8.3.65. Multi-level, because a discount and a pricing change differ in authority. |
-| Decided by principal | the name it points at, never the id | — |
-| Decision reason | text | Required on rejection. The only signal the assistant is proposing badly, and without it a poor model degrades silently. |
 | Proposed at | 1 Oct 2026, 14:30 | — |
 
 **Chart** (chart): **Comparison against the previous period by default.** A number with nothing beside it is a number nobody can act on.
@@ -2418,7 +2340,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (30), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (46 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ANL-009?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Ask reporting question, Acknowledge alert, Run report, Save alert rule, Decide proposed action.
 - [ ] Every transition is wired: `ANL-001`, `BO-010`.
@@ -2439,7 +2361,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P16 Venue Analytics (web) |
 | Module | Analytics · wave 3 · needs the `ai` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-ANALYTICS-ANL-010 |
 | Who uses it | venue staff holding `AI_USE` (1 operate) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`requestSuggestion`, `recordSuggestionOutcome`) and no read of a population — it is settings, not a list |

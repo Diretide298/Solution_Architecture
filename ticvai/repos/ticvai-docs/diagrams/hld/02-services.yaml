@@ -1,7 +1,7 @@
 id: HLD
 title: TICVAI — seventeen modules in five tiers, five deployables
 generatedBy: tools/derive-diagrams.py
-about: '**What ships together.** 2,731 operations and 1,116 tables resolve into seventeen modules, deployed
+about: '**What ships together.** 2,738 operations and 1,117 tables resolve into seventeen modules, deployed
   as five units (ADR-0055), and **the data boundary decides where they split**: a module owns and migrates
   its schemas; another module reads them through published views and writes them only through the owner''s
   in-process API.
@@ -67,7 +67,7 @@ tiers:
     ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
     ref: diagrams/lld/services/CatalogueService.yaml
   - service: OrderService
-    operations: 297
+    operations: 298
     tables: 115
     schemas:
     - orders
@@ -99,7 +99,7 @@ tiers:
     - ledger
     contracts:
     - finance
-    flowCoverage: 46%
+    flowCoverage: 50%
     scale: Write-heavy, batch-tolerant, not latency-critical. Recognition and revaluation are jobs.
     ifDown: '**Correctness over availability.** A ledger that is briefly unavailable is recoverable;
       one that is briefly wrong is not.'
@@ -124,8 +124,8 @@ tiers:
     these runs none of them.
   services:
   - service: VenueOpsService
-    operations: 285
-    tables: 123
+    operations: 287
+    tables: 124
     schemas:
     - queue
     - maintenance
@@ -144,18 +144,18 @@ tiers:
     - games
     - rental
     - transport
-    flowCoverage: 19%
+    flowCoverage: 18%
     scale: Low and steady. Queue readings are the only frequent write.
     ifDown: Down degrades venue operations. Selling and admitting continue.
     ref: diagrams/lld/services/VenueOpsService.yaml
   - service: FnbService
-    operations: 131
+    operations: 133
     tables: 52
     schemas:
     - fnb
     contracts:
     - fnb
-    flowCoverage: 50%
+    flowCoverage: 49%
     scale: Write-heavy during service, idle between. **Two peaks a day, sharply.**
     ifDown: Down means the kitchen falls back to paper. Offline-capable by design.
     ref: diagrams/lld/services/FnbService.yaml
@@ -166,7 +166,7 @@ tiers:
     - inventory
     contracts:
     - inventory
-    flowCoverage: 76%
+    flowCoverage: 72%
     scale: Mixed. Counting is bursty; procurement is not.
     ifDown: Down blocks receiving and counting; selling continues from the till's cache.
     ref: diagrams/lld/services/InventoryService.yaml
@@ -186,13 +186,13 @@ tiers:
     property and one that should be tested rather than assumed.
   services:
   - service: MarketingService
-    operations: 272
+    operations: 274
     tables: 132
     schemas:
     - marketing
     contracts:
     - marketing-crm
-    flowCoverage: 38%
+    flowCoverage: 37%
     scale: Bursty on send, read-heavy otherwise. **The one to watch for a split.**
     ifDown: Down stops campaigns and guest lookup. Neither stops trading.
     ref: diagrams/lld/services/MarketingService.yaml
@@ -243,7 +243,7 @@ tiers:
     - reporting
     contracts:
     - reporting
-    flowCoverage: 33%
+    flowCoverage: 35%
     scale: Analytical. Runs against the replica and the analytical store.
     ifDown: Down stops dashboards. **Nothing operational depends on it.**
     ref: diagrams/lld/services/ReportingService.yaml

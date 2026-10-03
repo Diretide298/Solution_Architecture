@@ -127,7 +127,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-088` | Approval Analytics | B–D | 0 | 4 | 6 | 0 | 0 | 3 | — | notStarted (generated) |
-| `BO-106` | People & Access Rights | B–D | 1 | 33 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
+| `BO-106` | People & Access Rights | B–D | 1 | 30 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -329,12 +329,9 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | Unique within the tenant (decided 28 September, audit R108). A seeded role's code is reserved in every tenant. |
 | Name | text | — |
 | Description | text | — |
-| Permissions | list or chips (count when long) | A role that grants no permissions is not a role. `Role` carried a code, a name and two counts until 18 August, and … |
-| Inherits from role | the name it points at, never the id | Role composition, one level deep and no deeper. A supervisor role that is a cashier plus three permissions is how venues actually describe … |
 | Is system | yes / no (icon or chip) | Seeded roles ship and are editable; deleting one is refused. A venue that removes `cashier` and rebuilds it has two roles with one name in … |
 | Principal count | 1,234 | — |
 | Grant count | 1,234 | — |
@@ -400,7 +397,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 - → `BO-084` Approval Inbox: *Approval Inbox*
 - → `BO-085` Approval Request: *Approval Request*
 - → `BO-087` Approval Delegations: *Approval Delegations*
-- → `BO-054` Role Assignment: *Role Assignment*
+- → `BO-054` Role Assignment: *Role Assignment*; carries `roleId`
 
 #### States
 
@@ -478,7 +475,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (1), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (33 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-106?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-053`, `BO-055`, `BO-056`, `BO-066`, `BO-084`, `BO-085`, `BO-087`, `BO-054`.

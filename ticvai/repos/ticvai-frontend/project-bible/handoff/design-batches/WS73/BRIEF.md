@@ -103,16 +103,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `CMS-051` | Waiver Operations Command Center | B–D | 2 | 22 | 6 | 0 | 2 | 4 | — | notStarted (generated) |
-| `CMS-052` | Participant Waiver Status & Tracking | B–D | 2 | 24 | 6 | 0 | 1 | 4 | — | notStarted (generated) |
-| `CMS-053` | Digital Signing & Collection Operations | B–D | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `CMS-054` | Minor, Guardian & Group Consent Management | B–D | 0 | 12 | 6 | 0 | 1 | 4 | — | notStarted (generated) |
-| `CMS-055` | Waiver Verification & Validation Workspace | B–D | 0 | 40 | 6 | 0 | 1 | 4 | — | notStarted (generated) |
-| `CMS-056` | Missing, Expired & Invalid Waiver Management | B–D | 0 | 20 | 6 | 0 | 2 | 4 | — | notStarted (generated) |
-| `CMS-057` | On-Site Waiver & Exception Handling | B–D | 7 | 0 | 5 | 0 | 0 | 4 | — | notStarted (generated) |
-| `CMS-058` | Compliance Evidence, Audit & Waiver Repository | B–D | 2 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
-| `CMS-059` | Waiver Analytics, Compliance & Operational Insights | B–D | 2 | 26 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
-| `CMS-060` | AI Waiver Compliance & Risk Intelligence Center | B–D | 0 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `CMS-051` | Waiver Operations Command Center | D | 2 | 22 | 6 | 0 | 2 | 4 | — | notStarted (generated) |
+| `CMS-052` | Participant Waiver Status & Tracking | D | 2 | 14 | 6 | 0 | 1 | 4 | — | notStarted (generated) |
+| `CMS-053` | Digital Signing & Collection Operations | D | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `CMS-054` | Minor, Guardian & Group Consent Management | D | 0 | 12 | 6 | 0 | 1 | 4 | — | notStarted (generated) |
+| `CMS-055` | Waiver Verification & Validation Workspace | D | 0 | 40 | 6 | 0 | 1 | 4 | — | notStarted (generated) |
+| `CMS-056` | Missing, Expired & Invalid Waiver Management | D | 0 | 20 | 6 | 0 | 2 | 4 | — | notStarted (generated) |
+| `CMS-057` | On-Site Waiver & Exception Handling | D | 7 | 0 | 5 | 0 | 0 | 4 | — | notStarted (generated) |
+| `CMS-058` | Compliance Evidence, Audit & Waiver Repository | D | 2 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `CMS-059` | Waiver Analytics, Compliance & Operational Insights | D | 2 | 26 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `CMS-060` | AI Waiver Compliance & Risk Intelligence Center | D | 0 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

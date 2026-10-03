@@ -4,7 +4,7 @@
   "name": "Wallet & Gift Cards",
   "module": "Membership, Loyalty & Value",
   "requiresModule": "retail",
-  "wave": 2,
+  "wave": 1,
   "capability": "C21",
   "implementation": {
    "app": "guest-web",
@@ -40,7 +40,7 @@
     {
      "to": "WEB-024",
      "trigger": "Devices, Wishlist & Consent",
-     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-021 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional); WEB-024 finds methodId (enrolMfaMethod) itself; WEB-024 opens on getWishlist, and enrolmentId has no source on WEB-024 yet (a gap in WEB-024, not in this edge)"
+     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-021 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId only pre-select (deep link or optional), and WEB-024 opens on its own"
     }
    ]
   },
@@ -101,7 +101,6 @@
         "GiftCard.faceValue",
         "GiftCard.balance",
         "GiftCard.status",
-        "GiftCard.blockedReason",
         "GiftCard.issuedAt",
         "GiftCard.activatedAt",
         "GiftCard.expiresAt"
@@ -252,7 +251,9 @@
    "params": [
     {
      "name": "cardCode",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getGiftCard`, `getGameCard` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "subjectId",
@@ -260,7 +261,9 @@
     },
     {
      "name": "walletId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getWallet`; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `cardCode`.",
@@ -285,7 +288,7 @@
     "differences": "Rows with toast actions; no transaction list, no gift-card balance lookup. Auto top-up is a prototype addition with no YAML operation. Saved payment tokens are a separate pane."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formStorePaymentToken",
@@ -359,7 +362,7 @@
   "name": "Membership Plans",
   "module": "Membership, Loyalty & Value",
   "requiresModule": "ticketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C31",
   "implementation": {
    "app": "guest-web",
@@ -382,17 +385,17 @@
     {
      "to": "WEB-021",
      "trigger": "Wallet & Gift Cards",
-     "provenance": "derived — WEB-021 declares entryState.params cardCode, walletId and WEB-022 holds none of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); WEB-021 finds walletId (getWallet) itself, and WEB-021 opens on its own"
+     "provenance": "derived — WEB-021 declares entryState.params cardCode, walletId and WEB-022 holds none of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional), and WEB-021 opens on its own"
     },
     {
      "to": "WEB-023",
      "trigger": "Membership Management",
-     "provenance": "derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-022 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional); WEB-023 finds statementId (listBillingStatements) itself; WEB-023 opens on listBillingStatements, and caseId has no source on WEB-023 yet (a gap in WEB-023, not in this edge)"
+     "provenance": "derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-022 holds none of them. The edge carries nothing: orderId, caseId, statementId only pre-select (deep link or optional), and WEB-023 opens on its own"
     },
     {
      "to": "WEB-024",
      "trigger": "Devices, Wishlist & Consent",
-     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-022 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional); WEB-024 finds methodId (enrolMfaMethod) itself; WEB-024 opens on getWishlist, and enrolmentId has no source on WEB-024 yet (a gap in WEB-024, not in this edge)"
+     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-022 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId only pre-select (deep link or optional), and WEB-024 opens on its own"
     }
    ]
   },
@@ -447,8 +450,6 @@
        "label": "Your membership",
        "bindsTo": "GuestMembership",
        "columns": [
-        "GuestMembership.entitlementId",
-        "GuestMembership.productId",
         "GuestMembership.name",
         "GuestMembership.tier",
         "GuestMembership.status",
@@ -456,8 +457,7 @@
         "GuestMembership.validTo",
         "GuestMembership.frozenDays",
         "GuestMembership.benefits",
-        "GuestMembership.renewsOn",
-        "GuestMembership.previousTerms"
+        "GuestMembership.renewsOn"
        ],
        "operation": "getMyMemberships",
        "provenance": "contract catalogue.yaml GET /guests/me/memberships"
@@ -523,7 +523,7 @@
     "differences": "Plans are sold as a booking flow, not a plans page; the account 'Compare' action is a toast."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "listGuestMemberships",
@@ -568,7 +568,7 @@
   "name": "Membership Management",
   "module": "Membership, Loyalty & Value",
   "requiresModule": "ticketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C31",
   "implementation": {
    "app": "guest-web",
@@ -591,7 +591,7 @@
     {
      "to": "WEB-021",
      "trigger": "Wallet & Gift Cards",
-     "provenance": "derived — WEB-021 declares entryState.params cardCode, walletId and WEB-023 holds none of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); WEB-021 finds walletId (getWallet) itself, and WEB-021 opens on its own"
+     "provenance": "derived — WEB-021 declares entryState.params cardCode, walletId and WEB-023 holds none of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional), and WEB-021 opens on its own"
     },
     {
      "to": "WEB-022",
@@ -604,7 +604,7 @@
     {
      "to": "WEB-024",
      "trigger": "Devices, Wishlist & Consent",
-     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-023 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional); WEB-024 finds methodId (enrolMfaMethod) itself; WEB-024 opens on getWishlist, and enrolmentId has no source on WEB-024 yet (a gap in WEB-024, not in this edge)"
+     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-023 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId only pre-select (deep link or optional), and WEB-024 opens on its own"
     }
    ]
   },
@@ -694,8 +694,6 @@
        "label": "Your membership",
        "bindsTo": "GuestMembership",
        "columns": [
-        "GuestMembership.entitlementId",
-        "GuestMembership.productId",
         "GuestMembership.name",
         "GuestMembership.tier",
         "GuestMembership.status",
@@ -703,8 +701,7 @@
         "GuestMembership.validTo",
         "GuestMembership.frozenDays",
         "GuestMembership.benefits",
-        "GuestMembership.renewsOn",
-        "GuestMembership.previousTerms"
+        "GuestMembership.renewsOn"
        ],
        "operation": "getMyMemberships",
        "provenance": "contract catalogue.yaml GET /guests/me/memberships"
@@ -791,11 +788,15 @@
     },
     {
      "name": "caseId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMyPaymentIssues` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "statementId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listBillingStatements` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error.",
@@ -820,7 +821,7 @@
     "differences": "Billing and dunning retry are well covered. Prototype adds membership transfer to a family member and guest passes; YAML's transferOrderTickets on this screen has no visible use."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRetryMyDunningPayment",
@@ -891,12 +892,12 @@
   "name": "Devices, Wishlist & Consent",
   "module": "Membership, Loyalty & Value",
   "requiresModule": "marketing",
-  "wave": 3,
+  "wave": 1,
   "capability": "C93",
   "implementation": {
    "app": "guest-web",
-   "route": "/membership-loyalty-and-value/loyalty-and-rewards",
-   "component": "apps/guest-web/src/routes/membership-loyalty-and-value/LoyaltyAndRewardsDetail.tsx",
+   "route": "/membership-loyalty-and-value/devices-wishlist-consent",
+   "component": "apps/guest-web/src/routes/membership-loyalty-and-value/DevicesWishlistConsentDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -914,7 +915,7 @@
     {
      "to": "WEB-021",
      "trigger": "Wallet & Gift Cards",
-     "provenance": "derived — WEB-021 declares entryState.params cardCode, walletId and WEB-024 holds none of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); WEB-021 finds walletId (getWallet) itself, and WEB-021 opens on its own"
+     "provenance": "derived — WEB-021 declares entryState.params cardCode, walletId and WEB-024 holds none of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional), and WEB-021 opens on its own"
     },
     {
      "to": "WEB-022",
@@ -924,7 +925,7 @@
     {
      "to": "WEB-023",
      "trigger": "Membership Management",
-     "provenance": "derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-024 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional); WEB-023 finds statementId (listBillingStatements) itself; WEB-023 opens on listBillingStatements, and caseId has no source on WEB-023 yet (a gap in WEB-023, not in this edge)"
+     "provenance": "derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-024 holds none of them. The edge carries nothing: orderId, caseId, statementId only pre-select (deep link or optional), and WEB-023 opens on its own"
     },
     {
      "to": "GST-037",
@@ -952,14 +953,8 @@
        "label": "Every guest device",
        "bindsTo": "GuestDevice",
        "columns": [
-        "GuestDevice.id",
-        "GuestDevice.subjectId",
         "GuestDevice.platform",
         "GuestDevice.tokenFingerprint",
-        "GuestDevice.appVersion",
-        "GuestDevice.osVersion",
-        "GuestDevice.deviceModel",
-        "GuestDevice.locale",
         "GuestDevice.status",
         "GuestDevice.failureCount",
         "GuestDevice.registeredAt",
@@ -973,17 +968,11 @@
        "label": "Every delegated access",
        "bindsTo": "DelegatedAccess",
        "columns": [
-        "DelegatedAccess.id",
-        "DelegatedAccess.principalId",
-        "DelegatedAccess.roleId",
         "DelegatedAccess.permission",
-        "DelegatedAccess.subjectId",
-        "DelegatedAccess.overSubjectId",
         "DelegatedAccess.overObjectRef",
         "DelegatedAccess.delegationKind",
         "DelegatedAccess.quota",
         "DelegatedAccess.isRevocableBySubject",
-        "DelegatedAccess.scopePath",
         "DelegatedAccess.effect"
        ],
        "operation": "listDelegations",
@@ -1030,15 +1019,9 @@
        "label": "The selected guest device",
        "bindsTo": "GuestDevice",
        "columns": [
-        "GuestDevice.id",
-        "GuestDevice.subjectId",
         "GuestDevice.platform",
         "GuestDevice.tokenFingerprint",
         "GuestDevice.tokenRef",
-        "GuestDevice.appVersion",
-        "GuestDevice.osVersion",
-        "GuestDevice.deviceModel",
-        "GuestDevice.locale",
         "GuestDevice.status",
         "GuestDevice.failureCount",
         "GuestDevice.registeredAt",
@@ -1334,11 +1317,15 @@
    "params": [
     {
      "name": "deviceId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listGuestDevices` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "itemId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that carries it only pre-selects the record."
     },
     {
      "name": "subjectId",
@@ -1346,11 +1333,15 @@
     },
     {
      "name": "enrolmentId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `enrolMfaMethod`; a link or an edge that holds one opens it instead."
     },
     {
      "name": "methodId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMfaMethods` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
@@ -1375,7 +1366,7 @@
     "differences": "Spread across four panes rather than one screen; wishlist is its own view (WEB-009). Security pane includes passkeys and two-step verification, which the YAML does not have for guests. YAML purpose text still says 'See loyalty & rewards' (stale)."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "getWaiverStatus",
@@ -1419,7 +1410,7 @@
   "name": "Loyalty & Rewards",
   "module": "Membership, Loyalty & Value",
   "requiresModule": "marketing",
-  "wave": 2,
+  "wave": 1,
   "implementation": {
    "app": "guest-web",
    "route": "/loyalty-and-rewards",
@@ -1458,13 +1449,8 @@
        "label": "Every loyalty programme",
        "bindsTo": "LoyaltyProgramme",
        "columns": [
-        "LoyaltyProgramme.id",
         "LoyaltyProgramme.code",
         "LoyaltyProgramme.name",
-        "LoyaltyProgramme.venueId",
-        "LoyaltyProgramme.pointsLiabilityAccountId",
-        "LoyaltyProgramme.earnRules",
-        "LoyaltyProgramme.tiers",
         "LoyaltyProgramme.pointsExpireAfterMonths",
         "LoyaltyProgramme.isActive"
        ],
@@ -1479,15 +1465,9 @@
         "Promotion.code",
         "Promotion.name",
         "Promotion.description",
-        "Promotion.venueId",
         "Promotion.discount",
-        "Promotion.conditions",
-        "Promotion.stackingMode",
-        "Promotion.stackingGroup",
-        "Promotion.precedence",
         "Promotion.validFrom",
-        "Promotion.validTo",
-        "Promotion.maxRedemptions"
+        "Promotion.validTo"
        ],
        "operation": "listPromotions",
        "provenance": "contract promotions.yaml GET /promotions"
@@ -1668,7 +1648,7 @@
     "differences": "Placed inside the in-venue section; referral code appears under Account → Groups & invitations (YAML createReferral is here)."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "confirmCreateReferral",

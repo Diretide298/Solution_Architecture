@@ -316,6 +316,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - … and 1 more flow steps (`flows/`)
 - Flow F189 branch at step 1 (expected): when Nothing has been set up on Wallet & Credit Management Dashboard yet, The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and it is a different situation from an empty result on an established one.
 - Flow F189 branch at step 1 (requiresStaff): when The operator does not hold the permission this screen requires, The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**, which is the right shape -- but the permission that would satisfy it is not granted by any role in …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -603,6 +604,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS60 Game and Ride Board 3.dc.html#bo-416`
 - Workshop pack: Game_and_Ride_Module.pdf board 3
 - Flow F189 *Game and Ride board 3: Wallet & Credit Management Dashboard*, step 4: Works in Wallet Account & Balance View → Allow authorized operators to inspect all value held in an individual guest wallet. The source requires stored credits to be viewable through operator and self-service kiosks.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1454,6 +1456,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS60 Game and Ride Board 3.dc.html#bo-422`
 - Workshop pack: Game_and_Ride_Module.pdf board 3
 - Flow F189 *Game and Ride board 3: Wallet & Credit Management Dashboard*, step 16: Works in Refund, Adjustment & Manual Bonus Control → Enforce refund restrictions and provide governed manual wallet adjustments.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1568,6 +1571,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - Client workshop board: `wireframes/WS60 Game and Ride Board 3.dc.html#bo-423`
 - Workshop pack: Game_and_Ride_Module.pdf board 3
 - Flow F189 *Game and Ride board 3: Wallet & Credit Management Dashboard*, step 18: Works in Wallet Credit Transaction Ledger & Audit → Provide complete traceability for every change to wallet value.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 

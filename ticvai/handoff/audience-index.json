@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-02",
+ "generated": "2026-10-03",
  "note": "Derived from `x-ticvai-audience` on every operation. **One field, eight values** \u2014 `x-ticvai-guest-callable` and `x-ticvai-auth` were two vocabularies answering the same question differently and were collapsed on 18 August (ADR-0025).",
  "field": "x-ticvai-audience",
  "values": [
@@ -111,7 +111,7 @@
   }
  },
  "totals": {
-  "operations": 2731,
+  "operations": 2738,
   "screens": 2450,
   "flows": 290
  },
@@ -249,12 +249,14 @@
     "recordGamePlay",
     "relinquishStoredValue",
     "reportReaderQueue",
+    "reprintOrder",
     "submitQueueReading",
     "syncGamePlays"
    ],
    "screens": [],
    "flows": [
     "F01",
+    "F03",
     "F07",
     "F102",
     "F22",
@@ -288,6 +290,7 @@
     "marketing.guest_profile",
     "marketing.kiosk_assist_session",
     "marketing.loyalty_position",
+    "orders.sales_order",
     "orders.stored_value_authorisation",
     "pii.subject",
     "platform.device",
@@ -309,11 +312,11 @@
     "whitelabel.tenant_config"
    ],
    "counts": {
-    "operations": 18,
+    "operations": 19,
     "screens": 0,
-    "flows": 9,
+    "flows": 10,
     "contracts": 6,
-    "tables": 34
+    "tables": 35
    }
   },
   "guest": {
@@ -390,6 +393,7 @@
     "getGroupPackageDefinition",
     "getGuestBill",
     "getGuestConsents",
+    "getGuestConversation",
     "getGuestMenu",
     "getGuestOrderStatus",
     "getGuestProfile",
@@ -457,6 +461,7 @@
     "listAnalyticsProviders",
     "listBadges",
     "listBillingStatements",
+    "listBookableOutlets",
     "listBookableVenueMaps",
     "listCases",
     "listCatalogueBundles",
@@ -493,6 +498,7 @@
     "listMyNotifications",
     "listMyOrders",
     "listMyPaymentIssues",
+    "listMyTableReservations",
     "listMyWaitingGuests",
     "listOrders",
     "listParkingFacilities",
@@ -561,6 +567,7 @@
     "searchTransportDepartures",
     "sendAiMessage",
     "sendConversationMessage",
+    "sendGuestConversationMessage",
     "setLeaderboardNickname",
     "setMarketingSubscription",
     "setSharedWalletMembers",
@@ -1102,7 +1109,7 @@
     "whitelabel.tenant_config"
    ],
    "counts": {
-    "operations": 269,
+    "operations": 273,
     "screens": 141,
     "flows": 22,
     "contracts": 22,
@@ -1890,6 +1897,7 @@
     "addCartLine",
     "addCaseMessage",
     "addGuestNote",
+    "addIncidentPerson",
     "addLicenceAddOn",
     "addRiskCaseEvidence",
     "addSuppression",
@@ -1975,6 +1983,7 @@
     "cancelInvoice",
     "cancelMerchandiseReservation",
     "cancelOutboxRepublish",
+    "cancelPaymentLink",
     "cancelPerformance",
     "cancelPricingRollback",
     "cancelPurchaseOrder",
@@ -4383,6 +4392,7 @@
     "updateWalletType",
     "updateWorkOrder",
     "uploadGuestDocument",
+    "uploadIncidentMedia",
     "validateAccess",
     "validateBookingFlow",
     "validateGameConfiguration",
@@ -7283,6 +7293,7 @@
     "maintenance.incident_authority_notification",
     "maintenance.incident_investigation_note",
     "maintenance.incident_involved_party",
+    "maintenance.incident_media",
     "maintenance.inspection",
     "maintenance.inspection_item",
     "maintenance.inspection_template",
@@ -7842,11 +7853,11 @@
     "workforce.work_assignment"
    ],
    "counts": {
-    "operations": 2550,
+    "operations": 2553,
     "screens": 2154,
     "flows": 137,
     "contracts": 33,
-    "tables": 1094
+    "tables": 1095
    }
   }
  }

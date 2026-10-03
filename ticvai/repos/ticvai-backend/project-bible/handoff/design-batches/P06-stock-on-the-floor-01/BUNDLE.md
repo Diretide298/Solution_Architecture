@@ -130,16 +130,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `EMP-061` | Retail Inventory Command Center | B–D | 6 | 40 | 6 | 12 | 0 | 4 | — | notStarted (generated) |
-| `EMP-062` | Store Stock & SKU Availability | A | 1 | 37 | 5 | 12 | 2 | 4 | — | notStarted (generated) |
-| `EMP-063` | Requisition & Smart Store Replenishment | B–D | 18 | 36 | 6 | 9 | 2 | 0 | — | notStarted (generated) |
-| `EMP-064` | Store-to-Store & Warehouse Transfers | B–D | 14 | 54 | 6 | 11 | 1 | 0 | — | notStarted (generated) |
-| `EMP-065` | Receiving | A | 31 | 32 | 5 | 7 | 2 | 0 | — | notStarted (generated) |
-| `EMP-066` | Stock Count & Cycle Count Management | B–D | 17 | 20 | 5 | 1 | 3 | 4 | — | notStarted (generated) |
-| `EMP-067` | Damage, Loss, Shrinkage & Stock Adjustment | B–D | 37 | 6 | 5 | 16 | 1 | 4 | — | notStarted (generated) |
-| `EMP-068` | Reservation, Allocation & Omnichannel Inventory | B–D | 8 | 12 | 5 | 14 | 1 | 4 | — | notStarted (generated) |
-| `EMP-069` | Barcode, RFID, Serialized Stock & Traceability | B–D | 3 | 18 | 6 | 0 | 2 | 4 | — | notStarted (generated) |
-| `EMP-070` | Inventory Exceptions, AI Replenishment & Action Center | B–D | 18 | 24 | 6 | 6 | 0 | 4 | — | notStarted (generated) |
+| `EMP-061` | Retail Inventory Command Center | D | 6 | 14 | 6 | 12 | 0 | 4 | — | notStarted (generated) |
+| `EMP-062` | Store Stock & SKU Availability | C | 1 | 30 | 5 | 12 | 2 | 4 | — | notStarted (generated) |
+| `EMP-063` | Requisition & Smart Store Replenishment | D | 18 | 21 | 6 | 9 | 2 | 0 | — | notStarted (generated) |
+| `EMP-064` | Store-to-Store & Warehouse Transfers | D | 14 | 48 | 6 | 11 | 1 | 0 | — | notStarted (generated) |
+| `EMP-065` | Receiving | A | 31 | 25 | 5 | 7 | 2 | 0 | — | notStarted (generated) |
+| `EMP-066` | Stock Count & Cycle Count Management | D | 17 | 20 | 5 | 1 | 3 | 4 | — | notStarted (generated) |
+| `EMP-067` | Damage, Loss, Shrinkage & Stock Adjustment | A | 37 | 6 | 5 | 16 | 1 | 4 | — | notStarted (generated) |
+| `EMP-068` | Reservation, Allocation & Omnichannel Inventory | C | 8 | 5 | 5 | 14 | 1 | 4 | — | notStarted (generated) |
+| `EMP-069` | Barcode, RFID, Serialized Stock & Traceability | D | 3 | 8 | 6 | 0 | 2 | 4 | — | notStarted (generated) |
+| `EMP-070` | Inventory Exceptions, AI Replenishment & Action Center | D | 18 | 9 | 6 | 6 | 0 | 4 | — | notStarted (generated) |
 
 ---
 
@@ -155,7 +155,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Stock on the Floor · wave 2 · needs the `inventory` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-061 |
 | Who uses it | venue staff holding `PRODUCT_VIEW`, `REPORT_VIEW_VENUE` (1 read, 1 operate); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listStockMovements` reads the population and `getStockPositions` reads one of them — list, select, act |
@@ -220,18 +220,10 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Item | the name it points at, never the id | — |
-| Location | the name it points at, never the id | — |
-| Kind | chip: Receipt, Issue, Sale depletion, Waste, Adjustment in, Adjustment out… | The kind decides the direction (decided 28 September, audit R171). In: `receipt`, `transferIn`, `adjustmentIn`, `countGain`, `production` … |
 | Quantity | 1,234.5 | Always positive. The `kind` decides whether it adds or removes stock, not the sign (decided 28 September, audit R171). |
-| Unit | text | — |
-| Reason | text | Required for `adjustmentIn`, `adjustmentOut` and `waste` (decided 28 September, audit R171); adjustments are reported separately. |
-| Cost center | the name it points at, never the id | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
 | Balance after | 1,234.5 | — |
 | Unit cost | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Total cost | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **Card list** (card list): **Cards rather than a table.** One thumb, arm’s length, and a person who is walking.
 
@@ -239,36 +231,18 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Item | the name it points at, never the id | — |
-| Location | the name it points at, never the id | — |
 | Kind | chip: Receipt, Issue, Sale depletion, Waste, Adjustment in, Adjustment out… | The kind decides the direction (decided 28 September, audit R171). In: `receipt`, `transferIn`, `adjustmentIn`, `countGain`, `production` … |
 | Quantity | 1,234.5 | Always positive. The `kind` decides whether it adds or removes stock, not the sign (decided 28 September, audit R171). |
-| Unit | text | — |
-| Reason | text | Required for `adjustmentIn`, `adjustmentOut` and `waste` (decided 28 September, audit R171); adjustments are reported separately. |
-| Cost center | the name it points at, never the id | — |
-| Recorded at | 1 Oct 2026, 14:30 | — |
 | Balance after | 1,234.5 | — |
 | Unit cost | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Total cost | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Principal | the name it points at, never the id | — |
-| Source type | text | What generated it — an order, a count, a transfer. |
-| Source | text | — |
-| Journal entry | text | — |
 
 **The stock position** (detail panel, from `getStockPositions`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Item | the name it points at, never the id | — |
 | Item name | text | — |
-| SKU | text | — |
-| Location | the name it points at, never the id | — |
 | Location name | text | — |
-| On hand | 1,234.5 | — |
-| Allocated | 1,234.5 | Reserved for orders: the quantity under an active stock reservation for an order (decided 28 September, audit R171). |
-| Available | 1,234.5 | On-hand minus allocated (decided 28 September, audit R171). What can still be sold or issued. |
-| Unit | text | — |
 | Value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Last counted at | 1 Oct 2026, 14:30 | — |
 | Last movement at | 1 Oct 2026, 14:30 | — |
@@ -369,7 +343,7 @@ Also apply: 1 for P06 · Stock on the Floor, 12 for all of P06, 29 for every app
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (6), with its required mark, default, format and its error state (400, 404).
-- [ ] Every output is drawn (40 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-061?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm.
 - [ ] No transition is declared; back returns where the user came from.
@@ -390,12 +364,12 @@ Also apply: 1 for P06 · Stock on the Floor, 12 for all of P06, 29 for every app
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Stock on the Floor · wave 2 · needs the `retail` module |
-| Block | Block A · ticket #18185 (APP-SETUP-EMP-062) |
+| Block | Block C · task APP-SETUP-EMP-062 |
 | Who uses it | venue staff holding `PRODUCT_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | statusTracker (comfortable density): `getStockPositions` reads one record and nothing reads a population — the screen is about that one thing |
 | Offline | **Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice. |
-| Opens with | `venueId` (session), `outletId` (navigation) · cold entry: **Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to. |
+| Opens with | `venueId` (session), `outletId` (session) · cold entry: **Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to. |
 | Route | `/operations/store-stock-sku-availability` |
 
 **What the spec says about it.** **Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Named in the board contents and not written up in it.** **Food-safety operations wired 20 August** — boards 5G and 5J of the client F&B pack, and **HACCP is a regulatory obligation nothing in the package touched.** **Links to EMP-067 for the reading itself** — F28 step 1 to step 2, and a due-checks list that cannot reach the recording screen is a list nobody acts on.
@@ -442,15 +416,8 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Shows | Format | Notes |
 |---|---|---|
-| Item | the name it points at, never the id | — |
 | Item name | text | — |
-| SKU | text | — |
-| Location | the name it points at, never the id | — |
 | Location name | text | — |
-| On hand | 1,234.5 | — |
-| Allocated | 1,234.5 | Reserved for orders: the quantity under an active stock reservation for an order (decided 28 September, audit R171). |
-| Available | 1,234.5 | On-hand minus allocated (decided 28 September, audit R171). What can still be sold or issued. |
-| Unit | text | — |
 | Value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Last counted at | 1 Oct 2026, 14:30 | — |
 | Last movement at | 1 Oct 2026, 14:30 | — |
@@ -599,11 +566,12 @@ Also apply: 1 for P06 · Stock on the Floor, 12 for all of P06, 29 for every app
 - Derived from `wireframes/reference/FnB Board 5.dc.html`
 - Drawn by: Claude Design F&B pack, 24 August
 - Client design-board frames: `FnB Board 5.dc.html#fnb-5j`
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (1), with its required mark, default, format and its error state (400, 404).
-- [ ] Every output is drawn (37 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-062?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm.
 - [ ] Every transition is wired: `EMP-067`.
@@ -623,7 +591,7 @@ Also apply: 1 for P06 · Stock on the Floor, 12 for all of P06, 29 for every app
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Stock on the Floor · wave 2 · needs the `inventory` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-063 |
 | Who uses it | venue staff holding `PROCUREMENT_REQUEST`, `PROCUREMENT_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listRequisitions` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -703,17 +671,9 @@ Errors to draw in the form: 409 Already approved: the requisition is `approved`,
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Requisition number | text | — |
-| Venue | the name it points at, never the id | — |
-| Department | the name it points at, never the id | — |
 | Status | chip: Draft, Pending approval, Approved, Rejected, Returned for info, Ordered… | — |
-| Lines | list or chips (count when long) | — |
 | Estimated total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Raised by principal | the name it points at, never the id | — |
-| Approved by principal | the name it points at, never the id | — |
-| Approval note | text | — |
-| Required by | 1 Oct 2026 | — |
 | Approved at | 1 Oct 2026, 14:30 | — |
 
 **Card list** (card list): **Cards rather than a table.** One thumb, arm’s length, and a person who is walking.
@@ -739,17 +699,10 @@ Errors to draw in the form: 409 Already approved: the requisition is `approved`,
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Requisition number | text | — |
-| Venue | the name it points at, never the id | — |
-| Department | the name it points at, never the id | — |
 | Status | chip: Draft, Pending approval, Approved, Rejected, Returned for info, Ordered… | — |
 | Lines | list or chips (count when long) | — |
 | Estimated total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Raised by principal | the name it points at, never the id | — |
-| Approved by principal | the name it points at, never the id | — |
-| Approval note | text | — |
-| Required by | 1 Oct 2026 | — |
 | Approved at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
@@ -774,7 +727,7 @@ Errors to draw in the form: 409 Already approved: the requisition is `approved`,
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the requisition smart store untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No requisition smart store yet. Offers Create requisition (`createRequisition`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status, raisedByPrincipalId and the requisition smart store are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listRequisitions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PROCUREMENT_VIEW`, which `listRequisitions` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PROCUREMENT_REQUEST` for `createRequisition`, `updateRequisitionLines`. |
 | Offline (`?state=offline`) | **Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Already approved: the requisition is `approved`, `ordered` or `closed` (audit R171), or it is `rejected` or `cancelled`. |
 
@@ -803,7 +756,7 @@ request:
 - `getSuggestedRequisitions` → `PROCUREMENT_VIEW` (read) · staff
 - `updateRequisitionLines` → `PROCUREMENT_REQUEST` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listRequisitions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PROCUREMENT_VIEW`, which `listRequisitions` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PROCUREMENT_REQUEST` for `createRequisition`, `updateRequisitionLines`.
 
 #### Requirements it meets
 
@@ -844,7 +797,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (18), with its required mark, default, format and its error state (400, 409).
-- [ ] Every output is drawn (36 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-063?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Create requisition, Edit lines.
 - [ ] No transition is declared; back returns where the user came from.
@@ -863,7 +816,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Stock on the Floor · wave 2 · needs the `inventory` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-064 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listStockLocations` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -938,12 +891,9 @@ Errors to draw in the form: 409 The transfer is not `inTransit` or `partiallyRec
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
 | Kind | chip: Main store, Sub store, Kitchen, Bar, Retail floor, Cellar… | — |
-| Parent location | the name it points at, never the id | — |
 | Is active | yes / no (icon or chip) | — |
 
 **Card list** (card list): **Cards rather than a table.** One thumb, arm’s length, and a person who is walking.
@@ -1002,12 +952,9 @@ Errors to draw in the form: 409 The transfer is not `inTransit` or `partiallyRec
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
 | Kind | chip: Main store, Sub store, Kitchen, Bar, Retail floor, Cellar… | — |
-| Parent location | the name it points at, never the id | — |
 | Is active | yes / no (icon or chip) | — |
 
 **Actions and what each produces**
@@ -1032,7 +979,7 @@ Errors to draw in the form: 409 The transfer is not `inTransit` or `partiallyRec
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the store-to-store warehouse transfers untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No store-to-store warehouse transfers yet. Offers Create stock transfer (`createStockTransfer`). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listStockLocations` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listStockLocations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listStockLocations` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createStockTransfer`, `receiveStockTransfer`. |
 | Offline (`?state=offline`) | **Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Insufficient stock at the source; 409 The transfer is not `inTransit` or `partiallyReceived` — it has already been received in full, or closed short |
 
@@ -1060,7 +1007,7 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `getStockTransfer` → `PRODUCT_VIEW` (read) · staff
 - `receiveStockTransfer` → `PRODUCT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listStockLocations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listStockLocations` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createStockTransfer`, `receiveStockTransfer`.
 
 #### Requirements it meets
 
@@ -1102,7 +1049,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (14), with its required mark, default, format and its error state (409).
-- [ ] Every output is drawn (54 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (48 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-064?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Create stock transfer, Receive.
 - [ ] No transition is declared; back returns where the user came from.
@@ -1120,8 +1067,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
-| Module | Stock on the Floor · wave 2 · needs the `inventory` module |
-| Block | Block A · ticket #18186 (APP-SETUP-EMP-065) |
+| Module | Stock on the Floor · wave 1 · needs the `inventory` module |
+| Block | Block A · task APP-SETUP-EMP-065 |
 | Who uses it | venue staff holding `INCIDENT_REPORT`, `PROCUREMENT_RECEIVE`, `PROCUREMENT_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 operate, 2 read, 1 configure); in the flows as storekeeper |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | statusTracker (comfortable density): `getStockTransfer` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1232,18 +1179,11 @@ Errors to draw in the form: 409 The transfer is not `inTransit` or `partiallyRec
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Transfer number | text | — |
-| From location | the name it points at, never the id | — |
-| To location | the name it points at, never the id | — |
 | Status | chip: Dispatched, In transit, Received, Partially received, Cancelled | — |
 | Lines | list or chips (count when long) | — |
-| Dispatched by principal | the name it points at, never the id | — |
-| Received by principal | the name it points at, never the id | — |
 | Dispatched at | 1 Oct 2026, 14:30 | — |
 | Received at | 1 Oct 2026, 14:30 | — |
-| Close short reason | text | Why the balance was written off, from `closeTransferShort`. |
-| Scope path | text | The partition key (ADR-0005). `fromLocationId` and `toLocationId` give the endpoints; this gives the owner, the source venue's scope. |
 
 **Expected deliveries** (data table, from `listPurchaseOrders`)
 
@@ -1308,7 +1248,7 @@ Errors to draw in the form: 409 The transfer is not `inTransit` or `partiallyRec
 | Loading (`?state=loading`) | The receiving store put-away, read by `getStockTransfer`. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the receiving store put-away untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No receiving store put-away yet. Offers Create goods receipt (`createGoodsReceipt`). |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getStockTransfer` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getStockTransfer` requires to show this screen, and names that permission (the screen's other reads need `PROCUREMENT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_REPORT` for `logColdChain`; `PROCUREMENT_RECEIVE` for … |
 | Offline (`?state=offline`) | **Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 `reason` is `other` with no `note` (audit R222).; 409 A line rejects more than was received and not already rejected on it, or names a `lineId` the receipt does not hold (audit R171); 409 Over-receipt beyond `VenueSettings.inventory.overReceiptTolerancePercent` (proposed default 5, audit R094), or the purchase order is closed; 409 The transfer is not `inTransit` or `partiallyReceived` — it … |
 
@@ -1364,7 +1304,7 @@ receiver: Khalid Al Mansoori
 - `listPurchaseOrders` → `PROCUREMENT_VIEW` (read) · staff
 - `receiveStockTransfer` → `PRODUCT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getStockTransfer` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getStockTransfer` requires to show this screen, and names that permission (the screen's other reads need `PROCUREMENT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_REPORT` for `logColdChain`; `PROCUREMENT_RECEIVE` for …
 
 #### Requirements it meets
 
@@ -1406,7 +1346,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (31), with its required mark, default, format and its error state (400, 409).
-- [ ] Every output is drawn (32 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (25 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-065?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create goods receipt, Reject received goods, Log cold chain, Receive transfer, Confirm.
 - [ ] Every transition is wired: `BO-052`, `BO-080`.
@@ -1425,7 +1365,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Stock on the Floor · wave 2 · needs the `inventory` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-066 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as storekeeper |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | statusTracker (comfortable density): `getCountVariance` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1561,7 +1501,7 @@ Errors to draw in the form: 409 A count is already open for this location
 | Loading (`?state=loading`) | The stock count cycle, read by `listStockCounts`. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the stock count cycle untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No stock count cycle yet. Offers Start stock count (`startStockCount`). |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listStockCounts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listStockCounts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `startStockCount`, `enterCountLine`, `setDailyCount`. |
 | Offline (`?state=offline`) | **Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 A count is already open for this location |
 
@@ -1592,7 +1532,7 @@ line:
 - `setDailyCount` → `PRODUCT_CONFIGURE` (configure) · staff
 - `listStockCounts` → `PRODUCT_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listStockCounts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listStockCounts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `startStockCount`, `enterCountLine`, `setDailyCount`.
 
 #### Requirements it meets
 
@@ -1653,8 +1593,8 @@ Also apply: 1 for P06 · Stock on the Floor, 12 for all of P06, 29 for every app
 | | |
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
-| Module | Stock on the Floor · wave 2 · needs the `fnb` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Stock on the Floor · wave 1 · needs the `fnb` module |
+| Block | Block A · task APP-SETUP-EMP-067 |
 | Who uses it | venue staff holding `INCIDENT_MANAGE`, `INCIDENT_REPORT`, `INCIDENT_VIEW`, `ORDER_MODIFY`, `PRODUCT_CONFIGURE` (2 configure, 2 operate, 1 read); in the flows as storekeeper |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | configEditor (comfortable density): the screen declares only writes (`recordWaste`, `createStockMovement`, `logTemperature`) and no read of a population — it is settings, not a list |
@@ -1792,7 +1732,7 @@ Errors to draw in the form: 409 A critical finding signed by the principal who r
 | Loading (`?state=loading`) | The saved damage loss shrinkage. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the damage loss shrinkage untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No damage loss shrinkage configured. The form opens empty and `recordWaste` saves the first one; it says what the platform does in the meantime. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `ORDER_MODIFY`, which `recordWaste` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `INCIDENT_VIEW`, which `getHaccpStatus` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_MANAGE` for `signCorrectiveAction`; `INCIDENT_REPORT` for `logTemperature`; `ORDER_MODIFY` for `recordWaste`; `PRODUCT_CONFIGURE` for … |
 | Offline (`?state=offline`) | **Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed, including an `adjustmentIn`, `adjustmentOut` or `waste` movement with no `reason` (audit R171).; 409 A critical finding signed by the principal who raised it (`CorrectiveAction.raisedByPrincipalId`).; 409 Insufficient stock, and the item does not permit negative balances; 422 The waste-approval policy is on and the value needs photo evidence that was not sent … |
 
@@ -1822,7 +1762,7 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `signCorrectiveAction` → `INCIDENT_MANAGE` (configure) · staff
 - `getHaccpStatus` → `INCIDENT_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `ORDER_MODIFY`, which `recordWaste` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `INCIDENT_VIEW`, which `getHaccpStatus` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_MANAGE` for `signCorrectiveAction`; `INCIDENT_REPORT` for `logTemperature`; `ORDER_MODIFY` for `recordWaste`; `PRODUCT_CONFIGURE` for …
 
 #### Requirements it meets
 
@@ -1897,12 +1837,12 @@ Also apply: 1 for P06 · Stock on the Floor, 12 for all of P06, 29 for every app
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Stock on the Floor · wave 2 · needs the `inventory` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-068 |
 | Who uses it | venue staff holding `ORDER_CREATE`, `PRODUCT_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | statusTracker (comfortable density): `getStockPositions` reads one record and nothing reads a population — the screen is about that one thing |
 | Offline | **Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice. |
-| Opens with | `venueId` (session), `outletId` (EMP-003), `reservationId` (navigation) · cold entry: **Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to. |
+| Opens with | `venueId` (session), `outletId` (session), `reservationId` (navigation) · cold entry: **Resolves from the session and the shift.** A handheld is signed into at the start of a shift, not navigated to. |
 | Route | `/operations/reservation-allocation-omnichannel-inventory` |
 
 **What the spec says about it.** **Added 20 August from the client design board.** P06 had no table or stock operations at all — **twenty screens of floor work with nothing behind them** — and every operation these need already existed. **Named in the board contents and not written up in it.** **Drawn 31 August** — `Retail Board 4.dc.html` frame `ret-4h`. **Matched on frame title against screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Reservation, Allocation &amp; Omnichannel Inventory* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.
@@ -1968,15 +1908,8 @@ Errors to draw in the form: 400 `expiresAt` is less than 15 minutes ahead, or la
 
 | Shows | Format | Notes |
 |---|---|---|
-| Item | the name it points at, never the id | — |
 | Item name | text | — |
-| SKU | text | — |
-| Location | the name it points at, never the id | — |
 | Location name | text | — |
-| On hand | 1,234.5 | — |
-| Allocated | 1,234.5 | Reserved for orders: the quantity under an active stock reservation for an order (decided 28 September, audit R171). |
-| Available | 1,234.5 | On-hand minus allocated (decided 28 September, audit R171). What can still be sold or issued. |
-| Unit | text | — |
 | Value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Last counted at | 1 Oct 2026, 14:30 | — |
 | Last movement at | 1 Oct 2026, 14:30 | — |
@@ -2005,7 +1938,7 @@ Errors to draw in the form: 400 `expiresAt` is less than 15 minutes ahead, or la
 | Loading (`?state=loading`) | The reservation allocation omnichannel, read by `getStockPositions`. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the reservation allocation omnichannel untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No reservation allocation omnichannel yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getStockPositions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getStockPositions` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `reserveMerchandise`, `collectMerchandiseReservation`, `cancelMerchandiseReservation`. |
 | Offline (`?state=offline`) | **Works from cache and queues what it records.** Staff walk out of coverage constantly — a stock count in a warehouse corner and a table order on a terrace both happen where the signal does not reach, and a screen that blanks there is a screen nobody uses twice. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 `expiresAt` is less than 15 minutes ahead, or later than the end of the visit day (audit R215).; 409 Insufficient stock. `refusedReason` is `insufficientStock`, and `lines` names the lines short. (StockConflictProblem) |
 
@@ -2029,7 +1962,7 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `collectMerchandiseReservation` → `ORDER_CREATE` (operate) · staff
 - `cancelMerchandiseReservation` → `ORDER_CREATE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getStockPositions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getStockPositions` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `reserveMerchandise`, `collectMerchandiseReservation`, `cancelMerchandiseReservation`.
 
 #### Requirements it meets
 
@@ -2071,11 +2004,12 @@ Also apply: 1 for P06 · Stock on the Floor, 12 for all of P06, 29 for every app
 - Wireframe frame: `wireframes/P06 Venue Staff App.dc.html#emp-068` · status **notStarted** · provenance generated · **Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed …
 - Derived from `wireframes/reference/Retail Board 4.dc.html`
 - Client design-board frames: `Retail Board 4.dc.html#ret-4h`
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (8), with its required mark, default, format and its error state (400, 409).
-- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-068?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Reserve merchandise, Collected, Release hold.
 - [ ] No transition is declared; back returns where the user came from.
@@ -2095,7 +2029,7 @@ Also apply: 1 for P06 · Stock on the Floor, 12 for all of P06, 29 for every app
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Stock on the Floor · wave 2 · needs the `inventory` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-069 |
 | Who uses it | venue staff holding `PRODUCT_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listSerialisedItems` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2130,13 +2064,8 @@ Also apply: 1 for P06 · Stock on the Floor, 12 for all of P06, 29 for every app
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Item | the name it points at, never the id | — |
-| Batch | the name it points at, never the id | The batch it arrived in, where the item is both lotted and serialised. |
 | Serial | text | Unique within the item, not globally. Two manufacturers reuse serial numbers and a global constraint would refuse the second one. |
-| Location | the name it points at, never the id | — |
 | Status | chip: In stock, Reserved, Sold, Returned, Damaged, Lost… | — |
-| Sold on order line | the name it points at, never the id | The link that makes serialisation worth having. A warranty claim, a recall and a proof of purchase all start with *which sale was this … |
 | Warranty until | 1 Oct 2026 | — |
 | Received at | 1 Oct 2026, 14:30 | — |
 
@@ -2146,13 +2075,8 @@ Also apply: 1 for P06 · Stock on the Floor, 12 for all of P06, 29 for every app
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Item | the name it points at, never the id | — |
-| Batch | the name it points at, never the id | The batch it arrived in, where the item is both lotted and serialised. |
 | Serial | text | Unique within the item, not globally. Two manufacturers reuse serial numbers and a global constraint would refuse the second one. |
-| Location | the name it points at, never the id | — |
 | Status | chip: In stock, Reserved, Sold, Returned, Damaged, Lost… | — |
-| Sold on order line | the name it points at, never the id | The link that makes serialisation worth having. A warranty claim, a recall and a proof of purchase all start with *which sale was this … |
 | Warranty until | 1 Oct 2026 | — |
 | Received at | 1 Oct 2026, 14:30 | — |
 
@@ -2225,11 +2149,12 @@ Also apply: 1 for P06 · Stock on the Floor, 12 for all of P06, 29 for every app
 - Wireframe frame: `wireframes/P06 Venue Staff App.dc.html#emp-069` · status **notStarted** · provenance generated · **Drawn by Claude Design on `Retail Board 4.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed …
 - Derived from `wireframes/reference/Retail Board 4.dc.html`
 - Client design-board frames: `Retail Board 4.dc.html#ret-4j`
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (3), with its required mark, default, format and its error state (400, 404).
-- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-069?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Lookup merchandise.
 - [ ] No transition is declared; back returns where the user came from.
@@ -2248,7 +2173,7 @@ Also apply: 1 for P06 · Stock on the Floor, 12 for all of P06, 29 for every app
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Stock on the Floor · wave 2 · needs the `analytics` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-070 |
 | Who uses it | venue staff holding `PROCUREMENT_REQUEST`, `REPORT_VIEW_VENUE` (2 operate) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listAlerts` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2313,18 +2238,10 @@ Errors to draw in the form: 400 Validation failed
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Rule | the name it points at, never the id | — |
 | Raised at | 1 Oct 2026, 14:30 | — |
 | Severity | chip: Info, Warning, Critical | How urgent an alert rule's breach is. Shared by `AlertRule`, `Alert` and the `listAlerts` filter. |
 | Status | chip: Raised, Acknowledged, Resolved, Expired | Where a raised alert is. Shared by `Alert` and the `listAlerts` filter. |
-| Observed value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
-| Threshold | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
-| Scope path | text | — |
-| Acknowledged by principal | the name it points at, never the id | — |
 | Acknowledged at | 1 Oct 2026, 14:30 | — |
-| Resolved at | 1 Oct 2026, 14:30 | Set when the metric returns to range, automatically. An alert that only a person can close is an alert list that only grows. |
-| Escalated at | 1 Oct 2026, 14:30 | Where `VenueSettings.alerting.escalateAfterMinutes` passed with no acknowledgement. |
 
 **Card list** (card list): **Cards rather than a table.** One thumb, arm’s length, and a person who is walking.
 
@@ -2332,18 +2249,11 @@ Errors to draw in the form: 400 Validation failed
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Rule | the name it points at, never the id | — |
 | Raised at | 1 Oct 2026, 14:30 | — |
 | Severity | chip: Info, Warning, Critical | How urgent an alert rule's breach is. Shared by `AlertRule`, `Alert` and the `listAlerts` filter. |
 | Status | chip: Raised, Acknowledged, Resolved, Expired | Where a raised alert is. Shared by `Alert` and the `listAlerts` filter. |
 | Observed value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
-| Threshold | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
-| Scope path | text | — |
-| Acknowledged by principal | the name it points at, never the id | — |
 | Acknowledged at | 1 Oct 2026, 14:30 | — |
-| Resolved at | 1 Oct 2026, 14:30 | Set when the metric returns to range, automatically. An alert that only a person can close is an alert list that only grows. |
-| Escalated at | 1 Oct 2026, 14:30 | Where `VenueSettings.alerting.escalateAfterMinutes` passed with no acknowledgement. |
 
 **Actions and what each produces**
 
@@ -2367,7 +2277,7 @@ Errors to draw in the form: 400 Validation failed
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the inventory exceptions replenishment untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No inventory exceptions replenishment yet. Offers Create requisition (`createRequisition`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status, severity, workstationId, shiftId, itemId and the inventory exceptions replenishment are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PROCUREMENT_REQUEST` for `createRequisition`. |
 | Offline (`?state=offline`) | **Not available offline.** `listAlerts` reads the analytical replica (ADR-0016). **Corrected 24 August** — the shared "works from cache and queues what it records" wording was applied to a screen whose only operation is an analytical read. |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
@@ -2389,7 +2299,7 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `acknowledgeAlert` → `REPORT_VIEW_VENUE` (operate) · staff
 - `createRequisition` → `PROCUREMENT_REQUEST` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PROCUREMENT_REQUEST` for `createRequisition`.
 
 #### Requirements it meets
 
@@ -2427,7 +2337,7 @@ Also apply: 1 for P06 · Stock on the Floor, 12 for all of P06, 29 for every app
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (18), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-070?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Acknowledge alert, Create requisition.
 - [ ] No transition is declared; back returns where the user came from.

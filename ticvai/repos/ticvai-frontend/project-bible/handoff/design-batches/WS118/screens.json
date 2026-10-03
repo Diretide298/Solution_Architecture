@@ -821,7 +821,9 @@
    "params": [
     {
      "name": "decisionKey",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getConfigurationBlueprint`; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "sessionId",
@@ -1055,7 +1057,9 @@
    "params": [
     {
      "name": "actionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProposedActions` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "planId",
@@ -2760,7 +2764,9 @@
    "params": [
     {
      "name": "decisionRecordId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `searchAiDecisions` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "tenantId",

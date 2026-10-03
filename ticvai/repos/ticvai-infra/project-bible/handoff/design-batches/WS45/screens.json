@@ -15,7 +15,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/promotion-command-center-dashboard-adm-138",
    "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-010"
   },
   "navigation": {
    "entryFrom": [
@@ -46,25 +47,7 @@
     {
      "to": "ADM-145",
      "trigger": "Promotion Approval Inbox",
-     "provenance": "derived — ADM-145 declares entryState.params requestId and ADM-138 holds none of them. The edge carries nothing: ADM-145 finds requestId (listApprovalRequests) itself, and ADM-145 opens on its own"
-    },
-    {
-     "to": "ADM-140",
-     "trigger": "Works in Promotion Overview",
-     "provenance": "flow F154 step 3→4",
-     "operation": "listPromotions",
-     "carries": [
-      "promotionId"
-     ]
-    },
-    {
-     "to": "ADM-141",
-     "trigger": "Works in Promotion Lifecycle & Status Manager",
-     "provenance": "flow F154 step 5→6",
-     "operation": "listPromotions",
-     "carries": [
-      "promotionId"
-     ]
+     "provenance": "derived — ADM-145 declares entryState.params requestId and ADM-138 holds none of them. The edge carries nothing: requestId only pre-selects (deep link or optional), and ADM-145 opens on its own"
     },
     {
      "to": "ADM-142",
@@ -112,6 +95,24 @@
      "provenance": "flow F154 step 1→2",
      "carries": [
       "campaignId"
+     ]
+    },
+    {
+     "to": "ADM-140",
+     "trigger": "Works in Promotion Overview",
+     "provenance": "flow F154 step 3→4",
+     "operation": "listPromotions",
+     "carries": [
+      "promotionId"
+     ]
+    },
+    {
+     "to": "ADM-141",
+     "trigger": "Works in Promotion Lifecycle & Status Manager",
+     "provenance": "flow F154 step 5→6",
+     "operation": "listPromotions",
+     "carries": [
+      "promotionId"
      ]
     }
    ]
@@ -433,16 +434,11 @@
        "label": "Every commercial campaign",
        "bindsTo": "CommercialCampaign",
        "columns": [
-        "CommercialCampaign.id",
-        "CommercialCampaign.venueId",
         "CommercialCampaign.code",
         "CommercialCampaign.name",
         "CommercialCampaign.description",
-        "CommercialCampaign.ownerPrincipalId",
-        "CommercialCampaign.legalEntityId",
         "CommercialCampaign.validFrom",
-        "CommercialCampaign.validTo",
-        "CommercialCampaign.budgets"
+        "CommercialCampaign.validTo"
        ],
        "operation": "listCommercialCampaigns",
        "provenance": "contract promotions.yaml GET /commercial-campaigns"
@@ -712,7 +708,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/promotion-overview-adm-140",
    "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-010"
   },
   "navigation": {
    "entryFrom": [
@@ -920,7 +917,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/promotion-lifecycle-status-manager-adm-141",
    "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-010"
   },
   "navigation": {
    "entryFrom": [
@@ -1241,16 +1239,11 @@
        "label": "Every commercial campaign",
        "bindsTo": "CommercialCampaign",
        "columns": [
-        "CommercialCampaign.id",
-        "CommercialCampaign.venueId",
         "CommercialCampaign.code",
         "CommercialCampaign.name",
         "CommercialCampaign.description",
-        "CommercialCampaign.ownerPrincipalId",
-        "CommercialCampaign.legalEntityId",
         "CommercialCampaign.validFrom",
-        "CommercialCampaign.validTo",
-        "CommercialCampaign.budgets"
+        "CommercialCampaign.validTo"
        ],
        "operation": "listCommercialCampaigns",
        "provenance": "contract promotions.yaml GET /commercial-campaigns"
@@ -1763,7 +1756,8 @@
    "app": "venue-management-web",
    "route": "/approvals/approval-inbox/promotion-approval-inbox-adm-145",
    "component": "apps/venue-management-web/src/routes/approvals/ApprovalInbox.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-084"
   },
   "navigation": {
    "entryFrom": [
@@ -1933,7 +1927,9 @@
    "params": [
     {
      "name": "requestId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listApprovalRequests` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one the screen says what is missing and offers that list — never an empty form that looks configurable.",

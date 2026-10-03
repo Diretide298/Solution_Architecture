@@ -227,9 +227,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 **Where the user goes next**
 
 - → `BO-100` Venue Home: *Back to Venue Home*
-- → `BO-525` Pricing Profile Builder: *Pricing Profile Builder*
-- → `BO-526` Duration & Tiered Pricing Configuration: *Duration & Tiered Pricing Configuration*
-- → `BO-527` Calendar, Peak & Seasonal Pricing: *Calendar, Peak & Seasonal Pricing*
+- → `BO-525` Pricing Profile Builder: *Pricing Profile Builder*; carries `profileId`
+- → `BO-526` Duration & Tiered Pricing Configuration: *Duration & Tiered Pricing Configuration*; carries `profileId`
+- → `BO-527` Calendar, Peak & Seasonal Pricing: *Calendar, Peak & Seasonal Pricing*; carries `profileId`
 - → `BO-528` Dynamic Pricing & AI Recommendation: *Dynamic Pricing & AI Recommendation*
 - → `BO-529` Deposit & Security Hold Policy: *Deposit & Security Hold Policy*
 - → `BO-530` Deposit Lifecycle & Settlement Rules: *Deposit Lifecycle & Settlement Rules*

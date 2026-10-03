@@ -126,16 +126,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ANL-041` | Reporting Governance Command Center | B–D | 0 | 36 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-042` | Report Scheduler | B–D | 23 | 0 | 5 | 4 | 1 | 0 | — | notStarted (—) |
-| `ANL-043` | Subscription Manager | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ANL-044` | Distribution & Delivery Configuration | B–D | 14 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
-| `ANL-045` | Export & Download Center | B–D | 0 | 22 | 6 | 5 | 1 | 0 | — | notStarted (—) |
-| `ANL-046` | Report API & Data Delivery Manager | B–D | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-047` | Report Access & Sharing Control | B–D | 39 | 24 | 6 | 7 | 0 | 0 | — | notStarted (—) |
-| `ANL-048` | Delivery Monitoring & Failure Management | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-049` | Report Audit Trail & Compliance | B–D | 16 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ANL-050` | Retention, Archive & Governance Policy | B–D | 14 | 0 | 5 | 1 | 0 | 0 | — | notStarted (—) |
+| `ANL-041` | Reporting Governance Command Center | D | 0 | 36 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-042` | Report Scheduler | D | 23 | 0 | 5 | 4 | 1 | 0 | — | notStarted (—) |
+| `ANL-043` | Subscription Manager | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-044` | Distribution & Delivery Configuration | D | 14 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
+| `ANL-045` | Export & Download Center | D | 0 | 22 | 6 | 5 | 1 | 0 | — | notStarted (—) |
+| `ANL-046` | Report API & Data Delivery Manager | D | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-047` | Report Access & Sharing Control | B | 39 | 18 | 6 | 7 | 0 | 0 | — | notStarted (—) |
+| `ANL-048` | Delivery Monitoring & Failure Management | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-049` | Report Audit Trail & Compliance | D | 16 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-050` | Retention, Archive & Governance Policy | B | 14 | 0 | 5 | 1 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

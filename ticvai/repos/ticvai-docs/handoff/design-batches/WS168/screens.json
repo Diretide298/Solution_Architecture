@@ -823,7 +823,9 @@
    "params": [
     {
      "name": "holdId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getSeatHold` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1425,7 +1427,9 @@
    "params": [
     {
      "name": "seatMapId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `listSeats` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ],
    "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that list — never an empty form that looks configurable."
@@ -1572,13 +1576,10 @@
        "label": "The selected discrepancy",
        "bindsTo": "SeatDiscrepancy",
        "columns": [
-        "SeatDiscrepancy.seatId",
         "SeatDiscrepancy.label",
         "SeatDiscrepancy.kind",
         "SeatDiscrepancy.mapState",
         "SeatDiscrepancy.orderState",
-        "SeatDiscrepancy.orderIds",
-        "SeatDiscrepancy.detectedAt",
         "Cart state",
         "Payment state",
         "Ticket state",

@@ -106,15 +106,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-007` | Product Directory | A | 97 | 62 | 6 | 75 | 3 | 0 | — | notStarted (generated) |
-| `BO-008` | Product Detail & Variants | A | 41 | 44 | 6 | 37 | 22 | 3 | — | notStarted (generated) |
-| `BO-009` | Pricing Rules | A | 57 | 25 | 6 | 19 | 3 | 0 | — | notStarted (generated) |
-| `BO-010` | Promotions & Coupons | A | 165 | 70 | 6 | 51 | 3 | 2 | — | notStarted (generated) |
-| `BO-011` | Packages & Bundles | A | 69 | 47 | 6 | 11 | 4 | 0 | — | notStarted (generated) |
-| `BO-012` | Membership Products | A | 115 | 53 | 6 | 112 | 0 | 0 | — | notStarted (generated) |
-| `BO-013` | Channel & Distribution | B–D | 40 | 54 | 6 | 34 | 2 | 0 | — | notStarted (generated) |
-| `BO-014` | Catalogue Publishing | B–D | 8 | 33 | 6 | 30 | 0 | 6 | — | notStarted (generated) |
-| `BO-015` | Performance Calendar | B–D | 39 | 58 | 6 | 38 | 5 | 0 | — | notStarted (generated) |
+| `BO-007` | Product Directory | A | 97 | 38 | 6 | 75 | 3 | 0 | — | notStarted (generated) |
+| `BO-008` | Product Detail & Variants | A | 41 | 34 | 6 | 37 | 22 | 3 | — | notStarted (generated) |
+| `BO-009` | Pricing Rules | A | 57 | 21 | 6 | 19 | 3 | 0 | — | notStarted (generated) |
+| `BO-010` | Promotions & Coupons | A | 165 | 39 | 6 | 51 | 3 | 2 | — | notStarted (generated) |
+| `BO-011` | Packages & Bundles | A | 69 | 36 | 6 | 11 | 4 | 0 | — | notStarted (generated) |
+| `BO-012` | Membership Products | A | 115 | 33 | 6 | 112 | 0 | 0 | — | notStarted (generated) |
+| `BO-013` | Channel & Distribution | B–D | 40 | 32 | 6 | 34 | 2 | 0 | — | notStarted (generated) |
+| `BO-014` | Catalogue Publishing | B–D | 8 | 19 | 6 | 30 | 0 | 6 | — | notStarted (generated) |
+| `BO-015` | Performance Calendar | B–D | 39 | 44 | 6 | 38 | 5 | 0 | — | notStarted (generated) |
 | `BO-016` | Performance Template | B–D | 19 | 15 | 6 | 0 | 5 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
@@ -135,7 +135,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 1 · needs the `ticketing` module |
-| Block | Block A · ticket #18007 (APP-SETUP-BO-007) |
+| Block | Block A · task APP-SETUP-BO-007 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `TENANT_CONFIGURE` (2 configure, 1 read); in the flows as supervisor, venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listProducts` reads the population and `getProduct` reads one of them — list, select, act |
@@ -353,16 +353,10 @@ Errors to draw in the form: 400 The selection names nothing (`empty-selection`),
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
 | Kind | chip: Admission, Timed admission, Dated admission, Open dated, Seated, Membership… | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Created by principal | the name it points at, never the id | 1.4.18. The approval gate refuses an approver who is the author, and nothing recorded either. |
-| Approved by principal | the name it points at, never the id | — |
-| Responsible department | the name it points at, never the id | Who owns this product commercially. A scope node at `department` level. |
 | On sale from | 1 Oct 2026, 14:30 | 1.4.8. A seasonal product should not need somebody awake at midnight. |
 | On sale to | 1 Oct 2026, 14:30 | Retires the product automatically. Retirement is not deletion — the product stops selling and every order that referenced it still resolves. |
 
@@ -393,12 +387,8 @@ Errors to draw in the form: 400 The selection names nothing (`empty-selection`),
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
-| Outlet | the name it points at, never the id | — |
-| Availability | grouped details | When this menu is in force. Absent means always. |
-| Sections | list or chips (count when long) | — |
 | Is active | yes / no (icon or chip) | — |
 | Published version | 1,234 | The `MenuVersion.version` live now. Null for a menu never published. |
 | Published at | 1 Oct 2026, 14:30 | — |
@@ -408,37 +398,23 @@ Errors to draw in the form: 400 The selection names nothing (`empty-selection`),
 | Shows | Format | Notes |
 |---|---|---|
 | Description | text | What the item is, in the guest's words. Indexed for guest-app search. |
-| ID | the name it points at, never the id | — |
 | SKU | text | — |
 | Barcode | text | — |
 | Name | text | — |
-| Outlet | the name it points at, never the id | — |
-| Category | the name it points at, never the id | — |
-| Variant | the name it points at, never the id | The catalogue variant sold. Price and tax come from there. |
-| Inventory item | the name it points at, never the id | The stock item depleted on sale. Null means the item sells but never runs out, which is almost always a configuration error. |
 | Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | On hand | 1,234.5 | — |
-| Is returnable | yes / no (icon or chip) | — |
 
 **The selected product** (detail panel, from `getProduct`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
 | Kind | chip: Admission, Timed admission, Dated admission, Open dated, Seated, Membership… | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Created by principal | the name it points at, never the id | 1.4.18. The approval gate refuses an approver who is the author, and nothing recorded either. |
-| Approved by principal | the name it points at, never the id | — |
-| Responsible department | the name it points at, never the id | Who owns this product commercially. A scope node at `department` level. |
 | On sale from | 1 Oct 2026, 14:30 | 1.4.8. A seasonal product should not need somebody awake at midnight. |
 | On sale to | 1 Oct 2026, 14:30 | Retires the product automatically. Retirement is not deletion — the product stops selling and every order that referenced it still resolves. |
 | Lifecycle state | chip: Draft, In review, Approved, Live, Withdrawn, Archived | — |
-| Is sellable | yes / no (icon or chip) | True only when live and carried by a published bundle. Approval and publication are different acts. |
-| Has variants | yes / no (icon or chip) | — |
 | Variant count | 1,234 | — |
 
 **Actions and what each produces**
@@ -482,7 +458,7 @@ Errors to draw in the form: 400 The selection names nothing (`empty-selection`),
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the product untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No product yet. Offers Create product (`createProduct`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, kind, isSellable and the product are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createProduct`, `setAlternativeCodes`, `setProductAttributes`, `transitionProductLifecycle` and 3 more; `TENANT_CONFIGURE` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 400 A `variantId` is not a variant of this product, or the body sends one code twice for the same partner.; 400 The selection names nothing (`empty-selection`), or `changes` sets nothing.; 400 Two axes share a code, or one axis repeats a … |
 
@@ -559,7 +535,7 @@ products:
 - `listMerchandise` → `PRODUCT_VIEW` (read) · staff, guest
 - `bulkUpdateCatalogueProducts` → `PRODUCT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createProduct`, `setAlternativeCodes`, `setProductAttributes`, `transitionProductLifecycle` and 3 more; `TENANT_CONFIGURE` …
 
 #### Requirements it meets
 
@@ -604,12 +580,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Flow F78 *A supplier is set up and a catalogue is priced and published*, step 2: The new range becomes products in the directory. → **One product per sellable thing, with its barcodes.** A range that is not in the directory cannot be priced or scanned.
 - Flow F85 *Production is planned, costed and released*, step 4: Product Directory. → **Drawn by the client as FNB-2C.** 4 operations on this step.
 - Flow F93 *A recipe changes and its allergen claim is re-verified*, step 4: Product Directory. → **Drawn by the client as FNB-2C.**
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (97), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (62 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (38 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-007?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create product, Resolve product by code, Save alternative codes, Save product attributes, Transition product lifecycle, Save product, Create merchandise, Bulk update products.
 - [ ] Every transition is wired: `BO-112`, `BO-008`, `BO-009`, `BO-010`, `BO-045`.
@@ -628,7 +605,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 1 · needs the `ticketing` module |
-| Block | Block A · ticket #20668 (APP-SETUP-BO-008) |
+| Block | Block A · task APP-SETUP-BO-008 |
 | Who uses it | venue staff holding `ASSET_LIBRARY_VIEW`, `GUEST_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `TENANT_CONFIGURE` (3 read, 2 configure); in the flows as partner, supervisor, venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listProductVariants` reads the population and `getProduct` reads one of them — list, select, act |
@@ -764,8 +741,6 @@ Errors to draw in the form: 400 A `description` value longer than 300 characters
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Product | the name it points at, never the id | — |
 | SKU | text | — |
 | Axis values | grouped details | — |
 | Name | text | Taken from their variant tables, 20 September. `axisValues` gives `{size: L}` and no string a guest can read. |
@@ -778,22 +753,14 @@ Errors to draw in the form: 400 A `description` value longer than 300 characters
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
 | Kind | chip: Admission, Timed admission, Dated admission, Open dated, Seated, Membership… | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Created by principal | the name it points at, never the id | 1.4.18. The approval gate refuses an approver who is the author, and nothing recorded either. |
-| Approved by principal | the name it points at, never the id | — |
-| Responsible department | the name it points at, never the id | Who owns this product commercially. A scope node at `department` level. |
 | On sale from | 1 Oct 2026, 14:30 | 1.4.8. A seasonal product should not need somebody awake at midnight. |
 | On sale to | 1 Oct 2026, 14:30 | Retires the product automatically. Retirement is not deletion — the product stops selling and every order that referenced it still resolves. |
-| Category | the name it points at, never the id | Taken from their `fnb.product` and `retail.product`, 20 September. `catalogue.product_category` has existed since 20 August with two … |
 | Lifecycle state | chip: Draft, In review, Approved, Live, Withdrawn, Archived | — |
 | Is sellable | yes / no (icon or chip) | True only when live and carried by a published bundle. Approval and publication are different acts. |
-| Is stock tracked | yes / no (icon or chip) | Taken from their `fnb.product`, 20 September. Whether a sale decrements stock, which is not what `isSellable` asks. |
 
 **What the guest sees** (detail panel, from `getProduct`): **What the guest sees of the product** (decided 29 September, rev 3). `guestListing`: bookable (the default), info only, or hidden; an info-only product keeps its details and photo, shows `notBookableLabel` (default "Info only / Not bookable online") and opens details instead of Add to basket, and `addCartLine` refuses it `409` (REV3-14). `displayTags`: up to six, each a kind (clock, height …
 
@@ -852,7 +819,7 @@ Errors to draw in the form: 400 A `description` value longer than 300 characters
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the product variants untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No product variants yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listProductVariants` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getProduct` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getProduct` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ASSET_LIBRARY_VIEW` for `searchMedia`; `GUEST_VIEW` for `listConsentQuestions`; `PRODUCT_CONFIGURE` for `setProductAttributes`, `updateProduct` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `description` value longer than 300 characters.; 400 Two axes share a code, or one axis repeats a value code.; 400 `media` with no `isPrimary` item or more than one, or one asset twice.; 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit … |
 
@@ -927,7 +894,7 @@ impact:
 - `listProductVersions` → `PRODUCT_VIEW` (read) · staff
 - `previewProductTickets` → `PRODUCT_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getProduct` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getProduct` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ASSET_LIBRARY_VIEW` for `searchMedia`; `GUEST_VIEW` for `listConsentQuestions`; `PRODUCT_CONFIGURE` for `setProductAttributes`, `updateProduct` …
 
 #### Requirements it meets
 
@@ -994,11 +961,12 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 - Flow F85 *Production is planned, costed and released*, step 3: Product Detail & Variants. → **Drawn by the client as FNB-2D.** 4 operations on this step.
 - Flow F93 *A recipe changes and its allergen claim is re-verified*, step 3: Product Detail & Variants. → **Drawn by the client as FNB-2D.**
 - Flow F10 branch at step 6 (requiresStaff): when Usage disputed at reconciliation, Scan records are the evidence. This is why `scan_event` is retained and why offline scans carry both recordedAt and syncedAt.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (41), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (34 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-008?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save product attributes, Save product, Save ticket type.
 - [ ] Every transition is wired: `BO-007`.
@@ -1018,7 +986,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 1 · needs the `ticketing` module |
-| Block | Block A · ticket #20669 (APP-SETUP-BO-009) |
+| Block | Block A · task APP-SETUP-BO-009 |
 | Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRICE_VIEW`, `PRODUCT_CONFIGURE` (2 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPriceLists` reads the population and `getPriceList` reads one of them — list, select, act |
@@ -1148,15 +1116,11 @@ Errors to draw in the form: 400 Currency or scale mismatch against the region
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
 | Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overridable below, so a row in a UAE region is AED and … |
 | Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overridable below, so a row in a UAE region is AED and … |
-| Channels | list or chips (count when long) | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
-| Valid to | 1 Oct 2026, 14:30 | — |
 | Priority | 1,234 | Where lists overlap, higher priority wins. |
 
 **Every price** (data table, from `listPrices`)
@@ -1219,7 +1183,7 @@ Errors to draw in the form: 400 Currency or scale mismatch against the region
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the pricing rules untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No pricing rules yet. Offers Create price list (`createPriceList`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on channel and the pricing rules are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRICE_VIEW`, which `listPriceLists` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRICE_VIEW`, which `listPriceLists` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_CONFIGURE` for `createPriceList`, `copyPriceList`, `setPrices`, `updatePriceList` and 1 more; `PRODUCT_CONFIGURE` for `bulkChangePrices`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Currency or scale mismatch against the region; 400 Validation failed |
 
@@ -1288,7 +1252,7 @@ dynamicRule:
 - `getDynamicPriceRule` → `PRICE_VIEW` (read) · staff
 - `setDynamicPriceRule` → `PRICE_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRICE_VIEW`, which `listPriceLists` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRICE_VIEW`, which `listPriceLists` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_CONFIGURE` for `createPriceList`, `copyPriceList`, `setPrices`, `updatePriceList` and 1 more; `PRODUCT_CONFIGURE` for `bulkChangePrices`.
 
 #### Requirements it meets
 
@@ -1336,7 +1300,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (57), with its required mark, default, format and its error state (400, 404).
-- [ ] Every output is drawn (25 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-009?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create price list, Copy price list, Save prices, Save price list.
 - [ ] Every transition is wired: `BO-007`, `BO-010`, `BO-014`.
@@ -1354,8 +1318,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Sell · wave 2 · needs the `ticketing` module |
-| Block | Block A · ticket #18008 (APP-SETUP-BO-010) |
+| Module | Sell · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-SETUP-BO-010 |
 | Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRICE_VIEW`, `REPORT_VIEW_VENUE` (1 configure, 1 read, 1 operate); in the flows as marketer |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPromotions` reads the population and `getPromotion` reads one of them — list, select, act |
@@ -1643,15 +1607,9 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Venue | the name it points at, never the id | — |
 | Discount | grouped details | — |
-| Conditions | grouped details | All conditions must hold. An empty object matches everything. |
 | Stacking mode | chip: Exclusive, Stackable, Best only, Stack with group | How this promotion combines with others. Declared, never inferred from creation order — two reasonable promotions can otherwise combine … |
-| Stacking group | text | — |
-| Precedence | 1,234 | Higher evaluates first where several could apply. |
 | Valid from | 1 Oct 2026, 14:30 | — |
-| Valid to | 1 Oct 2026, 14:30 | — |
-| Max redemptions | 1,234 | — |
 
 **Every coupon campaign** (data table, from `listCouponCampaigns`)
 
@@ -1659,14 +1617,8 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 |---|---|---|
 | Code | text | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Discount | grouped details | — |
-| Conditions | grouped details | All conditions must hold. An empty object matches everything. |
-| Is single use | yes / no (icon or chip) | True generates individually redeemable codes. False issues one shared code with a redemption limit. |
 | Max redemptions per code | 1,234 | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
-| Valid to | 1 Oct 2026, 14:30 | — |
-| ID | the name it points at, never the id | — |
 | Generated count | 1,234 | — |
 | Redeemed count | 1,234 | — |
 
@@ -1675,32 +1627,21 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 | Shows | Format | Notes |
 |---|---|---|
 | Code | text | — |
-| Campaign | the name it points at, never the id | — |
-| Batch | the name it points at, never the id | The `generateCouponCodes` batch that issued this code. Null where no batch did. |
 | Status | chip: Issued, Assigned, Redeemed, Expired, Voided | — |
-| Assigned subject | the name it points at, never the id | — |
 | Redemption count | 1,234 | — |
-| Max redemptions | 1,234 | — |
 | Discount | grouped details | — |
-| Invalid reason | chip: Expired, Already redeemed, Voided, Not yet valid, Wrong venue, Conditions not met… | Why the code cannot be applied. A cashier reading `expired` to a guest is a very different conversation from reading `already used`. |
 | Valid from | 1 Oct 2026, 14:30 | — |
-| Valid to | 1 Oct 2026, 14:30 | — |
 | Redeemed at | 1 Oct 2026, 14:30 | — |
 
 **Every commercial campaign** (data table, from `listCommercialCampaigns`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Owner principal | the name it points at, never the id | The campaign (and budget) owner. |
-| Legal entity | the name it points at, never the id | The business entity that funds and books the campaign. |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | — |
-| Budgets | list or chips (count when long) | The rows of `promotions.campaign_budget`, one per budget line. |
 
 **The selected promotion** (detail panel, from `getPromotion`)
 
@@ -1709,18 +1650,10 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Venue | the name it points at, never the id | — |
 | Discount | grouped details | — |
 | Conditions | grouped details | All conditions must hold. An empty object matches everything. |
 | Stacking mode | chip: Exclusive, Stackable, Best only, Stack with group | How this promotion combines with others. Declared, never inferred from creation order — two reasonable promotions can otherwise combine … |
-| Stacking group | text | — |
-| Precedence | 1,234 | Higher evaluates first where several could apply. |
 | Valid from | 1 Oct 2026, 14:30 | — |
-| Valid to | 1 Oct 2026, 14:30 | — |
-| Max redemptions | 1,234 | — |
-| Max redemptions per guest | 1,234 | — |
-| Budget cap | AED 1,234.50 | Total discount value after which the promotion stops automatically. Enforced at checkout, where an order whose discount would take the … |
-| ID | the name it points at, never the id | — |
 | Status | chip: Draft, Scheduled, Live, Paused, Expired, Ended | — |
 
 **The promotion usage** (detail panel, from `getPromotionUsage`)
@@ -1794,7 +1727,7 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the promotions coupons untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No promotions coupons yet. Offers Create coupon campaign (`createCouponCampaign`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, status, activeAt and the promotions coupons are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRICE_VIEW`, which `listPromotions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRICE_VIEW`, which `listPromotions` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_VENUE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_CONFIGURE` for `createCouponCampaign`, `createPromotion` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Conditions are unsatisfiable, or the discount exceeds the configured cap. The cap is `VenueSettings.promotions.maxDiscountPercent`, a venue setting with a …; 400 More guests in `assignToSubjectIds` than `quantity` codes (audit R101); 400 Required parameter missing, or the date range exceeds `maxDateRangeDays` (366 days when the definition sets none, audit R158); 400 The variants' … |
 
@@ -1868,7 +1801,7 @@ voucherBatch:
 - `listCommercialCampaigns` → `PRICE_VIEW` (read) · staff
 - `recordDashboardView` → `REPORT_VIEW_VENUE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRICE_VIEW`, which `listPromotions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRICE_VIEW`, which `listPromotions` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_VENUE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_CONFIGURE` for `createCouponCampaign`, `createPromotion` …
 
 #### Requirements it meets
 
@@ -1913,11 +1846,12 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 - Client design-board frames: `POS Board 4.dc.html#pos-4e`, `Retail Board 5.dc.html#ret-5a`, `Retail Board 5.dc.html#ret-5b`, `Retail Board 5.dc.html#ret-5c`, `Retail Board 5.dc.html#ret-5e`
 - Flow F77 *A promotion is built, bundled, published and measured*, step 4: Promotions & Coupons. → **Drawn by the client as RET-5A.** 15 operations on this step.
 - Flow F90 *An audience is built, offered to, and the result is judged*, step 2: Promotions & Coupons. → **Drawn by the client as RET-5E.**
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (165), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (70 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (39 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-010?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, , Analyse promotion conflicts, Create coupon campaign, Create promotion, End promotion, Evaluate promotions, Generate coupon codes, Pause promotion, Publish promotion, Unschedule promotion, Save promotion, Simulate promotion, Run report, Void coupon code, What publishing changes.
 - [ ] Every transition is wired: `BO-007`, `BO-009`, `ANL-009`.
@@ -1935,8 +1869,8 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Sell · wave 2 · needs the `ticketing` module |
-| Block | Block A · ticket #18009 (APP-SETUP-BO-011) |
+| Module | Sell · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-SETUP-BO-011 |
 | Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRICE_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (2 configure, 2 read); in the flows as marketer |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCatalogueBundles` reads the population and `getLatestBundle` reads one of them — list, select, act |
@@ -1977,7 +1911,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 
 **Form: Save group package definition** (modal, opened by *Save group package definition*; *Save group package definition* calls `setGroupPackageDefinition`, *Cancel* sends nothing)
 
-**Collects what `setGroupPackageDefinition` sends before it is called.** Required: `kind`, `maxParticipants`, `durationMinutes`. Optional: `id`, `productId`, `hostCount`, `pricingBasis`, `freeLeaderRatio`, `paymentMode`, `includes`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setGroupPackageDefinition` sends before it is called.** Required: `kind`, `maxParticipants`, `durationMinutes`. Optional: `hostCount`, `pricingBasis`, `freeLeaderRatio`, `paymentMode`, `includes`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `productId`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -2050,7 +1984,7 @@ Errors to draw in the form: 400 Allocation does not sum to 100 per cent, or fixe
 
 **Form: Save package pricing definition** (modal, opened by *Save package pricing definition*; *Save package pricing definition* calls `setPackagePricingDefinition`, *Cancel* sends nothing)
 
-**Collects what `setPackagePricingDefinition` sends before it is called.** Required: `id`, `scopePath`, `productId`, `recordKind`, `pricingModel`, `status`. Optional: `name`, `priceListId`, `addOnType`, `packagePrice`, `components`, `componentPriceVisibility`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setPackagePricingDefinition` sends before it is called.** Required: `productId`, `recordKind`, `pricingModel`, `status`. Optional: `name`, `priceListId`, `addOnType`, `packagePrice`, `components`, `componentPriceVisibility`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -2082,11 +2016,8 @@ Errors to draw in the form: 409 `changeRequestRequired`.; 422 `priceRequired` or
 
 | Shows | Format | Notes |
 |---|---|---|
-| Venue | the name it points at, never the id | — |
 | Published at | 1 Oct 2026, 14:30 | — |
 | Published by | the name it points at, never the id | — |
-| Content hash | text | — |
-| Signature key | text | Key that signed this bundle. A terminal offline across a key rotation needs a grace window, or it cannot verify the next bundle. |
 | Stale after | 1 Oct 2026, 14:30 | — |
 | Size bytes | 1,234 | — |
 | Note | text | — |
@@ -2096,16 +2027,11 @@ Errors to draw in the form: 409 `changeRequestRequired`.; 422 `priceRequired` or
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
-| Owner principal | the name it points at, never the id | The campaign (and budget) owner. |
-| Legal entity | the name it points at, never the id | The business entity that funds and books the campaign. |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | — |
-| Budgets | list or chips (count when long) | The rows of `promotions.campaign_budget`, one per budget line. |
 
 **The selected bundle** (detail panel, from `listCatalogueBundles`)
 
@@ -2125,8 +2051,6 @@ Errors to draw in the form: 409 `changeRequestRequired`.; 422 `priceRequired` or
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Product | text | — |
 | Kind | chip: School, Party | — |
 | Max participants | 1,234 | Pupils or children, e.g. 30 or 10. |
 | Duration minutes | 1,234 | — |
@@ -2135,7 +2059,6 @@ Errors to draw in the form: 409 `changeRequestRequired`.; 422 `priceRequired` or
 | Free leader ratio | 1,234 | Schools: one teacher or assistant enters free per this many pupils. |
 | Payment mode | chip: Invoice, Deposit, Full | Schools are invoiced; parties take a deposit (see `DepositPolicy`). |
 | Includes | list or chips (count when long) | — |
-| Scope path | text | The partition key (ADR-0005). Operations write it at `venue` scope. |
 
 **The catalogue bundle** (detail panel, from `getLatestBundle`)
 
@@ -2185,7 +2108,7 @@ Errors to draw in the form: 409 `changeRequestRequired`.; 422 `priceRequired` or
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the packages bundles untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No packages bundles yet. Offers Create bundle (`createBundle`). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listCatalogueBundles` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getGroupPackageDefinition` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listCatalogueBundles` requires to show this screen, and names that permission (the screen's other reads need `PRICE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_CONFIGURE` for `setPackagePricingDefinition` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Allocation does not sum to 100 per cent, or fixed amounts do not sum to the bundle price.; 400 The bundle's allocation is `fixedAmount` and the new price no longer equals the sum of the fixed amounts.; 400 Validation failed; 409 `changeRequestRequired`. |
 
@@ -2239,7 +2162,7 @@ groupPackage:
 - `listCommercialCampaigns` → `PRICE_VIEW` (read) · staff
 - `setPackagePricingDefinition` → `PRICE_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getGroupPackageDefinition` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listCatalogueBundles` requires to show this screen, and names that permission (the screen's other reads need `PRICE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRICE_CONFIGURE` for `setPackagePricingDefinition` …
 
 #### Requirements it meets
 
@@ -2282,11 +2205,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client design-board frames: `FnB Board 2.dc.html#fnb-2g`, `Retail Board 5.dc.html#ret-5h`
 - Flow F77 *A promotion is built, bundled, published and measured*, step 2: Packages & Bundles. → **Drawn by the client as RET-5H.** 2 operations on this step.
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (69), with its required mark, default, format and its error state (400, 403, 404, 409, 412, 422).
-- [ ] Every output is drawn (47 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (36 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-011?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create bundle, What publishing changes, Save group package definition, Save package pricing definition.
 - [ ] Every transition is wired: `BO-007`, `BO-008`, `BO-009`, `ANL-009`.
@@ -2304,8 +2228,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Sell · wave 2 · needs the `ticketing` module |
-| Block | Block A · ticket #17864 (APP-SETUP-BO-012) |
+| Module | Sell · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-SETUP-BO-012 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listProducts` reads the population and `getProduct` reads one of them — list, select, act |
@@ -2341,7 +2265,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Create entitlement template** (modal, opened by *Create entitlement template*; *Create entitlement template* calls `createEntitlementTemplate`, *Cancel* sends nothing)
 
-**Collects what `createEntitlementTemplate` sends before it is called.** Required: `id`, `code`, `name`, `validityKind`. Optional: `description`, `validFromOffsetDays`, `validForDays`, `daysOfWeek`, `expiryAnchor`, `expiryDate`, `carriesStoredValue`, `includedValue`, `validTimeWindows`, `blackoutDates`, `fastTrackTier`, `entriesAllowed` and 15 more. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `createEntitlementTemplate` sends before it is called.** Required: `code`, `name`, `validityKind`. Optional: `description`, `validFromOffsetDays`, `validForDays`, `daysOfWeek`, `expiryAnchor`, `expiryDate`, `carriesStoredValue`, `includedValue`, `validTimeWindows`, `blackoutDates`, `fastTrackTier`, `entriesAllowed` and 15 more. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -2517,16 +2441,10 @@ Errors to draw in the form: 400 `media` with no `isPrimary` item or more than on
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
 | Kind | chip: Admission, Timed admission, Dated admission, Open dated, Seated, Membership… | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Created by principal | the name it points at, never the id | 1.4.18. The approval gate refuses an approver who is the author, and nothing recorded either. |
-| Approved by principal | the name it points at, never the id | — |
-| Responsible department | the name it points at, never the id | Who owns this product commercially. A scope node at `department` level. |
 | On sale from | 1 Oct 2026, 14:30 | 1.4.8. A seasonal product should not need somebody awake at midnight. |
 | On sale to | 1 Oct 2026, 14:30 | Retires the product automatically. Retirement is not deletion — the product stops selling and every order that referenced it still resolves. |
 
@@ -2535,17 +2453,11 @@ Errors to draw in the form: 400 `media` with no `isPrimary` item or more than on
 | Shows | Format | Notes |
 |---|---|---|
 | Description | text | Validity, re-entry and transfer rules in prose. "Can I leave and come back" is answered from here, and a name cannot answer it. |
-| ID | the name it points at, never the id | Assigned by the server on create; `createEntitlementTemplate` does not take it. |
 | Code | text | — |
 | Name | text | — |
 | Validity kind | chip: Single use, Dated, Date range, Rolling, Unlimited, Count limited | — |
-| Valid from offset days | 1,234 | — |
-| Valid for days | 1,234 | — |
-| Days of week | list or chips (count when long) | 1.1.7 and 1.1.82. A camp ticket admits on Tuesdays and Thursdays for six weeks, and `validityKind` had six values with no day pattern among … |
-| Expiry anchor | chip: Offset days, End of month, End of quarter, End of year, Fixed date, Season end | 1.1.90 to 1.1.92. A pass bought on the 20th and expiring on the 31st cannot be expressed by an offset in days. |
 | Expiry date | 1 Oct 2026 | Where `expiryAnchor` is `fixedDate`. Every pass expires the same day regardless of purchase. |
 | Carries stored value | yes / no (icon or chip) | BL-033. A ticket that is also a wallet — a resort pass with 200 dirhams of spend on it, deducted at a gate or a till. |
-| Included value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **Every alternative code** (data table, from `listAlternativeCodes`)
 
@@ -2574,21 +2486,13 @@ Errors to draw in the form: 400 `media` with no `isPrimary` item or more than on
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
 | Kind | chip: Admission, Timed admission, Dated admission, Open dated, Seated, Membership… | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Created by principal | the name it points at, never the id | 1.4.18. The approval gate refuses an approver who is the author, and nothing recorded either. |
-| Approved by principal | the name it points at, never the id | — |
-| Responsible department | the name it points at, never the id | Who owns this product commercially. A scope node at `department` level. |
 | On sale from | 1 Oct 2026, 14:30 | 1.4.8. A seasonal product should not need somebody awake at midnight. |
 | On sale to | 1 Oct 2026, 14:30 | Retires the product automatically. Retirement is not deletion — the product stops selling and every order that referenced it still resolves. |
 | Lifecycle state | chip: Draft, In review, Approved, Live, Withdrawn, Archived | — |
-| Is sellable | yes / no (icon or chip) | True only when live and carried by a published bundle. Approval and publication are different acts. |
-| Has variants | yes / no (icon or chip) | — |
 | Variant count | 1,234 | — |
 
 **Actions and what each produces**
@@ -2627,7 +2531,7 @@ Errors to draw in the form: 400 `media` with no `isPrimary` item or more than on
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the membership products untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No membership products yet. Offers Create entitlement template (`createEntitlementTemplate`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, kind, isSellable and the membership products are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createEntitlementTemplate`, `createProduct`, `setAlternativeCodes`, `setProductAttributes` and 2 more. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 400 A `variantId` is not a variant of this product, or the body sends one code twice for the same partner.; 400 Two axes share a code, or one axis repeats a value code.; 400 Validation failed |
 
@@ -2676,7 +2580,7 @@ entitlement:
 - `transitionProductLifecycle` → `PRODUCT_CONFIGURE` (configure) · staff
 - `updateProduct` → `PRODUCT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createEntitlementTemplate`, `createProduct`, `setAlternativeCodes`, `setProductAttributes` and 2 more.
 
 #### Requirements it meets
 
@@ -2711,12 +2615,13 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### References
 
 - Wireframe frame: `wireframes/P08 Venue Management.dc.html#bo-012` · status **notStarted** · provenance generated
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (115), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (53 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (33 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-012?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create entitlement template, Create product, Resolve product by code, Save alternative codes, Save product attributes, Transition product lifecycle, Save product.
 - [ ] Every transition is wired: `BO-007`, `BO-008`, `BO-009`.
@@ -2734,7 +2639,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Sell · wave 2 · needs the `ticketing` module |
+| Module | Sell · wave 1 · needs the `ticketing` module |
 | Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `CAPACITY_CONFIGURE`, `PARTNER_MANAGE`, `PARTNER_VIEW`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (3 configure, 2 read); in the flows as marketer |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
@@ -2870,50 +2775,32 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Performance | the name it points at, never the id | — |
 | Name | text | — |
-| Seat category | the name it points at, never the id | — |
 | Oversell allowance | 1,234 | BL-046, 1.3.13. The guard existed in one direction — an envelope could be raised freely and refused reduction below what had sold. |
 | Oversell basis | chip: Fixed count, Historic no show rate, Percentage | — |
 | Capacity | 1,234 | — |
 | Sold | 1,234 | Units sold. Maintained on write (decided 29 September, SD-023): raised by `convertInventoryHold` in the order transaction and by … |
-| Leased | 1,234 | Units in `active` holds, not yet sold. Raised at acquire, lowered at conversion, release, force-release and expiry (SD-023). |
 | Remaining | 1,234 | What can still be held. Decremented at the hold with a guarded statement (`remaining >= n`) under the row lock, never at the sale, so two … |
-| Has channel allocations | yes / no (icon or chip) | True where capacity is divided across channels. Leases then draw from a channel allocation rather than from raw capacity. |
-| Is seated | yes / no (icon or chip) | Seated envelopes cannot be leased and are blocked offline. A seat map is not a count. |
 
 **Every channel listing** (data table, from `listChannelListings`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Channel name | chip: Viator, Klook, Headout, Get your guide, Tiqets, Expedia… | — |
-| Product | the name it points at, never the id | — |
 | External product ref | text | — |
 | Status | chip: Draft, Live, Paused, Delisted | — |
 | Allocation units | 1,234 | Inventory published to this channel, not the venue's whole capacity. An OTA given the full envelope will sell it, and the venue discovers … |
-| Price list | the name it points at, never the id | — |
-| Adapter | chip: Viator API, Klook API, Headout API, Get your guide API, Tiqets API, Octo standard… | BL-067. The commercial model was complete and the wire was not — `PartnerAgreement` carries rates, commission, credit and channels, and … |
-| Adapter credential ref | text | A vault reference. Never the credential, following the rule ADR-0020 set for AI providers. |
 | Push interval minutes | 1,234 | How often availability is pushed. The gap between pushes is the oversell window, and a channel selling a high-demand slot needs a shorter … |
-| Guest data scope | chip: None, Name only, Name and contact, Full | What the OTA passes through, and it is usually less than the venue wants. A ticket arriving with no contact detail cannot be reissued or … |
 | Last pushed at | 1 Oct 2026, 14:30 | — |
 
 **Every product** (data table, from `listProducts`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
 | Kind | chip: Admission, Timed admission, Dated admission, Open dated, Seated, Membership… | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Created by principal | the name it points at, never the id | 1.4.18. The approval gate refuses an approver who is the author, and nothing recorded either. |
-| Approved by principal | the name it points at, never the id | — |
-| Responsible department | the name it points at, never the id | Who owns this product commercially. A scope node at `department` level. |
 | On sale from | 1 Oct 2026, 14:30 | 1.4.8. A seasonal product should not need somebody awake at midnight. |
 | On sale to | 1 Oct 2026, 14:30 | Retires the product automatically. Retirement is not deletion — the product stops selling and every order that referenced it still resolves. |
 
@@ -2921,10 +2808,7 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Performance | the name it points at, never the id | — |
 | Name | text | — |
-| Seat category | the name it points at, never the id | — |
 | Oversell allowance | 1,234 | BL-046, 1.3.13. The guard existed in one direction — an envelope could be raised freely and refused reduction below what had sold. |
 | Oversell basis | chip: Fixed count, Historic no show rate, Percentage | — |
 | Capacity | 1,234 | — |
@@ -2932,7 +2816,6 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Leased | 1,234 | Units in `active` holds, not yet sold. Raised at acquire, lowered at conversion, release, force-release and expiry (SD-023). |
 | Remaining | 1,234 | What can still be held. Decremented at the hold with a guarded statement (`remaining >= n`) under the row lock, never at the sale, so two … |
 | Has channel allocations | yes / no (icon or chip) | True where capacity is divided across channels. Leases then draw from a channel allocation rather than from raw capacity. |
-| Is seated | yes / no (icon or chip) | Seated envelopes cannot be leased and are blocked offline. A seat map is not a count. |
 
 **The channel allocation set** (detail panel, from `getChannelAllocations`)
 
@@ -2983,7 +2866,7 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the channel distribution untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No channel distribution yet. Offers Create channel capacity (`createChannelCapacity`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on performanceId and the channel distribution are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getChannelAllocations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires to show this screen, and names that permission (the screen's other reads need `PARTNER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE` for `setChannelAllocations` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 400 Allocations exceed the channel capacity in total, or a channel appears twice; 409 A publish is already in progress for this venue; 409 An allocation is below what that channel has already sold plus its leased units (audit R101) |
 
@@ -3031,7 +2914,7 @@ otaListing:
 - `publishBundle` → `PRODUCT_CONFIGURE` (configure) · staff
 - `setChannelListing` → `PARTNER_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getChannelAllocations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listChannelCapacities` requires to show this screen, and names that permission (the screen's other reads need `PARTNER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CAPACITY_CONFIGURE` for `setChannelAllocations` …
 
 #### Requirements it meets
 
@@ -3075,11 +2958,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Flow F77 *A promotion is built, bundled, published and measured*, step 1: Channel & Distribution. → **Drawn by the client as RET-5G.** 6 operations on this step.
 - Flow F77 branch at step 1 (medium): when A step in the chain is not licensed for this tenant., **The chain stops at the module boundary.** `requiresModule` on each screen decides — a tenant without the retail licence does not see the retail half, and the journey is shorter rather than broken.
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (40), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (54 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (32 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-013?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Save channel allocations, Create channel capacity, Release channel allocation, Save channel capacity, Publish bundle, Save channel listing, What publishing changes.
 - [ ] Every transition is wired: `BO-007`, `BO-008`, `BO-009`, `BO-011`.
@@ -3163,16 +3047,10 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
 | Kind | chip: Admission, Timed admission, Dated admission, Open dated, Seated, Membership… | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Created by principal | the name it points at, never the id | 1.4.18. The approval gate refuses an approver who is the author, and nothing recorded either. |
-| Approved by principal | the name it points at, never the id | — |
-| Responsible department | the name it points at, never the id | Who owns this product commercially. A scope node at `department` level. |
 | On sale from | 1 Oct 2026, 14:30 | 1.4.8. A seasonal product should not need somebody awake at midnight. |
 | On sale to | 1 Oct 2026, 14:30 | Retires the product automatically. Retirement is not deletion — the product stops selling and every order that referenced it still resolves. |
 
@@ -3190,21 +3068,13 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Description | text | — |
 | Kind | chip: Admission, Timed admission, Dated admission, Open dated, Seated, Membership… | `openDated` added 24 August from the client's *Create Ticket Flow* board, which names six main ticket types and this was the one with no … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Created by principal | the name it points at, never the id | 1.4.18. The approval gate refuses an approver who is the author, and nothing recorded either. |
-| Approved by principal | the name it points at, never the id | — |
-| Responsible department | the name it points at, never the id | Who owns this product commercially. A scope node at `department` level. |
 | On sale from | 1 Oct 2026, 14:30 | 1.4.8. A seasonal product should not need somebody awake at midnight. |
 | On sale to | 1 Oct 2026, 14:30 | Retires the product automatically. Retirement is not deletion — the product stops selling and every order that referenced it still resolves. |
 | Lifecycle state | chip: Draft, In review, Approved, Live, Withdrawn, Archived | — |
-| Is sellable | yes / no (icon or chip) | True only when live and carried by a published bundle. Approval and publication are different acts. |
-| Has variants | yes / no (icon or chip) | — |
 | Variant count | 1,234 | — |
 
 **Actions and what each produces**
@@ -3241,7 +3111,7 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the catalogue publishing untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No catalogue publishing yet. Offers Publish bundle (`publishBundle`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, kind, isSellable and the catalogue publishing are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission (the screen's other reads need `PRICE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `transitionProductLifecycle`, `publishBundle`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A `categoryId` that names no category of the venue, or a `guidedAnswerIds` entry that is not an answer of the venue's published guided choice (W4, 29 …; 409 A publish is already in progress for this venue; 409 Transition not valid from the current state, or archiving attempted while unexpired entitlements exist. |
 
@@ -3280,7 +3150,7 @@ pending:
 - `listPrices` → `PRICE_VIEW` (read) · staff, partner
 - `publishBundle` → `PRODUCT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission (the screen's other reads need `PRICE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `transitionProductLifecycle`, `publishBundle`.
 
 #### Requirements it meets
 
@@ -3324,12 +3194,13 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 - Drawn by: Claude Design Retail pack, 24 August
 - Client design-board frames: `FnB Board 2.dc.html#fnb-2h`, `Retail Board 2.dc.html#ret-2h`
 - Flow F78 *A supplier is set up and a catalogue is priced and published*, step 4: The priced range is published to the tills. → **Publishing is what changes what every till charges**, which is why it is its own step.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (8), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (33 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-014?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: , Transition product lifecycle, Publish bundle, What publishing changes.
 - [ ] Every transition is wired: `BO-007`, `BO-008`, `BO-009`.
@@ -3493,15 +3364,10 @@ Errors to draw in the form: 409 A timing change on a performance with sold ticke
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Event | the name it points at, never the id | — |
 | Starts at | 1 Oct 2026, 14:30 | — |
 | Ends at | 1 Oct 2026, 14:30 | — |
-| Approval request | the name it points at, never the id | BL-048. The approval chain and the occurrence lifecycle sat on different entities, so neither was complete: `states/performance.yaml` … |
 | Requires approval to cancel | yes / no (icon or chip) | Cancelling a sold performance is the one transition that needs a name against it. |
 | Status | chip: Scheduled, On sale, Sold out, Suspended, Cancelled, Completed | — |
-| Admission rules | the name it points at, never the id | — |
-| Seat map | the name it points at, never the id | — |
 | Language | text | The language the performance is given in, as a BCP 47 tag (`en`, `ar`, `fr`, `de`, `zh`, `ru`, `ar-AE`). |
 | Format | text | How it is presented, free text the venue chooses, e.g. `2D`, `3D`, `IMAX`, `subtitled`. |
 
@@ -3509,12 +3375,8 @@ Errors to draw in the form: 409 A timing change on a performance with sold ticke
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Parent event | the name it points at, never the id | For grouped events. |
 | Performance count | 1,234 | How many performances the event has. Counted by the server; never sent by a client. |
 | Is active | yes / no (icon or chip) | — |
 
@@ -3522,15 +3384,10 @@ Errors to draw in the form: 409 A timing change on a performance with sold ticke
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Event | the name it points at, never the id | — |
 | Starts at | 1 Oct 2026, 14:30 | — |
 | Ends at | 1 Oct 2026, 14:30 | — |
-| Approval request | the name it points at, never the id | BL-048. The approval chain and the occurrence lifecycle sat on different entities, so neither was complete: `states/performance.yaml` … |
 | Requires approval to cancel | yes / no (icon or chip) | Cancelling a sold performance is the one transition that needs a name against it. |
 | Status | chip: Scheduled, On sale, Sold out, Suspended, Cancelled, Completed | — |
-| Admission rules | the name it points at, never the id | — |
-| Seat map | the name it points at, never the id | — |
 | Language | text | The language the performance is given in, as a BCP 47 tag (`en`, `ar`, `fr`, `de`, `zh`, `ru`, `ar-AE`). |
 | Format | text | How it is presented, free text the venue chooses, e.g. `2D`, `3D`, `IMAX`, `subtitled`. |
 
@@ -3595,7 +3452,7 @@ Errors to draw in the form: 409 A timing change on a performance with sold ticke
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the session calendar untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No session calendar yet. Offers Create performances (`createPerformances`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on from, to and the session calendar are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listPerformances` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getPerformance` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `EVENT_CONFIGURE` for `createEvent`, `updateEvent`; `PERFORMANCE_CONFIGURE` for `createPerformances`, `cancelPerformance`, `updatePerformance`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 A timing change on a performance with sold tickets, or a `status` move the state model does not allow.; 409 The performance is `cancelled`, `completed` or `soldOut`. `states/performance.yaml` cancels only from `scheduled`, `onSale` … |
 
@@ -3641,7 +3498,7 @@ slots:
 - `updateEvent` → `EVENT_CONFIGURE` (configure) · staff
 - `updatePerformance` → `PERFORMANCE_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listPerformances` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getPerformance` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `EVENT_CONFIGURE` for `createEvent`, `updateEvent`; `PERFORMANCE_CONFIGURE` for `createPerformances`, `cancelPerformance`, `updatePerformance`.
 
 #### Requirements it meets
 
@@ -3688,11 +3545,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Flow F09 *Event is cancelled and refunded*, step 2: Cancels it and states the reason → Sales stop immediately. Nothing new can be sold
 - Flow F09 branch at step 2 (requiresStaff): when Performance is part of a bundle, The bundle component is cancelled and the rest stands. **A guest who bought ticket plus dinner plus parking loses the ticket, not the evening** — refunding the whole bundle takes money the venue kept …
 - Flow F09 branch at step 2 (recoverable): when Fiscal period has closed over the original sale, The refund posts to the current period with a reference. It cannot post to a closed one — ADR on append-only.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (39), with its required mark, default, format and its error state (403, 404, 409).
-- [ ] Every output is drawn (58 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-015?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Create time slots, Cancel performance, Create event, Recommend seats, Save event, Save performance.
 - [ ] Every transition is wired: `BO-007`, `BO-009`, `BO-099`, `BO-023`.

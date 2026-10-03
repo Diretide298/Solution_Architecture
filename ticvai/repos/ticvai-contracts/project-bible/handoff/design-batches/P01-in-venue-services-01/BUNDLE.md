@@ -151,7 +151,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `WEB-037` | Menu Item Detail | A | 0 | 7 | 5 | 1 | 2 | 2 | guest | review (client-verified) |
 | `WEB-038` | F&B – Order Tracking | A | 0 | 14 | 5 | 0 | 0 | 0 | guest | review (client-verified) |
 | `WEB-039` | Venue Map & Wait Times | A | 0 | 18 | 6 | 5 | 4 | 6 | guest | review (client-verified) |
-| `WEB-040` | Virtual Queue | A | 8 | 27 | 6 | 11 | 3 | 6 | guest | review (client-verified) |
+| `WEB-040` | Virtual Queue | A | 8 | 15 | 6 | 11 | 3 | 6 | guest | review (client-verified) |
 | `WEB-041` | Parking – Reserve & Pay | A | 22 | 2 | 7 | 7 | 2 | 2 | guest | review (client-verified) |
 
 ## Thin screens in this batch
@@ -171,8 +171,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | In-venue Services · wave 2 · needs the `fnb` module |
-| Block | Block A · ticket #18163 (APP-WEB-WEB-036) |
+| Module | In-venue Services · wave 1 · needs the `fnb` module |
+| Block | Block A · task APP-WEB-WEB-036 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): Location, menu, basket, pay: the guest picks an outlet, then orders from its menu (CHG-SGU-018) |
@@ -444,6 +444,10 @@ Party size and seating (Any, Indoor, Outdoor, Bar, Booth, High chair needed). Na
 
 **Data it reads**: `getFnbDeliveryPolicy` (onLoad, Minimum order, delivery fee and area); `listFulfilmentSlots` (onLoad, Collection times or delivery windows still open); `getGuestMenu` (onLoad, The menu a guest sees); `listDiningOutlets` (onLoad, Where a guest can eat, right now); `listDeliveryLocations` (onLoad, Where an order can be delivered); `getGuestOrderStatus` (onLoad, Track an order Only when signed in (decided 2 October 2026 …)
 
+**Where the user goes next**
+
+- → `WEB-037` Menu Item Detail: *Menu Item Detail*; carries `outletId`
+
 #### States
 
 | State | What it shows |
@@ -655,7 +659,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - [ ] Every output is drawn (43 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-036?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Pay, Book a table, Change or cancel booking, Join the waitlist, Leave restaurant waitlist.
-- [ ] No transition is declared; back returns where the user came from.
+- [ ] Every transition is wired: `WEB-037`.
 - [ ] Sign-in is asked only where the spec asks for it.
 - [ ] The 11 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Drawn in the default theme; on a key screen also in the alternate tenant theme; nothing hard-codes a brand colour, logo or font.
@@ -672,8 +676,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | In-venue Services · wave 2 · needs the `fnb` module |
-| Block | Block A · ticket #18164 (APP-WEB-WEB-037) |
+| Module | In-venue Services · wave 1 · needs the `fnb` module |
+| Block | Block A · task APP-WEB-WEB-037 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): One dish from the outlet's guest menu, with its modifiers and allergens (CHG-SGU-018) |
@@ -857,8 +861,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | In-venue Services · wave 2 · needs the `fnb` module |
-| Block | Block A · ticket #18165 (APP-WEB-WEB-038) |
+| Module | In-venue Services · wave 1 · needs the `fnb` module |
+| Block | Block A · task APP-WEB-WEB-038 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getGuestOrderStatus` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1037,8 +1041,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | In-venue Services · wave 2 · needs the `queue` module |
-| Block | Block A · ticket #18166 (APP-WEB-WEB-039) |
+| Module | In-venue Services · wave 1 · needs the `queue` module |
+| Block | Block A · task APP-WEB-WEB-039 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listQueues` reads the population and `getVenueMap` reads one of them — list, select, act |
@@ -1238,8 +1242,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | In-venue Services · wave 2 · needs the `queue` module |
-| Block | Block A · ticket #18167 (APP-WEB-WEB-040) |
+| Module | In-venue Services · wave 1 · needs the `queue` module |
+| Block | Block A · task APP-WEB-WEB-040 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (compact density): `getWaitingGuest` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1300,18 +1304,10 @@ Errors to draw in the form: 409 Already in this queue, at the cross-queue limit,
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | The client-generated UUIDv7 from `JoinQueueRequest.id`, and the `entryId` every entry path takes. |
-| Queue | the name it points at, never the id | — |
 | Queue name | in the reader's language | — |
-| Subject | the name it points at, never the id | — |
 | Party number | 1,234 | What the guest sees and what appears on signage. |
-| Party size | 1,234 | — |
 | Status | chip: Waiting, Called, Redeemed, Expired, No show, Cancelled… | — |
-| Position in queue | 1,234 | — |
-| Parties ahead | 1,234 | — |
 | Estimated call at | 1 Oct 2026, 14:30 | — |
-| Is fast pass | yes / no (icon or chip) | — |
-| Entitlement | text | — |
 | Called at | 1 Oct 2026, 14:30 | — |
 | Return window ends at | 1 Oct 2026, 14:30 | — |
 | Redeemed at | 1 Oct 2026, 14:30 | — |
@@ -1321,13 +1317,9 @@ Errors to draw in the form: 409 Already in this queue, at the cross-queue limit,
 
 | Shows | Format | Notes |
 |---|---|---|
-| Queue | the name it points at, never the id | — |
 | Queue name | in the reader's language | — |
-| Attraction product | the name it points at, never the id | — |
-| Attraction category | the name it points at, never the id | The catalogue `ProductCategory` the attraction product is filed under — the value the `category` filter on `getWaitTimes` matches. |
 | Status | chip: Open, Paused, Closed, At capacity | — |
 | Wait minutes | 1,234 | Null where the queue is closed or no estimate is available. |
-| Source | chip: Sensor, Throughput, Manual, Unavailable | Where the estimate came from. Surfaced so an operator knows whether a figure is measured or guessed. |
 | Is stale | yes / no (icon or chip) | The underlying feed has gone quiet past its expected interval. The figure is shown with a caveat rather than frozen and presented as … |
 | Height requirement cm | 1,234 | — |
 | Zone | text | — |
@@ -1464,7 +1456,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (8), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#WEB-040?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Join queue, Leave queue.
 - [ ] No transition is declared; back returns where the user came from.
@@ -1484,8 +1476,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
-| Module | In-venue Services · wave 2 · needs the `access` module |
-| Block | Block A · ticket #18192 (APP-WEB-WEB-041) |
+| Module | In-venue Services · wave 1 · needs the `access` module |
+| Block | Block A · task APP-WEB-WEB-041 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listParkingFacilities` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

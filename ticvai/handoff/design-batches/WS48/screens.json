@@ -294,7 +294,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/buy-x-get-y-bogo-rule-builder-adm-169",
    "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-010"
   },
   "navigation": {
    "entryFrom": [
@@ -744,7 +745,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/fixed-price-n-for-x-offer-builder-adm-172",
    "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-010"
   },
   "navigation": {
    "entryFrom": [
@@ -889,7 +891,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/gift-free-product-added-value-offer-builder-adm-173",
    "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-010"
   },
   "navigation": {
    "entryFrom": [
@@ -1019,7 +1022,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/cross-category-promotion-builder-adm-174",
    "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-010"
   },
   "navigation": {
    "entryFrom": [
@@ -1515,7 +1519,9 @@
    "params": [
     {
      "name": "promotionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `simulatePromotion` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

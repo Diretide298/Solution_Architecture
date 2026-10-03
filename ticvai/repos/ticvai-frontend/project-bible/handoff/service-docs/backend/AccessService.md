@@ -30,16 +30,16 @@
 | access | [`approveManualOverrideSupervisor`](#approvemanualoverridesupervisor) | PUT | `/manual-override-supervisor` | setup | 1 |  |
 | access | [`bindCredentialDevice`](#bindcredentialdevice) | POST | `/my/credentials/{credentialId}/device-bindings` | core | 1 | GST-013, GST-055 |
 | access | [`deleteAccessPointGroup`](#deleteaccesspointgroup) | DELETE | `/access-point-groups/{groupId}` | setup | 1 | BO-151 |
-| access | [`enrolFacePass`](#enrolfacepass) | POST | `/face-pass/enrolments` | core | 2 | GST-069 |
+| access | [`enrolFacePass`](#enrolfacepass) | POST | `/face-pass/enrolments` | core | 1 | GST-069 |
 | access | [`enrolFaceTag`](#enrolfacetag) | POST | `/face-tag/enrolments` | core | 1 | POS-005 |
 | access | [`getEntitlement`](#getentitlement) | GET | `/entitlements/{entitlementId}` | core | 1 | BO-355, GST-012, GST-013, GST-055, WEB-018 |
 | access | [`getEntitlementCredential`](#getentitlementcredential) | GET | `/entitlements/{entitlementId}/credential` | core | 1 | BO-355, GST-012, GST-013, GST-055, WEB-018 |
 | access | [`getEntitlementHistory`](#getentitlementhistory) | GET | `/entitlements/{entitlementId}/history` | core | 1 | BO-355, GST-012, GST-013, WEB-018 |
-| access | [`getFacePassEnrolment`](#getfacepassenrolment) | GET | `/face-pass/enrolments/{enrolmentId}` | core | 2 | GST-069, WEB-024 |
+| access | [`getFacePassEnrolment`](#getfacepassenrolment) | GET | `/face-pass/enrolments/{enrolmentId}` | core | 1 | GST-069, WEB-024 |
 | access | [`listEntitlements`](#listentitlements) | GET | `/my/entitlements/all` | core | 1 | GST-012, WEB-018 |
 | access | [`listMyEntitlements`](#listmyentitlements) | GET | `/guests/me/entitlements` | core | 1 | GST-001, GST-012, GST-055, POS-002, WEB-001, WEB-017 … |
-| access | [`listParkingFacilities`](#listparkingfacilities) | GET | `/parking-facilities` | core | 2 | BO-006, GST-027, GST-028, WEB-041 |
-| access | [`revokeFacePass`](#revokefacepass) | DELETE | `/face-pass/enrolments/{enrolmentId}` | core | 2 | GST-069, WEB-024 |
+| access | [`listParkingFacilities`](#listparkingfacilities) | GET | `/parking-facilities` | core | 1 | BO-006, GST-027, GST-028, WEB-041 |
+| access | [`revokeFacePass`](#revokefacepass) | DELETE | `/face-pass/enrolments/{enrolmentId}` | core | 1 | GST-069, WEB-024 |
 | access | [`setAccessPointGroup`](#setaccesspointgroup) | PUT | `/access-point-groups` | setup | 1 | BO-151 |
 | access | [`setBiometricVerificationProfile`](#setbiometricverificationprofile) | PUT | `/biometric-verification-profile` | setup | 1 | BO-185 |
 | access | [`setBleBeaconGeofence`](#setblebeacongeofence) | PUT | `/ble-beacon-geofence` | setup | 1 | BO-168 |
@@ -49,10 +49,10 @@
 | access | [`setFacePassEnrollment`](#setfacepassenrollment) | PUT | `/face-pass-enrollment` | setup | 1 | BO-186 |
 | access | [`setFaceTagTemporaryEnrollment`](#setfacetagtemporaryenrollment) | PUT | `/face-tag-temporary` | setup | 1 | BO-188 |
 | access | [`setGateModePolicy`](#setgatemodepolicy) | PUT | `/gate-mode-policies` | setup | 1 | BO-201 |
-| access | [`setParkingFacility`](#setparkingfacility) | PUT | `/parking-facilities` | setup | 2 | BO-006 |
+| access | [`setParkingFacility`](#setparkingfacility) | PUT | `/parking-facilities` | setup | 1 | BO-006 |
 | access | [`setVirtualTicketIdentity`](#setvirtualticketidentity) | PUT | `/virtual-ticket-identity` | setup | 1 | BO-335 |
 | access | [`setVisualAccessRule`](#setvisualaccessrule) | PUT | `/visual-access-rule` | setup | 1 | BO-155 |
-| access | [`updateParkingEntitlement`](#updateparkingentitlement) | PATCH | `/parking-entitlements/{entitlementId}` | core | 2 | GST-027, WEB-041 |
+| access | [`updateParkingEntitlement`](#updateparkingentitlement) | PATCH | `/parking-entitlements/{entitlementId}` | core | 1 | GST-027, WEB-041 |
 | accessPoint | [`addBlacklistEntry`](#addblacklistentry) | POST | `/blacklist` | setup | 1 | BO-033 |
 | accessPoint | [`createAccessPoint`](#createaccesspoint) | POST | `/access-points` | setup | 1 | BO-064, BO-148 |
 | accessPoint | [`createAdmissionRules`](#createadmissionrules) | POST | `/admission-rules` | setup | 1 | BO-032, BO-154, BO-222 |
@@ -253,13 +253,14 @@ No image is stored — a template is. **The template cannot reconstruct the face
 **The face-capture SDK and the template format are an open value** (decided 28 September, audit R077 (b)): they are those of the facial-reader vendor the client has contracted, and the client names that vendor. Until then the template is carried as the vendor's opaque format and nothing here depends on which one it is.
 
 **Re-enrolment is recorded** (decided 29 September, writers pass): where the subject already has a Face Pass, the call writes one `access.face_reenrolment_attempt` (opaque capture references, never templates) and needs `reasonForReEnrollment`. A new capture within policy of the old one replaces it (`outcome: updated`, `201`); a significantly different one is held (`outcome: pendingReview`, `202`) for `reviewFaceReenrolment`, so nobody can swap another person's face onto a pass at a counter. Every enrolment and re-enrolment also writes an `access.biometric_audit_event`.
+**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own FacePass enrolment; another guest's enrolment is refused exactly as one that does not exist, never returned. `GUEST_MANAGE` is what a staff caller must hold to act for any guest (ADR-0025).
 
 |  |  |
 |---|---|
 | Permission | `GUEST_MANAGE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `access.biometric_profile`, `access.face_reenrolment_attempt`, `cache:idempotency`, `marketing.consent_record`, `pii.subject`, `pii.subject_biometric` |
@@ -505,7 +506,7 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 | expiresAt | string (date-time) |  | (nullable) |
 | rotation | object |  | The time-based seed the rotating code is derived from (audit R230). (nullable) |
 | rotation.secret | string | yes | Base32 shared secret. |
-| rotation.timeStepSeconds | integer | yes | (min 10; max 60; default 30) |
+| rotation.timeStepSeconds | integer | yes | 30 seconds for an admission QR (Chinmay, 3 October 2026, Block A business rules: GST-055's admission QR rotates every 30 seconds; CHG-RUL-018). (min 10; max 60; default 30) |
 | rotation.digits | integer | yes | (min 6; max 10; default 8) |
 | rotation.algorithm | enum (SHA1, SHA256, SHA512) | yes | (default SHA256) |
 | rotation.validFrom | string (date-time) | yes |  |
@@ -559,13 +560,14 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 **Returns metadata and never the template.** Whether one exists, when it was captured, which surface enrolled it, and the consent behind it.
 **Where the id comes from.** A screen opening on a guest's pass has the entitlement, not the enrolment: `Entitlement.facePassEnrolmentId` carries the id of the active `facePass` enrolment on that entitlement, or null when there is none — which is itself the answer to *is a face registered on this pass*. The id is also returned by `enrolFacePass`.
 **Face Pass enrolments only — decided 28 September, audit R228.** A Face Tag lives in the same table, but it is never returned here: an id that names a `faceTag` enrolment answers `404`, exactly as an unknown id does, so `kind` in the response is always `facePass`.
+**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own FacePass enrolment; another guest's enrolment is refused exactly as one that does not exist, never returned. `GUEST_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
 
 |  |  |
 |---|---|
 | Permission | `GUEST_VIEW` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
@@ -769,16 +771,18 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 **Which venue.** A staff caller sees the car parks of every venue their grants reach, and `venueId` narrows that to one. **A guest caller must send `venueId`** — a guest session carries no venue (`guestAuth`), so without it there is no venue to answer for, and the request is a `400`.
 **What a guest gets back.** The permission is the staff case (ADR-0025: audience and permission are orthogonal); a guest needs none, because car parks are what a guest chooses between when buying parking. **A guest is never shown the integration** — `vendorName`, `endpoint`, `credentialRef`, `pushLeadMinutes` and `vendorSwapTargetDays` are omitted from a guest response. They are how the platform talks to a vendor, not anything a guest decides on.
 **The staff permission is `PARKING_CONFIGURE`**, the same one `setParkingFacility` writes with. It was `ACCESS_POINT_CONFIGURE`, which let somebody who could configure a car park fail to read the one they had just configured.
+**A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets the car parks offered to guests, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not found. `PARKING_CONFIGURE` is what a staff caller must hold, and staff also see drafts (ADR-0025).
 
 |  |  |
 |---|---|
 | Permission | `PARKING_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
+| Guest callable | True |
 | Reads | `access.parking_facility` |
 | Writes | - |
 | Called by | BO-006, GST-027, GST-028, WEB-041 |
@@ -827,13 +831,14 @@ The QR payload, wallet pass reference or wristband serial. **Separated from `get
 Withdrawn by the guest, ended with the pass, or erased under a DSAR.
 **The template is destroyed, not flagged.** A biometric marked inactive is a biometric still held, and under PDPL that is the same as holding it — which is why this is a delete rather than a status change.
 **The entitlement survives.** A guest who withdraws their face still has their annual pass and enters another way (3.2.9 allows the check to be deactivated per ticket type).
+**A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002; `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own FacePass enrolment; another guest's enrolment is refused exactly as one that does not exist, never returned. `GUEST_MANAGE` is what a staff caller must hold to act for any guest (ADR-0025).
 
 |  |  |
 |---|---|
 | Permission | `GUEST_MANAGE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `pii.subject_biometric` |
@@ -1508,7 +1513,7 @@ A fourth case is out of scope: pay-per-hour parking unrelated to a ticket runs o
 | Permission | `PARKING_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | setup, makes `access.parking_facility` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
@@ -1714,7 +1719,7 @@ Revocation removes the plate from the whitelist. A refunded parking entitlement 
 | Permission | `None` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `access.parking_entitlement`, `cache:idempotency` |
@@ -2701,7 +2706,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | access_point_id | uuid | yes |  |
 | is_active | boolean | yes |  |
 | created_at | timestamptz | yes |  |
-| id | uuid | no |  |
+| id | uuid | yes |  |
 
 ### `access.face_reenrolment_attempt`
 
@@ -2762,7 +2767,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | facility_id | uuid | yes |  |
 | order_id | uuid | yes | The order's id, a UUIDv7 as in /orders/{orderId} (orders.sales_order.id). |
 | subject_id | uuid | no |  |
@@ -2779,7 +2784,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no | Server-assigned, and the upsert key of setParkingFacility. |
+| id | uuid | yes | Server-assigned, and the upsert key of setParkingFacility. |
 | name | text | yes |  |
 | venue_id | uuid | yes |  |
 | mode | text | yes |  |

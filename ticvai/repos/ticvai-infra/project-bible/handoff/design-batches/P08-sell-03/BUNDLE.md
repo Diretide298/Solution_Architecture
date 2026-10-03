@@ -189,15 +189,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-113` | Central Kitchen & Commissary Management | B–D | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (generated) |
-| `BO-114` | Variants, Attributes, Barcode & RFID Management | B–D | 3 | 18 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `BO-115` | Category, Brand & Merchandise Hierarchy | B–D | 14 | 20 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
-| `BO-116` | Merchandising & Product Presentation | A | 30 | 62 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
+| `BO-114` | Variants, Attributes, Barcode & RFID Management | B–D | 3 | 8 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-115` | Category, Brand & Merchandise Hierarchy | B–D | 14 | 15 | 6 | 0 | 2 | 6 | — | notStarted (generated) |
+| `BO-116` | Merchandising & Product Presentation | B | 30 | 62 | 6 | 4 | 1 | 0 | — | notStarted (generated) |
 | `BO-117` | Product Import, Governance & AI Configuration Assistant | A | 7 | 0 | 6 | 32 | 5 | 0 | — | notStarted (generated) |
-| `BO-118` | Campaign & Audience Management | B–D | 47 | 52 | 6 | 14 | 0 | 6 | — | notStarted (generated) |
-| `BO-119` | Cross-Sell, Upsell & Recommendation Rules | B–D | 1 | 27 | 5 | 54 | 4 | 0 | — | notStarted (generated) |
-| `BO-120` | Omnichannel Commerce & Journey Configuration | B–D | 28 | 20 | 6 | 9 | 1 | 6 | — | notStarted (generated) |
-| `BO-121` | Personalized Offers & Guest Engagement | B–D | 42 | 18 | 6 | 8 | 1 | 0 | — | notStarted (generated) |
-| `BO-1190` | Donation Campaigns | B–D | 27 | 22 | 7 | 5 | 2 | 6 | — | notStarted (generated) |
+| `BO-118` | Campaign & Audience Management | B–D | 47 | 45 | 6 | 14 | 0 | 6 | — | notStarted (generated) |
+| `BO-119` | Cross-Sell, Upsell & Recommendation Rules | B–D | 1 | 24 | 5 | 54 | 4 | 0 | — | notStarted (generated) |
+| `BO-120` | Omnichannel Commerce & Journey Configuration | B–D | 28 | 14 | 6 | 9 | 1 | 6 | — | notStarted (generated) |
+| `BO-121` | Personalized Offers & Guest Engagement | B–D | 42 | 14 | 6 | 8 | 1 | 0 | — | notStarted (generated) |
+| `BO-1190` | Donation Campaigns | B–D | 27 | 16 | 7 | 5 | 2 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -414,13 +414,8 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Item | the name it points at, never the id | — |
-| Batch | the name it points at, never the id | The batch it arrived in, where the item is both lotted and serialised. |
 | Serial | text | Unique within the item, not globally. Two manufacturers reuse serial numbers and a global constraint would refuse the second one. |
-| Location | the name it points at, never the id | — |
 | Status | chip: In stock, Reserved, Sold, Returned, Damaged, Lost… | — |
-| Sold on order line | the name it points at, never the id | The link that makes serialisation worth having. A warranty claim, a recall and a proof of purchase all start with *which sale was this … |
 | Warranty until | 1 Oct 2026 | — |
 | Received at | 1 Oct 2026, 14:30 | — |
 
@@ -428,13 +423,8 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Item | the name it points at, never the id | — |
-| Batch | the name it points at, never the id | The batch it arrived in, where the item is both lotted and serialised. |
 | Serial | text | Unique within the item, not globally. Two manufacturers reuse serial numbers and a global constraint would refuse the second one. |
-| Location | the name it points at, never the id | — |
 | Status | chip: In stock, Reserved, Sold, Returned, Damaged, Lost… | — |
-| Sold on order line | the name it points at, never the id | The link that makes serialisation worth having. A warranty claim, a recall and a proof of purchase all start with *which sale was this … |
 | Warranty until | 1 Oct 2026 | — |
 | Received at | 1 Oct 2026, 14:30 | — |
 
@@ -517,11 +507,12 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Derived from `wireframes/reference/Retail Board 4.dc.html`
 - Drawn by: Claude Design Retail pack, 24 August
 - Client design-board frames: `Retail Board 4.dc.html#ret-4j`
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (3), with its required mark, default, format and its error state (400, 404).
-- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-114?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Lookup merchandise.
 - [ ] Every transition is wired: `BO-102`.
@@ -599,14 +590,9 @@ Errors to draw in the form: 400 The body contains a cycle — a category that is
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
-| Name localised | grouped details | — |
 | Kind | chip: Category, Brand, Collection, Season, Department | — |
-| Parent | the name it points at, never the id | One tree, not four. A brand under a department under a category is how a real merchandise hierarchy runs, and separate tables for each … |
-| Scope path | text | Set by the server from the venue the caller acts at; not sent. |
 | Display order | 1,234 | — |
-| Image | the image or video | — |
 | Description | in the reader's language | The short line a guest reads under a category option, e.g. *Surf lessons: learn on the beginner wave with a coach* (decided 29 September … |
 | Is active | yes / no (icon or chip) | Deactivated rather than deleted. A category with a season behind it still names the products sold under it, and removing it rewrites last … |
 
@@ -646,7 +632,7 @@ Errors to draw in the form: 400 The body contains a cycle — a category that is
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the category brand merchandise untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No category brand merchandise yet. Offers no create action — this screen declares no operation that makes one. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listProductCategories` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listProductCategories` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listProductCategories` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setProductCategories`; `TENANT_CONFIGURE` for `listBookingFlows`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 The body contains a cycle — a category that is its own ancestor — or a `parentId` that names no category in the body.; 409 The body leaves out a category that products name (send it with `isActive` false rather than deleting it), or a category `code` is already used in this tenant …; 422 A category `bookingFlowId` that is not a booking flow of the venue (W12, 29 September). |
 
@@ -677,7 +663,7 @@ category:
 - `listProductCategories` → `PRODUCT_VIEW` (read) · staff, guest
 - `setProductCategories` → `PRODUCT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listProductCategories` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listProductCategories` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setProductCategories`; `TENANT_CONFIGURE` for `listBookingFlows`.
 
 #### Requirements it meets
 
@@ -713,7 +699,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (14), with its required mark, default, format and its error state (400, 403, 409, 422).
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-115?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save product categories.
 - [ ] Every transition is wired: `BO-102`, `BO-116`.
@@ -732,7 +718,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `retail` module |
-| Block | Block A · ticket #18011 (APP-SETUP-BO-116) |
+| Block | Block B · task APP-SETUP-BO-116 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`, `SCOPE_VIEW`, `WORKSTATION_CONFIGURE` (2 configure, 2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): 3 independent reads and no read of one record — the screen watches a population rather than working one |
@@ -788,7 +774,7 @@ Errors to draw in the form: 409 The new barcode is already in use in this venue.
 
 **Form: Save sale board** (modal, opened by *Save sale board*; *Save sale board* calls `updateSaleBoard`, *Cancel* sends nothing)
 
-**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** `id` is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `updateSaleBoard` sends before it is called.** Required: `code`, `name`, `venueId`, `kind`, `pages`. Optional: `isActive`. **Not asked:** is a client UUIDv7 generated silently (design-note correction, 2 October 2026). Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -927,7 +913,7 @@ Errors to draw in the form: 400 A tile references an unknown or unsellable varia
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the merchandising product presentation untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No merchandising product presentation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on outletId, categoryId, inStockOnly, search and the merchandising product presentation are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `updateMerchandise`; `WORKSTATION_CONFIGURE` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 A tile references an unknown or unsellable variant; 409 The new barcode is already in use in this venue. `refusedReason` is `barcodeInUse`. (MerchandiseConflictProblem) |
 
@@ -971,7 +957,7 @@ merchandise:
 - `listWorkstations` → `SCOPE_VIEW` (read) · staff
 - `updateSaleBoard` → `WORKSTATION_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listMerchandise` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `updateMerchandise`; `WORKSTATION_CONFIGURE` …
 
 #### Requirements it meets
 
@@ -1003,6 +989,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Drawn by: Claude Design POS pack, 24 August
 - Client design-board frames: `POS Board 4.dc.html#pos-4b`
 - Flow F86 *A POS layout is designed, previewed and deployed*, step 2: Merchandising & Product Presentation. → **Drawn by the client as POS-4B.** 2 operations on this step.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0002 *Authorisation is user-driven, not workstation-driven* (`docs/adr/0002-authorisation-is-user-driven-not-workstation-driven.md`)
 
 #### Acceptance for the design
@@ -1026,8 +1013,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Sell · wave 2 · needs the `ticketing` module |
-| Block | Block A · ticket #20670 (APP-SETUP-BO-117) |
+| Module | Sell · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-SETUP-BO-117 |
 | Who uses it | venue staff holding `AI_USE`, `PRODUCT_CONFIGURE` (1 operate, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listSaleBoards` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -1374,15 +1361,8 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 | Name | text | — |
 | Kind | chip: One off, Scheduled, Triggered, Recurring | — |
 | Channel | chip: Email, SMS, Whatsapp, Push, In app, Post | — |
-| Venue | the name it points at, never the id | — |
-| Segment | the name it points at, never the id | — |
-| Content | grouped details | — |
-| Trigger | grouped details | — |
 | Scheduled for | 1 Oct 2026, 14:30 | — |
 | Consent purpose | chip: Marketing, Personalisation, Profiling, Third party sharing, AI processing … | — |
-| Send window | grouped details | Hours during which sending is permitted. A promotional message at 3am is a complaint waiting to happen. |
-| ID | the name it points at, never the id | — |
-| Budget cap | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **Actions and what each produces**
 
@@ -1410,7 +1390,7 @@ Errors to draw in the form: 400 Required parameter missing, or the date range ex
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the campaign audience untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No campaign audience yet. Offers Create campaign (`createCampaign`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status and the campaign audience are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `listCampaigns` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `listCampaigns` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createCampaign`; `REPORT_VIEW_VENUE` for `runReport`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Required parameter missing, or the date range exceeds `maxDateRangeDays` (366 days when the definition sets none, audit R158); 400 Validation failed |
 
@@ -1436,7 +1416,7 @@ campaigns:
 - `listSegments` → `MARKETING_VIEW` (read) · staff
 - `runReport` → `REPORT_VIEW_VENUE` (operate) · staff, partner
 
-**A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `listCampaigns` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `listCampaigns` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createCampaign`; `REPORT_VIEW_VENUE` for `runReport`.
 
 #### Requirements it meets
 
@@ -1484,7 +1464,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (47), with its required mark, default, format and its error state (400, 403).
-- [ ] Every output is drawn (52 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (45 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-118?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create campaign, Run report.
 - [ ] Every transition is wired: `BO-102`, `BO-126`.
@@ -1553,13 +1533,10 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 
 | Shows | Format | Notes |
 |---|---|---|
-| Variant | the name it points at, never the id | — |
-| Bundle | the name it points at, never the id | — |
 | Name | text | — |
 | Price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Discounted price | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Source | chip: Rule, Recommendation | A configured rule always outranks a model. |
-| Rule | the name it points at, never the id | — |
 | Rank | 1,234 | — |
 | Rationale | text | — |
 
@@ -1608,7 +1585,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 | Loading (`?state=loading`) | The cross-sell upsell recommendation, read by `getUpsellSuggestions`. |
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the cross-sell upsell recommendation untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No cross-sell upsell recommendation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getRecommendations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listUpsellRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `decideRecommendations`; `PRODUCT_CONFIGURE` for `createUpsellRule`, `deleteUpsellRule`. |
 | Offline (`?state=offline`) | online only |
 
 #### Edge cases to draw
@@ -1638,7 +1615,7 @@ rule:
 - `getRecommendations` → `PRODUCT_VIEW` (read) · staff, guest
 - `getUpsellSuggestions` → `PRODUCT_VIEW` (read) · staff, guest
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getRecommendations` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listUpsellRules` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `decideRecommendations`; `PRODUCT_CONFIGURE` for `createUpsellRule`, `deleteUpsellRule`.
 
 #### Requirements it meets
 
@@ -1688,7 +1665,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (1), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-119?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Cancel.
 - [ ] Every transition is wired: `BO-010`, `BO-102`.
@@ -1740,7 +1717,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Form: Create journey** (modal, opened by *Create journey*; *Create journey* calls `createJourney`, *Cancel* sends nothing)
 
-**Collects what `createJourney` sends before it is called.** Required: `id`, `name`, `entryEvent`, `steps`, `status`. Optional: `templateKind`, `entryConditions`, `maxDurationDays`, `reentryPolicy`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `createJourney` sends before it is called.** Required: `name`, `entryEvent`, `steps`. Optional: `templateKind`, `entryConditions`, `maxDurationDays`, `reentryPolicy`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath`, `status` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1782,22 +1759,17 @@ Errors to draw in the form: 422 The graph does not terminate, or a step points a
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
 | Template kind | chip: Abandoned cart, Membership lifecycle, Loyalty lifecycle, Wallet lifecycle … | Which named lifecycle this implements. Set for reporting and for the library, not for behaviour — the steps decide what happens. |
 | Entry event | text | 22.3.2b. From the event catalogue, so a journey cannot enter on something nothing publishes. |
-| Entry conditions | grouped details | Narrows entry — a segment, a tier, a venue. Evaluated once at entry, unlike step conditions. |
-| Steps | list or chips (count when long) | 22.3.1b. What the builder produces. |
 | Status | chip: Draft, Active, Paused, Archived | — |
 | Max duration days | 1,234 | A journey with no end is a guest who never leaves it. After this, entrants exit wherever they are. |
 | Reentry policy | chip: Never, After completion, Always | 22.3.6b. Abandoned cart is the case that needs this. |
-| Scope path | text | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it … |
 
 **The selected journey** (detail panel, from `listJourneys`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
 | Template kind | chip: Abandoned cart, Membership lifecycle, Loyalty lifecycle, Wallet lifecycle … | Which named lifecycle this implements. Set for reporting and for the library, not for behaviour — the steps decide what happens. |
 | Entry event | text | 22.3.2b. From the event catalogue, so a journey cannot enter on something nothing publishes. |
@@ -1806,7 +1778,6 @@ Errors to draw in the form: 422 The graph does not terminate, or a step points a
 | Status | chip: Draft, Active, Paused, Archived | — |
 | Max duration days | 1,234 | A journey with no end is a guest who never leaves it. After this, entrants exit wherever they are. |
 | Reentry policy | chip: Never, After completion, Always | 22.3.6b. Abandoned cart is the case that needs this. |
-| Scope path | text | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it … |
 
 **Actions and what each produces**
 
@@ -1836,7 +1807,7 @@ Errors to draw in the form: 422 The graph does not terminate, or a step points a
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the omnichannel commerce journey untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No omnichannel commerce journey yet. Offers Create journey (`createJourney`). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listJourneys` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `listJourneys` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `listJourneys` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createJourney`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 422 The graph does not terminate, or a step points at nothing. Refused at creation rather than discovered by a guest stuck in a loop. |
 
@@ -1860,7 +1831,7 @@ journeys:
 - `listJourneys` → `MARKETING_VIEW` (read) · staff
 - `createJourney` → `MARKETING_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `listJourneys` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `listJourneys` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createJourney`.
 
 #### Requirements it meets
 
@@ -1904,7 +1875,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (28), with its required mark, default, format and its error state (422).
-- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-120?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create journey.
 - [ ] Every transition is wired: `BO-102`.
@@ -2008,11 +1979,7 @@ Errors to draw in the form: 400 Validation failed
 |---|---|---|
 | Name | text | — |
 | Description | text | — |
-| Venue | the name it points at, never the id | — |
 | Match | chip: All, Any | — |
-| Criteria | list or chips (count when long) | — |
-| Exclude segments | list or chips (count when long) | — |
-| ID | the name it points at, never the id | — |
 | Last evaluated size | 1,234 | — |
 | Last evaluated at | 1 Oct 2026, 14:30 | — |
 
@@ -2055,7 +2022,7 @@ Errors to draw in the form: 400 Validation failed
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the personalized offers guest untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No personalized offers guest yet. Offers Create campaign (`createCampaign`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on search and the personalized offers guest are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `listSegments` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `MARKETING_VIEW`, which `listSegments` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createCampaign`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
 
@@ -2081,7 +2048,7 @@ offer: Free karak with any meal (pre-configured)
 - `listSegments` → `MARKETING_VIEW` (read) · staff
 - `createCampaign` → `MARKETING_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `listSegments` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `MARKETING_VIEW`, which `listSegments` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MARKETING_MANAGE` for `createCampaign`.
 
 #### Requirements it meets
 
@@ -2120,7 +2087,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (42), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-121?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create campaign.
 - [ ] Every transition is wired: `BO-102`.
@@ -2236,17 +2203,11 @@ Answered questions: draw the decision, not the old default. Where a decision and
 |---|---|---|
 | Name | text | — |
 | Description | text | — |
-| Beneficiary | text | Who the money is for. Shown to the guest, and it is the reason they give. |
-| Venues | list or chips (count when long) | — |
 | Amount mode | chip: Fixed choices, Free amount, Round up | — |
 | Fixed amounts | list or chips (count when long) | 1.1.129. Predefined values, e.g. |
 | Min amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Max amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Liability account | the name it points at, never the id | Donations post here, not to revenue (1.1.132). Money collected for a charity is not the venue's to recognise, and treating it as revenue is … |
-| Channels | list or chips (count when long) | 1.1.133. Where it may be solicited — POS, kiosk, web, app. |
 | Valid from | 1 Oct 2026, 14:30 | — |
-| Valid to | 1 Oct 2026, 14:30 | — |
-| Is active | yes / no (icon or chip) | — |
 | Raised total | AED 1,234.50 | Not reversed when the campaign closes. The money is still owed. |
 
 **Actions and what each produces**
@@ -2345,7 +2306,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (27), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-1190?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, validation, offline.
 - [ ] Every action is wired with its success and its failure: New campaign, Save campaign, Close campaign.
 - [ ] Every transition is wired: `BO-102`.

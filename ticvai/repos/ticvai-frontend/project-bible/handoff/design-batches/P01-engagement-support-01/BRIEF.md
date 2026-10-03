@@ -1,6 +1,6 @@
 # P01-engagement-support-01 — P01 · Engagement & Support
 
-**6 screens · 25 operations · 64 schemas · 4 permissions**
+**6 screens · 25 operations · 66 schemas · 3 permissions**
 
 Platform P01 Guest Web · ships as **guest** ·
 guest audience · web ·
@@ -48,8 +48,8 @@ convincingly. It is never a caption.
 
 ## Rules that are not style preferences
 
-- **Every control that can be refused must be gated.** 4 permissions apply here:
-  `AI_USE, CASE_MANAGE, GUEST_VIEW, MARKETING_VIEW`. A control nobody can use must say so,
+- **Every control that can be refused must be gated.** 3 permissions apply here:
+  `AI_USE, GUEST_VIEW, MARKETING_VIEW`. A control nobody can use must say so,
   not sit enabled and fail.
 - **This shell is online only.** None of these operations is served offline here, whatever it can do on a shell that keeps a store. Offline, a screen shows what was already loaded, under the banner below.
 - **Offline, every screen shows one banner, the same on web and app:** *"You're offline. Connect to the internet to book, pay, order or join a queue."* The moment the connection drops, on every screen, above the screen's own content. By itself as soon as the connection is back, with a short "Back online" confirmation. **It never** Covers what is already on screen, or appears for a server error — that is the screen's own error state, and a guest told they are offline when the venue is down reconnects for nothing. Each screen's `states.offline` says what stays on screen and what waits.
@@ -159,7 +159,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `WEB-026` | Survey & Feedback | A | 28 | 20 | 5 | 82 | 2 | 0 | guest | review (client-verified) |
 | `WEB-027` | Newsletter Subscription | A | 3 | 13 | 6 | 10 | 1 | 0 | guest | review (client-verified) |
 | `WEB-028` | Contact & Venue Information | A | 0 | 20 | 5 | 0 | 0 | 0 | guest | review (client-verified) |
-| `WEB-044` | AI Concierge – Home | A | 8 | 23 | 6 | 35 | 4 | 0 | guest | review (client-verified) |
+| `WEB-044` | AI Concierge – Home | A | 8 | 23 | 6 | 32 | 4 | 0 | guest | review (client-verified) |
 | `WEB-046` | In-Venue Notifications | A | 3 | 12 | 6 | 0 | 2 | 0 | guest | review (client-verified) |
 
 ## Thin screens in this batch

@@ -97,11 +97,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ACC-001` | Landing / Programme Overview | B–D | 0 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ACC-002` | Registration Form | B–D | 6 | 0 | 5 | 1 | 6 | 0 | — | notStarted (generated) |
-| `ACC-003` | Application Review & Submit | B–D | 0 | 0 | 6 | 1 | 2 | 0 | — | notStarted (generated) |
-| `ACC-004` | Application Status Tracking | B–D | 0 | 0 | 6 | 9 | 2 | 0 | — | notStarted (generated) |
-| `ACC-005` | Accreditation Badge | B–D | 0 | 0 | 5 | 2 | 2 | 6 | — | notStarted (generated) |
+| `ACC-001` | Landing / Programme Overview | D | 0 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ACC-002` | Registration Form | D | 6 | 0 | 5 | 1 | 6 | 0 | — | notStarted (generated) |
+| `ACC-003` | Application Review & Submit | D | 0 | 0 | 6 | 1 | 2 | 0 | — | notStarted (generated) |
+| `ACC-004` | Application Status Tracking | D | 0 | 0 | 6 | 9 | 2 | 0 | — | notStarted (generated) |
+| `ACC-005` | Accreditation Badge | D | 0 | 0 | 5 | 2 | 2 | 6 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

@@ -1195,6 +1195,18 @@ paths:
         **Owned by the guest session**, as a cart is: a signed-in guest's plan is theirs, an
         anonymous one is bound to the device session and claimed on sign-in. Nothing is held or
         sold here; `bookVisitPlan` turns the plan into cart lines.
+
+        **Signed out, a guest builds and changes; signed in, they save, share and book** (Chinmay,
+        3 October 2026, Block A business rules; CHG-RUL-003). This operation, `getVisitPlan`,
+        `updateVisitPlan` and `listVisitPlanAlternatives` accept the anonymous guest session a
+        device holds before sign-in (the `guestAuth` token `orders.createCart` uses), so the Plan
+        tab works without an account. The plan is kept against that device session
+        (`VisitPlan.sessionRef`) and is not saved to any account: it lapses with the session.
+        **When the guest signs in on that device, every draft plan of the session moves to the
+        account** (`subjectId` set, `sessionRef` cleared, `ownership` becomes `account`), in the
+        same step as the cart is claimed, with no call from the client and with its versions
+        intact. Booking (`bookVisitPlan`) needs a signed-in guest; sharing a plan is a signed-in
+        act as well (no share operation is contracted yet).
       tags: [visitPlan]
       x-ticvai-permission: null
       x-ticvai-guest-callable: true
@@ -1300,7 +1312,8 @@ paths:
         **Every change is a new version, so undo is a change too** (29 September, MOB-6). The body
         names the version it was made against (`baseVersion`) and a list of changes: `swap` an
         item for an alternative from `listVisitPlanAlternatives`, `remove`, `add` a point or a
-        performance, `move` an item to another time, or `revertTo` an earlier version. The server
+        performance, `move` an item to another time, `addAddOn` or `removeAddOn` an add-on on an
+        item, or `revertTo` an earlier version. The server
         re-lays the affected day with the same rules as `generateVisitPlan`, so the times after a
         change still add up, and returns the new current version.
 
@@ -1318,6 +1331,15 @@ paths:
         This is the backstop for the AI planner agent: a restaurant or shop it names from
         another park never reaches the plan. Moving a day to another venue is a new plan from
         changed answers (`generateVisitPlan` with `dayVenues`), not a change here.
+
+        **Add-ons are changes too** (Chinmay, 3 October 2026, Block A business rules, GST-053;
+        CHG-RUL-009). `addAddOn` puts an add-on the venue sells for that stop (`addOnProductId`,
+        e.g. Fast Track on a ride, a photo pass) on an item, whether or not the planner
+        suggested it; `removeAddOn` takes one off. `acceptAddOn` and `declineAddOn` still answer
+        the planner's own suggestion (`addOnSuggestion`). An add-on not sold for that stop's
+        product is refused 422 `add-on-not-offered`. **Nothing is priced on the plan**: the add-on
+        is priced when the plan is booked (`bookVisitPlan`, by `addCartLine`). Allowed in an
+        anonymous session, like every change here.
       tags: [visitPlan]
       x-ticvai-permission: null
       x-ticvai-guest-callable: true
@@ -1362,6 +1384,7 @@ paths:
           x-ticvai-problem-types:
             - item-not-eligible
             - point-not-at-day-venue
+            - add-on-not-offered
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -1470,6 +1493,12 @@ paths:
 
         The plan moves to `booked` and keeps `cartId`, so reopening it from Tickets shows what was
         bought. `baseVersion` must be current (409 as `updateVisitPlan`).
+
+        **Sign in to book** (Chinmay, 3 October 2026, Block A business rules; CHG-RUL-003). An
+        anonymous device session is refused `403 sign-in-required` and nothing is added; the app
+        asks the guest to sign in, the plan moves to the account (`generateVisitPlan`), and the
+        guest books it. Add-ons on the plan (`addOnProductIds`, `addOnAccepted`) are priced here, at
+        booking, by the lines `addCartLine` creates; the plan itself carries no price.
       tags: [visitPlan]
       x-ticvai-permission: null
       x-ticvai-guest-callable: true
@@ -1532,6 +1561,15 @@ paths:
             refusal, so the guest is told why rather than taken to an empty cart.
           x-ticvai-problem-types:
             - nothing-bookable
+          content:
+            application/problem+json:
+              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
+        '403':
+          description: >
+            The caller is an anonymous device session (`sign-in-required`; CHG-RUL-003). Booking
+            is for a signed-in guest; the plan moves to the account on sign-in.
+          x-ticvai-problem-types:
+            - sign-in-required
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -1706,6 +1744,14 @@ components:
           nullable: true
           readOnly: true
           description: The anonymous device session that owns the plan until sign-in.
+        ownership:
+          type: string
+          enum: [anonymous, account]
+          readOnly: true
+          description: >
+            `anonymous` while the plan belongs to a device session (built and changed only; it lapses
+            with the session), `account` once the guest signed in and the plan moved to their account,
+            where it is saved and can be shared and booked (CHG-RUL-003).
         status:
           type: string
           enum: [draft, booked, archived]
@@ -1883,6 +1929,13 @@ components:
         addOnAccepted:
           type: boolean
           default: false
+        addOnProductIds:
+          type: array
+          readOnly: true
+          description: >
+            Add-ons the guest put on this stop with `addAddOn` (CHG-RUL-009), beside an accepted
+            suggestion, as catalogue product ids. No price: priced at booking.
+          items: { type: string, format: uuid }
         pinned:
           type: boolean
           default: false
@@ -1904,12 +1957,19 @@ components:
             type: object
             required: [op]
             properties:
-              op: { type: string, enum: [swap, remove, add, move, pin, acceptAddOn, declineAddOn, revertTo] }
+              op: { type: string, enum: [swap, remove, add, move, pin, acceptAddOn, declineAddOn, addAddOn, removeAddOn, revertTo] }
               itemId: { type: string, format: uuid, nullable: true }
               date: { type: string, format: date, nullable: true }
               pointId: { type: string, format: uuid, nullable: true }
               performanceId: { type: string, format: uuid, nullable: true }
               startsAt: { type: string, format: date-time, nullable: true }
+              addOnProductId:
+                type: string
+                format: uuid
+                nullable: true
+                description: >
+                  For `addAddOn` and `removeAddOn` (CHG-RUL-009): the add-on product (a catalogue
+                  product sold for the item's stop, e.g. Fast Track). Priced at booking, not here.
               version:
                 type: integer
                 nullable: true

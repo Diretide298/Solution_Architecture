@@ -79,7 +79,10 @@
     {
      "to": "BO-870",
      "trigger": "Operational Time & Resource Blocking",
-     "provenance": "structural — pack board 2 wiring, 19 September 2026"
+     "provenance": "structural — pack board 2 wiring, 19 September 2026",
+     "carries": [
+      "blockId"
+     ]
     },
     {
      "to": "BO-871",
@@ -351,7 +354,7 @@
   "name": "Resource Availability Schedule Configuration",
   "module": "Rentals",
   "requiresModule": "resources",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "2",
@@ -1209,7 +1212,7 @@
   "name": "Operational Time & Resource Blocking",
   "module": "Rentals",
   "requiresModule": "resources",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "2",
@@ -1348,7 +1351,9 @@
    "params": [
     {
      "name": "blockId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listResourceBlocks` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

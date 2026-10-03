@@ -74,7 +74,7 @@ branches:
 - at: 3
   condition: The requisition is returned for more information
   behaviour: '**Not a rejection.** The technician amends and resubmits without starting again, which
-    is the whole reason `returnRequisition` exists.'
+    is why `approveRequisition` has a return decision (CHG-SPF-010).'
   severity: recoverable
   resolvedBy: Technician
 - at: 4

@@ -63,12 +63,18 @@
     {
      "to": "BO-1008",
      "trigger": "Automatic Hold Release",
-     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "carries": [
+      "poolId"
+     ]
     },
     {
      "to": "BO-1009",
      "trigger": "Release, Convert & Reassign",
-     "provenance": "structural — pack board 6 wiring, 19 September 2026"
+     "provenance": "structural — pack board 6 wiring, 19 September 2026",
+     "carries": [
+      "poolId"
+     ]
     },
     {
      "to": "BO-1010",
@@ -842,7 +848,9 @@
    "params": [
     {
      "name": "poolId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listSeatHoldPools` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -994,7 +1002,9 @@
    "params": [
     {
      "name": "poolId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listSeatHoldPools` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

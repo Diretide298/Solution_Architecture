@@ -729,6 +729,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - Client workshop board: `wireframes/WS186 Wallet Configuration Backend Structure v1.0 Board 1.dc.html#bo-1086`
 - Workshop pack: Wallet_Configuration_Backend_Structure_v1.0.pdf board 1
 - Flow F293 *Wallet Configuration Backend Structure v1.0 board 1: Wallet Command Center*, step 6: Works in Wallet Ownership & Account Association → Configure which customer, family or organization owns and controls a wallet.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 

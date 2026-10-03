@@ -133,8 +133,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SUP-002` | Agent Dashboard | A | 35 | 56 | 6 | 17 | 1 | 0 | — | notStarted (generated) |
-| `SUP-008` | Agent Performance & SLA View | B–D | 76 | 47 | 6 | 97 | 0 | 0 | — | notStarted (generated) |
+| `SUP-002` | Agent Dashboard | A | 35 | 27 | 6 | 17 | 1 | 0 | — | notStarted (generated) |
+| `SUP-008` | Agent Performance & SLA View | D | 76 | 25 | 6 | 97 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

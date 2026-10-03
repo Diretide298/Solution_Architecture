@@ -175,6 +175,19 @@ def parse_table(stmt: str) -> Table:
         else:
             t.cols[unq(item.split()[0])] = item
     t.tail = norm(rest[end + 1:])
+    # **A key column is NOT NULL whether or not it says so** (PostgreSQL makes every primary-key
+    # column NOT NULL). derive-schema marks key columns required since 3 October (CHG-TBF-001), so the
+    # generator now writes `id uuid PRIMARY KEY NOT NULL` where r1 has `id uuid PRIMARY KEY`. They are
+    # the same column; compared as text they listed hundreds of "column changed" reviews that a person
+    # could do nothing about.
+    keys = set()
+    for c in t.constraints:
+        m = re.search(r"PRIMARY KEY\s*\(([^)]*)\)", c, re.I)
+        if m:
+            keys |= {unq(x.strip()) for x in m.group(1).split(",")}
+    for name, d in list(t.cols.items()):
+        if name in keys or re.search(r"\bPRIMARY KEY\b", d, re.I):
+            t.cols[name] = norm(re.sub(r"\s+NOT NULL\b", "", d, flags=re.I))
     return t
 
 

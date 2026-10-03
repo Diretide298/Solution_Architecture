@@ -440,7 +440,7 @@ screens:
   name: Assistant
   module: AI
   requiresModule: ai
-  wave: 2
+  wave: 1
   density: touchLarge
   operations:
   - createAiConversation

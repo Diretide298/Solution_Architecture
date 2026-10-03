@@ -107,9 +107,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-218` | Campaign Governance & Budget Command Center | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `ADM-219` | Campaign Budget & Financial Limit Setup | A | 29 | 10 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-219` | Campaign Budget & Financial Limit Setup | C | 29 | 5 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
 | `ADM-220` | Redemption, Discount & Exposure Limit Manager | B–D | 5 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-221` | Budget Consumption & Forecast Monitor | B–D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-221` | Budget Consumption & Forecast Monitor | B–D | 0 | 13 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-222` | Threshold Actions & Automatic Suspension | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-223` | Campaign Approval Workflow Designer | B–D | 0 | 20 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 | `ADM-224` | Approval Inbox & Decision Workspace | B–D | 0 | 46 | 6 | 7 | 0 | 3 | — | notStarted (generated) |

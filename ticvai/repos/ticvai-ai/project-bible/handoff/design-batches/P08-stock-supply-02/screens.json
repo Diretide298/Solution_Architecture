@@ -36,7 +36,10 @@
     {
      "to": "BO-049",
      "trigger": "Stock Levels",
-     "provenance": "derived — BO-049 declares entryState.params itemId and BO-105 holds none of them. The edge carries nothing: itemId only pre-selects (deep link or optional), and BO-049 opens on its own"
+     "carries": [
+      "itemId"
+     ],
+     "provenance": "derived — BO-049 declares entryState.params itemId and BO-105 holds itemId, so an edge into it carries them"
     },
     {
      "to": "BO-052",
@@ -61,12 +64,15 @@
     {
      "to": "BO-081",
      "trigger": "Inventory Items",
-     "provenance": "derived — BO-081 declares entryState.params itemId and BO-105 holds none of them. The edge carries nothing: itemId only pre-selects (deep link or optional), and BO-081 opens on its own"
+     "carries": [
+      "itemId"
+     ],
+     "provenance": "derived — BO-081 declares entryState.params itemId and BO-105 holds itemId, so an edge into it carries them"
     },
     {
      "to": "BO-083",
      "trigger": "Suppliers",
-     "provenance": "derived — BO-083 declares entryState.params contractId, supplierId and BO-105 holds none of them. The edge carries nothing: supplierId only pre-selects (deep link or optional); BO-083 finds contractId (listSupplierContracts) itself, and BO-083 opens on its own"
+     "provenance": "derived — BO-083 declares entryState.params contractId, supplierId and BO-105 holds none of them. The edge carries nothing: supplierId, contractId only pre-select (deep link or optional), and BO-083 opens on its own"
     },
     {
      "to": "BO-137",
@@ -81,12 +87,12 @@
     {
      "to": "BO-139",
      "trigger": "Wastage, Spoilage, Returns & Write-Off",
-     "provenance": "derived — BO-139 declares entryState.params outletId and BO-105 holds none of them. The edge carries nothing: outletId only pre-selects (deep link or optional), and BO-139 opens on its own"
+     "provenance": "derived — BO-139 declares entryState.params  and BO-105 holds none of them. The edge carries nothing: BO-139 needs nothing to open"
     },
     {
      "to": "BO-140",
      "trigger": "Product Availability, 86 & Operational Food Safety",
-     "provenance": "derived — BO-140 declares entryState.params itemId, menuId, outletId and BO-105 holds none of them. The edge carries nothing: itemId only pre-selects (deep link or optional); BO-140 finds outletId (setTemperatureCheckpoint) itself; BO-140 opens on list86Events, and menuId has no source on BO-140 yet (a gap in BO-140, not in this edge)"
+     "provenance": "derived — BO-140 declares entryState.params itemId, menuId, outletId and BO-105 holds none of them. The edge carries nothing: itemId, outletId only pre-select (deep link or optional); BO-140 opens on listTemperatureCheckpoints, and menuId has no source on BO-140 yet (a gap in BO-140, not in this edge)"
     },
     {
      "to": "BO-141",
@@ -205,7 +211,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-105"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formCreateInventoryItem",
@@ -369,11 +375,6 @@
        "label": "Every production run",
        "bindsTo": "ProductionRun",
        "columns": [
-        "ProductionRun.id",
-        "ProductionRun.recipeId",
-        "ProductionRun.productionPlanId",
-        "ProductionRun.producingOutletId",
-        "ProductionRun.forOutletIds",
         "ProductionRun.plannedQuantity",
         "ProductionRun.actualQuantity",
         "ProductionRun.scheduledFor",
@@ -507,7 +508,7 @@
    "source": "Claude Design F&B pack, 24 August",
    "note": "**Drawn by Claude Design on `FnB Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P08",
    "audience": "staff",
@@ -601,7 +602,9 @@
     },
     {
      "name": "runId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that carries it only pre-selects the record."
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first.",
@@ -760,7 +763,7 @@
    "loading": "The saved wastage spoilage returns.",
    "error": "Could not load. Names which read failed and leaves the wastage spoilage returns untouched.",
    "emptyFirstRun": "No wastage spoilage returns configured. The form opens empty and `recordWaste` saves the first one; it says what the platform does in the meantime.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_MODIFY`, which `recordWaste` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getWasteApprovalPolicy` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `AI_USE` for `requestSuggestion`; `ORDER_MODIFY` for `recordWaste`; `PRODUCT_CONFIGURE` for `setWasteApprovalPolicy`."
   },
   "apis": [
    {
@@ -799,7 +802,8 @@
     },
     {
      "name": "outletId",
-     "from": "deepLink"
+     "from": "session",
+     "notes": "From the session (3 October 2026, CHG-SPF-004): a staff screen works in the outlet its sign-in or device is scoped to; nothing navigates to it (the venue-scope rule)."
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first."
@@ -809,7 +813,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-139"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": null,
@@ -966,7 +970,7 @@
    "error": "Could not load. Names which read failed and leaves the product availability operational untouched.",
    "emptyFirstRun": "No product availability operational yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on withinDays and the product availability operational are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getMenu` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PRODUCT_VIEW`, which `getMenu` requires to show this screen, and names that permission (the screen's other reads need `INCIDENT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setItemAvailability`, `setTemperatureCheckpoint`, `setMenuItemDailyCount`."
   },
   "apis": [
    {
@@ -1026,7 +1030,9 @@
     },
     {
      "name": "itemId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `setItemAvailability`, `setMenuItemDailyCount` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "menuId",
@@ -1034,7 +1040,9 @@
     },
     {
      "name": "outletId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen reads it with `getMenu`; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first.",
@@ -1051,7 +1059,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-140"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetItemAvailability",
@@ -1215,15 +1223,9 @@
        "label": "Every alert",
        "bindsTo": "Alert",
        "columns": [
-        "Alert.id",
-        "Alert.ruleId",
         "Alert.raisedAt",
         "Alert.severity",
         "Alert.status",
-        "Alert.observedValue",
-        "Alert.threshold",
-        "Alert.scopePath",
-        "Alert.acknowledgedByPrincipalId",
         "Alert.acknowledgedAt",
         "Alert.resolvedAt",
         "Alert.escalatedAt"
@@ -1291,7 +1293,7 @@
    "error": "Could not load. Names which read failed and leaves the operational alerts replenishment untouched.",
    "emptyFirstRun": "No operational alerts replenishment yet. Offers Create requisition (`createRequisition`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on status, severity, workstationId, shiftId, itemId and the operational alerts replenishment are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PROCUREMENT_REQUEST` for `createRequisition`."
   },
   "apis": [
    {
@@ -1327,7 +1329,9 @@
     },
     {
      "name": "alertId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAlerts` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "Resolves from the session. A principal with more than one venue is asked which first.",
@@ -1344,7 +1348,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-141"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formAcknowledgeAlert",

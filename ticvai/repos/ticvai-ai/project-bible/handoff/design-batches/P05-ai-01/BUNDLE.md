@@ -95,7 +95,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `KSK-015` | Assistant | B–D | 3 | 37 | 5 | 35 | 0 | 0 | guest | notStarted (generated) |
+| `KSK-015` | Assistant | A | 3 | 37 | 5 | 35 | 0 | 0 | guest | notStarted (generated) |
 
 ---
 
@@ -110,8 +110,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P05 Guest Kiosk (kiosk) |
-| Module | AI · wave 2 · needs the `ai` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | AI · wave 1 · needs the `ai` module |
+| Block | Block A · task APP-KIOSK-KSK-015 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is a portrait touch kiosk, 1080 x 1920, large touch targets, no keyboard, an attract screen when idle. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (touchLarge density): A conversation: the question, the answer and its product cards are the content (CHG-SGU-016) |
@@ -119,7 +119,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Opens with | `conversationId` (deepLink), `messageId` (navigation) · cold entry: None: a kiosk has no notification cold entry. The assistant opens from KSK-004 at the point of confusion and closes when the guest returns or the session times … |
 | Route | `/kiosk/assistant` |
 
-**What the spec says about it.** Added 17 August for 2.1.28, which names the kiosk explicitly and was the only surface with no AI screen. **Scoped to `guestCapabilityScope`** — ticket selection, promotions, FAQs, recommendations and checkout, and nothing else. **No keyboard**: voice or a constrained touch interface, which is why the app chat pattern does not transfer. Depends on CF-14. **Not on the wireframe board.** **Wave 2 with the rest of the kiosk.** Set to Wave 1 in error on 17 August — an assistant that guides a guest through ticket selection and checkout cannot ship before the screens that do the selecting and the checking out. **Cross-platform navigation removed 24 August**: SUP-004. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.
+**What the spec says about it.** Added 17 August for 2.1.28, which names the kiosk explicitly and was the only surface with no AI screen. **Scoped to `guestCapabilityScope`** — ticket selection, promotions, FAQs, recommendations and checkout, and nothing else. **No keyboard**: voice or a constrained touch interface, which is why the app chat pattern does not transfer. Depends on CF-14. **Not on the wireframe board.** **Built with the kiosk's selection and checkout screens** (17 August): an assistant that guides a guest through ticket selection and checkout cannot ship before the screens that do the selecting and the checking out. **Cross-platform navigation removed 24 August**: SUP-004. **A till does not navigate to a back office and a guest app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.
 
 **Known gaps.** **`getAvailability` declares its response inline**, so the component that shows it names fields but binds to no schema. The contract should name the shape.
 
@@ -312,6 +312,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 - Flow F24 branch at step 2 (requiresStaff): when No agent is available, **Says so and offers a case**, rather than queuing a guest for somebody who is not there. The worst outcome here is a guest waiting in silence for a queue with nobody in it.
 - Flow F24 branch at step 2 (recoverable): when The guest is at a kiosk and there is no chat agent, Falls back to `KSK-013 Call staff` and `startKioskAssist` — **the person is in the building.** A guest standing at a machine does not want a chat queue.
 - Flow F24 branch at step 1 (recoverable): when The AI ceiling has been reached, **The assistant keeps answering** and the venue manager has been warned (CF-14). A cap that stops mid-visit turns a cost control into a guest-facing outage.
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0020 *— Where AI runs, and what it is isolated from* (`docs/adr/0020-ai-isolation-boundary.md`)
 - ADR-0013 *Local-First Point of Sale* (`docs/adr/0013-local-first-point-of-sale.md`)
 

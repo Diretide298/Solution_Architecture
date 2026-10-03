@@ -119,11 +119,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-002` | Platform Dashboard | B–D | 2 | 55 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
-| `ADM-003` | Cross-Tenant Health Dashboard | B–D | 4 | 45 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-004` | Platform Audit Log | B–D | 9 | 45 | 7 | 4 | 0 | 0 | — | notStarted (generated) |
-| `ADM-013` | Tenant Performance Monitor | B–D | 0 | 45 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-029` | Deployment Monitor | B–D | 5 | 66 | 7 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-002` | Platform Dashboard | B | 2 | 33 | 6 | 9 | 0 | 0 | — | notStarted (generated) |
+| `ADM-003` | Cross-Tenant Health Dashboard | A | 4 | 37 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-004` | Platform Audit Log | D | 9 | 30 | 7 | 4 | 0 | 0 | — | notStarted (generated) |
+| `ADM-013` | Tenant Performance Monitor | B | 0 | 37 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-029` | Deployment Monitor | B | 5 | 53 | 7 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -139,7 +139,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Overview & Health · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-002 |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_VIEW` (2 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listTenants` reads the population and `getEntitlementUsage` reads one of them — list, select, act |
@@ -175,12 +175,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
-| Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Plan name | text | — |
 | Cell count | 1,234 | — |
 | Venue count | 1,234 | — |
-| Billing email | text | — |
 
 **Every cell** (data table, from `listTenantCells`)
 
@@ -188,31 +185,20 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|
 | Name | text | — |
 | Kind | chip: Shared, Dedicated, On premise isolated, On premise connected, Control plane, Burst | Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law … |
-| Is reachable | yes / no (icon or chip) | False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and … |
 | Last contact at | 1 Oct 2026, 14:30 | When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first. |
 | Licence expires at | 1 Oct 2026, 14:30 | On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. |
-| Participates in cross cell | yes / no (icon or chip) | False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). |
 | Region name | text | — |
 | Country code | text | — |
-| Tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
 
 **The selected tenant** (detail panel, from `listTenants`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
 | Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Suspension effective at | 1 Oct 2026, 14:30 | When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. A future value is a pending suspension: the tenant stays `active` … |
-| Suspension notice message | in the reader's language | The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`. |
-| Termination scheduled at | 1 Oct 2026, 14:30 | When `terminateTenant` started the retention window. Null when no termination is under way. |
-| Termination retention until | 1 Oct 2026, 14:30 | `terminationScheduledAt` plus the request's `retentionDays`. Stored, not recomputed — the day count is client-supplied and exists nowhere … |
-| Termination reason | text | — |
-| Termination requested by principal | the name it points at, never the id | — |
-| Plan | the name it points at, never the id | — |
 | Plan name | text | — |
 | Cell count | 1,234 | — |
 | Venue count | 1,234 | — |
@@ -221,19 +207,11 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
 | Status | chip: Onboarding, Active, Suspended, Terminating, Terminated | — |
 | Suspension mode | chip: Read only, No new sales, Full lockout | Access validation continues under every mode. A commercial dispute must not strand guests at a gate holding valid tickets. |
-| Suspension reason | text | — |
 | Suspension effective at | 1 Oct 2026, 14:30 | When the suspension takes, or took, effect — `suspendTenant.effectiveAt`. A future value is a pending suspension: the tenant stays `active` … |
-| Suspension notice message | in the reader's language | The notice shown to the tenant's users about the suspension — `suspendTenant.noticeMessage`. |
-| Termination scheduled at | 1 Oct 2026, 14:30 | When `terminateTenant` started the retention window. Null when no termination is under way. |
-| Termination retention until | 1 Oct 2026, 14:30 | `terminationScheduledAt` plus the request's `retentionDays`. Stored, not recomputed — the day count is client-supplied and exists nowhere … |
-| Termination reason | text | — |
-| Termination requested by principal | the name it points at, never the id | — |
-| Plan | the name it points at, never the id | — |
 | Plan name | text | — |
 | Cell count | 1,234 | — |
 | Venue count | 1,234 | — |
@@ -270,8 +248,6 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 - → `ADM-007` Module & Feature Entitlement: *Module & Feature Entitlement*; carries `tenantId`
 - → `ADM-008` Subscription & Plan Management: *Subscription & Plan Management*; carries `planId`, `tenantId`
 - → `ADM-012` Tenant Isolation & Resource Pool: *Tenant Isolation & Resource Pool*; carries `cellId`, `tenantId`
-- → `ADM-020` Platform User Directory: *Creates the first principal and grants it the role*; carries `tenantId`; calls `listTenants`
-- → `ADM-021` Platform Role Management: *Defines the role the first administrator will hold*; carries `tenantId`
 - → `ADM-369` Commercial Command Center: *Commercial Command Center*
 - → `ADM-459` Billing & Commercial Command Center: *Billing & Commercial Command Center*
 - → `ADM-379` Welcome & Start Your TICVAI Journey: *Welcome & Start Your TICVAI Journey*
@@ -319,6 +295,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 - → `ADM-036` Platform Notification Broadcast: *Platform Notification Broadcast*
 - → `ADM-068` Tax, Fee & Calculation Command Center: *Tax, Fee & Calculation Command Center*; carries `tenantId`
 - → `ADM-699` My Account & Security: *My account & security*
+- → `ADM-020` Platform User Directory: *Creates the first principal and grants it the role*; carries `tenantId`; calls `listTenants`
+- → `ADM-021` Platform Role Management: *Defines the role the first administrator will hold*; carries `tenantId`
 
 #### States
 
@@ -392,10 +370,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (2), with its required mark, default, format and its error state (403, 404).
-- [ ] Every output is drawn (55 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (33 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-002?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `ADM-001`, `ADM-003`, `ADM-004`, `ADM-005`, `ADM-006`, `ADM-007`, `ADM-008`, `ADM-012`, `ADM-020`, `ADM-021`, `ADM-369`, `ADM-459`, `ADM-379`, `ADM-389`, `ADM-399`, `ADM-409`, `ADM-419`, `ADM-449`, `ADM-469`, `ADM-479`, `ADM-489`, `ADM-499`, `ADM-509`, `ADM-519`, `ADM-529`, `ADM-539`, `ADM-549`, `ADM-619`, `ADM-009`, `ADM-010`, `ADM-011`, `ADM-013`, `ADM-014`, `ADM-015`, `ADM-016`, `ADM-017`, `ADM-018`, `ADM-019`, `ADM-022`, `ADM-023`, `ADM-026`, `ADM-027`, `ADM-029`, `ADM-030`, `ADM-031`, `ADM-032`, `ADM-033`, `ADM-034`, `ADM-037`, `ADM-318`, `ADM-024`, `ADM-025`, `ADM-028`, `ADM-035`, `ADM-036`, `ADM-068`, `ADM-699`.
+- [ ] Every transition is wired: `ADM-001`, `ADM-003`, `ADM-004`, `ADM-005`, `ADM-006`, `ADM-007`, `ADM-008`, `ADM-012`, `ADM-369`, `ADM-459`, `ADM-379`, `ADM-389`, `ADM-399`, `ADM-409`, `ADM-419`, `ADM-449`, `ADM-469`, `ADM-479`, `ADM-489`, `ADM-499`, `ADM-509`, `ADM-519`, `ADM-529`, `ADM-539`, `ADM-549`, `ADM-619`, `ADM-009`, `ADM-010`, `ADM-011`, `ADM-013`, `ADM-014`, `ADM-015`, `ADM-016`, `ADM-017`, `ADM-018`, `ADM-019`, `ADM-022`, `ADM-023`, `ADM-026`, `ADM-027`, `ADM-029`, `ADM-030`, `ADM-031`, `ADM-032`, `ADM-033`, `ADM-034`, `ADM-037`, `ADM-318`, `ADM-024`, `ADM-025`, `ADM-028`, `ADM-035`, `ADM-036`, `ADM-068`, `ADM-699`, `ADM-020`, `ADM-021`.
 - [ ] Every gated control is gated: `PLATFORM_CELL_VIEW`, `PLATFORM_TENANT_VIEW`.
 - [ ] The module and platform inputs below are applied.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -409,8 +387,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
-| Module | Overview & Health · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Overview & Health · wave 1 · needs the `core` module |
+| Block | Block A · task APP-CONSOLE-ADM-003 |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW` (1 configure, 1 read); in the flows as guest |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCellJobs` reads the population and `getCellHealth` reads one of them — list, select, act |
@@ -498,22 +476,14 @@ Errors to draw in the form: 400 Target tier is unavailable in this jurisdiction
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
 | Kind | chip: Shared, Dedicated, On premise isolated, On premise connected, Control plane, Burst | Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law … |
-| Cluster | the name it points at, never the id | — |
-| Is reachable | yes / no (icon or chip) | False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and … |
 | Last contact at | 1 Oct 2026, 14:30 | When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first. |
 | Licence expires at | 1 Oct 2026, 14:30 | On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. |
-| Participates in cross cell | yes / no (icon or chip) | False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). |
-| Region | the name it points at, never the id | — |
 | Region name | text | — |
 | Country code | text | — |
 | Tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
 | Status | chip: Provisioning, Active, Migrating, Suspended, Decommissioning, Failed | — |
-| Cloud provider | text | — |
-| Cloud region | text | — |
-| API endpoint | text | — |
 
 **The cell capacity** (detail panel, from `getCellCapacity`)
 
@@ -578,7 +548,7 @@ Errors to draw in the form: 400 Target tier is unavailable in this jurisdiction
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the cross-tenant health untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No cross-tenant health yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellHealth` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellHealth` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `cancelDecommission`, `decommissionCell`, `updateCellTier`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Target tier is unavailable in this jurisdiction; 409 Not in a state that permits this |
 
@@ -626,7 +596,7 @@ cells:
 - `listCellJobs` → `PLATFORM_CELL_VIEW` (read) · staff
 - `updateCellTier` → `PLATFORM_CELL_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellHealth` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `getCellHealth` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `cancelDecommission`, `decommissionCell`, `updateCellTier`.
 
 #### Requirements it meets
 
@@ -655,7 +625,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (4), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (45 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (37 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-003?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Cancel decommission, Decommission cell, Save cell tier.
 - [ ] Every transition is wired: `ADM-001`, `ADM-002`, `ADM-004`, `SCN-003`.
@@ -674,7 +644,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Overview & Health · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-CONSOLE-ADM-004 |
 | Who uses it | ticvai staff holding `AI_AUDIT_VIEW`, `AUDIT_VIEW`, `PLATFORM_TENANT_ACCESS`, `PLATFORM_TENANT_VIEW` (3 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAiInteractions` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -749,17 +719,10 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Conversation | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
 | Audience | chip: Staff, Guest | Billing divides on this. Staff usage is bounded by headcount; guest usage is bounded by footfall and curiosity, and a venue cannot stop … |
-| Subject | the name it points at, never the id | The guest, where the audience is `guest`. `principalId` is null in that case — a guest is not a principal, and attributing their tokens to … |
-| Billable to tenant | the name it points at, never the id | Resolved from `scopePath` at write time, not derived later. Billing must not depend on walking a scope tree that has since been reorganised. |
-| Scope path | text | — |
 | Capability | text | — |
 | Prompt | text | — |
 | Response | text | — |
-| Sources | list or chips (count when long) | The sources an answer was grounded in, stored with the answer (8.3.70). One `jsonb` column on the row that carries it — … |
 | Outcome | chip: Answered, Refused, Applied, Rejected, Failed | — |
 
 **Platform audit log** (data table, from `listAuditRecords`)
@@ -782,13 +745,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Conversation | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
 | Audience | chip: Staff, Guest | Billing divides on this. Staff usage is bounded by headcount; guest usage is bounded by footfall and curiosity, and a venue cannot stop … |
-| Subject | the name it points at, never the id | The guest, where the audience is `guest`. `principalId` is null in that case — a guest is not a principal, and attributing their tokens to … |
-| Billable to tenant | the name it points at, never the id | Resolved from `scopePath` at write time, not derived later. Billing must not depend on walking a scope tree that has since been reorganised. |
-| Scope path | text | — |
 | Capability | text | — |
 | Prompt | text | — |
 | Response | text | — |
@@ -796,8 +753,6 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Outcome | chip: Answered, Refused, Applied, Rejected, Failed | — |
 | Refusal reason | text | — |
 | Provider | chip: Openai, Gemini, Anthropic, Azure openai, Local llm, Openai compatible | `openaiCompatible` (added 29 September, AI design 3.3): a customer endpoint that speaks the OpenAI API, taken with no custom development … |
-| Model | text | — |
-| Prompt tokens | 1,234 | — |
 
 **Actions and what each produces**
 
@@ -827,7 +782,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the platform audit log untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No platform audit log yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on principalId, outcome, from and the platform audit log are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `AI_AUDIT_VIEW`, which `listAiInteractions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `AI_AUDIT_VIEW`, which `listAiInteractions` requires to show this screen, and names that permission (the screen's other reads need `AUDIT_VIEW`, `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for … |
 | Grant required (`?state=grantRequired`) | **No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `AI_AUDIT_VIEW`, `AUDIT_VIEW`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001). |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed |
@@ -856,7 +811,7 @@ row:
 - `listOwnPlatformStaffGrants` → `PLATFORM_TENANT_ACCESS` (operate) · staff
 - `openPlatformStaffGrant` → `PLATFORM_TENANT_ACCESS` (operate) · staff · step-up mfa
 
-**A refused user sees:** Shown when the caller lacks `AI_AUDIT_VIEW`, which `listAiInteractions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `AI_AUDIT_VIEW`, which `listAiInteractions` requires to show this screen, and names that permission (the screen's other reads need `AUDIT_VIEW`, `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for …
 
 #### Requirements it meets
 
@@ -888,7 +843,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 403, 404).
-- [ ] Every output is drawn (45 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-004?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, grantRequired, offline.
 - [ ] Every action is wired with its success and its failure: Open access grant.
 - [ ] Every transition is wired: `ADM-001`, `ADM-002`, `ADM-003`, `BO-068`.
@@ -906,7 +861,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Overview & Health · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-013 |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_VIEW` (1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCellJobs` reads the population and `getCellHealth` reads one of them — list, select, act |
@@ -965,22 +920,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
 | Kind | chip: Shared, Dedicated, On premise isolated, On premise connected, Control plane, Burst | Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law … |
-| Cluster | the name it points at, never the id | — |
-| Is reachable | yes / no (icon or chip) | False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and … |
 | Last contact at | 1 Oct 2026, 14:30 | When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first. |
 | Licence expires at | 1 Oct 2026, 14:30 | On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. |
-| Participates in cross cell | yes / no (icon or chip) | False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). |
-| Region | the name it points at, never the id | — |
 | Region name | text | — |
 | Country code | text | — |
 | Tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
 | Status | chip: Provisioning, Active, Migrating, Suspended, Decommissioning, Failed | — |
-| Cloud provider | text | — |
-| Cloud region | text | — |
-| API endpoint | text | — |
 
 **The cell capacity** (detail panel, from `getCellCapacity`)
 
@@ -1086,7 +1033,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (45 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (37 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-013?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `ADM-001`, `ADM-002`, `ADM-003`, `ADM-014`.
@@ -1105,7 +1052,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Overview & Health · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-CONSOLE-ADM-029 |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_VIEW`, `PLATFORM_RELEASE_PROMOTE`, `PLATFORM_RELEASE_VIEW` (2 read, 1 operate); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCellJobs` reads the population and `getRollout` reads one of them — list, select, act |
@@ -1210,22 +1157,14 @@ Errors to draw in the form: 409 Not in a state that permits this
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Name | text | — |
 | Kind | chip: Shared, Dedicated, On premise isolated, On premise connected, Control plane, Burst | Two deployment locations (ADR-0017, amended by ADR-0046). `shared` is the default; the others exist because a client asked or a law … |
-| Cluster | the name it points at, never the id | — |
-| Is reachable | yes / no (icon or chip) | False for `onPremiseIsolated`, true for `onPremiseConnected` (ADR-0046). When false, the Control Plane holds the record for licensing and … |
 | Last contact at | 1 Oct 2026, 14:30 | When the site last called out. The only liveness signal for an unreachable cell, and the number a support engineer asks for first. |
 | Licence expires at | 1 Oct 2026, 14:30 | On-premise only. Licensing cannot be enforced by a Control Plane the site cannot reach, so a signed licence file is verified locally. |
-| Participates in cross cell | yes / no (icon or chip) | False by default for `onPremiseIsolated`, available for `onPremiseConnected` (ADR-0046). |
-| Region | the name it points at, never the id | — |
 | Region name | text | — |
 | Country code | text | — |
 | Tier | chip: Shared, Dedicated, Isolated, Client hosted | — |
 | Status | chip: Provisioning, Active, Migrating, Suspended, Decommissioning, Failed | — |
-| Cloud provider | text | — |
-| Cloud region | text | — |
-| API endpoint | text | — |
 
 **The cell capacity** (detail panel, from `getCellCapacity`)
 
@@ -1255,19 +1194,14 @@ Errors to draw in the form: 409 Not in a state that permits this
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Release | the name it points at, never the id | — |
 | Environment | chip: Dev, Staging, Production | — |
 | Status | chip: Queued, Canary, Rolling, Paused, Complete, Failed… | — |
 | Cells total | 1,234 | — |
 | Cells complete | 1,234 | — |
 | Cells failed | 1,234 | — |
-| Started by principal | the name it points at, never the id | — |
-| Approved by principal | the name it points at, never the id | — |
 | Paused reason | text | — |
 | Started at | 1 Oct 2026, 14:30 | — |
 | Completed at | 1 Oct 2026, 14:30 | — |
-| Cells | list or chips (count when long) | Per-cell state. "60% complete" says nothing about whether the failing 40% is one region or forty venues. |
 
 **Actions and what each produces**
 
@@ -1301,7 +1235,7 @@ Errors to draw in the form: 409 Not in a state that permits this
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the deployment untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No deployment yet. Offers Start rollout (`startRollout`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listCellJobs` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listCellJobs` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listCellJobs` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_RELEASE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_PROMOTE` for `pauseRollout` … |
 | Rollout pending approval (`?state=rolloutPendingApproval`) | **Requested, not moved.** `startRollout` answered 202: the rollout shows the stage it has reached, the stage requested and that a `releasePromotion` approval is pending with the platform release manager. The requester sees no approve action for their own request (decided 28 September, audit R144). |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 A migration in this release is irreversible. The response names it — a one-way door should be identified, not discovered. (IrreversibleProblem); 409 Not in a state that permits this |
@@ -1349,7 +1283,7 @@ Every cell job:
 - `getCellHealth` → `PLATFORM_CELL_VIEW` (read) · staff
 - `startRollout` → `PLATFORM_RELEASE_PROMOTE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listCellJobs` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PLATFORM_CELL_VIEW`, which `listCellJobs` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_RELEASE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_RELEASE_PROMOTE` for `pauseRollout` …
 
 #### Requirements it meets
 
@@ -1377,7 +1311,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (5), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (66 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (53 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-029?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, rolloutPendingApproval, offline.
 - [ ] Every action is wired with its success and its failure: Pause rollout, Rollback rollout, Start rollout.
 - [ ] Every transition is wired: `ADM-001`, `ADM-002`, `ADM-003`.

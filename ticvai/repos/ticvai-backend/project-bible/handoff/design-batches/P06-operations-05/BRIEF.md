@@ -122,12 +122,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `EMP-048` | Opening checklist | A | 12 | 30 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
-| `EMP-047` | Emergency mode | B–D | 1 | 24 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
-| `EMP-050` | Post-incident restore | B–D | 11 | 44 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
-| `EMP-045` | Arabic / RTL | B–D | 0 | 0 | 4 | 0 | 0 | 0 | — | notStarted (generated) |
-| `EMP-046` | Sign out | B–D | 0 | 0 | 4 | 0 | 0 | 0 | — | notStarted (generated) |
-| `EMP-049` | Hand over the journal | B–D | 20 | 27 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
+| `EMP-048` | Opening checklist | D | 12 | 13 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
+| `EMP-047` | Emergency mode | D | 1 | 9 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
+| `EMP-050` | Post-incident restore | D | 15 | 14 | 6 | 1 | 0 | 0 | — | notStarted (generated) |
+| `EMP-045` | Arabic / RTL | D | 0 | 0 | 4 | 0 | 0 | 0 | — | notStarted (generated) |
+| `EMP-046` | Sign out | B | 0 | 0 | 4 | 0 | 0 | 0 | — | notStarted (generated) |
+| `EMP-049` | Hand over the journal | C | 20 | 7 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

@@ -984,7 +984,9 @@
    "params": [
     {
      "name": "subscriptionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `listWebhookDeliveries` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

@@ -306,7 +306,7 @@
   "name": "Game & Ride Directory",
   "module": "Games & Rides",
   "requiresModule": "games",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Game_and_Ride_Module.pdf",
    "board": "1",
@@ -1151,7 +1151,9 @@
    "params": [
     {
      "name": "creditTypeId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `setCreditEligibilityRules` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

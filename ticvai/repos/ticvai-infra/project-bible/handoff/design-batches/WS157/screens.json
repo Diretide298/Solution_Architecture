@@ -701,7 +701,9 @@
    "params": [
     {
      "name": "resourceId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `setResourceQualifications` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -733,7 +735,7 @@
   "name": "Qualification & Assignment Rule Engine",
   "module": "Rentals",
   "requiresModule": "resources",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "3",
@@ -856,11 +858,15 @@
    "params": [
     {
      "name": "resourceId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): no operation on the screen takes it; a link that carries it only pre-selects the record."
     },
     {
      "name": "experienceId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `setExperienceResourceRequirements` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ],
    "coldEntry": "Opened from BO-873 with the experience picked there. Opened cold (a bookmark or a refresh), it shows the list to pick from rather than an empty record, and says plainly if the experience no longer exists."
@@ -1119,11 +1125,15 @@
    "params": [
     {
      "name": "resourceId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getResourceSchedule`, `setResourceSchedule` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "sourceId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listIntegrationSources` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1882,7 +1892,9 @@
    "params": [
     {
      "name": "sourceId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listIntegrationSources` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

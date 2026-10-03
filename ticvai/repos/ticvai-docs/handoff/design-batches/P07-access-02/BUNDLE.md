@@ -98,7 +98,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SCN-016` | Gate mode | B–D | 9 | 26 | 6 | 9 | 1 | 0 | — | notStarted (generated) |
+| `SCN-016` | Gate mode | C | 9 | 9 | 6 | 9 | 1 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -114,8 +114,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Staff · P07 Venue Scanner (handheld) |
 | Module | Access · wave 1 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `ACCESS_DIRECTION_SET`, `SCOPE_VIEW`, `TURNSTILE_MODE_SET` (1 ?, 1 read, 1 operate) |
+| Block | Block C · task APP-SCANNER-SCN-016 |
+| Who uses it | venue staff holding `ACCESS_DIRECTION_SET`, `SCOPE_VIEW`, `TURNSTILE_MODE_SET` (2 operate, 1 read) |
 | Device and orientation | This is a rugged handheld, 360 x 720, very large pass and fail states, readable in sunlight. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listAccessPoints` reads the population and `getAccessPoint` reads one of them — list, select, act |
 | Offline | **Requests only.** Hardware control is out of contract and the vendor SDK is outstanding (CF-33) |
@@ -188,36 +188,19 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| External credential sources | list or chips (count when long) | BL-108. A hotel room card admitting a guest to a water park — externally issued, and the platform validates it without having sold it. |
-| Scan anomaly rules | list or chips (count when long) | BL-104. Rule-based scan anomalies, separated from the parked model-based engine — device sharing, simultaneous entries at two gates, an … |
 | Operating mode | chip: Normal, Free flow, Drop arm, Closed, Podium, Maintenance | Set by the podium with `setTurnstileMode`, and it wins (audit R221). BL-107 and BL-109. |
-| Vehicle location capture | yes / no (icon or chip) | BL-023. Nothing helped a guest find their vehicle. |
 | Mode | chip: Free rotation, Closed | Narrows `operatingMode` only: `freeRotation` or `closed` within `normal` or `podium`, null otherwise and whenever the turnstile validates … |
-| Direction | chip: Entry, Exit, Reentry, Crossover | Fixed per access point (audit R221): set in the back office by `createAccessPoint` and `updateAccessPoint`, never by the podium. |
-| Anti passback enabled | yes / no (icon or chip) | — |
 
 **The selected access point** (detail panel, from `getAccessPoint`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| External credential sources | list or chips (count when long) | BL-108. A hotel room card admitting a guest to a water park — externally issued, and the platform validates it without having sold it. |
-| Scan anomaly rules | list or chips (count when long) | BL-104. Rule-based scan anomalies, separated from the parked model-based engine — device sharing, simultaneous entries at two gates, an … |
 | Operating mode | chip: Normal, Free flow, Drop arm, Closed, Podium, Maintenance | Set by the podium with `setTurnstileMode`, and it wins (audit R221). BL-107 and BL-109. |
-| Vehicle location capture | yes / no (icon or chip) | BL-023. Nothing helped a guest find their vehicle. |
 | Mode | chip: Free rotation, Closed | Narrows `operatingMode` only: `freeRotation` or `closed` within `normal` or `podium`, null otherwise and whenever the turnstile validates … |
-| Direction | chip: Entry, Exit, Reentry, Crossover | Fixed per access point (audit R221): set in the back office by `createAccessPoint` and `updateAccessPoint`, never by the podium. |
-| Anti passback enabled | yes / no (icon or chip) | — |
-| Is active | yes / no (icon or chip) | — |
 | Last heartbeat at | 1 Oct 2026, 14:30 | — |
 
 **Actions and what each produces**
@@ -252,7 +235,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the gate mode untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No gate mode yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId and the gate mode are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SCOPE_VIEW`, which `getAccessPoint` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SCOPE_VIEW`, which `listAccessPoints` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_DIRECTION_SET` for `setAccessPointDirection`; `TURNSTILE_MODE_SET` for `setTurnstileMode`, `cancelGateModeChange`. |
 | Offline (`?state=offline`) | **Requests only.** Hardware control is out of contract and the vendor SDK is outstanding (CF-33) |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 `not-pending`: the change is already applied or cancelled. |
 
@@ -282,9 +265,9 @@ gate:
 - `getAccessPoint` → `SCOPE_VIEW` (read) · staff
 - `listAccessPoints` → `SCOPE_VIEW` (read) · staff
 - `cancelGateModeChange` → `TURNSTILE_MODE_SET` (operate) · staff
-- `setAccessPointDirection` → `ACCESS_DIRECTION_SET` (tier not set) · staff
+- `setAccessPointDirection` → `ACCESS_DIRECTION_SET` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `SCOPE_VIEW`, which `getAccessPoint` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `SCOPE_VIEW`, which `listAccessPoints` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_DIRECTION_SET` for `setAccessPointDirection`; `TURNSTILE_MODE_SET` for `setTurnstileMode`, `cancelGateModeChange`.
 
 #### Requirements it meets
 
@@ -321,7 +304,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (9), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#SCN-016?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Save gate mode, Cancel gate mode change, Switch direction.
 - [ ] Every transition is wired: `SCN-001`, `SCN-002`, `SCN-003`.

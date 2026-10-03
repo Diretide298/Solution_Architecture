@@ -4,7 +4,7 @@
   "name": "Ticket Transfer",
   "module": "Ticketing",
   "requiresModule": "ticketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C02",
   "implementation": {
    "app": "guest-app",
@@ -49,9 +49,7 @@
         "Order.orderNumber",
         "Order.status",
         "Order.grossAmount",
-        "Order.currency",
-        "Order.lines",
-        "Order.createdAt"
+        "Order.currency"
        ],
        "operation": "listMyOrders",
        "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)",
@@ -151,7 +149,7 @@
     "view": "Account → All screens → Wave 2 → Ticket transfer (also Account → Ticket transfer)"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formTransferOrderTickets",
@@ -217,7 +215,7 @@
   "name": "My Reservations",
   "module": "Ticketing",
   "requiresModule": "ticketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C02",
   "implementation": {
    "app": "guest-app",
@@ -362,7 +360,9 @@
     },
     {
      "name": "reservationId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listReservations` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `reservationId`.",
@@ -387,7 +387,7 @@
     "differences": "Prototype lists cabana reservations and \"Book a table or cabana\"; YAML GST-070 says cabanas are booked by staff."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -424,7 +424,7 @@
   "name": "Reservation Details",
   "module": "Ticketing",
   "requiresModule": "ticketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C02",
   "implementation": {
    "app": "guest-app",
@@ -467,12 +467,9 @@
        "label": "The reservation",
        "bindsTo": "Reservation",
        "columns": [
-        "Reservation.id",
-        "Reservation.venueId",
         "Reservation.status",
         "Reservation.lines",
-        "Reservation.expiresAt",
-        "Reservation.convertedOrderId"
+        "Reservation.expiresAt"
        ],
        "operation": "getReservation",
        "provenance": "contract orders.yaml GET /reservations/{reservationId}"
@@ -549,7 +546,7 @@
     "differences": "Prototype shows a deposit that is kept on late cancellation; the YAML (audit R077a) says no deposit and no no-show fee. **Stale note:** REV3-8b (29 September) superseded R077 (a); the deposit kept on a late cancellation is a venue option, as the frame shows (CHG-SGU-020)."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -586,7 +583,7 @@
   "name": "Multi-Currency & Pricing",
   "module": "Ticketing",
   "requiresModule": "ticketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C107",
   "implementation": {
    "app": "guest-app",
@@ -730,7 +727,7 @@
     "view": "Account → All screens → Wave 2 → Multi-currency & pricing"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",

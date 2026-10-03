@@ -41,84 +41,84 @@ Branding, content, navigation and the tenant's own app configuration. Separate b
 | bookingFlows | [`listBookingFlows`](#listbookingflows) | GET | `/venues/{venueId}/booking-flows` | core | 1 | BO-007, BO-008, BO-115, CMS-014, CMS-101, CMS-102 … |
 | bookingFlows | [`updateBookingFlowDefinition`](#updatebookingflowdefinition) | PATCH | `/booking-flows/{bookingFlowId}` | core | 1 | CMS-103 |
 | bookingFlows | [`validateBookingFlow`](#validatebookingflow) | POST | `/booking-flows/{bookingFlowId}/validate` | core | 1 | CMS-103 |
-| brand | [`getAppIcons`](#getappicons) | GET | `/tenant-config/app-icons` | core | 2 | ADM-016, CMS-004 |
+| brand | [`getAppIcons`](#getappicons) | GET | `/tenant-config/app-icons` | core | 1 | ADM-016, CMS-004 |
 | brand | [`getBrandIdentity`](#getbrandidentity) | GET | `/tenant-config/brand` | core | 1 | ADM-016, CMS-002, CMS-004, CMS-006, CMS-104 |
-| brand | [`setAppIcons`](#setappicons) | PUT | `/tenant-config/app-icons` | core | 2 | ADM-016, CMS-004 |
+| brand | [`setAppIcons`](#setappicons) | PUT | `/tenant-config/app-icons` | core | 1 | ADM-016, CMS-004 |
 | brand | [`setBrandIdentity`](#setbrandidentity) | PUT | `/tenant-config/brand` | core | 1 | ADM-016, BO-836, CMS-002, CMS-004, CMS-104 |
-| branding | [`getBookingFlowConfig`](#getbookingflowconfig) | GET | `/tenant-config/booking-flow` | core | 2 | CMS-006, CMS-016 |
-| branding | [`setBookingFlowConfig`](#setbookingflowconfig) | PUT | `/tenant-config/booking-flow` | core | 2 | CMS-016 |
-| content | [`createBanner`](#createbanner) | POST | `/tenant-config/banners` | core | 2 | CMS-008 |
-| content | [`createContentPage`](#createcontentpage) | POST | `/tenant-config/pages` | core | 2 | BO-837, CMS-007 |
-| content | [`createGuidedChoice`](#createguidedchoice) | POST | `/venues/{venueId}/guided-choices` | core | 2 | CMS-101 |
-| content | [`createPromoBlock`](#createpromoblock) | POST | `/tenant-config/promo-blocks` | core | 2 | CMS-008 |
-| content | [`deleteBanner`](#deletebanner) | DELETE | `/tenant-config/banners/{bannerId}` | core | 2 | CMS-008 |
-| content | [`deleteContentPage`](#deletecontentpage) | DELETE | `/tenant-config/pages/{pageId}` | core | 2 | CMS-007 |
-| content | [`deleteGuidedChoice`](#deleteguidedchoice) | DELETE | `/guided-choices/{guidedChoiceId}` | core | 2 | CMS-101 |
-| content | [`deletePromoBlock`](#deletepromoblock) | DELETE | `/tenant-config/promo-blocks/{promoBlockId}` | core | 2 | CMS-008 |
+| branding | [`getBookingFlowConfig`](#getbookingflowconfig) | GET | `/tenant-config/booking-flow` | core | 1 | CMS-006, CMS-016 |
+| branding | [`setBookingFlowConfig`](#setbookingflowconfig) | PUT | `/tenant-config/booking-flow` | core | 1 | CMS-016 |
+| content | [`createBanner`](#createbanner) | POST | `/tenant-config/banners` | core | 1 | CMS-008 |
+| content | [`createContentPage`](#createcontentpage) | POST | `/tenant-config/pages` | core | 1 | BO-837, CMS-007 |
+| content | [`createGuidedChoice`](#createguidedchoice) | POST | `/venues/{venueId}/guided-choices` | core | 1 | CMS-101 |
+| content | [`createPromoBlock`](#createpromoblock) | POST | `/tenant-config/promo-blocks` | core | 1 | CMS-008 |
+| content | [`deleteBanner`](#deletebanner) | DELETE | `/tenant-config/banners/{bannerId}` | core | 1 | CMS-008 |
+| content | [`deleteContentPage`](#deletecontentpage) | DELETE | `/tenant-config/pages/{pageId}` | core | 1 | CMS-007 |
+| content | [`deleteGuidedChoice`](#deleteguidedchoice) | DELETE | `/guided-choices/{guidedChoiceId}` | core | 1 | CMS-101 |
+| content | [`deletePromoBlock`](#deletepromoblock) | DELETE | `/tenant-config/promo-blocks/{promoBlockId}` | core | 1 | CMS-008 |
 | content | [`getPublishedGuidedChoice`](#getpublishedguidedchoice) | GET | `/venues/{venueId}/guided-choice` | core | 1 | GST-003, GST-008, WEB-002, WEB-005 |
-| content | [`listBanners`](#listbanners) | GET | `/tenant-config/banners` | core | 2 | CMS-008 |
-| content | [`listContentPages`](#listcontentpages) | GET | `/tenant-config/pages` | core | 2 | BO-837, CMS-007 |
-| content | [`listGuidedChoices`](#listguidedchoices) | GET | `/venues/{venueId}/guided-choices` | core | 2 | CMS-101 |
-| content | [`listPolicies`](#listpolicies) | GET | `/tenant-config/policies` | core | 2 | BO-748, CMS-018 |
-| content | [`listPromoBlocks`](#listpromoblocks) | GET | `/tenant-config/promo-blocks` | core | 2 | CMS-008 |
-| content | [`listPublishedContentPages`](#listpublishedcontentpages) | GET | `/storefront/pages` | core | 2 | GST-040, GST-057, WEB-045 |
+| content | [`listBanners`](#listbanners) | GET | `/tenant-config/banners` | core | 1 | CMS-008 |
+| content | [`listContentPages`](#listcontentpages) | GET | `/tenant-config/pages` | core | 1 | BO-837, CMS-007 |
+| content | [`listGuidedChoices`](#listguidedchoices) | GET | `/venues/{venueId}/guided-choices` | core | 1 | CMS-101 |
+| content | [`listPolicies`](#listpolicies) | GET | `/tenant-config/policies` | core | 1 | BO-748, CMS-018 |
+| content | [`listPromoBlocks`](#listpromoblocks) | GET | `/tenant-config/promo-blocks` | core | 1 | CMS-008 |
+| content | [`listPublishedContentPages`](#listpublishedcontentpages) | GET | `/storefront/pages` | core | 1 | GST-040, GST-057, WEB-045 |
 | content | [`listPublishedFaqs`](#listpublishedfaqs) | GET | `/storefront/faqs` | core | 1 | GST-040, WEB-025, WEB-045 |
 | content | [`listPublishedPolicies`](#listpublishedpolicies) | GET | `/storefront/policies` | core | 1 | GST-009, GST-040, WEB-012, WEB-045 |
 | content | [`proposeGuidedChoice`](#proposeguidedchoice) | POST | `/venues/{venueId}/guided-choice-suggestions` | core | 1 |  |
-| content | [`publishGuidedChoice`](#publishguidedchoice) | POST | `/guided-choices/{guidedChoiceId}/publish` | core | 2 | CMS-101 |
+| content | [`publishGuidedChoice`](#publishguidedchoice) | POST | `/guided-choices/{guidedChoiceId}/publish` | core | 1 | CMS-101 |
 | content | [`setFaqs`](#setfaqs) | PUT | `/tenant-config/faqs` | setup | 1 |  |
-| content | [`setPolicy`](#setpolicy) | PUT | `/tenant-config/policies/{policyKind}` | core | 2 | CMS-018 |
-| content | [`unpublishGuidedChoice`](#unpublishguidedchoice) | POST | `/guided-choices/{guidedChoiceId}/unpublish` | core | 2 | CMS-101 |
-| content | [`updateBanner`](#updatebanner) | PATCH | `/tenant-config/banners/{bannerId}` | core | 2 | CMS-008 |
-| content | [`updateContentPage`](#updatecontentpage) | PUT | `/tenant-config/pages/{pageId}` | core | 2 | CMS-007 |
-| content | [`updateGuidedChoice`](#updateguidedchoice) | PATCH | `/guided-choices/{guidedChoiceId}` | core | 2 | CMS-101 |
-| content | [`updatePromoBlock`](#updatepromoblock) | PATCH | `/tenant-config/promo-blocks/{promoBlockId}` | core | 2 | CMS-008 |
-| homepage | [`getHomepageLayout`](#gethomepagelayout) | GET | `/tenant-config/homepage` | core | 2 | CMS-007 |
-| homepage | [`listLandingPageTemplates`](#listlandingpagetemplates) | GET | `/landing-page-templates` | core | 2 | CMS-007 |
-| homepage | [`setHomepageLayout`](#sethomepagelayout) | PUT | `/tenant-config/homepage` | core | 2 | BO-840, CMS-007 |
-| modules | [`getFeatureToggles`](#getfeaturetoggles) | GET | `/tenant-config/features` | core | 2 | CMS-001 |
-| modules | [`getModuleEnablement`](#getmoduleenablement) | GET | `/tenant-config/modules` | core | 2 | ADM-424, CMS-001, CMS-007 |
-| modules | [`setFeatureToggles`](#setfeaturetoggles) | PUT | `/tenant-config/features` | core | 2 | CMS-001 |
-| modules | [`setLanguages`](#setlanguages) | PUT | `/tenant-config/languages` | core | 2 | ADM-018, CMS-011 |
-| modules | [`setModuleEnablement`](#setmoduleenablement) | PUT | `/tenant-config/modules` | core | 2 | ADM-424, CMS-001 |
-| navigation | [`buildDeepLink`](#builddeeplink) | POST | `/deep-links` | core | 2 | CMS-009 |
-| navigation | [`getDeepLinkScheme`](#getdeeplinkscheme) | GET | `/deep-links` | core | 2 | CMS-009 |
-| navigation | [`getNavigation`](#getnavigation) | GET | `/tenant-config/navigation` | core | 2 | CMS-009 |
-| navigation | [`setHeader`](#setheader) | PUT | `/tenant-config/header` | core | 2 | CMS-009 |
-| navigation | [`setNavigation`](#setnavigation) | PUT | `/tenant-config/navigation` | core | 2 | CMS-009 |
+| content | [`setPolicy`](#setpolicy) | PUT | `/tenant-config/policies/{policyKind}` | core | 1 | CMS-018 |
+| content | [`unpublishGuidedChoice`](#unpublishguidedchoice) | POST | `/guided-choices/{guidedChoiceId}/unpublish` | core | 1 | CMS-101 |
+| content | [`updateBanner`](#updatebanner) | PATCH | `/tenant-config/banners/{bannerId}` | core | 1 | CMS-008 |
+| content | [`updateContentPage`](#updatecontentpage) | PUT | `/tenant-config/pages/{pageId}` | core | 1 | CMS-007 |
+| content | [`updateGuidedChoice`](#updateguidedchoice) | PATCH | `/guided-choices/{guidedChoiceId}` | core | 1 | CMS-101 |
+| content | [`updatePromoBlock`](#updatepromoblock) | PATCH | `/tenant-config/promo-blocks/{promoBlockId}` | core | 1 | CMS-008 |
+| homepage | [`getHomepageLayout`](#gethomepagelayout) | GET | `/tenant-config/homepage` | core | 1 | CMS-007 |
+| homepage | [`listLandingPageTemplates`](#listlandingpagetemplates) | GET | `/landing-page-templates` | core | 1 | CMS-007 |
+| homepage | [`setHomepageLayout`](#sethomepagelayout) | PUT | `/tenant-config/homepage` | core | 1 | BO-840, CMS-007 |
+| modules | [`getFeatureToggles`](#getfeaturetoggles) | GET | `/tenant-config/features` | core | 1 | CMS-001 |
+| modules | [`getModuleEnablement`](#getmoduleenablement) | GET | `/tenant-config/modules` | core | 1 | ADM-424, CMS-001, CMS-007 |
+| modules | [`setFeatureToggles`](#setfeaturetoggles) | PUT | `/tenant-config/features` | core | 1 | CMS-001 |
+| modules | [`setLanguages`](#setlanguages) | PUT | `/tenant-config/languages` | core | 1 | ADM-018, CMS-011 |
+| modules | [`setModuleEnablement`](#setmoduleenablement) | PUT | `/tenant-config/modules` | core | 1 | ADM-424, CMS-001 |
+| navigation | [`buildDeepLink`](#builddeeplink) | POST | `/deep-links` | core | 1 | CMS-009 |
+| navigation | [`getDeepLinkScheme`](#getdeeplinkscheme) | GET | `/deep-links` | core | 1 | CMS-009 |
+| navigation | [`getNavigation`](#getnavigation) | GET | `/tenant-config/navigation` | core | 1 | CMS-009 |
+| navigation | [`setHeader`](#setheader) | PUT | `/tenant-config/header` | core | 1 | CMS-009 |
+| navigation | [`setNavigation`](#setnavigation) | PUT | `/tenant-config/navigation` | core | 1 | CMS-009 |
 | overview | [`getPublishedTenantConfig`](#getpublishedtenantconfig) | GET | `/storefront/tenant-config` | core | 1 | GST-001, GST-043, GST-047, KSK-002, WEB-001, WEB-028 … |
 | overview | [`getTenantAppStatus`](#gettenantappstatus) | GET | `/tenant-config/status` | core | 1 | CMS-001, CMS-014, CMS-102, GST-001, GST-029, GST-038 … |
-| overview | [`getTenantConfig`](#gettenantconfig) | GET | `/tenant-config` | core | 2 | ADM-018, BO-834, CMS-011 |
-| overview | [`listAnalyticsProviders`](#listanalyticsproviders) | GET | `/tenant-config/analytics-providers` | core | 1 | CMS-016, GST-001, WEB-001 |
+| overview | [`getTenantConfig`](#gettenantconfig) | GET | `/tenant-config` | core | 1 | ADM-018, BO-834, CMS-011 |
+| overview | [`listAnalyticsProviders`](#listanalyticsproviders) | GET | `/tenant-config/analytics-providers` | core | 1 | CMS-016 |
 | overview | [`recordStorefrontSessionEvents`](#recordstorefrontsessionevents) | POST | `/storefront/session-events` | core | 1 | GST-001, WEB-001 |
-| overview | [`setAnalyticsProvider`](#setanalyticsprovider) | PUT | `/tenant-config/analytics-providers` | core | 2 | CMS-016 |
-| overview | [`setMaintenanceMode`](#setmaintenancemode) | PUT | `/tenant-config/status` | core | 2 | CMS-001 |
-| publishing | [`createPreview`](#createpreview) | POST | `/tenant-config/preview` | core | 2 | ADM-016, CMS-006, CMS-012, CMS-014 |
-| publishing | [`diffConfigVersion`](#diffconfigversion) | GET | `/tenant-config/versions/{version}/diff` | core | 2 | ADM-016, CMS-014, CMS-015 |
-| publishing | [`exportSitePackage`](#exportsitepackage) | POST | `/site-package` | core | 2 | ADM-016, CMS-014 |
-| publishing | [`getPublishReviewPolicy`](#getpublishreviewpolicy) | GET | `/publish-review-policy` | core | 2 | CMS-014 |
-| publishing | [`getSitePackage`](#getsitepackage) | GET | `/site-package/{packageId}` | core | 2 | ADM-016, CMS-014 |
+| overview | [`setAnalyticsProvider`](#setanalyticsprovider) | PUT | `/tenant-config/analytics-providers` | core | 1 | CMS-016 |
+| overview | [`setMaintenanceMode`](#setmaintenancemode) | PUT | `/tenant-config/status` | core | 1 | CMS-001 |
+| publishing | [`createPreview`](#createpreview) | POST | `/tenant-config/preview` | core | 1 | ADM-016, CMS-006, CMS-012, CMS-014 |
+| publishing | [`diffConfigVersion`](#diffconfigversion) | GET | `/tenant-config/versions/{version}/diff` | core | 1 | ADM-016, CMS-014, CMS-015 |
+| publishing | [`exportSitePackage`](#exportsitepackage) | POST | `/site-package` | core | 1 | ADM-016, CMS-014 |
+| publishing | [`getPublishReviewPolicy`](#getpublishreviewpolicy) | GET | `/publish-review-policy` | core | 1 | CMS-014 |
+| publishing | [`getSitePackage`](#getsitepackage) | GET | `/site-package/{packageId}` | core | 1 | ADM-016, CMS-014 |
 | publishing | [`getSiteSetupProgress`](#getsitesetupprogress) | GET | `/tenant-config/site-setup` | core | 1 | CMS-001, CMS-102 |
-| publishing | [`listConfigVersions`](#listconfigversions) | GET | `/tenant-config/versions` | core | 2 | ADM-016, CMS-015 |
+| publishing | [`listConfigVersions`](#listconfigversions) | GET | `/tenant-config/versions` | core | 1 | ADM-016, CMS-015 |
 | publishing | [`publishTenantConfig`](#publishtenantconfig) | POST | `/tenant-config/publish` | core | 1 | ADM-016, BO-843, CMS-014, CMS-103 |
-| publishing | [`restoreConfigVersion`](#restoreconfigversion) | POST | `/tenant-config/versions/{version}/restore` | core | 2 | ADM-016, CMS-015 |
-| publishing | [`setPublishReviewPolicy`](#setpublishreviewpolicy) | PUT | `/publish-review-policy` | core | 2 | CMS-014 |
+| publishing | [`restoreConfigVersion`](#restoreconfigversion) | POST | `/tenant-config/versions/{version}/restore` | core | 1 | ADM-016, CMS-015 |
+| publishing | [`setPublishReviewPolicy`](#setpublishreviewpolicy) | PUT | `/publish-review-policy` | core | 1 | CMS-014 |
 | publishing | [`setSiteSetupProgress`](#setsitesetupprogress) | PUT | `/tenant-config/site-setup` | core | 1 | CMS-102 |
 | publishing | [`validateTenantConfig`](#validatetenantconfig) | POST | `/tenant-config/validate` | core | 1 | CMS-012, CMS-014, CMS-102 |
-| theme | [`getFonts`](#getfonts) | GET | `/tenant-config/fonts` | core | 2 | CMS-003, CMS-006 |
-| theme | [`getTheme`](#gettheme) | GET | `/tenant-config/theme` | core | 2 | ADM-016, CMS-005, CMS-006 |
-| theme | [`setFonts`](#setfonts) | PUT | `/tenant-config/fonts` | core | 2 | CMS-003 |
-| theme | [`setTheme`](#settheme) | PUT | `/tenant-config/theme` | core | 2 | ADM-016, CMS-005 |
-| white-label | [`claimCustomDomain`](#claimcustomdomain) | POST | `/tenant-domains` | core | 2 | ADM-017, BO-835, CMS-017 |
-| white-label | [`getPlatformSubdomain`](#getplatformsubdomain) | GET | `/platform-subdomain` | core | 2 | ADM-017, CMS-017 |
-| white-label | [`listCustomDomains`](#listcustomdomains) | GET | `/tenant-domains` | core | 2 | ADM-017, CMS-017 |
-| white-label | [`regenerateDomainToken`](#regeneratedomaintoken) | POST | `/tenant-domains/{domainId}/token` | core | 2 | ADM-017, CMS-017 |
-| white-label | [`relinquishCustomDomain`](#relinquishcustomdomain) | DELETE | `/tenant-domains/{domainId}` | core | 2 | ADM-017, CMS-017 |
-| white-label | [`setPrimaryDomain`](#setprimarydomain) | POST | `/tenant-domains/{domainId}/primary` | core | 2 | ADM-017, CMS-017 |
-| white-label | [`verifyCustomDomain`](#verifycustomdomain) | POST | `/tenant-domains/{domainId}/verify` | core | 2 | ADM-017, CMS-017 |
-| whiteLabel | [`createContentBlock`](#createcontentblock) | POST | `/content-blocks` | core | 2 | BO-839, CMS-007 |
-| whiteLabel | [`publishContentBlock`](#publishcontentblock) | POST | `/content-blocks/{blockId}/publish` | core | 2 | CMS-007 |
-| whiteLabel | [`setFooter`](#setfooter) | PUT | `/footer` | core | 2 | CMS-009 |
+| theme | [`getFonts`](#getfonts) | GET | `/tenant-config/fonts` | core | 1 | CMS-003, CMS-006 |
+| theme | [`getTheme`](#gettheme) | GET | `/tenant-config/theme` | core | 1 | ADM-016, CMS-005, CMS-006 |
+| theme | [`setFonts`](#setfonts) | PUT | `/tenant-config/fonts` | core | 1 | CMS-003 |
+| theme | [`setTheme`](#settheme) | PUT | `/tenant-config/theme` | core | 1 | ADM-016, CMS-005 |
+| white-label | [`claimCustomDomain`](#claimcustomdomain) | POST | `/tenant-domains` | core | 1 | ADM-017, BO-835, CMS-017 |
+| white-label | [`getPlatformSubdomain`](#getplatformsubdomain) | GET | `/platform-subdomain` | core | 1 | ADM-017, CMS-017 |
+| white-label | [`listCustomDomains`](#listcustomdomains) | GET | `/tenant-domains` | core | 1 | ADM-017, CMS-017 |
+| white-label | [`regenerateDomainToken`](#regeneratedomaintoken) | POST | `/tenant-domains/{domainId}/token` | core | 1 | ADM-017, CMS-017 |
+| white-label | [`relinquishCustomDomain`](#relinquishcustomdomain) | DELETE | `/tenant-domains/{domainId}` | core | 1 | ADM-017, CMS-017 |
+| white-label | [`setPrimaryDomain`](#setprimarydomain) | POST | `/tenant-domains/{domainId}/primary` | core | 1 | ADM-017, CMS-017 |
+| white-label | [`verifyCustomDomain`](#verifycustomdomain) | POST | `/tenant-domains/{domainId}/verify` | core | 1 | ADM-017, CMS-017 |
+| whiteLabel | [`createContentBlock`](#createcontentblock) | POST | `/content-blocks` | core | 1 | BO-839, CMS-007 |
+| whiteLabel | [`publishContentBlock`](#publishcontentblock) | POST | `/content-blocks/{blockId}/publish` | core | 1 | CMS-007 |
+| whiteLabel | [`setFooter`](#setfooter) | PUT | `/footer` | core | 1 | CMS-009 |
 
 ## Group: appPublishing
 
@@ -974,7 +974,7 @@ A partial update of the working draft; guests see it after `publishTenantConfig`
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -1058,7 +1058,7 @@ Source is a single 1024×1024 PNG without transparency; derived sizes are genera
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.tenant_config` |
@@ -1179,7 +1179,7 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -1281,7 +1281,7 @@ Logo and favicon are runtime — they change with a publish. **Splash images are
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -1450,7 +1450,7 @@ Scheduled by date window. A campaign banner set to run through a religious or na
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.banner` |
@@ -1529,7 +1529,7 @@ Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are 
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.content_page` |
@@ -1596,7 +1596,7 @@ Always created as a `draft`; `id`, `status`, `isReferenced` and `scopePath` are 
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
@@ -1699,7 +1699,7 @@ Presentation only. A block may point at a promotion, but it does not create or p
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.promo_block` |
@@ -1776,7 +1776,7 @@ Presentation only. A block may point at a promotion, but it does not create or p
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.tenant_config` |
@@ -1809,7 +1809,7 @@ Refused where the page is referenced by navigation or the homepage. Deleting a l
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.tenant_config` |
@@ -1842,7 +1842,7 @@ A `published` choice is unpublished first, or 409.
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
@@ -1875,7 +1875,7 @@ A `published` choice is unpublished first, or 409.
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.promo_block` |
@@ -1973,7 +1973,7 @@ A `published` choice is unpublished first, or 409.
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -2034,7 +2034,7 @@ A `published` choice is unpublished first, or 409.
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -2090,7 +2090,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
@@ -2156,7 +2156,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -2187,7 +2187,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -2213,7 +2213,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | Permission | `None` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -2432,7 +2432,7 @@ Drafts, AI suggestions awaiting review and the published one (decided 29 Septemb
 | Permission | `TENANT_PUBLISH` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
@@ -2552,7 +2552,7 @@ Also the grounding corpus for the AI concierge, which is why an answer here is c
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -2608,7 +2608,7 @@ Returns it to `draft` (decided 29 September, rev 3 REV3-11). Guests stop seeing 
 | Permission | `TENANT_PUBLISH` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
@@ -2676,7 +2676,7 @@ Returns it to `draft` (decided 29 September, rev 3 REV3-11). Guests stop seeing 
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.banner` |
@@ -2754,7 +2754,7 @@ Replaces the page's editable fields. `status` is taken only to archive the page 
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.content_page` |
@@ -2817,7 +2817,7 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
@@ -2899,7 +2899,7 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.promo_block` |
@@ -2978,7 +2978,7 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3023,7 +3023,7 @@ A partial update. Only a `draft` may be edited: a `published` choice is unpublis
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3075,7 +3075,7 @@ The drag-and-drop builder. Sections are an ordered list; the order here is the o
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -3146,7 +3146,7 @@ The drag-and-drop builder. Sections are an ordered list; the order here is the o
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3172,7 +3172,7 @@ Shows which modules the tenant has licensed and which are enabled. A module that
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3199,7 +3199,7 @@ Several are build-time on native apps and are flagged accordingly. A tenant enab
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -3240,7 +3240,7 @@ Enabling a language does not translate existing content. The response reports ho
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.tenant_config` |
@@ -3295,7 +3295,7 @@ A disabled module is **hidden from the guest app entirely** — not shown and re
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -3339,7 +3339,7 @@ The CMS link builder (CHG-CSA-037): given a target, the URL to paste on the tena
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | - |
@@ -3386,7 +3386,7 @@ The CMS link builder (CHG-CSA-037): given a target, the URL to paste on the tena
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3420,7 +3420,7 @@ The CMS link builder (CHG-CSA-037): given a target, the URL to paste on the tena
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -3471,7 +3471,7 @@ The CMS link builder (CHG-CSA-037): given a target, the URL to paste on the tena
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.tenant_config` |
@@ -3526,7 +3526,7 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.navigation_item` |
@@ -3804,6 +3804,12 @@ Bottom navigation is capped at five visible items; the remainder moves to the ov
 | contact.whatsapp | string |  | (nullable) |
 | contact.address | object |  | (nullable) |
 | contact.openingHours | object |  | Prose, as the guest reads it. (nullable) |
+| analyticsProviders | array of PublishedAnalyticsProvider |  | The analytics platforms the storefront and app load (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-005): a guest reads them here instead of listAnalyticsProviders, which needs TENANT_CONFIGURE. |
+| analyticsProviders[].provider | enum (googleAnalytics4, googleTagManager, adobeAnalytics, metaPixel, matomo, other) | yes |  |
+| analyticsProviders[].otherProviderName | string |  | The provider's name, when provider is other (StorefrontAnalyticsProvider.providerLabel). (max length 100; nullable) |
+| analyticsProviders[].measurementId | string | yes | What the tag or SDK reports to (GA4 G-..., Tag Manager GTM-..., a pixel id). (max length 100) |
+| analyticsProviders[].surfaces | array of enum (guestWeb, guestApp) | yes | (min items 1) |
+| analyticsProviders[].consentCategory | enum (functional, analytics, personalisation, marketing) | yes | The cookie category the visitor must grant before this provider loads (marketing-crm CookieCategory). |
 
 **Responses**
 
@@ -3899,7 +3905,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -4149,6 +4155,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 **`GET /tenant-config/analytics-providers`**: The analytics platforms the storefront and app report to
 
 **Staff get every row as configured, guests get what the tag loader needs.** A staff caller sees each provider with its venue, surfaces, consent category and reporting link. **A guest caller gets only the enabled rows in force for the venue they are browsing** (the venue's own row, else the tenant-wide one), with `provider`, `measurementId`, `surfaces` and `consentCategory` and nothing else; `TENANT_CONFIGURE` is not needed for that, as with `getTenantConfig`. **The loader injects a provider only once marketing-crm `getCookieConsentRuntime` says its `consentCategory` is granted**; before that nothing is sent to it (2.6.58). Ordered by `venueId` (tenant-wide first) then `provider`; keyset cursor.
+**A guest reads the providers from the published tenant config** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-005): the storefront and app tag loader reads `PublishedTenantConfig.analyticsProviders` from `getPublishedTenantConfig`, which needs no session, and GST-001 and WEB-001 no longer call this. This stays a staff read under `TENANT_CONFIGURE`; the guest audience and the optional credential stay only so a client built against r1 is not broken, and a guest caller still gets the rows described above.
 
 |  |  |
 |---|---|
@@ -4161,7 +4168,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | Read routing | replica |
 | Reads | `whitelabel.analytics_provider` |
 | Writes | - |
-| Called by | CMS-016, GST-001, WEB-001 |
+| Called by | CMS-016 |
 
 **Parameters**
 
@@ -4270,7 +4277,7 @@ Everything the builder edits. **A staff caller gets the working draft**, or with
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | venue |
 | Conflict policy | serverWins |
@@ -4343,7 +4350,7 @@ Renders the branded maintenance screen with an expected-back time. Tenant-brande
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.tenant_config` |
@@ -4441,7 +4448,7 @@ A short-lived link rendering the working draft as the guest app would, for a cho
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.tenant_config` |
@@ -4497,7 +4504,7 @@ What a review step actually needs. A publish note saying "updated homepage" is n
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -4544,7 +4551,7 @@ What a review step actually needs. A publish note saying "updated homepage" is n
 | Permission | `TENANT_PUBLISH` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `whitelabel.site_package` |
@@ -4596,7 +4603,7 @@ Off by default: a single publish by a `TENANT_PUBLISH` holder (CHG-CSA-042).
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -4632,7 +4639,7 @@ The package job's status and, once `ready`, a short-lived download link (CHG-CSA
 | Permission | `TENANT_PUBLISH` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | primary |
@@ -4716,7 +4723,7 @@ The builder's checklist (decided 29 September, W12 and M24-05): the preset picke
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -4840,7 +4847,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | Permission | `TENANT_PUBLISH` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -5097,7 +5104,7 @@ Copies the chosen version's `snapshot` into the working draft. **It does not pub
 | Permission | `TENANT_PUBLISH` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -5251,7 +5258,7 @@ Run before publishing. Reports missing translations, navigation pointing at disa
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -5287,7 +5294,7 @@ Run before publishing. Reports missing translations, navigation pointing at disa
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -5352,7 +5359,7 @@ Run before publishing. Reports missing translations, navigation pointing at disa
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.tenant_config` |
@@ -5401,6 +5408,7 @@ Run before publishing. Reports missing translations, navigation pointing at disa
 **`PUT /tenant-config/theme`**: Set colour theme
 
 Runtime (reaches guests on publish, not on a store release) and written to the working draft. Contrast is checked against WCAG 2.2 AA and a failing pair is refused — accessibility is a stated target for the guest app, and a tenant picking two similar colours should be told at configuration time rather than at audit. **Refused, not warned (confirmed 28 September, audit R139)**: flow F22 is corrected to match.
+**The pairs and ratios** (Chinmay, 3 October 2026, Block A business rules: "WCAG AA"; CHG-RUL-007), listed on `Theme.x-ticvai-contrast-pairs` so the server, CMS-005 and the check read one list: text on the background at **4.5:1**; large text (24 px, or 18.66 px bold, and up) at **3:1**; the primary, secondary and accent colours against the background at **3:1** (a button, a link, a focus ring is a user-interface component, WCAG 1.4.11); and for each component colour, its text on its own background at **4.5:1** and its background against the page background at **3:1**. The ratio is the WCAG 2.2 relative-luminance contrast ratio. Each failing pair is named in `ContrastProblem.failures` with its ratio and the one it needed.
 **One theme, no dark mode** (Chinmay, 2 October, workbook Q150; CHG-CSA-035): `darkMode` is deprecated and ignored; a body that carries it is accepted and the field is not applied.
 **Accepts `Prefer: validate-only`** (29 September, build pass, group G2): validates and answers 200 with the would-be result without writing, for the AI executor's plan validation; registered as an AI tool (`ai.AiTool`, 1.2.59, 2.6.50).
 
@@ -5409,7 +5417,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.tenant_config` |
@@ -5519,7 +5527,7 @@ Runtime (reaches guests on publish, not on a store release) and written to the w
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -5594,7 +5602,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -5629,7 +5637,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -5655,7 +5663,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `whitelabel.custom_domain` |
@@ -5726,7 +5734,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `whitelabel.custom_domain` |
@@ -5760,7 +5768,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `whitelabel.custom_domain` |
@@ -5830,7 +5838,7 @@ The address every tenant gets at provisioning, `<venue>.<cell>.ticvai.app` (CHG-
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `whitelabel.custom_domain` |
@@ -5901,7 +5909,7 @@ BL-172. **The CMS modelled configuration and not authoring** — a marketer coul
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.content_block`, `marketing.segment` |
@@ -5969,7 +5977,7 @@ Approval is separate from authoring where the tenant requires it — **the appro
 | Permission | `TENANT_PUBLISH` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.content_block`, `identity.principal` |
@@ -6027,7 +6035,7 @@ BL-002. **A header is chrome and a footer is a link surface**, which is why this
 | Permission | `TENANT_CONFIGURE` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -6100,7 +6108,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | venue_id | uuid | no |  |
 | provider | text | yes |  |
 | provider_label | text | no | The name, when provider is other. |
@@ -6155,7 +6163,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | venue_id | uuid | no | From the path of createBookingFlowDefinition. |
 | flow_type_key | text | yes |  |
 | name | text | yes | Staff-facing, e.g. |
@@ -6170,7 +6178,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | booking_flow_id | uuid | no |  |
 | step_key | text | yes |  |
 | is_enabled | boolean | yes | A required step cannot be off; the flow saves and isValid turns false. |
@@ -6316,7 +6324,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | guided_choice_id | uuid | yes | The parent row. |
-| id | uuid | no | UUIDv7. |
+| id | uuid | yes | UUIDv7. |
 | title | jsonb | yes |  |
 | kind | text | no | What the question asks (decided 29 September, W4). |
 | sort_order | integer | yes |  |
@@ -6326,7 +6334,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | guided_choice_id | uuid | yes | The parent row. |
-| id | uuid | no | UUIDv7. |
+| id | uuid | yes | UUIDv7. |
 | title | jsonb | yes |  |
 | kind | text | no | What the question asks (decided 29 September, W4). |
 | sort_order | integer | yes |  |
@@ -6337,7 +6345,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 |---|---|---|---|
 | template_key | text | no | The landing-page template this layout started from (listLandingPageTemplates), or null for a layout composed from scratch (CHG-CSA-037). |
 | landing_source | text | no | storefront: this home is the tenant's landing page. |
-| id | uuid | no | Added 20 August. |
+| id | uuid | yes | Added 20 August. |
 | content_page_id | uuid | no | Points at whitelabel.content_page. |
 | homepage_section_id | uuid | yes | Points at whitelabel.homepage_section. |
 
@@ -6357,7 +6365,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no | Added 20 August. |
+| id | uuid | yes | Added 20 August. |
 | kind | text | yes |  |
 | buy_button | jsonb | no | The persistent Buy tickets button (decided 29 September, MOB-2). |
 | navigation_item_id | uuid | yes | Points at whitelabel.navigation_item. |
@@ -6397,11 +6405,11 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes | Synthesised key. |
 | is_enabled | boolean | yes |  |
 | reviewer_must_differ_from_author | boolean | no |  |
 | applies_to | text[] | no | What the review covers. |
 | scope_path | text | no | The partition key (ADR-0005). |
+| id | uuid | yes | Synthesised key. |
 
 ### `whitelabel.site_package`
 
@@ -6421,7 +6429,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | preset_key | text | no | The starting point. |
 | current_step | text | no |  |
 | steps | jsonb | no | One entry per SiteSetupStepKey. |
@@ -6433,7 +6441,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | store | text | yes |  |
 | account_holder_name | text | yes | The client's legal entity as the store knows it. |
 | duns_number | text | no | Required for appleAppStore; Apple enrols an organisation only with its D-U-N-S number. |

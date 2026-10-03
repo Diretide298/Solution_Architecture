@@ -1092,7 +1092,9 @@
    "params": [
     {
      "name": "packageId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listResourcePackages` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1124,7 +1126,7 @@
   "name": "AI Event Resource Forecasting",
   "module": "Rentals",
   "requiresModule": "resources",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Resource_Management_Configuration_Reference.pdf",
    "board": "7",

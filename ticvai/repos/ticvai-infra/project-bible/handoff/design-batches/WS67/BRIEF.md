@@ -102,16 +102,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ANL-021` | Dashboard Library | B–D | 0 | 62 | 6 | 18 | 2 | 0 | — | notStarted (—) |
-| `ANL-022` | Dashboard Creation Wizard | B–D | 18 | 0 | 5 | 18 | 1 | 0 | — | notStarted (—) |
-| `ANL-023` | Drag-and-Drop Dashboard Canvas | A | 20 | 33 | 6 | 0 | 3 | 0 | — | notStarted (—) |
-| `ANL-024` | Widget & Visualization Library | B–D | 0 | 12 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ANL-021` | Dashboard Library | D | 0 | 62 | 6 | 18 | 2 | 0 | — | notStarted (—) |
+| `ANL-022` | Dashboard Creation Wizard | D | 18 | 0 | 5 | 18 | 1 | 0 | — | notStarted (—) |
+| `ANL-023` | Drag-and-Drop Dashboard Canvas | A | 37 | 33 | 6 | 18 | 3 | 0 | — | notStarted (—) |
+| `ANL-024` | Widget & Visualization Library | D | 0 | 12 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `ANL-025` | KPI Builder | A | 22 | 7 | 5 | 0 | 1 | 0 | — | notStarted (—) |
-| `ANL-026` | Targets, Thresholds & KPI Status Rules | B–D | 0 | 16 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `ANL-027` | Data & Filter Configuration | B–D | 18 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `ANL-028` | Drill-Down & Interaction Designer | B–D | 9 | 0 | 5 | 0 | 3 | 0 | — | notStarted (—) |
-| `ANL-029` | Dashboard Access, Publishing & Versioning | B–D | 0 | 12 | 6 | 0 | 2 | 6 | — | notStarted (—) |
-| `ANL-030` | Dashboard Preview, Validation & Health | B–D | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ANL-026` | Targets, Thresholds & KPI Status Rules | D | 0 | 16 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ANL-027` | Data & Filter Configuration | D | 18 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
+| `ANL-028` | Drill-Down & Interaction Designer | D | 9 | 0 | 5 | 0 | 3 | 0 | — | notStarted (—) |
+| `ANL-029` | Dashboard Access, Publishing & Versioning | D | 0 | 12 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `ANL-030` | Dashboard Preview, Validation & Health | D | 0 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

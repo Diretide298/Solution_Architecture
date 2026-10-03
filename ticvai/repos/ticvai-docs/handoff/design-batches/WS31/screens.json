@@ -42,15 +42,6 @@
      "provenance": "derived — BO-100 declares entryState.params  and BO-304 holds none of them. The edge carries nothing: BO-304 is opened from BO-100, so this edge is the way back and BO-100 keeps its own state"
     },
     {
-     "to": "BO-305",
-     "trigger": "Works in Order Detail & Transaction Workspace",
-     "provenance": "flow F140 step 1→2",
-     "operation": "listOrderReservation",
-     "carries": [
-      "orderId"
-     ]
-    },
-    {
      "to": "BO-306",
      "trigger": "Works in Reservation & Hold Policy Configuration",
      "provenance": "flow F140 step 3→4",
@@ -97,6 +88,15 @@
      "trigger": "Works in Order Lifecycle Timeline, SLA, Exceptions & AI Operations",
      "provenance": "flow F140 step 17→18",
      "operation": "listOrderReservation"
+    },
+    {
+     "to": "BO-305",
+     "trigger": "Works in Order Detail & Transaction Workspace",
+     "provenance": "flow F140 step 1→2",
+     "operation": "listOrderReservation",
+     "carries": [
+      "orderId"
+     ]
     }
    ]
   },
@@ -116,29 +116,12 @@
        "kind": "dataTable",
        "label": "Every order reservation",
        "columns": [
-        "OrderReservationCommandCenterView.ordersToday",
-        "OrderReservationCommandCenterView.confirmedOrders",
-        "OrderReservationCommandCenterView.activeReservations",
-        "OrderReservationCommandCenterView.temporaryHolds",
-        "OrderReservationCommandCenterView.pendingPayment",
-        "OrderReservationCommandCenterView.expiringReservations",
-        "OrderReservationCommandCenterView.failedOrders",
-        "OrderReservationCommandCenterView.partiallyFulfilled",
-        "OrderReservationCommandCenterView.completedOrders",
-        "OrderReservationCommandCenterView.cancelledOrders",
-        "OrderReservationCommandCenterView.ordersRequiringAttention",
         "OrderReservationCommandCenterView.grossOrderValue",
-        "OrderReservationCommandCenterView.orderId",
-        "OrderReservationCommandCenterView.reservationId",
         "OrderReservationCommandCenterView.channel",
-        "OrderReservationCommandCenterView.venue",
         "OrderReservationCommandCenterView.orderValue",
         "OrderReservationCommandCenterView.paymentStatus",
         "OrderReservationCommandCenterView.reservationStatus",
-        "OrderReservationCommandCenterView.fulfillmentStatus",
-        "OrderReservationCommandCenterView.createdDate",
-        "OrderReservationCommandCenterView.expiry",
-        "OrderReservationCommandCenterView.ownerAgent"
+        "OrderReservationCommandCenterView.fulfillmentStatus"
        ],
        "bindsTo": "OrderReservationCommandCenterView",
        "operation": "listOrderReservation",
@@ -156,28 +139,13 @@
        "bindsTo": "OrderReservationCommandCenterView",
        "columns": [
         "OrderReservationCommandCenterView.ordersToday",
-        "OrderReservationCommandCenterView.confirmedOrders",
-        "OrderReservationCommandCenterView.activeReservations",
-        "OrderReservationCommandCenterView.temporaryHolds",
-        "OrderReservationCommandCenterView.pendingPayment",
-        "OrderReservationCommandCenterView.expiringReservations",
-        "OrderReservationCommandCenterView.failedOrders",
-        "OrderReservationCommandCenterView.partiallyFulfilled",
-        "OrderReservationCommandCenterView.completedOrders",
-        "OrderReservationCommandCenterView.cancelledOrders",
-        "OrderReservationCommandCenterView.ordersRequiringAttention",
         "OrderReservationCommandCenterView.grossOrderValue",
-        "OrderReservationCommandCenterView.orderId",
-        "OrderReservationCommandCenterView.reservationId",
         "OrderReservationCommandCenterView.channel",
-        "OrderReservationCommandCenterView.venue",
         "OrderReservationCommandCenterView.orderValue",
         "OrderReservationCommandCenterView.paymentStatus",
         "OrderReservationCommandCenterView.reservationStatus",
         "OrderReservationCommandCenterView.fulfillmentStatus",
-        "OrderReservationCommandCenterView.createdDate",
-        "OrderReservationCommandCenterView.expiry",
-        "OrderReservationCommandCenterView.ownerAgent"
+        "OrderReservationCommandCenterView.createdDate"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Search using”.",
        "provenance": "pack Order___Reservation_Management_Reference.pdf, page 3 §Display"

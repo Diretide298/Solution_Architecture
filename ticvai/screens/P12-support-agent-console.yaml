@@ -2005,12 +2005,6 @@ screens:
       trigger: Works in Case Creation, Classification & Intelligent Routing
       provenance: flow F134 step 5→6
       operation: listCustomerService
-    - to: SUP-013
-      trigger: Works in Case Investigation & Resolution Workspace
-      provenance: flow F134 step 7→8
-      operation: listCustomerService
-      carries:
-      - caseId
     - to: SUP-014
       trigger: Works in Order, Booking & Ticket Service Workspace
       provenance: flow F134 step 9→10
@@ -2023,16 +2017,22 @@ screens:
       trigger: Works in Escalation, Collaboration & Internal Resolution
       provenance: flow F134 step 13→14
       operation: listCustomerService
+    - to: SUP-018
+      trigger: Works in AI Customer Service Copilot & Knowledge Workspace
+      provenance: flow F134 step 17→18
+      operation: listCustomerService
+    - to: SUP-013
+      trigger: Works in Case Investigation & Resolution Workspace
+      provenance: flow F134 step 7→8
+      operation: listCustomerService
+      carries:
+      - caseId
     - to: SUP-017
       trigger: Works in Case Resolution, Closure & Customer Feedback
       provenance: flow F134 step 15→16
       operation: listCustomerService
       carries:
       - caseId
-    - to: SUP-018
-      trigger: Works in AI Customer Service Copilot & Knowledge Workspace
-      provenance: flow F134 step 17→18
-      operation: listCustomerService
   density: compact
   purposeNote: An agent can immediately understand their workload, priorities, SLA exposure and required
     actions without navigating multiple TICVAI modules.

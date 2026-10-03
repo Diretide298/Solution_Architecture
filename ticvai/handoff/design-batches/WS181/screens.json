@@ -504,7 +504,9 @@
    "params": [
     {
      "name": "strategyId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRecommendationStrategies` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -673,7 +675,9 @@
    "params": [
     {
      "name": "orderId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `quoteUpgrade` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -837,7 +841,9 @@
    "params": [
     {
      "name": "orderId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `quoteUpgrade` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -984,7 +990,9 @@
    "params": [
     {
      "name": "orderId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `quoteUpgrade` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1141,7 +1149,9 @@
    "params": [
     {
      "name": "strategyId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRecommendationStrategies` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1300,11 +1310,15 @@
    "params": [
     {
      "name": "orderId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `quoteUpgrade` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "strategyId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRecommendationStrategies` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

@@ -24,13 +24,26 @@
 
 | ID | Screen | Module | Wave | Operations |
 |---|---|---|---|---|
+| [KIT-001](#kit-001-kitchen-operations-command-center) | Kitchen Operations Command Center | Kitchen | 1 | 3 |
+| [KIT-002](#kit-002-kitchen-display-system-kds) | Kitchen Display System (KDS) | Kitchen | 1 | 5 |
+| [KIT-003](#kit-003-order-firing-course-management) | Order Firing & Course Management | Kitchen | 1 | 5 |
+| [KIT-004](#kit-004-active-order-management-fulfilment-journey) | Active Order Management & Fulfilment Journey | Kitchen | 1 | 2 |
+| [KIT-005](#kit-005-kitchen-station-workload-dynamic-routing) | Kitchen Station Workload & Dynamic Routing | Kitchen | 1 | 3 |
+| [KIT-006](#kit-006-expeditor-order-assembly) | Expeditor & Order Assembly | Kitchen | 1 | 6 |
+| [KIT-007](#kit-007-guest-collection-buzzer-digital-notification) | Guest Collection, Buzzer & Digital Notification | Kitchen | 1 | 1 |
+| [KIT-008](#kit-008-exceptions-re-fire-unavailable-items) | Exceptions, Re-Fire & Unavailable Items | Kitchen | 1 | 5 |
+| [KIT-009](#kit-009-sla-priority-service-rules) | SLA, Priority & Service Rules | Kitchen | 1 | 3 |
+| [KIT-010](#kit-010-kitchen-performance-ai-operational-optimization) | Kitchen Performance, AI & Operational Optimization | Kitchen | 1 | 3 |
 | [POS-000](#pos-000-sign-in) | Sign In | Shift | 1 | 8 |
 | [POS-001](#pos-001-begin-shift) | Begin Shift | Shift | 1 | 7 |
 | [POS-002](#pos-002-sell-ticket-catalogue) | Sell — Ticket Catalogue | Sell | 1 | 32 |
 | [POS-003](#pos-003-sell-timed-entry) | Sell — Timed Entry | Sell | 1 | 8 |
+| [POS-004](#pos-004-sell-seat-map) | Sell — Seat Map | Sell | 1 | 7 |
 | [POS-005](#pos-005-payment) | Payment | Payment | 1 | 13 |
 | [POS-006](#pos-006-held-orders) | Held Orders | Sell | 1 | 14 |
 | [POS-007](#pos-007-close-shift) | Close Shift | Shift | 1 | 8 |
+| [POS-008](#pos-008-reports) | Reports | Reports | 1 | 4 |
+| [POS-009](#pos-009-staff-roster) | Staff Roster | Shift | 1 | 3 |
 | [POS-010](#pos-010-add-to-existing-ticket) | Add to Existing Ticket | Sell | 1 | 5 |
 | [POS-011](#pos-011-returns-refunds-exchanges) | Returns, Refunds & Exchanges | Sell | 1 | 7 |
 | [POS-012](#pos-012-omnichannel-order-fulfilment-center) | Omnichannel Order & Fulfilment Center | Sell | 1 | 6 |
@@ -53,19 +66,488 @@
 | [POS-029](#pos-029-order-queue) | Order Queue | Sell | 1 | 1 |
 | [POS-030](#pos-030-sales-journal) | Sales Journal | Sell | 1 | 8 |
 | [POS-031](#pos-031-reservations-group-arrivals) | Reservations & Group Arrivals | Sell | 1 | 9 |
-| [KIT-001](#kit-001-kitchen-operations-command-center) | Kitchen Operations Command Center | Kitchen | 2 | 3 |
-| [KIT-002](#kit-002-kitchen-display-system-kds) | Kitchen Display System (KDS) | Kitchen | 2 | 5 |
-| [KIT-003](#kit-003-order-firing-course-management) | Order Firing & Course Management | Kitchen | 2 | 5 |
-| [KIT-004](#kit-004-active-order-management-fulfilment-journey) | Active Order Management & Fulfilment Journey | Kitchen | 2 | 2 |
-| [KIT-005](#kit-005-kitchen-station-workload-dynamic-routing) | Kitchen Station Workload & Dynamic Routing | Kitchen | 2 | 3 |
-| [KIT-006](#kit-006-expeditor-order-assembly) | Expeditor & Order Assembly | Kitchen | 2 | 6 |
-| [KIT-007](#kit-007-guest-collection-buzzer-digital-notification) | Guest Collection, Buzzer & Digital Notification | Kitchen | 2 | 2 |
-| [KIT-008](#kit-008-exceptions-re-fire-unavailable-items) | Exceptions, Re-Fire & Unavailable Items | Kitchen | 2 | 5 |
-| [KIT-009](#kit-009-sla-priority-service-rules) | SLA, Priority & Service Rules | Kitchen | 2 | 3 |
-| [KIT-010](#kit-010-kitchen-performance-ai-operational-optimization) | Kitchen Performance, AI & Operational Optimization | Kitchen | 2 | 3 |
-| [POS-004](#pos-004-sell-seat-map) | Sell — Seat Map | Sell | 2 | 7 |
-| [POS-008](#pos-008-reports) | Reports | Reports | 2 | 4 |
-| [POS-009](#pos-009-staff-roster) | Staff Roster | Shift | 2 | 3 |
+
+## KIT-001 Kitchen Operations Command Center
+
+**Kitchen Operations Command Center — board 3 of the client F&B design set.**
+
+|  |  |
+|---|---|
+| Module | Kitchen |
+| Wave | 1 |
+| Licensed module | fnb |
+| Route | `/kitchen/kitchen-operations-command-center` |
+| Component | `apps/kitchen-display/src/routes/kitchen/KitchenOperationsCommandCenterBoard.tsx` |
+| Pattern | commandCentre |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| venueId | session |
+| stationId | session |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | Kitchen ticket queue | `ORDER_VIEW` |
+| `listKitchenStations` | [FnbService](../backend/FnbService.md#listkitchenstations) | onLoad | List preparation stations and their routing | `PRODUCT_VIEW` |
+| `listFnbOrders` | [FnbService](../backend/FnbService.md#listfnborders) | onLoad | List F&B orders | `ORDER_VIEW` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | Every station's load, then the tickets, in the server's order. |
+| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
+| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
+| emptyNoResults | Nothing matches the station chips; the kitchen is not empty. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, the screen's permission, and names it. The command centre is not tied to one station, so it never says "not assigned to a station". |
+| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| KIT-002 | Kitchen Display System (KDS) | ticketId |  |
+| KIT-003 | Order Firing & Course Management | ticketId |  |
+| KIT-004 | Active Order Management & Fulfilment Journey | orderId |  |
+| KIT-005 | Kitchen Station Workload & Dynamic Routing |  |  |
+| KIT-006 | Expeditor & Order Assembly | ticketId |  |
+| KIT-007 | Guest Collection, Buzzer & Digital Notification | orderId |  |
+| KIT-008 | Exceptions, Re-Fire & Unavailable Items | ticketId |  |
+| KIT-009 | SLA, Priority & Service Rules |  |  |
+| KIT-010 | Kitchen Performance, AI & Operational Optimization |  |  |
+
+## KIT-002 Kitchen Display System (KDS)
+
+**Kitchen Display System (KDS) — board 3 of the client F&B design set.**
+
+|  |  |
+|---|---|
+| Module | Kitchen |
+| Wave | 1 |
+| Licensed module | fnb |
+| Route | `/kitchen/kitchen-display-system-kds` |
+| Component | `apps/kitchen-display/src/routes/kitchen/KitchenDisplaySystemKdsBoard.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| venueId | session |
+| stationId | session |
+| ticketId | KIT-002 |
+| visitId | deepLink |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | Kitchen ticket queue | `ORDER_VIEW` |
+| `setKitchenTicketStatus` | [FnbService](../backend/FnbService.md#setkitchenticketstatus) | onAction | Advance a kitchen ticket | `ORDER_MODIFY` |
+| `refireItem` | [FnbService](../backend/FnbService.md#refireitem) | onAction | Make it again | `ORDER_MODIFY` |
+| `recallKitchenTicket` | [FnbService](../backend/FnbService.md#recallkitchenticket) | onAction | Bring back a ticket that was bumped by mistake | `ORDER_MODIFY` |
+| `notifyServer` | [FnbService](../backend/FnbService.md#notifyserver) | onAction | The kitchen calls the server to the pass | `ORDER_MODIFY` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The rail. The count renders before the tickets. The server's order, never re-sorted on the device (`listKitchenTickets` orders by priority weights; design-notes correction fnb-retail): no "oldest first" and no "promise time" sort of its own. |
+| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
+| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
+| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
+| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `setKitchenTicketStatus`, `refireItem`, `recallKitchenTicket`, `notifyServer`. |
+| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| KIT-001 | Kitchen Operations Command Center |  |  |
+| KIT-003 | Order Firing & Course Management | ticketId |  |
+| EMP-058 | Starters cleared | ticketId, visitId |  |
+| EMP-059 | The server comps the delayed dish | visitId |  |
+| POS-022 | The guest is called and takes it | orderId, ticketId |  |
+
+## KIT-003 Order Firing & Course Management
+
+**Order Firing & Course Management — board 3 of the client F&B design set.**
+
+|  |  |
+|---|---|
+| Module | Kitchen |
+| Wave | 1 |
+| Licensed module | fnb |
+| Route | `/kitchen/order-firing-course-management` |
+| Component | `apps/kitchen-display/src/routes/kitchen/OrderFiringCourseManagementBoard.tsx` |
+| Pattern | configEditor |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| venueId | session |
+| stationId | session |
+| ticketId | KIT-002 |
+| outletId | session |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | Kitchen ticket queue, filtered by course (audit R277) | `ORDER_VIEW` |
+| `setKitchenTicketStatus` | [FnbService](../backend/FnbService.md#setkitchenticketstatus) | onAction | Advance a kitchen ticket | `ORDER_MODIFY` |
+| `prioritiseKitchenTicket` | [FnbService](../backend/FnbService.md#prioritisekitchenticket) | onAction | Move a ticket up the queue | `ORDER_MODIFY` |
+| `fireCourse` | [FnbService](../backend/FnbService.md#firecourse) | onAction | Send a held course to the pass | `ORDER_MODIFY` |
+| `holdCourse` | [FnbService](../backend/FnbService.md#holdcourse) | onAction | Stop a course going out | `ORDER_MODIFY` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The rail, oldest ticket first. The count renders before the tickets — a kitchen wants to know how deep it is before it reads anything. |
+| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
+| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
+| emptyNoResults | Nothing matches this course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic (audit R277). |
+| emptyNoAccess | Without `ORDER_VIEW`, which `listKitchenTickets` requires, the screen does not load and this state names that permission. This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `ORDER_MODIFY` gets this state naming `ORDER_MODIFY`, the screen's `permission` and the one its fire, hold, status and prioritise actions need (the screen has no read); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
+| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| KIT-001 | Kitchen Operations Command Center |  |  |
+| KIT-004 | Active Order Management & Fulfilment Journey | orderId |  |
+
+## KIT-004 Active Order Management & Fulfilment Journey
+
+**Follow one order from the till to the pass and out to the guest.**
+
+|  |  |
+|---|---|
+| Module | Kitchen |
+| Wave | 1 |
+| Licensed module | fnb |
+| Route | `/kitchen/active-order-management-fulfilment-journey` |
+| Component | `apps/kitchen-display/src/routes/kitchen/ActiveOrderManagementFulfilmentJouBoard.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| venueId | session |
+| stationId | session |
+| orderId | KIT-002 |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | Kitchen ticket queue | `ORDER_VIEW` |
+| `getFnbOrder` | [FnbService](../backend/FnbService.md#getfnborder) | onLoad | Read an F&B order | `ORDER_VIEW` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The order, then its tickets at each station. |
+| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
+| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
+| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
+| emptyNoAccess | Shown when the caller lacks ORDER_VIEW for this outlet, and names it. |
+| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| KIT-001 | Kitchen Operations Command Center |  |  |
+| KIT-008 | Exceptions, Re-Fire & Unavailable Items | ticketId |  |
+
+## KIT-005 Kitchen Station Workload & Dynamic Routing
+
+**Kitchen Station Workload & Dynamic Routing — board 3 of the client F&B design set.**
+
+|  |  |
+|---|---|
+| Module | Kitchen |
+| Wave | 1 |
+| Licensed module | fnb |
+| Route | `/kitchen/kitchen-station-workload-dynamic-routing` |
+| Component | `apps/kitchen-display/src/routes/kitchen/KitchenStationWorkloadDynamicRoutiBoard.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| venueId | session |
+| stationId | session |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | Kitchen ticket queue, filtered by course (audit R277) | `ORDER_VIEW` |
+| `listKitchenStations` | [FnbService](../backend/FnbService.md#listkitchenstations) | onLoad | List preparation stations and their routing | `PRODUCT_VIEW` |
+| `rebalanceStationLoad` | [FnbService](../backend/FnbService.md#rebalancestationload) | onAction | Move work between stations mid-service | `PRODUCT_CONFIGURE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The rail, oldest ticket first. The count renders before the tickets — a kitchen wants to know how deep it is before it reads anything. |
+| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
+| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
+| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
+| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `PRODUCT_VIEW` gets this state naming `PRODUCT_VIEW`, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `rebalanceStationLoad`. |
+| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| KIT-001 | Kitchen Operations Command Center |  |  |
+
+## KIT-006 Expeditor & Order Assembly
+
+**Expeditor & Order Assembly — board 3 of the client F&B design set.**
+
+|  |  |
+|---|---|
+| Module | Kitchen |
+| Wave | 1 |
+| Licensed module | fnb |
+| Route | `/kitchen/expeditor-order-assembly` |
+| Component | `apps/kitchen-display/src/routes/kitchen/ExpeditorOrderAssemblyBoard.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| venueId | session |
+| stationId | session |
+| ticketId | KIT-002 |
+| orderId | session |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | Kitchen ticket queue | `ORDER_VIEW` |
+| `setKitchenTicketStatus` | [FnbService](../backend/FnbService.md#setkitchenticketstatus) | onAction | Advance a kitchen ticket | `ORDER_MODIFY` |
+| `chaseStation` | [FnbService](../backend/FnbService.md#chasestation) | onAction | The pass asks a station where an item is | `ORDER_MODIFY` |
+| `markOrderCollected` | [FnbService](../backend/FnbService.md#markordercollected) | onAction | The guest took it | `ORDER_MODIFY` |
+| `printOrderLabel` | [FnbService](../backend/FnbService.md#printorderlabel) | onAction | A label for the bag | `ORDER_VIEW` |
+| `recordOrderHandover` | [FnbService](../backend/FnbService.md#recordorderhandover) | onAction | A runner delivered the order to a location | `ORDER_MODIFY` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | Whole orders, in the server's order. |
+| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
+| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
+| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
+| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_MODIFY` for `setKitchenTicketStatus`, `chaseStation`, `markOrderCollected`, `recordOrderHandover`. |
+| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| KIT-001 | Kitchen Operations Command Center |  |  |
+| KIT-002 | Kitchen Display System (KDS) | ticketId |  |
+
+## KIT-007 Guest Collection, Buzzer & Digital Notification
+
+**Guest Collection, Buzzer & Digital Notification — board 3 of the client F&B design set.**
+
+|  |  |
+|---|---|
+| Module | Kitchen |
+| Wave | 1 |
+| Licensed module | fnb |
+| Route | `/kitchen/guest-collection-buzzer-digital-notification` |
+| Component | `apps/kitchen-display/src/routes/kitchen/GuestCollectionBuzzerDigitalNotifiBoard.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| venueId | session |
+| stationId | session |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | Kitchen ticket queue | `ORDER_VIEW` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | Order numbers under Preparing and Ready for pickup. |
+| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
+| emptyFirstRun | Nothing preparing or ready: the board shows the venue's idle message. |
+| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
+| emptyNoAccess | Never shown on the board: it is an unattended guest display and carries no staff state. |
+| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| KIT-001 | Kitchen Operations Command Center |  |  |
+
+## KIT-008 Exceptions, Re-Fire & Unavailable Items
+
+**Exceptions, Re-Fire & Unavailable Items — board 3 of the client F&B design set.**
+
+|  |  |
+|---|---|
+| Module | Kitchen |
+| Wave | 1 |
+| Licensed module | fnb |
+| Route | `/kitchen/exceptions-re-fire-unavailable-items` |
+| Component | `apps/kitchen-display/src/routes/kitchen/ExceptionsReFireUnavailableItemsBoard.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| venueId | session |
+| stationId | session |
+| itemId | KIT-002 |
+| ticketId | KIT-002 |
+| outletId | session |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | Kitchen ticket queue, filtered by course (audit R277) | `ORDER_VIEW` |
+| `setItemAvailability` | [FnbService](../backend/FnbService.md#setitemavailability) | onAction | Mark an item available or eighty-sixed | `PRODUCT_CONFIGURE` |
+| `getHaccpStatus` | [FnbService](../backend/FnbService.md#gethaccpstatus) | onLoad | getHaccpStatus | `INCIDENT_VIEW` |
+| `list86Events` | [FnbService](../backend/FnbService.md#list86events) | onLoad | What came off the menu today, when, and for how long | `PRODUCT_VIEW` |
+| `logKitchenException` | [FnbService](../backend/FnbService.md#logkitchenexception) | onAction | Something went wrong that is not a refire | `INCIDENT_REPORT` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The rail, oldest ticket first. The count renders before the tickets — a kitchen wants to know how deep it is before it reads anything. |
+| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
+| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
+| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
+| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `PRODUCT_VIEW` gets this state naming `PRODUCT_VIEW`, the screen's `permission` and the one `list86Events`, the population it reads, enforces (`getHaccpStatus` needs `INCIDENT_VIEW` and reaches no component yet, see `gaps`); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_REPORT` for `logKitchenException`; `PRODUCT_CONFIGURE` for `setItemAvailability`. |
+| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| KIT-001 | Kitchen Operations Command Center |  |  |
+
+## KIT-009 SLA, Priority & Service Rules
+
+**SLA, Priority & Service Rules — board 3 of the client F&B design set.**
+
+|  |  |
+|---|---|
+| Module | Kitchen |
+| Wave | 1 |
+| Licensed module | fnb |
+| Route | `/kitchen/sla-priority-service-rules` |
+| Component | `apps/kitchen-display/src/routes/kitchen/SlaPriorityServiceRulesBoard.tsx` |
+| Pattern | configEditor |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| venueId | session |
+| stationId | session |
+| outletId | session |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `setKitchenSla` | [FnbService](../backend/FnbService.md#setkitchensla) | onAction | The outlet's kitchen service-time targets | `PRODUCT_CONFIGURE` |
+| `getKitchenSla` | [FnbService](../backend/FnbService.md#getkitchensla) | onLoad | The targets set now, so the rules editor loads what it changes (CHG-CSA-045) | `PRODUCT_VIEW` |
+| `getCourseRules` | [FnbService](../backend/FnbService.md#getcourserules) | onLoad | How this outlet courses by default, shown beside the targets (CHG-CSA-045) | `PRODUCT_VIEW` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The rail, oldest ticket first. The count renders before the tickets — a kitchen wants to know how deep it is before it reads anything. |
+| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
+| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
+| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. Shown when the caller lacks `PRODUCT_VIEW`, which `getKitchenSla` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `setKitchenSla`. |
+| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| KIT-001 | Kitchen Operations Command Center |  |  |
+
+## KIT-010 Kitchen Performance, AI & Operational Optimization
+
+**Kitchen Performance, AI & Operational Optimization — board 3 of the client F&B design set.**
+
+|  |  |
+|---|---|
+| Module | Kitchen |
+| Wave | 1 |
+| Licensed module | fnb |
+| Route | `/kitchen/kitchen-performance-ai-operational-optimization` |
+| Component | `apps/kitchen-display/src/routes/kitchen/KitchenPerformanceAiOperationalOptBoard.tsx` |
+| Pattern | statusTracker |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| venueId | session |
+| stationId | session |
+| dashboardId | KIT-002 |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getDashboard` | [ReportingService](../backend/ReportingService.md#getdashboard) | onLoad | Read a dashboard with tile data | `REPORT_VIEW_VENUE` |
+| `askReportingQuestion` | [ReportingService](../backend/ReportingService.md#askreportingquestion) | onAction | Natural-language reporting query | `REPORT_VIEW_VENUE` |
+| `recordDashboardView` | [ReportingService](../backend/ReportingService.md#recorddashboardview) | background | Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it. | `REPORT_VIEW_VENUE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | Kitchen and station performance for the period, then the AI analysis. |
+| error | Could not load the performance figures. Names which read failed. |
+| emptyFirstRun | Insufficient data: fewer service days than the analysis needs; says how many more. |
+| emptyNoResults | No service in the chosen period. |
+| emptyNoAccess | Shown when the caller lacks REPORT_VIEW_VENUE, and names it. |
+| offline | Not available offline. `getDashboard` is an analytical read (ADR-0016) and there is nothing local to serve. The rail on KIT-001 is what survives a network loss. Corrected 24 August: the earlier wording described the kitchen rather than this screen, and a checker cannot tell those apart from prose. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| KIT-001 | Kitchen Operations Command Center |  |  |
 
 ## POS-000 Sign In
 
@@ -92,7 +574,7 @@
 |---|---|---|---|---|
 | `changeOwnCredential` | [IdentityService](../backend/IdentityService.md#changeowncredential) | onAction | Replace a temporary PIN or password at first sign-in | `None` |
 | `login` | [IdentityService](../backend/IdentityService.md#login) | onAction | Authenticate the operator at this terminal | `None` |
-| `listActiveSessions` | [IdentityService](../backend/IdentityService.md#listactivesessions) | onLoad | Who holds this till now | `SESSION_FORCE_LOGOUT` |
+| `listActiveSessions` | [IdentityService](../backend/IdentityService.md#listactivesessions) | onAction | Who holds this till now, read only after a supervisor's PIN step-up: nobody is signed in at the door (decided by Chinmay, 3 October 2026 (CHG-SPF-012)) | `SESSION_FORCE_LOGOUT` |
 | `forceLogout` | [IdentityService](../backend/IdentityService.md#forcelogout) | onAction | A supervisor ends the session of the operator holding the till, after login was refused 409 (audit R184) | `SESSION_FORCE_LOGOUT` |
 | `selectRole` | [IdentityService](../backend/IdentityService.md#selectrole) | onAction | Choose which role to work as when login returns more than one | `None` |
 | `getCurrentSession` | [IdentityService](../backend/IdentityService.md#getcurrentsession) | onAction | Read the session the login just created | `None` |
@@ -159,7 +641,7 @@
 | error | Could not load. Names which read failed and leaves the begin shift untouched. |
 | emptyFirstRun | Nothing is waiting, which is the good outcome. An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
 | emptyNoResults | Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires to show this screen, and names that permission (the screen's other reads need `DEVICE_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `SHIFT_APPROVE_OPEN` for `approveShiftOpen`. |
 | offline | Cannot open offline. `openShift` is online only (F32; audit R257): an opening float declared offline is one nobody can reconcile against the safe. Says so and keeps the count on screen until the link returns (design-notes correction fnb-retail POS-001). |
 | denied | Sign-in succeeds and the shift will not open — the operator's role does not hold `sale.create` on this terminal. The float count is kept, not discarded, and a supervisor can open the shift against the same count. |
 
@@ -256,7 +738,7 @@
 | error | Could not load. Names which read failed and leaves the sell ticket catalogue untouched. |
 | emptyFirstRun | No sell ticket catalogue yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing. |
 | emptyNoResults | Nothing matches the filter on venueId, kind, isSellable and the sell ticket catalogue are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW`, `PRICE_VIEW`, `SCOPE_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_REQUEST` for `createApprovalRequest`; `APPROVAL_VIEW` for `evaluateApprovalRequirement`; `GUEST_VIEW` for `getGuestLoyalty`, `identifyGuest`; `LOYALTY_REDEEM` for `redeemLoyaltyPoints`; `ORDER_CREATE` for `createOrder`, `createPayment`, `issueGameCard`, `createRetailSale`; `ORDER_DISCOUNT` for `applyManualDiscount`. |
 | offline | Served from the local catalogue bundle (ADR-0013). One read path, always local — the terminal does not know whether it has a network. |
 | denied | The catalogue reads normally and Charge is refused without `payment.take`. The cart is held, not cleared, so a permitted operator can complete the same sale. |
 
@@ -271,15 +753,15 @@
 | POS-013 | Offline sales and sync |  |  |
 | POS-007 | Close Shift |  |  |
 | POS-010 | Add to Existing Ticket | orderId |  |
-| POS-020 | Shift Exceptions & Alerts |  |  |
+| POS-020 | Shift Exceptions & Alerts | requestId |  |
 | POS-008 | Reports |  |  |
 | POS-030 | History | orderId |  |
 | POS-031 | Reserve | cartId |  |
 | POS-018 | A guest wants cash back and the drawer is heavy |  |  |
-| POS-011 | Three days later the guest returns one item | orderId, outletId |  |
 | BO-045 | The new price is wrong on eleven items |  |  |
-| BO-084 | The manager sees it in their inbox | approvalRequestId |  |
 | BO-133 | The venue's offline exposure crosses a ceiling |  |  |
+| POS-011 | Three days later the guest returns one item | orderId, outletId |  |
+| BO-084 | The manager sees it in their inbox | approvalRequestId, requestId |  |
 | GST-011 | Checks the card's balance in the app's wallet | cardCode, walletId |  |
 
 ## POS-003 Sell — Timed Entry
@@ -323,7 +805,7 @@
 | error | Could not load. Names which read failed and leaves the sell timed entry untouched. |
 | emptyFirstRun | No sell timed entry yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | emptyNoResults | Never shown: `listProductVariants` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getAvailability` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `acquireInventoryHold`. |
 | offline | Availability is never served from the bundle. A lease is acquired against the server; without one the terminal sells only from its allocated lease and refuses beyond it (ADR-0013) |
 | denied | Session and date selection are readable; adding to a sale needs `payment.take` to complete. The hold is not taken until the sale can be charged. |
 
@@ -333,8 +815,61 @@
 |---|---|---|---|
 | POS-002 | Back | productId |  |
 | POS-005 | Add to sale, then charge |  | payment.take |
-| POS-004 | Sell — Seat Map | performanceId |  |
+| POS-004 | Sell — Seat Map | holdId, performanceId |  |
 | POS-006 | Held Orders |  |  |
+
+## POS-004 Sell — Seat Map
+
+**Choose specific seats for a seated event.**
+
+|  |  |
+|---|---|
+| Module | Sell |
+| Wave | 1 |
+| Licensed module | seating |
+| Route | `/sell/sell-seat-map` |
+| Component | `apps/venue-pos/src/routes/sell/SellSeatMapCanvas.tsx` |
+| Pattern | statusTracker |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| holdId | deepLink |
+| performanceId | deepLink |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `getSeatAvailability` | [CatalogueService](../backend/CatalogueService.md#getseatavailability) | onLoad | Seat status | `PRODUCT_VIEW` |
+| `createSeatHold` | [CatalogueService](../backend/CatalogueService.md#createseathold) | onAction | Hold on selection | `ORDER_CREATE` |
+| `getPerformance` | [CatalogueService](../backend/CatalogueService.md#getperformance) | onLoad | Read a performance | `PRODUCT_VIEW` |
+| `getSeatHold` | [CatalogueService](../backend/CatalogueService.md#getseathold) | onLoad | Read a hold | `ORDER_VIEW` |
+| `relinquishSeatHold` | [CatalogueService](../backend/CatalogueService.md#relinquishseathold) | onAction | Release a hold | `ORDER_CREATE` |
+| `createOrder` | [OrderService](../backend/OrderService.md#createorder) | onAction | Create an order | `ORDER_CREATE` |
+| `createPayment` | [OrderService](../backend/OrderService.md#createpayment) | onAction | Take a payment against an order | `ORDER_CREATE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The sell seat map, read by `getSeatAvailability`. |
+| error | Could not load. Names which read failed and leaves the sell seat map untouched. |
+| emptyFirstRun | No sell seat map yet. Offers Create seat hold (`createSeatHold`). |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getSeatAvailability` requires to show this screen, and names that permission (the screen's other reads need `ORDER_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createSeatHold`, `relinquishSeatHold`, `createOrder`, `createPayment`. |
+| offline | Not available offline. Seat holds require the primary; two terminals selling the same seat is unrecoverable |
+| denied | Seats can be viewed but not held without `payment.take` — an unchargeable hold takes capacity off sale for eight minutes and returns it unsold. |
+| zoneUnavailable | The zone sold out while the cashier was choosing. The board refuses the zone rather than the sale — the seat map reloads with that zone struck out and the cart intact. |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| POS-002 | Back | orderId |  |
+| POS-005 | Add seats to sale, then charge | paymentId | payment.take |
+| POS-003 | Sell — Timed Entry |  |  |
+| POS-006 | Held Orders | orderId |  |
 
 ## POS-005 Payment
 
@@ -382,7 +917,7 @@
 | error | Could not load. Names which read failed and leaves the payment untouched. |
 | emptyFirstRun | No payment yet. Offers Create payment (`createPayment`); distinct from a filter that matched nothing. |
 | emptyNoResults | Never shown: the payment screen completes one sale and has no list filter. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getRetailSale` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listRetailSales` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_MANAGE` for `enrolFaceTag`; `LOYALTY_REDEEM` for `redeemLoyaltyPoints`; `ORDER_CREATE` for `createPayment`, `inquirePaymentStatus`, `capturePayment`, `createRetailSale` and 2 more; `ORDER_MODIFY` for `addTip`; `ORDER_REPRINT` for `reprintReceipt`. |
 | offline | Cash completes locally and journals. Card does not — an offline card approval the acquirer never saw is a sale that vanishes at settlement |
 
 **Goes to**
@@ -395,8 +930,8 @@
 | POS-022 | Charged — back to the pass, where the order already sent to the kitchen is handed over (send to kitchen, then charge; audit R261) | orderId |  |
 | KIT-002 | The kitchen makes it and bumps it |  |  |
 | POS-026 | Receipt | entitlementId, orderId, saleId |  |
-| POS-010 | The guest asks to add a locker to the ticket they just bought | orderId |  |
 | GST-062 | Guest tracks it in the app |  |  |
+| POS-010 | The guest asks to add a locker to the ticket they just bought | orderId |  |
 
 ## POS-006 Held Orders
 
@@ -444,7 +979,7 @@
 | error | Could not load. Names which read failed and leaves the held orders untouched. |
 | emptyFirstRun | No held orders yet. Offers Create order (`createOrder`); distinct from a filter that matched nothing. |
 | emptyNoResults | Nothing on this terminal matches the search; the holds are still there. Clear the search. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createOrder`; `ORDER_DISCOUNT` for `applyManualDiscount`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_MODIFY` for `resumeOrder`, `holdOrder`, `modifyOrder`; `ORDER_REFUND` for `createRefund`; `ORDER_REPRINT` for `reprintOrder`. |
 | offline | Orders held at this terminal are listed. Those held elsewhere are not — resuming another till's sale needs the server |
 | denied | Held sales are listed and cannot be recalled without `sale.resume`. The list is still shown, because a cashier who cannot see the held sale fetches a supervisor to the wrong screen. |
 
@@ -497,7 +1032,7 @@
 | error | Could not load. Names which read failed and leaves the close shift untouched. |
 | emptyFirstRun | Nothing is waiting, which is the good outcome. An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
 | emptyNoResults | Never shown: `listCashMovements` takes no filter, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_WORKSTATION` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT` for `acceptShiftVariance`, `rejectShiftVariance`; `SHIFT_CLOSE` for `submitShiftCount`, `closeShift`. |
 | offline | Cannot close. Closing requires the server total, and a locally computed variance is not a variance |
 | denied | `acceptShiftVariance` was refused: the caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is. The shift stays `pendingVariance` against the same count, and a supervisor accepts it on this till (audit R080 (e)). |
 | pendingVariance | Counted; "Under review". `submitShiftCount` answered `referredToSupervisor`. The cashier sees "Under review" and no amount, and may sign out: the shift waits, and the next cashier opens a shift on this till meanwhile (it never blocks the next one). A supervisor resolves it with their PIN on this till or any till of the venue (accept the variance, ask for a recount, or close it with `closeShift`), or in the daily cash reconciliation, which lists every shift of the day and resolves them one by one (decided 2 October 2026, Chinmay, batch 3 #1 and pre-apply round; DEC-059, DEC-173; CHG-CSP-012; CHG-FIN-003; audit R080 (e)). |
@@ -511,6 +1046,98 @@
 | POS-008 | The day is reported |  |  |
 | BO-024 | The supervisor reviews the shift and the deposit reconciles |  |  |
 | POS-009 | Staff Roster |  |  |
+
+## POS-008 Reports
+
+**See how the day is going from the terminal.**
+
+|  |  |
+|---|---|
+| Module | Reports |
+| Wave | 1 |
+| Licensed module | analytics |
+| Route | `/reports/reports` |
+| Component | `apps/venue-pos/src/routes/reports/ReportsDashboard.tsx` |
+| Pattern | listDetail |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| conversationId | deepLink |
+| reportId | deepLink |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `runReport` | [ReportingService](../backend/ReportingService.md#runreport) | onAction | Terminal day view -- runs the seeded report terminalDayView (audit R282) | `REPORT_VIEW_VENUE` |
+| `askReportingQuestion` | [ReportingService](../backend/ReportingService.md#askreportingquestion) | onAction | Natural-language reporting query | `REPORT_VIEW_VENUE` |
+| `getReport` | [ReportingService](../backend/ReportingService.md#getreport) | onAction | Read a report definition | `REPORT_VIEW_VENUE` |
+| `listReports` | [ReportingService](../backend/ReportingService.md#listreports) | onLoad | List available report definitions | `REPORT_VIEW_VENUE` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The reports list. |
+| error | Could not load. Names which read failed and leaves the reports untouched. |
+| emptyFirstRun | No reports yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
+| emptyNoResults | Nothing matches the filter on category, search and the reports are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller holds neither REPORT_VIEW_OWN (a cashier's own figures) nor REPORT_VIEW_WORKSTATION (this terminal's, for a supervisor), and names them. Never the venue-wide report permission: a till shows the person's or the terminal's day. |
+| offline | Not available. Reporting reads the analytical replica (ADR-0016) and a terminal-local figure would disagree with the back office |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| POS-009 | Staffing against takings is read |  |  |
+
+## POS-009 Staff Roster
+
+**See who is on duty and on which terminal.**
+
+|  |  |
+|---|---|
+| Module | Shift |
+| Wave | 1 |
+| Licensed module | core |
+| Route | `/sell/staff-roster` |
+| Component | `apps/venue-pos/src/routes/sell/StaffRosterBoard.tsx` |
+| Pattern | approvalInbox |
+
+**Entry parameters**
+
+| Parameter | From |
+|---|---|
+| shiftId | session |
+
+**Operations**
+
+| Operation | Service | When | Purpose | Permission |
+|---|---|---|---|---|
+| `listShifts` | [OrderService](../backend/OrderService.md#listshifts) | onLoad | Open shifts at this venue | `REPORT_VIEW_WORKSTATION` |
+| `listRotaAssignments` | [TenancyService](../backend/TenancyService.md#listrotaassignments) | onLoad | The rota | `WORKFORCE_VIEW` |
+| `recordAttendance` | [TenancyService](../backend/TenancyService.md#recordattendance) | onAction | Clock in or out, or start or end a break | `ATTENDANCE_RECORD` |
+
+**States**
+
+| State | Behaviour |
+|---|---|
+| loading | The staff roster list. |
+| error | Could not load. Names which read failed and leaves the staff roster untouched. |
+| emptyFirstRun | Nothing is waiting, which is the good outcome. An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
+| emptyNoResults | Nothing matches the filter on workstationId, status, openedFrom, openedTo and the staff roster are still there. Names the active filter and offers to clear it. |
+| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires to show this screen, and names that permission (the screen's other reads need `WORKFORCE_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ATTENDANCE_RECORD` for `recordAttendance`. |
+| offline | Last known roster, with its age shown |
+
+**Goes to**
+
+| To | Trigger | Carries | Guard |
+|---|---|---|---|
+| POS-001 | Begin Shift | shiftId |  |
+| POS-007 | Close Shift |  |  |
+| BO-043 | The daily cash reconciliation lists every shift of the day and resolves the ones still under review, one by… |  |  |
 
 ## POS-010 Add to Existing Ticket
 
@@ -551,7 +1178,7 @@
 | loading | The add existing ticket, read by `getMediaEntitlements`. |
 | error | Could not load. Names which read failed and leaves the add existing ticket untouched. |
 | emptyFirstRun | No add existing ticket yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getMediaEntitlements` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `ASSET_LIBRARY_VIEW`, which `getMediaAsset` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `appendEntitlementToMedia`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_VIEW` for `getMediaEntitlements`. |
 | offline | Not available. The entitlement set must be read live; appending to a stale picture double-sells a locker |
 
 **Goes to**
@@ -606,7 +1233,7 @@
 | error | Could not load. Names which read failed and leaves the returns refunds exchanges untouched. |
 | emptyFirstRun | No returns refunds exchanges yet. Offers Create refund (`createRefund`); distinct from a filter that matched nothing. |
 | emptyNoResults | Nothing matches the filter on includeInactive and the returns refunds exchanges are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `getReturnPolicy` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `listSerialisedItems` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_POST` for `issueCreditMemo`; `ORDER_EXCHANGE` for `exchangeOrderLines`; `ORDER_REFUND` for `createRefund`, `createRetailReturn`; `ORDER_VIEW` for `getReturnPolicy`, `lookupRetailSale`. |
 | offline | Refunds and returns are refused offline (F58 step 8; design-notes correction fnb-retail POS-011). The till keeps selling from the local journal; a refund needs the original sale and its payment, which only the server holds. Says so and offers to try again when the link returns. |
 
 **Goes to**
@@ -658,7 +1285,7 @@
 | error | Could not load. Names which read failed and leaves the omnichannel order fulfilment untouched. |
 | emptyFirstRun | No omnichannel order fulfilment yet. Offers Record order handover (`recordOrderHandover`); distinct from a filter that matched nothing. |
 | emptyNoResults | Nothing matches the filter on venueId, principalId, shiftId, status, createdFrom, createdTo and the omnichannel order fulfilment are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission (the screen's other reads need `SHIFT_OPEN` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `reserveMerchandise`; `ORDER_MODIFY` for `recordOrderHandover`, `collectShopAndDrop`. |
 | offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
 
 **Goes to**
@@ -704,7 +1331,7 @@
 | error | Could not load. Names which read failed and leaves the mobile pos event untouched. |
 | emptyFirstRun | No mobile pos event yet. Offers Create order (`createOrder`). |
 | emptyNoResults | Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `syncOrders`, `createOrder`. |
 | offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
 | denied | The sync queue is readable by anyone on shift. Resolving a conflict changes stock and needs `inventory.conflict.resolve`; a supervisor PIN unlocks it in place. |
 
@@ -715,7 +1342,7 @@
 | POS-002 | Back to sale | orderId, promotionId |  |
 | POS-020 | Open a queued transaction that needs attention | shiftId | inventory.conflict.resolve |
 | POS-007 | Close Shift |  |  |
-| BO-130 | Four transactions are rejected — a product retired while the till was offline |  |  |
+| BO-130 | Four transactions are rejected — a product retired while the till was offline | rejectionId |  |
 
 ## POS-014 Sales Exceptions, Controls & Operational Actions
 
@@ -806,7 +1433,7 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | POS-001 | Begin Shift | shiftId |  |
-| POS-018 | Safe drop destinations are allocated | shiftId |  |
+| POS-018 | Safe drop destinations are allocated | boxId, shiftId |  |
 
 ## POS-016 Till Configuration
 
@@ -844,7 +1471,7 @@
 | loading | The saved till. |
 | error | Could not load. Names which read failed and leaves the till untouched. |
 | emptyFirstRun | No till configured. The form opens empty and `allocateDepositBox` saves the first one; it says what the platform does in the meantime. |
-| emptyNoAccess | Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `DEVICE_VIEW`, which `listDevices` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVICE_MANAGE` for `setDeviceAssignment`; `SHIFT_OPEN` for `allocateDepositBox`; `WORKSTATION_CONFIGURE` for `configureWorkstation`. |
 | offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
 
 **Goes to**
@@ -933,7 +1560,7 @@
 | error | Could not load. Names which read failed and leaves the safe drop cash untouched. |
 | emptyFirstRun | No safe drop cash yet. Offers Create cash movement (`createCashMovement`); distinct from a filter that matched nothing. |
 | emptyNoResults | Nothing matches the filter on scopePath, isActive and the safe drop cash are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `SHIFT_OPEN`, which `listDepositBoxes` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASH_LIFT` for `createCashMovement`, `withdrawFromDepositBox`. |
 | offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
 
 **Goes to**
@@ -979,7 +1606,7 @@
 | error | Could not load. Names which read failed and leaves the shift templates policies untouched. |
 | emptyFirstRun | No shift templates policies yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
 | emptyNoResults | Nothing matches the filter on workstationId, status, openedFrom, openedTo and the shift templates policies are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires to show this screen, and names that permission (the screen's other reads need `SCOPE_VIEW` and say so in their own panels). Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `WORKSTATION_CONFIGURE` for `setTillShiftPolicy`. |
 | offline | Working from the local journal. The till keeps taking money; this reconciles on sync. |
 
 **Goes to**
@@ -1029,7 +1656,7 @@
 | error | Could not load. Names which read failed and leaves the shift exceptions alerts untouched. |
 | emptyFirstRun | Nothing is waiting, which is the good outcome. An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
 | emptyNoResults | Nothing matches the filter on status, severity, workstationId, shiftId, itemId and the shift exceptions alerts are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listAlerts` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_DECIDE` for `decideApprovalRequest`; `APPROVAL_REQUEST` for `createApprovalRequest`; `CASH_NO_SALE` for `recordNoSale`. |
 | offline | The till keeps taking money; this screen does not keep showing alerts. `listAlerts` reads the analytical replica (ADR-0016) and there is nothing local to read — the offline trading happens on POS-002 and POS-013, and this monitor goes quiet until the network returns. Corrected 24 August: the prose claimed continued function the wiring cannot deliver. |
 
 **Goes to**
@@ -1131,7 +1758,7 @@
 | error | Could not load. Names which read failed and leaves the send kitchen untouched. |
 | emptyFirstRun | No send kitchen yet. Offers Create F&B order (`createFnbOrder`); distinct from a filter that matched nothing. |
 | emptyNoResults | Nothing matches the filter on stationId, status and the send kitchen are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listKitchenTickets` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listKitchenTickets` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CREATE` for `createFnbOrder`; `ORDER_MODIFY` for `setKitchenTicketStatus`, `markOrderCollected`, `cancelFnbOrder`. |
 | offline | Queued locally and sent on reconnect. The kitchen display is on the same LAN, so a venue-wide outage stops both and a device outage stops neither. |
 | denied | The rail is readable and Send to kitchen is refused without `payment.take`. Tickets already fired are unaffected. |
 
@@ -1332,7 +1959,7 @@
 | `reissueEntitlement` | [OrderService](../backend/OrderService.md#reissueentitlement) | onAction | Reissue the ticket or wristband | `ORDER_EXCHANGE` |
 | `issueTaxInvoice` | [LedgerService](../backend/LedgerService.md#issuetaxinvoice) | onAction | Issue a tax invoice | `LEDGER_POST` |
 | `getTaxInvoice` | [LedgerService](../backend/LedgerService.md#gettaxinvoice) | onLoad | Show a tax invoice | `LEDGER_VIEW` |
-| `getTaxDocumentRendition` | [LedgerService](../backend/LedgerService.md#gettaxdocumentrendition) | onLoad | Download the invoice / credit memo PDF | `LEDGER_VIEW` |
+| `getTaxDocumentRendition` | [LedgerService](../backend/LedgerService.md#gettaxdocumentrendition) | onAction | Download the invoice / credit memo PDF | `LEDGER_VIEW` |
 
 **States**
 
@@ -1498,7 +2125,7 @@
 | To | Trigger | Carries | Guard |
 |---|---|---|---|
 | POS-025 | Till Home |  |  |
-| POS-022 | Send to Kitchen | orderId |  |
+| POS-022 | Send to Kitchen | orderId, ticketId |  |
 
 ## POS-030 Sales Journal
 
@@ -1545,7 +2172,7 @@
 | error | Could not load the journal. Names which read failed and keeps the filters as they were. |
 | emptyFirstRun | No sales on this terminal today yet. Says so plainly; the journal fills as sales are made. |
 | emptyNoResults | Nothing matches the filter on terminal, day, customer, payment method or status, and the till's sales are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires, and names that permission. Never an empty table — that reads as *there is no data*. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listOrders` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `GUEST_VIEW` for `searchGuests`; `LEDGER_POST` for `issueTaxInvoice`; `LEDGER_VIEW` for `getTaxDocumentRendition`; `ORDER_REPRINT` for `reprintReceipt`, `reprintOrder`. |
 | denied | Another terminal's or another cashier's sales need `ORDER_VIEW_OTHER`. This terminal's own sales are still listed; the filter names what is withheld. |
 | offline | Orders taken on this terminal are listed from the local journal; other terminals, the customer search and tax invoices need the network. Reprint works offline (`reprintOrder`). |
 
@@ -1603,7 +2230,7 @@
 | error | Could not load. Names which read failed and leaves the reservations untouched. |
 | emptyFirstRun | No reservations held and no groups due today. Offers New reservation (`createReservation`). |
 | emptyNoResults | Nothing matches the status or expiry filter, and the reservations are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listReservations` requires, and names that permission. Never an empty table. |
+| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, which `listReservations` requires to show this screen, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ORDER_CANCEL` for `cancelReservation`; `ORDER_CREATE` for `createReservation`, `extendReservation`, `convertReservation`; `ORDER_MODIFY` for `recordGroupCheckIn`. |
 | denied | Reservations are listed; New reservation, Take payment and Extend need `ORDER_CREATE`, Cancel needs `ORDER_CANCEL` and the check-in `ORDER_MODIFY`. The list is still shown, so the cashier can fetch a supervisor to the right reservation. |
 | offline | Reservations need the network: a hold is capacity, and only the server knows what is left. Offline the screen says so and sells nothing from here. |
 
@@ -1613,632 +2240,3 @@
 |---|---|---|---|
 | POS-025 | Till Home |  |  |
 | POS-005 | Take payment | orderId | ORDER_CREATE |
-
-## KIT-001 Kitchen Operations Command Center
-
-**Kitchen Operations Command Center — board 3 of the client F&B design set.**
-
-|  |  |
-|---|---|
-| Module | Kitchen |
-| Wave | 2 |
-| Licensed module | fnb |
-| Route | `/kitchen/kitchen-operations-command-center` |
-| Component | `apps/kitchen-display/src/routes/kitchen/KitchenOperationsCommandCenterBoard.tsx` |
-| Pattern | commandCentre |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| venueId | session |
-| stationId | session |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | Kitchen ticket queue | `ORDER_VIEW` |
-| `listKitchenStations` | [FnbService](../backend/FnbService.md#listkitchenstations) | onLoad | List preparation stations and their routing | `PRODUCT_VIEW` |
-| `listFnbOrders` | [FnbService](../backend/FnbService.md#listfnborders) | onLoad | List F&B orders | `ORDER_VIEW` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | Every station's load, then the tickets, in the server's order. |
-| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
-| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
-| emptyNoResults | Nothing matches the station chips; the kitchen is not empty. |
-| emptyNoAccess | Shown when the caller lacks `ORDER_VIEW`, the screen's permission, and names it. The command centre is not tied to one station, so it never says "not assigned to a station". |
-| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| KIT-002 | Kitchen Display System (KDS) |  |  |
-| KIT-003 | Order Firing & Course Management |  |  |
-| KIT-004 | Active Order Management & Fulfilment Journey | orderId |  |
-| KIT-005 | Kitchen Station Workload & Dynamic Routing |  |  |
-| KIT-006 | Expeditor & Order Assembly |  |  |
-| KIT-007 | Guest Collection, Buzzer & Digital Notification | orderId |  |
-| KIT-008 | Exceptions, Re-Fire & Unavailable Items |  |  |
-| KIT-009 | SLA, Priority & Service Rules |  |  |
-| KIT-010 | Kitchen Performance, AI & Operational Optimization |  |  |
-
-## KIT-002 Kitchen Display System (KDS)
-
-**Kitchen Display System (KDS) — board 3 of the client F&B design set.**
-
-|  |  |
-|---|---|
-| Module | Kitchen |
-| Wave | 2 |
-| Licensed module | fnb |
-| Route | `/kitchen/kitchen-display-system-kds` |
-| Component | `apps/kitchen-display/src/routes/kitchen/KitchenDisplaySystemKdsBoard.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| venueId | session |
-| stationId | session |
-| ticketId | KIT-002 |
-| visitId | deepLink |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | Kitchen ticket queue | `ORDER_VIEW` |
-| `setKitchenTicketStatus` | [FnbService](../backend/FnbService.md#setkitchenticketstatus) | onAction | Advance a kitchen ticket | `ORDER_MODIFY` |
-| `refireItem` | [FnbService](../backend/FnbService.md#refireitem) | onAction | Make it again | `ORDER_MODIFY` |
-| `recallKitchenTicket` | [FnbService](../backend/FnbService.md#recallkitchenticket) | onAction | Bring back a ticket that was bumped by mistake | `ORDER_MODIFY` |
-| `notifyServer` | [FnbService](../backend/FnbService.md#notifyserver) | onAction | The kitchen calls the server to the pass | `ORDER_MODIFY` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The rail. The count renders before the tickets. The server's order, never re-sorted on the device (`listKitchenTickets` orders by priority weights; design-notes correction fnb-retail): no "oldest first" and no "promise time" sort of its own. |
-| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
-| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
-| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
-| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| KIT-001 | Kitchen Operations Command Center |  |  |
-| KIT-003 | Order Firing & Course Management | ticketId |  |
-| EMP-058 | Starters cleared | ticketId, visitId |  |
-| EMP-059 | The server comps the delayed dish | visitId |  |
-| POS-022 | The guest is called and takes it | orderId, ticketId |  |
-
-## KIT-003 Order Firing & Course Management
-
-**Order Firing & Course Management — board 3 of the client F&B design set.**
-
-|  |  |
-|---|---|
-| Module | Kitchen |
-| Wave | 2 |
-| Licensed module | fnb |
-| Route | `/kitchen/order-firing-course-management` |
-| Component | `apps/kitchen-display/src/routes/kitchen/OrderFiringCourseManagementBoard.tsx` |
-| Pattern | configEditor |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| venueId | session |
-| stationId | session |
-| ticketId | KIT-002 |
-| outletId | session |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | Kitchen ticket queue, filtered by course (audit R277) | `ORDER_VIEW` |
-| `setKitchenTicketStatus` | [FnbService](../backend/FnbService.md#setkitchenticketstatus) | onAction | Advance a kitchen ticket | `ORDER_MODIFY` |
-| `prioritiseKitchenTicket` | [FnbService](../backend/FnbService.md#prioritisekitchenticket) | onAction | Move a ticket up the queue | `ORDER_MODIFY` |
-| `fireCourse` | [FnbService](../backend/FnbService.md#firecourse) | onAction | Send a held course to the pass | `ORDER_MODIFY` |
-| `holdCourse` | [FnbService](../backend/FnbService.md#holdcourse) | onAction | Stop a course going out | `ORDER_MODIFY` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The rail, oldest ticket first. The count renders before the tickets — a kitchen wants to know how deep it is before it reads anything. |
-| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
-| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
-| emptyNoResults | Nothing matches this course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic (audit R277). |
-| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `ORDER_MODIFY` gets this state naming `ORDER_MODIFY`, the screen's `permission` and the one its fire, hold, status and prioritise actions need (the screen has no read); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
-| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| KIT-001 | Kitchen Operations Command Center |  |  |
-| KIT-004 | Active Order Management & Fulfilment Journey | orderId |  |
-
-## KIT-004 Active Order Management & Fulfilment Journey
-
-**Follow one order from the till to the pass and out to the guest.**
-
-|  |  |
-|---|---|
-| Module | Kitchen |
-| Wave | 2 |
-| Licensed module | fnb |
-| Route | `/kitchen/active-order-management-fulfilment-journey` |
-| Component | `apps/kitchen-display/src/routes/kitchen/ActiveOrderManagementFulfilmentJouBoard.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| venueId | session |
-| stationId | session |
-| orderId | KIT-002 |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | Kitchen ticket queue | `ORDER_VIEW` |
-| `getFnbOrder` | [FnbService](../backend/FnbService.md#getfnborder) | onLoad | Read an F&B order | `ORDER_VIEW` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The order, then its tickets at each station. |
-| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
-| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
-| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| emptyNoAccess | Shown when the caller lacks ORDER_VIEW for this outlet, and names it. |
-| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| KIT-001 | Kitchen Operations Command Center |  |  |
-| KIT-008 | Exceptions, Re-Fire & Unavailable Items |  |  |
-
-## KIT-005 Kitchen Station Workload & Dynamic Routing
-
-**Kitchen Station Workload & Dynamic Routing — board 3 of the client F&B design set.**
-
-|  |  |
-|---|---|
-| Module | Kitchen |
-| Wave | 2 |
-| Licensed module | fnb |
-| Route | `/kitchen/kitchen-station-workload-dynamic-routing` |
-| Component | `apps/kitchen-display/src/routes/kitchen/KitchenStationWorkloadDynamicRoutiBoard.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| venueId | session |
-| stationId | session |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | Kitchen ticket queue, filtered by course (audit R277) | `ORDER_VIEW` |
-| `listKitchenStations` | [FnbService](../backend/FnbService.md#listkitchenstations) | onLoad | List preparation stations and their routing | `PRODUCT_VIEW` |
-| `rebalanceStationLoad` | [FnbService](../backend/FnbService.md#rebalancestationload) | onAction | Move work between stations mid-service | `PRODUCT_CONFIGURE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The rail, oldest ticket first. The count renders before the tickets — a kitchen wants to know how deep it is before it reads anything. |
-| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
-| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
-| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `PRODUCT_VIEW` gets this state naming `PRODUCT_VIEW`, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
-| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| KIT-001 | Kitchen Operations Command Center |  |  |
-
-## KIT-006 Expeditor & Order Assembly
-
-**Expeditor & Order Assembly — board 3 of the client F&B design set.**
-
-|  |  |
-|---|---|
-| Module | Kitchen |
-| Wave | 2 |
-| Licensed module | fnb |
-| Route | `/kitchen/expeditor-order-assembly` |
-| Component | `apps/kitchen-display/src/routes/kitchen/ExpeditorOrderAssemblyBoard.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| venueId | session |
-| stationId | session |
-| ticketId | KIT-002 |
-| orderId | session |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | Kitchen ticket queue | `ORDER_VIEW` |
-| `setKitchenTicketStatus` | [FnbService](../backend/FnbService.md#setkitchenticketstatus) | onAction | Advance a kitchen ticket | `ORDER_MODIFY` |
-| `chaseStation` | [FnbService](../backend/FnbService.md#chasestation) | onAction | The pass asks a station where an item is | `ORDER_MODIFY` |
-| `markOrderCollected` | [FnbService](../backend/FnbService.md#markordercollected) | onAction | The guest took it | `ORDER_MODIFY` |
-| `printOrderLabel` | [FnbService](../backend/FnbService.md#printorderlabel) | onAction | A label for the bag | `ORDER_VIEW` |
-| `recordOrderHandover` | [FnbService](../backend/FnbService.md#recordorderhandover) | onAction | A runner delivered the order to a location | `ORDER_MODIFY` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | Whole orders, in the server's order. |
-| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
-| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
-| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `ORDER_VIEW` gets this state naming `ORDER_VIEW`, the screen's `permission` and the one its read enforces; a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
-| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| KIT-001 | Kitchen Operations Command Center |  |  |
-| KIT-002 | Kitchen Display System (KDS) | ticketId |  |
-
-## KIT-007 Guest Collection, Buzzer & Digital Notification
-
-**Guest Collection, Buzzer & Digital Notification — board 3 of the client F&B design set.**
-
-|  |  |
-|---|---|
-| Module | Kitchen |
-| Wave | 2 |
-| Licensed module | fnb |
-| Route | `/kitchen/guest-collection-buzzer-digital-notification` |
-| Component | `apps/kitchen-display/src/routes/kitchen/GuestCollectionBuzzerDigitalNotifiBoard.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| venueId | session |
-| stationId | session |
-| orderId | KIT-002 |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | Kitchen ticket queue | `ORDER_VIEW` |
-| `recordOrderHandover` | [FnbService](../backend/FnbService.md#recordorderhandover) | onAction | Record that an order reached the guest | `ORDER_MODIFY` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | Order numbers under Preparing and Ready for pickup. |
-| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
-| emptyFirstRun | Nothing preparing or ready: the board shows the venue's idle message. |
-| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| emptyNoAccess | Never shown on the board: it is an unattended guest display and carries no staff state. |
-| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| KIT-001 | Kitchen Operations Command Center |  |  |
-
-## KIT-008 Exceptions, Re-Fire & Unavailable Items
-
-**Exceptions, Re-Fire & Unavailable Items — board 3 of the client F&B design set.**
-
-|  |  |
-|---|---|
-| Module | Kitchen |
-| Wave | 2 |
-| Licensed module | fnb |
-| Route | `/kitchen/exceptions-re-fire-unavailable-items` |
-| Component | `apps/kitchen-display/src/routes/kitchen/ExceptionsReFireUnavailableItemsBoard.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| venueId | session |
-| stationId | session |
-| itemId | KIT-002 |
-| ticketId | KIT-002 |
-| outletId | session |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listKitchenTickets` | [FnbService](../backend/FnbService.md#listkitchentickets) | onLoad | Kitchen ticket queue, filtered by course (audit R277) | `ORDER_VIEW` |
-| `setItemAvailability` | [FnbService](../backend/FnbService.md#setitemavailability) | onAction | Mark an item available or eighty-sixed | `PRODUCT_CONFIGURE` |
-| `getHaccpStatus` | [FnbService](../backend/FnbService.md#gethaccpstatus) | onLoad | getHaccpStatus | `INCIDENT_VIEW` |
-| `list86Events` | [FnbService](../backend/FnbService.md#list86events) | onLoad | What came off the menu today, when, and for how long | `PRODUCT_VIEW` |
-| `logKitchenException` | [FnbService](../backend/FnbService.md#logkitchenexception) | onAction | Something went wrong that is not a refire | `INCIDENT_REPORT` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The rail, oldest ticket first. The count renders before the tickets — a kitchen wants to know how deep it is before it reads anything. |
-| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
-| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
-| emptyNoResults | Nothing matches this station or course filter. The rail is not empty — the filter is narrow, and on a kitchen screen that distinction is the difference between calm and panic. |
-| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `PRODUCT_VIEW` gets this state naming `PRODUCT_VIEW`, the screen's `permission` and the one `list86Events`, the population it reads, enforces (`getHaccpStatus` needs `INCIDENT_VIEW` and reaches no component yet, see `gaps`); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
-| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| KIT-001 | Kitchen Operations Command Center |  |  |
-
-## KIT-009 SLA, Priority & Service Rules
-
-**SLA, Priority & Service Rules — board 3 of the client F&B design set.**
-
-|  |  |
-|---|---|
-| Module | Kitchen |
-| Wave | 2 |
-| Licensed module | fnb |
-| Route | `/kitchen/sla-priority-service-rules` |
-| Component | `apps/kitchen-display/src/routes/kitchen/SlaPriorityServiceRulesBoard.tsx` |
-| Pattern | configEditor |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| venueId | session |
-| stationId | session |
-| outletId | session |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `setKitchenSla` | [FnbService](../backend/FnbService.md#setkitchensla) | onAction | The outlet's kitchen service-time targets | `PRODUCT_CONFIGURE` |
-| `getKitchenSla` | [FnbService](../backend/FnbService.md#getkitchensla) | onLoad | The targets set now, so the rules editor loads what it changes (CHG-CSA-045) | `PRODUCT_VIEW` |
-| `getCourseRules` | [FnbService](../backend/FnbService.md#getcourserules) | onLoad | How this outlet courses by default, shown beside the targets (CHG-CSA-045) | `PRODUCT_VIEW` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The rail, oldest ticket first. The count renders before the tickets — a kitchen wants to know how deep it is before it reads anything. |
-| error | Could not reach the platform. The rail is still live from cache and every bump is queued. |
-| emptyFirstRun | No tickets. The kitchen is clear, and that is worth saying plainly rather than showing a blank rail — a screen that looks broken and a screen that means nothing to do are the same picture otherwise. |
-| emptyNoAccess | This display is not assigned to a station. Assignment is a back-office act — a kitchen screen does not choose what it shows. A principal without `ORDER_MODIFY` gets this state naming `ORDER_MODIFY`, the screen's `permission` and the one prioritising needs (the screen has no read); a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission. |
-| offline | Amber, and it keeps working. The kitchen still has to send food out — a display that blanks mid-service is worse than one that says it is behind, and every bump journals locally and syncs when the network returns. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| KIT-001 | Kitchen Operations Command Center |  |  |
-
-## KIT-010 Kitchen Performance, AI & Operational Optimization
-
-**Kitchen Performance, AI & Operational Optimization — board 3 of the client F&B design set.**
-
-|  |  |
-|---|---|
-| Module | Kitchen |
-| Wave | 2 |
-| Licensed module | fnb |
-| Route | `/kitchen/kitchen-performance-ai-operational-optimization` |
-| Component | `apps/kitchen-display/src/routes/kitchen/KitchenPerformanceAiOperationalOptBoard.tsx` |
-| Pattern | statusTracker |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| venueId | session |
-| stationId | session |
-| dashboardId | KIT-002 |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `getDashboard` | [ReportingService](../backend/ReportingService.md#getdashboard) | onLoad | Read a dashboard with tile data | `REPORT_VIEW_VENUE` |
-| `askReportingQuestion` | [ReportingService](../backend/ReportingService.md#askreportingquestion) | onAction | Natural-language reporting query | `REPORT_VIEW_VENUE` |
-| `recordDashboardView` | [ReportingService](../backend/ReportingService.md#recorddashboardview) | background | Record that a dashboard was opened — fired once when the dashboard renders; nothing on the screen waits for it. | `REPORT_VIEW_VENUE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | Kitchen and station performance for the period, then the AI analysis. |
-| error | Could not load the performance figures. Names which read failed. |
-| emptyFirstRun | Insufficient data: fewer service days than the analysis needs; says how many more. |
-| emptyNoResults | No service in the chosen period. |
-| emptyNoAccess | Shown when the caller lacks REPORT_VIEW_VENUE, and names it. |
-| offline | Not available offline. `getDashboard` is an analytical read (ADR-0016) and there is nothing local to serve. The rail on KIT-001 is what survives a network loss. Corrected 24 August: the earlier wording described the kitchen rather than this screen, and a checker cannot tell those apart from prose. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| KIT-001 | Kitchen Operations Command Center |  |  |
-
-## POS-004 Sell — Seat Map
-
-**Choose specific seats for a seated event.**
-
-|  |  |
-|---|---|
-| Module | Sell |
-| Wave | 2 |
-| Licensed module | seating |
-| Route | `/sell/sell-seat-map` |
-| Component | `apps/venue-pos/src/routes/sell/SellSeatMapCanvas.tsx` |
-| Pattern | statusTracker |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| holdId | deepLink |
-| performanceId | deepLink |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `getSeatAvailability` | [CatalogueService](../backend/CatalogueService.md#getseatavailability) | onLoad | Seat status | `PRODUCT_VIEW` |
-| `createSeatHold` | [CatalogueService](../backend/CatalogueService.md#createseathold) | onAction | Hold on selection | `ORDER_CREATE` |
-| `getPerformance` | [CatalogueService](../backend/CatalogueService.md#getperformance) | onLoad | Read a performance | `PRODUCT_VIEW` |
-| `getSeatHold` | [CatalogueService](../backend/CatalogueService.md#getseathold) | onLoad | Read a hold | `ORDER_VIEW` |
-| `relinquishSeatHold` | [CatalogueService](../backend/CatalogueService.md#relinquishseathold) | onAction | Release a hold | `ORDER_CREATE` |
-| `createOrder` | [OrderService](../backend/OrderService.md#createorder) | onAction | Create an order | `ORDER_CREATE` |
-| `createPayment` | [OrderService](../backend/OrderService.md#createpayment) | onAction | Take a payment against an order | `ORDER_CREATE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The sell seat map, read by `getSeatAvailability`. |
-| error | Could not load. Names which read failed and leaves the sell seat map untouched. |
-| emptyFirstRun | No sell seat map yet. Offers Create seat hold (`createSeatHold`). |
-| emptyNoAccess | Shown when the caller lacks `PRODUCT_VIEW`, which `getSeatAvailability` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | Not available offline. Seat holds require the primary; two terminals selling the same seat is unrecoverable |
-| denied | Seats can be viewed but not held without `payment.take` — an unchargeable hold takes capacity off sale for eight minutes and returns it unsold. |
-| zoneUnavailable | The zone sold out while the cashier was choosing. The board refuses the zone rather than the sale — the seat map reloads with that zone struck out and the cart intact. |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| POS-002 | Back | orderId |  |
-| POS-005 | Add seats to sale, then charge | paymentId | payment.take |
-| POS-003 | Sell — Timed Entry |  |  |
-| POS-006 | Held Orders | orderId |  |
-
-## POS-008 Reports
-
-**See how the day is going from the terminal.**
-
-|  |  |
-|---|---|
-| Module | Reports |
-| Wave | 2 |
-| Licensed module | analytics |
-| Route | `/reports/reports` |
-| Component | `apps/venue-pos/src/routes/reports/ReportsDashboard.tsx` |
-| Pattern | listDetail |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| conversationId | deepLink |
-| reportId | deepLink |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `runReport` | [ReportingService](../backend/ReportingService.md#runreport) | onAction | Terminal day view -- runs the seeded report terminalDayView (audit R282) | `REPORT_VIEW_VENUE` |
-| `askReportingQuestion` | [ReportingService](../backend/ReportingService.md#askreportingquestion) | onAction | Natural-language reporting query | `REPORT_VIEW_VENUE` |
-| `getReport` | [ReportingService](../backend/ReportingService.md#getreport) | onAction | Read a report definition | `REPORT_VIEW_VENUE` |
-| `listReports` | [ReportingService](../backend/ReportingService.md#listreports) | onLoad | List available report definitions | `REPORT_VIEW_VENUE` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The reports list. |
-| error | Could not load. Names which read failed and leaves the reports untouched. |
-| emptyFirstRun | No reports yet. Offers no create action — this screen declares no operation that makes one — and says so rather than showing an empty table. |
-| emptyNoResults | Nothing matches the filter on category, search and the reports are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller holds neither REPORT_VIEW_OWN (a cashier's own figures) nor REPORT_VIEW_WORKSTATION (this terminal's, for a supervisor), and names them. Never the venue-wide report permission: a till shows the person's or the terminal's day. |
-| offline | Not available. Reporting reads the analytical replica (ADR-0016) and a terminal-local figure would disagree with the back office |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| POS-009 | Staffing against takings is read |  |  |
-
-## POS-009 Staff Roster
-
-**See who is on duty and on which terminal.**
-
-|  |  |
-|---|---|
-| Module | Shift |
-| Wave | 2 |
-| Licensed module | core |
-| Route | `/sell/staff-roster` |
-| Component | `apps/venue-pos/src/routes/sell/StaffRosterBoard.tsx` |
-| Pattern | approvalInbox |
-
-**Entry parameters**
-
-| Parameter | From |
-|---|---|
-| shiftId | session |
-
-**Operations**
-
-| Operation | Service | When | Purpose | Permission |
-|---|---|---|---|---|
-| `listShifts` | [OrderService](../backend/OrderService.md#listshifts) | onLoad | Open shifts at this venue | `REPORT_VIEW_WORKSTATION` |
-| `listRotaAssignments` | [TenancyService](../backend/TenancyService.md#listrotaassignments) | onLoad | The rota | `WORKFORCE_VIEW` |
-| `recordAttendance` | [TenancyService](../backend/TenancyService.md#recordattendance) | onAction | Clock in or out, or start or end a break | `ATTENDANCE_RECORD` |
-
-**States**
-
-| State | Behaviour |
-|---|---|
-| loading | The staff roster list. |
-| error | Could not load. Names which read failed and leaves the staff roster untouched. |
-| emptyFirstRun | Nothing is waiting, which is the good outcome. An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
-| emptyNoResults | Nothing matches the filter on workstationId, status, openedFrom, openedTo and the staff roster are still there. Names the active filter and offers to clear it. |
-| emptyNoAccess | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires, and names that permission. Never an empty table — that reads as *there is no data* and sends somebody to support with the wrong question. |
-| offline | Last known roster, with its age shown |
-
-**Goes to**
-
-| To | Trigger | Carries | Guard |
-|---|---|---|---|
-| POS-001 | Begin Shift | shiftId |  |
-| POS-007 | Close Shift |  |  |
-| BO-043 | The daily cash reconciliation lists every shift of the day and resolves the ones still under review, one by… |  |  |

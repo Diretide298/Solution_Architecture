@@ -94,8 +94,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-012` | Checkout / Credit Purchase | B–D | 21 | 0 | 5 | 10 | 1 | 6 | — | notStarted (generated) |
-| `PTR-013` | Credit Limit & Balance | B–D | 0 | 13 | 5 | 5 | 1 | 0 | — | notStarted (generated) |
+| `PTR-012` | Checkout / Credit Purchase | C | 21 | 0 | 5 | 10 | 1 | 6 | — | notStarted (generated) |
+| `PTR-013` | Credit Limit & Balance | C | 0 | 8 | 5 | 5 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -115,7 +115,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Credit & Settlement · wave 2 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-PARTNER-PTR-012 |
 | Who uses it | partner staff holding `ORDER_CREATE` (1 operate) |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | configEditor (compact density): the screen declares only writes (`createPayment`, `addTip`, `capturePayment`) and no read of a population — it is settings, not a list |
@@ -256,6 +256,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 #### References
 
 - Wireframe frame: `wireframes/P10 Partner Web.dc.html#ptr-012` · status **notStarted** · provenance generated
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -278,7 +279,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Credit & Settlement · wave 2 · needs the `partner` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-PARTNER-PTR-013 |
 | Who uses it | partner staff holding `ORDER_VIEW` (1 read) |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | statusTracker (compact density): `getB2bCredit` reads one record and nothing reads a population — the screen is about that one thing |
@@ -306,19 +307,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Added 20 August. The schema reference derives table columns from API response schemas, and a response is not a table — this one returned … |
-| Account | the name it points at, never the id | — |
 | Account name | text | — |
 | Credit limit | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Used | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Available | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Is over limit | yes / no (icon or chip) | — |
-| Is suspended | yes / no (icon or chip) | — |
 | Payment terms days | 1,234 | — |
 | Oldest unpaid invoice at | 1 Oct 2026, 14:30 | — |
 | Days overdue | 1,234 | — |
 | Active overrides | list or chips (count when long) | — |
-| Scope path | text | The partition key (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it … |
 
 **Data it reads**: `getB2bCredit` (onLoad, from page inventory)
 
@@ -383,7 +379,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state (404).
-- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (8 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#PTR-013?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `PTR-001`, `PTR-002`, `PTR-003`.

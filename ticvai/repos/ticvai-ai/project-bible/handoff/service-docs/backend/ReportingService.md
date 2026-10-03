@@ -28,21 +28,21 @@
 |---|---|---|---|---|---|---|
 | catalogue | [`createReport`](#createreport) | POST | `/reports` | setup | 1 | ANL-032, ANL-054, BO-029, BO-058, BO-059, BO-060 … |
 | catalogue | [`deleteReport`](#deletereport) | DELETE | `/reports/{reportId}` | setup | 1 | BO-029, BO-058, BO-059, BO-060, PTR-018, SUP-008 |
-| catalogue | [`getReport`](#getreport) | GET | `/reports/{reportId}` | core | 2 | ANL-023, BO-029, BO-058, BO-059, BO-060, POS-008 … |
-| catalogue | [`listReports`](#listreports) | GET | `/reports` | core | 2 | ANL-023, ANL-031, BO-029, BO-058, BO-059, BO-060 … |
+| catalogue | [`getReport`](#getreport) | GET | `/reports/{reportId}` | core | 1 | ANL-023, BO-029, BO-058, BO-059, BO-060, POS-008 … |
+| catalogue | [`listReports`](#listreports) | GET | `/reports` | core | 1 | ANL-023, ANL-031, BO-029, BO-058, BO-059, BO-060 … |
 | catalogue | [`updateReport`](#updatereport) | PUT | `/reports/{reportId}` | setup | 1 | ANL-035, ANL-036, ANL-037, ANL-038, BO-029, BO-058 … |
-| dashboard | [`createDashboard`](#createdashboard) | POST | `/dashboards` | setup | 2 | ADM-031, ANL-021, ANL-022, ANL-053 |
-| dashboard | [`getDashboard`](#getdashboard) | GET | `/dashboards/{dashboardId}` | core | 2 | ADM-031, ANL-001, ANL-002, ANL-003, ANL-004, ANL-005 … |
-| dashboard | [`recordDashboardView`](#recorddashboardview) | POST | `/dashboards/{dashboardId}/views` | core | 2 | ADM-031, ANL-001, ANL-002, ANL-003, ANL-004, ANL-005 … |
-| dashboard | [`updateDashboard`](#updatedashboard) | PUT | `/dashboards/{dashboardId}` | setup | 2 | ADM-031, ANL-023, ANL-027, ANL-028, ANL-029 |
+| dashboard | [`createDashboard`](#createdashboard) | POST | `/dashboards` | setup | 1 | ADM-031, ANL-021, ANL-022, ANL-023, ANL-053 |
+| dashboard | [`getDashboard`](#getdashboard) | GET | `/dashboards/{dashboardId}` | core | 1 | ADM-031, ANL-001, ANL-002, ANL-003, ANL-004, ANL-005 … |
+| dashboard | [`recordDashboardView`](#recorddashboardview) | POST | `/dashboards/{dashboardId}/views` | core | 1 | ADM-031, ANL-001, ANL-002, ANL-003, ANL-004, ANL-005 … |
+| dashboard | [`updateDashboard`](#updatedashboard) | PUT | `/dashboards/{dashboardId}` | setup | 1 | ADM-031, ANL-023, ANL-027, ANL-028, ANL-029 |
 | execution | [`runReport`](#runreport) | POST | `/reports/{reportId}/run` | core | 1 | ANL-001, ANL-002, ANL-003, ANL-004, ANL-005, ANL-006 … |
-| naturalLanguage | [`askReportingQuestion`](#askreportingquestion) | POST | `/reports/ask` | core | 2 | ANL-008, ANL-009, ANL-019, ANL-052, ANL-056, BO-029 … |
+| naturalLanguage | [`askReportingQuestion`](#askreportingquestion) | POST | `/reports/ask` | core | 1 | ANL-008, ANL-009, ANL-019, ANL-052, ANL-056, BO-029 … |
 | naturalLanguage | [`saveNaturalLanguageQuery`](#savenaturallanguagequery) | POST | `/reports/ask/{conversationId}/save` | setup | 1 | ANL-052, BO-029, BO-058, BO-059, BO-060, PTR-018 … |
-| reporting | [`createKpi`](#createkpi) | POST | `/kpis` | setup | 2 | ANL-025, ANL-062 |
-| reporting | [`deleteDashboard`](#deletedashboard) | DELETE | `/dashboards/{dashboardId}` | setup | 2 | ANL-023 |
+| reporting | [`createKpi`](#createkpi) | POST | `/kpis` | setup | 1 | ANL-025, ANL-062 |
+| reporting | [`deleteDashboard`](#deletedashboard) | DELETE | `/dashboards/{dashboardId}` | setup | 1 | ANL-023 |
 | reporting | [`listAlerts`](#listalerts) | GET | `/alerts` | core | 1 | ANL-001, ANL-003, ANL-009, ANL-012, BO-036, BO-133 … |
 | reporting | [`setAlertRule`](#setalertrule) | PUT | `/alert-rules` | setup | 1 | ANL-009, BO-133, BO-886 |
-| reporting | [`setSemanticModel`](#setsemanticmodel) | PUT | `/semantic-model` | setup | 2 | ANL-066 |
+| reporting | [`setSemanticModel`](#setsemanticmodel) | PUT | `/semantic-model` | setup | 1 | ANL-066 |
 
 ## Group: catalogue
 
@@ -210,7 +210,7 @@ Retired rather than deleted where executions or paused schedules reference it �
 | Permission | `REPORT_VIEW_VENUE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | analytical |
@@ -291,7 +291,7 @@ Only definitions the caller may run. A report requiring `REPORT_VIEW_TENANT` doe
 | Permission | `REPORT_VIEW_VENUE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | analytical |
@@ -505,13 +505,13 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | Permission | `REPORT_MANAGE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `reporting.dashboard`, `reporting.dashboard_tile` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `reporting.dashboard`, `reporting.dashboard_tile` |
 | Writes | `cache:idempotency`, `reporting.dashboard`, `reporting.dashboard_tile` |
-| Called by | ADM-031, ANL-021, ANL-022, ANL-053 |
+| Called by | ADM-031, ANL-021, ANL-022, ANL-023, ANL-053 |
 
 **Parameters**
 
@@ -587,7 +587,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | Permission | `REPORT_VIEW_VENUE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | analytical |
@@ -662,7 +662,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | Permission | `REPORT_VIEW_VENUE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | append |
 | Reads | `cache:idempotency`, `reporting.dashboard` |
@@ -696,12 +696,14 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 
 **PUT semantics — a full replace of the dashboard, never a create.** The body is the whole dashboard, tiles included. **Tiles are matched on `id` within this dashboard**: a tile whose id is already on it is replaced whole, a new id adds a tile, and a stored tile the body leaves out is removed. A tile id that belongs to another dashboard is `400`. An unknown `dashboardId` is `404` — `createDashboard` makes dashboards.
 
+**The first Save creates, every later Save updates, and the refresh budget is checked on both** (Chinmay, 3 October 2026, Block A business rules, ANL-023; CHG-RUL-008). A canvas with no `dashboardId` yet calls `createDashboard`; from then on it calls this. The tiles' refreshes per minute, summed, may not exceed `VenueSettings.reporting.dashboardRefreshBudgetPerMinute` (the tenant default for a tenant-wide dashboard; proposed 24, audit R094), exactly as on create: otherwise `400` and nothing is saved, so an update is not the way round the budget.
+
 |  |  |
 |---|---|
 | Permission | `REPORT_MANAGE` |
 | Scope level | tenant |
 | Part of slice | setup, changes rows of `reporting.dashboard`, `reporting.dashboard_tile` that another operation creates |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Conflict policy | serverWins |
@@ -770,6 +772,7 @@ Tiles reference report definitions. Each tile carries its own refresh interval, 
 | Code | Shape | Meaning |
 |---|---|---|
 | 200 |  | Updated |
+| 400 |  | The tiles' refreshes per minute exceed VenueSettings.reporting.dashboardRefreshBudgetPerMinute (proposed default 24, audit R094), as on createDashboard (CHG-RUL-008); or a tile id belongs to another… |
 | 409 |  | Moving a dashboard to a module the caller is not entitled to. |
 | 422 |  | A tile's report lacks the column encodings its visualisation needs (problem type tile-encoding-missing, CHG-FIN-007), as createDashboard. |
 | 429 | TooManyRequests | Rate limit exceeded for this tenant, venue or principal. |
@@ -863,7 +866,7 @@ Runs under the caller's resolved permissions. The generated query cannot widen s
 | Permission | `REPORT_VIEW_VENUE` |
 | Scope level | venue |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `ai.policy`, `ai.provider`, `cache:idempotency`, `reporting.kpi_definition`, `reporting.natural_language_query`, `reporting.report_column`, `reporting.report_filter`, `reporting.semantic_model` |
@@ -1055,7 +1058,7 @@ Turns a one-off question into something schedulable. The generated query becomes
 | Permission | `REPORT_MANAGE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `reporting.kpi_definition` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Config scope | tenant |
 | Reads | `reporting.kpi_definition` |
@@ -1122,7 +1125,7 @@ The tiles go with it and come back with it. `reporting.dashboard_tile` carries `
 | Permission | `REPORT_MANAGE` |
 | Scope level | tenant |
 | Part of slice | setup, changes rows of `reporting.dashboard` that another operation creates |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Reads | `cache:idempotency`, `reporting.dashboard`, `reporting.dashboard_tile` |
 | Writes | `cache:idempotency`, `reporting.dashboard` |
@@ -1263,7 +1266,7 @@ BL-152. **The metric comes from the closed set**, so a rule cannot watch somethi
 | Permission | `REPORT_MANAGE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `reporting.semantic_model` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Reads | `reporting.semantic_model` |
 | Writes | `reporting.semantic_model` |
@@ -1402,7 +1405,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | dashboard_id | uuid | yes |  |
 | viewed_by_principal_id | uuid | yes |  |
 | venue_id | uuid | no | The venue the dashboard was narrowed to when opened, as Dashboard.venueId. |
@@ -1432,7 +1435,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no |  |
+| id | uuid | yes |  |
 | code | text | yes | takings and admissions are seeded for every tenant as system KPIs (decided 28 September, audit R283), and the five accreditation KPIs for every tenant with the accreditation module (29 September, bui… |
 | name | text | yes |  |
 | description | text | no |  |
@@ -1464,7 +1467,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | report_definition_id | uuid | yes | The parent row. |
-| id | uuid | no | Added 20 August. |
+| id | uuid | yes | Added 20 August. |
 | field | text | yes |  |
 | label | text | no |  |
 | aggregation | text | no |  |
@@ -1516,7 +1519,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 | Column | Type | Required | Notes |
 |---|---|---|---|
 | report_definition_id | uuid | yes | The parent row. |
-| id | uuid | no | Added 20 August. |
+| id | uuid | yes | Added 20 August. |
 | field | text | yes |  |
 | operator | text | yes |  |
 | value | text | no | Open on purpose; its type is the field's. |

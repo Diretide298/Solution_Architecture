@@ -1492,7 +1492,6 @@ paths:
         format: uuid
     post:
       operationId: extendSeatHold
-      x-ticvai-consumed-by: []
       x-ticvai-audience:
       - staff
       summary: Extend a hold

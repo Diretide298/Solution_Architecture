@@ -886,7 +886,9 @@
     },
     {
      "name": "vendorServiceRequestId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listVendorServiceRequests` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1300,7 +1302,9 @@
     },
     {
      "name": "stockReservationId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listStockReservations` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1579,7 +1583,9 @@
     },
     {
      "name": "assetId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `submitInspection`; a link or an edge that holds one opens it instead."
     }
    ]
   },

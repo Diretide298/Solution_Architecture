@@ -388,6 +388,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - Client workshop board: `wireframes/WS144 Seat Management Venue Mapping Reference v1.0 Board 5.dc.html#bo-994`
 - Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 5
 - Flow F278 *Seat Management Venue Mapping Reference v1.0 board 5: Experience Command Center*, step 2: Works in Choose My Seats → Allow a guest or authorized agent to select exact seats from an interactive map. Display section, row, seat, price, fees, type, view quality, accessibility, amenity and live availability. Support …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 - ADR-0037 *A lock holds one statement, not a transaction* (`docs/adr/0037-what-may-be-inside-a-lock.md`)
 - ADR-0031 *Contention is leased, not locked — and where a lock is unavoidable it is named* (`docs/adr/0031-contention-and-locking.md`)
 
@@ -558,6 +559,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - Client workshop board: `wireframes/WS144 Seat Management Venue Mapping Reference v1.0 Board 5.dc.html#bo-995`
 - Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 5
 - Flow F278 *Seat Management Venue Mapping Reference v1.0 board 5: Experience Command Center*, step 4: Works in Find Seats For Me → Return best-available seat groups from stated customer preferences. Capture quantity, zone, level, price range, accessibility, aisle, view, amenity and proximity preferences. Rank valid contiguous or …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -669,6 +671,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS144 Seat Management Venue Mapping Reference v1.0 Board 5.dc.html#bo-996`
 - Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 5
 - Flow F278 *Seat Management Venue Mapping Reference v1.0 board 5: Experience Command Center*, step 6: Works in Filters & Interactive Legend → Make large and complex seat maps understandable and searchable. Provide zone, price, group size, amenities, seat type, accessibility, view quality, level and availability filters. Update results …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1139,6 +1142,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS144 Seat Management Venue Mapping Reference v1.0 Board 5.dc.html#bo-1000`
 - Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 5
 - Flow F278 *Seat Management Venue Mapping Reference v1.0 board 5: Experience Command Center*, step 14: Works in Mobile & Accessible Selection → Deliver an equivalent and WCAG-aligned selection flow on supported devices. Provide responsive map/list modes, large targets, screen-reader labels, logical focus order, keyboard and switch access. …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1299,6 +1303,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS144 Seat Management Venue Mapping Reference v1.0 Board 5.dc.html#bo-1001`
 - Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 5
 - Flow F278 *Seat Management Venue Mapping Reference v1.0 board 5: Experience Command Center*, step 16: Works in View Preview, Compare & Heat Map → Help customers understand qualitative and demand differences before choosing. Show approved seat-view previews or representative section views with source, freshness and obstruction disclosure. …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1461,6 +1466,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 - Client workshop board: `wireframes/WS144 Seat Management Venue Mapping Reference v1.0 Board 5.dc.html#bo-1002`
 - Workshop pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf board 5
 - Flow F278 *Seat Management Venue Mapping Reference v1.0 board 5: Experience Command Center*, step 18: Works in AI Conversational Seat Assistant → Allow natural-language seat discovery through governed AI. Understand requests such as family size, budget, view, aisle, stage proximity, accessibility and preferred level. Return only currently …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 

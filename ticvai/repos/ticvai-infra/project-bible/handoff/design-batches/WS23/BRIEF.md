@@ -96,14 +96,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-042` | Partner Operations Command Center | B–D | 2 | 28 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `PTR-043` | Partner Orders & Booking Management | B–D | 2 | 32 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `PTR-044` | Reservations, Holds & Release Management | B–D | 0 | 160 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `PTR-045` | Partner Cancellations, Refunds & Amendments | B–D | 8 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `PTR-046` | Partner Statement & Account Activity | B–D | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `PTR-049` | Partner Disputes, Cases & Service Management | B–D | 21 | 8 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `PTR-050` | Partner Performance Scorecard & Risk Monitoring | B–D | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `PTR-051` | Partner AI Intelligence & Relationship Optimization | B–D | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-042` | Partner Operations Command Center | B | 2 | 28 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `PTR-043` | Partner Orders & Booking Management | B | 2 | 32 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `PTR-044` | Reservations, Holds & Release Management | B | 0 | 160 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `PTR-045` | Partner Cancellations, Refunds & Amendments | B | 8 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `PTR-046` | Partner Statement & Account Activity | B | 0 | 14 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-049` | Partner Disputes, Cases & Service Management | B | 21 | 8 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-050` | Partner Performance Scorecard & Risk Monitoring | B | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `PTR-051` | Partner AI Intelligence & Relationship Optimization | B | 0 | 2 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

@@ -1421,6 +1421,15 @@ paths:
         at configuration time rather than at audit. **Refused, not warned (confirmed 28 September,
         audit R139)**: flow F22 is corrected to match.
 
+        **The pairs and ratios** (Chinmay, 3 October 2026, Block A business rules: "WCAG AA"; CHG-RUL-007), listed
+        on `Theme.x-ticvai-contrast-pairs` so the server, CMS-005 and the check read one list: text on the
+        background at **4.5:1**; large text (24 px, or 18.66 px bold, and up) at **3:1**; the primary, secondary
+        and accent colours against the background at **3:1** (a button, a link, a focus ring is a user-interface
+        component, WCAG 1.4.11); and for each component colour, its text on its own background at **4.5:1** and
+        its background against the page background at **3:1**. The ratio is the WCAG 2.2 relative-luminance
+        contrast ratio. Each failing pair is named in `ContrastProblem.failures` with its ratio and the one it
+        needed.
+
         **One theme, no dark mode** (Chinmay, 2 October, workbook Q150; CHG-CSA-035): `darkMode` is deprecated
         and ignored; a body that carries it is accepted and the field is not applied.
 
@@ -2362,7 +2371,6 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFaqs
-      x-ticvai-consumed-by: []
       x-ticvai-audience:
       - staff
       summary: Set FAQ categories and entries
@@ -3545,8 +3553,6 @@ paths:
     get:
       operationId: listAnalyticsProviders
       x-ticvai-consumed-by:
-        - "P01 WEB-001 Home / Landing"
-        - "P02 GST-001 Home"
         - "P13 CMS-016 Site Settings"
       x-ticvai-audience:
       - staff
@@ -3563,6 +3569,12 @@ paths:
         `getTenantConfig`. **The loader injects a provider only once marketing-crm
         `getCookieConsentRuntime` says its `consentCategory` is granted**; before that nothing is sent
         to it (2.6.58). Ordered by `venueId` (tenant-wide first) then `provider`; keyset cursor.
+
+        **A guest reads the providers from the published tenant config** (Chinmay, 3 October 2026, Pattern 4;
+        CHG-GCF-005): the storefront and app tag loader reads `PublishedTenantConfig.analyticsProviders` from
+        `getPublishedTenantConfig`, which needs no session, and GST-001 and WEB-001 no longer call this. This
+        stays a staff read under `TENANT_CONFIGURE`; the guest audience and the optional credential stay only
+        so a client built against r1 is not broken, and a guest caller still gets the rows described above.
       tags:
       - overview
       x-ticvai-permission: TENANT_CONFIGURE
@@ -7617,6 +7629,17 @@ components:
     Theme:
       x-ticvai-persistence: none — embedded in tenant_config
       type: object
+      # The WCAG AA pairs `setTheme` checks (Chinmay, 3 October 2026; CHG-RUL-007). `use` is text (4.5:1),
+      # largeText (3:1) or nonText (3:1, WCAG 1.4.11). `componentColours.*` means every component colour;
+      # an unset optional colour is not checked. Read by tools/check-business-rules.py (BR-CONTRAST).
+      x-ticvai-contrast-pairs:
+      - { foreground: textColour, background: backgroundColour, use: text, ratio: 4.5 }
+      - { foreground: textColour, background: backgroundColour, use: largeText, ratio: 3.0 }
+      - { foreground: primaryColour, background: backgroundColour, use: nonText, ratio: 3.0 }
+      - { foreground: secondaryColour, background: backgroundColour, use: nonText, ratio: 3.0 }
+      - { foreground: accentColour, background: backgroundColour, use: nonText, ratio: 3.0 }
+      - { foreground: componentColours.*.text, background: componentColours.*.background, use: text, ratio: 4.5 }
+      - { foreground: componentColours.*.background, background: backgroundColour, use: nonText, ratio: 3.0 }
       required:
       - primaryColour
       - secondaryColour
@@ -9026,6 +9049,62 @@ components:
           nullable: true
         contact:
           $ref: '#/components/schemas/VenueContact'
+        analyticsProviders:
+          type: array
+          description: '**The analytics platforms the storefront and app load** (Chinmay, 3 October 2026, Pattern 4;
+            CHG-GCF-005): a guest reads them here instead of `listAnalyticsProviders`, which needs `TENANT_CONFIGURE`.
+            The enabled `StorefrontAnalyticsProvider` rows in force for the venue being browsed (that venue''s own
+            rows when `venueId` was sent and it has any, else the tenant-wide ones), read live, with only what the
+            tag loader needs. **A provider loads only once marketing-crm `getCookieConsentRuntime` says its
+            `consentCategory` is granted**; before that nothing is sent to it (2.6.58).'
+          items:
+            $ref: '#/components/schemas/PublishedAnalyticsProvider'
+    PublishedAnalyticsProvider:
+      x-ticvai-persistence: none — the enabled rows of whitelabel.analytics_provider, guest-facing fields only
+      description: '**What the tag loader needs and nothing else** (CHG-GCF-005): no reporting property, no
+        credential, no venue or scope. The values are those of `StorefrontAnalyticsProvider`.'
+      type: object
+      required:
+      - provider
+      - measurementId
+      - surfaces
+      - consentCategory
+      properties:
+        provider:
+          type: string
+          enum:
+          - googleAnalytics4
+          - googleTagManager
+          - adobeAnalytics
+          - metaPixel
+          - matomo
+          - other
+        otherProviderName:
+          type: string
+          maxLength: 100
+          nullable: true
+          description: The provider's name, when `provider` is `other` (`StorefrontAnalyticsProvider.providerLabel`).
+        measurementId:
+          type: string
+          maxLength: 100
+          description: What the tag or SDK reports to (GA4 `G-...`, Tag Manager `GTM-...`, a pixel id).
+        surfaces:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            enum:
+            - guestWeb
+            - guestApp
+        consentCategory:
+          type: string
+          enum:
+          - functional
+          - analytics
+          - personalisation
+          - marketing
+          description: The cookie category the visitor must grant before this provider loads (marketing-crm
+            `CookieCategory`).
     PublishedPolicy:
       x-ticvai-persistence: none — a public projection of whitelabel.policy
       type: object

@@ -1,5 +1,5 @@
 id: LLD-marketing-crm
-title: marketing-crm — 272 operations
+title: marketing-crm — 274 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -708,6 +708,16 @@ operations:
   - marketing.consent_purpose
   - marketing.consent_record
   - pii.subject
+  writes: []
+- operation: getGuestConversation
+  verb: GET
+  path: /my/conversations/{conversationId}
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads: []
   writes: []
 - operation: getGuestExtraValues
   verb: GET
@@ -2731,6 +2741,16 @@ operations:
   - marketing.conversation
   - marketing.conversation_message
   - marketing.conversation_message_attachment
+- operation: sendGuestConversationMessage
+  verb: POST
+  path: /my/conversations/{conversationId}/messages
+  scope: tenant
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads: []
+  writes: []
 - operation: sendTransactionalMessage
   verb: POST
   path: /messages

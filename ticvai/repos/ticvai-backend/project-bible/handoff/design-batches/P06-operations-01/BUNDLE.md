@@ -1,6 +1,6 @@
 # P06-operations-01 — P06 · Operations (1 of 5)
 
-**10 screens · 47 operations · 48 schemas · 19 permissions**
+**10 screens · 47 operations · 49 schemas · 19 permissions**
 
 Platform P06 Venue Staff App · ships as **venue-staff-mobile** ·
 staff audience · mobileApp ·
@@ -149,16 +149,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `EMP-001` | Sign in | B–D | 14 | 43 | 9 | 5 | 3 | 0 | — | notStarted (generated) |
-| `EMP-002` | Select venue & role | B–D | 1 | 11 | 6 | 3 | 1 | 5 | — | notStarted (generated) |
-| `EMP-003` | Home — on duty | B–D | 31 | 70 | 6 | 11 | 3 | 0 | — | notStarted (generated) |
-| `EMP-009` | End shift | B–D | 14 | 63 | 6 | 1 | 1 | 6 | — | notStarted (generated) |
-| `EMP-010` | Scan — ready | B–D | 17 | 0 | 6 | 46 | 1 | 0 | — | notStarted (generated) |
-| `EMP-004` | Task list | B–D | 4 | 44 | 6 | 15 | 6 | 0 | — | notStarted (generated) |
-| `EMP-005` | Task detail | B–D | 40 | 47 | 6 | 22 | 4 | 0 | — | notStarted (generated) |
-| `EMP-006` | Raise a task | B–D | 63 | 44 | 6 | 33 | 4 | 0 | — | notStarted (generated) |
-| `EMP-007` | Handover notes | B–D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `EMP-008` | Shift summary | B–D | 4 | 56 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
+| `EMP-001` | Sign in | A | 14 | 43 | 9 | 5 | 3 | 0 | — | notStarted (generated) |
+| `EMP-002` | Select venue & role | B | 1 | 5 | 6 | 3 | 1 | 5 | — | notStarted (generated) |
+| `EMP-003` | Home — on duty | D | 35 | 24 | 6 | 11 | 3 | 0 | — | notStarted (generated) |
+| `EMP-009` | End shift | C | 17 | 23 | 6 | 1 | 1 | 6 | — | notStarted (generated) |
+| `EMP-010` | Scan — ready | C | 17 | 0 | 6 | 46 | 1 | 0 | — | notStarted (generated) |
+| `EMP-004` | Task list | A | 4 | 14 | 6 | 15 | 6 | 0 | — | notStarted (generated) |
+| `EMP-005` | Task detail | A | 40 | 17 | 6 | 22 | 4 | 0 | — | notStarted (generated) |
+| `EMP-006` | Raise a task | D | 63 | 14 | 6 | 33 | 4 | 0 | — | notStarted (generated) |
+| `EMP-007` | Handover notes | D | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `EMP-008` | Shift summary | C | 4 | 24 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -178,7 +178,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block A · task APP-STAFF-EMP-001 |
 | Who uses it | venue; in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | form (comfortable density): A sign-in on a shared handheld: number and PIN, the venue's SSO where it has one, the code only when a permission demands it - a form, not a list. |
@@ -426,7 +426,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block B · task APP-STAFF-EMP-002 |
 | Who uses it | venue; in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listMfaMethods` reads the population and `getCurrentSession` reads one of them — list, select, act |
@@ -466,15 +466,9 @@ Errors to draw in the form: 403 Authenticated but not permitted at the requested
 
 | Shows | Format | Notes |
 |---|---|---|
-| Session | the name it points at, never the id | — |
-| Principal | the name it points at, never the id | — |
-| Role | the name it points at, never the id | — |
 | Display name | text | — |
 | Scope | list or chips (count when long) | Scope nodes this session may act within, resolved once at login from the ltree hierarchy with deny-overrides-allow. |
 | Effective permissions | list or chips (count when long) | Flattened set across all granted scopes, after deny resolution. Convenience for coarse checks. |
-| Permissions by scope | list or chips (count when long) | Permissions effective at each granted scope path. Clients filter navigation on this and never compute permissions themselves. |
-| Sale board | the name it points at, never the id | Landing surface, derived from the WORKSTATION, not the role (12 Aug 2026 §3). Ticketing, F&B or Retail board. |
-| Workstation | grouped details | — |
 | Opened at | 1 Oct 2026, 14:30 | — |
 | Expires at | 1 Oct 2026, 14:30 | — |
 
@@ -562,7 +556,7 @@ Also apply: 1 for P06 · Operations, 12 for all of P06, 29 for every app (sectio
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (1), with its required mark, default, format and its error state (403).
-- [ ] Every output is drawn (11 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-002?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Select role.
 - [ ] Every transition is wired: `EMP-048`, `EMP-001`, `EMP-003`.
@@ -580,7 +574,7 @@ Also apply: 1 for P06 · Operations, 12 for all of P06, 29 for every app (sectio
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `maintenance` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-003 |
 | Who uses it | venue staff holding `INCIDENT_MANAGE`, `INCIDENT_REPORT`, `INCIDENT_VIEW`, `REPORT_VIEW_WORKSTATION` (1 configure, 2 operate, 1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | approvalInbox (comfortable density): `approveShiftOpen` decides items that `listIncidents` queues — every row is waiting for a person, so the empty state is success |
@@ -670,8 +664,12 @@ Errors to draw in the form: 400 Validation failed
 | Corrective actions `correctiveActions` | text area | optional | — | max length 5000 | — | — | `updateIncident` body |
 | Corrective work order `correctiveWorkOrderId` | picker: choose a corrective work order | optional | — | — | shows names, sends the id | — | `updateIncident` body |
 | Attachment refs `attachmentRefs` | list of values (chips) | optional | — | — | — | — | `updateIncident` body |
+| Escalate `escalate` | group | optional | — | — | — | Escalate an incident under investigation (the optional Escalated step; CHG-RUL-011). | `updateIncident` body |
+| To principal `escalate.toPrincipalId` | picker: choose a to principal | required | — | — | shows names, sends the id | — | `updateIncident` body |
+| Reason `escalate.reason` | text area | required | — | min length 3; max length 1000 | — | — | `updateIncident` body |
+| Reason `reason` | text area | optional | — | min length 3; max length 1000 | — | Why the status changes. Required to reopen a closed incident (back to `underInvestigation`) and to close a `reported` one straight away (CHG-RUL-011). | `updateIncident` body |
 
-Errors to draw in the form: 400 Closure attempted without findings or a corrective action; 403 A critical incident closed by the person who completed its corrective action (`closer-completed-action`; workbook Q530; CHG-CSA-033).
+Errors to draw in the form: 400 Closure attempted without findings or a corrective action; 403 A critical incident closed by the person who completed its corrective action (`closer-completed-action`; workbook Q530; CHG-CSA-033).; 422 A move outside the incident flow (`incident-transition-not-allowed`; CHG-RUL-011): to `actionRequired`, from `closed` to anything but `underInvestigation`, a …
 
 **Rules for these inputs** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
@@ -685,96 +683,50 @@ Errors to draw in the form: 400 Closure attempted without findings or a correcti
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Incident number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
-| Kind | chip: Guest injury, Staff injury, Near miss, Property damage, Equipment failure, Security … | — |
 | Severity | chip: Near miss, Minor, Moderate, Major, Critical | — |
 | Status | chip: Reported, Under investigation, Action required, Closed | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Location description | text | — |
-| Is reportable | yes / no (icon or chip) | Requires notification to an external authority within a statutory window. |
-| Notification due at | 1 Oct 2026, 14:30 | — |
-| Notified at | 1 Oct 2026, 14:30 | The earliest `notifiedAt` among this incident's authority notifications. Maintained on write by `recordAuthorityNotification`; each … |
-| Assigned to principal | the name it points at, never the id | — |
 
 **The selected incident** (detail panel, from `listIncidents`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Incident number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | Kind | chip: Guest injury, Staff injury, Near miss, Property damage, Equipment failure, Security … | — |
 | Severity | chip: Near miss, Minor, Moderate, Major, Critical | — |
 | Status | chip: Reported, Under investigation, Action required, Closed | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Location description | text | — |
-| Is reportable | yes / no (icon or chip) | Requires notification to an external authority within a statutory window. |
-| Notification due at | 1 Oct 2026, 14:30 | — |
-| Notified at | 1 Oct 2026, 14:30 | The earliest `notifiedAt` among this incident's authority notifications. Maintained on write by `recordAuthorityNotification`; each … |
-| Assigned to principal | the name it points at, never the id | — |
-| Reported by principal | the name it points at, never the id | — |
-| Corrective work order | the name it points at, never the id | — |
-| Occurred at | 1 Oct 2026, 14:30 | — |
-| Recorded at | 1 Oct 2026, 14:30 | — |
 
 **The incident** (detail panel, from `getIncident`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Incident number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | Kind | chip: Guest injury, Staff injury, Near miss, Property damage, Equipment failure, Security … | — |
 | Severity | chip: Near miss, Minor, Moderate, Major, Critical | — |
 | Status | chip: Reported, Under investigation, Action required, Closed | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Location description | text | — |
-| Is reportable | yes / no (icon or chip) | Requires notification to an external authority within a statutory window. |
-| Notification due at | 1 Oct 2026, 14:30 | — |
-| Notified at | 1 Oct 2026, 14:30 | The earliest `notifiedAt` among this incident's authority notifications. Maintained on write by `recordAuthorityNotification`; each … |
-| Assigned to principal | the name it points at, never the id | — |
-| Reported by principal | the name it points at, never the id | — |
-| Corrective work order | the name it points at, never the id | — |
-| Occurred at | 1 Oct 2026, 14:30 | — |
-| Recorded at | 1 Oct 2026, 14:30 | — |
 
 **The shift** (detail panel, from `getShift`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. Also the idempotency key. |
-| Workstation | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Principal | the name it points at, never the id | Who opened it. Cash reconciles to a person and a drawer. |
 | Principal display name | text | — |
 | Incidents | list or chips (count when long) | BL-097. A till has exceptions and there was nowhere to write them — a no-sale, a drawer opened without a transaction, a manager override, a … |
 | Status | chip: Pending approval, Open, Suspended, Pending variance, Pending closure, Closed… | — |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Deposit box code | text | — |
 | Bag number | text | — |
-| Opening float | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **The shift** (detail panel, from `getWorkstationShift`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. Also the idempotency key. |
-| Workstation | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Principal | the name it points at, never the id | Who opened it. Cash reconciles to a person and a drawer. |
 | Principal display name | text | — |
 | Incidents | list or chips (count when long) | BL-097. A till has exceptions and there was nowhere to write them — a no-sale, a drawer opened without a transaction, a manager override, a … |
 | Status | chip: Pending approval, Open, Suspended, Pending variance, Pending closure, Closed… | — |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Deposit box code | text | — |
 | Bag number | text | — |
-| Opening float | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **Actions and what each produces**
 
@@ -782,7 +734,7 @@ Errors to draw in the form: 400 Closure attempted without findings or a correcti
 |---|---|---|---|---|---|
 | Record authority notification (secondary button) | `recordAuthorityNotification` POST `/incidents/{incidentId}/notify-authority` | inline | Incident | 409 The incident is not reportable (`isReportable` false, audit R106 (6)). | opens modal first |
 | Report incident (secondary button) | `reportIncident` POST `/incidents` | ReportIncidentRequest | Incident | 400 Validation failed | works offline; opens modal first |
-| Save incident (secondary button) | `updateIncident` PATCH `/incidents/{incidentId}` | inline | Incident | 400 Closure attempted without findings or a corrective action; 403 A critical incident closed by the person who completed its corrective action (`closer-completed-action`; workbook Q530; CHG-CSA-033). | opens modal first |
+| Save incident (secondary button) | `updateIncident` PATCH `/incidents/{incidentId}` | inline | Incident | 400 Closure attempted without findings or a corrective action; 403 A critical incident closed by the person who completed its corrective action (`closer-completed-action`; workbook Q530; CHG-CSA-033).; 422 A move … | opens modal first |
 
 **Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
@@ -849,9 +801,9 @@ Errors to draw in the form: 400 Closure attempted without findings or a correcti
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the home duty untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | **Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on severity, status, isReportable and the home duty are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `getWorkstationShift` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `getWorkstationShift` requires to show this screen, and names that permission (the screen's other reads need `INCIDENT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_MANAGE` for `recordAuthorityNotification` … |
 | Offline (`?state=offline`) | Last synced view, with its age. The pending count is always current because it is local |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 Closure attempted without findings or a corrective action; 400 Validation failed; 409 The incident is not reportable (`isReportable` false, audit R106 (6)). |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 Closure attempted without findings or a corrective action; 400 Validation failed; 409 The incident is not reportable (`isReportable` false, audit R106 (6)).; 422 A move outside the incident flow (`incident-transition-not-allowed`; CHG-RUL-011): to `actionRequired`, from `closed` to anything but `underInvestigation`, a … |
 
 #### Edge cases to draw
 
@@ -895,7 +847,7 @@ pendingSync: 2 waiting to sync · last synced 20:38 GST
 - `reportIncident` → `INCIDENT_REPORT` (operate) · staff
 - `updateIncident` → `INCIDENT_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `getWorkstationShift` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `getWorkstationShift` requires to show this screen, and names that permission (the screen's other reads need `INCIDENT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `INCIDENT_MANAGE` for `recordAuthorityNotification` …
 
 #### Requirements it meets
 
@@ -939,8 +891,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (31), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (70 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (35), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
+- [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-003?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Record authority notification, Report incident, Save incident.
 - [ ] Every transition is wired: `EMP-004`, `EMP-001`, `EMP-002`, `EMP-051`, `EMP-052`, `EMP-053`, `EMP-054`, `EMP-055`, `EMP-056`, `EMP-057`, `EMP-058`, `EMP-059`, `EMP-060`, `EMP-061`, `EMP-062`, `EMP-063`, `EMP-064`, `EMP-065`, `EMP-066`, `EMP-067`, `EMP-068`, `EMP-069`, `EMP-070`, `EMP-071`, `EMP-081`, `EMP-091`, `EMP-006`, `EMP-014`, `EMP-019`, `EMP-021`, `EMP-022`, `EMP-024`, `EMP-025`, `EMP-026`, `EMP-028`, `EMP-029`, `EMP-030`, `EMP-031`, `EMP-033`, `EMP-034`, `EMP-037`, `EMP-038`, `EMP-039`, `EMP-047`, `EMP-042`.
@@ -961,7 +913,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-009 |
 | Who uses it | venue staff holding `OVERSHORT_ACCEPT`, `REPORT_VIEW_WORKSTATION`, `SHIFT_CLOSE`, `SHIFT_OPEN`, `SHIFT_SUSPEND` (5 operate); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | approvalInbox (comfortable density): `approveShiftOpen` decides items that `listCashMovements` queues — every row is waiting for a person, so the empty state is success |
@@ -1027,6 +979,9 @@ Errors to draw in the form: 403 The shift is not the caller's own (problem type 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
 | Reason `reason` | text area | required | — | min length 3; max length 500 | — | Retained for audit. The accepting principal is recorded. | `acceptShiftVariance` body |
+| Supervisor step up `supervisorStepUp` | group | optional | — | — | — | The supervisor accepting, signing on this device (CHG-RUL-019). Refused without it (`403 supervisor-step-up-refused`). | `acceptShiftVariance` body |
+| Principal `supervisorStepUp.principalId` | picker: choose a principal | required | — | — | shows names, sends the id | The supervisor signing. Recorded against the act. | `acceptShiftVariance` body |
+| Credential `supervisorStepUp.credential` | text area | required | — | max length 512 | — | The supervisor's staff PIN, as they sign in at a till with it. A PIN, never a password (audit R123 (7)). | `acceptShiftVariance` body |
 
 Errors to draw in the form: 403 The caller lacks OVERSHORT_ACCEPT at this venue, or is the cashier whose shift it is (problem type `approver-is-cashier`) — a cashier signing off their own …; 409 Shift is not `pendingVariance` (problem type `shift-not-pending-variance`) — within tolerance, still open, or already accepted.
 
@@ -1051,32 +1006,17 @@ Errors to draw in the form: 403 The caller lacks OVERSHORT_ACCEPT at this venue,
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. |
-| Kind | chip: Opening float, Lift, Add | `openingFloat` is written by `openShift`; `lift` by `createCashMovement` and by `withdrawFromDepositBox`, which is a lift from one … |
-| Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Denominations | list or chips (count when long) | Stored as `orders.cash_count_line` rows with `countKind: movement` and this movement's `cashMovementId`, not as a column. |
 | Reference | text | Safe drop reference or bag number. |
 | Reason | text | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
-| Shift | the name it points at, never the id | — |
-| Authorised by principal | the name it points at, never the id | The principal who authorised the movement, recorded for audit. |
-| Sequence | 1,234 | Monotonic within the shift. Preserves order across an offline batch. |
 | Synced at | 1 Oct 2026, 14:30 | — |
 
 **Every shift** (data table, from `listShifts`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. Also the idempotency key. |
-| Workstation | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Principal | the name it points at, never the id | Who opened it. Cash reconciles to a person and a drawer. |
 | Principal display name | text | — |
-| Incidents | list or chips (count when long) | BL-097. A till has exceptions and there was nowhere to write them — a no-sale, a drawer opened without a transaction, a manager override, a … |
 | Status | chip: Pending approval, Open, Suspended, Pending variance, Pending closure, Closed… | — |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Deposit box code | text | — |
 | Bag number | text | — |
 
@@ -1084,56 +1024,31 @@ Errors to draw in the form: 403 The caller lacks OVERSHORT_ACCEPT at this venue,
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. |
 | Kind | chip: Opening float, Lift, Add | `openingFloat` is written by `openShift`; `lift` by `createCashMovement` and by `withdrawFromDepositBox`, which is a lift from one … |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Denominations | list or chips (count when long) | Stored as `orders.cash_count_line` rows with `countKind: movement` and this movement's `cashMovementId`, not as a column. |
 | Reference | text | Safe drop reference or bag number. |
 | Reason | text | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
-| Shift | the name it points at, never the id | — |
-| Deposit box | the name it points at, never the id | The box the cash moved in or out of. Set on every lift `withdrawFromDepositBox` records (26 September, pull audit R099). |
-| Witness principal | the name it points at, never the id | The cashier who countersigned a withdrawal. Null on other movements. |
-| Withdrawal reason | chip: Banking, Safe drop, Change order, Other | Why a supervisor took cash out of a box. Set only on lifts `withdrawFromDepositBox` records. |
-| Authorised by principal | the name it points at, never the id | The principal who authorised the movement, recorded for audit. |
-| Sequence | 1,234 | Monotonic within the shift. Preserves order across an offline batch. |
-| Synced at | 1 Oct 2026, 14:30 | — |
 
 **The shift** (detail panel, from `getShift`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. Also the idempotency key. |
-| Workstation | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Principal | the name it points at, never the id | Who opened it. Cash reconciles to a person and a drawer. |
 | Principal display name | text | — |
 | Incidents | list or chips (count when long) | BL-097. A till has exceptions and there was nowhere to write them — a no-sale, a drawer opened without a transaction, a manager override, a … |
 | Status | chip: Pending approval, Open, Suspended, Pending variance, Pending closure, Closed… | — |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Deposit box code | text | — |
 | Bag number | text | — |
-| Opening float | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **The shift** (detail panel, from `getCurrentShift`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. Also the idempotency key. |
-| Workstation | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Principal | the name it points at, never the id | Who opened it. Cash reconciles to a person and a drawer. |
 | Principal display name | text | — |
 | Incidents | list or chips (count when long) | BL-097. A till has exceptions and there was nowhere to write them — a no-sale, a drawer opened without a transaction, a manager override, a … |
 | Status | chip: Pending approval, Open, Suspended, Pending variance, Pending closure, Closed… | — |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Deposit box code | text | — |
 | Bag number | text | — |
-| Opening float | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **Actions and what each produces**
 
@@ -1171,7 +1086,7 @@ Errors to draw in the form: 403 The caller lacks OVERSHORT_ACCEPT at this venue,
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the end shift untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | **Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listCashMovements` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_WORKSTATION` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT` for `acceptShiftVariance`; `SHIFT_CLOSE` … |
 | Offline (`?state=offline`) | **Cannot close.** Closing needs the server total, and a locally computed variance is not a variance |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Shift is not `open` (problem type `shift-not-open`); 409 Shift is not `pendingVariance` (problem type `shift-not-pending-variance`) — within tolerance, still open, or already accepted.; 409 The shift is neither `open`, `suspended` nor `pendingVariance` (problem type `shift-not-countable`). |
 
@@ -1219,7 +1134,7 @@ handover:
 - `listShifts` → `REPORT_VIEW_WORKSTATION` (operate) · staff
 - `suspendShift` → `SHIFT_SUSPEND` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `SHIFT_OPEN`, which `getCurrentShift` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_WORKSTATION` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `OVERSHORT_ACCEPT` for `acceptShiftVariance`; `SHIFT_CLOSE` …
 
 #### Requirements it meets
 
@@ -1256,8 +1171,8 @@ Also apply: 1 for P06 · Operations, 12 for all of P06, 29 for every app (sectio
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (14), with its required mark, default, format and its error state (403, 404, 409).
-- [ ] Every output is drawn (63 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (17), with its required mark, default, format and its error state (403, 404, 409).
+- [ ] Every output is drawn (23 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-009?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Close shift, Accept shift variance, Suspend shift.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`.
@@ -1278,7 +1193,7 @@ Also apply: 1 for P06 · Operations, 12 for all of P06, 29 for every app (sectio
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `access` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-010 |
 | Who uses it | venue staff holding `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `TICKET_LOOKUP` (3 operate) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listScans` reads the population and `getOfflinePackage` reads one of them — list, select, act |
@@ -1465,7 +1380,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `maintenance` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block A · task APP-STAFF-EMP-004 |
 | Who uses it | venue staff holding `MAINTENANCE_EXECUTE`, `WORK_ORDER_VIEW` (1 operate, 1 read); in the flows as supervisor, technician |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listWorkOrders` reads the population and `getWorkOrder` reads one of them — list, select, act |
@@ -1534,59 +1449,29 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Shows | Format | Notes |
 |---|---|---|
 | Downtime minutes | 1,234 | Measured from out-of-service to back-in-service, not from work start to work end. |
-| Root cause | chip: Wear and tear, Operator error, Guest damage, Manufacturing defect, Environmental … | Structured, because free text cannot be counted. *Deferred maintenance* is the value a venue least wants to see and most needs to — a fault … |
-| Root cause note | text | — |
-| Escalated at | 1 Oct 2026, 14:30 | — |
-| Escalation level | 1,234 | Escalation is a clock, not a decision. A work order on a ride nobody has accepted after twenty minutes escalates itself, because the … |
-| ID | the name it points at, never the id | — |
 | Work order number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | Title | text | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Asset name | text | The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record … |
-| Status | chip: Open, Assigned, In progress, Paused, Awaiting parts, Completed… | — |
 
 **The selected work order** (detail panel, from `listWorkOrders`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Downtime minutes | 1,234 | Measured from out-of-service to back-in-service, not from work start to work end. |
-| Root cause | chip: Wear and tear, Operator error, Guest damage, Manufacturing defect, Environmental … | Structured, because free text cannot be counted. *Deferred maintenance* is the value a venue least wants to see and most needs to — a fault … |
-| Root cause note | text | — |
-| Escalated at | 1 Oct 2026, 14:30 | — |
-| Escalation level | 1,234 | Escalation is a clock, not a decision. A work order on a ride nobody has accepted after twenty minutes escalates itself, because the … |
-| ID | the name it points at, never the id | — |
 | Work order number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | Title | text | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Asset name | text | The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record … |
 | Status | chip: Open, Assigned, In progress, Paused, Awaiting parts, Completed… | — |
 | Priority | chip: Low, Normal, High, Urgent, Emergency | — |
-| Kind | chip: Corrective, Planned, Inspection follow up, Incident corrective, Improvement | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Raised by principal | the name it points at, never the id | — |
 
 **The work order** (detail panel, from `getWorkOrder`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Downtime minutes | 1,234 | Measured from out-of-service to back-in-service, not from work start to work end. |
-| Root cause | chip: Wear and tear, Operator error, Guest damage, Manufacturing defect, Environmental … | Structured, because free text cannot be counted. *Deferred maintenance* is the value a venue least wants to see and most needs to — a fault … |
-| Root cause note | text | — |
-| Escalated at | 1 Oct 2026, 14:30 | — |
-| Escalation level | 1,234 | Escalation is a clock, not a decision. A work order on a ride nobody has accepted after twenty minutes escalates itself, because the … |
-| ID | the name it points at, never the id | — |
 | Work order number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | Title | text | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Asset name | text | The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record … |
 | Status | chip: Open, Assigned, In progress, Paused, Awaiting parts, Completed… | — |
 | Priority | chip: Low, Normal, High, Urgent, Emergency | — |
-| Kind | chip: Corrective, Planned, Inspection follow up, Incident corrective, Improvement | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Raised by principal | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
@@ -1629,7 +1514,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the task list untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No task list yet. Offers no create action — this screen declares no operation that makes one; distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on assignedToPrincipalId, status, priority, assetId, overdueOnly and the task list are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORK_ORDER_VIEW`, which `listWorkOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORK_ORDER_VIEW`, which `listWorkOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MAINTENANCE_EXECUTE` for `acceptWorkOrder`, `rejectWorkOrder`. |
 | Offline (`?state=offline`) | Local queue. Tasks completed offline sync on return |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed; 409 Not assigned to this principal, or already accepted |
 
@@ -1682,7 +1567,7 @@ available:
 - `rejectWorkOrder` → `MAINTENANCE_EXECUTE` (operate) · staff
 - `getWorkOrder` → `WORK_ORDER_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `WORK_ORDER_VIEW`, which `listWorkOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `WORK_ORDER_VIEW`, which `listWorkOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MAINTENANCE_EXECUTE` for `acceptWorkOrder`, `rejectWorkOrder`.
 
 #### Requirements it meets
 
@@ -1731,7 +1616,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (4), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-004?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Accept work order, Reject work order.
 - [ ] Every transition is wired: `EMP-003`, `EMP-005`.
@@ -1751,7 +1636,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `maintenance` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block A · task APP-STAFF-EMP-005 |
 | Who uses it | venue staff holding `MAINTENANCE_EXECUTE`, `PROCUREMENT_REQUEST`, `PRODUCT_VIEW`, `WORK_ORDER_MANAGE`, `WORK_ORDER_VIEW` (2 operate, 2 read, 1 configure); in the flows as supervisor, technician |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listWorkOrders` reads the population and `getWorkOrder` reads one of them — list, select, act |
@@ -1918,59 +1803,29 @@ Errors to draw in the form: 400 Validation failed; 409 Action inconsistent with 
 | Shows | Format | Notes |
 |---|---|---|
 | Downtime minutes | 1,234 | Measured from out-of-service to back-in-service, not from work start to work end. |
-| Root cause | chip: Wear and tear, Operator error, Guest damage, Manufacturing defect, Environmental … | Structured, because free text cannot be counted. *Deferred maintenance* is the value a venue least wants to see and most needs to — a fault … |
-| Root cause note | text | — |
-| Escalated at | 1 Oct 2026, 14:30 | — |
-| Escalation level | 1,234 | Escalation is a clock, not a decision. A work order on a ride nobody has accepted after twenty minutes escalates itself, because the … |
-| ID | the name it points at, never the id | — |
 | Work order number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | Title | text | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Asset name | text | The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record … |
-| Status | chip: Open, Assigned, In progress, Paused, Awaiting parts, Completed… | — |
 
 **The selected work order** (detail panel, from `listWorkOrders`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Downtime minutes | 1,234 | Measured from out-of-service to back-in-service, not from work start to work end. |
-| Root cause | chip: Wear and tear, Operator error, Guest damage, Manufacturing defect, Environmental … | Structured, because free text cannot be counted. *Deferred maintenance* is the value a venue least wants to see and most needs to — a fault … |
-| Root cause note | text | — |
-| Escalated at | 1 Oct 2026, 14:30 | — |
-| Escalation level | 1,234 | Escalation is a clock, not a decision. A work order on a ride nobody has accepted after twenty minutes escalates itself, because the … |
-| ID | the name it points at, never the id | — |
 | Work order number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | Title | text | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Asset name | text | The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record … |
 | Status | chip: Open, Assigned, In progress, Paused, Awaiting parts, Completed… | — |
 | Priority | chip: Low, Normal, High, Urgent, Emergency | — |
-| Kind | chip: Corrective, Planned, Inspection follow up, Incident corrective, Improvement | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Raised by principal | the name it points at, never the id | — |
 
 **The work order** (detail panel, from `getWorkOrder`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Downtime minutes | 1,234 | Measured from out-of-service to back-in-service, not from work start to work end. |
-| Root cause | chip: Wear and tear, Operator error, Guest damage, Manufacturing defect, Environmental … | Structured, because free text cannot be counted. *Deferred maintenance* is the value a venue least wants to see and most needs to — a fault … |
-| Root cause note | text | — |
-| Escalated at | 1 Oct 2026, 14:30 | — |
-| Escalation level | 1,234 | Escalation is a clock, not a decision. A work order on a ride nobody has accepted after twenty minutes escalates itself, because the … |
-| ID | the name it points at, never the id | — |
 | Work order number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | Title | text | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Asset name | text | The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record … |
 | Status | chip: Open, Assigned, In progress, Paused, Awaiting parts, Completed… | — |
 | Priority | chip: Low, Normal, High, Urgent, Emergency | — |
-| Kind | chip: Corrective, Planned, Inspection follow up, Incident corrective, Improvement | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Raised by principal | the name it points at, never the id | — |
 
 **Parts reserved for this task** (data table, from `listStockReservations`): **Reserved in the general inventory** (decided 17 September, M17-02), `sourceType` workOrder. *Record work order parts* issues from the reservation first. Needs signal: stock depletes in real time, so the reserve action is hidden offline.
 
@@ -2035,7 +1890,7 @@ Errors to draw in the form: 400 Validation failed; 409 Action inconsistent with 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the task untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No task yet. Offers Record work order parts (`recordWorkOrderParts`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on assignedToPrincipalId, status, priority, assetId, overdueOnly and the task are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORK_ORDER_VIEW`, which `getWorkOrder` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORK_ORDER_VIEW`, which `listWorkOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MAINTENANCE_EXECUTE` for `startWorkOrder`, `pauseWorkOrder`, `acceptWorkOrder`, `attachWorkOrderEvidence` and 2 more; `PROCUREMENT_REQUEST` for … |
 | Offline (`?state=offline`) | Editable offline. Findings and photos queue |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Completion photographs required for this category and none supplied; 400 Validation failed; 409 Action inconsistent with the current timer state; 409 Insufficient stock |
 
@@ -2099,7 +1954,7 @@ workOrder:
 - `rejectWorkOrder` → `MAINTENANCE_EXECUTE` (operate) · staff
 - `resumeWorkOrder` → `MAINTENANCE_EXECUTE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `WORK_ORDER_VIEW`, which `getWorkOrder` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `WORK_ORDER_VIEW`, which `listWorkOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MAINTENANCE_EXECUTE` for `startWorkOrder`, `pauseWorkOrder`, `acceptWorkOrder`, `attachWorkOrderEvidence` and 2 more; `PROCUREMENT_REQUEST` for …
 
 #### Requirements it meets
 
@@ -2154,7 +2009,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (40), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (47 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (17 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-005?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Start work order, Pause work order, Complete work order, Accept work order, Attach work order evidence, Record work order parts, Record work order time, Reject work order, Resume work order, Reserve parts, Release reserved parts.
 - [ ] Every transition is wired: `EMP-007`, `EMP-001`, `EMP-002`, `EMP-003`, `BO-078`, `BO-030`.
@@ -2174,7 +2029,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 1 · needs the `maintenance` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-006 |
 | Who uses it | venue staff holding `MAINTENANCE_APPROVE`, `MAINTENANCE_EXECUTE`, `WORK_ORDER_MANAGE`, `WORK_ORDER_VERIFY`, `WORK_ORDER_VIEW` (3 operate, 1 configure, 1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listWorkOrders` reads the population and `getWorkOrder` reads one of them — list, select, act |
@@ -2386,59 +2241,29 @@ Errors to draw in the form: 403 Verifier is the technician who completed the wor
 | Shows | Format | Notes |
 |---|---|---|
 | Downtime minutes | 1,234 | Measured from out-of-service to back-in-service, not from work start to work end. |
-| Root cause | chip: Wear and tear, Operator error, Guest damage, Manufacturing defect, Environmental … | Structured, because free text cannot be counted. *Deferred maintenance* is the value a venue least wants to see and most needs to — a fault … |
-| Root cause note | text | — |
-| Escalated at | 1 Oct 2026, 14:30 | — |
-| Escalation level | 1,234 | Escalation is a clock, not a decision. A work order on a ride nobody has accepted after twenty minutes escalates itself, because the … |
-| ID | the name it points at, never the id | — |
 | Work order number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | Title | text | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Asset name | text | The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record … |
-| Status | chip: Open, Assigned, In progress, Paused, Awaiting parts, Completed… | — |
 
 **The selected work order** (detail panel, from `listWorkOrders`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Downtime minutes | 1,234 | Measured from out-of-service to back-in-service, not from work start to work end. |
-| Root cause | chip: Wear and tear, Operator error, Guest damage, Manufacturing defect, Environmental … | Structured, because free text cannot be counted. *Deferred maintenance* is the value a venue least wants to see and most needs to — a fault … |
-| Root cause note | text | — |
-| Escalated at | 1 Oct 2026, 14:30 | — |
-| Escalation level | 1,234 | Escalation is a clock, not a decision. A work order on a ride nobody has accepted after twenty minutes escalates itself, because the … |
-| ID | the name it points at, never the id | — |
 | Work order number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | Title | text | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Asset name | text | The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record … |
 | Status | chip: Open, Assigned, In progress, Paused, Awaiting parts, Completed… | — |
 | Priority | chip: Low, Normal, High, Urgent, Emergency | — |
-| Kind | chip: Corrective, Planned, Inspection follow up, Incident corrective, Improvement | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Raised by principal | the name it points at, never the id | — |
 
 **The work order** (detail panel, from `getWorkOrder`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Downtime minutes | 1,234 | Measured from out-of-service to back-in-service, not from work start to work end. |
-| Root cause | chip: Wear and tear, Operator error, Guest damage, Manufacturing defect, Environmental … | Structured, because free text cannot be counted. *Deferred maintenance* is the value a venue least wants to see and most needs to — a fault … |
-| Root cause note | text | — |
-| Escalated at | 1 Oct 2026, 14:30 | — |
-| Escalation level | 1,234 | Escalation is a clock, not a decision. A work order on a ride nobody has accepted after twenty minutes escalates itself, because the … |
-| ID | the name it points at, never the id | — |
 | Work order number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152). |
 | Title | text | — |
-| Venue | the name it points at, never the id | — |
-| Asset | the image or video | — |
 | Asset name | text | The asset's name, copied when the work order is raised or its asset changes, and not updated when the asset is later renamed — the record … |
 | Status | chip: Open, Assigned, In progress, Paused, Awaiting parts, Completed… | — |
 | Priority | chip: Low, Normal, High, Urgent, Emergency | — |
-| Kind | chip: Corrective, Planned, Inspection follow up, Incident corrective, Improvement | — |
-| Assigned to principal | the name it points at, never the id | — |
-| Raised by principal | the name it points at, never the id | — |
 
 **Actions and what each produces**
 
@@ -2448,7 +2273,7 @@ Errors to draw in the form: 403 Verifier is the technician who completed the wor
 | Create work order (primary button) | `createWorkOrder` POST `/work-orders` | CreateWorkOrderRequest | WorkOrder | 400 Validation failed | works offline; opens modal first |
 | Accept work order (secondary button) | `acceptWorkOrder` POST `/work-orders/{workOrderId}/accept` | — | WorkOrder | 409 Not assigned to this principal, or already accepted | works offline |
 | Attach work order evidence (secondary button) | `attachWorkOrderEvidence` POST `/work-orders/{workOrderId}/attachments` | inline | WorkOrderAttachment | — | works offline; opens modal first |
-| Cancel work order (destructive button) | `cancelWorkOrder` POST `/work-orders/{workOrderId}/cancel` | inline | WorkOrder | 409 Work has started. | — |
+| Cancel work order (destructive button) | `cancelWorkOrder` POST `/work-orders/{workOrderId}/cancel` | inline | WorkOrder | 409 Labour time or a part is already recorded against it (`work-recorded`; CHG-RUL-010). | — |
 | Close work order (destructive button) | `closeWorkOrder` POST `/work-orders/{workOrderId}/close` | inline | WorkOrder | — | — |
 | Complete work order (secondary button) | `completeWorkOrder` POST `/work-orders/{workOrderId}/complete` | inline | WorkOrder | 400 Completion photographs required for this category and none supplied | works offline; opens modal first |
 | Pause work order (secondary button) | `pauseWorkOrder` POST `/work-orders/{workOrderId}/pause` | inline | WorkOrder | 400 Validation failed | works offline; opens modal first |
@@ -2493,7 +2318,7 @@ Errors to draw in the form: 403 Verifier is the technician who completed the wor
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the raise task untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No raise task yet. Offers Create work order (`createWorkOrder`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on assignedToPrincipalId, status, priority, assetId, overdueOnly and the raise task are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORK_ORDER_VIEW`, which `getWorkOrder` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `WORK_ORDER_VIEW`, which `listWorkOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MAINTENANCE_APPROVE` for `closeWorkOrder`; `MAINTENANCE_EXECUTE` for `acceptWorkOrder`, `attachWorkOrderEvidence`, `pauseWorkOrder` … |
 | Offline (`?state=offline`) | Queues locally. A task raised in a plant room must not need signal |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Completion photographs required for this category and none supplied; 400 Validation failed; 409 Action inconsistent with the current timer state; 409 Insufficient stock |
 
@@ -2551,7 +2376,7 @@ raised:
 - `updateWorkOrder` → `WORK_ORDER_MANAGE` (configure) · staff
 - `verifyWorkOrder` → `WORK_ORDER_VERIFY` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `WORK_ORDER_VIEW`, which `getWorkOrder` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `WORK_ORDER_VIEW`, which `listWorkOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `MAINTENANCE_APPROVE` for `closeWorkOrder`; `MAINTENANCE_EXECUTE` for `acceptWorkOrder`, `attachWorkOrderEvidence`, `pauseWorkOrder` …
 
 #### Requirements it meets
 
@@ -2596,7 +2421,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (63), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (44 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-006?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Create work order, Accept work order, Attach work order evidence, Cancel work order, Close work order, Complete work order, Pause work order, Record work order parts, Record work order time, Reject work order, Resume work order, Start work order, Save work order, Verify work order.
 - [ ] Every transition is wired: `EMP-001`, `EMP-002`, `EMP-003`, `EMP-004`.
@@ -2617,7 +2442,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-007 |
 | Who uses it | venue staff holding `WORK_ORDER_VIEW` (1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listAnnouncements` reads the population and `getAnnouncementReach` reads one of them — list, select, act |
@@ -2804,8 +2629,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `core` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
-| Who uses it | venue staff holding `REPORT_VIEW_OWN`, `REPORT_VIEW_WORKSTATION`, `SHIFT_OPEN` (1 ?, 2 operate); in the flows as supervisor |
+| Block | Block C · task APP-STAFF-EMP-008 |
+| Who uses it | venue staff holding `REPORT_VIEW_OWN`, `REPORT_VIEW_WORKSTATION`, `SHIFT_OPEN` (3 operate); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listShifts` reads the population and `getCurrentShift` reads one of them — list, select, act |
 | Offline | Local totals, marked as unreconciled |
@@ -2872,16 +2697,8 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. Also the idempotency key. |
-| Workstation | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Principal | the name it points at, never the id | Who opened it. Cash reconciles to a person and a drawer. |
 | Principal display name | text | — |
-| Incidents | list or chips (count when long) | BL-097. A till has exceptions and there was nowhere to write them — a no-sale, a drawer opened without a transaction, a manager override, a … |
 | Status | chip: Pending approval, Open, Suspended, Pending variance, Pending closure, Closed… | — |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Deposit box code | text | — |
 | Bag number | text | — |
 
@@ -2889,54 +2706,30 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. |
 | Kind | chip: Opening float, Lift, Add | `openingFloat` is written by `openShift`; `lift` by `createCashMovement` and by `withdrawFromDepositBox`, which is a lift from one … |
 | Amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Denominations | list or chips (count when long) | Stored as `orders.cash_count_line` rows with `countKind: movement` and this movement's `cashMovementId`, not as a column. |
 | Reference | text | Safe drop reference or bag number. |
-| Reason | text | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
-| Shift | the name it points at, never the id | — |
-| Deposit box | the name it points at, never the id | The box the cash moved in or out of. Set on every lift `withdrawFromDepositBox` records (26 September, pull audit R099). |
-| Witness principal | the name it points at, never the id | The cashier who countersigned a withdrawal. Null on other movements. |
-| Withdrawal reason | chip: Banking, Safe drop, Change order, Other | Why a supervisor took cash out of a box. Set only on lifts `withdrawFromDepositBox` records. |
-| Authorised by principal | the name it points at, never the id | The principal who authorised the movement, recorded for audit. |
 
 **The selected shift** (detail panel, from `getCurrentShift`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. Also the idempotency key. |
-| Workstation | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Principal | the name it points at, never the id | Who opened it. Cash reconciles to a person and a drawer. |
 | Principal display name | text | — |
 | Incidents | list or chips (count when long) | BL-097. A till has exceptions and there was nowhere to write them — a no-sale, a drawer opened without a transaction, a manager override, a … |
 | Status | chip: Pending approval, Open, Suspended, Pending variance, Pending closure, Closed… | — |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Deposit box code | text | — |
 | Bag number | text | — |
-| Opening float | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **The shift** (detail panel, from `getShift`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | Client-generated UUIDv7. Also the idempotency key. |
-| Workstation | the name it points at, never the id | — |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
-| Principal | the name it points at, never the id | Who opened it. Cash reconciles to a person and a drawer. |
 | Principal display name | text | — |
 | Incidents | list or chips (count when long) | BL-097. A till has exceptions and there was nowhere to write them — a no-sale, a drawer opened without a transaction, a manager override, a … |
 | Status | chip: Pending approval, Open, Suspended, Pending variance, Pending closure, Closed… | — |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Currency scale | 1,234 | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Deposit box code | text | — |
 | Bag number | text | — |
-| Opening float | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
 **Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
@@ -2987,7 +2780,7 @@ afterCount:
 - `getCurrentShift` → `SHIFT_OPEN` (operate) · staff
 - `getShift` → `REPORT_VIEW_WORKSTATION` (operate) · staff
 - `listCashMovements` → `REPORT_VIEW_WORKSTATION` (operate) · staff
-- `getServiceSummary` → `REPORT_VIEW_OWN` (tier not set) · staff
+- `getServiceSummary` → `REPORT_VIEW_OWN` (operate) · staff
 
 **A refused user sees:** Shown when the caller lacks `REPORT_VIEW_WORKSTATION`, which `listShifts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
 
@@ -3022,7 +2815,7 @@ Also apply: 1 for P06 · Operations, 12 for all of P06, 29 for every app (sectio
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (4), with its required mark, default, format and its error state (403, 404).
-- [ ] Every output is drawn (56 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-008?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `EMP-017`, `EMP-001`, `EMP-002`, `EMP-003`.
@@ -3160,7 +2953,7 @@ Method, path, parameters, request and response for every operation these screens
 "startWorkOrder": {"method":"POST","path":"/work-orders/{workOrderId}/start","contract":"maintenance","summary":"Work has begun","permission":"MAINTENANCE_EXECUTE","offlineCapable":true,"conflictPolicy":"lastWriterWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WorkOrder"},
 "submitShiftCount": {"method":"POST","path":"/shifts/{shiftId}/count","contract":"shift","summary":"The cashier's blind count, closing their own shift","permission":"SHIFT_CLOSE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CloseShiftRequest","responds":"ShiftCountReceipt"},
 "suspendShift": {"method":"POST","path":"/shifts/{shiftId}/suspend","contract":"shift","summary":"Suspend a shift so another user can log in","permission":"SHIFT_SUSPEND","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Shift"},
-"updateIncident": {"method":"PATCH","path":"/incidents/{incidentId}","contract":"maintenance","summary":"Investigate, escalate or close an incident","permission":"INCIDENT_MANAGE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Incident"},
+"updateIncident": {"method":"PATCH","path":"/incidents/{incidentId}","contract":"maintenance","summary":"Investigate, escalate, close or reopen an incident","permission":"INCIDENT_MANAGE","offlineCapable":false,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Incident"},
 "updateWorkOrder": {"method":"PATCH","path":"/work-orders/{workOrderId}","contract":"maintenance","summary":"Assign, reprioritise or amend","permission":"WORK_ORDER_MANAGE","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"WorkOrder"},
 "validateAccess": {"method":"POST","path":"/access/validate","contract":"access","summary":"Validate media at an access point and admit or deny","permission":"ACCESS_VALIDATE","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"ValidateRequest","responds":"ValidationResult"},
 "validateGroupAccess": {"method":"POST","path":"/access/group-validate","contract":"access","summary":"Admit a group on one read","permission":"ACCESS_VALIDATE","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"workstation","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"ValidationResult"},
@@ -3185,11 +2978,11 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "CreateWorkOrderRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","title","venueId","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"title":{"type":"string","maxLength":200},"description":{"type":"string","maxLength":5000},"venueId":{"type":"string","format":"uuid"},"assetId":{"type":"string","format":"uuid"},"locationDescription":{"type":"string","maxLength":500},"kind":{"allOf":[{"$ref":"#/components/schemas/WorkOrderKind"}],"default":"corrective"},"priority":{"allOf":[{"$ref":"#/components/schemas/WorkOrderPriority"}],"description":"**Optional since 29 September** (M17-01). Sent, it is `manual` and wins. Absent, the asset's `priorityOverride` applies, and failing that the venue's `WorkOrderPriorityPolicy` scores the fault.\n"},"faultAssessment":{"$ref":"#/components/schemas/WorkOrderFaultAssessment"},"requiredQualificationCodes":{"type":"array","maxItems":10,"items":{"type":"string"},"description":"Skills the job needs, as qualification codes; `suggestWorkOrderAssignee` ranks by them (M17-13)."},"categoryId":{"type":"string","format":"uuid"},"assignedToPrincipalId":{"type":"string","format":"uuid"},"dueAt":{"type":"string","format":"date-time"},"attachmentRefs":{"type":"array","description":"Photo-first. Expected at creation, not added later from memory.","items":{"type":"string"}},"takeAssetOutOfService":{"type":"boolean","default":false,"description":"Raise and immediately suspend the asset. For a fault found on a live ride, the two are one action.\n"},"recordedAt":{"type":"string","format":"date-time"}}},
 "DenyReason": {"type":"string","description":"Enumerated so the client can render an appropriate operator prompt. A gate operator facing a queue needs a reason and a next action, not a boolean.\n","enum":["notFound","notYetValid","expired","alreadyUsed","reentryLimitReached","exitRequiredBeforeReentry","wrongAccessPoint","wrongPerformance","outsideAdmissionWindow","entitlementSuspended","blacklisted","capacityReached","waiverRequired","accompanimentRequired","mediaDeactivated","unpaid","delegatedRightExhausted","delegatedRightRevoked","journeyNotCovered"]},
 "Direction": {"type":"string","enum":["entry","exit","reentry","crossover"]},
-"Incident": {"x-ticvai-persistence":"maintenance.incident","type":"object","required":["id","incidentNumber","kind","severity","status","venueId","occurredAt","reportedByPrincipalId"],"properties":{"id":{"type":"string","format":"uuid"},"incidentNumber":{"type":"string","readOnly":true,"description":"**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"},"kind":{"$ref":"#/components/schemas/IncidentKind"},"severity":{"$ref":"#/components/schemas/IncidentSeverity"},"status":{"$ref":"#/components/schemas/IncidentStatus"},"venueId":{"type":"string","format":"uuid"},"assetId":{"type":"string","format":"uuid","nullable":true},"locationDescription":{"type":"string","nullable":true},"isReportable":{"type":"boolean","description":"Requires notification to an external authority within a statutory window."},"notificationDueAt":{"type":"string","format":"date-time","nullable":true},"notifiedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"The earliest `notifiedAt` among this incident's authority notifications. **Maintained on write** by `recordAuthorityNotification`; each notification itself is a row of `maintenance.incident_authority_notification`.\n"},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true},"reportedByPrincipalId":{"type":"string","format":"uuid"},"correctiveWorkOrderId":{"type":"string","format":"uuid","nullable":true},"occurredAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"},"closedAt":{"type":"string","format":"date-time","nullable":true},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
+"Incident": {"x-ticvai-persistence":"maintenance.incident","type":"object","required":["id","incidentNumber","kind","severity","status","venueId","occurredAt","reportedByPrincipalId"],"properties":{"id":{"type":"string","format":"uuid"},"incidentNumber":{"type":"string","readOnly":true,"description":"**Server-assigned: the venue prefix plus a sequence per venue** (decided 28 September, audit R152). Not gapless; only tax invoices are gapless, per legal entity.\n"},"kind":{"$ref":"#/components/schemas/IncidentKind"},"severity":{"$ref":"#/components/schemas/IncidentSeverity"},"status":{"$ref":"#/components/schemas/IncidentStatus"},"venueId":{"type":"string","format":"uuid"},"assetId":{"type":"string","format":"uuid","nullable":true},"locationDescription":{"type":"string","nullable":true},"isReportable":{"type":"boolean","description":"Requires notification to an external authority within a statutory window."},"notificationDueAt":{"type":"string","format":"date-time","nullable":true},"notifiedAt":{"type":"string","format":"date-time","nullable":true,"readOnly":true,"x-ticvai-derived":"onWrite","description":"The earliest `notifiedAt` among this incident's authority notifications. **Maintained on write** by `recordAuthorityNotification`; each notification itself is a row of `maintenance.incident_authority_notification`.\n"},"assignedToPrincipalId":{"type":"string","format":"uuid","nullable":true},"reportedByPrincipalId":{"type":"string","format":"uuid"},"correctiveWorkOrderId":{"type":"string","format":"uuid","nullable":true},"escalation":{"type":"object","nullable":true,"readOnly":true,"description":"**Set while the incident is escalated** (the optional Escalated step of the 3 October flow; CHG-RUL-011). Screens show \"Escalated\" when `status` is `underInvestigation` and this is set. Cleared when the incident closes.\n","properties":{"toPrincipalId":{"type":"string","format":"uuid"},"byPrincipalId":{"type":"string","format":"uuid"},"reason":{"type":"string"},"escalatedAt":{"type":"string","format":"date-time"}}},"reopenCount":{"type":"integer","minimum":0,"readOnly":true,"description":"How many times the incident was reopened (CHG-RUL-011). Each reopen is a logged row."},"occurredAt":{"type":"string","format":"date-time"},"recordedAt":{"type":"string","format":"date-time"},"closedAt":{"type":"string","format":"date-time","nullable":true},"syncedAt":{"type":"string","format":"date-time","nullable":true}}},
 "IncidentAuthorityNotification": {"x-ticvai-persistence":"maintenance.incident_authority_notification","type":"object","description":"**One notification to an external authority, appended by `recordAuthorityNotification`.** An incident may be reported to more than one authority, or to the same one twice, and each is the evidence that an obligation was met — so each is a row, not an overwrite of `maintenance.incident.notified_at`.\n","required":["id","incidentId","authority","notifiedAt"],"properties":{"id":{"type":"string","format":"uuid"},"incidentId":{"type":"string","format":"uuid"},"authority":{"type":"string","maxLength":200},"reference":{"type":"string","maxLength":128,"nullable":true},"notifiedAt":{"type":"string","format":"date-time"},"notifiedByPrincipalId":{"type":"string","format":"uuid"},"attachmentRefs":{"type":"array","items":{"type":"string"}},"recordedAt":{"type":"string","format":"date-time"}}},
 "IncidentDetail": {"x-ticvai-persistence":"maintenance.incident","allOf":[{"$ref":"#/components/schemas/Incident"},{"type":"object","properties":{"description":{"type":"string","description":"The original report. Never edited — investigation adds to the record."},"investigationNote":{"type":"string","nullable":true,"readOnly":true,"description":"The latest entry of `investigationNotes`, kept for readers that show one line."},"investigationNotes":{"type":"array","readOnly":true,"description":"**Every investigation note, oldest first** (decided 28 September, audit R106 (5)). Read from `maintenance.incident_investigation_note`; appended by `updateIncident`.\n","items":{"$ref":"#/components/schemas/IncidentInvestigationNote"}},"rootCause":{"type":"string","nullable":true},"correctiveActions":{"type":"string","nullable":true},"firstAidGiven":{"type":"boolean"},"emergencyServicesCalled":{"type":"boolean"},"witnessCount":{"type":"integer"},"attachmentRefs":{"type":"array","items":{"type":"string"}},"involvedParties":{"type":"array","description":"Who was involved, as given in `ReportIncidentRequest.involvedSubjectIds` and `involvedStaffPrincipalIds`. Read from `maintenance.incident_involved_party`.\n","items":{"$ref":"#/components/schemas/IncidentInvolvedParty"}},"authorityNotifications":{"type":"array","description":"Read from `maintenance.incident_authority_notification`, oldest first.","items":{"$ref":"#/components/schemas/IncidentAuthorityNotification"}}}}]},
-"IncidentInvestigationNote": {"x-ticvai-persistence":"maintenance.incident_investigation_note","type":"object","description":"**One investigation note, appended by `updateIncident`** (decided 28 September, audit R106 (5)). A history rather than a field, so what an investigator thought on Tuesday survives what they found on Thursday.\n","required":["id","incidentId","note","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"incidentId":{"type":"string","format":"uuid"},"note":{"type":"string","maxLength":10000},"writtenByPrincipalId":{"type":"string","format":"uuid"},"recordedAt":{"type":"string","format":"date-time"}}},
-"IncidentInvolvedParty": {"x-ticvai-persistence":"maintenance.incident_involved_party","type":"object","description":"**One person involved in an incident, by opaque reference.** A guest or member of the public is a `pii.subject` id — personal details live there, the erasable store of ADR-0023, so the incident record survives an erasure request intact. A member of staff is a principal id. Exactly one of the two is set, as `kind` says.\n","required":["id","incidentId","kind"],"properties":{"id":{"type":"string","format":"uuid"},"incidentId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["subject","staff"]},"subjectId":{"type":"string","format":"uuid","nullable":true,"description":"A `pii.subject` id where `kind` is `subject`."},"principalId":{"type":"string","format":"uuid","nullable":true,"description":"The staff principal where `kind` is `staff`."}}},
+"IncidentInvestigationNote": {"x-ticvai-persistence":"maintenance.incident_investigation_note","type":"object","description":"**One investigation note, appended by `updateIncident`** (decided 28 September, audit R106 (5)). A history rather than a field, so what an investigator thought on Tuesday survives what they found on Thursday.\n","required":["id","incidentId","note","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"incidentId":{"type":"string","format":"uuid"},"note":{"type":"string","maxLength":10000},"kind":{"type":"string","enum":["note","statusChange","escalation","reopen"],"default":"note","description":"**Every change is logged here** (CHG-RUL-011): an investigator's note, or a row the server writes for a status change, an escalation or a reopen, with `note` as its reason.\n"},"fromStatus":{"allOf":[{"$ref":"#/components/schemas/IncidentStatus"}],"nullable":true},"toStatus":{"allOf":[{"$ref":"#/components/schemas/IncidentStatus"}],"nullable":true},"writtenByPrincipalId":{"type":"string","format":"uuid"},"recordedAt":{"type":"string","format":"date-time"}}},
+"IncidentInvolvedParty": {"x-ticvai-persistence":"maintenance.incident_involved_party","type":"object","description":"**One person involved in an incident, by opaque reference.** A guest or member of the public is a `pii.subject` id — personal details live there, the erasable store of ADR-0023, so the incident record survives an erasure request intact. A member of staff is a principal id. Exactly one of the two is set, as `kind` says.\n","required":["id","incidentId","kind"],"properties":{"id":{"type":"string","format":"uuid"},"incidentId":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["subject","staff"]},"subjectId":{"type":"string","format":"uuid","nullable":true,"description":"A `pii.subject` id where `kind` is `subject`."},"principalId":{"type":"string","format":"uuid","nullable":true,"description":"The staff principal where `kind` is `staff`."},"role":{"type":"string","nullable":true,"enum":["injured","involved","witness","reporter",null],"description":"The person's part in the incident, from `addIncidentPerson` (CHG-RUL-013)."},"contactStored":{"type":"boolean","readOnly":true,"description":"Whether a contact is held for the person: only with their consent to be contacted (`AddIncidentPersonRequest.contactConsent`; CHG-RUL-013).\n"}}},
 "IncidentKind": {"type":"string","enum":["guestInjury","staffInjury","nearMiss","propertyDamage","equipmentFailure","securityIncident","fireOrEvacuation","foodSafety","environmental","other"]},
 "IncidentSeverity": {"type":"string","enum":["nearMiss","minor","moderate","major","critical"]},
 "IncidentStatus": {"type":"string","enum":["reported","underInvestigation","actionRequired","closed"]},
@@ -3211,6 +3004,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "SsoProtocol": {"type":"string","enum":["oidc","saml2"]},
 "SsoProvider": {"x-ticvai-persistence":"identity.sso_provider","type":"object","required":["id","displayName","protocol"],"properties":{"id":{"type":"string","format":"uuid"},"displayName":{"type":"string"},"protocol":{"$ref":"#/components/schemas/SsoProtocol"},"iconAssetRef":{"type":"string","nullable":true},"isEnforced":{"type":"boolean","description":"True disables password login for principals covered by this provider."},"scopePath":{"type":"string","readOnly":true,"description":"**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `tenant` scope**; the server sets it and ignores it in a request."}}},
 "StockReservationSourceType": {"type":"string","enum":["workOrder","rentalAgreement","order","transfer","other"],"description":"What a stock reservation is for (decided 17 September, M17-02; `rentalAgreement` is the existing use from `rental.agreement_item`)."},
+"SupervisorStepUp": {"type":"object","description":"**A supervisor signs the act in place, on the device making the call** (decided 28 September, audit R144). Used where the decision is a same-device step-up rather than an approval request: reopening a shift, recounting a stock count, a retail return above the venue threshold, and (proposed by the coordinator, client to confirm) closing a stock transfer short and cancelling a performance.\n\n**The verification rule, the same on every operation that takes it:** the server checks `credential` against `principalId`; that principal must hold the operation's `x-ticvai-permission` at the operation's scope, must be active at that venue, and must not be the person whose act is being reversed where the operation says so. Any failure is a `403` (`supervisor-step-up-refused`) and nothing is written. **No approval request is raised**, and the operation declares `x-ticvai-step-up: pin`.\n","required":["principalId","credential"],"properties":{"principalId":{"type":"string","format":"uuid","description":"The supervisor signing. Recorded against the act."},"credential":{"type":"string","maxLength":512,"writeOnly":true,"description":"The supervisor's staff PIN, as they sign in at a till with it. **A PIN, never a password** (audit R123 (7)). Never stored or returned."}}},
 "TicketStatus": {"x-ticvai-persistence":"none — computed from entitlement and scans","description":"**A validation result, not a lifecycle**, despite the name. Computed at scan time from the entitlement and its scan history — `isValid`, `entriesUsed`, `isInsideVenue`.\n**The name misled a state model into anchoring on it** (`states/entitlement.yaml`, removed 18 August): six lifecycle states were checked against an object with no values, and `check-states` warned about it for a day before anyone read the schema.\nThe entitlement's lifecycle is `orders.EntitlementStatus`. **This is what a gate learns when it scans**, which is a different question with a similar name.\n","type":"object","required":["ticketId","isValid"],"properties":{"ticketId":{"type":"string","format":"uuid","description":"Stable for the life of the ticket, independent of the media carrying it."},"mediaCode":{"type":"string","nullable":true},"productName":{"type":"string"},"holderName":{"type":"string","nullable":true,"description":"Present only where the entitlement is name-bound. Identity and entitlement are separate concerns; most entitlements carry no holder.\n"},"isValid":{"type":"boolean"},"validFrom":{"type":"string","format":"date-time","nullable":true},"validTo":{"type":"string","format":"date-time","nullable":true},"performanceId":{"type":"string","format":"uuid","nullable":true},"entriesUsed":{"type":"integer"},"entriesAllowed":{"type":"integer","nullable":true,"description":"Null means unlimited."},"reentryAllowed":{"type":"boolean"},"isInsideVenue":{"type":"boolean","description":"Derived from the last scan. Drives anti-passback evaluation."},"issuingCellId":{"type":"string","nullable":true,"description":"Present when this entitlement was issued in a different cell and is being redeemed here as a delegated right (ADR-0010). Null for locally issued tickets.\n"},"guestLinkId":{"type":"string","nullable":true,"description":"Pseudonymous cross-region guest reference. Present only on delegated rights. Carries no personal data.\n"},"admissionRulesId":{"type":"string","format":"uuid"},"denyReason":{"$ref":"#/components/schemas/DenyReason"}}},
 "TokenPair": {"x-ticvai-persistence":"none — transient","type":"object","required":["accessToken","refreshToken","expiresIn"],"properties":{"accessToken":{"type":"string","description":"JWT carrying `sid`, validated per request against the session registry."},"refreshToken":{"type":"string"},"expiresIn":{"type":"integer","description":"Seconds"}}},
 "ValidateRequest": {"type":"object","required":["id","mediaCode","mediaKind","direction","recordedAt"],"properties":{"id":{"type":"string","format":"uuid","description":"Client-generated UUIDv7. Also the idempotency key and dedupe key."},"mediaCode":{"type":"string","maxLength":256,"description":"What was read from the media. NOT the ticket id — media can be re-linked over a ticket's life.\n"},"mediaKind":{"$ref":"#/components/schemas/MediaKind"},"direction":{"$ref":"#/components/schemas/Direction"},"groupSize":{"type":"integer","minimum":1,"description":"For group media admitting several holders on one read."},"proximityToken":{"type":"string","description":"BLE proximity assertion where the venue requires the operator to be physically at the gate. Absent where not configured.\n"},"recordedAt":{"type":"string","format":"date-time","description":"Device time of the read. Authoritative for ordering, not for validity."}}},

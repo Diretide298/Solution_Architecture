@@ -1452,6 +1452,7 @@ Also apply: 5 for P08 · Orders & Money, 24 for all of P08, 29 for every app (se
 - Client workshop board: `wireframes/WS191 Wallet Configuration Backend Structure v1.0 Board 6.dc.html#bo-1142`
 - Workshop pack: Wallet_Configuration_Backend_Structure_v1.0.pdf board 6
 - Flow F298 *Wallet Configuration Backend Structure v1.0 board 6: Wallet Usage & Channel …*, step 18: Works in Wallet Transaction Simulator, Monitoring & Channel Audit → Test the complete channel-to-wallet transaction flow before configuration is published. Simulation Scenario Customer: Family Member / Child Wallet: Family Wallet Credential: RFID Wristband #CH-0045 …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 

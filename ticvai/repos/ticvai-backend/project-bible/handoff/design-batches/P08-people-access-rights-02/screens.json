@@ -95,7 +95,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-088"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "listIndexJobs",
@@ -160,7 +160,7 @@
     {
      "to": "BO-053",
      "trigger": "Staff Directory",
-     "provenance": "derived — BO-053 declares entryState.params challengeId, principalId and BO-106 holds none of them. The edge carries nothing: principalId only pre-selects (deep link or optional); BO-053 finds challengeId (createMfaChallenge) itself, and BO-053 opens on its own"
+     "provenance": "derived — BO-053 declares entryState.params challengeId, principalId and BO-106 holds none of them. The edge carries nothing: challengeId, principalId only pre-select (deep link or optional), and BO-053 opens on its own"
     },
     {
      "to": "BO-055",
@@ -195,7 +195,10 @@
     {
      "to": "BO-054",
      "trigger": "Role Assignment",
-     "provenance": "derived — BO-054 declares entryState.params principalId and BO-106 holds none of them. The edge carries nothing: BO-054 finds principalId (listPermissionFindings) itself, and BO-054 opens on its own"
+     "carries": [
+      "roleId"
+     ],
+     "provenance": "derived — BO-054 declares entryState.params campaignId, principalId, roleId and BO-106 holds roleId, so an edge into it carries them"
     }
    ]
   },
@@ -216,12 +219,9 @@
        "label": "Every role",
        "bindsTo": "Role",
        "columns": [
-        "Role.id",
         "Role.code",
         "Role.name",
         "Role.description",
-        "Role.permissions",
-        "Role.inheritsFromRoleId",
         "Role.isSystem",
         "Role.principalCount",
         "Role.grantCount"
@@ -350,7 +350,7 @@
    "provenance": "generated",
    "board": "wireframes/P08 Venue Management.dc.html#bo-106"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P08",
    "audience": "staff",

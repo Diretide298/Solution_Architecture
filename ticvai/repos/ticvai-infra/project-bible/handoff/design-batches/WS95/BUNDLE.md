@@ -185,15 +185,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 **Where the user goes next**
 
 - → `BO-100` Venue Home: *Back to Venue Home*
-- → `BO-565` Return Scan & Rental Retrieval: *Return Scan & Rental Retrieval*
-- → `BO-566` Return Summary & Actual Return Time: *Return Summary & Actual Return Time*
-- → `BO-567` Post-Rental Condition Inspection: *Post-Rental Condition Inspection*
-- → `BO-568` Before vs After Condition Comparison: *Before vs After Condition Comparison*
-- → `BO-569` Damage Assessment & Charge Workflow: *Damage Assessment & Charge Workflow*
-- → `BO-570` Partial Return & Missing Equipment: *Partial Return & Missing Equipment*
-- → `BO-571` Late Fees, Damage Fees & Final Settlement: *Late Fees, Damage Fees & Final Settlement*
-- → `BO-572` Deposit Release, Capture & Customer Confirmation: *Deposit Release, Capture & Customer Confirmation*
-- → `BO-573` Return Completion & Equipment Disposition: *Return Completion & Equipment Disposition*
+- → `BO-565` Return Scan & Rental Retrieval: *Return Scan & Rental Retrieval*; carries `bookingId`
+- → `BO-566` Return Summary & Actual Return Time: *Return Summary & Actual Return Time*; carries `bookingId`
+- → `BO-567` Post-Rental Condition Inspection: *Post-Rental Condition Inspection*; carries `bookingId`
+- → `BO-568` Before vs After Condition Comparison: *Before vs After Condition Comparison*; carries `bookingId`
+- → `BO-569` Damage Assessment & Charge Workflow: *Damage Assessment & Charge Workflow*; carries `bookingId`
+- → `BO-570` Partial Return & Missing Equipment: *Partial Return & Missing Equipment*; carries `bookingId`
+- → `BO-571` Late Fees, Damage Fees & Final Settlement: *Late Fees, Damage Fees & Final Settlement*; carries `bookingId`
+- → `BO-572` Deposit Release, Capture & Customer Confirmation: *Deposit Release, Capture & Customer Confirmation*; carries `bookingId`
+- → `BO-573` Return Completion & Equipment Disposition: *Return Completion & Equipment Disposition*; carries `bookingId`
 
 #### States
 

@@ -246,9 +246,7 @@
   "type": "object",
   "required": [
    "id",
-   "requisitionId",
    "supplierId",
-   "quotationId",
    "lines",
    "expectedDelivery"
   ],
@@ -257,9 +255,22 @@
     "type": "string",
     "format": "uuid"
    },
+   "kind": {
+    "type": "string",
+    "enum": [
+     "standard",
+     "blanket",
+     "release",
+     "rfqAward"
+    ],
+    "default": "standard",
+    "description": "**Which order this is** (CHG-RUL-004). `standard` needs `requisitionId` and `quotationId` (409 `requisition-required` without them); `blanket` and `rfqAward` are raised without a requisition; `release` names `blanketParentId`. Every kind goes through the PO approval matrix."
+   },
    "requisitionId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required for a `standard` order; omitted for a blanket order, an RFQ award or a release."
    },
    "supplierId": {
     "type": "string",
@@ -267,7 +278,27 @@
    },
    "quotationId": {
     "type": "string",
-    "format": "uuid"
+    "format": "uuid",
+    "nullable": true,
+    "description": "Required for a `standard` order and an `rfqAward` (the winning quotation)."
+   },
+   "rfqId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For an `rfqAward`, the quotation round it awards."
+   },
+   "blanketParentId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "For a `release`, the open blanket order it draws against."
+   },
+   "contractPriceValidUntil": {
+    "type": "string",
+    "format": "date",
+    "nullable": true,
+    "description": "For a `blanket` order, the last day its prices hold."
    },
    "deliverToLocationId": {
     "type": "string",

@@ -71,7 +71,7 @@ screens:
   name: Kitchen Operations Command Center
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: ORDER_VIEW
   implementation:
     app: kitchen-display
@@ -94,9 +94,13 @@ screens:
     - to: KIT-002
       trigger: Kitchen Display System (KDS)
       provenance: flow F83 step 1→2
+      carries:
+      - ticketId
     - to: KIT-003
       trigger: Order Firing & Course Management
       provenance: structural — KIT-001 is P15's home screen and its exits are its launcher
+      carries:
+      - ticketId
     - to: KIT-004
       trigger: Active Order Management & Fulfilment Journey
       provenance: structural — KIT-001 is P15's home screen and its exits are its launcher
@@ -108,6 +112,8 @@ screens:
     - to: KIT-006
       trigger: Expeditor & Order Assembly
       provenance: structural — KIT-001 is P15's home screen and its exits are its launcher
+      carries:
+      - ticketId
     - to: KIT-007
       trigger: Guest Collection, Buzzer & Digital Notification
       provenance: structural — KIT-001 is P15's home screen and its exits are its launcher
@@ -116,6 +122,8 @@ screens:
     - to: KIT-008
       trigger: Exceptions, Re-Fire & Unavailable Items
       provenance: structural — KIT-001 is P15's home screen and its exits are its launcher
+      carries:
+      - ticketId
     - to: KIT-009
       trigger: SLA, Priority & Service Rules
       provenance: structural — KIT-001 is P15's home screen and its exits are its launcher
@@ -178,18 +186,12 @@ screens:
         label: Every station, at a glance
         bindsTo: KitchenTicket
         columns:
-        - KitchenTicket.id
-        - KitchenTicket.orderId
         - KitchenTicket.orderNumber
-        - KitchenTicket.outletId
         - KitchenTicket.tableLabel
         - KitchenTicket.serviceMode
-        - KitchenTicket.coursing
         - KitchenTicket.buzzerCode
         - KitchenTicket.status
         - KitchenTicket.priority
-        - KitchenTicket.prioritisedByPrincipalId
-        - KitchenTicket.prioritiseReason
         operation: listKitchenTickets
         permission: ORDER_VIEW
         provenance: contract fnb.yaml GET /kitchen/tickets
@@ -249,14 +251,14 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3a
-  apisNote: Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
 - id: KIT-002
   name: Kitchen Display System (KDS)
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: ORDER_VIEW
   implementation:
     app: kitchen-display
@@ -357,18 +359,12 @@ screens:
         label: Every kitchen ticket
         bindsTo: KitchenTicket
         columns:
-        - KitchenTicket.id
-        - KitchenTicket.orderId
         - KitchenTicket.orderNumber
-        - KitchenTicket.outletId
         - KitchenTicket.tableLabel
         - KitchenTicket.serviceMode
-        - KitchenTicket.coursing
         - KitchenTicket.buzzerCode
         - KitchenTicket.status
         - KitchenTicket.priority
-        - KitchenTicket.prioritisedByPrincipalId
-        - KitchenTicket.prioritiseReason
         operation: listKitchenTickets
         permission: ORDER_VIEW
         provenance: contract fnb.yaml GET /kitchen/tickets
@@ -395,19 +391,12 @@ screens:
         label: The selected kitchen ticket
         bindsTo: KitchenTicket
         columns:
-        - KitchenTicket.id
-        - KitchenTicket.orderId
         - KitchenTicket.orderNumber
-        - KitchenTicket.outletId
         - KitchenTicket.tableLabel
         - KitchenTicket.serviceMode
-        - KitchenTicket.coursing
         - KitchenTicket.buzzerCode
         - KitchenTicket.status
         - KitchenTicket.priority
-        - KitchenTicket.prioritisedByPrincipalId
-        - KitchenTicket.prioritiseReason
-        - KitchenTicket.lines
         - KitchenTicket.targetReadyAt
         - KitchenTicket.elapsedSeconds
         operation: listKitchenTickets
@@ -446,10 +435,13 @@ screens:
       same picture otherwise.'
     emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
       is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
+    emptyNoAccess: 'This display is not assigned to a station. **Assignment is a back-office act** — a
       kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state
-      naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own
-      `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission.
+      naming `ORDER_VIEW`**, the screen''s `permission` and the one its read enforces; a button whose
+      own `permission` the principal lacks is hidden, and a 403 from an action names that operation''s
+      permission. A caller who can see the screen but lacks what an action needs sees that action disabled,
+      naming its permission: `ORDER_MODIFY` for `setKitchenTicketStatus`, `refireItem`, `recallKitchenTicket`,
+      `notifyServer`.'
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
       syncs when the network returns.'
@@ -511,9 +503,9 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3b
-  apisNote: Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetKitchenTicketStatus
     component: modal
@@ -577,7 +569,7 @@ screens:
   name: Order Firing & Course Management
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: ORDER_MODIFY
   implementation:
     app: kitchen-display
@@ -706,11 +698,12 @@ screens:
       same picture otherwise.'
     emptyNoResults: Nothing matches this course filter. **The rail is not empty** — the filter is narrow,
       and on a kitchen screen that distinction is the difference between calm and panic (audit R277).
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
-      kitchen screen does not choose what it shows. **A principal without `ORDER_MODIFY` gets this state
-      naming `ORDER_MODIFY`**, the screen's `permission` and the one its fire, hold, status and prioritise
-      actions need (the screen has no read); a button whose own `permission` the principal lacks is hidden,
-      and a 403 from an action names that operation's permission.
+    emptyNoAccess: Without `ORDER_VIEW`, which `listKitchenTickets` requires, the screen does not load
+      and this state names that permission. This display is not assigned to a station. **Assignment is
+      a back-office act** — a kitchen screen does not choose what it shows. **A principal without `ORDER_MODIFY`
+      gets this state naming `ORDER_MODIFY`**, the screen's `permission` and the one its fire, hold, status
+      and prioritise actions need (the screen has no read); a button whose own `permission` the principal
+      lacks is hidden, and a 403 from an action names that operation's permission.
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
       syncs when the network returns.'
@@ -757,9 +750,9 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3c
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formPrioritiseKitchenTicket
     component: modal
@@ -819,7 +812,7 @@ screens:
   name: Active Order Management & Fulfilment Journey
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: ORDER_VIEW
   implementation:
     app: kitchen-display
@@ -844,6 +837,8 @@ screens:
     - to: KIT-008
       trigger: Exceptions, Re-Fire & Unavailable Items
       provenance: flow F83 step 4→5
+      carries:
+      - ticketId
   notes: '**Built 20 August from board 3 of the client F&B design set.** **Board repointed 24 August.**
     This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3d` — a frame in the client pack, which
     is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
@@ -869,18 +864,12 @@ screens:
         label: This order's tickets, station by station
         bindsTo: KitchenTicket
         columns:
-        - KitchenTicket.id
-        - KitchenTicket.orderId
         - KitchenTicket.orderNumber
-        - KitchenTicket.outletId
         - KitchenTicket.tableLabel
         - KitchenTicket.serviceMode
-        - KitchenTicket.coursing
         - KitchenTicket.buzzerCode
         - KitchenTicket.status
         - KitchenTicket.priority
-        - KitchenTicket.prioritisedByPrincipalId
-        - KitchenTicket.prioritiseReason
         operation: listKitchenTickets
         permission: ORDER_VIEW
         provenance: contract fnb.yaml GET /kitchen/tickets
@@ -903,19 +892,12 @@ screens:
         label: The selected kitchen ticket
         bindsTo: KitchenTicket
         columns:
-        - KitchenTicket.id
-        - KitchenTicket.orderId
         - KitchenTicket.orderNumber
-        - KitchenTicket.outletId
         - KitchenTicket.tableLabel
         - KitchenTicket.serviceMode
-        - KitchenTicket.coursing
         - KitchenTicket.buzzerCode
         - KitchenTicket.status
         - KitchenTicket.priority
-        - KitchenTicket.prioritisedByPrincipalId
-        - KitchenTicket.prioritiseReason
-        - KitchenTicket.lines
         - KitchenTicket.targetReadyAt
         - KitchenTicket.elapsedSeconds
         operation: listKitchenTickets
@@ -925,17 +907,11 @@ screens:
         label: The F&B order
         bindsTo: FnbOrder
         columns:
-        - FnbOrder.id
         - FnbOrder.orderNumber
-        - FnbOrder.outletId
         - FnbOrder.serviceMode
-        - FnbOrder.tableVisitId
         - FnbOrder.status
-        - FnbOrder.lines
-        - FnbOrder.salesOrderId
         - FnbOrder.grossAmount
         - FnbOrder.taxAmount
-        - FnbOrder.kitchenTicketId
         - FnbOrder.estimatedReadyAt
         - FnbOrder.recordedAt
         - FnbOrder.syncedAt
@@ -987,9 +963,9 @@ screens:
       — it carries operations, states, entry params and exits, and it is better specified than anything
       derived from the screen file.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3d
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   purposeNote: 'Purpose rewritten 2 October 2026 (CHG-WIR-010): The purpose was the board title ("Active
     Order Management & Fulfilment Journey — board 3 of the client F&B design set") (design-notes correction
     fnb-retail KIT-004).'
@@ -997,7 +973,7 @@ screens:
   name: Kitchen Station Workload & Dynamic Routing
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: PRODUCT_VIEW
   implementation:
     app: kitchen-display
@@ -1113,11 +1089,12 @@ screens:
       same picture otherwise.'
     emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
       is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
+    emptyNoAccess: 'This display is not assigned to a station. **Assignment is a back-office act** — a
       kitchen screen does not choose what it shows. **A principal without `PRODUCT_VIEW` gets this state
-      naming `PRODUCT_VIEW`**, the screen's `permission` and the one its read enforces; a button whose
-      own `permission` the principal lacks is hidden, and a 403 from an action names that operation's
-      permission.
+      naming `PRODUCT_VIEW`**, the screen''s `permission` and the one its read enforces; a button whose
+      own `permission` the principal lacks is hidden, and a 403 from an action names that operation''s
+      permission. A caller who can see the screen but lacks what an action needs sees that action disabled,
+      naming its permission: `PRODUCT_CONFIGURE` for `rebalanceStationLoad`.'
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
       syncs when the network returns.'
@@ -1160,9 +1137,9 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3e
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: setKitchenStations
     removed: true
@@ -1174,7 +1151,7 @@ screens:
   name: Expeditor & Order Assembly
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: ORDER_VIEW
   implementation:
     app: kitchen-display
@@ -1235,18 +1212,12 @@ screens:
         label: Whole orders, ready to assemble
         bindsTo: KitchenTicket
         columns:
-        - KitchenTicket.id
-        - KitchenTicket.orderId
         - KitchenTicket.orderNumber
-        - KitchenTicket.outletId
         - KitchenTicket.tableLabel
         - KitchenTicket.serviceMode
-        - KitchenTicket.coursing
         - KitchenTicket.buzzerCode
         - KitchenTicket.status
         - KitchenTicket.priority
-        - KitchenTicket.prioritisedByPrincipalId
-        - KitchenTicket.prioritiseReason
         operation: listKitchenTickets
         permission: ORDER_VIEW
         provenance: contract fnb.yaml GET /kitchen/tickets
@@ -1271,19 +1242,12 @@ screens:
         label: The selected kitchen ticket
         bindsTo: KitchenTicket
         columns:
-        - KitchenTicket.id
-        - KitchenTicket.orderId
         - KitchenTicket.orderNumber
-        - KitchenTicket.outletId
         - KitchenTicket.tableLabel
         - KitchenTicket.serviceMode
-        - KitchenTicket.coursing
         - KitchenTicket.buzzerCode
         - KitchenTicket.status
         - KitchenTicket.priority
-        - KitchenTicket.prioritisedByPrincipalId
-        - KitchenTicket.prioritiseReason
-        - KitchenTicket.lines
         - KitchenTicket.targetReadyAt
         - KitchenTicket.elapsedSeconds
         operation: listKitchenTickets
@@ -1324,10 +1288,13 @@ screens:
       same picture otherwise.'
     emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
       is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
+    emptyNoAccess: 'This display is not assigned to a station. **Assignment is a back-office act** — a
       kitchen screen does not choose what it shows. **A principal without `ORDER_VIEW` gets this state
-      naming `ORDER_VIEW`**, the screen's `permission` and the one its read enforces; a button whose own
-      `permission` the principal lacks is hidden, and a 403 from an action names that operation's permission.
+      naming `ORDER_VIEW`**, the screen''s `permission` and the one its read enforces; a button whose
+      own `permission` the principal lacks is hidden, and a 403 from an action names that operation''s
+      permission. A caller who can see the screen but lacks what an action needs sees that action disabled,
+      naming its permission: `ORDER_MODIFY` for `setKitchenTicketStatus`, `chaseStation`, `markOrderCollected`,
+      `recordOrderHandover`.'
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
       syncs when the network returns.'
@@ -1373,6 +1340,9 @@ screens:
       from: session
     - name: ticketId
       from: KIT-002
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listKitchenTickets`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: orderId
       from: session
     coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen
@@ -1393,9 +1363,9 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3f
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetKitchenTicketStatus
     component: modal
@@ -1457,7 +1427,7 @@ screens:
   name: Guest Collection, Buzzer & Digital Notification
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: ORDER_VIEW
   implementation:
     app: kitchen-display
@@ -1495,7 +1465,11 @@ screens:
     **The guest board is an unattended customer display** (POSV2-7; design-notes correction fnb-retail
     KIT-007; CHG-SPO-017): order numbers only, under Preparing and Ready for pickup, never a name and
     no staff control. Handover is recorded at the pass (KIT-006). The buzzer number is on the ticket,
-    but nothing writes it from the till or dispatches to a pager yet (open entry CHG-SPO-019).'
+    but nothing writes it from the till or dispatches to a pager yet (open entry CHG-SPO-019).
+
+
+    **An unattended guest display, read-only** (decided by Chinmay, 3 October 2026 (CHG-SPF-008)): `recordOrderHandover`,
+    its button and form left this screen; a handover is recorded on KIT-006 Expo / Pass.'
   density: touchLarge
   densityReason: '**Bumped by somebody with flour on their hands, read from two metres, in a room where
     nobody is sitting down.** A kitchen display is not a back office at a different width.'
@@ -1512,34 +1486,23 @@ screens:
       slot: collection
       components:
       - kind: cardList
-        bindsTo: KitchenTicket[]
-        notes: '**One ticket per card, ordered by promise time not arrival.** A ticket due in two minutes
-          sits above one that arrived first, because a kitchen works to when food is wanted.'
-        provenance: carried from the previous definition
-      - kind: cardList
         label: Guest status board — Preparing and Ready for pickup
         bindsTo: KitchenTicket
         operation: listKitchenTickets
         notes: '**Order numbers only, never a name**, in two columns, Preparing and Ready for pickup,
           readable from across the room. **Owned here** (decided 1 October 2026, POSV2-7); the till''s
-          Order Queue (POS-029) mirrors it. The look is the v2 build''s queue status board.'
+          Order Queue (POS-029) mirrors it. The look is the v2 build''s queue status board.
+
+
+          **Read-only, in the order the server returns** (decided by Chinmay, 3 October 2026 (CHG-SPF-008)):
+          order numbers, Preparing and Ready for pickup, no buttons and no re-sorting on the display.
+          The handover is recorded on KIT-006.'
         provenance: v2 build, Queue (the guest status board, wireframes/incoming/P04-pos-v2/img/pos-029.png)
       - kind: metricTile
         notes: Depth and oldest ticket age. **Two numbers, glanceable** — anything a chef has to read
           is a number they will not read. The station-load tile is not in the first release (decided 28
           September, audit R277).
         provenance: carried from the previous definition
-    - name: contextPanel
-      slot: selection
-      components: []
-    - name: actionBar
-      slot: rowActions
-      components:
-      - kind: primaryButton
-        label: Record order handover
-        operation: recordOrderHandover
-        permission: ORDER_MODIFY
-        provenance: contract fnb.yaml POST /guest-orders/{orderId}/delivery
   states:
     loading: Order numbers under Preparing and Ready for pickup.
     error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
@@ -1555,20 +1518,12 @@ screens:
     contract: fnb
     purpose: Kitchen ticket queue
     trigger: onLoad
-  - operationId: recordOrderHandover
-    contract: fnb
-    purpose: Record that an order reached the guest
-    trigger: onAction
-    invalidates:
-    - listKitchenTickets
   entryState:
     params:
     - name: venueId
       from: session
     - name: stationId
       from: session
-    - name: orderId
-      from: KIT-002
     coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen
       is open, and it resolves its station from the device assignment rather than from a person.'
     preloaded:
@@ -1588,36 +1543,15 @@ screens:
       its look** (decided 1 October 2026, POSV2-7): wireframes/incoming/P04-pos-v2/img/pos-029.png, the
       board above the lanes.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3g
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
-  overlays:
-  - id: formRecordOrderHandover
-    component: modal
-    trigger: Record order handover
-    body: '**Collects what `recordOrderHandover` sends before it is called.** Required: `outcome`, `recordedAt`.
-      Optional: `deliveredToLocationId`, `runnerPrincipalId`, `note`. **Only the outcome that fits the
-      order''s service mode is offered**: tableService `served`; quickService or collection `collected`;
-      delivery or roomService `delivered`, with `deliveredToLocationId` required. `guestNotFound` and
-      `refused` are offered for every mode. Any other pairing is refused 422 `outcomeNotForServiceMode`
-      (decided 28 September, audit R125 (1)). Dismissing sends nothing; the screen behind is unchanged.'
-    confirm:
-      label: Record order handover
-      operation: recordOrderHandover
-    dismiss:
-      label: Cancel
-      discards:
-      - outcome
-      - recordedAt
-      - deliveredToLocationId
-      - runnerPrincipalId
-      - note
-    provenance: contract fnb.yaml POST /guest-orders/{orderId}/delivery
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
+  overlays: []
 - id: KIT-008
   name: Exceptions, Re-Fire & Unavailable Items
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: PRODUCT_VIEW
   implementation:
     app: kitchen-display
@@ -1751,12 +1685,14 @@ screens:
       same picture otherwise.'
     emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
       is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
+    emptyNoAccess: 'This display is not assigned to a station. **Assignment is a back-office act** — a
       kitchen screen does not choose what it shows. **A principal without `PRODUCT_VIEW` gets this state
-      naming `PRODUCT_VIEW`**, the screen's `permission` and the one `list86Events`, the population it
+      naming `PRODUCT_VIEW`**, the screen''s `permission` and the one `list86Events`, the population it
       reads, enforces (`getHaccpStatus` needs `INCIDENT_VIEW` and reaches no component yet, see `gaps`);
       a button whose own `permission` the principal lacks is hidden, and a 403 from an action names that
-      operation's permission.
+      operation''s permission. A caller who can see the screen but lacks what an action needs sees that
+      action disabled, naming its permission: `INCIDENT_REPORT` for `logKitchenException`; `PRODUCT_CONFIGURE`
+      for `setItemAvailability`.'
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
       syncs when the network returns.'
@@ -1793,8 +1729,15 @@ screens:
       from: session
     - name: itemId
       from: KIT-002
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `setItemAvailability`
+        takes the id from the record the user acts on, and an edge or link that holds one only pre-selects
+        it.'
     - name: ticketId
       from: KIT-002
+      optional: true
+      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listKitchenTickets`
+        and the user picks one; an edge that holds one may still carry it to open on that record.'
     - name: outletId
       from: session
     coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen
@@ -1809,9 +1752,9 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3h
-  apisNote: Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formSetItemAvailability
     component: modal
@@ -1857,7 +1800,7 @@ screens:
   name: SLA, Priority & Service Rules
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: ORDER_MODIFY
   implementation:
     app: kitchen-display
@@ -1940,11 +1883,12 @@ screens:
     emptyFirstRun: '**No tickets. The kitchen is clear**, and that is worth saying plainly rather than
       showing a blank rail — a screen that looks broken and a screen that means nothing to do are the
       same picture otherwise.'
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
-      kitchen screen does not choose what it shows. **A principal without `ORDER_MODIFY` gets this state
-      naming `ORDER_MODIFY`**, the screen's `permission` and the one prioritising needs (the screen has
-      no read); a button whose own `permission` the principal lacks is hidden, and a 403 from an action
-      names that operation's permission.
+    emptyNoAccess: 'This display is not assigned to a station. **Assignment is a back-office act** — a
+      kitchen screen does not choose what it shows. Shown when the caller lacks `PRODUCT_VIEW`, which
+      `getKitchenSla` requires to show this screen, and names that permission. **Never an empty table**
+      — that reads as *there is no data* and sends somebody to support with the wrong question. A caller
+      who can see the screen but lacks what an action needs sees that action disabled, naming its permission:
+      `PRODUCT_CONFIGURE` for `setKitchenSla`.'
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
       syncs when the network returns.'
@@ -1985,9 +1929,9 @@ screens:
       The frame it points at now is the generated one. This screen has been designed once and is not starting
       from nothing.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3j
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   gaps:
   - operation: prioritiseKitchenTicket
     removed: true
@@ -2009,7 +1953,7 @@ screens:
   name: Kitchen Performance, AI & Operational Optimization
   module: Kitchen
   requiresModule: fnb
-  wave: 2
+  wave: 1
   permission: REPORT_VIEW_VENUE
   implementation:
     app: kitchen-display
@@ -2127,9 +2071,9 @@ screens:
       — it carries operations, states, entry params and exits, and it is better specified than anything
       derived from the screen file.'
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3k
-  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
-    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
-    to the ones that matter is work a person still owes this screen.
+  apisNote: 'Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop
+    pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
+    at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
   overlays:
   - id: formAskReportingQuestion
     component: modal

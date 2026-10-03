@@ -161,10 +161,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-129` | Software, Configuration & Version Management | B–D | 16 | 12 | 6 | 5 | 4 | 0 | — | notStarted (generated) |
-| `BO-130` | Offline Policy & Rules Configuration | B–D | 14 | 18 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
+| `BO-130` | Offline Policy & Rules Configuration | B–D | 14 | 13 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
 | `BO-131` | Connectivity & Auto-Switch Settings | B–D | 13 | 0 | 5 | 0 | 3 | 0 | — | notStarted (generated) |
-| `BO-132` | Offline Transaction Monitor & Sync Queue | B–D | 43 | 18 | 6 | 2 | 2 | 6 | — | notStarted (generated) |
-| `BO-133` | Offline Alerts, Limits & Audit | A | 25 | 37 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
+| `BO-132` | Offline Transaction Monitor & Sync Queue | B–D | 43 | 13 | 6 | 2 | 2 | 6 | — | notStarted (generated) |
+| `BO-133` | Offline Alerts, Limits & Audit | A | 25 | 26 | 6 | 8 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

@@ -395,7 +395,9 @@
    "params": [
     {
      "name": "seatCategoryId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listSeatCategories` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

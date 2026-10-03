@@ -85,15 +85,19 @@
     {
      "to": "BO-1150",
      "trigger": "Wallet Block, Freeze & Restriction Management",
-     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "provenance": "authored 3 October 2026 (CHG-SPF-004): BO-1143 holds subjectId and BO-1150 cannot load without it, so the edge carries it; was: structural — pack board 7 wiring, 19 September 2026",
      "carries": [
-      "walletId"
+      "walletId",
+      "subjectId"
      ]
     },
     {
      "to": "BO-1151",
      "trigger": "Wallet Disputes & Operational Exception Queue",
-     "provenance": "structural — pack board 7 wiring, 19 September 2026"
+     "provenance": "structural — pack board 7 wiring, 19 September 2026",
+     "carries": [
+      "disputeId"
+     ]
     },
     {
      "to": "BO-1152",
@@ -1981,7 +1985,9 @@
    "params": [
     {
      "name": "disputeId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listWalletDisputes` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

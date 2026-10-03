@@ -414,7 +414,6 @@ paths:
         - "P04 POS-009 Staff Roster"
         - "P06 EMP-024 Clock in / out"
         - "P06 EMP-025 Break management"
-        - "P08 BO-056 Time & Attendance"
         - "P08 BO-889 Staff Check-In, Check-Out & Attendance Exceptions"
         - "P08 BO-935 Assignment Detail & Operational Brief"
         - "P08 BO-936 Mobile Staff Check-In & Check-Out"

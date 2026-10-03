@@ -27,10 +27,10 @@ Splitting them would give three services writing one schema, which is the arrang
 
 | Group | Operation | Method | Path | Part | Wave | Called by |
 |---|---|---|---|---|---|---|
-| licensing | [`addLicenceAddOn`](#addlicenceaddon) | POST | `/tenants/{tenantId}/licences/add-ons` | setup | 2 | ADM-005, ADM-007, ADM-011, ADM-422 |
-| licensing | [`getTenantLicences`](#gettenantlicences) | GET | `/tenants/{tenantId}/licences` | core | 3 | ADM-002, ADM-005, ADM-006, ADM-007, ADM-008, ADM-009 … |
-| plan | [`createPlan`](#createplan) | POST | `/plans` | setup | 2 | ADM-008, ADM-392 |
-| plan | [`createPlanVersion`](#createplanversion) | POST | `/plans/{planId}` | setup | 2 | ADM-008, ADM-398 |
+| licensing | [`addLicenceAddOn`](#addlicenceaddon) | POST | `/tenants/{tenantId}/licences/add-ons` | setup | 1 | ADM-005, ADM-007, ADM-011, ADM-422 |
+| licensing | [`getTenantLicences`](#gettenantlicences) | GET | `/tenants/{tenantId}/licences` | core | 1 | ADM-002, ADM-005, ADM-006, ADM-007, ADM-008, ADM-009 … |
+| plan | [`createPlan`](#createplan) | POST | `/plans` | setup | 1 | ADM-008, ADM-392 |
+| plan | [`createPlanVersion`](#createplanversion) | POST | `/plans/{planId}` | setup | 1 | ADM-008, ADM-398 |
 | publicApi | [`certifyIntegration`](#certifyintegration) | POST | `/listings/{listingId}/certify` | setup | 1 | DEV-008 |
 | publicApi | [`createApiClient`](#createapiclient) | POST | `/api-clients` | setup | 1 | BO-1177, DEV-003, PTR-019 |
 | publicApi | [`decideProductionAccess`](#decideproductionaccess) | POST | `/production-access-requests/{requestId}/decide` | setup | 1 | ADM-015, DEV-008 |
@@ -39,15 +39,15 @@ Splitting them would give three services writing one schema, which is the arrang
 | publicApi | [`rotateApiCredential`](#rotateapicredential) | POST | `/api-clients/{clientId}/credentials` | setup | 1 | DEV-003, PTR-019 |
 | publicApi | [`setApiLicensing`](#setapilicensing) | PUT | `/api-licensing` | setup | 1 | DEV-008 |
 | publicApi | [`setDeveloperMembers`](#setdevelopermembers) | PUT | `/developers/{developerId}/members` | setup | 1 | DEV-002 |
-| subscription | [`listModuleCatalogue`](#listmodulecatalogue) | GET | `/module-catalogue` | core | 3 | ADM-386, ADM-401, ADM-402, ADM-403, ADM-404, ADM-423 … |
-| subscription | [`setModuleListing`](#setmodulelisting) | PUT | `/module-catalogue` | setup | 3 |  |
-| subscription | [`setSubscription`](#setsubscription) | PUT | `/tenants/{tenantId}/subscription` | setup | 2 | ADM-008, ADM-410, ADM-417, ADM-463, SGN-019, SGN-024 |
-| tenant | [`createTenant`](#createtenant) | POST | `/tenants` | setup | 2 | ADM-005, ADM-419, ADM-420 |
-| tenant | [`listTenants`](#listtenants) | GET | `/tenants` | core | 2 | ADM-002, ADM-004, ADM-005, ADM-006, ADM-007, ADM-008 … |
-| tenant | [`reactivateTenant`](#reactivatetenant) | POST | `/tenants/{tenantId}/reactivate` | setup | 2 | ADM-005 |
-| tenant | [`suspendTenant`](#suspendtenant) | POST | `/tenants/{tenantId}/suspend` | setup | 2 | ADM-005 |
-| tenant | [`terminateTenant`](#terminatetenant) | POST | `/tenants/{tenantId}/terminate` | setup | 2 | ADM-005 |
-| tenant | [`updateTenant`](#updatetenant) | PATCH | `/tenants/{tenantId}` | setup | 2 | ADM-005, ADM-006 |
+| subscription | [`listModuleCatalogue`](#listmodulecatalogue) | GET | `/module-catalogue` | core | 1 | ADM-386, ADM-401, ADM-402, ADM-403, ADM-404, ADM-423 … |
+| subscription | [`setModuleListing`](#setmodulelisting) | PUT | `/module-catalogue` | setup | 1 |  |
+| subscription | [`setSubscription`](#setsubscription) | PUT | `/tenants/{tenantId}/subscription` | setup | 1 | ADM-008, ADM-410, ADM-417, ADM-463, SGN-019, SGN-024 |
+| tenant | [`createTenant`](#createtenant) | POST | `/tenants` | setup | 1 | ADM-005, ADM-419, ADM-420 |
+| tenant | [`listTenants`](#listtenants) | GET | `/tenants` | core | 1 | ADM-002, ADM-004, ADM-005, ADM-006, ADM-007, ADM-008 … |
+| tenant | [`reactivateTenant`](#reactivatetenant) | POST | `/tenants/{tenantId}/reactivate` | setup | 1 | ADM-005 |
+| tenant | [`suspendTenant`](#suspendtenant) | POST | `/tenants/{tenantId}/suspend` | setup | 1 | ADM-005 |
+| tenant | [`terminateTenant`](#terminatetenant) | POST | `/tenants/{tenantId}/terminate` | setup | 1 | ADM-005 |
+| tenant | [`updateTenant`](#updatetenant) | PATCH | `/tenants/{tenantId}` | setup | 1 | ADM-005, ADM-006 |
 
 ## Group: licensing
 
@@ -62,7 +62,7 @@ A module or limit increase sold separately. Add-ons survive a plan change unless
 | Permission | `PLATFORM_TENANT_MANAGE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `control.licence_add_on` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.licence_add_on` |
@@ -137,7 +137,7 @@ A module or limit increase sold separately. Add-ons survive a plan change unless
 | Permission | `PLATFORM_TENANT_VIEW` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | yes |
 | Conflict policy | serverWins |
 | Read routing | primary |
@@ -195,7 +195,7 @@ A plan bundles licensed modules, entitlement limits and a cell tier. Plans are v
 | Permission | `PLATFORM_PLAN_MANAGE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `subscription.plan` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.tenant`, `subscription.plan`, `subscription.plan_limit`, `subscription.plan_module` |
@@ -324,7 +324,7 @@ Existing subscribers remain on their version until migrated deliberately. A pric
 | Permission | `PLATFORM_PLAN_MANAGE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `subscription.plan` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.tenant`, `subscription.plan`, `subscription.plan_limit`, `subscription.plan_module` |
@@ -937,7 +937,7 @@ Boards 4.3 and 4.6. **A module marketplace without a dependency graph sells comb
 | Permission | `PLATFORM_PLAN_MANAGE` |
 | Scope level | platform |
 | Part of slice | core |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Read routing | replica |
 | Guest callable | True |
@@ -961,7 +961,7 @@ Boards 4.3 and 4.6. **A module marketplace without a dependency graph sells comb
 | Permission | `PLATFORM_PLAN_MANAGE` |
 | Scope level | platform |
 | Part of slice | setup, makes `subscription.module_listing` non-empty |
-| Wave | 3 |
+| Wave | 1 |
 | Offline | no |
 | Reads | `subscription.module_listing` |
 | Writes | `subscription.module_listing` |
@@ -1039,7 +1039,7 @@ Silently switching off a module a venue is trading on is not an acceptable conse
 | Permission | `PLATFORM_TENANT_MANAGE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `subscription.contract` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `subscription.contract`, `subscription.plan` |
@@ -1109,7 +1109,7 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 | Permission | `PLATFORM_TENANT_MANAGE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `control.tenant` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.tenant` |
@@ -1178,7 +1178,7 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 | Permission | `PLATFORM_TENANT_VIEW` |
 | Scope level | tenant |
 | Part of slice | core |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Read routing | replica |
@@ -1242,7 +1242,7 @@ Creates the record only. **No cell exists until a region is provisioned** — a 
 | Permission | `PLATFORM_TENANT_MANAGE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `control.tenant` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.tenant` |
@@ -1304,7 +1304,7 @@ Graceful and reversible. Data is retained, cells stay provisioned, and the behav
 | Permission | `PLATFORM_TENANT_MANAGE` |
 | Scope level | tenant |
 | Part of slice | setup, changes rows of `control.tenant` that another operation creates |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.tenant` |
@@ -1374,7 +1374,7 @@ A tenant with unsettled ledger balances cannot be terminated — the money has t
 | Permission | `PLATFORM_TENANT_TERMINATE` |
 | Scope level | tenant |
 | Part of slice | setup, makes `control.tenant`, `subscription.contract` non-empty |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.tenant`, `subscription.contract` |
@@ -1428,7 +1428,7 @@ A tenant with unsettled ledger balances cannot be terminated — the money has t
 | Permission | `PLATFORM_TENANT_MANAGE` |
 | Scope level | tenant |
 | Part of slice | setup, changes rows of `control.tenant` that another operation creates |
-| Wave | 2 |
+| Wave | 1 |
 | Offline | no |
 | Conflict policy | serverWins |
 | Reads | `cache:idempotency`, `control.tenant` |
@@ -1514,7 +1514,7 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | no | Added 20 August. |
+| id | uuid | yes | Added 20 August. |
 | tenant_id | uuid | yes |  |
 | licensed_modules | text[] | yes | The example in the requirement is the shape: a venue licensing the ticketing API and not the F&B one. |
 | call_allowance_per_month | integer | no |  |

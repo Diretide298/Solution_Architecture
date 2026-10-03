@@ -118,16 +118,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `SGN-001` | Welcome & Start Your TICVAI Journey | B–D | 4 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
-| `SGN-002` | Customer & Organization Registration | B–D | 5 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `SGN-003` | Venue Type & Business Profile | B–D | 1 | 12 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `SGN-004` | Visitor, Capacity & Operational Scale | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `SGN-005` | Sales Channel Assessment | B–D | 11 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `SGN-006` | Ticketing & Product Requirements | B–D | 15 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `SGN-007` | Access, Queue & Visitor Experience Assessment | B–D | 0 | 0 | 6 | 2 | 1 | 6 | — | notStarted (—) |
-| `SGN-008` | Additional Business Module Assessment | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `SGN-009` | Integration, Payment & Technical Readiness | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `SGN-010` | AI Assessment Summary & Handoff | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `SGN-001` | Welcome & Start Your TICVAI Journey | B | 4 | 0 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `SGN-002` | Customer & Organization Registration | B | 5 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `SGN-003` | Venue Type & Business Profile | B | 1 | 12 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `SGN-004` | Visitor, Capacity & Operational Scale | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `SGN-005` | Sales Channel Assessment | B | 11 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `SGN-006` | Ticketing & Product Requirements | B | 15 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `SGN-007` | Access, Queue & Visitor Experience Assessment | B | 0 | 0 | 6 | 2 | 1 | 6 | — | notStarted (—) |
+| `SGN-008` | Additional Business Module Assessment | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `SGN-009` | Integration, Payment & Technical Readiness | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `SGN-010` | AI Assessment Summary & Handoff | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

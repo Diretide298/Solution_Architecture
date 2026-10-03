@@ -163,47 +163,74 @@
     {
      "to": "EMP-072",
      "trigger": "Voucher Scan & Reservation Retrieval",
-     "provenance": "structural — Rental board 6 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 6 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "EMP-073",
      "trigger": "Checkout Readiness Validation",
-     "provenance": "structural — Rental board 6 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 6 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "EMP-074",
      "trigger": "Equipment Assignment Workspace",
-     "provenance": "structural — Rental board 6 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 6 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "EMP-075",
      "trigger": "Equipment Scan & Validation",
-     "provenance": "structural — Rental board 6 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 6 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "EMP-076",
      "trigger": "Pre-Rental Condition Inspection",
-     "provenance": "structural — Rental board 6 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 6 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "EMP-077",
      "trigger": "Safety & Handover Checklist",
-     "provenance": "structural — Rental board 6 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 6 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "EMP-078",
      "trigger": "Deposit & Financial Handover Validation",
-     "provenance": "structural — Rental board 6 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 6 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "EMP-079",
      "trigger": "Group & Multi-Item Checkout",
-     "provenance": "structural — Rental board 6 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 6 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     },
     {
      "to": "EMP-080",
      "trigger": "Checkout Confirmation & Rental Activation",
-     "provenance": "structural — Rental board 6 on the staff app, 11 September 2026"
+     "provenance": "structural — Rental board 6 on the staff app, 11 September 2026",
+     "carries": [
+      "bookingId"
+     ]
     }
    ]
   },
@@ -328,7 +355,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -448,7 +477,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getRentalBooking` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -593,7 +624,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assignRentalEquipment` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -738,7 +771,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assignRentalEquipment` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -875,7 +910,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `recordRentalInspection` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1007,7 +1044,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `checkOutRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1139,7 +1178,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `checkOutRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1270,7 +1311,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `assignRentalEquipment` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },
@@ -1388,7 +1431,9 @@
    "params": [
     {
      "from": "navigation",
-     "name": "bookingId"
+     "name": "bookingId",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `checkOutRental` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ]
   },

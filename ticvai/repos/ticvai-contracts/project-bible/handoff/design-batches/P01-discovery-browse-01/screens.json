@@ -131,7 +131,7 @@
     {
      "to": "WEB-008",
      "trigger": "Add-ons & Upsell",
-     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-001 holds none of them, so the edge carries nothing and WEB-008 opens cold"
+     "provenance": "derived — WEB-008 declares entryState.params bundleId and WEB-001 holds none of them. The edge carries nothing: bundleId only pre-selects (deep link or optional), and WEB-008 opens on its own"
     },
     {
      "to": "WEB-009",
@@ -155,12 +155,12 @@
     {
      "to": "WEB-019",
      "trigger": "Order History",
-     "provenance": "derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-001 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional); WEB-019 finds invoiceId (listTaxInvoices) itself; WEB-019 opens on listMyOrders, and documentId has no source on WEB-019 yet (a gap in WEB-019, not in this edge)"
+     "provenance": "derived — WEB-019 declares entryState.params documentId, invoiceId, orderId and WEB-001 holds none of them. The edge carries nothing: orderId, documentId, invoiceId only pre-select (deep link or optional), and WEB-019 opens on its own"
     },
     {
      "to": "WEB-021",
      "trigger": "Wallet & Gift Cards",
-     "provenance": "derived — WEB-021 declares entryState.params cardCode, walletId and WEB-001 holds none of them. The edge carries nothing: cardCode only pre-selects (deep link or optional); WEB-021 finds walletId (getWallet) itself, and WEB-021 opens on its own"
+     "provenance": "derived — WEB-021 declares entryState.params cardCode, walletId and WEB-001 holds none of them. The edge carries nothing: cardCode, walletId only pre-select (deep link or optional), and WEB-021 opens on its own"
     },
     {
      "to": "WEB-022",
@@ -173,12 +173,12 @@
     {
      "to": "WEB-023",
      "trigger": "Membership Management",
-     "provenance": "derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-001 holds none of them. The edge carries nothing: orderId only pre-selects (deep link or optional); WEB-023 finds statementId (listBillingStatements) itself; WEB-023 opens on listBillingStatements, and caseId has no source on WEB-023 yet (a gap in WEB-023, not in this edge)"
+     "provenance": "derived — WEB-023 declares entryState.params caseId, orderId, statementId and WEB-001 holds none of them. The edge carries nothing: orderId, caseId, statementId only pre-select (deep link or optional), and WEB-023 opens on its own"
     },
     {
      "to": "WEB-024",
      "trigger": "Devices, Wishlist & Consent",
-     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-001 holds none of them. The edge carries nothing: deviceId, itemId only pre-select (deep link or optional); WEB-024 finds methodId (enrolMfaMethod) itself; WEB-024 opens on getWishlist, and enrolmentId has no source on WEB-024 yet (a gap in WEB-024, not in this edge)"
+     "provenance": "derived — WEB-024 declares entryState.params deviceId, enrolmentId, itemId, methodId and WEB-001 holds none of them. The edge carries nothing: deviceId, itemId, enrolmentId, methodId only pre-select (deep link or optional), and WEB-024 opens on its own"
     },
     {
      "to": "WEB-027",
@@ -363,7 +363,7 @@
    {
     "operationId": "getPublishedTenantConfig",
     "contract": "white-label",
-    "purpose": "The published brand, theme, fonts, header, footer, navigation, homepage, booking-flow display settings and languages, read before anyone signs in (GFIX-1)",
+    "purpose": "The published brand, theme, fonts, header, footer, navigation, homepage, booking-flow display settings and languages, read before anyone signs in (GFIX-1)\n\nAlso the analytics providers to start once their consent category is granted, from the published config (listAnalyticsProviders needs TENANT_CONFIGURE and left the guest screens: decided by Chinmay, 3 October 2026 (CHG-SPF-007)).",
     "trigger": "onLoad",
     "provenance": "decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-1)"
    },
@@ -391,13 +391,6 @@
     "contract": "marketing-crm",
     "purpose": "Accept all, reject non-essential or save preferences from the banner",
     "trigger": "onAction",
-    "provenance": "build, 29 September 2026"
-   },
-   {
-    "operationId": "listAnalyticsProviders",
-    "contract": "white-label",
-    "purpose": "Analytics tags to inject once their consent category is granted",
-    "trigger": "onLoad",
     "provenance": "build, 29 September 2026"
    },
    {
@@ -445,7 +438,7 @@
     "differences": "No first-open venue picker remembered on the device and no 'Change venue' in the header (YAML R267); the prototype shows 'Browse by venue' tiles instead and switches venue from the Config drawer. Prototype adds a resume-booking card, a video 'Tonight in the city' panel, live queue times on cards and footer links to Contact / Accessibility / Service status. YAML emptyNoAccess/offline states are not drawn on Home (offline exists only as a demo tweak)."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "getTenantConfig",
@@ -701,7 +694,7 @@
     "view": "Header 'What's on'"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -865,7 +858,7 @@
     "differences": "No separate results page: results render as a type-ahead overlay and then in the WEB-002 listing with the query applied. Recent and popular searches are prototype additions not in the YAML."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P01",
    "audience": "guest",
@@ -1195,7 +1188,7 @@
     "differences": "No standing attraction-detail page in the default flow: details are a banner above the booking step (behind a Config toggle), a pop-up per product, or the listing preview. Eligibility rule display (getProductEligibilityRule) appears only as tags. Prototype labels it WEB-003b, not WEB-004. **Handoff: the screen id is WEB-004**; the prototype's \"WEB-003b\" label is not an id (CHG-SGU-020)."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P01",
    "audience": "guest",

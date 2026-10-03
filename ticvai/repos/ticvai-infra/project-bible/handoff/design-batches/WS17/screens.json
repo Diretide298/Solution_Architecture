@@ -48,7 +48,10 @@
     {
      "to": "BO-385",
      "trigger": "Delegation Management",
-     "provenance": "structural — pack board 5 wiring, 9 September 2026"
+     "provenance": "structural — pack board 5 wiring, 9 September 2026",
+     "carries": [
+      "delegationId"
+     ]
     },
     {
      "to": "BO-386",
@@ -386,7 +389,9 @@
    "params": [
     {
      "name": "delegationId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listApprovalDelegations` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "**Reached from the list that owns it**, so the identifier arrives with the navigation. Opened cold without one, the screen says what is missing and offers that list — never an empty form that looks configurable."
@@ -1476,10 +1481,6 @@
         "ApprovalAnalytics.rows[].raised",
         "ApprovalAnalytics.rows[].approved",
         "ApprovalAnalytics.rows[].rejected",
-        "ApprovalAnalytics.rows[].withdrawn",
-        "ApprovalAnalytics.rows[].expired",
-        "ApprovalAnalytics.rows[].escalated",
-        "ApprovalAnalytics.rows[].slaBreached",
         "ApprovalAnalytics.rows[].medianMinutes",
         "ApprovalAnalytics.rows[].p95Minutes"
        ],
@@ -1578,7 +1579,9 @@
    "params": [
     {
      "name": "requestId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listApprovalRequests` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

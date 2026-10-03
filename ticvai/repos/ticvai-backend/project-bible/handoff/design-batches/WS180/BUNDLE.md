@@ -230,14 +230,14 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Where the user goes next**
 
 - → `BO-100` Venue Home: *Back to Venue Home*
-- → `ADM-640` Recommendation Strategy Manager: *Recommendation Strategy Manager*
-- → `ADM-641` Recommendation Objective & KPI Configuration: *Recommendation Objective & KPI Configuration*
+- → `ADM-640` Recommendation Strategy Manager: *Recommendation Strategy Manager*; carries `strategyId`
+- → `ADM-641` Recommendation Objective & KPI Configuration: *Recommendation Objective & KPI Configuration*; carries `strategyId`
 - → `ADM-642` Recommendation Type & Product Relationship Manager: *Recommendation Type & Product Relationship Manager*
-- → `ADM-643` Recommendation Placement & Touchpoint Manager: *Recommendation Placement & Touchpoint Manager*
-- → `ADM-644` Channel & Journey Strategy Manager: *Channel & Journey Strategy Manager*
-- → `ADM-645` Recommendation Priority, Ranking & Suppression Manager17: *Recommendation Priority, Ranking & Suppression Manager17*
-- → `ADM-646` Recommendation Guardrails & Business Controls: *Recommendation Guardrails & Business Controls*
-- → `ADM-647` Recommendation Policy, AI Control & Governance: *Recommendation Policy, AI Control & Governance*
+- → `ADM-643` Recommendation Placement & Touchpoint Manager: *Recommendation Placement & Touchpoint Manager*; carries `strategyId`
+- → `ADM-644` Channel & Journey Strategy Manager: *Channel & Journey Strategy Manager*; carries `strategyId`
+- → `ADM-645` Recommendation Priority, Ranking & Suppression Manager17: *Recommendation Priority, Ranking & Suppression Manager17*; carries `strategyId`
+- → `ADM-646` Recommendation Guardrails & Business Controls: *Recommendation Guardrails & Business Controls*; carries `strategyId`
+- → `ADM-647` Recommendation Policy, AI Control & Governance: *Recommendation Policy, AI Control & Governance*; carries `strategyId`
 - → `ADM-648` Recommendation Strategy Simulator & AI Advisor: *Recommendation Strategy Simulator & AI Advisor*
 
 #### States

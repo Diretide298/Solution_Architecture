@@ -1,6 +1,6 @@
 # P02-system-states-01 — P02 · System States
 
-**2 screens · 2 operations · 18 schemas · 0 permissions**
+**2 screens · 2 operations · 19 schemas · 0 permissions**
 
 Platform P02 Guest App · ships as **guest** ·
 guest audience · mobileApp ·
@@ -103,7 +103,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `GST-043` | Arabic / RTL Experience | A | 1 | 0 | 4 | 0 | 0 | 0 | guest | notStarted (client-verified) |
-| `GST-047` | Maintenance / Upgrade Page | A | 0 | 69 | 9 | 0 | 1 | 2 | guest | notStarted (client-verified) |
+| `GST-047` | Maintenance / Upgrade Page | A | 0 | 65 | 9 | 0 | 1 | 2 | guest | notStarted (client-verified) |
 
 ## Thin screens in this batch
 

@@ -22,7 +22,7 @@
   "method": "POST",
   "path": "/requisitions/{requisitionId}/approve",
   "contract": "inventory",
-  "summary": "Approve or reject a requisition",
+  "summary": "Approve, reject or return a requisition",
   "permission": "APPROVAL_ACT",
   "offlineCapable": false,
   "conflictPolicy": "serverWins",
@@ -965,25 +965,6 @@
   "requestBody": null,
   "responds": "GoodsReceipt"
  },
- "rejectRequisition": {
-  "method": "POST",
-  "path": "/requisitions/{requisitionId}/reject",
-  "contract": "inventory",
-  "summary": "Reject a requisition",
-  "permission": "APPROVAL_ACT",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Requisition"
- },
  "requestRecount": {
   "method": "POST",
   "path": "/fnb-stock-counts/{countId}/recount",
@@ -1002,25 +983,6 @@
   ],
   "requestBody": null,
   "responds": "RecountResult"
- },
- "returnRequisition": {
-  "method": "POST",
-  "path": "/requisitions/{requisitionId}/return",
-  "contract": "inventory",
-  "summary": "Return a requisition for more information",
-  "permission": "APPROVAL_ACT",
-  "offlineCapable": false,
-  "conflictPolicy": "serverWins",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "Requisition"
  },
  "sendPurchaseOrder": {
   "method": "POST",

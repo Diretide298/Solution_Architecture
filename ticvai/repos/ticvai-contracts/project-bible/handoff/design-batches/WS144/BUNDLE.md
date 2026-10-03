@@ -135,9 +135,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-824` | Gamification Command Center | B–D | 0 | 5 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-825` | Challenge Builder | A | 15 | 35 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-826` | Achievement & Badge Engine | B–D | 0 | 10 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-826` | Achievement & Badge Engine | A | 0 | 10 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-827` | Points & Activity Rules | A | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-828` | Milestones & Reward Rules | B–D | 31 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
+| `BO-828` | Milestones & Reward Rules | A | 31 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `BO-829` | Family, Team & Event Challenges | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-830` | Referral & Streak Management | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-831` | Progress, Leaderboards & Hub | B–D | 3 | 18 | 6 | 0 | 0 | 0 | — | notStarted (—) |
@@ -312,8 +312,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | Block A · ticket #18012 (APP-SETUP-BO-825) |
+| Module | Engagement & Support · wave 1 · needs the `marketing` module |
+| Block | Block A · task APP-SETUP-BO-825 |
 | Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_SEND`, `MARKETING_VIEW` (1 configure, 1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -514,8 +514,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Engagement & Support · wave 1 · needs the `marketing` module |
+| Block | Block A · task APP-SETUP-BO-826 |
 | Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -647,8 +647,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | Block A · ticket #17987 (APP-SETUP-BO-827) |
+| Module | Engagement & Support · wave 1 · needs the `marketing` module |
+| Block | Block A · task APP-SETUP-BO-827 |
 | Who uses it | venue staff holding `MARKETING_MANAGE`, `MARKETING_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -812,8 +812,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Engagement & Support · wave 3 · needs the `marketing` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Module | Engagement & Support · wave 1 · needs the `marketing` module |
+| Block | Block A · task APP-SETUP-BO-828 |
 | Who uses it | venue staff holding `MARKETING_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1481,6 +1481,7 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Where the user goes next**
 
 - → `BO-824` Gamification Command Center: *Back to Gamification Command Center*
+- → `BO-827` Points & Activity Rules: *Points & Activity Rules*; carries `programmeId`
 
 #### States
 
@@ -1541,6 +1542,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - Client workshop board: `wireframes/WS79 Marketing CRM Configuration Reference v1.0 Board 10.dc.html#bo-833`
 - Workshop pack: Marketing_CRM_Configuration_Reference v1.0.pdf board 10
 - Flow F253 *Marketing CRM Configuration Reference v1.0 board 10: Gamification Command Center*, step 18: Works in Gamification Analytics & Audit → Measure challenge performance, cost and long-term effect. Report participant funnel, completion, points, rewards, redemption, cost, revenue and repeat visits. Compare challenges, audiences, venues …
+- ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
 
 #### Acceptance for the design
 
@@ -1548,7 +1550,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 - [ ] Every output is drawn (0 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-833?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
-- [ ] Every transition is wired: `BO-824`.
+- [ ] Every transition is wired: `BO-824`, `BO-827`.
 - [ ] Every gated control is gated: `MARKETING_VIEW`, `REPORT_VIEW_VENUE`.
 - [ ] The module and platform inputs below are applied.
 - [ ] The 2 pending correction(s) are respected: the corrected version is drawn, never the one the package still shows.

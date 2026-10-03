@@ -29,7 +29,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-005 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-005 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -135,12 +135,9 @@
         "Tenant.code",
         "Tenant.name",
         "Tenant.status",
-        "Tenant.suspensionMode",
-        "Tenant.suspensionReason",
         "Tenant.planName",
         "Tenant.cellCount",
-        "Tenant.venueCount",
-        "Tenant.billingEmail"
+        "Tenant.venueCount"
        ],
        "operation": "listTenants",
        "provenance": "contract subscription.yaml GET /tenants"
@@ -152,13 +149,10 @@
        "columns": [
         "Cell.name",
         "Cell.kind",
-        "Cell.isReachable",
         "Cell.lastContactAt",
         "Cell.licenceExpiresAt",
-        "Cell.participatesInCrossCell",
         "Cell.regionName",
-        "Cell.countryCode",
-        "Cell.tier"
+        "Cell.countryCode"
        ],
        "operation": "listTenantCells",
        "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
@@ -174,19 +168,11 @@
        "label": "The selected tenant",
        "bindsTo": "Tenant",
        "columns": [
-        "Tenant.id",
         "Tenant.code",
         "Tenant.name",
         "Tenant.status",
         "Tenant.suspensionMode",
-        "Tenant.suspensionReason",
         "Tenant.suspensionEffectiveAt",
-        "Tenant.suspensionNoticeMessage",
-        "Tenant.terminationScheduledAt",
-        "Tenant.terminationRetentionUntil",
-        "Tenant.terminationReason",
-        "Tenant.terminationRequestedByPrincipalId",
-        "Tenant.planId",
         "Tenant.planName",
         "Tenant.cellCount",
         "Tenant.venueCount"
@@ -199,17 +185,14 @@
        "label": "The SSO provider config",
        "bindsTo": "SsoProviderConfig",
        "columns": [
-        "SsoProviderConfig.id",
         "SsoProviderConfig.displayName",
         "SsoProviderConfig.protocol",
         "SsoProviderConfig.metadataUrl",
         "SsoProviderConfig.issuer",
-        "SsoProviderConfig.clientId",
         "SsoProviderConfig.clientSecretRef",
         "SsoProviderConfig.groupMappings",
         "SsoProviderConfig.autoProvisionPrincipals",
-        "SsoProviderConfig.isEnforced",
-        "SsoProviderConfig.isActive"
+        "SsoProviderConfig.isEnforced"
        ],
        "operation": "getSsoConfig",
        "provenance": "contract identity.yaml GET /tenants/sso-config"
@@ -219,19 +202,11 @@
        "label": "The tenant",
        "bindsTo": "TenantDetail",
        "columns": [
-        "TenantDetail.id",
         "TenantDetail.code",
         "TenantDetail.name",
         "TenantDetail.status",
         "TenantDetail.suspensionMode",
-        "TenantDetail.suspensionReason",
         "TenantDetail.suspensionEffectiveAt",
-        "TenantDetail.suspensionNoticeMessage",
-        "TenantDetail.terminationScheduledAt",
-        "TenantDetail.terminationRetentionUntil",
-        "TenantDetail.terminationReason",
-        "TenantDetail.terminationRequestedByPrincipalId",
-        "TenantDetail.planId",
         "TenantDetail.planName",
         "TenantDetail.cellCount",
         "TenantDetail.venueCount"
@@ -490,7 +465,7 @@
    "error": "Could not load. Names which read failed and leaves the tenant untouched.",
    "emptyFirstRun": "No tenants yet. Offers Create tenant, the first act of onboarding; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on status, planId and the tenant are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_CELL_VIEW`, `USER_MANAGE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `provisionCell`; `PLATFORM_TENANT_ACCESS` for `openPlatformStaffGrant`, `listOwnPlatformStaffGrants`; `PLATFORM_TENANT_MANAGE` for `addLicenceAddOn`, `createTenant`, `reactivateTenant`, `removeLicenceAddOn` and 2 more; `PLATFORM_TENANT_TERMINATE` for `terminateTenant`.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions, expiry). The same state returns when the grant reaches `expiresAt` (decided 28 September, audit R098)."
   },
   "apis": [
@@ -645,7 +620,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-005"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 15 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 15 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "purposeNote": "Purpose rewritten 2 October 2026 (CHG-WIR-023): The purpose was the generic list template (\"Find the right one quickly, and act on it without opening it\").",
   "_platform": {
    "code": "P09",
@@ -700,7 +675,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-006 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-006 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -795,12 +770,9 @@
         "Tenant.code",
         "Tenant.name",
         "Tenant.status",
-        "Tenant.suspensionMode",
-        "Tenant.suspensionReason",
         "Tenant.planName",
         "Tenant.cellCount",
-        "Tenant.venueCount",
-        "Tenant.billingEmail"
+        "Tenant.venueCount"
        ],
        "operation": "listTenants",
        "provenance": "contract subscription.yaml GET /tenants"
@@ -812,13 +784,10 @@
        "columns": [
         "Cell.name",
         "Cell.kind",
-        "Cell.isReachable",
         "Cell.lastContactAt",
         "Cell.licenceExpiresAt",
-        "Cell.participatesInCrossCell",
         "Cell.regionName",
-        "Cell.countryCode",
-        "Cell.tier"
+        "Cell.countryCode"
        ],
        "operation": "listTenantCells",
        "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
@@ -849,19 +818,11 @@
        "label": "The selected tenant",
        "bindsTo": "Tenant",
        "columns": [
-        "Tenant.id",
         "Tenant.code",
         "Tenant.name",
         "Tenant.status",
         "Tenant.suspensionMode",
-        "Tenant.suspensionReason",
         "Tenant.suspensionEffectiveAt",
-        "Tenant.suspensionNoticeMessage",
-        "Tenant.terminationScheduledAt",
-        "Tenant.terminationRetentionUntil",
-        "Tenant.terminationReason",
-        "Tenant.terminationRequestedByPrincipalId",
-        "Tenant.planId",
         "Tenant.planName",
         "Tenant.cellCount",
         "Tenant.venueCount"
@@ -885,19 +846,11 @@
        "label": "The tenant",
        "bindsTo": "TenantDetail",
        "columns": [
-        "TenantDetail.id",
         "TenantDetail.code",
         "TenantDetail.name",
         "TenantDetail.status",
         "TenantDetail.suspensionMode",
-        "TenantDetail.suspensionReason",
         "TenantDetail.suspensionEffectiveAt",
-        "TenantDetail.suspensionNoticeMessage",
-        "TenantDetail.terminationScheduledAt",
-        "TenantDetail.terminationRetentionUntil",
-        "TenantDetail.terminationReason",
-        "TenantDetail.terminationRequestedByPrincipalId",
-        "TenantDetail.planId",
         "TenantDetail.planName",
         "TenantDetail.cellCount",
         "TenantDetail.venueCount"
@@ -944,7 +897,7 @@
    "error": "Could not load. Names which read failed and leaves the tenant hierarchy untouched.",
    "emptyFirstRun": "No tenant hierarchy yet. Offers Create org unit (`createOrgUnit`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on status, planId and the tenant hierarchy are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listTenants` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_CELL_VIEW`, `SCOPE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`, `openPlatformStaffGrant`; `PLATFORM_TENANT_MANAGE` for `updateTenant`; `SCOPE_MANAGE` for `createOrgUnit`.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `SCOPE_MANAGE`, `SCOPE_VIEW`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
@@ -1039,7 +992,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-006"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formUpdateTenant",
@@ -1166,7 +1119,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-007 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-007 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -1219,13 +1172,10 @@
        "columns": [
         "Cell.name",
         "Cell.kind",
-        "Cell.isReachable",
         "Cell.lastContactAt",
         "Cell.licenceExpiresAt",
-        "Cell.participatesInCrossCell",
         "Cell.regionName",
-        "Cell.countryCode",
-        "Cell.tier"
+        "Cell.countryCode"
        ],
        "operation": "listTenantCells",
        "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
@@ -1238,13 +1188,9 @@
         "Tenant.code",
         "Tenant.name",
         "Tenant.status",
-        "Tenant.suspensionMode",
-        "Tenant.suspensionReason",
         "Tenant.suspensionEffectiveAt",
-        "Tenant.suspensionNoticeMessage",
         "Tenant.terminationScheduledAt",
-        "Tenant.terminationRetentionUntil",
-        "Tenant.terminationReason"
+        "Tenant.terminationRetentionUntil"
        ],
        "operation": "listTenants",
        "provenance": "contract subscription.yaml GET /tenants"
@@ -1267,22 +1213,14 @@
        "label": "The selected cell",
        "bindsTo": "Cell",
        "columns": [
-        "Cell.id",
         "Cell.name",
         "Cell.kind",
-        "Cell.clusterId",
-        "Cell.isReachable",
         "Cell.lastContactAt",
         "Cell.licenceExpiresAt",
-        "Cell.participatesInCrossCell",
-        "Cell.regionId",
         "Cell.regionName",
         "Cell.countryCode",
         "Cell.tier",
-        "Cell.status",
-        "Cell.cloudProvider",
-        "Cell.cloudRegion",
-        "Cell.apiEndpoint"
+        "Cell.status"
        ],
        "operation": "listTenantCells",
        "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
@@ -1321,19 +1259,11 @@
        "label": "The tenant",
        "bindsTo": "TenantDetail",
        "columns": [
-        "TenantDetail.id",
         "TenantDetail.code",
         "TenantDetail.name",
         "TenantDetail.status",
         "TenantDetail.suspensionMode",
-        "TenantDetail.suspensionReason",
         "TenantDetail.suspensionEffectiveAt",
-        "TenantDetail.suspensionNoticeMessage",
-        "TenantDetail.terminationScheduledAt",
-        "TenantDetail.terminationRetentionUntil",
-        "TenantDetail.terminationReason",
-        "TenantDetail.terminationRequestedByPrincipalId",
-        "TenantDetail.planId",
         "TenantDetail.planName",
         "TenantDetail.cellCount",
         "TenantDetail.venueCount"
@@ -1412,7 +1342,7 @@
    "error": "Could not load. Names which read failed and leaves the module feature entitlement untouched.",
    "emptyFirstRun": "No module feature entitlement yet. Offers Add licence add on (`addLicenceAddOn`).",
    "emptyNoResults": "Never shown: `listTenantCells` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_CELL_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_MANAGE` for `addLicenceAddOn`, `removeLicenceAddOn`."
   },
   "apis": [
    {
@@ -1491,7 +1421,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-007"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "getSsoConfig",
@@ -1554,7 +1484,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-008 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-008 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -1600,13 +1530,8 @@
         "Plan.name",
         "Plan.description",
         "Plan.cellTier",
-        "Plan.licensedModules",
-        "Plan.limits",
         "Plan.basePrice",
-        "Plan.billingPeriod",
-        "Plan.includesBrandedApp",
-        "Plan.includedAiTokens",
-        "Plan.isActive"
+        "Plan.billingPeriod"
        ],
        "operation": "listPlans",
        "provenance": "contract subscription.yaml GET /plans"
@@ -1617,12 +1542,9 @@
        "bindsTo": "SubscriptionInvoice",
        "columns": [
         "SubscriptionInvoice.invoiceNumber",
-        "SubscriptionInvoice.periodStart",
-        "SubscriptionInvoice.periodEnd",
         "SubscriptionInvoice.status",
         "SubscriptionInvoice.subtotal",
         "SubscriptionInvoice.taxAmount",
-        "SubscriptionInvoice.total",
         "SubscriptionInvoice.issuedAt",
         "SubscriptionInvoice.dueAt"
        ],
@@ -1636,13 +1558,10 @@
        "columns": [
         "Cell.name",
         "Cell.kind",
-        "Cell.isReachable",
         "Cell.lastContactAt",
         "Cell.licenceExpiresAt",
-        "Cell.participatesInCrossCell",
         "Cell.regionName",
-        "Cell.countryCode",
-        "Cell.tier"
+        "Cell.countryCode"
        ],
        "operation": "listTenantCells",
        "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
@@ -1655,13 +1574,9 @@
         "Tenant.code",
         "Tenant.name",
         "Tenant.status",
-        "Tenant.suspensionMode",
-        "Tenant.suspensionReason",
         "Tenant.suspensionEffectiveAt",
-        "Tenant.suspensionNoticeMessage",
         "Tenant.terminationScheduledAt",
-        "Tenant.terminationRetentionUntil",
-        "Tenant.terminationReason"
+        "Tenant.terminationRetentionUntil"
        ],
        "operation": "listTenants",
        "provenance": "contract subscription.yaml GET /tenants"
@@ -1682,13 +1597,7 @@
         "Plan.description",
         "Plan.cellTier",
         "Plan.licensedModules",
-        "Plan.limits",
         "Plan.basePrice",
-        "Plan.billingPeriod",
-        "Plan.includesBrandedApp",
-        "Plan.includedAiTokens",
-        "Plan.id",
-        "Plan.isActive",
         "Plan.subscriberCount",
         "Plan.publishedAt"
        ],
@@ -1718,19 +1627,11 @@
        "label": "The tenant",
        "bindsTo": "TenantDetail",
        "columns": [
-        "TenantDetail.id",
         "TenantDetail.code",
         "TenantDetail.name",
         "TenantDetail.status",
         "TenantDetail.suspensionMode",
-        "TenantDetail.suspensionReason",
         "TenantDetail.suspensionEffectiveAt",
-        "TenantDetail.suspensionNoticeMessage",
-        "TenantDetail.terminationScheduledAt",
-        "TenantDetail.terminationRetentionUntil",
-        "TenantDetail.terminationReason",
-        "TenantDetail.terminationRequestedByPrincipalId",
-        "TenantDetail.planId",
         "TenantDetail.planName",
         "TenantDetail.cellCount",
         "TenantDetail.venueCount"
@@ -1818,7 +1719,7 @@
    "error": "Could not load. Names which read failed and leaves the subscription plan untouched.",
    "emptyFirstRun": "No subscription plan yet. Offers Create plan (`createPlan`).",
    "emptyNoResults": "Never shown: `listPlans` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listPlans` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `listPlans` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_BILLING_VIEW`, `PLATFORM_CELL_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_BILLING_MANAGE` for `generateInvoice`; `PLATFORM_PLAN_MANAGE` for `createPlan`, `createPlanVersion`; `PLATFORM_TENANT_MANAGE` for `setSubscription`."
   },
   "apis": [
    {
@@ -1949,7 +1850,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-008"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 19 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetSubscription",
@@ -2147,7 +2048,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-009 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-009 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -2188,16 +2089,10 @@
        "label": "Every subscription invoice",
        "bindsTo": "SubscriptionInvoice",
        "columns": [
-        "SubscriptionInvoice.id",
         "SubscriptionInvoice.invoiceNumber",
-        "SubscriptionInvoice.periodStart",
-        "SubscriptionInvoice.periodEnd",
         "SubscriptionInvoice.status",
-        "SubscriptionInvoice.lines",
         "SubscriptionInvoice.subtotal",
         "SubscriptionInvoice.taxAmount",
-        "SubscriptionInvoice.total",
-        "SubscriptionInvoice.planVersionUsed",
         "SubscriptionInvoice.issuedAt",
         "SubscriptionInvoice.dueAt"
        ],
@@ -2209,18 +2104,12 @@
        "label": "Every tenant",
        "bindsTo": "Tenant",
        "columns": [
-        "Tenant.id",
         "Tenant.code",
         "Tenant.name",
         "Tenant.status",
-        "Tenant.suspensionMode",
-        "Tenant.suspensionReason",
         "Tenant.suspensionEffectiveAt",
-        "Tenant.suspensionNoticeMessage",
         "Tenant.terminationScheduledAt",
-        "Tenant.terminationRetentionUntil",
-        "Tenant.terminationReason",
-        "Tenant.terminationRequestedByPrincipalId"
+        "Tenant.terminationRetentionUntil"
        ],
        "operation": "listTenants",
        "provenance": "contract subscription.yaml GET /tenants"
@@ -2236,16 +2125,11 @@
        "label": "The selected subscription invoice",
        "bindsTo": "SubscriptionInvoice",
        "columns": [
-        "SubscriptionInvoice.id",
         "SubscriptionInvoice.invoiceNumber",
-        "SubscriptionInvoice.periodStart",
-        "SubscriptionInvoice.periodEnd",
         "SubscriptionInvoice.status",
-        "SubscriptionInvoice.lines",
         "SubscriptionInvoice.subtotal",
         "SubscriptionInvoice.taxAmount",
         "SubscriptionInvoice.total",
-        "SubscriptionInvoice.planVersionUsed",
         "SubscriptionInvoice.issuedAt",
         "SubscriptionInvoice.dueAt",
         "SubscriptionInvoice.paidAt"
@@ -2276,19 +2160,11 @@
        "label": "The tenant",
        "bindsTo": "TenantDetail",
        "columns": [
-        "TenantDetail.id",
         "TenantDetail.code",
         "TenantDetail.name",
         "TenantDetail.status",
         "TenantDetail.suspensionMode",
-        "TenantDetail.suspensionReason",
         "TenantDetail.suspensionEffectiveAt",
-        "TenantDetail.suspensionNoticeMessage",
-        "TenantDetail.terminationScheduledAt",
-        "TenantDetail.terminationRetentionUntil",
-        "TenantDetail.terminationReason",
-        "TenantDetail.terminationRequestedByPrincipalId",
-        "TenantDetail.planId",
         "TenantDetail.planName",
         "TenantDetail.cellCount",
         "TenantDetail.venueCount"
@@ -2340,7 +2216,7 @@
    "error": "Could not load. Names which read failed and leaves the tenant billing invoicing untouched.",
    "emptyFirstRun": "No tenant billing invoicing yet. Offers Generate invoice (`generateInvoice`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on status and the tenant billing invoicing are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_BILLING_VIEW`, which `listSubscriptionInvoices` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_BILLING_VIEW`, which `listSubscriptionInvoices` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_TENANT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_BILLING_MANAGE` for `generateInvoice`."
   },
   "apis": [
    {
@@ -2417,7 +2293,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-009"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formGenerateInvoice",
@@ -2505,7 +2381,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-010 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-010 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -2541,13 +2417,10 @@
        "columns": [
         "Cell.name",
         "Cell.kind",
-        "Cell.isReachable",
         "Cell.lastContactAt",
         "Cell.licenceExpiresAt",
-        "Cell.participatesInCrossCell",
         "Cell.regionName",
-        "Cell.countryCode",
-        "Cell.tier"
+        "Cell.countryCode"
        ],
        "operation": "listTenantCells",
        "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
@@ -2560,13 +2433,9 @@
         "Tenant.code",
         "Tenant.name",
         "Tenant.status",
-        "Tenant.suspensionMode",
-        "Tenant.suspensionReason",
         "Tenant.suspensionEffectiveAt",
-        "Tenant.suspensionNoticeMessage",
         "Tenant.terminationScheduledAt",
-        "Tenant.terminationRetentionUntil",
-        "Tenant.terminationReason"
+        "Tenant.terminationRetentionUntil"
        ],
        "operation": "listTenants",
        "provenance": "contract subscription.yaml GET /tenants"
@@ -2582,22 +2451,14 @@
        "label": "The selected cell",
        "bindsTo": "Cell",
        "columns": [
-        "Cell.id",
         "Cell.name",
         "Cell.kind",
-        "Cell.clusterId",
-        "Cell.isReachable",
         "Cell.lastContactAt",
         "Cell.licenceExpiresAt",
-        "Cell.participatesInCrossCell",
-        "Cell.regionId",
         "Cell.regionName",
         "Cell.countryCode",
         "Cell.tier",
-        "Cell.status",
-        "Cell.cloudProvider",
-        "Cell.cloudRegion",
-        "Cell.apiEndpoint"
+        "Cell.status"
        ],
        "operation": "listTenantCells",
        "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
@@ -2618,19 +2479,11 @@
        "label": "The tenant",
        "bindsTo": "TenantDetail",
        "columns": [
-        "TenantDetail.id",
         "TenantDetail.code",
         "TenantDetail.name",
         "TenantDetail.status",
         "TenantDetail.suspensionMode",
-        "TenantDetail.suspensionReason",
         "TenantDetail.suspensionEffectiveAt",
-        "TenantDetail.suspensionNoticeMessage",
-        "TenantDetail.terminationScheduledAt",
-        "TenantDetail.terminationRetentionUntil",
-        "TenantDetail.terminationReason",
-        "TenantDetail.terminationRequestedByPrincipalId",
-        "TenantDetail.planId",
         "TenantDetail.planName",
         "TenantDetail.cellCount",
         "TenantDetail.venueCount"
@@ -2732,7 +2585,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-010"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "getSsoConfig",
@@ -2796,7 +2649,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-011 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-011 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -2847,13 +2700,10 @@
        "columns": [
         "Cell.name",
         "Cell.kind",
-        "Cell.isReachable",
         "Cell.lastContactAt",
         "Cell.licenceExpiresAt",
-        "Cell.participatesInCrossCell",
         "Cell.regionName",
-        "Cell.countryCode",
-        "Cell.tier"
+        "Cell.countryCode"
        ],
        "operation": "listTenantCells",
        "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
@@ -2866,13 +2716,9 @@
         "Tenant.code",
         "Tenant.name",
         "Tenant.status",
-        "Tenant.suspensionMode",
-        "Tenant.suspensionReason",
         "Tenant.suspensionEffectiveAt",
-        "Tenant.suspensionNoticeMessage",
         "Tenant.terminationScheduledAt",
-        "Tenant.terminationRetentionUntil",
-        "Tenant.terminationReason"
+        "Tenant.terminationRetentionUntil"
        ],
        "operation": "listTenants",
        "provenance": "contract subscription.yaml GET /tenants"
@@ -2888,22 +2734,14 @@
        "label": "The selected cell",
        "bindsTo": "Cell",
        "columns": [
-        "Cell.id",
         "Cell.name",
         "Cell.kind",
-        "Cell.clusterId",
-        "Cell.isReachable",
         "Cell.lastContactAt",
         "Cell.licenceExpiresAt",
-        "Cell.participatesInCrossCell",
-        "Cell.regionId",
         "Cell.regionName",
         "Cell.countryCode",
         "Cell.tier",
-        "Cell.status",
-        "Cell.cloudProvider",
-        "Cell.cloudRegion",
-        "Cell.apiEndpoint"
+        "Cell.status"
        ],
        "operation": "listTenantCells",
        "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
@@ -2931,19 +2769,11 @@
        "label": "The tenant",
        "bindsTo": "TenantDetail",
        "columns": [
-        "TenantDetail.id",
         "TenantDetail.code",
         "TenantDetail.name",
         "TenantDetail.status",
         "TenantDetail.suspensionMode",
-        "TenantDetail.suspensionReason",
         "TenantDetail.suspensionEffectiveAt",
-        "TenantDetail.suspensionNoticeMessage",
-        "TenantDetail.terminationScheduledAt",
-        "TenantDetail.terminationRetentionUntil",
-        "TenantDetail.terminationReason",
-        "TenantDetail.terminationRequestedByPrincipalId",
-        "TenantDetail.planId",
         "TenantDetail.planName",
         "TenantDetail.cellCount",
         "TenantDetail.venueCount"
@@ -3061,7 +2891,7 @@
    "error": "Could not load. Names which read failed and leaves the licence seat untouched.",
    "emptyFirstRun": "No licence seat yet. Offers Add licence add on (`addLicenceAddOn`).",
    "emptyNoResults": "Never shown: `listTenantCells` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_CELL_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_TENANT_MANAGE` for `addLicenceAddOn`, `removeLicenceAddOn`."
   },
   "apis": [
    {
@@ -3149,7 +2979,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-011"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 11 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "getSsoConfig",
@@ -3220,7 +3050,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-012 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-012 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -3272,13 +3102,10 @@
        "columns": [
         "Cell.name",
         "Cell.kind",
-        "Cell.isReachable",
         "Cell.lastContactAt",
         "Cell.licenceExpiresAt",
-        "Cell.participatesInCrossCell",
         "Cell.regionName",
-        "Cell.countryCode",
-        "Cell.tier"
+        "Cell.countryCode"
        ],
        "operation": "listTenantCells",
        "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
@@ -3291,13 +3118,9 @@
         "Tenant.code",
         "Tenant.name",
         "Tenant.status",
-        "Tenant.suspensionMode",
-        "Tenant.suspensionReason",
         "Tenant.suspensionEffectiveAt",
-        "Tenant.suspensionNoticeMessage",
         "Tenant.terminationScheduledAt",
-        "Tenant.terminationRetentionUntil",
-        "Tenant.terminationReason"
+        "Tenant.terminationRetentionUntil"
        ],
        "operation": "listTenants",
        "provenance": "contract subscription.yaml GET /tenants"
@@ -3313,22 +3136,14 @@
        "label": "The selected cell",
        "bindsTo": "Cell",
        "columns": [
-        "Cell.id",
         "Cell.name",
         "Cell.kind",
-        "Cell.clusterId",
-        "Cell.isReachable",
         "Cell.lastContactAt",
         "Cell.licenceExpiresAt",
-        "Cell.participatesInCrossCell",
-        "Cell.regionId",
         "Cell.regionName",
         "Cell.countryCode",
         "Cell.tier",
-        "Cell.status",
-        "Cell.cloudProvider",
-        "Cell.cloudRegion",
-        "Cell.apiEndpoint"
+        "Cell.status"
        ],
        "operation": "listTenantCells",
        "provenance": "contract subscription.yaml GET /tenants/{tenantId}/cells"
@@ -3338,19 +3153,11 @@
        "label": "The tenant",
        "bindsTo": "TenantDetail",
        "columns": [
-        "TenantDetail.id",
         "TenantDetail.code",
         "TenantDetail.name",
         "TenantDetail.status",
         "TenantDetail.suspensionMode",
-        "TenantDetail.suspensionReason",
         "TenantDetail.suspensionEffectiveAt",
-        "TenantDetail.suspensionNoticeMessage",
-        "TenantDetail.terminationScheduledAt",
-        "TenantDetail.terminationRetentionUntil",
-        "TenantDetail.terminationReason",
-        "TenantDetail.terminationRequestedByPrincipalId",
-        "TenantDetail.planId",
         "TenantDetail.planName",
         "TenantDetail.cellCount",
         "TenantDetail.venueCount"
@@ -3418,7 +3225,7 @@
    "error": "Could not load. Names which read failed and leaves the tenant isolation resource untouched.",
    "emptyFirstRun": "No tenant isolation resource yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Never shown: `listTenantCells` takes no filter, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getEntitlementUsage` requires to show this screen, and names that permission (the screen's other reads need `PLATFORM_CELL_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PLATFORM_CELL_MANAGE` for `provisionCell`."
   },
   "apis": [
    {
@@ -3489,7 +3296,7 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-012"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formProvisionCell",
@@ -3575,7 +3382,7 @@
     {
      "to": "ADM-001",
      "trigger": "Platform Login / MFA",
-     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-015 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (enrolMfaMethod) itself, and ADM-001 opens on its own"
+     "provenance": "derived — ADM-001 declares entryState.params challengeId, methodId, providerId and ADM-015 holds none of them. The edge carries nothing: providerId only pre-selects (deep link or optional); ADM-001 finds challengeId (createMfaChallenge), methodId (login) itself, and ADM-001 opens on its own"
     },
     {
      "to": "ADM-002",
@@ -3659,13 +3466,9 @@
         "Tenant.code",
         "Tenant.name",
         "Tenant.status",
-        "Tenant.suspensionMode",
-        "Tenant.suspensionReason",
         "Tenant.suspensionEffectiveAt",
-        "Tenant.suspensionNoticeMessage",
         "Tenant.terminationScheduledAt",
-        "Tenant.terminationRetentionUntil",
-        "Tenant.terminationReason"
+        "Tenant.terminationRetentionUntil"
        ],
        "operation": "listTenants",
        "provenance": "contract subscription.yaml GET /tenants"
@@ -3738,19 +3541,11 @@
        "label": "The tenant",
        "bindsTo": "TenantDetail",
        "columns": [
-        "TenantDetail.id",
         "TenantDetail.code",
         "TenantDetail.name",
         "TenantDetail.status",
         "TenantDetail.suspensionMode",
-        "TenantDetail.suspensionReason",
         "TenantDetail.suspensionEffectiveAt",
-        "TenantDetail.suspensionNoticeMessage",
-        "TenantDetail.terminationScheduledAt",
-        "TenantDetail.terminationRetentionUntil",
-        "TenantDetail.terminationReason",
-        "TenantDetail.terminationRequestedByPrincipalId",
-        "TenantDetail.planId",
         "TenantDetail.planName",
         "TenantDetail.cellCount",
         "TenantDetail.venueCount"
@@ -3770,8 +3565,7 @@
         "ApiUsageSummary.p50LatencyMs",
         "ApiUsageSummary.p95LatencyMs",
         "ApiUsageSummary.p99LatencyMs",
-        "ApiUsageSummary.quotaBreaches",
-        "ApiUsageSummary.byOperation"
+        "ApiUsageSummary.quotaBreaches"
        ],
        "operation": "getApiUsage",
        "provenance": "contract public-api.yaml GET /api-usage"
@@ -3821,7 +3615,7 @@
    "error": "Could not load. Names which read failed and leaves the api rate limit untouched.",
    "emptyFirstRun": "No api rate limit yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Never shown: nothing on this screen filters its list, so an empty list is always the first-run state above.",
-   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `PLATFORM_TENANT_VIEW`, which `getTenantLicences` requires to show this screen, and names that permission (the screen's other reads need `DEVELOPER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `DEVELOPER_ADMIN` for `setApiQuota`, `decideProductionAccess`, `setApiAnomalyRule`; `PLATFORM_TENANT_ACCESS` for `listOwnPlatformStaffGrants`, `openPlatformStaffGrant`.",
    "grantRequired": "**No access into this tenant yet.** A tenant is picked and no platform-staff grant into it is open, so every tenant action is disabled and the screen offers **Open access grant** (`openPlatformStaffGrant`: reason, permissions `DEVELOPER_ADMIN`, `DEVELOPER_VIEW`, expiry). The same state returns when the grant reaches `expiresAt` (audit R098; CHG-SBO-001)."
   },
   "apis": [
@@ -3926,7 +3720,9 @@
     },
     {
      "name": "requestId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listProductionAccessRequests` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
@@ -3943,13 +3739,13 @@
    "provenance": "generated",
    "board": "wireframes/P09 TICVAI Web.dc.html#adm-015"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formSetApiQuota",
     "component": "modal",
     "trigger": "Save API quota",
-    "body": "**Collects what `setApiQuota` sends before it is called.** Required: `clientId`, `sustainedPerMinute`. Optional: `id`, `burstPerSecond`, `dailyCap`, `perOperationOverrides`, `onBreach`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setApiQuota` sends before it is called.** Required: `clientId`, `sustainedPerMinute`. Optional: `burstPerSecond`, `dailyCap`, `perOperationOverrides`, `onBreach`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "ApiQuota",
     "confirm": {
      "label": "Save API quota",
@@ -3960,7 +3756,6 @@
      "discards": [
       "clientId",
       "sustainedPerMinute",
-      "id",
       "burstPerSecond",
       "dailyCap",
       "perOperationOverrides",

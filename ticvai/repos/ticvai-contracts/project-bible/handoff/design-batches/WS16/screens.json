@@ -203,7 +203,9 @@
    "params": [
     {
      "name": "requestId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listApprovalRequests` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -260,7 +262,10 @@
      "to": "BO-374",
      "trigger": "Back to Approval Decision Workspace",
      "provenance": "structural — pack board 4 wiring, 9 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "requestId"
+     ]
     }
    ]
   },
@@ -416,7 +421,10 @@
      "to": "BO-374",
      "trigger": "Back to Approval Decision Workspace",
      "provenance": "structural — pack board 4 wiring, 9 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "requestId"
+     ]
     }
    ]
   },
@@ -545,7 +553,10 @@
      "to": "BO-374",
      "trigger": "Back to Approval Decision Workspace",
      "provenance": "structural — pack board 4 wiring, 9 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "requestId"
+     ]
     }
    ]
   },
@@ -699,7 +710,10 @@
      "to": "BO-374",
      "trigger": "Back to Approval Decision Workspace",
      "provenance": "structural — pack board 4 wiring, 9 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "requestId"
+     ]
     }
    ]
   },
@@ -845,7 +859,10 @@
      "to": "BO-374",
      "trigger": "Back to Approval Decision Workspace",
      "provenance": "structural — pack board 4 wiring, 9 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "requestId"
+     ]
     }
    ]
   },
@@ -974,7 +991,10 @@
      "to": "BO-374",
      "trigger": "Back to Approval Decision Workspace",
      "provenance": "structural — pack board 4 wiring, 9 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "requestId"
+     ]
     }
    ]
   },
@@ -1320,7 +1340,9 @@
    "params": [
     {
      "name": "executionId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listApprovedActionExecutions` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1398,7 +1420,10 @@
      "to": "BO-374",
      "trigger": "Back to Approval Decision Workspace",
      "provenance": "structural — pack board 4 wiring, 9 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "requestId"
+     ]
     }
    ]
   },

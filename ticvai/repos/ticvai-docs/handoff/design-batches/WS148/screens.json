@@ -270,7 +270,7 @@
   "name": "Gateway, PSP & Acquirer Directory",
   "module": "Commercial",
   "requiresModule": "core",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Payment_Payment_Orchestration.pdf",
    "board": "2",

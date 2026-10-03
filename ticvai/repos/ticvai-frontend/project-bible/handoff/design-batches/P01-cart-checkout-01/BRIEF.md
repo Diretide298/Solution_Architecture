@@ -128,7 +128,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `WEB-010` | Shopping Cart | A | 13 | 70 | 5 | 35 | 12 | 6 | guest | review (client-verified) |
 | `WEB-011` | Guest Details & Attendee Forms | A | 12 | 21 | 6 | 7 | 15 | 0 | guest | review (client-verified) |
-| `WEB-012` | Checkout — Payment | A | 14 | 38 | 5 | 24 | 17 | 6 | guest | review (client-verified) |
+| `WEB-012` | Checkout — Payment | A | 14 | 32 | 5 | 24 | 17 | 6 | guest | review (client-verified) |
 | `WEB-013` | Booking Confirmation | A | 7 | 10 | 5 | 11 | 4 | 6 | guest | review (client-verified) |
 | `WEB-014` | Pay for a Booking | A | 3 | 3 | 5 | 0 | 2 | 6 | guest | review (designed) |
 

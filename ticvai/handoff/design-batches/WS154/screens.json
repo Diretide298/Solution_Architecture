@@ -952,23 +952,33 @@
    "params": [
     {
      "name": "alertId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRiskAlerts` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "caseId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRiskAlerts` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "chargebackId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listChargebacks` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "entityRef",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRiskAlerts` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "entityType",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRiskAlerts` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1232,7 +1242,9 @@
    "params": [
     {
      "name": "chargebackId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listChargebacks` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1376,7 +1388,9 @@
    "params": [
     {
      "name": "chargebackId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listChargebacks` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1673,11 +1687,15 @@
    "params": [
     {
      "name": "entityRef",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRiskAlerts` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "entityType",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listRiskAlerts` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

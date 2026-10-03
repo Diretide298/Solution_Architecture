@@ -51,7 +51,7 @@ servicesCalled:
 - service: VenueOpsService
   operationCalls: 38
 - service: WhiteLabelService
-  operationCalls: 24
+  operationCalls: 23
 - service: IdentityService
   operationCalls: 23
 - service: FnbService
@@ -84,7 +84,6 @@ screens:
   - getCookieConsentRuntime
   - getPublishedTenantConfig
   - getTenantAppStatus
-  - listAnalyticsProviders
   - listMyEntitlements
   - listProducts
   - recordDeviceConsent
@@ -313,7 +312,7 @@ screens:
   name: Interactive Seat Selection
   module: Booking & Selection
   requiresModule: seating
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createSeatHold
@@ -350,7 +349,7 @@ screens:
   name: Add-ons & Upsell
   module: Booking & Selection
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - addCartLine
@@ -382,7 +381,7 @@ screens:
   name: Wishlist
   module: Booking & Selection
   requiresModule: marketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - addToWishlist
@@ -581,7 +580,7 @@ screens:
   name: Branded Queue / Waiting Room
   module: High-Demand Access
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - enterWaitingRoom
@@ -790,7 +789,7 @@ screens:
   name: Wallet & Gift Cards
   module: Membership, Loyalty & Value
   requiresModule: retail
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - getGameCard
@@ -828,7 +827,7 @@ screens:
   name: Membership Plans
   module: Membership, Loyalty & Value
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - getMyMemberships
@@ -856,7 +855,7 @@ screens:
   name: Membership Management
   module: Membership, Loyalty & Value
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createInstalmentPlan
@@ -891,7 +890,7 @@ screens:
   name: Devices, Wishlist & Consent
   module: Membership, Loyalty & Value
   requiresModule: marketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - deleteGuestAccount
@@ -956,7 +955,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - caseId<-navigation
   goesTo:
   - WEB-001
   - WEB-026
@@ -969,7 +969,7 @@ screens:
   name: Survey & Feedback
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - getForm
@@ -998,7 +998,7 @@ screens:
   name: Newsletter Subscription
   module: Engagement & Support
   requiresModule: marketing
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - getGuestConsents
@@ -1108,7 +1108,7 @@ screens:
   name: My Reservations
   module: Ticketing
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - cancelReservation
@@ -1145,7 +1145,7 @@ screens:
   name: Offers & Promotions
   module: Promotions
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - getPromotion
@@ -1169,7 +1169,7 @@ screens:
   name: Shop
   module: Retail
   requiresModule: retail
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - addCartLine
@@ -1198,7 +1198,7 @@ screens:
   name: Lost & Found
   module: Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - listMyCases
@@ -1251,7 +1251,7 @@ screens:
   name: F&B – Browse & Order
   module: In-venue Services
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - addCartLine
@@ -1281,8 +1281,10 @@ screens:
   - orderId<-deepLink
   - entryId<-deepLink
   - cartId<-session
+  - reservationId<-navigation
   goesTo:
   - WEB-001
+  - WEB-037
   boardFrames: null
   wireframe: wireframes/P01 Guest Web.dc.html#web-036
   inFlows: null
@@ -1290,7 +1292,7 @@ screens:
   name: Menu Item Detail
   module: In-venue Services
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - getGuestMenu
@@ -1313,7 +1315,7 @@ screens:
   name: F&B – Order Tracking
   module: In-venue Services
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - getGuestBill
@@ -1339,7 +1341,7 @@ screens:
   name: Venue Map & Wait Times
   module: In-venue Services
   requiresModule: queue
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - getVenueMap
@@ -1367,7 +1369,7 @@ screens:
   name: Virtual Queue
   module: In-venue Services
   requiresModule: queue
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - getWaitTimes
@@ -1394,7 +1396,7 @@ screens:
   name: Parking – Reserve & Pay
   module: In-venue Services
   requiresModule: access
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - addCartLine
@@ -1422,7 +1424,7 @@ screens:
   name: Retail & Shop and Drop
   module: Retail
   requiresModule: retail
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - addCartLine
@@ -1449,7 +1451,7 @@ screens:
   name: Loyalty & Rewards
   module: Membership, Loyalty & Value
   requiresModule: marketing
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createReferral
@@ -1483,7 +1485,7 @@ screens:
   name: AI Concierge – Home
   module: Engagement & Support
   requiresModule: ai
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - createAiConversation
@@ -1493,7 +1495,7 @@ screens:
   - recordAnswerFeedback
   - requestSuggestion
   - sendAiMessage
-  - sendConversationMessage
+  - sendGuestConversationMessage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1515,7 +1517,7 @@ screens:
   name: Help Centre & Accessibility
   module: Support
   requiresModule: core
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - getTenantAppStatus
@@ -1540,7 +1542,7 @@ screens:
   name: In-Venue Notifications
   module: Engagement & Support
   requiresModule: marketing
-  wave: 2
+  wave: 1
   density: compact
   operations:
   - listMyNotifications
@@ -1564,7 +1566,7 @@ screens:
   name: Map Booking — Cabanas & Spots
   module: Booking & Selection
   requiresModule: resources
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - addCartLine
@@ -1600,7 +1602,7 @@ screens:
   name: Book a Space by the Hour
   module: Booking & Selection
   requiresModule: resources
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - addCartLine
@@ -1628,7 +1630,7 @@ screens:
   name: Transport — Route & Schedule
   module: Transport
   requiresModule: transport
-  wave: 3
+  wave: 1
   density: compact
   operations:
   - addCartLine

@@ -449,6 +449,9 @@ paths:
                         minimum: 10
                         maximum: 60
                         default: 30
+                        description: '**30 seconds for an admission QR** (Chinmay, 3 October 2026, Block A business
+                          rules: GST-055''s admission QR rotates every 30 seconds; CHG-RUL-018). The bounds stay
+                          for other credential kinds.'
                       digits:
                         type: integer
                         minimum: 6
@@ -878,10 +881,16 @@ paths:
         one is held (`outcome: pendingReview`, `202`) for `reviewFaceReenrolment`, so nobody can swap another person''s
         face onto a pass at a counter. Every enrolment and re-enrolment also writes an `access.biometric_audit_event`.
 
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own
+        FacePass enrolment; another guest''s enrolment is refused exactly as one that does not exist, never
+        returned. `GUEST_MANAGE` is what a staff caller must hold to act for any guest (ADR-0025).
+
         '
       tags:
       - access
       x-ticvai-permission: GUEST_MANAGE
+      x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1055,10 +1064,16 @@ paths:
         table, but it is never returned here: an id that names a `faceTag` enrolment answers `404`,
         exactly as an unknown id does, so `kind` in the response is always `facePass`.
 
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own
+        FacePass enrolment; another guest''s enrolment is refused exactly as one that does not exist, never
+        returned. `GUEST_VIEW` is what a staff caller must hold to act for any guest (ADR-0025).
+
         '
       tags:
       - access
       x-ticvai-permission: GUEST_VIEW
+      x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1095,10 +1110,16 @@ paths:
         **The entitlement survives.** A guest who withdraws their face still has their annual pass and
         enters another way (3.2.9 allows the check to be deactivated per ticket type).
 
+        **A guest acts on their own only** (Chinmay, 3 October 2026, Pattern 4; CHG-GCF-002;
+        `x-ticvai-self-scoped: subject`): a guest caller needs no permission and is answered for their own
+        FacePass enrolment; another guest''s enrolment is refused exactly as one that does not exist, never
+        returned. `GUEST_MANAGE` is what a staff caller must hold to act for any guest (ADR-0025).
+
         '
       tags:
       - access
       x-ticvai-permission: GUEST_MANAGE
+      x-ticvai-self-scoped: subject
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
@@ -1149,6 +1170,11 @@ paths:
         with. It was `ACCESS_POINT_CONFIGURE`, which let somebody who could configure a car park fail
         to read the one they had just configured.
 
+        **A guest calls this without a permission and sees published data only** (Chinmay, 3 October 2026,
+        Pattern 4; CHG-GCF-001; `x-ticvai-guest-callable`): a guest or a visitor gets the car parks offered to
+        guests, and nothing in draft, unpublished or withdrawn; asked for by id, such a record answers as not
+        found. `PARKING_CONFIGURE` is what a staff caller must hold, and staff also see drafts (ADR-0025).
+
         '
       tags:
       - access
@@ -1163,6 +1189,7 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       x-ticvai-permission: PARKING_CONFIGURE
+      x-ticvai-guest-callable: true
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true
       x-ticvai-conflict-policy: serverWins
@@ -8096,6 +8123,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Sets how long biometric data is kept; a wrong value is a data protection breach.
   /biometric:
     get:
@@ -10052,6 +10080,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Opens a gate by hand, against the admission rules, for a person standing at
         it.
   /credential-disable-blacklist:
@@ -12995,6 +13024,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Moves a paid ticket onto new media; the old one stops working.
   /access-point-groups:
     put:
@@ -15521,6 +15551,7 @@ paths:
       - access
       x-ticvai-permission: BIOMETRIC_IMAGE_VIEW
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Opens a guest's face images, special-category data under PDPL; every look is logged (DEC-239).
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false

@@ -87,7 +87,7 @@
     "differences": "Rev 3 decision: the basket stays on the right in Arabic by default (configurable)."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -174,11 +174,7 @@
        "label": "The tenant app status",
        "bindsTo": "TenantAppStatus",
        "columns": [
-        "TenantAppStatus.isPublished",
-        "TenantAppStatus.publishedVersion",
         "TenantAppStatus.publishedAt",
-        "TenantAppStatus.isInMaintenance",
-        "TenantAppStatus.maintenanceMessage",
         "TenantAppStatus.expectedBackAt",
         "TenantAppStatus.minimumAppVersion",
         "TenantAppStatus.availability",
@@ -244,7 +240,7 @@
     "view": "Account → All screens → Wave 1 → Maintenance / upgrade"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",

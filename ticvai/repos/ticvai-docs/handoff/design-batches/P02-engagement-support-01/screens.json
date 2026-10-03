@@ -4,7 +4,7 @@
   "name": "In-Venue Notifications",
   "module": "Engagement & Support",
   "requiresModule": "fnb",
-  "wave": 2,
+  "wave": 1,
   "capability": "C61",
   "implementation": {
    "app": "guest-app",
@@ -114,7 +114,7 @@
     "differences": "The YAML defers this (no in-app notification feed in the first release), but the prototype still shows a feed and an Alerts tab, so the client will expect it."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "entryState": {
    "params": [
     {
@@ -159,7 +159,7 @@
   "name": "AI Concierge – Home",
   "module": "Engagement & Support",
   "requiresModule": "ai",
-  "wave": 2,
+  "wave": 1,
   "capability": "AI-02",
   "implementation": {
    "app": "guest-app",
@@ -211,7 +211,7 @@
        "kind": "assistantPanel",
        "label": "Ask Sahli",
        "operation": "sendAiMessage",
-       "notes": "**The conversation is the content.** The question shows at once and the answer streams with its sources; on 503 (every provider failed) \"Sahli can't answer right now\" with Hand over to a person and Try again. The conversation is opened silently (`createAiConversation`) on the first message, its scope taken from the session; the guest never picks a module.",
+       "notes": "**The conversation is the content.** The question shows at once and the answer streams with its sources; on 503 (every provider failed) \"Sahli can't answer right now\" with Hand over to a person and Try again. The conversation is opened silently (`createAiConversation`) on the first message, its scope taken from the session; the guest never picks a module.\n\n**Answers stream** (decided by Chinmay, 3 October 2026 (CHG-SPF-013)): server-sent events carry the tokens, then the sources and any proposed action; the full message is stored once it ends.",
        "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
       },
       {
@@ -225,7 +225,7 @@
       {
        "kind": "textField",
        "label": "Message to the agent",
-       "operation": "sendConversationMessage",
+       "operation": "sendGuestConversationMessage",
        "notes": "Replaces the ask box once a person has taken the conversation; the transcript stays above.",
        "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)",
        "bindsTo": "ConversationMessage.body"
@@ -253,7 +253,7 @@
        "kind": "secondaryButton",
        "label": "Hand over to a person",
        "operation": "handoverToAgent",
-       "notes": "One tap, always visible in the panel header. Sends reason `guestRequested` with Sahli's own summary; the platform sets `assistantFailed`, `outOfScope` or `negativeSentiment` itself. The panel becomes the agent chat (`sendConversationMessage`) with queue position and wait; 409 offers to raise a case.",
+       "notes": "One tap, always visible in the panel header. Sends reason `guestRequested` with Sahli's own summary; the platform sets `assistantFailed`, `outOfScope` or `negativeSentiment` itself. The panel becomes the agent chat (`sendGuestConversationMessage`) with queue position and wait; 409 offers to raise a case.",
        "provenance": "corrected 2 October 2026 (CHG-SGU-016, design-notes correction)"
       },
       {
@@ -325,9 +325,9 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "sendConversationMessage",
+    "operationId": "sendGuestConversationMessage",
     "contract": "marketing-crm",
-    "purpose": "After a handover, the guest talks to the agent",
+    "purpose": "After a handover, the guest writes to the agent, as the guest: sendConversationMessage needs CASE_MANAGE (decided by Chinmay, 3 October 2026 (CHG-SPF-013))",
     "trigger": "onAction"
    }
   ],
@@ -335,11 +335,15 @@
    "params": [
     {
      "name": "conversationId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAiConversations` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "outletId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `getGuestMenu` takes the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     },
     {
      "name": "messageId",
@@ -362,7 +366,7 @@
    "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -399,7 +403,7 @@
   "name": "AI Concierge – Chat",
   "module": "Engagement & Support",
   "requiresModule": "ticketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "AI-02",
   "implementation": {
    "app": "guest-app",
@@ -452,7 +456,6 @@
        "label": "The guest order status",
        "bindsTo": "GuestOrderStatus",
        "columns": [
-        "GuestOrderStatus.orderId",
         "GuestOrderStatus.orderNumber",
         "GuestOrderStatus.status",
         "GuestOrderStatus.estimatedReadyAt",
@@ -467,17 +470,11 @@
        "label": "The cart",
        "bindsTo": "Cart",
        "columns": [
-        "Cart.channel",
         "Cart.status",
-        "Cart.lines",
         "Cart.subtotal",
         "Cart.discountTotal",
         "Cart.taxTotal",
-        "Cart.total",
-        "Cart.appliedPromotionIds",
-        "Cart.expiresAt",
-        "Cart.extensionsUsed",
-        "Cart.maxExtensions"
+        "Cart.total"
        ],
        "operation": "getCart",
        "provenance": "contract orders.yaml GET /carts/{cartId}"
@@ -511,12 +508,13 @@
        "kind": "secondaryButton",
        "label": "Send AI message",
        "operation": "sendAiMessage",
-       "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages"
+       "provenance": "contract ai.yaml POST /conversations/{conversationId}/messages",
+       "notes": "**Answers stream** (decided by Chinmay, 3 October 2026 (CHG-SPF-013)): server-sent events carry the tokens, then the sources and any proposed action; the full message is stored once it ends."
       },
       {
        "kind": "secondaryButton",
-       "label": "Send conversation message",
-       "operation": "sendConversationMessage",
+       "label": "Send to the agent",
+       "operation": "sendGuestConversationMessage",
        "provenance": "contract marketing-crm.yaml POST /conversations/{conversationId}/messages"
       },
       {
@@ -575,9 +573,9 @@
     "trigger": "onAction"
    },
    {
-    "operationId": "sendConversationMessage",
+    "operationId": "sendGuestConversationMessage",
     "contract": "marketing-crm",
-    "purpose": "Say something, as a guest or an agent",
+    "purpose": "After a handover, the guest writes to the agent, as the guest: sendConversationMessage needs CASE_MANAGE (decided by Chinmay, 3 October 2026 (CHG-SPF-013))",
     "trigger": "onAction"
    },
    {
@@ -628,7 +626,7 @@
    "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 8 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formAddCartLine",
@@ -690,13 +688,13 @@
     "provenance": "client-verified"
    },
    {
-    "id": "formSendConversationMessage",
+    "id": "formSendGuestConversationMessage",
     "component": "modal",
-    "trigger": "Send conversation message",
-    "body": "**Collects what `sendConversationMessage` sends before it is called.** Required: `body`. Optional: `attachments`. Dismissing sends nothing; the screen behind is unchanged.",
+    "trigger": "Send to the agent",
+    "body": "**Collects what `sendGuestConversationMessage` sends before it is called.** Required: `body`. Optional: `attachments`. Dismissing sends nothing; the screen behind is unchanged.",
     "confirm": {
-     "label": "Send conversation message",
-     "operation": "sendConversationMessage"
+     "label": "Send to the agent",
+     "operation": "sendGuestConversationMessage"
     },
     "dismiss": {
      "label": "Cancel",
@@ -763,7 +761,7 @@
   "name": "AI Concierge – Contextual Help",
   "module": "Engagement & Support",
   "requiresModule": "ai",
-  "wave": 2,
+  "wave": 1,
   "capability": "AI-02",
   "implementation": {
    "app": "guest-app",
@@ -899,7 +897,7 @@
    },
    "note": "Corrected 2 October 2026 (CHG-SGU-016): the prototype view is a catalogue entry (\"Account → All screens → Wave 2\"), not a client-drawn layout, so the frame is treated as designed, not client-verified."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -936,7 +934,7 @@
   "name": "Feedback & Ratings",
   "module": "Engagement & Support",
   "requiresModule": "marketing",
-  "wave": 3,
+  "wave": 1,
   "capability": "C62",
   "implementation": {
    "app": "guest-app",
@@ -1091,7 +1089,7 @@
     "view": "Account → All screens → Wave 3 → Feedback & ratings"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRaiseMyCase",
@@ -1162,7 +1160,7 @@
   "name": "Help & Support",
   "module": "Engagement & Support",
   "requiresModule": "marketing",
-  "wave": 2,
+  "wave": 1,
   "capability": "C17",
   "implementation": {
    "app": "guest-app",
@@ -1372,7 +1370,7 @@
     "view": "Account → All screens → Wave 2 → Help & support"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 5 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formRaiseMyCase",
@@ -1518,7 +1516,7 @@
     }
    ]
   },
-  "notes": "Minuted 10 Aug §4.9. Benchmarked against Skidata. Tied to a ticket purchase and saved as a personal visit profile. **Out of the first release** (decided 28 September, audit R187): the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release that builds it.\n\n**Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): the Plan tab root, \"Plan\".** Inputs: party size, heights (or ages), dates, pace (packed, balanced or relaxed), interests and cuisine. The rules planner (`generateVisitPlan`) runs with no AI. The tab is hidden when the venue turns module `visitPlanner` off.\n\n**Multi-venue intelligence (client meeting 30 September, MoM 4.7, Allam; agreed by Chinmay).** In a multi-venue tenant each chosen day is at one park, and the planner uses **only the rides, dining and retail that exist at that park**: a cuisine or shop preference is checked against that park's own points, never assumed of every park (only one park has the Indian restaurant, so *Indian* places lunch there on that park's day and nowhere else). Retail and kiosk shops are now planner options alongside F&B (the gap a Softlabs teammate flagged). Contract: venue-map `generateVisitPlan` `dayVenues`, `retailTags`, `VisitPlan.unmatchedPreferences`.\n\n**In the first release (Block A, wave 1), stated plainly (CHG-SGU-021).** The R187 note that put the planner out of the first release (wave 4) was superseded by rev 3 (29 September); the Plan tab is in the Block A slice.",
+  "notes": "Minuted 10 Aug §4.9. Benchmarked against Skidata. Tied to a ticket purchase and saved as a personal visit profile. **Deferred on 28 September (audit R187), and brought back the next day**: the itinerary planner was put in `wave: 4` with a `deferred` block and kept rather than deleted; the 29 September re-plan below superseded that, and the screen is in Block A, wave 1 (3 October 2026, CHG-SPF-006).\n\n**Rev 3 (decided 29 September).** Had stayed deferred (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): the Plan tab root, \"Plan\".** Inputs: party size, heights (or ages), dates, pace (packed, balanced or relaxed), interests and cuisine. The rules planner (`generateVisitPlan`) runs with no AI. The tab is hidden when the venue turns module `visitPlanner` off.\n\n**Multi-venue intelligence (client meeting 30 September, MoM 4.7, Allam; agreed by Chinmay).** In a multi-venue tenant each chosen day is at one park, and the planner uses **only the rides, dining and retail that exist at that park**: a cuisine or shop preference is checked against that park's own points, never assumed of every park (only one park has the Indian restaurant, so *Indian* places lunch there on that park's day and nowhere else). Retail and kiosk shops are now planner options alongside F&B (the gap a Softlabs teammate flagged). Contract: venue-map `generateVisitPlan` `dayVenues`, `retailTags`, `VisitPlan.unmatchedPreferences`.\n\n**In the first release (Block A, wave 1), stated plainly (CHG-SGU-021).** The R187 note that deferred the planner was superseded by rev 3 (29 September); the Plan tab is in the Block A slice.",
   "density": "comfortable",
   "pattern": "multiStepForm",
   "patternReason": "The v4 prototype asks six questions one at a time (who, heights, days, pace, likes, food) and ends on *Make my plan*",
@@ -1681,7 +1679,7 @@
     "view": "Plan tab (Plan your visit · 1 of 6)"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -1759,7 +1757,7 @@
     }
    ]
   },
-  "notes": "Minuted 10 Aug §4.9. ** wired 24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the heuristic later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens` refused it and was right: **a guest does not record an outcome — the platform observes what they did.** A guest app that self-reports whether it took the advice is a training label the guest could forge, and the observation belongs server-side where the plan and the visit can be compared. **Out of the first release** (decided 28 September, audit R187): the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release that builds it. **Itinerary suggestion removed 28 September** (decided 28 September, audit R209): the planner is deferred (R187) and `requestSuggestion` refuses a guest anything but prepPlan, upsell and waitTime, so this screen no longer asks for a day plan.\n\n**Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): ready-made day plans per venue** the guest can take; each is rules-built by `generateVisitPlan` from preset inputs, then edited on GST-053.",
+  "notes": "Minuted 10 Aug §4.9. ** wired 24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the heuristic later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens` refused it and was right: **a guest does not record an outcome — the platform observes what they did.** A guest app that self-reports whether it took the advice is a training label the guest could forge, and the observation belongs server-side where the plan and the visit can be compared. **Deferred on 28 September (audit R187), and brought back the next day**: the itinerary planner was put in `wave: 4` with a `deferred` block and kept rather than deleted; the 29 September re-plan below superseded that, and the screen is in Block A, wave 1 (3 October 2026, CHG-SPF-006). **Itinerary suggestion removed 28 September** (decided 28 September, audit R209): the planner was deferred (R187) and `requestSuggestion` refuses a guest anything but prepPlan, upsell and waitTime, so this screen no longer asks for a day plan.\n\n**Rev 3 (decided 29 September).** Had stayed deferred (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): ready-made day plans per venue** the guest can take; each is rules-built by `generateVisitPlan` from preset inputs, then edited on GST-053.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
@@ -1853,7 +1851,7 @@
    "source": "Claude Code, 30 September 2026, drawn in the Mobile App v4 look",
    "note": "**Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no value for an agent-drawn frame; it is the value the eight Claude Design frames of 29 September carry. Gaps the operations leave are in handoff/design-batches/apps/1-guest-app/return/FINDINGS.md."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -1894,8 +1892,8 @@
   "capability": "C02",
   "implementation": {
    "app": "guest-app",
-   "route": "/general/build-your-own-itinerary",
-   "component": "apps/guest-app/src/routes/general/BuildYourOwnItineraryDetail.tsx",
+   "route": "/general/your-plan",
+   "component": "apps/guest-app/src/routes/general/YourPlanDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -1967,7 +1965,7 @@
     }
    ]
   },
-  "notes": "Minuted 10 Aug §4.9. **Group sharing agreed** — an in-app QR a friend scans to join the itinerary (Chinmay raised, Qossai confirmed). **Out of the first release** (decided 28 September, audit R187): the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release that builds it.\n\n**Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): \"Your Plan\".** Per-day itinerary with swap, remove, add and undo (`updateVisitPlan` is versioned), add-ons such as Fast Track, and **Book this plan** → GST-041.\n\n**Multi-venue intelligence (client meeting 30 September, MoM 4.7, Allam).** Each day tab is one park, and every item on it (rides, dining, and now retail: shops and kiosks) is at that park; a preference the park cannot meet shows as *Not at this park* rather than being filled from another park.",
+  "notes": "Minuted 10 Aug §4.9. **Group sharing agreed** — an in-app QR a friend scans to join the itinerary (Chinmay raised, Qossai confirmed). **Deferred on 28 September (audit R187), and brought back the next day**: the itinerary planner was put in `wave: 4` with a `deferred` block and kept rather than deleted; the 29 September re-plan below superseded that, and the screen is in Block A, wave 1 (3 October 2026, CHG-SPF-006).\n\n**Rev 3 (decided 29 September).** Had stayed deferred (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): \"Your Plan\".** Per-day itinerary with swap, remove, add and undo (`updateVisitPlan` is versioned), add-ons such as Fast Track, and **Book this plan** → GST-041.\n\n**Multi-venue intelligence (client meeting 30 September, MoM 4.7, Allam).** Each day tab is one park, and every item on it (rides, dining, and now retail: shops and kiosks) is at that park; a preference the park cannot meet shows as *Not at this park* rather than being filled from another park.\n\n**A signed-out guest builds and changes a plan** (decided by Chinmay, 3 October 2026 (CHG-SPF-012)): the plan lives in an anonymous session; signing in is asked only to save, share or book, and the plan moves to the account on sign-in.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getCart` reads one of them — list, select, act",
@@ -2048,7 +2046,7 @@
        "kind": "toggle",
        "label": "Add Fast Track",
        "operation": "updateVisitPlan",
-       "notes": "An add-on from the plan's `addOnSuggestions` (the product GST-048 sells), priced per guest, with the queuing time it saves.",
+       "notes": "An add-on from the plan's `addOnSuggestions` (the product GST-048 sells), priced per guest, with the queuing time it saves.\n\nSends `updateVisitPlan` with the change kind `addAddOn` (on) or `removeAddOn` (off); the add-on is priced at booking (decided by Chinmay, 3 October 2026 (CHG-SPF-012)).",
        "provenance": "decided 29 September 2026, MOB-6"
       },
       {
@@ -2186,7 +2184,7 @@
     "view": "Plan tab → the six questions → Make my plan (Your plan)"
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P02",
    "audience": "guest",
@@ -2227,8 +2225,8 @@
   "capability": "AI-35",
   "implementation": {
    "app": "guest-app",
-   "route": "/general/ai-optimized-itinerary",
-   "component": "apps/guest-app/src/routes/general/AiOptimizedItineraryDetail.tsx",
+   "route": "/general/ai-planner",
+   "component": "apps/guest-app/src/routes/general/AIPlannerDetail.tsx",
    "status": "notStarted"
   },
   "navigation": {
@@ -2265,7 +2263,7 @@
     }
    ]
   },
-  "notes": "Minuted 10 Aug §4.9. **The AI half is Wave 2** — the manual planner must work without it (CF-41). **Guest concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.** Still degrades to the manual planner rather than to an error. ** wired 24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the heuristic later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens` refused it and was right: **a guest does not record an outcome — the platform observes what they did.** A guest app that self-reports whether it took the advice is a training label the guest could forge, and the observation belongs server-side where the plan and the visit can be compared. **Out of the first release** (decided 28 September, audit R187): the itinerary planner is deferred and this screen is `wave: 4` with a `deferred` block. Kept, not deleted, for the release that builds it. **Itinerary suggestion removed 28 September** (decided 28 September, audit R209): the planner is deferred (R187) and `requestSuggestion` refuses a guest anything but prepPlan, upsell and waitTime, so this screen no longer asks for a day plan.\n\n**Rev 3 (decided 29 September).** Had stayed in wave 4 (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): \"AI Planner\".** The agent refines the rules plan by chat; its tools are the plan operations, and `requestSuggestion` gains the guest-allowed kind `itinerary` (what R209 said to add if the planner ships). AI writes only `ai.*` stores; the plan change itself is `updateVisitPlan`. **The rules plan never fails over to an error**: with AI off, not licensed or failing, the guest keeps the rules plan and the Plan tab works in full.\n\n**Grounding (client meeting 30 September, MoM 4.7, Allam).** The agent's candidates are only the rides, dining and retail (shops and kiosks) of each day's own park, as the plan operations return them; `updateVisitPlan` refuses a point from another park (`point-not-at-day-venue`) as the backstop.",
+  "notes": "Minuted 10 Aug §4.9. **The AI half came second in the 10 August minutes** — the manual planner must work without it (CF-41); since the 29 September re-plan (MOB-6) both are in Block A. **Guest concierge confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.** Still degrades to the manual planner rather than to an error. ** wired 24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the heuristic later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens` refused it and was right: **a guest does not record an outcome — the platform observes what they did.** A guest app that self-reports whether it took the advice is a training label the guest could forge, and the observation belongs server-side where the plan and the visit can be compared. **Deferred on 28 September (audit R187), and brought back the next day**: the itinerary planner was put in `wave: 4` with a `deferred` block and kept rather than deleted; the 29 September re-plan below superseded that, and the screen is in Block A, wave 1 (3 October 2026, CHG-SPF-006). **Itinerary suggestion removed 28 September** (decided 28 September, audit R209): the planner was deferred (R187) and `requestSuggestion` refuses a guest anything but prepPlan, upsell and waitTime, so this screen no longer asks for a day plan.\n\n**Rev 3 (decided 29 September).** Had stayed deferred (GAP-C3); superseded the same day by the re-plan below.\n\n**Brought into Block A on 29 September** (Chinmay, the 29 September re-plan, MOB-6): a rules-based planner with the AI planner agent on top. This supersedes audit R187, the deferral half of R209 and rev 3 GAP-C3; the `deferred` block is removed and the screen is wave 1.\n\n**Mobile v4 role (MOB-6): \"AI Planner\".** The agent refines the rules plan by chat; its tools are the plan operations, and `requestSuggestion` gains the guest-allowed kind `itinerary` (what R209 said to add if the planner ships). AI writes only `ai.*` stores; the plan change itself is `updateVisitPlan`. **The rules plan never fails over to an error**: with AI off, not licensed or failing, the guest keeps the rules plan and the Plan tab works in full.\n\n**Grounding (client meeting 30 September, MoM 4.7, Allam).** The agent's candidates are only the rides, dining and retail (shops and kiosks) of each day's own park, as the plan operations return them; `updateVisitPlan` refuses a point from another park (`point-not-at-day-venue`) as the backstop.\n\n**A signed-out guest builds and changes a plan** (decided by Chinmay, 3 October 2026 (CHG-SPF-012)): the plan lives in an anonymous session; signing in is asked only to save, share or book, and the plan moves to the account on sign-in.",
   "density": "comfortable",
   "pattern": "listDetail",
   "patternReason": "`listProducts` reads the population and `getWaitTimes` reads one of them — list, select, act",
@@ -2420,7 +2418,7 @@
     "differences": "v4 draws the rules plan and a general assistant chat; it has no plan-specific chat. Built from this definition."
    }
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "machine": {
    "key": "plannerMode",
    "initial": "rulesPlan",

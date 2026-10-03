@@ -69,13 +69,19 @@
      "to": "BO-219",
      "trigger": "Works in Re-entry & Temporary Exit Journey",
      "provenance": "flow F118 step 9→10",
-     "operation": "listGuestJourney"
+     "operation": "listGuestJourney",
+     "carries": [
+      "profileId"
+     ]
     },
     {
      "to": "BO-220",
      "trigger": "Works in Multi-Park & Crossover Journey Orchestrator",
      "provenance": "flow F118 step 11→12",
-     "operation": "listGuestJourney"
+     "operation": "listGuestJourney",
+     "carries": [
+      "profileId"
+     ]
     },
     {
      "to": "BO-221",
@@ -981,7 +987,9 @@
    "params": [
     {
      "name": "profileId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAdmissionRules` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1143,7 +1151,9 @@
    "params": [
     {
      "name": "profileId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listAdmissionRules` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1311,7 +1321,9 @@
    "params": [
     {
      "name": "queueId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listQueues` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

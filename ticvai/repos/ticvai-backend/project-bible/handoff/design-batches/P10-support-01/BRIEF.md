@@ -103,7 +103,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-021` | Support & Contact | B–D | 23 | 44 | 6 | 11 | 0 | 0 | — | notStarted (generated) |
+| `PTR-021` | Support & Contact | D | 23 | 22 | 6 | 11 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

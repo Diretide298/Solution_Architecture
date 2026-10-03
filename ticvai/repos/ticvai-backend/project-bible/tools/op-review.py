@@ -94,6 +94,8 @@ def main():
     rewrite = []
     kinds = Counter()
     for i, t in new_txt.items():
+        if not i.isdigit():
+            continue                     # not pushed yet: keyed by plan key (op-descriptions.py, CHG-GTR-001)
         was = old_txt.get(i, "")
         if was.strip() == t.strip():
             continue

@@ -293,6 +293,16 @@
   "scopeLevel": "venue",
   "parameters": [
    {
+    "name": "X-Supervisor-Principal-Id",
+    "in": "header",
+    "required": false
+   },
+   {
+    "name": "X-Supervisor-Pin",
+    "in": "header",
+    "required": false
+   },
+   {
     "name": "venueId",
     "in": "query",
     "required": null
@@ -752,25 +762,6 @@
   ],
   "requestBody": "Announcement",
   "responds": "Announcement"
- },
- "recordAttendance": {
-  "method": "POST",
-  "path": "/attendance/clock",
-  "contract": "workforce",
-  "summary": "Clock in, clock out, or take a break",
-  "permission": "ATTENDANCE_RECORD",
-  "offlineCapable": true,
-  "conflictPolicy": "append",
-  "scopeLevel": "venue",
-  "parameters": [
-   {
-    "name": null,
-    "in": null,
-    "required": null
-   }
-  ],
-  "requestBody": null,
-  "responds": "AttendanceRecord"
  },
  "requestShiftSwap": {
   "method": "POST",

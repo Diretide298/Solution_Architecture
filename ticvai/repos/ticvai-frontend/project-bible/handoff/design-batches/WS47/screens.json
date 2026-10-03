@@ -15,7 +15,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/coupon-promo-code-command-center-adm-158",
    "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-010"
   },
   "navigation": {
    "entryFrom": [
@@ -44,16 +45,6 @@
      "back": true
     },
     {
-     "to": "ADM-160",
-     "trigger": "Works in Unique Code Generation & Batch Manager",
-     "provenance": "flow F156 step 3→4",
-     "operation": "listCouponCodes",
-     "carries": [
-      "batchId",
-      "campaignId"
-     ]
-    },
-    {
      "to": "ADM-161",
      "trigger": "Works in Code Eligibility & Restriction Manager",
      "provenance": "flow F156 step 5→6",
@@ -70,15 +61,6 @@
      "trigger": "Works in Validity, Date & Time Control",
      "provenance": "flow F156 step 9→10",
      "operation": "listCouponCodes"
-    },
-    {
-     "to": "ADM-164",
-     "trigger": "Works in Code Distribution & Assignment Manager",
-     "provenance": "flow F156 step 11→12",
-     "operation": "listCouponCodes",
-     "carries": [
-      "campaignId"
-     ]
     },
     {
      "to": "ADM-165",
@@ -112,6 +94,25 @@
      "trigger": "Works in Coupon & Promo Code Builder, a section of BO-010, which saves the record with createCouponCampaign…",
      "provenance": "flow F156 step 1→2",
      "operation": "listCouponCodes"
+    },
+    {
+     "to": "ADM-160",
+     "trigger": "Works in Unique Code Generation & Batch Manager",
+     "provenance": "flow F156 step 3→4",
+     "operation": "listCouponCodes",
+     "carries": [
+      "batchId",
+      "campaignId"
+     ]
+    },
+    {
+     "to": "ADM-164",
+     "trigger": "Works in Code Distribution & Assignment Manager",
+     "provenance": "flow F156 step 11→12",
+     "operation": "listCouponCodes",
+     "carries": [
+      "campaignId"
+     ]
     }
    ]
   },
@@ -340,7 +341,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/promotions-coupons/coupon-promo-code-builder-adm-159",
    "component": "apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-010"
   },
   "navigation": {
    "entryFrom": [
@@ -1112,7 +1114,7 @@
   "name": "Code Distribution & Assignment Manager",
   "module": "Commercial",
   "requiresModule": "marketing",
-  "wave": 3,
+  "wave": 1,
   "source": {
    "pack": "Promotions___Bundles_Management_Reference.pdf",
    "board": "3",

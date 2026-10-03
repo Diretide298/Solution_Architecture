@@ -100,16 +100,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `EMP-081` | Active Rental Operations Command Center | B–D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-082` | Active Rental Detail & Live Timeline | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-083` | Rental Extension Request | B–D | 2 | 8 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-084` | Extension Pricing & Confirmation | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-085` | Equipment Swap / Replacement | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-086` | Rental Incident & Operational Exception | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-087` | Due Soon & Customer Notification Management | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-088` | Overdue Rental Management | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-089` | Active Group Rental Management | B–D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-090` | Active Rental Intelligence & Operational Alerts | B–D | 0 | 14 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-081` | Active Rental Operations Command Center | C | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-082` | Active Rental Detail & Live Timeline | C | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-083` | Rental Extension Request | C | 2 | 8 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-084` | Extension Pricing & Confirmation | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-085` | Equipment Swap / Replacement | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-086` | Rental Incident & Operational Exception | C | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-087` | Due Soon & Customer Notification Management | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-088` | Overdue Rental Management | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-089` | Active Group Rental Management | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-090` | Active Rental Intelligence & Operational Alerts | D | 0 | 9 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -129,7 +129,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-081 |
 | Who uses it | venue staff holding `RENTAL_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | commandCentre (comfortable density): the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -196,14 +196,14 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 **Where the user goes next**
 
 - → `EMP-003` Home — on duty: *Back to Home — on duty*
-- → `EMP-082` Active Rental Detail & Live Timeline: *Active Rental Detail & Live Timeline*
+- → `EMP-082` Active Rental Detail & Live Timeline: *Active Rental Detail & Live Timeline*; carries `bookingId`
 - → `EMP-083` Rental Extension Request: *Rental Extension Request*
-- → `EMP-084` Extension Pricing & Confirmation: *Extension Pricing & Confirmation*
-- → `EMP-085` Equipment Swap / Replacement: *Equipment Swap / Replacement*
+- → `EMP-084` Extension Pricing & Confirmation: *Extension Pricing & Confirmation*; carries `bookingId`
+- → `EMP-085` Equipment Swap / Replacement: *Equipment Swap / Replacement*; carries `bookingId`
 - → `EMP-086` Rental Incident & Operational Exception: *Rental Incident & Operational Exception*
 - → `EMP-087` Due Soon & Customer Notification Management: *Due Soon & Customer Notification Management*
 - → `EMP-088` Overdue Rental Management: *Overdue Rental Management*
-- → `EMP-089` Active Group Rental Management: *Active Group Rental Management*
+- → `EMP-089` Active Group Rental Management: *Active Group Rental Management*; carries `bookingId`
 - → `EMP-090` Active Rental Intelligence & Operational Alerts: *Active Rental Intelligence & Operational Alerts*
 
 #### States
@@ -301,7 +301,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-082 |
 | Who uses it | venue staff holding `RENTAL_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -420,7 +420,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-083 |
 | Who uses it | venue staff holding `RENTAL_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -581,7 +581,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-084 |
 | Who uses it | venue staff holding `RENTAL_OPERATE`, `RENTAL_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -704,7 +704,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-085 |
 | Who uses it | venue staff holding `RENTAL_OPERATE` (1 operate) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -824,7 +824,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-086 |
 | Who uses it | venue staff holding `RENTAL_OPERATE` (1 operate) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -947,7 +947,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block C · task APP-STAFF-EMP-087 |
 | Who uses it | venue staff holding `RENTAL_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1070,7 +1070,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-088 |
 | Who uses it | venue staff holding `RENTAL_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1199,7 +1199,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-089 |
 | Who uses it | venue staff holding `RENTAL_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -1309,7 +1309,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | after Block A (B to D: set per app-module by the sprint plan) |
+| Block | Block D · task APP-STAFF-EMP-090 |
 | Who uses it | venue staff holding `RENTAL_VIEW` (1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): the pack gives this screen a display directory (§Display) and no metric row |
@@ -1350,9 +1350,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Predicted late returns | text | not in the schema: `Predicted late returns` |
 | Future reservation conflicts | text | not in the schema: `Future reservation conflicts` |
 | Extension demand | text | not in the schema: `Extension demand` |
-| Equipment incident trends | text | not in the schema: `Equipment incident trends` |
-| Location return pressure | text | not in the schema: `Location return pressure` |
-| Expected inventory shortage | text | not in the schema: `Expected inventory shortage` |
 
 **The selected active rental intelligence** (detail panel): The pack groups this record's detail under its own headings: “RNT-10482”, “Confirmed”, “Ready for Checkout”, “Active”, “Incident”, “Overdue”.
 
@@ -1363,8 +1360,6 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 | Future reservation conflicts | text | not in the schema: `Future reservation conflicts` |
 | Extension demand | text | not in the schema: `Extension demand` |
 | Equipment incident trends | text | not in the schema: `Equipment incident trends` |
-| Location return pressure | text | not in the schema: `Location return pressure` |
-| Expected inventory shortage | text | not in the schema: `Expected inventory shortage` |
 
 **Rules for what is shown** (from the Food, Beverage & Retail process; these refine the tables above and win where they differ)
 
@@ -1435,7 +1430,7 @@ Also apply: 12 for all of P06, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#EMP-090?state=<state>`: emptyFirstRun, emptyNoAccess, emptyNoResults, error, loading, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `EMP-081`.

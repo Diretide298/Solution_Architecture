@@ -603,7 +603,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 **Form: Save case category definition** (modal, opened by *Save case category definition*; *Save case category definition* calls `setCaseCategoryDefinition`, *Cancel* sends nothing)
 
-**Collects what `setCaseCategoryDefinition` sends before it is called.** Required: `id`, `code`, `name`, `isActive`. Optional: `parentCategoryId`, `defaultPriority`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setCaseCategoryDefinition` sends before it is called.** Required: `code`, `name`, `isActive`. Optional: `parentCategoryId`, `defaultPriority`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|

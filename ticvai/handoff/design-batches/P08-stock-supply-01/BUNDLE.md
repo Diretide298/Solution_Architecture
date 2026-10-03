@@ -1,6 +1,6 @@
 # P08-stock-supply-01 — P08 · Stock & Supply (1 of 2)
 
-**10 screens · 54 operations · 37 schemas · 11 permissions**
+**10 screens · 52 operations · 37 schemas · 11 permissions**
 
 Platform P08 Venue Management · ships as **venue-management** ·
 staff audience · web ·
@@ -99,16 +99,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `BO-049` | Stock Levels | B–D | 18 | 30 | 6 | 34 | 2 | 4 | — | notStarted (generated) |
-| `BO-050` | Stock Position & Valuation | B–D | 0 | 16 | 5 | 12 | 2 | 4 | — | notStarted (generated) |
-| `BO-051` | Purchase Orders | B–D | 18 | 21 | 6 | 12 | 1 | 4 | — | notStarted (generated) |
-| `BO-052` | Goods Receipt | B–D | 19 | 41 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
-| `BO-078` | Requisitions | B–D | 25 | 46 | 6 | 16 | 3 | 0 | — | notStarted (generated) |
-| `BO-079` | Stock Count | B–D | 28 | 32 | 6 | 8 | 0 | 4 | — | notStarted (generated) |
-| `BO-080` | Stock Transfers | B–D | 18 | 27 | 6 | 8 | 2 | 4 | — | notStarted (generated) |
-| `BO-081` | Inventory Items | A | 33 | 30 | 6 | 33 | 2 | 4 | — | notStarted (generated) |
-| `BO-082` | Stock Movements | B–D | 14 | 24 | 6 | 18 | 0 | 4 | — | notStarted (generated) |
-| `BO-083` | Suppliers | B–D | 36 | 19 | 6 | 7 | 1 | 4 | — | notStarted (generated) |
+| `BO-049` | Stock Levels | B–D | 18 | 23 | 6 | 34 | 2 | 4 | — | notStarted (generated) |
+| `BO-050` | Stock Position & Valuation | B–D | 0 | 12 | 5 | 12 | 2 | 4 | — | notStarted (generated) |
+| `BO-051` | Purchase Orders | B–D | 22 | 14 | 6 | 12 | 1 | 4 | — | notStarted (generated) |
+| `BO-052` | Goods Receipt | B–D | 19 | 19 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
+| `BO-078` | Requisitions | B–D | 23 | 26 | 6 | 16 | 3 | 0 | — | notStarted (generated) |
+| `BO-079` | Stock Count | B–D | 28 | 18 | 6 | 8 | 0 | 4 | — | notStarted (generated) |
+| `BO-080` | Stock Transfers | B–D | 18 | 12 | 6 | 8 | 2 | 4 | — | notStarted (generated) |
+| `BO-081` | Inventory Items | A | 33 | 18 | 6 | 33 | 2 | 4 | — | notStarted (generated) |
+| `BO-082` | Stock Movements | B–D | 14 | 16 | 6 | 18 | 0 | 4 | — | notStarted (generated) |
+| `BO-083` | Suppliers | B–D | 36 | 13 | 6 | 7 | 1 | 4 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -219,12 +219,9 @@ Errors to draw in the form: 400 Validation failed, including an `adjustmentIn`, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
 | Kind | chip: Main store, Sub store, Kitchen, Bar, Retail floor, Cellar… | — |
-| Parent location | the name it points at, never the id | — |
 | Is active | yes / no (icon or chip) | — |
 
 **The selected stock location** (detail panel, from `listStockLocations`)
@@ -252,15 +249,11 @@ Errors to draw in the form: 400 Validation failed, including an `adjustmentIn`, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| Item | the name it points at, never the id | — |
 | Item name | text | — |
 | SKU | text | — |
-| Location | the name it points at, never the id | — |
 | Location name | text | — |
 | On hand | 1,234.5 | — |
 | Allocated | 1,234.5 | Reserved for orders: the quantity under an active stock reservation for an order (decided 28 September, audit R171). |
-| Available | 1,234.5 | On-hand minus allocated (decided 28 September, audit R171). What can still be sold or issued. |
-| Unit | text | — |
 | Value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Last counted at | 1 Oct 2026, 14:30 | — |
 | Last movement at | 1 Oct 2026, 14:30 | — |
@@ -292,8 +285,8 @@ Errors to draw in the form: 400 Validation failed, including an `adjustmentIn`, 
 
 - → `BO-082` Stock Movements: *The four orders are sourced from another store instead*; calls `createStockMovement`
 - → `BO-079` Stock Count: *Stock Count*
-- → `BO-080` Stock Transfers: *Stock Transfers*
-- → `EMP-065` Receiving: *The delivery arrives*
+- → `BO-080` Stock Transfers: *Stock Transfers*; carries `transferId`
+- → `EMP-065` Receiving: *The delivery arrives*; carries `transferId`
 - → `BO-081` Inventory Items: *Inventory Items*; carries `itemId`
 
 #### States
@@ -304,7 +297,7 @@ Errors to draw in the form: 400 Validation failed, including an `adjustmentIn`, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the stock levels untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No stock levels yet. Offers Create stock transfer (`createStockTransfer`). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listStockLocations` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getStockPositions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `getStockPositions` requires to show this screen, and names that permission (the screen's other reads need `LEDGER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createStockTransfer` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed, including an `adjustmentIn`, `adjustmentOut` or `waste` movement with no `reason` (audit R171).; 409 Insufficient stock at the source; 409 Insufficient stock, and the item does not permit negative balances |
 
@@ -371,7 +364,7 @@ valuation:
 - `createStockMovement` → `PRODUCT_CONFIGURE` (configure) · staff
 - `listStockLocations` → `PRODUCT_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getStockPositions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `getStockPositions` requires to show this screen, and names that permission (the screen's other reads need `LEDGER_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createStockTransfer` …
 
 #### Requirements it meets
 
@@ -426,7 +419,7 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (18), with its required mark, default, format and its error state (400, 409).
-- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (23 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-049?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create stock transfer, Create stock movement.
 - [ ] Every transition is wired: `BO-082`, `BO-079`, `BO-080`, `EMP-065`, `BO-081`.
@@ -498,15 +491,11 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 
 | Shows | Format | Notes |
 |---|---|---|
-| Item | the name it points at, never the id | — |
 | Item name | text | — |
 | SKU | text | — |
-| Location | the name it points at, never the id | — |
 | Location name | text | — |
 | On hand | 1,234.5 | — |
 | Allocated | 1,234.5 | Reserved for orders: the quantity under an active stock reservation for an order (decided 28 September, audit R171). |
-| Available | 1,234.5 | On-hand minus allocated (decided 28 September, audit R171). What can still be sold or issued. |
-| Unit | text | — |
 | Value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Last counted at | 1 Oct 2026, 14:30 | — |
 | Last movement at | 1 Oct 2026, 14:30 | — |
@@ -624,7 +613,7 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (0), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-050?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] No transition is declared; back returns where the user came from.
@@ -687,9 +676,13 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
 | ID `id` | picker: choose an id | required | — | — | shows names, sends the id | — | `createPurchaseOrder` body |
-| Requisition `requisitionId` | picker: choose a requisition | required | — | — | shows names, sends the id | — | `createPurchaseOrder` body |
+| Kind `kind` | radio group | optional | Standard | Standard · Blanket · Release · Rfq award; `standard` needs `requisitionId` and `quotationId` (409 `requisition-required` without them); `blanket` and `rfqAward` are raised without a requisition; `release` names `blanketParentId`. | — | Which order this is (CHG-RUL-004). `standard` needs `requisitionId` and `quotationId` (409 `requisition-required` without them); `blanket` and `rfqAward` are raised without a … | `createPurchaseOrder` body |
+| Requisition `requisitionId` | picker: choose a requisition | optional | — | — | shows names, sends the id | Required for a `standard` order; omitted for a blanket order, an RFQ award or a release. | `createPurchaseOrder` body |
 | Supplier `supplierId` | picker: choose a supplier | required | — | — | shows names, sends the id | — | `createPurchaseOrder` body |
-| Quotation `quotationId` | picker: choose a quotation | required | — | — | shows names, sends the id | — | `createPurchaseOrder` body |
+| Quotation `quotationId` | picker: choose a quotation | optional | — | — | shows names, sends the id | Required for a `standard` order and an `rfqAward` (the winning quotation). | `createPurchaseOrder` body |
+| Rfq `rfqId` | picker: choose a rfq | optional | — | — | shows names, sends the id | For an `rfqAward`, the quotation round it awards. | `createPurchaseOrder` body |
+| Blanket parent `blanketParentId` | picker: choose a blanket parent | optional | — | — | shows names, sends the id | For a `release`, the open blanket order it draws against. | `createPurchaseOrder` body |
+| Contract price valid until `contractPriceValidUntil` | date picker | optional | — | — | 1 Oct 2026 (dd MMM yyyy) | For a `blanket` order, the last day its prices hold. | `createPurchaseOrder` body |
 | Deliver to location `deliverToLocationId` | picker: choose a deliver to location | optional | — | — | shows names, sends the id | — | `createPurchaseOrder` body |
 | Lines `lines` | repeatable rows | required | — | at least 1 | — | — | `createPurchaseOrder` body |
 | Item `lines[].itemId` | picker: choose an item | required | — | — | shows names, sends the id | — | `createPurchaseOrder` body |
@@ -700,7 +693,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Expected delivery `expectedDelivery` | date picker | required | — | — | 1 Oct 2026 (dd MMM yyyy) | — | `createPurchaseOrder` body |
 | Note `note` | text area | optional | — | max length 1000 | — | — | `createPurchaseOrder` body |
 
-Errors to draw in the form: 400 A line price differs from the selected quotation with no `priceOverrideReason` (audit R171).; 409 Requisition is not approved, or the quotation does not match it
+Errors to draw in the form: 400 A line price differs from the selected quotation with no `priceOverrideReason` (audit R171).; 409 A `standard` order with no approved requisition or no quotation (`requisition-required`), a quotation that does not match the requisition or the RFQ …
 
 **Form: Acknowledge purchase order** (modal, opened by *Acknowledge purchase order*; *Acknowledge purchase order* calls `acknowledgePurchaseOrder`, *Cancel* sends nothing)
 
@@ -753,18 +746,11 @@ Errors to draw in the form: 409 Not in a state that permits this
 | Shows | Format | Notes |
 |---|---|---|
 | Purchase order number | text | Per venue, in sequence (decided 28 September, audit R171). Assigned by the server from the venue's gap-free sequence, or the tenant's for … |
-| Requisition | the name it points at, never the id | Null on a blanket order or an RFQ award, which are raised without one. |
 | Supplier name | text | — |
 | Kind | chip: Standard, Blanket, Release, Rfq award | BL-159. A blanket order is a price and a commitment, not a delivery. |
-| Blanket parent | the name it points at, never the id | The blanket order this release draws against — another purchase order, so the same id type. |
 | Contract price valid until | 1 Oct 2026 | — |
-| Rfq | the name it points at, never the id | Where this order came from a quotation round. Keeping the link is what lets a venue show it took the best of three, which is usually the … |
-| Supplier invoice ref | text | BL-123. Purchase orders and goods receipts both existed — the third leg did not. |
 | Match status | chip: Unmatched, Matched, Price variance, Quantity variance, Both variance | The variance kinds are separated because they have different owners — a price variance is a buyer's problem and a quantity variance is a … |
 | Status | chip: Raised, Sent, Acknowledged, Partially received, Received, Closed short… | — |
-| Approval request | the name it points at, never the id | The pending approval request raised by `cancelPurchaseOrder` or `closePurchaseOrderShort` (kinds `purchaseOrderCancel` … |
-| Deliver to location | the name it points at, never the id | Scoped 31 August. A purchase order is raised by somebody, for somewhere, and carried neither. |
-| Lines | list or chips (count when long) | — |
 | Subtotal | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
@@ -772,8 +758,8 @@ Errors to draw in the form: 409 Not in a state that permits this
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
-| Create purchase order (primary button) | `createPurchaseOrder` POST `/purchase-orders` | CreatePurchaseOrderRequest | PurchaseOrder | 400 A line price differs from the selected quotation with no `priceOverrideReason` (audit R171).; 409 Requisition is not approved, or the quotation does not match it | gated `PROCUREMENT_MANAGE`; opens modal first |
-| Send purchase order (secondary button) | `sendPurchaseOrder` POST `/purchase-orders/{purchaseOrderId}/send` | — | PurchaseOrder | 409 Not in a state that permits this | gated `PROCUREMENT_MANAGE` |
+| Create purchase order (primary button) | `createPurchaseOrder` POST `/purchase-orders` | CreatePurchaseOrderRequest | PurchaseOrder | 400 A line price differs from the selected quotation with no `priceOverrideReason` (audit R171).; 409 A `standard` order with no approved requisition or no quotation (`requisition-required`), a quotation that does not … | gated `PROCUREMENT_MANAGE`; opens modal first |
+| Send purchase order (secondary button) | `sendPurchaseOrder` POST `/purchase-orders/{purchaseOrderId}/send` | — | PurchaseOrder | 409 Not in a state that permits this, or the order waits for its approval under the PO approval matrix (`po-approval-pending`; CHG-RUL-004). | gated `PROCUREMENT_MANAGE` |
 | Acknowledge purchase order (secondary button) | `acknowledgePurchaseOrder` POST `/purchase-orders/{purchaseOrderId}/acknowledge` | inline | PurchaseOrder | 409 Not in a state that permits this | gated `PROCUREMENT_MANAGE`; opens modal first |
 | Cancel purchase order (destructive button) | `cancelPurchaseOrder` POST `/purchase-orders/{purchaseOrderId}/cancel` | inline | PurchaseOrder | 409 The order is not `raised` or `sent`. | gated `PROCUREMENT_MANAGE` |
 | Close purchase order short (destructive button) | `closePurchaseOrderShort` POST `/purchase-orders/{purchaseOrderId}/close-short` | inline | PurchaseOrder | 409 Not in a state that permits this | gated `PROCUREMENT_MANAGE` |
@@ -812,9 +798,9 @@ Errors to draw in the form: 409 Not in a state that permits this
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the purchase orders untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No purchase orders yet. Offers Create purchase order (`createPurchaseOrder`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status and supplierId, and the purchase orders are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PROCUREMENT_VIEW`, which `listPurchaseOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PROCUREMENT_VIEW`, which `listPurchaseOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PROCUREMENT_MANAGE` for `createPurchaseOrder`, `sendPurchaseOrder`, `acknowledgePurchaseOrder`, `cancelPurchaseOrder` and 1 more. |
 | Offline (`?state=offline`) | online only |
-| Validation and conflict | the form keeps what was entered and marks the problem: 400 A line price differs from the selected quotation with no `priceOverrideReason` (audit R171).; 409 Not in a state that permits this; 409 Requisition is not approved, or the quotation does not match it; 409 The order is not `raised` or `sent`. |
+| Validation and conflict | the form keeps what was entered and marks the problem: 400 A line price differs from the selected quotation with no `priceOverrideReason` (audit R171).; 409 A `standard` order with no approved requisition or no quotation (`requisition-required`), a quotation that does not match the requisition or the RFQ …; 409 Not in a state that permits this; 409 Not in a state that permits this, or the order waits for its approval under the PO approval matrix … |
 
 #### Edge cases to draw
 
@@ -873,7 +859,7 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `cancelPurchaseOrder` → `PROCUREMENT_MANAGE` (configure) · staff
 - `closePurchaseOrderShort` → `PROCUREMENT_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PROCUREMENT_VIEW`, which `listPurchaseOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PROCUREMENT_VIEW`, which `listPurchaseOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PROCUREMENT_MANAGE` for `createPurchaseOrder`, `sendPurchaseOrder`, `acknowledgePurchaseOrder`, `cancelPurchaseOrder` and 1 more.
 
 #### Requirements it meets
 
@@ -918,8 +904,8 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (18), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (21 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (22), with its required mark, default, format and its error state (400, 404, 409).
+- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-051?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create purchase order, Send purchase order, Acknowledge purchase order, Cancel purchase order, Close purchase order short.
 - [ ] Every transition is wired: `BO-052`.
@@ -1029,33 +1015,20 @@ Errors to draw in the form: 409 Over-receipt beyond `VenueSettings.inventory.ove
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Purchase order number | text | Per venue, in sequence (decided 28 September, audit R171). Assigned by the server from the venue's gap-free sequence, or the tenant's for … |
-| Requisition | the name it points at, never the id | Null on a blanket order or an RFQ award, which are raised without one. |
-| Supplier | the name it points at, never the id | — |
 | Supplier name | text | — |
 | Kind | chip: Standard, Blanket, Release, Rfq award | BL-159. A blanket order is a price and a commitment, not a delivery. |
-| Blanket parent | the name it points at, never the id | The blanket order this release draws against — another purchase order, so the same id type. |
 | Contract price valid until | 1 Oct 2026 | — |
-| Rfq | the name it points at, never the id | Where this order came from a quotation round. Keeping the link is what lets a venue show it took the best of three, which is usually the … |
-| Supplier invoice ref | text | BL-123. Purchase orders and goods receipts both existed — the third leg did not. |
 | Match status | chip: Unmatched, Matched, Price variance, Quantity variance, Both variance | The variance kinds are separated because they have different owners — a price variance is a buyer's problem and a quantity variance is a … |
 | Status | chip: Raised, Sent, Acknowledged, Partially received, Received, Closed short… | — |
-| Approval request | the name it points at, never the id | The pending approval request raised by `cancelPurchaseOrder` or `closePurchaseOrderShort` (kinds `purchaseOrderCancel` … |
 
 **Every goods receipt** (data table, from `listGoodsReceipts`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Receipt number | text | Server-assigned: the venue prefix plus a sequence per venue (decided 28 September, audit R152), e.g. |
-| Purchase order | the name it points at, never the id | — |
-| Location | the name it points at, never the id | — |
 | Delivery note reference | text | — |
-| Lines | list or chips (count when long) | — |
 | Total value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Received by principal | the name it points at, never the id | — |
-| Journal entry | text | The accrual the supplier invoice will later match against. |
 | Recorded at | 1 Oct 2026, 14:30 | — |
 | Synced at | 1 Oct 2026, 14:30 | — |
 
@@ -1063,21 +1036,12 @@ Errors to draw in the form: 409 Over-receipt beyond `VenueSettings.inventory.ove
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Purchase order number | text | Per venue, in sequence (decided 28 September, audit R171). Assigned by the server from the venue's gap-free sequence, or the tenant's for … |
-| Requisition | the name it points at, never the id | Null on a blanket order or an RFQ award, which are raised without one. |
-| Supplier | the name it points at, never the id | — |
 | Supplier name | text | — |
 | Kind | chip: Standard, Blanket, Release, Rfq award | BL-159. A blanket order is a price and a commitment, not a delivery. |
-| Blanket parent | the name it points at, never the id | The blanket order this release draws against — another purchase order, so the same id type. |
 | Contract price valid until | 1 Oct 2026 | — |
-| Rfq | the name it points at, never the id | Where this order came from a quotation round. Keeping the link is what lets a venue show it took the best of three, which is usually the … |
-| Supplier invoice ref | text | BL-123. Purchase orders and goods receipts both existed — the third leg did not. |
 | Match status | chip: Unmatched, Matched, Price variance, Quantity variance, Both variance | The variance kinds are separated because they have different owners — a price variance is a buyer's problem and a quantity variance is a … |
 | Status | chip: Raised, Sent, Acknowledged, Partially received, Received, Closed short… | — |
-| Approval request | the name it points at, never the id | The pending approval request raised by `cancelPurchaseOrder` or `closePurchaseOrderShort` (kinds `purchaseOrderCancel` … |
-| Deliver to location | the name it points at, never the id | Scoped 31 August. A purchase order is raised by somebody, for somewhere, and carried neither. |
-| Lines | list or chips (count when long) | — |
 | Subtotal | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 
@@ -1118,7 +1082,7 @@ Errors to draw in the form: 409 Over-receipt beyond `VenueSettings.inventory.ove
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the goods receipt untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No goods receipt yet. Offers Create goods receipt (`createGoodsReceipt`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status, supplierId and the goods receipt are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PROCUREMENT_VIEW`, which `listPurchaseOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PROCUREMENT_VIEW`, which `listPurchaseOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PROCUREMENT_RECEIVE` for `createGoodsReceipt`, `rejectReceivedGoods`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 `reason` is `other` with no `note` (audit R222).; 409 A line rejects more than was received and not already rejected on it, or names a `lineId` the receipt does not hold (audit R171); 409 Over-receipt beyond `VenueSettings.inventory.overReceiptTolerancePercent` (proposed default 5, audit R094), or the purchase order is closed |
 
@@ -1170,7 +1134,7 @@ totalValue: AED 1,125.00
 - `listGoodsReceipts` → `PROCUREMENT_VIEW` (read) · staff
 - `rejectReceivedGoods` → `PROCUREMENT_RECEIVE` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `PROCUREMENT_VIEW`, which `listPurchaseOrders` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PROCUREMENT_VIEW`, which `listPurchaseOrders` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PROCUREMENT_RECEIVE` for `createGoodsReceipt`, `rejectReceivedGoods`.
 
 #### Requirements it meets
 
@@ -1216,7 +1180,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (19), with its required mark, default, format and its error state (400, 404, 409).
-- [ ] Every output is drawn (41 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-052?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Confirm, Create goods receipt, Reject received goods.
 - [ ] Every transition is wired: `EMP-005`, `BO-049`.
@@ -1299,9 +1263,9 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 Errors to draw in the form: 400 Validation failed
 
-**Form: Approve requisition** (modal, opened by *Approve requisition*; *Approve requisition* calls `approveRequisition`, *Cancel* sends nothing)
+**Form: Decide requisition** (modal, opened by *Decide requisition*; *Send decision* calls `approveRequisition`, *Cancel* sends nothing)
 
-**Collects what `approveRequisition` sends before it is called.** Required: `decision`. Optional: `note`, `amendedLines`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects the decision `approveRequisition` sends** (decided by Chinmay, 3 October 2026 (CHG-SPF-010)): `decision` is approve, reject or return; a reject or a return names its reason in `note`, which the form will not send empty. Optional: `amendedLines` (approve only). Dismissing sends nothing; the screen behind is unchanged.
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -1312,16 +1276,6 @@ Errors to draw in the form: 400 Validation failed
 | Approved quantity `amendedLines[].approvedQuantity` | number field | optional | — | min 0 | — | — | `approveRequisition` body |
 
 Errors to draw in the form: 400 An amended quantity exceeds the requested quantity; 403 Authenticated but not permitted at the requested scope; 409 The requisition is not `pendingApproval`, or the caller raised it — the state model's guard is that the approver is not the requester
-
-**Form: Return requisition** (modal, opened by *Return requisition*; *Return requisition* calls `returnRequisition`, *Cancel* sends nothing)
-
-**Collects what `returnRequisition` sends before it is called.** Required: `question`. Dismissing sends nothing; the screen behind is unchanged.
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Question `question` | text field | required | — | — | — | Kept as `Requisition.returnQuestion`, so the requester sees what to answer. | `returnRequisition` body |
-
-Errors to draw in the form: 409 Not in a state that permits this
 
 **Form: Save requisition lines** (modal, opened by *Save requisition lines*; *Save requisition lines* calls `updateRequisitionLines`, *Cancel* sends nothing)
 
@@ -1335,12 +1289,6 @@ Errors to draw in the form: 409 Not in a state that permits this
 | Reason `lines[].reason` | text area | optional | — | — | — | Why the quantity differs from the suggestion. Kept on the line. | `updateRequisitionLines` body |
 
 Errors to draw in the form: 409 Already approved: the requisition is `approved`, `ordered` or `closed` (audit R171), or it is `rejected` or `cancelled`.
-
-**Sent by *Reject requisition*** (`rejectRequisition`; no form is declared, so these are filled from the screen or collected inline)
-
-| Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
-|---|---|---|---|---|---|---|---|
-| Reason `reason` | text area | required | — | — | — | Kept as `Requisition.rejectionReason`. | `rejectRequisition` body |
 
 **Sent by *Cancel requisition*** (`cancelRequisition`; no form is declared, so these are filled from the screen or collected inline)
 
@@ -1365,15 +1313,9 @@ Errors to draw in the form: 409 Already approved: the requisition is `approved`,
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Requisition number | text | — |
-| Venue | the name it points at, never the id | — |
-| Department | the name it points at, never the id | — |
 | Status | chip: Draft, Pending approval, Approved, Rejected, Returned for info, Ordered… | — |
-| Lines | list or chips (count when long) | — |
 | Estimated total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Raised by principal | the name it points at, never the id | — |
-| Approved by principal | the name it points at, never the id | — |
 | Approval note | text | — |
 | Required by | 1 Oct 2026 | — |
 | Approved at | 1 Oct 2026, 14:30 | — |
@@ -1382,40 +1324,28 @@ Errors to draw in the form: 409 Already approved: the requisition is `approved`,
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
 | Kind | chip: Main store, Sub store, Kitchen, Bar, Retail floor, Cellar… | — |
-| Parent location | the name it points at, never the id | — |
 | Is active | yes / no (icon or chip) | — |
 
 **The selected requisition** (detail panel, from `listRequisitions`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Requisition number | text | — |
-| Venue | the name it points at, never the id | — |
-| Department | the name it points at, never the id | — |
-| Cost center | the name it points at, never the id | — |
 | Justification | text | — |
 | Status | chip: Draft, Pending approval, Approved, Rejected, Returned for info, Ordered… | — |
 | Lines | list or chips (count when long) | — |
 | Estimated total | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Raised by principal | the name it points at, never the id | — |
-| Approved by principal | the name it points at, never the id | — |
 | Approval note | text | — |
-| Required by | 1 Oct 2026 | — |
 | Approved at | 1 Oct 2026, 14:30 | — |
-| Rejection reason | text | From `rejectRequisition`. What the requester reads before copying it into a new draft. |
 | Rejected at | 1 Oct 2026, 14:30 | — |
 
 **The requisition suggestion** (detail panel, from `getSuggestedRequisitions`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| Item | the name it points at, never the id | — |
 | Item name | text | — |
 | SKU | text | — |
 | On hand | 1,234.5 | — |
@@ -1424,17 +1354,13 @@ Errors to draw in the form: 409 Already approved: the requisition is `approved`,
 | Suggested quantity | 1,234.5 | — |
 | Average daily consumption | 1,234.5 | — |
 | Days of cover remaining | 1,234.5 | — |
-| Preferred supplier | the name it points at, never the id | — |
-| Lead time days | 1,234 | — |
 
 **Actions and what each produces**
 
 | Action | Calls | Sends | On success returns | Errors to show | Notes |
 |---|---|---|---|---|---|
 | Create requisition (primary button) | `createRequisition` POST `/requisitions` | CreateRequisitionRequest | Requisition | 400 Validation failed | gated `PROCUREMENT_REQUEST`; opens modal first |
-| Approve requisition (secondary button) | `approveRequisition` POST `/requisitions/{requisitionId}/approve` | inline | Requisition | 400 An amended quantity exceeds the requested quantity; 403 Authenticated but not permitted at the requested scope; 409 The requisition is not `pendingApproval`, or the caller raised it — the state model's guard is that … | gated `APPROVAL_ACT`; opens modal first |
-| Reject requisition (destructive button) | `rejectRequisition` POST `/requisitions/{requisitionId}/reject` | inline | Requisition | 409 Not in a state that permits this | gated `APPROVAL_ACT` |
-| Return requisition (secondary button) | `returnRequisition` POST `/requisitions/{requisitionId}/return` | inline | Requisition | 409 Not in a state that permits this | gated `APPROVAL_ACT`; opens modal first |
+| Decide requisition (secondary button) | `approveRequisition` POST `/requisitions/{requisitionId}/approve` | inline | Requisition | 400 An amended quantity exceeds the requested quantity; 403 Authenticated but not permitted at the requested scope; 409 The requisition is not `pendingApproval`, or the caller raised it — the state model's guard is that … | gated `APPROVAL_ACT`; opens modal first |
 | Cancel requisition (destructive button) | `cancelRequisition` POST `/requisitions/{requisitionId}/cancel` | inline | Requisition | 409 Not in a state that permits this | gated `PROCUREMENT_REQUEST` |
 | Compare quotations (secondary button) | `compareQuotations` GET `/requisitions/{requisitionId}/quotations` | — | QuotationComparison | — | gated `PROCUREMENT_VIEW` |
 | Save requisition lines (secondary button) | `updateRequisitionLines` PUT `/requisitions/{requisitionId}/lines` | inline | Requisition | 409 Already approved: the requisition is `approved`, `ordered` or `closed` (audit R171), or it is `rejected` or `cancelled`. | gated `PROCUREMENT_REQUEST`; opens modal first |
@@ -1466,7 +1392,6 @@ Errors to draw in the form: 409 Already approved: the requisition is `approved`,
 
 **What opens over it**
 
-- confirmDialog *Reject requisition*: **Names what `rejectRequisition` changes and what it leaves alone**, in the consequence rather than the verb. A requisitions this affects should be identified in the dialog, not just counted. **Collects what `rejectRequisition` sends before it is called.** Required: `reason`.
 - confirmDialog *Cancel requisition*: **Names what `cancelRequisition` changes and what it leaves alone**, in the consequence rather than the verb. A requisitions this affects should be identified in the dialog, not just counted. **Collects what `cancelRequisition` sends before it is called.** Required: `reason`.
 
 #### States
@@ -1477,7 +1402,7 @@ Errors to draw in the form: 409 Already approved: the requisition is `approved`,
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the requisitions untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | **Nothing is waiting, which is the good outcome.** An empty queue means every item has been decided; it offers no create action, because creating work is not what it needs. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status, raisedByPrincipalId and the requisitions are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PROCUREMENT_VIEW`, which `listRequisitions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PROCUREMENT_VIEW`, which `listRequisitions` requires to show this screen, and names that permission (the screen's other reads need `PRODUCT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_ACT` for `approveRequisition`, `rejectRequisition` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 An amended quantity exceeds the requested quantity; 400 Validation failed; 409 Already approved: the requisition is `approved`, `ordered` or `closed` (audit R171), or it is `rejected` or `cancelled`.; 409 Not in a state that permits this |
 
@@ -1525,15 +1450,13 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `listRequisitions` → `PROCUREMENT_VIEW` (read) · staff
 - `createRequisition` → `PROCUREMENT_REQUEST` (operate) · staff
 - `approveRequisition` → `APPROVAL_ACT` (operate) · staff
-- `rejectRequisition` → `APPROVAL_ACT` (operate) · staff
-- `returnRequisition` → `APPROVAL_ACT` (operate) · staff
 - `cancelRequisition` → `PROCUREMENT_REQUEST` (operate) · staff
 - `getSuggestedRequisitions` → `PROCUREMENT_VIEW` (read) · staff
 - `compareQuotations` → `PROCUREMENT_VIEW` (read) · staff
 - `listStockLocations` → `PRODUCT_VIEW` (read) · staff
 - `updateRequisitionLines` → `PROCUREMENT_REQUEST` (operate) · staff
 
-**A refused user sees:** Shown when the caller lacks `PROCUREMENT_VIEW`, which `listRequisitions` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PROCUREMENT_VIEW`, which `listRequisitions` requires to show this screen, and names that permission (the screen's other reads need `PRODUCT_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `APPROVAL_ACT` for `approveRequisition`, `rejectRequisition` …
 
 #### Requirements it meets
 
@@ -1582,10 +1505,10 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 
 #### Acceptance for the design
 
-- [ ] Every input above is drawn (25), with its required mark, default, format and its error state (400, 403, 409).
-- [ ] Every output is drawn (46 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every input above is drawn (23), with its required mark, default, format and its error state (400, 403, 409).
+- [ ] Every output is drawn (26 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-078?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
-- [ ] Every action is wired with its success and its failure: Create requisition, Approve requisition, Reject requisition, Return requisition, Cancel requisition, Compare quotations, Save requisition lines.
+- [ ] Every action is wired with its success and its failure: Create requisition, Decide requisition, Cancel requisition, Compare quotations, Save requisition lines.
 - [ ] Every transition is wired: `BO-080`, `BO-084`, `BO-079`, `BO-081`.
 - [ ] Every gated control is gated: `APPROVAL_ACT`, `PROCUREMENT_REQUEST`, `PROCUREMENT_VIEW`, `PRODUCT_VIEW`.
 - [ ] The 3 client meeting input(s) for this screen are applied; open questions are built to their default.
@@ -1733,39 +1656,25 @@ Errors to draw in the form: 403 The supervisor step-up failed (audit R144). The 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Location | the name it points at, never the id | — |
 | Location name | text | — |
 | Kind | text | — |
 | Status | chip: Open, Counting, Closed, Variance pending, Posted, Cancelled | — |
-| Is blind | yes / no (icon or chip) | — |
 | Line count | 1,234 | — |
 | Counted count | 1,234 | — |
 | Variance line count | 1,234 | — |
-| Variance value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Started by principal | the name it points at, never the id | — |
-| Posted by principal | the name it points at, never the id | — |
 
 **The selected stock count** (detail panel, from `listStockCounts`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Location | the name it points at, never the id | — |
 | Location name | text | — |
 | Kind | text | — |
 | Status | chip: Open, Counting, Closed, Variance pending, Posted, Cancelled | — |
-| Is blind | yes / no (icon or chip) | — |
 | Line count | 1,234 | — |
 | Counted count | 1,234 | — |
 | Variance line count | 1,234 | — |
 | Variance value | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Started by principal | the name it points at, never the id | — |
-| Posted by principal | the name it points at, never the id | — |
-| Journal entry | text | — |
 | Started at | 1 Oct 2026, 14:30 | — |
-| Closed at | 1 Oct 2026, 14:30 | — |
-| Posted at | 1 Oct 2026, 14:30 | — |
 
 **The count variance** (detail panel, from `getCountVariance`): **Called only after the count is submitted** (decided 28 September, audit R110). While the count is `open` or `counting` the server answers 409 and the panel reads *Variance appears once the count is submitted* — never a zero.
 
@@ -1824,7 +1733,7 @@ Errors to draw in the form: 403 The supervisor step-up failed (audit R144). The 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the stock count untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No stock count yet. Offers Request recount (`requestRecount`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on locationId, status and the stock count are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listStockCounts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listStockCounts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_APPROVE` for `recountStockCount`; `LEDGER_POST` for `postStockCount`; `PRODUCT_CONFIGURE` for `startStockCount`, `cancelStockCount` … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 A count is already open for this location; 409 Count is still open.; 409 Not in a state that permits this; 409 Unreviewed variance lines remain, or approval is required |
 
@@ -1887,7 +1796,7 @@ variance:
 - `enterCountLine` → `PRODUCT_CONFIGURE` (configure) · staff
 - `requestRecount` → `PRODUCT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listStockCounts` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listStockCounts` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_APPROVE` for `recountStockCount`; `LEDGER_POST` for `postStockCount`; `PRODUCT_CONFIGURE` for `startStockCount`, `cancelStockCount` …
 
 #### Requirements it meets
 
@@ -1936,7 +1845,7 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (28), with its required mark, default, format and its error state (403, 409).
-- [ ] Every output is drawn (32 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-079?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Start stock count, Post stock count, Recount stock count, Cancel stock count, Submit counted quantities, Enter count line, Request recount.
 - [ ] Every transition is wired: `BO-049`, `BO-078`, `BO-080`, `BO-081`, `BO-137`, `EMP-066`.
@@ -2049,38 +1958,23 @@ Errors to draw in the form: 409 The transfer is not `inTransit` or `partiallyRec
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Transfer number | text | — |
-| From location | the name it points at, never the id | — |
-| To location | the name it points at, never the id | — |
 | Status | chip: Dispatched, In transit, Received, Partially received, Cancelled | — |
-| Lines | list or chips (count when long) | — |
-| Dispatched by principal | the name it points at, never the id | — |
-| Received by principal | the name it points at, never the id | — |
 | Dispatched at | 1 Oct 2026, 14:30 | — |
 | Received at | 1 Oct 2026, 14:30 | — |
 | From venue | the name it points at, never the id | The venue of `fromLocationId`. Set by the server (audit R183). |
 | To venue | the name it points at, never the id | The venue of `toLocationId`. Set by the server (audit R183). |
-| Scope path | text | The partition key (ADR-0005). `fromLocationId` and `toLocationId` give the endpoints; this gives the owner, the source venue's scope. |
 
 **The stock transfer** (detail panel, from `getStockTransfer`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Transfer number | text | — |
-| From location | the name it points at, never the id | — |
-| To location | the name it points at, never the id | — |
 | Status | chip: Dispatched, In transit, Received, Partially received, Cancelled | — |
 | Lines | list or chips (count when long) | — |
-| Dispatched by principal | the name it points at, never the id | — |
-| Received by principal | the name it points at, never the id | — |
 | Dispatched at | 1 Oct 2026, 14:30 | — |
 | Received at | 1 Oct 2026, 14:30 | — |
 | Close short reason | text | Why the balance was written off, from `closeTransferShort`. |
-| From venue | the name it points at, never the id | The venue of `fromLocationId`. Set by the server (audit R183). |
-| To venue | the name it points at, never the id | The venue of `toLocationId`. Set by the server (audit R183). |
-| Scope path | text | The partition key (ADR-0005). `fromLocationId` and `toLocationId` give the endpoints; this gives the owner, the source venue's scope. |
 
 **Actions and what each produces**
 
@@ -2109,8 +2003,8 @@ Errors to draw in the form: 409 The transfer is not `inTransit` or `partiallyRec
 - → `BO-079` Stock Count: *Stock Count*
 - → `BO-081` Inventory Items: *Inventory Items*; carries `itemId`
 - → `BO-052` Goods Receipt: *Goods Receipt*
-- → `BO-049` Stock Levels: *The website has already sold four of the damaged units*; carries `itemId`
 - → `BO-051` Purchase Orders: *Goods Receipt*
+- → `BO-049` Stock Levels: *The website has already sold four of the damaged units*; carries `itemId`
 
 **What opens over it**
 
@@ -2124,7 +2018,7 @@ Errors to draw in the form: 409 The transfer is not `inTransit` or `partiallyRec
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the stock transfers untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No stock transfers yet. Offers Create stock transfer (`createStockTransfer`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on status and the stock transfers are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listStockTransfers` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listStockTransfers` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_APPROVE` for `closeTransferShort`; `PRODUCT_CONFIGURE` for `createStockTransfer`, `receiveStockTransfer`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 Insufficient stock at the source; 409 Not in a state that permits this; 409 The transfer is not `inTransit` or `partiallyReceived` — it has already been received in full, or closed short |
 
@@ -2173,7 +2067,7 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `closeTransferShort` → `LEDGER_APPROVE` (operate) · staff · step-up pin
 - `getStockTransfer` → `PRODUCT_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listStockTransfers` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listStockTransfers` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `LEDGER_APPROVE` for `closeTransferShort`; `PRODUCT_CONFIGURE` for `createStockTransfer`, `receiveStockTransfer`.
 
 #### Requirements it meets
 
@@ -2220,10 +2114,10 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (18), with its required mark, default, format and its error state (403, 409).
-- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (12 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-080?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create stock transfer, Receive stock transfer, Close transfer short.
-- [ ] Every transition is wired: `BO-078`, `BO-079`, `BO-081`, `BO-052`, `BO-049`, `BO-051`.
+- [ ] Every transition is wired: `BO-078`, `BO-079`, `BO-081`, `BO-052`, `BO-051`, `BO-049`.
 - [ ] Every gated control is gated: `LEDGER_APPROVE`, `PRODUCT_CONFIGURE`, `PRODUCT_VIEW`.
 - [ ] The 2 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] The 2 edge case(s) from the process notes are drawn.
@@ -2240,8 +2134,8 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Stock & Supply · wave 2 · needs the `inventory` module |
-| Block | Block A · ticket #17984 (APP-SETUP-BO-081) |
+| Module | Stock & Supply · wave 1 · needs the `inventory` module |
+| Block | Block A · task APP-SETUP-BO-081 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as storekeeper |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listInventoryItems` reads the population and `getInventoryItem` reads one of them — list, select, act |
@@ -2362,11 +2256,7 @@ Errors to draw in the form: 409 Attempt to change costing method or base unit af
 | SKU | text | — |
 | Barcode | text | — |
 | Name | text | — |
-| Base unit | text | The unit stock is held in. Immutable once movements exist. |
-| Purchase unit | text | How the supplier sells it — a case of 24 against a base unit of one. |
-| Purchase unit factor | 1,234.5 | — |
 | Costing method | chip: Weighted average, Fifo, Standard cost, Last purchase price | Fixed at item creation. Immutable once movements exist. |
-| Reorder point | 1,234.5 | — |
 | Reorder quantity | 1,234.5 | — |
 | Par level | 1,234.5 | — |
 
@@ -2386,19 +2276,11 @@ Errors to draw in the form: 409 Attempt to change costing method or base unit af
 | SKU | text | — |
 | Barcode | text | — |
 | Name | text | — |
-| Venue | the name it points at, never the id | — |
-| Category | the name it points at, never the id | — |
 | Base unit | text | The unit stock is held in. Immutable once movements exist. |
 | Purchase unit | text | How the supplier sells it — a case of 24 against a base unit of one. |
-| Purchase unit factor | 1,234.5 | — |
 | Costing method | chip: Weighted average, Fifo, Standard cost, Last purchase price | Fixed at item creation. Immutable once movements exist. |
-| Reorder point | 1,234.5 | — |
 | Reorder quantity | 1,234.5 | — |
 | Par level | 1,234.5 | — |
-| Preferred supplier | the name it points at, never the id | — |
-| Allow negative stock | yes / no (icon or chip) | True permits issue beyond on-hand. Occasionally needed at a bar mid-service; dangerous everywhere else. |
-| Is perishable | yes / no (icon or chip) | — |
-| Shelf life days | 1,234 | — |
 
 **Actions and what each produces**
 
@@ -2436,7 +2318,7 @@ Errors to draw in the form: 409 Attempt to change costing method or base unit af
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the inventory items untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No inventory items yet. Offers Create inventory item (`createInventoryItem`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on venueId, categoryId, belowReorderPoint, search and the inventory items are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listInventoryItems` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listInventoryItems` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createInventoryItem`, `updateInventoryItem`, `createStockLocation`, `setInventoryKitDefinition`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Neither barcode nor SKU supplied; 400 Validation failed; 409 Attempt to change costing method or base unit after movements exist; 409 SKU already in use in this venue |
 
@@ -2508,7 +2390,7 @@ locations:
 - `getInventoryKitDefinition` → `PRODUCT_VIEW` (read) · staff
 - `setInventoryKitDefinition` → `PRODUCT_CONFIGURE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listInventoryItems` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listInventoryItems` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createInventoryItem`, `updateInventoryItem`, `createStockLocation`, `setInventoryKitDefinition`.
 
 #### Requirements it meets
 
@@ -2558,7 +2440,7 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (33), with its required mark, default, format and its error state (400, 403, 404, 409, 422).
-- [ ] Every output is drawn (30 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-081?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create inventory item, Save inventory item, Lookup inventory item, Create stock location.
 - [ ] Every transition is wired: `BO-078`, `BO-079`, `BO-080`.
@@ -2668,22 +2550,14 @@ Errors to draw in the form: 400 Validation failed, including an `adjustmentIn`, 
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
-| Item | the name it points at, never the id | — |
-| Location | the name it points at, never the id | — |
 | Kind | chip: Receipt, Issue, Sale depletion, Waste, Adjustment in, Adjustment out… | The kind decides the direction (decided 28 September, audit R171). In: `receipt`, `transferIn`, `adjustmentIn`, `countGain`, `production` … |
 | Quantity | 1,234.5 | Always positive. The `kind` decides whether it adds or removes stock, not the sign (decided 28 September, audit R171). |
 | Unit | text | — |
-| Reason | text | Required for `adjustmentIn`, `adjustmentOut` and `waste` (decided 28 September, audit R171); adjustments are reported separately. |
-| Cost center | the name it points at, never the id | — |
 | Recorded at | 1 Oct 2026, 14:30 | — |
 | Balance after | 1,234.5 | — |
 | Unit cost | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Total cost | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Principal | the name it points at, never the id | — |
 | Source type | text | What generated it — an order, a count, a transfer. |
-| Source | text | — |
-| Journal entry | text | — |
 
 **Actions and what each produces**
 
@@ -2717,7 +2591,7 @@ Errors to draw in the form: 400 Validation failed, including an `adjustmentIn`, 
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the stock movements untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No stock movements yet. Offers Create stock movement (`createStockMovement`); distinct from a filter that matched nothing. |
 | Empty, no results (`?state=emptyNoResults`) | Nothing matches the filter on itemId, locationId, kind, recordedFrom, recordedTo and the stock movements are still there. Names the active filter and offers to clear it. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listStockMovements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PRODUCT_VIEW`, which `listStockMovements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createStockMovement`. |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 400 Validation failed, including an `adjustmentIn`, `adjustmentOut` or `waste` movement with no `reason` (audit R171).; 409 Insufficient stock, and the item does not permit negative balances |
 
@@ -2766,7 +2640,7 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `listInventoryItems` → `PRODUCT_VIEW` (read) · staff
 - `listStockLocations` → `PRODUCT_VIEW` (read) · staff
 
-**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listStockMovements` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PRODUCT_VIEW`, which `listStockMovements` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PRODUCT_CONFIGURE` for `createStockMovement`.
 
 #### Requirements it meets
 
@@ -2811,7 +2685,7 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (14), with its required mark, default, format and its error state (400, 403, 409).
-- [ ] Every output is drawn (24 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-082?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create stock movement.
 - [ ] Every transition is wired: `BO-079`, `BO-078`, `BO-080`.
@@ -2936,18 +2810,12 @@ Errors to draw in the form: 409 A business code the request names is already use
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | — |
 | Code | text | Unique per tenant (decided 28 September, audit R108). |
 | Name | text | — |
 | Contact name | text | — |
 | Contact email | text | — |
 | Contact phone | +971 50 123 4567 | — |
 | Tax registration number | text | — |
-| Payment terms days | 1,234 | — |
-| Lead time days | 1,234 | — |
-| Currency | text | — |
-| Account | the name it points at, never the id | — |
-| Is active | yes / no (icon or chip) | — |
 
 **Supplier performance** (detail panel, from `getSupplierPerformance`): Shows `ordersPlaced`, `onTimeInFullPercent`, `averageDaysLate`, `shortDeliveryPercent`, `rejectionPercent`, `rejectionReasons`, `priceVariancePercent` from `getSupplierPerformance`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.
 
@@ -2995,7 +2863,7 @@ Errors to draw in the form: 409 A business code the request names is already use
 | Error (`?state=error`) | Could not load. Names which read failed and leaves the suppliers untouched. |
 | Empty, first run (`?state=emptyFirstRun`) | No suppliers yet. At tenant scope offers Create supplier (`createSupplier`); at venue scope says suppliers are set up by the tenant (audit R183). |
 | Empty, no results (`?state=emptyNoResults`) | Never shown: `listSuppliers` takes no filter, so an empty list is always the first-run state above. |
-| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PROCUREMENT_VIEW`, which `listSuppliers` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. |
+| Permission denied (`?state=emptyNoAccess`) | Shown when the caller lacks `PROCUREMENT_VIEW`, which `listSuppliers` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PROCUREMENT_MANAGE` for `createSupplier`, `recordQuotation`, `updateSupplier`, `createSupplierContract` and 1 more; `REPORT_VIEW_VENUE` for … |
 | Offline (`?state=offline`) | online only |
 | Validation and conflict | the form keeps what was entered and marks the problem: 409 A business code the request names is already used within its uniqueness scope (the scope the property's `x-ticvai-unique` names; decided 28 September, audit …; 409 The contract is `terminated` or `expired`; a renewal is a new contract.; 422 `validTo` before `validFrom`, or `active` without a `documentReference`. |
 
@@ -3046,7 +2914,7 @@ Seed the screen with these (realistic, in the venue's world). They outrank inven
 - `createSupplierContract` → `PROCUREMENT_MANAGE` (configure) · staff
 - `updateSupplierContract` → `PROCUREMENT_MANAGE` (configure) · staff
 
-**A refused user sees:** Shown when the caller lacks `PROCUREMENT_VIEW`, which `listSuppliers` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.
+**A refused user sees:** Shown when the caller lacks `PROCUREMENT_VIEW`, which `listSuppliers` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `PROCUREMENT_MANAGE` for `createSupplier`, `recordQuotation`, `updateSupplier`, `createSupplierContract` and 1 more; `REPORT_VIEW_VENUE` for …
 
 #### Requirements it meets
 
@@ -3089,7 +2957,7 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (36), with its required mark, default, format and its error state (404, 409, 422).
-- [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (13 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-083?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Create supplier, Record quotation, Save supplier.
 - [ ] Every transition is wired: `BO-078`, `BO-007`.
@@ -3199,7 +3067,7 @@ Method, path, parameters, request and response for every operation these screens
 ```json
 {
 "acknowledgePurchaseOrder": {"method":"POST","path":"/purchase-orders/{purchaseOrderId}/acknowledge","contract":"inventory","summary":"Record the supplier acknowledgement","permission":"PROCUREMENT_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PurchaseOrder"},
-"approveRequisition": {"method":"POST","path":"/requisitions/{requisitionId}/approve","contract":"inventory","summary":"Approve or reject a requisition","permission":"APPROVAL_ACT","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Requisition"},
+"approveRequisition": {"method":"POST","path":"/requisitions/{requisitionId}/approve","contract":"inventory","summary":"Approve, reject or return a requisition","permission":"APPROVAL_ACT","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Requisition"},
 "cancelPurchaseOrder": {"method":"POST","path":"/purchase-orders/{purchaseOrderId}/cancel","contract":"inventory","summary":"Cancel a purchase order","permission":"PROCUREMENT_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PurchaseOrder"},
 "cancelRequisition": {"method":"POST","path":"/requisitions/{requisitionId}/cancel","contract":"inventory","summary":"Cancel a requisition","permission":"PROCUREMENT_REQUEST","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Requisition"},
 "cancelStockCount": {"method":"POST","path":"/stock-counts/{countId}/cancel","contract":"inventory","summary":"Abandon a count","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"StockCount"},
@@ -3241,9 +3109,7 @@ Method, path, parameters, request and response for every operation these screens
 "recordQuotation": {"method":"POST","path":"/suppliers/{supplierId}/quotations","contract":"inventory","summary":"Record a supplier quotation","permission":"PROCUREMENT_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"CreateQuotationRequest","responds":"Quotation"},
 "recountStockCount": {"method":"POST","path":"/stock-counts/{countId}/recount","contract":"inventory","summary":"Send a count back to be recounted","permission":"LEDGER_APPROVE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"StockCount"},
 "rejectReceivedGoods": {"method":"POST","path":"/goods-receipts/{receiptId}/reject","contract":"inventory","summary":"Reject received goods","permission":"PROCUREMENT_RECEIVE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"GoodsReceipt"},
-"rejectRequisition": {"method":"POST","path":"/requisitions/{requisitionId}/reject","contract":"inventory","summary":"Reject a requisition","permission":"APPROVAL_ACT","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Requisition"},
 "requestRecount": {"method":"POST","path":"/fnb-stock-counts/{countId}/recount","contract":"fnb","summary":"Send a line back to be counted again","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"RecountResult"},
-"returnRequisition": {"method":"POST","path":"/requisitions/{requisitionId}/return","contract":"inventory","summary":"Return a requisition for more information","permission":"APPROVAL_ACT","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"Requisition"},
 "sendPurchaseOrder": {"method":"POST","path":"/purchase-orders/{purchaseOrderId}/send","contract":"inventory","summary":"Issue the order to the supplier","permission":"PROCUREMENT_MANAGE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":null,"responds":"PurchaseOrder"},
 "setInventoryKitDefinition": {"method":"PUT","path":"/inventory-items/{itemId}/kit-definition","contract":"inventory","summary":"Make an item a kit of other stocked items","permission":"PRODUCT_CONFIGURE","offlineCapable":false,"conflictPolicy":"serverWins","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"InventoryKitDefinition","responds":"InventoryKitDefinition"},
 "startStockCount": {"method":"POST","path":"/stock-counts","contract":"inventory","summary":"Start a stock count","permission":"PRODUCT_CONFIGURE","offlineCapable":true,"conflictPolicy":"append","scopeLevel":"venue","parameters":[{"name":null,"in":null,"required":null}],"requestBody":"StartStockCountRequest","responds":"StockCount"},
@@ -3266,7 +3132,7 @@ The data those operations carry, resolved one level deep. **Seed from these.** T
 "CountVariance": {"x-ticvai-persistence":"none — computed at close","type":"object","required":["countId","totalVarianceValue","lines"],"properties":{"countId":{"type":"string","format":"uuid"},"totalVarianceValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"exceptionCount":{"type":"integer","description":"Lines beyond `VenueSettings.inventory.countVarianceTolerancePercent` (proposed default 2 per cent, audit R094), requiring review before posting."},"lines":{"type":"array","items":{"type":"object","required":["itemId","expectedQuantity","countedQuantity","variance","isException"],"properties":{"itemId":{"type":"string","format":"uuid"},"itemName":{"type":"string"},"sku":{"type":"string"},"expectedQuantity":{"type":"number"},"countedQuantity":{"type":"number"},"variance":{"type":"number"},"variancePercentage":{"type":"number"},"varianceValue":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"isException":{"type":"boolean"},"recountCount":{"type":"integer","description":"A line counted several times is itself a finding."},"note":{"type":"string","nullable":true}}}}}},
 "CreateGoodsReceiptRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","purchaseOrderId","locationId","lines","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"purchaseOrderId":{"type":"string","format":"uuid"},"locationId":{"type":"string","format":"uuid"},"deliveryNoteReference":{"type":"string","maxLength":128},"lines":{"type":"array","minItems":1,"items":{"type":"object","required":["itemId","receivedQuantity"],"properties":{"itemId":{"type":"string","format":"uuid"},"receivedQuantity":{"type":"number","minimum":0},"unit":{"type":"string"},"batchNumber":{"type":"string","maxLength":64},"expiryDate":{"type":"string","format":"date","description":"Required for perishable items."},"note":{"type":"string","maxLength":200}}}},"recordedAt":{"type":"string","format":"date-time"}}},
 "CreateInventoryItemRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["sku","name","venueId","baseUnit","costingMethod"],"properties":{"sku":{"type":"string","maxLength":64},"barcode":{"type":"string","maxLength":128},"name":{"type":"string","maxLength":200},"venueId":{"type":"string","format":"uuid"},"categoryId":{"type":"string","format":"uuid"},"baseUnit":{"type":"string","description":"The unit stock is held in. Immutable once movements exist."},"purchaseUnit":{"type":"string","description":"How the supplier sells it — a case of 24 against a base unit of one."},"purchaseUnitFactor":{"type":"number","minimum":0,"default":1},"costingMethod":{"$ref":"#/components/schemas/CostingMethod"},"reorderPoint":{"type":"number","minimum":0},"reorderQuantity":{"type":"number","minimum":0},"parLevel":{"type":"number","minimum":0},"preferredSupplierId":{"type":"string","format":"uuid"},"allowNegativeStock":{"type":"boolean","default":false,"description":"True permits issue beyond on-hand. Occasionally needed at a bar mid-service; dangerous everywhere else.\n"},"isPerishable":{"type":"boolean","default":false},"shelfLifeDays":{"type":"integer","nullable":true}}},
-"CreatePurchaseOrderRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","requisitionId","supplierId","quotationId","lines","expectedDelivery"],"properties":{"id":{"type":"string","format":"uuid"},"requisitionId":{"type":"string","format":"uuid"},"supplierId":{"type":"string","format":"uuid"},"quotationId":{"type":"string","format":"uuid"},"deliverToLocationId":{"type":"string","format":"uuid"},"lines":{"type":"array","minItems":1,"items":{"type":"object","required":["itemId","quantity"],"properties":{"itemId":{"type":"string","format":"uuid"},"quantity":{"type":"number","minimum":0},"unit":{"type":"string"},"unitPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Omitted, the selected quotation line's price. **Editable with a reason** (decided 28 September, audit R171).\n"},"priceOverrideReason":{"type":"string","maxLength":500,"nullable":true,"description":"Required when `unitPrice` differs from the quotation line (audit R171)."}}}},"expectedDelivery":{"type":"string","format":"date"},"note":{"type":"string","maxLength":1000}}},
+"CreatePurchaseOrderRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","supplierId","lines","expectedDelivery"],"properties":{"id":{"type":"string","format":"uuid"},"kind":{"type":"string","enum":["standard","blanket","release","rfqAward"],"default":"standard","description":"**Which order this is** (CHG-RUL-004). `standard` needs `requisitionId` and `quotationId` (409 `requisition-required` without them); `blanket` and `rfqAward` are raised without a requisition; `release` names `blanketParentId`. Every kind goes through the PO approval matrix."},"requisitionId":{"type":"string","format":"uuid","nullable":true,"description":"Required for a `standard` order; omitted for a blanket order, an RFQ award or a release."},"supplierId":{"type":"string","format":"uuid"},"quotationId":{"type":"string","format":"uuid","nullable":true,"description":"Required for a `standard` order and an `rfqAward` (the winning quotation)."},"rfqId":{"type":"string","format":"uuid","nullable":true,"description":"For an `rfqAward`, the quotation round it awards."},"blanketParentId":{"type":"string","format":"uuid","nullable":true,"description":"For a `release`, the open blanket order it draws against."},"contractPriceValidUntil":{"type":"string","format":"date","nullable":true,"description":"For a `blanket` order, the last day its prices hold."},"deliverToLocationId":{"type":"string","format":"uuid"},"lines":{"type":"array","minItems":1,"items":{"type":"object","required":["itemId","quantity"],"properties":{"itemId":{"type":"string","format":"uuid"},"quantity":{"type":"number","minimum":0},"unit":{"type":"string"},"unitPrice":{"allOf":[{"$ref":"../shared/common.yaml#/components/schemas/Money"}],"description":"Omitted, the selected quotation line's price. **Editable with a reason** (decided 28 September, audit R171).\n"},"priceOverrideReason":{"type":"string","maxLength":500,"nullable":true,"description":"Required when `unitPrice` differs from the quotation line (audit R171)."}}}},"expectedDelivery":{"type":"string","format":"date"},"note":{"type":"string","maxLength":1000}}},
 "CreateQuotationRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["requisitionId","lines","validUntil"],"properties":{"requisitionId":{"type":"string","format":"uuid"},"reference":{"type":"string","maxLength":128},"lines":{"type":"array","minItems":1,"items":{"type":"object","required":["itemId","unitPrice","quantity"],"properties":{"itemId":{"type":"string","format":"uuid"},"quantity":{"type":"number","minimum":0},"unitPrice":{"$ref":"../shared/common.yaml#/components/schemas/Money"},"unit":{"type":"string"}}}},"leadTimeDays":{"type":"integer"},"validUntil":{"type":"string","format":"date"},"note":{"type":"string","maxLength":1000}}},
 "CreateRequisitionRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","venueId","lines","requiredBy"],"properties":{"id":{"type":"string","format":"uuid"},"venueId":{"type":"string","format":"uuid"},"departmentId":{"type":"string","format":"uuid"},"costCenterId":{"type":"string","format":"uuid"},"lines":{"type":"array","minItems":1,"items":{"type":"object","required":["itemId","quantity"],"properties":{"itemId":{"type":"string","format":"uuid"},"quantity":{"type":"number","minimum":0},"unit":{"type":"string"},"note":{"type":"string","maxLength":200}}}},"requiredBy":{"type":"string","format":"date"},"justification":{"type":"string","maxLength":1000}}},
 "CreateStockMovementRequest": {"x-ticvai-persistence":"none — request only","type":"object","required":["id","itemId","locationId","kind","quantity","recordedAt"],"properties":{"id":{"type":"string","format":"uuid"},"itemId":{"type":"string","format":"uuid"},"locationId":{"type":"string","format":"uuid"},"kind":{"$ref":"#/components/schemas/MovementKind"},"quantity":{"type":"number","exclusiveMinimum":0,"description":"Always positive. **The `kind` decides whether it adds or removes stock**, not the sign (decided 28 September, audit R171).\n"},"unit":{"type":"string"},"reason":{"type":"string","maxLength":500,"description":"**Required for `adjustmentIn`, `adjustmentOut` and `waste`** (decided 28 September, audit R171); adjustments are reported separately.\n"},"costCenterId":{"type":"string","format":"uuid"},"recordedAt":{"type":"string","format":"date-time"}}},

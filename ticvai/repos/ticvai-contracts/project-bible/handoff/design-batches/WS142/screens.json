@@ -675,7 +675,7 @@
     "id": "formSetCaseCategoryDefinition",
     "component": "modal",
     "trigger": "Save case category definition",
-    "body": "**Collects what `setCaseCategoryDefinition` sends before it is called.** Required: `id`, `code`, `name`, `isActive`. Optional: `parentCategoryId`, `defaultPriority`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.",
+    "body": "**Collects what `setCaseCategoryDefinition` sends before it is called.** Required: `code`, `name`, `isActive`. Optional: `parentCategoryId`, `defaultPriority`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets them (readOnly in the contract): `id`, `scopePath` (3 October 2026, CHG-SPF-001).",
     "bindsTo": "CaseCategory",
     "confirm": {
      "label": "Save case category definition",
@@ -684,13 +684,11 @@
     "dismiss": {
      "label": "Cancel",
      "discards": [
-      "id",
       "code",
       "name",
       "isActive",
       "parentCategoryId",
-      "defaultPriority",
-      "scopePath"
+      "defaultPriority"
      ]
     },
     "provenance": "contract marketing-crm.yaml PUT /case-categories"

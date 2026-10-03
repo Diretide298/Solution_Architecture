@@ -15,7 +15,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/packages-bundles/bundle-combo-command-center-adm-178",
    "component": "apps/venue-management-web/src/routes/venue-operations/PackagesBundlesDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-011"
   },
   "navigation": {
    "entryFrom": [
@@ -307,7 +308,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/packages-bundles/bundle-definition-setup-adm-179",
    "component": "apps/venue-management-web/src/routes/venue-operations/PackagesBundlesDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-011"
   },
   "navigation": {
    "entryFrom": [
@@ -432,16 +434,11 @@
        "label": "Every commercial campaign",
        "bindsTo": "CommercialCampaign",
        "columns": [
-        "CommercialCampaign.id",
-        "CommercialCampaign.venueId",
         "CommercialCampaign.code",
         "CommercialCampaign.name",
         "CommercialCampaign.description",
-        "CommercialCampaign.ownerPrincipalId",
-        "CommercialCampaign.legalEntityId",
         "CommercialCampaign.validFrom",
-        "CommercialCampaign.validTo",
-        "CommercialCampaign.budgets"
+        "CommercialCampaign.validTo"
        ],
        "operation": "listCommercialCampaigns",
        "provenance": "contract promotions.yaml GET /commercial-campaigns"
@@ -521,7 +518,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/packages-bundles/bundle-component-builder-adm-180",
    "component": "apps/venue-management-web/src/routes/venue-operations/PackagesBundlesDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-011"
   },
   "navigation": {
    "entryFrom": [
@@ -677,7 +675,8 @@
    "app": "venue-management-web",
    "route": "/venue-operations/packages-bundles/guest-choice-build-your-own-bundle-designer-adm-181",
    "component": "apps/venue-management-web/src/routes/venue-operations/PackagesBundlesDetail.tsx",
-   "status": "notStarted"
+   "status": "notStarted",
+   "sectionOf": "BO-011"
   },
   "navigation": {
    "entryFrom": [
@@ -1271,18 +1270,12 @@
        "label": "Every partner bundle product",
        "bindsTo": "PartnerBundleProduct",
        "columns": [
-        "PartnerBundleProduct.id",
-        "PartnerBundleProduct.bundleComponentId",
-        "PartnerBundleProduct.partnerId",
-        "PartnerBundleProduct.externalProductId",
         "PartnerBundleProduct.productName",
         "PartnerBundleProduct.apiSource",
         "PartnerBundleProduct.availabilitySource",
         "PartnerBundleProduct.externalPrice",
         "PartnerBundleProduct.sellingPrice",
-        "PartnerBundleProduct.commission",
-        "PartnerBundleProduct.settlementRule",
-        "PartnerBundleProduct.cancellationRule"
+        "PartnerBundleProduct.settlementRule"
        ],
        "operation": "listBundlePartnerProductMappings",
        "provenance": "contract promotions.yaml GET /bundles/{bundleId}/partner-products"

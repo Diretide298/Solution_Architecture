@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 229
+  x-ticvai-screen-count: 230
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -372,6 +372,10 @@ paths:
         format: uuid
     post:
       operationId: sendGuestConversationMessage
+      x-ticvai-consumed-by:
+        - "P01 WEB-044 AI Concierge – Home"
+        - "P02 GST-031 AI Concierge – Home"
+        - "P02 GST-032 AI Concierge – Chat"
       security:
       - guestAuth: []
       summary: Write to the agent, as the guest, in the guest's own handed-over conversation
@@ -2938,9 +2942,6 @@ paths:
     post:
       operationId: sendConversationMessage
       x-ticvai-consumed-by:
-        - "P01 WEB-044 AI Concierge – Home"
-        - "P02 GST-031 AI Concierge – Home"
-        - "P02 GST-032 AI Concierge – Chat"
         - "P08 BO-799 Agent Workspace"
         - "P12 SUP-005 Live Chat Workspace"
       security:
@@ -3651,6 +3652,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-027 Guest Lookup"
         - "P04 POS-030 Sales Journal"
+        - "P06 EMP-026 Incident report"
         - "P08 BO-734 CRM Command Center"
         - "P08 BO-735 Guest Directory"
       x-ticvai-audience:

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Food & Beverage
   version: 0.1.0
-  x-ticvai-screen-count: 122
+  x-ticvai-screen-count: 124
   x-ticvai-tier: satellite
   x-ticvai-module: 7 — F&B POS  ·  5 — F&B & Guest Management (service)
   x-ticvai-requirements: 151
@@ -4111,7 +4111,8 @@ paths:
         format: uuid
     get:
       operationId: listBookableOutlets
-      x-ticvai-consumed-by: []
+      x-ticvai-consumed-by:
+        - "P02 GST-070 Reserve a Table"
       x-ticvai-agreed: '3 October: Chinmay, Block A business rules, GST-070 ("a published list of bookable restaurants");
         CHG-RUL-013; shape follows listDiningOutlets (public, paged)'
       x-ticvai-audience:
@@ -4170,7 +4171,8 @@ paths:
   /me/table-reservations:
     get:
       operationId: listMyTableReservations
-      x-ticvai-consumed-by: []
+      x-ticvai-consumed-by:
+        - "P02 GST-070 Reserve a Table"
       x-ticvai-agreed: '3 October: Chinmay, Block A business rules, GST-070 ("bind the guest''s own reservations/waitlist
         list, self-scoped"); CHG-RUL-013; shape follows listTableReservations (paged)'
       security:
@@ -4495,7 +4497,6 @@ paths:
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
         - "P08 BO-021 Order Search"
         - "P15 KIT-006 Expeditor & Order Assembly"
-        - "P15 KIT-007 Guest Collection, Buzzer & Digital Notification"
       x-ticvai-audience:
       - staff
       summary: Record that an order reached the guest

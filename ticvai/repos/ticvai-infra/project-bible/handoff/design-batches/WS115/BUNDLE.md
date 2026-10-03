@@ -155,7 +155,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-685` | Accreditation Status & Portfolio Reporting | B–D | 0 | 0 | 6 | 3 | 1 | 6 | — | notStarted (—) |
 | `BO-686` | Accreditation Utilization Analytics | B–D | 0 | 22 | 6 | 3 | 1 | 6 | — | notStarted (—) |
 | `BO-687` | Accreditation Access Activity Reporting | B–D | 0 | 0 | 6 | 3 | 0 | 6 | — | notStarted (—) |
-| `BO-688` | Accreditation Trend & Comparative Analysis | B–D | 4 | 19 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-688` | Accreditation Trend & Comparative Analysis | B–D | 4 | 15 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-689` | Accreditation Audit Reporting | B–D | 0 | 0 | 6 | 2 | 0 | 6 | — | notStarted (—) |
 | `BO-690` | Immutable Accreditation Audit Log | B–D | 14 | 0 | 6 | 2 | 0 | 6 | — | notStarted (—) |
 | `BO-691` | Accreditation API Management | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
@@ -998,15 +998,11 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Shows | Format | Notes |
 |---|---|---|
 | Name | text | — |
-| Scope path | text | — |
 | Period | text | — |
 | Value | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
 | Comparison | 1,234.5 | A reading of a metric or KPI, or a threshold on one. A `Money` where the metric is money-valued — `MetricSource` lists those in … |
 | Variance percent | 1,234.5 | — |
-| Direction | chip: Up, Down, Flat | — |
 | Status | chip: Green, Amber, Red, No target | — |
-| As of | 1 Oct 2026, 14:30 | — |
-| Stale | yes / no (icon or chip) | True when the pipeline behind it has not refreshed. A number nobody flagged as stale is a number somebody will act on. |
 
 **Rules for what is shown** (from the Finance, Ledger & Tax · Reporting & Analytics process; these refine the tables above and win where they differ)
 
@@ -1080,7 +1076,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (4), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-688?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-684`.

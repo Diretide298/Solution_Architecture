@@ -131,32 +131,12 @@
        "kind": "dataTable",
        "label": "Every group booking operations",
        "columns": [
-        "GroupBookingOperationsCommandCenterView.upcomingGroups",
-        "GroupBookingOperationsCommandCenterView.groupsToday",
-        "GroupBookingOperationsCommandCenterView.expectedGuestsToday",
-        "GroupBookingOperationsCommandCenterView.groupsAwaitingDeposit",
-        "GroupBookingOperationsCommandCenterView.guestListsPending",
-        "GroupBookingOperationsCommandCenterView.ticketsPending",
-        "GroupBookingOperationsCommandCenterView.resourcesPending",
-        "GroupBookingOperationsCommandCenterView.groupsReady",
-        "GroupBookingOperationsCommandCenterView.groupsWithIssues",
-        "GroupBookingOperationsCommandCenterView.outstandingPayments",
-        "GroupBookingOperationsCommandCenterView.checkInsToday",
-        "GroupBookingOperationsCommandCenterView.completedGroups",
-        "GroupBookingOperationsCommandCenterView.groupBookingId",
-        "GroupBookingOperationsCommandCenterView.organization",
-        "GroupBookingOperationsCommandCenterView.groupType",
-        "GroupBookingOperationsCommandCenterView.venueEvent",
-        "GroupBookingOperationsCommandCenterView.visitDate",
-        "GroupBookingOperationsCommandCenterView.arrivalTime",
-        "GroupBookingOperationsCommandCenterView.guests",
         "GroupBookingOperationsCommandCenterView.bookingValue",
         "GroupBookingOperationsCommandCenterView.paymentStatus",
         "GroupBookingOperationsCommandCenterView.guestListStatus",
         "GroupBookingOperationsCommandCenterView.ticketStatus",
         "GroupBookingOperationsCommandCenterView.resourceStatus",
-        "GroupBookingOperationsCommandCenterView.readiness",
-        "GroupBookingOperationsCommandCenterView.operationalOwner"
+        "GroupBookingOperationsCommandCenterView.readiness"
        ],
        "bindsTo": "GroupBookingOperationsCommandCenterView",
        "operation": "listGroupBooking",
@@ -173,32 +153,14 @@
        "label": "The selected group booking operations",
        "bindsTo": "GroupBookingOperationsCommandCenterView",
        "columns": [
-        "GroupBookingOperationsCommandCenterView.upcomingGroups",
-        "GroupBookingOperationsCommandCenterView.groupsToday",
-        "GroupBookingOperationsCommandCenterView.expectedGuestsToday",
-        "GroupBookingOperationsCommandCenterView.groupsAwaitingDeposit",
-        "GroupBookingOperationsCommandCenterView.guestListsPending",
-        "GroupBookingOperationsCommandCenterView.ticketsPending",
-        "GroupBookingOperationsCommandCenterView.resourcesPending",
-        "GroupBookingOperationsCommandCenterView.groupsReady",
-        "GroupBookingOperationsCommandCenterView.groupsWithIssues",
-        "GroupBookingOperationsCommandCenterView.outstandingPayments",
-        "GroupBookingOperationsCommandCenterView.checkInsToday",
-        "GroupBookingOperationsCommandCenterView.completedGroups",
-        "GroupBookingOperationsCommandCenterView.groupBookingId",
-        "GroupBookingOperationsCommandCenterView.organization",
         "GroupBookingOperationsCommandCenterView.groupType",
-        "GroupBookingOperationsCommandCenterView.venueEvent",
         "GroupBookingOperationsCommandCenterView.visitDate",
-        "GroupBookingOperationsCommandCenterView.arrivalTime",
-        "GroupBookingOperationsCommandCenterView.guests",
         "GroupBookingOperationsCommandCenterView.bookingValue",
         "GroupBookingOperationsCommandCenterView.paymentStatus",
         "GroupBookingOperationsCommandCenterView.guestListStatus",
         "GroupBookingOperationsCommandCenterView.ticketStatus",
         "GroupBookingOperationsCommandCenterView.resourceStatus",
-        "GroupBookingOperationsCommandCenterView.readiness",
-        "GroupBookingOperationsCommandCenterView.operationalOwner"
+        "GroupBookingOperationsCommandCenterView.readiness"
        ],
        "notes": "The pack groups this record's detail under its own headings: “Use”.",
        "provenance": "pack Group_Sales___Corporate_Booking_Management_Reference.pdf, page 20 §Display"
@@ -1602,7 +1564,9 @@
     },
     {
      "name": "orderId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): the screen loads without it; `rescheduleOrder`, `modifyOrder` take the id from the record the user acts on, and an edge or link that holds one only pre-selects it."
     }
    ],
    "preloaded": [

@@ -172,7 +172,9 @@
    "params": [
     {
      "name": "challengeId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `createMfaChallenge`; a link or an edge that holds one opens it instead."
     }
    ],
    "coldEntry": "**The only screen of the scanner that needs nothing.** The scanner's `workstationId` travels in the sign-in request from the device itself (CHG-DOOR-001)."
@@ -250,7 +252,7 @@
     {
      "to": "SCN-001",
      "trigger": "Sign in",
-     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-002 holds none of them. The edge carries nothing: SCN-001 finds challengeId (createMfaChallenge) itself, and SCN-001 opens on its own"
+     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-002 holds none of them. The edge carries nothing: challengeId only pre-selects (deep link or optional), and SCN-001 opens on its own"
     },
     {
      "to": "SCN-003",
@@ -291,18 +293,10 @@
        "label": "Every access point",
        "bindsTo": "AccessPoint",
        "columns": [
-        "AccessPoint.id",
         "AccessPoint.code",
         "AccessPoint.name",
-        "AccessPoint.venueId",
-        "AccessPoint.scopePath",
-        "AccessPoint.externalCredentialSources",
-        "AccessPoint.scanAnomalyRules",
-        "AccessPoint.operatingMode",
-        "AccessPoint.vehicleLocationCapture",
         "AccessPoint.mode",
-        "AccessPoint.direction",
-        "AccessPoint.antiPassbackEnabled"
+        "AccessPoint.direction"
        ],
        "operation": "listAccessPoints",
        "provenance": "contract access.yaml GET /access-points"
@@ -318,20 +312,11 @@
        "label": "The selected access point",
        "bindsTo": "AccessPoint",
        "columns": [
-        "AccessPoint.id",
         "AccessPoint.code",
         "AccessPoint.name",
-        "AccessPoint.venueId",
-        "AccessPoint.scopePath",
-        "AccessPoint.externalCredentialSources",
-        "AccessPoint.scanAnomalyRules",
         "AccessPoint.operatingMode",
-        "AccessPoint.vehicleLocationCapture",
         "AccessPoint.mode",
-        "AccessPoint.direction",
-        "AccessPoint.antiPassbackEnabled",
-        "AccessPoint.isActive",
-        "AccessPoint.lastHeartbeatAt"
+        "AccessPoint.direction"
        ],
        "operation": "getAccessPoint",
        "provenance": "contract access.yaml GET /access-points/{accessPointId}"
@@ -367,7 +352,7 @@
    "error": "Could not load. Names which read failed and leaves the access point direction untouched.",
    "emptyFirstRun": "No access point direction yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on venueId and the access point direction are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listAccessPoints` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `SCOPE_VIEW`, which `listAccessPoints` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TURNSTILE_MODE_SET` for `startPodiumShift`, `endPodiumShift`.",
    "offline": "Fully offline. The access point list is in the bundle"
   },
   "apis": [
@@ -431,7 +416,7 @@
    "provenance": "generated",
    "board": "wireframes/P07 Venue Scanner.dc.html#scn-002"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formStartPodiumShift",
@@ -533,7 +518,7 @@
     {
      "to": "SCN-001",
      "trigger": "Sign in",
-     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-003 holds none of them. The edge carries nothing: SCN-001 finds challengeId (createMfaChallenge) itself, and SCN-001 opens on its own"
+     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-003 holds none of them. The edge carries nothing: challengeId only pre-selects (deep link or optional), and SCN-001 opens on its own"
     },
     {
      "to": "SCN-002",
@@ -791,7 +776,7 @@
    "provenance": "generated",
    "board": "wireframes/P07 Venue Scanner.dc.html#scn-003"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "getOfflinePackage",
@@ -868,7 +853,7 @@
     {
      "to": "SCN-001",
      "trigger": "Sign in",
-     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-007 holds none of them. The edge carries nothing: SCN-001 finds challengeId (createMfaChallenge) itself, and SCN-001 opens on its own"
+     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-007 holds none of them. The edge carries nothing: challengeId only pre-selects (deep link or optional), and SCN-001 opens on its own"
     },
     {
      "to": "SCN-002",
@@ -928,11 +913,8 @@
         "OfflinePackage.generatedAt",
         "OfflinePackage.validFrom",
         "OfflinePackage.validTo",
-        "OfflinePackage.accessPointId",
         "OfflinePackage.entitlements",
-        "OfflinePackage.delegatedRights",
-        "OfflinePackage.blacklist",
-        "OfflinePackage.admissionRules"
+        "OfflinePackage.delegatedRights"
        ],
        "operation": "getOfflinePackage",
        "provenance": "contract access.yaml GET /access/offline-package"
@@ -987,7 +969,7 @@
    "error": "Could not load. Names which read failed and leaves the group admission untouched.",
    "emptyFirstRun": "No group admission yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the group admission are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP` for `lookupTicket`.",
    "offline": "Fully offline. Admits what is valid and states the shortfall"
   },
   "apis": [
@@ -1024,7 +1006,7 @@
    "provenance": "generated",
    "board": "wireframes/P07 Venue Scanner.dc.html#scn-007"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "listScans",
@@ -1107,7 +1089,7 @@
     {
      "to": "SCN-001",
      "trigger": "Sign in",
-     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-008 holds none of them. The edge carries nothing: SCN-001 finds challengeId (createMfaChallenge) itself, and SCN-001 opens on its own"
+     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-008 holds none of them. The edge carries nothing: challengeId only pre-selects (deep link or optional), and SCN-001 opens on its own"
     },
     {
      "to": "SCN-002",
@@ -1162,11 +1144,8 @@
         "OfflinePackage.generatedAt",
         "OfflinePackage.validFrom",
         "OfflinePackage.validTo",
-        "OfflinePackage.accessPointId",
         "OfflinePackage.entitlements",
-        "OfflinePackage.delegatedRights",
-        "OfflinePackage.blacklist",
-        "OfflinePackage.admissionRules"
+        "OfflinePackage.delegatedRights"
        ],
        "operation": "getOfflinePackage",
        "provenance": "contract access.yaml GET /access/offline-package"
@@ -1224,7 +1203,7 @@
    "error": "Could not load. Names which read failed and leaves the manual entry untouched.",
    "emptyFirstRun": "No manual entry yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the manual entry are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP` for `lookupTicket`.",
    "offline": "Searches the bundle only. A reference issued after the last sync will not be found, and the screen says so rather than denying"
   },
   "apis": [
@@ -1261,7 +1240,7 @@
    "provenance": "generated",
    "board": "wireframes/P07 Venue Scanner.dc.html#scn-008"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "listScans",
@@ -1338,7 +1317,7 @@
     {
      "to": "SCN-001",
      "trigger": "Sign in",
-     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-009 holds none of them. The edge carries nothing: SCN-001 finds challengeId (createMfaChallenge) itself, and SCN-001 opens on its own"
+     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-009 holds none of them. The edge carries nothing: challengeId only pre-selects (deep link or optional), and SCN-001 opens on its own"
     },
     {
      "to": "SCN-002",
@@ -1411,18 +1390,8 @@
        "label": "Every scan event",
        "bindsTo": "ScanEvent",
        "columns": [
-        "ScanEvent.id",
-        "ScanEvent.accessPointId",
-        "ScanEvent.venueId",
-        "ScanEvent.scopePath",
-        "ScanEvent.ticketId",
         "ScanEvent.mediaCode",
-        "ScanEvent.outcome",
-        "ScanEvent.denyReason",
-        "ScanEvent.direction",
-        "ScanEvent.operatorPrincipalId",
-        "ScanEvent.deviceId",
-        "ScanEvent.overridesScanId"
+        "ScanEvent.outcome"
        ],
        "operation": "listScans",
        "provenance": "contract access.yaml GET /access/scans"
@@ -1453,19 +1422,9 @@
        "label": "The selected scan event",
        "bindsTo": "ScanEvent",
        "columns": [
-        "ScanEvent.id",
-        "ScanEvent.accessPointId",
-        "ScanEvent.venueId",
-        "ScanEvent.scopePath",
-        "ScanEvent.ticketId",
         "ScanEvent.mediaCode",
         "ScanEvent.outcome",
         "ScanEvent.denyReason",
-        "ScanEvent.direction",
-        "ScanEvent.operatorPrincipalId",
-        "ScanEvent.deviceId",
-        "ScanEvent.overridesScanId",
-        "ScanEvent.overrideReason",
         "ScanEvent.recordedAt",
         "ScanEvent.syncedAt"
        ],
@@ -1480,11 +1439,8 @@
         "OfflinePackage.generatedAt",
         "OfflinePackage.validFrom",
         "OfflinePackage.validTo",
-        "OfflinePackage.accessPointId",
         "OfflinePackage.entitlements",
-        "OfflinePackage.delegatedRights",
-        "OfflinePackage.blacklist",
-        "OfflinePackage.admissionRules"
+        "OfflinePackage.delegatedRights"
        ],
        "operation": "getOfflinePackage",
        "provenance": "contract access.yaml GET /access/offline-package"
@@ -1510,7 +1466,7 @@
    "error": "Could not load. Names which read failed and leaves the ticket lookup untouched.",
    "emptyFirstRun": "No ticket lookup yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the ticket lookup are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires to show this screen, and names that permission (the screen's other reads need `REPORT_VIEW_VENUE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP` for `lookupTicket`.",
    "offline": "Bundle only, and the bundle age is shown beside the results"
   },
   "apis": [
@@ -1547,7 +1503,7 @@
    "provenance": "generated",
    "board": "wireframes/P07 Venue Scanner.dc.html#scn-009"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "overrideAccess",
@@ -1623,7 +1579,7 @@
     {
      "to": "SCN-001",
      "trigger": "Sign in",
-     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-011 holds none of them. The edge carries nothing: SCN-001 finds challengeId (createMfaChallenge) itself, and SCN-001 opens on its own"
+     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-011 holds none of them. The edge carries nothing: challengeId only pre-selects (deep link or optional), and SCN-001 opens on its own"
     },
     {
      "to": "SCN-002",
@@ -1657,22 +1613,11 @@
        "label": "The cross region entitlement",
        "bindsTo": "CrossRegionEntitlement",
        "columns": [
-        "CrossRegionEntitlement.id",
-        "CrossRegionEntitlement.rightId",
-        "CrossRegionEntitlement.ticketId",
-        "CrossRegionEntitlement.guestLinkId",
         "CrossRegionEntitlement.issuingCellName",
         "CrossRegionEntitlement.consumingCellName",
-        "CrossRegionEntitlement.mediaCodes",
         "CrossRegionEntitlement.validFrom",
-        "CrossRegionEntitlement.validTo",
-        "CrossRegionEntitlement.admissionRulesId",
-        "CrossRegionEntitlement.venueId",
-        "CrossRegionEntitlement.entriesAllowed",
-        "CrossRegionEntitlement.entriesConsumed",
         "CrossRegionEntitlement.status",
-        "CrossRegionEntitlement.lastConsumedAt",
-        "CrossRegionEntitlement.lastReconciledAt"
+        "CrossRegionEntitlement.lastConsumedAt"
        ],
        "operation": "getCrossRegionEntitlement",
        "provenance": "contract cross-region.yaml GET /cross-region-entitlements/{rightId}"
@@ -1697,7 +1642,7 @@
    "loading": "The delegated right, read by `getCrossRegionEntitlement`.",
    "error": "Could not load. Names which read failed and leaves the delegated right untouched.",
    "emptyFirstRun": "Never a create action: a delegated right arrives by scan. With nothing scanned the screen says \"Scan the ticket from the other venue\".",
-   "emptyNoAccess": "Shown when the caller lacks `TICKET_LOOKUP`, which `getCrossRegionEntitlement` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `TICKET_LOOKUP`, which `getCrossRegionEntitlement` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_VALIDATE` for `consumeCrossRegionEntitlement`.",
    "offline": "**Not available offline.** A delegated right issued in another region cannot be verified from a local bundle, and admitting on trust is how a pass gets used twice in two countries"
   },
   "apis": [
@@ -1728,7 +1673,7 @@
    "provenance": "generated",
    "board": "wireframes/P07 Venue Scanner.dc.html#scn-011"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formConsumeCrossRegionEntitlement",
@@ -1806,7 +1751,7 @@
     {
      "to": "SCN-001",
      "trigger": "Sign in",
-     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-013 holds none of them. The edge carries nothing: SCN-001 finds challengeId (createMfaChallenge) itself, and SCN-001 opens on its own"
+     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-013 holds none of them. The edge carries nothing: challengeId only pre-selects (deep link or optional), and SCN-001 opens on its own"
     },
     {
      "to": "SCN-002",
@@ -1861,11 +1806,8 @@
         "OfflinePackage.generatedAt",
         "OfflinePackage.validFrom",
         "OfflinePackage.validTo",
-        "OfflinePackage.accessPointId",
         "OfflinePackage.entitlements",
-        "OfflinePackage.delegatedRights",
-        "OfflinePackage.blacklist",
-        "OfflinePackage.admissionRules"
+        "OfflinePackage.delegatedRights"
        ],
        "operation": "getOfflinePackage",
        "provenance": "contract access.yaml GET /access/offline-package"
@@ -1987,7 +1929,7 @@
    "error": "Could not load. Names which read failed and leaves the offline journal untouched.",
    "emptyFirstRun": "No offline journal yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the offline journal are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_OVERRIDE` for `overrideAccess`; `TICKET_LOOKUP` for `lookupTicket`.",
    "offline": "The journal is the offline record. It is why an offline admit is recoverable"
   },
   "apis": [
@@ -2042,7 +1984,7 @@
    "provenance": "generated",
    "board": "wireframes/P07 Venue Scanner.dc.html#scn-013"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "listScans",
@@ -2103,7 +2045,7 @@
     {
      "to": "SCN-001",
      "trigger": "Sign in",
-     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-014 holds none of them. The edge carries nothing: SCN-001 finds challengeId (createMfaChallenge) itself, and SCN-001 opens on its own"
+     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-014 holds none of them. The edge carries nothing: challengeId only pre-selects (deep link or optional), and SCN-001 opens on its own"
     },
     {
      "to": "SCN-002",
@@ -2170,15 +2112,10 @@
        "label": "Every sync rejection",
        "bindsTo": "SyncRejection",
        "columns": [
-        "SyncRejection.id",
-        "SyncRejection.workstationId",
         "SyncRejection.kind",
         "SyncRejection.recordedAt",
         "SyncRejection.rejectedAt",
-        "SyncRejection.problem",
-        "SyncRejection.payload",
-        "SyncRejection.resolvedAt",
-        "SyncRejection.resolvedByPrincipalId"
+        "SyncRejection.resolvedAt"
        ],
        "operation": "listSyncRejections",
        "provenance": "contract orders.yaml GET /sync/rejections"
@@ -2188,18 +2125,8 @@
        "label": "Every scan event",
        "bindsTo": "ScanEvent",
        "columns": [
-        "ScanEvent.id",
-        "ScanEvent.accessPointId",
-        "ScanEvent.venueId",
-        "ScanEvent.scopePath",
-        "ScanEvent.ticketId",
         "ScanEvent.mediaCode",
-        "ScanEvent.outcome",
-        "ScanEvent.denyReason",
-        "ScanEvent.direction",
-        "ScanEvent.operatorPrincipalId",
-        "ScanEvent.deviceId",
-        "ScanEvent.overridesScanId"
+        "ScanEvent.outcome"
        ],
        "operation": "listScans",
        "provenance": "contract access.yaml GET /access/scans"
@@ -2230,17 +2157,11 @@
        "label": "The selected sync rejection",
        "bindsTo": "SyncRejection",
        "columns": [
-        "SyncRejection.id",
-        "SyncRejection.workstationId",
         "SyncRejection.kind",
         "SyncRejection.recordedAt",
         "SyncRejection.rejectedAt",
         "SyncRejection.problem",
-        "SyncRejection.payload",
-        "SyncRejection.resolvedAt",
-        "SyncRejection.resolvedByPrincipalId",
-        "SyncRejection.resolution",
-        "SyncRejection.resolvedRecordId"
+        "SyncRejection.resolvedAt"
        ],
        "operation": "listSyncRejections",
        "provenance": "contract orders.yaml GET /sync/rejections"
@@ -2253,11 +2174,8 @@
         "OfflinePackage.generatedAt",
         "OfflinePackage.validFrom",
         "OfflinePackage.validTo",
-        "OfflinePackage.accessPointId",
         "OfflinePackage.entitlements",
-        "OfflinePackage.delegatedRights",
-        "OfflinePackage.blacklist",
-        "OfflinePackage.admissionRules"
+        "OfflinePackage.delegatedRights"
        ],
        "operation": "getOfflinePackage",
        "provenance": "contract access.yaml GET /access/offline-package"
@@ -2379,7 +2297,7 @@
    "error": "Could not load. Names which read failed and leaves the sync reconciliation untouched.",
    "emptyFirstRun": "No sync reconciliation yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on workstationId, kind, resolved and the sync reconciliation are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `ORDER_VIEW`, which `listSyncRejections` requires to show this screen, and names that permission (the screen's other reads need `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `ACCESS_OVERRIDE` for `overrideAccess`; `TICKET_LOOKUP` for `lookupTicket`.",
    "offline": "Not applicable. This screen exists to end the offline period"
   },
   "apis": [
@@ -2455,7 +2373,7 @@
    "provenance": "generated",
    "board": "wireframes/P07 Venue Scanner.dc.html#scn-014"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "syncOrders",
@@ -2517,7 +2435,7 @@
     {
      "to": "SCN-001",
      "trigger": "Sign in",
-     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-015 holds none of them. The edge carries nothing: SCN-001 finds challengeId (createMfaChallenge) itself, and SCN-001 opens on its own"
+     "provenance": "derived — SCN-001 declares entryState.params challengeId and SCN-015 holds none of them. The edge carries nothing: challengeId only pre-selects (deep link or optional), and SCN-001 opens on its own"
     },
     {
      "to": "SCN-002",
@@ -2573,11 +2491,8 @@
         "OfflinePackage.generatedAt",
         "OfflinePackage.validFrom",
         "OfflinePackage.validTo",
-        "OfflinePackage.accessPointId",
         "OfflinePackage.entitlements",
-        "OfflinePackage.delegatedRights",
-        "OfflinePackage.blacklist",
-        "OfflinePackage.admissionRules"
+        "OfflinePackage.delegatedRights"
        ],
        "operation": "getOfflinePackage",
        "provenance": "contract access.yaml GET /access/offline-package"
@@ -2603,7 +2518,7 @@
    "error": "Could not load. Names which read failed and leaves the offline package untouched.",
    "emptyFirstRun": "No offline package yet. **Offers no create action** — this screen declares no operation that makes one — and says so rather than showing an empty table.",
    "emptyNoResults": "Nothing matches the filter on accessPointId, ticketId, outcome, recordedFrom, recordedTo and the offline package are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question.",
+   "emptyNoAccess": "Shown when the caller lacks `ACCESS_VALIDATE`, which `getOfflinePackage` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `TICKET_LOOKUP` for `lookupTicket`.",
    "offline": "Cannot refresh. The existing bundle continues to be used and its age is shown"
   },
   "apis": [
@@ -2634,7 +2549,7 @@
    "provenance": "generated",
    "board": "wireframes/P07 Venue Scanner.dc.html#scn-015"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 7 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "gaps": [
    {
     "operation": "listScans",

@@ -130,13 +130,13 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-883` | Workforce Roster Command Center | B–D | 0 | 0 | 6 | 10 | 1 | 0 | — | notStarted (—) |
 | `BO-884` | Attraction & Operational Staffing Roster | B–D | 0 | 77 | 6 | 11 | 1 | 0 | — | notStarted (—) |
 | `BO-885` | Minimum Staffing & Coverage Rule Configuration | B–D | 5 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-886` | Staffing Gap & Coverage Control Center | B–D | 4 | 27 | 6 | 1 | 2 | 0 | — | notStarted (—) |
+| `BO-886` | Staffing Gap & Coverage Control Center | B–D | 4 | 22 | 6 | 1 | 2 | 0 | — | notStarted (—) |
 | `BO-887` | Shift Marketplace & Workforce Requests | B–D | 0 | 8 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-888` | Attendance & Live Workforce Command Center | B–D | 0 | 22 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `BO-889` | Staff Check-In, Check-Out & Attendance Exceptions | B–D | 19 | 5 | 6 | 4 | 1 | 0 | — | notStarted (—) |
 | `BO-890` | Workforce Compliance Validation Center | B–D | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-891` | Labor Cost & Staffing Budget Control | B–D | 10 | 17 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-892` | AI Workforce Planner & Roster Optimization | B–D | 4 | 18 | 6 | 1 | 1 | 1 | — | notStarted (—) |
+| `BO-892` | AI Workforce Planner & Roster Optimization | B–D | 4 | 15 | 6 | 1 | 1 | 1 | — | notStarted (—) |
 
 ## Thin screens in this batch
 
@@ -889,11 +889,6 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Position code | text | — |
 | From | text | — |
 | To | text | — |
-| Required | 1,234 | — |
-| Rostered | 1,234 | — |
-| Qualified | 1,234 | A position filled by somebody not qualified for it is still a gap. |
-| Checked in | text | not in the schema: `Checked in` |
-| Gap | 1,234 | — |
 | Severity | chip: Covered, Tight, Short, Blocking | — |
 
 **The selected gap** (detail panel, from `getStaffingCoverage`): Gap type (missing staff / role / skill / certification, absence- or demand-created) and the AI recommendation are pack labels.
@@ -988,7 +983,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (4), with its required mark, default, format and its error state (400).
-- [ ] Every output is drawn (27 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (22 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-886?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] The screen has no action of its own; nothing is drawn as a button that does nothing.
 - [ ] Every transition is wired: `BO-883`.
@@ -1805,7 +1800,7 @@ Answered questions: draw the decision, not the old default. Where a decision and
 
 **Form: Save labour budget** (modal, opened by *Save labour budget*; *Save labour budget* calls `setLabourBudget`, *Cancel* sends nothing)
 
-**Collects what `setLabourBudget` sends before it is called.** Required: `id`, `venueId`, `periodStart`, `periodEnd`, `budgetAmount`. Optional: `departmentId`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged.
+**Collects what `setLabourBudget` sends before it is called.** Required: `venueId`, `periodStart`, `periodEnd`, `budgetAmount`. Optional: `departmentId`, `scopePath`. Dismissing sends nothing; the screen behind is unchanged. Not asked, because the server sets it (readOnly in the contract): `id` (3 October 2026, CHG-SPF-001).
 
 | Field | Control | Required | Default | Allowed values, rules and conditions | Format | Helper text | Source |
 |---|---|---|---|---|---|---|---|
@@ -2069,9 +2064,6 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | From | text | — |
 | To | text | — |
 | Required | 1,234 | — |
-| Rostered | 1,234 | — |
-| Qualified | 1,234 | A position filled by somebody not qualified for it is still a gap. |
-| Gap | 1,234 | — |
 | Severity | chip: Covered, Tight, Short, Blocking | — |
 
 **Why this assignment** (detail panel): The pack's explanation ("Available, Level 3 Instructor, certification valid, language match, already at venue, no overtime").
@@ -2185,7 +2177,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (4), with its required mark, default, format and its error state.
-- [ ] Every output is drawn (18 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (15 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#BO-892?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Generate roster with AI.
 - [ ] Every transition is wired: `BO-883`.

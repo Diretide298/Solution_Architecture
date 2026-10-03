@@ -1164,7 +1164,8 @@
   "orders.till_shift_policy": "2026-10-02",
   "reporting.analytics_governance_policy": "2026-10-02",
   "whitelabel.publish_review_policy": "2026-10-02",
-  "whitelabel.site_package": "2026-10-02"
+  "whitelabel.site_package": "2026-10-02",
+  "maintenance.incident_media": "2026-10-03"
  },
  "renames": [
   {
@@ -1361,5 +1362,5 @@
   "ai.chunk_ref": "2026-09-30"
  },
  "baseline": "2026-09-19",
- "generated": "2026-10-02"
+ "generated": "2026-10-03"
 }

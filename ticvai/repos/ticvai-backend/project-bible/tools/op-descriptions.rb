@@ -13,7 +13,8 @@
 
 PROJECT_ID = 153
 path = ARGV[0] or abort("usage: rails runner op-descriptions.rb op-descriptions.json")
-texts = JSON.parse(File.read(path)).transform_keys(&:to_i)
+# A key that is not an id is a ticket not pushed yet (op-descriptions.py, fresh start of 3 October): nothing to apply.
+texts = JSON.parse(File.read(path)).select { |k, _| k =~ /\A\d+\z/ }.transform_keys(&:to_i)
 apply = ENV["APPLY"] == "1"
 
 current = WorkPackage.where(id: texts.keys).pluck(:id, :project_id, :description).map { |i, p, d| [i, [p, d]] }.to_h

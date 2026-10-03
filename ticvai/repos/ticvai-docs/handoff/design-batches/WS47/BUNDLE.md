@@ -107,7 +107,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-158` | Coupon & Promo Code Command Center | B–D | 0 | 16 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
-| `ADM-159` | Coupon & Promo Code Builder | A | 9 | 20 | 5 | 0 | 0 | 2 | — | notStarted (generated) |
+| `ADM-159` | Coupon & Promo Code Builder | B–D | 9 | 20 | 5 | 0 | 0 | 2 | — | notStarted (generated) |
 | `ADM-160` | Unique Code Generation & Batch Manager | B–D | 14 | 12 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
 | `ADM-161` | Code Eligibility & Restriction Manager | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-162` | Usage, Capacity & Frequency Control | B–D | 0 | 8 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
@@ -228,16 +228,16 @@ Nothing to enter: the screen reads and acts, and every action sends what the scr
 **Where the user goes next**
 
 - → `BO-100` Venue Home: *Back to Venue Home*
-- → `ADM-160` Unique Code Generation & Batch Manager: *Works in Unique Code Generation & Batch Manager*; carries `batchId`, `campaignId`; calls `listCouponCodes`
 - → `ADM-161` Code Eligibility & Restriction Manager: *Works in Code Eligibility & Restriction Manager*; calls `listCouponCodes`
 - → `ADM-162` Usage, Capacity & Frequency Control: *Works in Usage, Capacity & Frequency Control*; calls `listCouponCodes`
 - → `ADM-163` Validity, Date & Time Control: *Works in Validity, Date & Time Control*; calls `listCouponCodes`
-- → `ADM-164` Code Distribution & Assignment Manager: *Works in Code Distribution & Assignment Manager*; carries `campaignId`; calls `listCouponCodes`
 - → `ADM-165` Redemption Monitor & Code Lookup: *Works in Redemption Monitor & Code Lookup*; calls `listCouponCodes`
 - → `ADM-166` Code Security, Fraud & Exception Center: *Works in Code Security, Fraud & Exception Center*; calls `listCouponCodes`
 - → `ADM-167` Redemption Analytics, Audit & AI Optimization: *Works in Redemption Analytics, Audit & AI Optimization*; calls `listCouponCodes`
 - → `BO-010` Promotions & Coupons: *Open Promotions & Coupons*; carries `campaignId`, `code`
 - → `ADM-159` Coupon & Promo Code Builder: *Works in Coupon & Promo Code Builder, a section of BO-010, which saves the record with createCouponCampaign…*; calls `listCouponCodes`
+- → `ADM-160` Unique Code Generation & Batch Manager: *Works in Unique Code Generation & Batch Manager*; carries `batchId`, `campaignId`; calls `listCouponCodes`
+- → `ADM-164` Code Distribution & Assignment Manager: *Works in Code Distribution & Assignment Manager*; carries `campaignId`; calls `listCouponCodes`
 
 #### States
 
@@ -309,7 +309,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 - [ ] Every output is drawn (16 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#ADM-158?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Draft, Pending Approval, Capacity Reached.
-- [ ] Every transition is wired: `BO-100`, `ADM-160`, `ADM-161`, `ADM-162`, `ADM-163`, `ADM-164`, `ADM-165`, `ADM-166`, `ADM-167`, `BO-010`, `ADM-159`.
+- [ ] Every transition is wired: `BO-100`, `ADM-161`, `ADM-162`, `ADM-163`, `ADM-165`, `ADM-166`, `ADM-167`, `BO-010`, `ADM-159`, `ADM-160`, `ADM-164`.
 - [ ] Every gated control is gated: `PRICE_VIEW`.
 - [ ] The 1 client meeting input(s) for this screen are applied; open questions are built to their default.
 - [ ] Nothing in this specification appears on the screen as text (no ids, field names or permission keys).
@@ -324,7 +324,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block A · ticket #20648 (APP-SETUP-ADM-159) |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -991,8 +991,8 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 | | |
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
-| Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block A · ticket #20649 (APP-SETUP-ADM-164) |
+| Module | Commercial · wave 1 · needs the `marketing` module |
+| Block | Block A · task APP-SETUP-ADM-164 |
 | Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRICE_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Show) and no metric row |

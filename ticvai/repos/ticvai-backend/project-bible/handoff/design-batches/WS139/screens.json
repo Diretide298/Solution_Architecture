@@ -89,7 +89,10 @@
     {
      "to": "BO-783",
      "trigger": "Journey Analytics & Audit",
-     "provenance": "structural — pack board 5 wiring, 19 September 2026"
+     "provenance": "structural — pack board 5 wiring, 19 September 2026",
+     "carries": [
+      "journeyId"
+     ]
     }
    ]
   },
@@ -165,7 +168,9 @@
    "params": [
     {
      "name": "journeyId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listJourneys` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -222,7 +227,10 @@
      "to": "BO-774",
      "trigger": "Back to Journey Automation Center",
      "provenance": "structural — pack board 5 wiring, 19 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "journeyId"
+     ]
     }
    ]
   },
@@ -499,7 +507,10 @@
      "to": "BO-774",
      "trigger": "Back to Journey Automation Center",
      "provenance": "structural — pack board 5 wiring, 19 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "journeyId"
+     ]
     }
    ]
   },
@@ -747,7 +758,10 @@
      "to": "BO-774",
      "trigger": "Back to Journey Automation Center",
      "provenance": "structural — pack board 5 wiring, 19 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "journeyId"
+     ]
     }
    ]
   },
@@ -866,7 +880,10 @@
      "to": "BO-774",
      "trigger": "Back to Journey Automation Center",
      "provenance": "structural — pack board 5 wiring, 19 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "journeyId"
+     ]
     }
    ]
   },
@@ -979,7 +996,10 @@
      "to": "BO-774",
      "trigger": "Back to Journey Automation Center",
      "provenance": "structural — pack board 5 wiring, 19 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "journeyId"
+     ]
     }
    ]
   },
@@ -1098,7 +1118,10 @@
      "to": "BO-774",
      "trigger": "Back to Journey Automation Center",
      "provenance": "structural — pack board 5 wiring, 19 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "journeyId"
+     ]
     }
    ]
   },
@@ -1193,7 +1216,9 @@
    "params": [
     {
      "name": "insightId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listMarketingRecommendations` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },
@@ -1250,7 +1275,10 @@
      "to": "BO-774",
      "trigger": "Back to Journey Automation Center",
      "provenance": "structural — pack board 5 wiring, 19 September 2026",
-     "back": true
+     "back": true,
+     "carries": [
+      "journeyId"
+     ]
     }
    ]
   },
@@ -1325,7 +1353,9 @@
    "params": [
     {
      "name": "journeyId",
-     "from": "navigation"
+     "from": "navigation",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listJourneys` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ]
   },

@@ -206,15 +206,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-012` | My Tickets | A | 7 | 45 | 6 | 7 | 10 | 0 | guest | notStarted (client-verified) |
-| `GST-013` | Ticket Details | A | 10 | 31 | 5 | 7 | 16 | 0 | guest | notStarted (client-verified) |
-| `GST-018` | Add to Calendar / Reminders | A | 5 | 14 | 6 | 4 | 1 | 0 | guest | notStarted (client-verified) |
-| `GST-019` | Order History | A | 11 | 79 | 6 | 6 | 0 | 0 | guest | notStarted (designed) |
+| `GST-012` | My Tickets | A | 7 | 28 | 6 | 7 | 10 | 0 | guest | notStarted (client-verified) |
+| `GST-013` | Ticket Details | A | 10 | 20 | 5 | 7 | 16 | 0 | guest | notStarted (client-verified) |
+| `GST-018` | Add to Calendar / Reminders | A | 5 | 9 | 6 | 4 | 1 | 0 | guest | notStarted (client-verified) |
+| `GST-019` | Order History | A | 11 | 69 | 6 | 6 | 0 | 0 | guest | notStarted (designed) |
 | `GST-020` | Saved Items / Wishlist | A | 0 | 15 | 4 | 1 | 1 | 0 | guest | notStarted (client-verified) |
 | `GST-039` | Profile | A | 9 | 47 | 5 | 14 | 1 | 0 | guest | notStarted (designed) |
-| `GST-042` | Simple Registration & OTP | A | 35 | 6 | 6 | 13 | 8 | 0 | guest | notStarted (designed) |
+| `GST-042` | Simple Registration & OTP | A | 35 | 5 | 6 | 13 | 8 | 0 | guest | notStarted (designed) |
 | `GST-045` | Ticket Delivery & Sharing | A | 7 | 12 | 5 | 5 | 3 | 0 | guest | notStarted (client-verified) |
-| `GST-055` | Dynamic QR Ticket | A | 5 | 38 | 5 | 2 | 10 | 0 | guest | notStarted (client-verified) |
+| `GST-055` | Dynamic QR Ticket | A | 5 | 19 | 5 | 2 | 10 | 0 | guest | notStarted (client-verified) |
 | `GST-066` | Privacy & My Data | A | 3 | 12 | 6 | 23 | 2 | 4 | guest | notStarted (designed) |
 
 ## Design inputs from the client meetings

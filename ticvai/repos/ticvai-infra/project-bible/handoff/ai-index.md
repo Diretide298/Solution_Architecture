@@ -338,28 +338,28 @@
 **P01 Guest Web**
 
 - `WEB-001` Home / Landing — wave 1, 2 operations
-- `WEB-008` Add-ons & Upsell — wave 2, 2 operations
-- `WEB-043` Loyalty & Rewards — wave 2, 2 operations
-- `WEB-044` AI Concierge – Home — wave 2, 5 operations
+- `WEB-008` Add-ons & Upsell — wave 1, 2 operations
+- `WEB-043` Loyalty & Rewards — wave 1, 2 operations
+- `WEB-044` AI Concierge – Home — wave 1, 5 operations
 
 **P02 Guest App**
 
 - `GST-001` Home — wave 1, 2 operations
-- `GST-031` AI Concierge – Home — wave 2, 5 operations
-- `GST-032` AI Concierge – Chat — wave 2, 2 operations
-- `GST-033` AI Concierge – Contextual Help — wave 2, 3 operations
-- `GST-036` Loyalty & Rewards — wave 2, 2 operations
-- `GST-048` Upsell / Cross-Sell — wave 2, 2 operations
+- `GST-031` AI Concierge – Home — wave 1, 5 operations
+- `GST-032` AI Concierge – Chat — wave 1, 2 operations
+- `GST-033` AI Concierge – Contextual Help — wave 1, 3 operations
+- `GST-036` Loyalty & Rewards — wave 1, 2 operations
+- `GST-048` Upsell / Cross-Sell — wave 1, 2 operations
 - `GST-054` AI Planner — wave 1, 3 operations
-- `GST-068` Help & My Cases — wave 2, 1 operation
+- `GST-068` Help & My Cases — wave 1, 1 operation
 
 **P04 Venue POS**
 
-- `POS-008` Reports — wave 2, 1 operation
+- `POS-008` Reports — wave 1, 1 operation
 
 **P05 Guest Kiosk**
 
-- `KSK-015` Assistant — wave 2, 3 operations
+- `KSK-015` Assistant — wave 1, 3 operations
 
 **P06 Venue Staff App**
 
@@ -384,17 +384,17 @@
 - `ADM-696` AI Risk, Fairness, Explainability & Safety Center — wave 3, 3 operations
 - `ADM-697` Recommendation Audit, Decision Trace & Investigation — wave 3, 1 operation
 - `BO-005` Queue Monitor — wave 1, 1 operation
-- `BO-029` Report Builder — wave 2, 2 operations
+- `BO-029` Report Builder — wave 1, 2 operations
 - `BO-058` Reporting Home — wave 1, 2 operations
 - `BO-059` Sales Reports — wave 1, 2 operations
 - `BO-060` Attendance & Footfall — wave 2, 2 operations
 - `BO-084` Approval Inbox — wave 1, 1 operation
 - `BO-091` AI Policy & Spend — wave 1, 11 operations
-- `BO-093` Map Import & Labelling — wave 2, 1 operation
+- `BO-093` Map Import & Labelling — wave 1, 1 operation
 - `BO-102` Sell — wave 1, 1 operation
 - `BO-1048` Seat Upsell Recommendations — wave 3, 1 operation
 - `BO-1160` Fraud Alert & Investigation Case Management — wave 3, 5 operations
-- `BO-117` Product Import, Governance & AI Configuration Assistant — wave 2, 1 operation
+- `BO-117` Product Import, Governance & AI Configuration Assistant — wave 1, 1 operation
 - `BO-119` Cross-Sell, Upsell & Recommendation Rules — wave 2, 1 operation
 - `BO-139` Wastage, Spoilage, Returns & Write-Off — wave 2, 1 operation
 - `BO-367` Approval Request Detail — wave 3, 1 operation
@@ -406,19 +406,19 @@
 - `BO-761` AI Audience Discovery — wave 3, 1 operation
 - `BO-762` Predictive Audiences — wave 3, 2 operations
 - `BO-764` Campaign Command Center — wave 3, 1 operation
-- `BO-766` Campaign Builder — wave 3, 1 operation
-- `BO-772` A/B & AI Optimization — wave 3, 4 operations
+- `BO-766` Campaign Builder — wave 1, 1 operation
+- `BO-772` A/B & AI Optimization — wave 1, 4 operations
 - `BO-782` AI Journey Optimization — wave 3, 3 operations
-- `BO-785` Template Library — wave 3, 2 operations
+- `BO-785` Template Library — wave 1, 2 operations
 - `BO-786` Newsletter Builder — wave 3, 1 operation
 - `BO-787` Content Blocks & Product Feed — wave 3, 1 operation
 - `BO-789` Transactional Notification Rules — wave 3, 1 operation
 - `BO-793` AI Content, Translation & Audit — wave 3, 3 operations
-- `BO-798` Intent & Knowledge Management — wave 3, 3 operations
-- `BO-919` AI Event Resource Forecasting — wave 3, 3 operations
+- `BO-798` Intent & Knowledge Management — wave 1, 3 operations
+- `BO-919` AI Event Resource Forecasting — wave 1, 3 operations
 - `BO-925` AI Staff Recommendation & Workforce Matching — wave 3, 2 operations
 - `BO-926` Resource Demand Forecasting — wave 3, 2 operations
-- `BO-927` AI Staffing Requirement Forecast — wave 3, 5 operations
+- `BO-927` AI Staffing Requirement Forecast — wave 1, 5 operations
 - `BO-928` AI Conflict Resolution Assistant — wave 3, 4 operations
 - `BO-929` Automatic Schedule Optimization — wave 3, 3 operations
 - `BO-931` Operational Scenario Simulator & Digital Twin — wave 3, 2 operations
@@ -463,15 +463,15 @@
 - `ADM-497` Configuration History, Versions & Rollback — wave 3, 3 operations
 - `ADM-498` AI Configuration Audit & Governance — wave 3, 2 operations
 - `ADM-499` Forecasting Command Center — wave 3, 3 operations
-- `ADM-500` Forecast Configuration & Forecasting Strategy — wave 3, 3 operations
+- `ADM-500` Forecast Configuration & Forecasting Strategy — wave 1, 3 operations
 - `ADM-501` Forecast Data & Signal Configuration — wave 3, 3 operations
 - `ADM-502` Attendance & Visitation Forecast — wave 3, 3 operations
 - `ADM-503` Ticket, Product & Timeslot Demand Forecast — wave 3, 1 operation
 - `ADM-504` Channel & Booking Pace Forecast — wave 3, 1 operation
 - `ADM-505` Revenue & Commercial Forecast — wave 3, 1 operation
-- `ADM-506` Forecast Drivers, Confidence & Explainability — wave 3, 4 operations
+- `ADM-506` Forecast Drivers, Confidence & Explainability — wave 1, 4 operations
 - `ADM-507` Forecast Scenario & What-If Simulator — wave 3, 3 operations
-- `ADM-508` Forecast Accuracy, Review & Publication Center — wave 3, 5 operations
+- `ADM-508` Forecast Accuracy, Review & Publication Center — wave 1, 5 operations
 - `ADM-509` Operational Forecasting Command Center — wave 3, 2 operations
 - `ADM-510` Capacity & Occupancy Forecast — wave 3, 4 operations
 - `ADM-511` Attraction Utilization & Queue Forecast — wave 3, 3 operations
@@ -486,12 +486,12 @@
 - `ADM-520` AI Capability Registry & Ownership — wave 3, 2 operations
 - `ADM-521` AI Risk Classification & Assessment — wave 3, 2 operations
 - `ADM-522` AI Autonomy Level Configuration — wave 3, 3 operations
-- `ADM-523` AI Action & Permission Policy Builder — wave 3, 3 operations
+- `ADM-523` AI Action & Permission Policy Builder — wave 1, 3 operations
 - `ADM-524` AI Data Access & Usage Policy — wave 3, 2 operations
 - `ADM-525` Environment, Tenant & Scope Governance — wave 3, 2 operations
 - `ADM-526` AI Policy Conflict, Exception & Override Management — wave 3, 4 operations
-- `ADM-527` AI Policy Testing & Governance Simulation — wave 3, 2 operations
-- `ADM-528` AI Governance Policy Publication & Effective Policy Map — wave 3, 3 operations
+- `ADM-527` AI Policy Testing & Governance Simulation — wave 1, 2 operations
+- `ADM-528` AI Governance Policy Publication & Effective Policy Map — wave 1, 3 operations
 - `ADM-529` AI Human Oversight Command Center — wave 3, 2 operations
 - `ADM-530` AI Approval Requirement & Routing Configuration — wave 3, 3 operations
 - `ADM-531` AI Approval Review Workspace — wave 3, 3 operations
@@ -517,9 +517,9 @@
 - `ADM-551` AI Governance Control Library & Control Effectiveness — wave 3, 2 operations
 - `ADM-552` AI Policy Compliance & Violation Monitoring — wave 3, 2 operations
 - `ADM-553` AI Data, Privacy & Usage Compliance Monitoring — wave 3, 2 operations
-- `ADM-554` AI Quality, Behavior & Governance Drift Monitoring — wave 3, 6 operations
+- `ADM-554` AI Quality, Behavior & Governance Drift Monitoring — wave 1, 6 operations
 - `ADM-555` AI Governance Alert & Detection Center — wave 3, 3 operations
-- `ADM-556` AI Incident & Remediation Management — wave 3, 6 operations
+- `ADM-556` AI Incident & Remediation Management — wave 1, 6 operations
 - `ADM-557` AI Compliance, Assurance & Governance Reporting — wave 3, 3 operations
 - `ADM-558` AI Governance Review, Action Plan & Continuous Improvement — wave 3, 2 operations
 
@@ -535,17 +535,17 @@
 
 **P13 Venue CMS**
 
-- `CMS-007` Page Builder — wave 2, 2 operations
-- `CMS-008` Content Blocks — wave 2, 2 operations
-- `CMS-010` Media Library — wave 2, 1 operation
-- `CMS-011` Translations — wave 2, 1 operation
+- `CMS-007` Page Builder — wave 1, 2 operations
+- `CMS-008` Content Blocks — wave 1, 2 operations
+- `CMS-010` Media Library — wave 1, 1 operation
+- `CMS-011` Translations — wave 1, 1 operation
 - `CMS-062` Central Digital Asset Library — wave 3, 1 operation
-- `CMS-101` Help Me Choose — wave 2, 2 operations
+- `CMS-101` Help Me Choose — wave 1, 2 operations
 - `CMS-104` App Build & Store Publishing — wave 1, 2 operations
 
 **P15 Kitchen Display**
 
-- `KIT-010` Kitchen Performance, AI & Operational Optimization — wave 2, 1 operation
+- `KIT-010` Kitchen Performance, AI & Operational Optimization — wave 1, 1 operation
 
 **P16 Venue Analytics**
 

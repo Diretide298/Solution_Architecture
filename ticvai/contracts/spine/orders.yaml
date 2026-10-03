@@ -860,7 +860,6 @@ paths:
         format: uuid
     post:
       operationId: cancelPaymentLink
-      x-ticvai-consumed-by: []
       x-ticvai-agreed: '3 October: Chinmay, defaults taken on the business-rules questions ("add cancelPaymentLink under
         ORDER_CREATE"); CHG-RUL-021; shape follows resendPaymentLink'
       summary: Cancel a live payment link

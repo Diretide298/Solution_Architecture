@@ -4,7 +4,7 @@
   "name": "Agent Dashboard",
   "module": "Overview",
   "requiresModule": "marketing",
-  "wave": 3,
+  "wave": 1,
   "capability": "C32",
   "implementation": {
    "app": "venue-support-web",
@@ -86,17 +86,11 @@
        "label": "Every case",
        "bindsTo": "Case",
        "columns": [
-        "Case.id",
         "Case.caseNumber",
-        "Case.subjectId",
         "Case.guestName",
         "Case.subject",
-        "Case.categoryId",
         "Case.status",
         "Case.priority",
-        "Case.assignedToPrincipalId",
-        "Case.venueId",
-        "Case.relatedOrderId",
         "Case.slaDueAt"
        ],
        "operation": "listCases",
@@ -107,15 +101,8 @@
        "label": "Every conversation",
        "bindsTo": "Conversation",
        "columns": [
-        "Conversation.id",
-        "Conversation.telephony",
-        "Conversation.assistSessionId",
         "Conversation.channel",
         "Conversation.state",
-        "Conversation.subjectId",
-        "Conversation.venueId",
-        "Conversation.assignedPrincipalId",
-        "Conversation.queueId",
         "Conversation.queuePosition",
         "Conversation.estimatedWaitSeconds",
         "Conversation.handoverReason"
@@ -134,22 +121,14 @@
        "label": "The selected case",
        "bindsTo": "Case",
        "columns": [
-        "Case.id",
         "Case.caseNumber",
-        "Case.subjectId",
         "Case.guestName",
         "Case.subject",
         "Case.kind",
         "Case.channel",
         "Case.recordedAt",
-        "Case.syncedAt",
-        "Case.categoryId",
         "Case.status",
-        "Case.priority",
-        "Case.assignedToPrincipalId",
-        "Case.venueId",
-        "Case.relatedOrderId",
-        "Case.slaDueAt"
+        "Case.priority"
        ],
        "operation": "listCases",
        "provenance": "contract marketing-crm.yaml GET /cases"
@@ -159,22 +138,14 @@
        "label": "The case",
        "bindsTo": "CaseDetail",
        "columns": [
-        "CaseDetail.id",
         "CaseDetail.caseNumber",
-        "CaseDetail.subjectId",
         "CaseDetail.guestName",
         "CaseDetail.subject",
         "CaseDetail.kind",
         "CaseDetail.channel",
         "CaseDetail.recordedAt",
-        "CaseDetail.syncedAt",
-        "CaseDetail.categoryId",
         "CaseDetail.status",
-        "CaseDetail.priority",
-        "CaseDetail.assignedToPrincipalId",
-        "CaseDetail.venueId",
-        "CaseDetail.relatedOrderId",
-        "CaseDetail.slaDueAt"
+        "CaseDetail.priority"
        ],
        "operation": "getCase",
        "provenance": "contract marketing-crm.yaml GET /cases/{caseId}"
@@ -230,7 +201,7 @@
    "error": "Could not load. Names which read failed (cases or conversations) and leaves the other on screen.",
    "emptyFirstRun": "No cases assigned to you: you are available for new work. Offers Create case (`createCase`) for a contact that arrives outside the queue; distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the status, assignee, priority or SLA filter, and the cases are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `CASE_VIEW`, which `listCases` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `CASE_VIEW`, which `listCases` requires to show this screen, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `CASE_MANAGE` for `addCaseMessage`, `createCase`, `escalateCase`, `reopenCase` and 2 more."
   },
   "apis": [
    {
@@ -329,7 +300,7 @@
    "derivedFrom": "wireframes/reference/Dashboards Board.dc.html",
    "note": "**Drawn by Claude Design on `Dashboards Board.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.** The frame it points at now is the generated one. This screen has been designed once and is not starting from nothing."
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "overlays": [
    {
     "id": "formAddCaseMessage",
@@ -555,14 +526,7 @@
         "ReportDefinition.name",
         "ReportDefinition.description",
         "ReportDefinition.category",
-        "ReportDefinition.dataSource",
-        "ReportDefinition.columns",
-        "ReportDefinition.filters",
-        "ReportDefinition.groupBy",
-        "ReportDefinition.parameters",
-        "ReportDefinition.requiredPermission",
         "ReportDefinition.maxDateRangeDays",
-        "ReportDefinition.id",
         "ReportDefinition.isSystem"
        ],
        "operation": "listReports",
@@ -573,15 +537,8 @@
        "label": "Every conversation",
        "bindsTo": "Conversation",
        "columns": [
-        "Conversation.id",
-        "Conversation.telephony",
-        "Conversation.assistSessionId",
         "Conversation.channel",
         "Conversation.state",
-        "Conversation.subjectId",
-        "Conversation.venueId",
-        "Conversation.assignedPrincipalId",
-        "Conversation.queueId",
         "Conversation.queuePosition",
         "Conversation.estimatedWaitSeconds",
         "Conversation.handoverReason"
@@ -606,15 +563,7 @@
         "ReportDefinition.dataSource",
         "ReportDefinition.columns",
         "ReportDefinition.filters",
-        "ReportDefinition.groupBy",
-        "ReportDefinition.parameters",
-        "ReportDefinition.requiredPermission",
-        "ReportDefinition.maxDateRangeDays",
-        "ReportDefinition.id",
-        "ReportDefinition.isSystem",
-        "ReportDefinition.isRetired",
         "ReportDefinition.estimatedCost",
-        "ReportDefinition.createdByPrincipalId",
         "ReportDefinition.lastRunAt"
        ],
        "operation": "getReport",
@@ -809,7 +758,7 @@
    "error": "Could not load. Names which read failed and leaves the agent performance sla untouched.",
    "emptyFirstRun": "No agent performance sla yet. Offers Create report (`createReport`); distinct from a filter that matched nothing.",
    "emptyNoResults": "Nothing matches the filter on category, search and the agent performance sla are still there. Names the active filter and offers to clear it.",
-   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires, and names that permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+   "emptyNoAccess": "Shown when the caller lacks `REPORT_VIEW_VENUE`, which `getFinancialReport` requires to show this screen, and names that permission (the screen's other reads need `CASE_VIEW` and say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question. A caller who can see the screen but lacks what an action needs sees that action disabled, naming its permission: `REPORT_MANAGE` for `createReport`, `deleteReport`, `saveNaturalLanguageQuery`, `updateReport`."
   },
   "apis": [
    {
@@ -892,11 +841,15 @@
    "params": [
     {
      "name": "conversationId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listConversations` and the user picks one; an edge that holds one may still carry it to open on that record."
     },
     {
      "name": "reportId",
-     "from": "deepLink"
+     "from": "deepLink",
+     "optional": true,
+     "notes": "Optional (3 October 2026, CHG-SPF-004): opened without it, the screen lists them with `listReports` and the user picks one; an edge that holds one may still carry it to open on that record."
     }
    ],
    "coldEntry": "A conversation link an agent opens from a notification. Resolves, or says it was closed and by whom.",
@@ -913,7 +866,7 @@
    "provenance": "generated",
    "board": "wireframes/P12 Venue Support.dc.html#sup-008"
   },
-  "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002): at most five on a phone or handheld, plumbing and foreign ids left to the record itself.",
   "_platform": {
    "code": "P12",
    "audience": "staff",

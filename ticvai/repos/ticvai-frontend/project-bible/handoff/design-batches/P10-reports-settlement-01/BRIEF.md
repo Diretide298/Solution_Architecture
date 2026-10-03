@@ -126,9 +126,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `PTR-014` | Settlement & Payment History | B–D | 12 | 39 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `PTR-017` | Commission Statement | B–D | 2 | 36 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
-| `PTR-018` | Reports & Sales Performance | B–D | 76 | 35 | 6 | 93 | 0 | 0 | — | notStarted (generated) |
+| `PTR-014` | Settlement & Payment History | C | 12 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `PTR-017` | Commission Statement | B | 2 | 22 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
+| `PTR-018` | Reports & Sales Performance | D | 76 | 20 | 6 | 93 | 0 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings
 

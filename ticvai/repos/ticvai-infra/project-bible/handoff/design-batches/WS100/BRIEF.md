@@ -96,16 +96,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-389` | Commercial Rules Engine Overview | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-390` | VSI Model Builder | B–D | 10 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-391` | VSI Scoring & Tier Threshold Configuration | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-392` | Subscription Tier Configuration | B–D | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
-| `ADM-393` | Tier Included Allowances | B–D | 9 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-394` | Commercial & Licensing Model Configuration | B–D | 23 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-395` | Billable Unit, Minimum Guarantee & Enforcement Rules | B–D | 17 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-396` | Overage Pricing & Capacity Packs | B–D | 11 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-397` | Commercial Model & Rule Simulation | B–D | 0 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-398` | Rule Versioning, Approval & Publication | B–D | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
+| `ADM-389` | Commercial Rules Engine Overview | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `ADM-390` | VSI Model Builder | B | 10 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-391` | VSI Scoring & Tier Threshold Configuration | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-392` | Subscription Tier Configuration | B | 0 | 0 | 6 | 2 | 1 | 0 | — | notStarted (—) |
+| `ADM-393` | Tier Included Allowances | B | 9 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-394` | Commercial & Licensing Model Configuration | B | 23 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-395` | Billable Unit, Minimum Guarantee & Enforcement Rules | B | 17 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-396` | Overage Pricing & Capacity Packs | B | 11 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-397` | Commercial Model & Rule Simulation | B | 0 | 16 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-398` | Rule Versioning, Approval & Publication | B | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

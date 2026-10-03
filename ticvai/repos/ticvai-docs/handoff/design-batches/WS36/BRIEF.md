@@ -142,7 +142,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-072` | Fee Applicability & Charging Rule Builder | B–D | 5 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-073` | Fee Waiver, Tax Exemption & Exception Rules | B–D | 11 | 0 | 5 | 0 | 1 | 4 | — | notStarted (generated) |
 | `ADM-074` | Price Calculation Sequence & Formula Engine | B–D | 25 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-075` | Currency Precision, Rounding & Monetary Rules | A | 11 | 2 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `ADM-075` | Currency Precision, Rounding & Monetary Rules | B | 11 | 2 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
 | `ADM-076` | Price Breakdown, Calculation Simulation & Explainability | B–D | 13 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-077` | Calculation Validation, Reconciliation & Service Interface | A | 0 | 0 | 6 | 1 | 0 | 6 | — | notStarted (generated) |
 

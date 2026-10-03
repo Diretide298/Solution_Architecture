@@ -128,7 +128,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-734` | CRM Command Center | B–D | 1 | 0 | 6 | 1 | 1 | 0 | — | notStarted (—) |
-| `BO-735` | Guest Directory | B–D | 13 | 21 | 6 | 16 | 1 | 0 | — | notStarted (—) |
+| `BO-735` | Guest Directory | B–D | 13 | 18 | 6 | 16 | 1 | 0 | — | notStarted (—) |
 | `BO-736` | Guest Master Configuration | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-737` | Customer 360 Profile | B–D | 0 | 70 | 6 | 12 | 3 | 0 | — | notStarted (—) |
 | `BO-738` | Activity Timeline | B–D | 0 | 11 | 6 | 3 | 0 | 0 | — | notStarted (—) |

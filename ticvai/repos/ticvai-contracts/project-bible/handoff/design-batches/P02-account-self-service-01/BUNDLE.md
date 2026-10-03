@@ -206,15 +206,15 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-012` | My Tickets | A | 7 | 45 | 6 | 7 | 10 | 0 | guest | notStarted (client-verified) |
-| `GST-013` | Ticket Details | A | 10 | 31 | 5 | 7 | 16 | 0 | guest | notStarted (client-verified) |
-| `GST-018` | Add to Calendar / Reminders | A | 5 | 14 | 6 | 4 | 1 | 0 | guest | notStarted (client-verified) |
-| `GST-019` | Order History | A | 11 | 79 | 6 | 6 | 0 | 0 | guest | notStarted (designed) |
+| `GST-012` | My Tickets | A | 7 | 28 | 6 | 7 | 10 | 0 | guest | notStarted (client-verified) |
+| `GST-013` | Ticket Details | A | 10 | 20 | 5 | 7 | 16 | 0 | guest | notStarted (client-verified) |
+| `GST-018` | Add to Calendar / Reminders | A | 5 | 9 | 6 | 4 | 1 | 0 | guest | notStarted (client-verified) |
+| `GST-019` | Order History | A | 11 | 69 | 6 | 6 | 0 | 0 | guest | notStarted (designed) |
 | `GST-020` | Saved Items / Wishlist | A | 0 | 15 | 4 | 1 | 1 | 0 | guest | notStarted (client-verified) |
 | `GST-039` | Profile | A | 9 | 47 | 5 | 14 | 1 | 0 | guest | notStarted (designed) |
-| `GST-042` | Simple Registration & OTP | A | 35 | 6 | 6 | 13 | 8 | 0 | guest | notStarted (designed) |
+| `GST-042` | Simple Registration & OTP | A | 35 | 5 | 6 | 13 | 8 | 0 | guest | notStarted (designed) |
 | `GST-045` | Ticket Delivery & Sharing | A | 7 | 12 | 5 | 5 | 3 | 0 | guest | notStarted (client-verified) |
-| `GST-055` | Dynamic QR Ticket | A | 5 | 38 | 5 | 2 | 10 | 0 | guest | notStarted (client-verified) |
+| `GST-055` | Dynamic QR Ticket | A | 5 | 19 | 5 | 2 | 10 | 0 | guest | notStarted (client-verified) |
 | `GST-066` | Privacy & My Data | A | 3 | 12 | 6 | 23 | 2 | 4 | guest | notStarted (designed) |
 
 ---
@@ -231,7 +231,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Account & Self-Service · wave 1 · needs the `access` module |
-| Block | Block A · ticket #17972 (APP-MOB-GST-012) |
+| Block | Block A · task APP-MOB-GST-012 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listMyEntitlements` reads the population and `getEntitlement` reads one of them — list, select, act |
@@ -289,12 +289,9 @@ Errors to draw in the form: 409 Ticket already redeemed (`alreadyRedeemed`), alr
 
 | Shows | Format | Notes |
 |---|---|---|
-| Product | the name it points at, never the id | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | Resolved at issue from the template, then owned here. A freeze extends it, a reissue replaces it, and neither reaches back to the template. |
 | Lifecycle label | chip: Created, Pending fulfillment, Active, Partially used, Used, Expired… | The Virtual Ticket status in the client's 13 names, mapped onto the entitlement model (decided 2 October 2026, Chinmay, critical set 2 … |
-| Entries used | 1,234 | The number `validateAccess` decrements and nothing was decrementing. A ten-entry pass with no counter is a ten-entry pass that admits … |
-| Entries allowed | 1,234 | — |
 | Holder name | text | — |
 
 **Entitlement history** (data table, from `getEntitlementHistory`): Shows `at`, `kind`, `accessPointName`, `denyReason`, `byPrincipalName` from `getEntitlementHistory`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.
@@ -311,33 +308,19 @@ Errors to draw in the form: 409 Ticket already redeemed (`alreadyRedeemed`), alr
 
 | Shows | Format | Notes |
 |---|---|---|
-| Product | the name it points at, never the id | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
 | Valid to | 1 Oct 2026, 14:30 | Resolved at issue from the template, then owned here. A freeze extends it, a reissue replaces it, and neither reaches back to the template. |
 | Lifecycle label | chip: Created, Pending fulfillment, Active, Partially used, Used, Expired… | The Virtual Ticket status in the client's 13 names, mapped onto the entitlement model (decided 2 October 2026, Chinmay, critical set 2 … |
-| Entries used | 1,234 | The number `validateAccess` decrements and nothing was decrementing. A ten-entry pass with no counter is a ten-entry pass that admits … |
-| Entries allowed | 1,234 | — |
 | Holder name | text | — |
 
 **The selected entitlement** (detail panel, from `getEntitlement`)
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | A UUIDv7, matching `TicketStatus.ticketId` — stable for the life of the ticket and independent of the media carrying it. |
-| Template | the name it points at, never the id | The definition it was issued against. Pinned at issue — a template edited next month must not change what this guest bought. |
-| Product | the name it points at, never the id | — |
-| Order | the name it points at, never the id | The order's id, a UUIDv7 as in `/orders/{orderId}` (`orders.sales_order.id`). |
-| Order line | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | Who holds it. Null is legitimate — a ticket bought as a gift or sold at a till to somebody who gave no details has no subject until it is … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
 | Media code | text | What is scanned — a QR payload, a wristband serial, a card number. Rotatable without reissuing, because a guest whose wristband broke … |
 | Status | chip: Issued, Partially consumed, Fully consumed, Expired, Cancelled, Surrendered | What the storage layer holds, and what a guest is shown. `MediaEntitlements` carried only `isValid` and a reason string — a boolean cannot … |
 | Status note | text | Not `TicketStatus` — that is a validation result with a misleading name, computed at scan time and carrying `isValid` and `isInsideVenue`. |
 | Valid from | 1 Oct 2026, 14:30 | — |
-| Valid to | 1 Oct 2026, 14:30 | Resolved at issue from the template, then owned here. A freeze extends it, a reissue replaces it, and neither reaches back to the template. |
-| Entries used | 1,234 | The number `validateAccess` decrements and nothing was decrementing. A ten-entry pass with no counter is a ten-entry pass that admits … |
-| Entries allowed | 1,234 | — |
 | Last entry at | 1 Oct 2026, 14:30 | `recordedAt` of the latest admission counted in `entriesUsed`, written by the same writes. |
 
 **Entitlement credential** (detail panel, from `getEntitlementCredential`): Shows `mediaCode`, `payload`, `expiresAt` from `getEntitlementCredential`'s inline response. **The response has no named schema**, so this cannot bind until the contract names one.
@@ -349,7 +332,7 @@ Errors to draw in the form: 409 Ticket already redeemed (`alreadyRedeemed`), alr
 | Expires at | 1 Oct 2026, 14:30 | — |
 | Rotation | grouped details | The time-based seed the rotating code is derived from (audit R230). Null for a credential that does not rotate (a wristband serial, a … |
 | Secret | text | Base32 shared secret. Held on the device and in the gates' offline package; replaced by `rotate=true`. |
-| Time step seconds | 1,234 | — |
+| Time step seconds | 1,234 | 30 seconds for an admission QR (Chinmay, 3 October 2026, Block A business rules: GST-055's admission QR rotates every 30 seconds … |
 | Digits | 1,234 | — |
 | Algorithm | chip: SHA1, SHA256, SHA512 | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
@@ -483,7 +466,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (7), with its required mark, default, format and its error state (404, 409).
-- [ ] Every output is drawn (45 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (28 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-012?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Transfer order tickets.
 - [ ] Every transition is wired: `GST-001`, `GST-013`.
@@ -503,7 +486,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Account & Self-Service · wave 1 · needs the `access` module |
-| Block | Block A · ticket #17973 (APP-MOB-GST-013) |
+| Block | Block A · task APP-MOB-GST-013 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): `getEntitlement` reads one record and nothing reads a population — the screen is about that one thing |
@@ -567,21 +550,10 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | A UUIDv7, matching `TicketStatus.ticketId` — stable for the life of the ticket and independent of the media carrying it. |
-| Template | the name it points at, never the id | The definition it was issued against. Pinned at issue — a template edited next month must not change what this guest bought. |
-| Product | the name it points at, never the id | — |
-| Order | the name it points at, never the id | The order's id, a UUIDv7 as in `/orders/{orderId}` (`orders.sales_order.id`). |
-| Order line | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | Who holds it. Null is legitimate — a ticket bought as a gift or sold at a till to somebody who gave no details has no subject until it is … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
 | Media code | text | What is scanned — a QR payload, a wristband serial, a card number. Rotatable without reissuing, because a guest whose wristband broke … |
 | Status | chip: Issued, Partially consumed, Fully consumed, Expired, Cancelled, Surrendered | What the storage layer holds, and what a guest is shown. `MediaEntitlements` carried only `isValid` and a reason string — a boolean cannot … |
 | Status note | text | Not `TicketStatus` — that is a validation result with a misleading name, computed at scan time and carrying `isValid` and `isInsideVenue`. |
 | Valid from | 1 Oct 2026, 14:30 | — |
-| Valid to | 1 Oct 2026, 14:30 | Resolved at issue from the template, then owned here. A freeze extends it, a reissue replaces it, and neither reaches back to the template. |
-| Entries used | 1,234 | The number `validateAccess` decrements and nothing was decrementing. A ten-entry pass with no counter is a ten-entry pass that admits … |
-| Entries allowed | 1,234 | — |
 | Last entry at | 1 Oct 2026, 14:30 | `recordedAt` of the latest admission counted in `entriesUsed`, written by the same writes. |
 
 **Show code** (detail panel, from `getEntitlementCredential`): The primary act on a ticket: the code, full screen and bright (F50 step 5). Transfer is secondary.
@@ -593,7 +565,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Expires at | 1 Oct 2026, 14:30 | — |
 | Rotation | grouped details | The time-based seed the rotating code is derived from (audit R230). Null for a credential that does not rotate (a wristband serial, a … |
 | Secret | text | Base32 shared secret. Held on the device and in the gates' offline package; replaced by `rotate=true`. |
-| Time step seconds | 1,234 | — |
+| Time step seconds | 1,234 | 30 seconds for an admission QR (Chinmay, 3 October 2026, Block A business rules: GST-055's admission QR rotates every 30 seconds … |
 | Digits | 1,234 | — |
 | Algorithm | chip: SHA1, SHA256, SHA512 | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
@@ -747,7 +719,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (10), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (31 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (20 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-013?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Transfer order tickets, Bind credential device.
 - [ ] Every transition is wired: `GST-001`, `GST-055`.
@@ -766,8 +738,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Account & Self-Service · wave 3 · needs the `ticketing` module |
-| Block | Block A · ticket #18212 (APP-MOB-GST-018) |
+| Module | Account & Self-Service · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-MOB-GST-018 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listOrders` reads the population and `getOrder` reads one of them — list, select, act |
@@ -828,15 +800,10 @@ Errors to draw in the form: 400 Validation failed; 404 The resource does not exi
 | Shows | Format | Notes |
 |---|---|---|
 | Order number | text | The number a guest reads and a cashier types. Server-assigned: the venue prefix and a sequence per venue, for example `DXB1-000123` … |
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for … |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
-| Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
 | Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Net amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Lines | list or chips (count when long) | — |
-| Payments | list or chips (count when long) | — |
 
 **Actions and what each produces**
 
@@ -933,7 +900,7 @@ Also set there, as content the tenant writes: social links: platform.
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (5), with its required mark, default, format and its error state (400, 404, 409, 412).
-- [ ] Every output is drawn (14 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (9 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-018?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Issue wallet pass, Download order calendar event, Save visit reminder.
 - [ ] Every transition is wired: `GST-001`.
@@ -951,8 +918,8 @@ Also set there, as content the tenant writes: social links: platform.
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Account & Self-Service · wave 2 · needs the `ticketing` module |
-| Block | Block A · ticket #18142 (APP-MOB-GST-019) |
+| Module | Account & Self-Service · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-MOB-GST-019 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listOrders` reads the population and `getOrder` reads one of them — list, select, act |
@@ -993,7 +960,6 @@ Answered questions: draw the decision, not the old default. Where a decision and
 | Legal entity | picker: choose a legal entity | — | — | `listCreditMemos` ?legalEntityId |
 | Issued from | date picker | — | — | `listCreditMemos` ?issuedFrom |
 | Issued to | date picker | — | — | `listCreditMemos` ?issuedTo |
-| Language | text field | — | pattern `^[a-z]{2}(-[A-Z]{2})?$` | `getTaxDocumentRendition` ?language |
 
 **Form: Get a tax invoice** (modal, opened by *Get a tax invoice*; *Get a tax invoice* calls `issueTaxInvoice`, *Cancel* sends nothing)
 
@@ -1032,8 +998,6 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
 | Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Lines | list or chips (count when long) | — |
-| Created at | 1 Oct 2026, 14:30 | — |
 
 **Tax invoices** (card list, from `listTaxInvoices`): The VAT receipt (simplified tax invoice) and any full tax invoice for the order, with its number.
 
@@ -1115,18 +1079,10 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 | Shows | Format | Notes |
 |---|---|---|
 | Order number | text | The number a guest reads and a cashier types. Server-assigned: the venue prefix and a sequence per venue, for example `DXB1-000123` … |
-| Channel | chip: POS, Kiosk, Guest app, Guest web, Call centre, Partner… | Where it came from. Drives revenue attribution, promotion eligibility and the self-service adoption figures the operator will ask for … |
 | Status | chip: Pending, Held, Paid, Partially paid, Completed, Voided… | `held` is a parked sale — the cashier freed the till and the guest will return. It holds no inventory and expires, because a till that … |
 | Currency | text | Resolved from the region, not stored (ADR-0018, 24 August). Region-scoped and not overri dable below, so a row in a UAE region is AED and … |
-| Gross amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Tax amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Net amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
-| Refunded amount | AED 1,234.50 | On the wire this is three fields; in the database it is one column. 24 August. |
 | Lines | list or chips (count when long) | — |
 | Payments | list or chips (count when long) | — |
-| Charge currency | text | The currency the guest selected and is charged in (CHG-FIN-001, 2 October 2026). |
-| Charge total | AED 1,234.50 | `grossAmount` converted at `chargeFxRate` and rounded to the charge currency's scale: what the guest pays and what the payment request to … |
-| Charge FX rate | text | Units of `chargeCurrency` per one unit of the base currency, from the region's `tender` rate in force at checkout (`finance.FxRate`) … |
 
 **Actions and what each produces**
 
@@ -1149,7 +1105,7 @@ Errors to draw in the form: 404 The resource does not exist, or is outside the c
 - **Transfer tickets**: Opens the transfer form for this order's tickets (recipient, optional message). *(source: screens/P02-guest-mobile-app.yaml#GST-019)*
 - **Ask for a refund**: Hands the order to GST-067. *(source: screens/P02-guest-mobile-app.yaml#GST-019)*
 
-**Data it reads**: `listMyOrders` (onLoad, The orders this guest placed); `listTaxInvoices` (onLoad, List tax invoices); `getTaxInvoice` (onLoad, Show a tax invoice); `listCreditMemos` (onLoad, List credit memos); `getTaxDocumentRendition` (onLoad, Download the invoice / credit memo PDF)
+**Data it reads**: `listMyOrders` (onLoad, The orders this guest placed); `listTaxInvoices` (onLoad, List tax invoices); `getTaxInvoice` (onLoad, Show a tax invoice); `listCreditMemos` (onLoad, List credit memos)
 
 **Where the user goes next**
 
@@ -1250,7 +1206,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (11), with its required mark, default, format and its error state (404, 409, 422).
-- [ ] Every output is drawn (79 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (69 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-019?state=<state>`: loading, error, emptyFirstRun, emptyNoResults, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Download or email the PDF, Get a tax invoice.
 - [ ] Every transition is wired: `GST-001`, `GST-067`.
@@ -1270,8 +1226,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Account & Self-Service · wave 3 · needs the `marketing` module |
-| Block | Block A · ticket #18219 (APP-MOB-GST-020) |
+| Module | Account & Self-Service · wave 1 · needs the `marketing` module |
+| Block | Block A · task APP-MOB-GST-020 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): `getWishlist` reads one record and nothing reads a population — the screen is about that one thing |
@@ -1436,7 +1392,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Account & Self-Service · wave 1 · needs the `marketing` module |
-| Block | Block A · ticket #17974 (APP-MOB-GST-039) |
+| Block | Block A · task APP-MOB-GST-039 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | configEditor (comfortable density): the screen declares only writes (`recordConsent`) and no read of a population — it is settings, not a list |
@@ -1683,7 +1639,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Account & Self-Service · wave 1 · needs the `core` module |
-| Block | Block A · ticket #17975 (APP-MOB-GST-042) |
+| Block | Block A · task APP-MOB-GST-042 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | form (comfortable density): **A sign-in form, not a list.** Four ways in (a one-time code, a password, Apple or Google, UAE Pass) and a way to register; `getGuestSession` is the one piece of context. Rebuilt 28 September: the … |
@@ -1808,7 +1764,6 @@ Errors to draw in the form: 403 Contact detail on the order does not match the v
 
 | Shows | Format | Notes |
 |---|---|---|
-| Subject | the name it points at, never the id | — |
 | Display name | text | — |
 | Is verified | yes / no (icon or chip) | False until an OTP or a verified provider identity confirms ownership. An unverified account may browse and fill a cart but not transact … |
 | Identity providers | list or chips (count when long) | Linked providers. Several may resolve to one account. |
@@ -1974,7 +1929,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (35), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (6 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (5 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-042?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, signInRefused, offline.
 - [ ] Every action is wired with its success and its failure: Send me a code, Sign in with the code, Sign in with password, Continue with Apple or Google, Continue with UAE Pass, Create an account, Sign out, Link an order I placed as a guest.
 - [ ] Every transition is wired: `GST-001`, `GST-041`, `WEB-016`.
@@ -1993,8 +1948,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Account & Self-Service · wave 2 · needs the `ticketing` module |
-| Block | Block A · ticket #18143 (APP-MOB-GST-045) |
+| Module | Account & Self-Service · wave 1 · needs the `ticketing` module |
+| Block | Block A · task APP-MOB-GST-045 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | configEditor (comfortable density): the screen declares only writes (`transferOrderTickets`) and no read of a population — it is settings, not a list |
@@ -2152,7 +2107,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Account & Self-Service · wave 1 · needs the `ticketing` module |
-| Block | Block A · ticket #17976 (APP-MOB-GST-055) |
+| Block | Block A · task APP-MOB-GST-055 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | credentialView (comfortable density): A code the holder presents at a gate: rendered to be scanned, bright and full screen (CHG-SGU-021) |
@@ -2210,20 +2165,12 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | A UUIDv7, matching `TicketStatus.ticketId` — stable for the life of the ticket and independent of the media carrying it. |
-| Template | the name it points at, never the id | The definition it was issued against. Pinned at issue — a template edited next month must not change what this guest bought. |
-| Product | the name it points at, never the id | — |
-| Order | the name it points at, never the id | The order's id, a UUIDv7 as in `/orders/{orderId}` (`orders.sales_order.id`). |
-| Order line | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | Who holds it. Null is legitimate — a ticket bought as a gift or sold at a till to somebody who gave no details has no subject until it is … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
 | Media code | text | What is scanned — a QR payload, a wristband serial, a card number. Rotatable without reissuing, because a guest whose wristband broke … |
 | Status | chip: Issued, Partially consumed, Fully consumed, Expired, Cancelled, Surrendered | What the storage layer holds, and what a guest is shown. `MediaEntitlements` carried only `isValid` and a reason string — a boolean cannot … |
 | Status note | text | Not `TicketStatus` — that is a validation result with a misleading name, computed at scan time and carrying `isValid` and `isInsideVenue`. |
 | Valid from | 1 Oct 2026, 14:30 | — |
 
-**Your code** (credential display, from `getEntitlementCredential`): **The code rotates every 30 seconds by default, the venue's setting** (decided by Chinmay, 2 October 2026; DEC-136; `DynamicQrSecurityProfile.refreshIntervalSeconds`: 15, 30, 45, 60 or a custom value of at least 5 seconds, matching BO-165). A countdown shows the seconds to the next code; the seed's time step is that one setting, never a value of its own (CHG-SGU-003).
+**Your code** (credential display, from `getEntitlementCredential`): **The code rotates every 30 seconds by default, the venue's setting** (decided by Chinmay, 2 October 2026; DEC-136; `DynamicQrSecurityProfile.refreshIntervalSeconds`: 15, 30, 45, 60 or a custom value of at least 5 seconds, matching BO-165). A countdown shows the seconds to the next code; the seed's time step is that one setting, never a value of its own (CHG-SGU-003). **Every 30 seconds** …
 
 | Shows | Format | Notes |
 |---|---|---|
@@ -2232,7 +2179,7 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 | Expires at | 1 Oct 2026, 14:30 | — |
 | Rotation | grouped details | The time-based seed the rotating code is derived from (audit R230). Null for a credential that does not rotate (a wristband serial, a … |
 | Secret | text | Base32 shared secret. Held on the device and in the gates' offline package; replaced by `rotate=true`. |
-| Time step seconds | 1,234 | — |
+| Time step seconds | 1,234 | 30 seconds for an admission QR (Chinmay, 3 October 2026, Block A business rules: GST-055's admission QR rotates every 30 seconds … |
 | Digits | 1,234 | — |
 | Algorithm | chip: SHA1, SHA256, SHA512 | — |
 | Valid from | 1 Oct 2026, 14:30 | — |
@@ -2242,21 +2189,10 @@ Errors to draw in the form: 400 Validation failed; 403 Authenticated but not per
 
 | Shows | Format | Notes |
 |---|---|---|
-| ID | the name it points at, never the id | A UUIDv7, matching `TicketStatus.ticketId` — stable for the life of the ticket and independent of the media carrying it. |
-| Template | the name it points at, never the id | The definition it was issued against. Pinned at issue — a template edited next month must not change what this guest bought. |
-| Product | the name it points at, never the id | — |
-| Order | the name it points at, never the id | The order's id, a UUIDv7 as in `/orders/{orderId}` (`orders.sales_order.id`). |
-| Order line | the name it points at, never the id | — |
-| Subject | the name it points at, never the id | Who holds it. Null is legitimate — a ticket bought as a gift or sold at a till to somebody who gave no details has no subject until it is … |
-| Venue | the name it points at, never the id | — |
-| Scope path | text | — |
 | Media code | text | What is scanned — a QR payload, a wristband serial, a card number. Rotatable without reissuing, because a guest whose wristband broke … |
 | Status | chip: Issued, Partially consumed, Fully consumed, Expired, Cancelled, Surrendered | What the storage layer holds, and what a guest is shown. `MediaEntitlements` carried only `isValid` and a reason string — a boolean cannot … |
 | Status note | text | Not `TicketStatus` — that is a validation result with a misleading name, computed at scan time and carrying `isValid` and `isInsideVenue`. |
 | Valid from | 1 Oct 2026, 14:30 | — |
-| Valid to | 1 Oct 2026, 14:30 | Resolved at issue from the template, then owned here. A freeze extends it, a reissue replaces it, and neither reaches back to the template. |
-| Entries used | 1,234 | The number `validateAccess` decrements and nothing was decrementing. A ten-entry pass with no counter is a ten-entry pass that admits … |
-| Entries allowed | 1,234 | — |
 | Last entry at | 1 Oct 2026, 14:30 | `recordedAt` of the latest admission counted in `entriesUsed`, written by the same writes. |
 
 **Actions and what each produces**
@@ -2371,7 +2307,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 #### Acceptance for the design
 
 - [ ] Every input above is drawn (5), with its required mark, default, format and its error state (400, 403, 404, 409).
-- [ ] Every output is drawn (38 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
+- [ ] Every output is drawn (19 fields) with realistic seeded data in the format given (AED, dates, names, never ids).
 - [ ] Every state opens from `#GST-055?state=<state>`: loading, error, emptyFirstRun, emptyNoAccess, offline.
 - [ ] Every action is wired with its success and its failure: Bind credential device.
 - [ ] Every transition is wired: `GST-001`.
@@ -2391,8 +2327,8 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 | | |
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
-| Module | Account & Self-Service · wave 2 · needs the `core` module |
-| Block | Block A · ticket #18175 (APP-MOB-GST-066) |
+| Module | Account & Self-Service · wave 1 · needs the `core` module |
+| Block | Block A · task APP-MOB-GST-066 |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | statusTracker (comfortable density): `getGuestConsents` reads one record and nothing reads a population — the screen is about that one thing |
@@ -2625,8 +2561,8 @@ Also set there, as content the tenant writes: theme, buttons, links.
 - Wireframe frame: `wireframes/P02 Guest App.dc.html#gst-066` · status **notStarted** · provenance designed · **Drawn by Claude Code on 30 September 2026 in the Mobile App v4 look; not client-verified, awaiting the client's design reviewer.** `provenance: designed` because the accepted vocabulary has no …
 - Prototype (Mobile App v4, 29 September 2026, verified —, match none): `sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html`, view **
 - Drawn by: Claude Code, 30 September 2026, drawn in the Mobile App v4 look
-- ADR-0033 *Every asynchronous handoff has an outbox and a place to fail* (`docs/adr/0033-outbox-and-dead-letters.md`)
 - ADR-0025 *— One field says who may call an operation* (`docs/adr/0025-one-audience-field.md`)
+- ADR-0033 *Every asynchronous handoff has an outbox and a place to fail* (`docs/adr/0033-outbox-and-dead-letters.md`)
 - ADR-0030 *A deep link is a pointer, not authorisation* (`docs/adr/0030-deep-link-cold-entry.md`)
 - ADR-0010 *Cross-Jurisdiction Entitlements* (`docs/adr/0010-cross-jurisdiction-entitlements.md`)
 - ADR-0023 *— Personal data lives apart from the append-only ledger* (`docs/adr/0023-pii-separation.md`)

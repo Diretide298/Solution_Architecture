@@ -52,13 +52,13 @@ servicesCalled:
   operationCalls: 51
 - service: IdentityService
   operationCalls: 27
-- service: WhiteLabelService
+- service: FnbService
   operationCalls: 22
+- service: WhiteLabelService
+  operationCalls: 21
 - service: AccessService
   operationCalls: 20
 - service: AiService
-  operationCalls: 20
-- service: FnbService
   operationCalls: 20
 - service: WalletService
   operationCalls: 8
@@ -85,7 +85,6 @@ screens:
   - getMyProfile
   - getPublishedTenantConfig
   - getTenantAppStatus
-  - listAnalyticsProviders
   - listMyEntitlements
   - listProductCategories
   - listProducts
@@ -300,6 +299,7 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-006
   boardFrames:
   - Guest Mobile Board 1.dc.html#gm-1b
   wireframe: wireframes/P02 Guest App.dc.html#gst-005
@@ -437,6 +437,7 @@ screens:
   - GST-001
   - GST-002
   - GST-010
+  - GST-028
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-009
   inFlows:
@@ -471,7 +472,7 @@ screens:
   name: Wallet Overview
   module: Membership, Loyalty & Value
   requiresModule: retail
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - getGameCard
@@ -570,7 +571,7 @@ screens:
   name: Ticket Transfer
   module: Ticketing
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - claimTicketTransfer
@@ -599,7 +600,7 @@ screens:
   name: Memberships
   module: Membership, Loyalty & Value
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - createInstalmentPlan
@@ -636,7 +637,7 @@ screens:
   name: My Reservations
   module: Ticketing
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - cancelReservation
@@ -665,7 +666,7 @@ screens:
   name: Reservation Details
   module: Ticketing
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - cancelReservation
@@ -691,7 +692,7 @@ screens:
   name: Add to Calendar / Reminders
   module: Account & Self-Service
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   density: comfortable
   operations:
   - getOrder
@@ -719,7 +720,7 @@ screens:
   name: Order History
   module: Account & Self-Service
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - getOrder
@@ -753,7 +754,7 @@ screens:
   name: Saved Items / Wishlist
   module: Account & Self-Service
   requiresModule: marketing
-  wave: 3
+  wave: 1
   density: comfortable
   operations:
   - addToWishlist
@@ -779,7 +780,7 @@ screens:
   name: Interactive Map
   module: In-venue Services
   requiresModule: seating
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - getVenueMap
@@ -813,7 +814,7 @@ screens:
   name: Attraction Wait Times
   module: In-venue Services
   requiresModule: queue
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - getWaitTimes
@@ -838,7 +839,7 @@ screens:
   name: Virtual Queue
   module: In-venue Services
   requiresModule: queue
-  wave: 3
+  wave: 1
   density: comfortable
   operations:
   - getWaitTimes
@@ -868,7 +869,7 @@ screens:
   name: F&B – Browse & Order
   module: In-venue Services
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - claimLocationSession
@@ -896,6 +897,7 @@ screens:
   - GST-002
   - GST-009
   - GST-025
+  - GST-061
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-024
   inFlows:
@@ -905,7 +907,7 @@ screens:
   name: F&B – Order Tracking
   module: In-venue Services
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - getGuestBill
@@ -933,7 +935,7 @@ screens:
   name: Retail / Merchandise
   module: Retail
   requiresModule: retail
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - addCartLine
@@ -962,7 +964,7 @@ screens:
   name: Parking – Reserve & Pay
   module: In-venue Services
   requiresModule: access
-  wave: 3
+  wave: 1
   density: comfortable
   operations:
   - addCartLine
@@ -983,6 +985,7 @@ screens:
   goesTo:
   - GST-001
   - GST-002
+  - GST-009
   - GST-028
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-027
@@ -992,7 +995,7 @@ screens:
   name: Parking – Reservation Confirmed
   module: In-venue Services
   requiresModule: access
-  wave: 3
+  wave: 1
   density: comfortable
   operations:
   - getOrder
@@ -1019,7 +1022,7 @@ screens:
   name: Venue Info & Services
   module: In-venue Services
   requiresModule: core
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - getTenantAppStatus
@@ -1044,7 +1047,7 @@ screens:
   name: In-Venue Notifications
   module: Engagement & Support
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - listMyNotifications
@@ -1069,7 +1072,7 @@ screens:
   name: AI Concierge – Home
   module: Engagement & Support
   requiresModule: ai
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - createAiConversation
@@ -1079,7 +1082,7 @@ screens:
   - recordAnswerFeedback
   - requestSuggestion
   - sendAiMessage
-  - sendConversationMessage
+  - sendGuestConversationMessage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1102,7 +1105,7 @@ screens:
   name: AI Concierge – Chat
   module: Engagement & Support
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - addCartLine
@@ -1113,7 +1116,7 @@ screens:
   - handoverToAgent
   - recordAnswerFeedback
   - sendAiMessage
-  - sendConversationMessage
+  - sendGuestConversationMessage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1138,7 +1141,7 @@ screens:
   name: AI Concierge – Contextual Help
   module: Engagement & Support
   requiresModule: ai
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - createAiConversation
@@ -1165,7 +1168,7 @@ screens:
   name: Lost & Found
   module: Support
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - listMyCases
@@ -1193,7 +1196,7 @@ screens:
   name: Feedback & Ratings
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   density: comfortable
   operations:
   - getForm
@@ -1219,7 +1222,7 @@ screens:
   name: Loyalty & Rewards
   module: Membership, Loyalty & Value
   requiresModule: marketing
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - createReferral
@@ -1255,7 +1258,7 @@ screens:
   name: Offers & Promotions
   module: Promotions
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - getCouponCode
@@ -1284,7 +1287,7 @@ screens:
   name: At the Venue
   module: In-venue Services
   requiresModule: queue
-  wave: 3
+  wave: 1
   density: comfortable
   operations:
   - getTenantAppStatus
@@ -1350,7 +1353,7 @@ screens:
   name: Help & Support
   module: Engagement & Support
   requiresModule: marketing
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - getTenantAppStatus
@@ -1486,7 +1489,7 @@ screens:
   name: Multi-Currency & Pricing
   module: Ticketing
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - listFxRates
@@ -1510,7 +1513,7 @@ screens:
   name: Ticket Delivery & Sharing
   module: Account & Self-Service
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - transferOrderTickets
@@ -1585,7 +1588,7 @@ screens:
   name: Upsell / Cross-Sell
   module: Booking & Selection
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - addCartLine
@@ -1610,7 +1613,7 @@ screens:
   name: Interactive Seat Selection
   module: Booking & Selection
   requiresModule: seating
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - createSeatHold
@@ -1642,7 +1645,7 @@ screens:
   name: Resource Booking – Cabana
   module: Booking & Selection
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   density: comfortable
   operations:
   - addCartLine
@@ -1829,7 +1832,7 @@ screens:
   name: Bundle Package
   module: Booking & Selection
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - addCartLine
@@ -1856,7 +1859,7 @@ screens:
   name: Accessibility Information
   module: Discovery & Browse
   requiresModule: core
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - listPublishedContentPages
@@ -1880,7 +1883,7 @@ screens:
   name: Resource Availability (Cabana)
   module: Booking & Selection
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   density: comfortable
   operations:
   - getAvailability
@@ -1937,7 +1940,7 @@ screens:
   name: Menu Item Detail
   module: In-Venue Experience
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - getGuestMenu
@@ -1962,7 +1965,7 @@ screens:
   name: Shop & Drop Collection
   module: In-Venue Experience
   requiresModule: retail
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - lookupShopAndDrop
@@ -2008,7 +2011,7 @@ screens:
   name: Newsletter & Preferences
   module: Marketing
   requiresModule: marketing
-  wave: 3
+  wave: 1
   density: comfortable
   operations:
   - getGuestConsents
@@ -2036,7 +2039,7 @@ screens:
   name: Privacy & My Data
   module: Account & Self-Service
   requiresModule: core
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - deleteGuestAccount
@@ -2067,7 +2070,7 @@ screens:
   name: Refunds & Resale
   module: Account & Self-Service
   requiresModule: core
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - createRefundRequest
@@ -2091,7 +2094,7 @@ screens:
   name: Help & My Cases
   module: Engagement & Support
   requiresModule: core
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - listAiConversations
@@ -2107,6 +2110,7 @@ screens:
   offlineState: true
   entryParams:
   - subjectId<-session
+  - caseId<-navigation
   goesTo:
   - GST-039
   boardFrames: null
@@ -2116,7 +2120,7 @@ screens:
   name: Face Pass
   module: Account & Self-Service
   requiresModule: core
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - enrolFacePass
@@ -2144,13 +2148,15 @@ screens:
   name: Reserve a Table
   module: In-venue Services
   requiresModule: fnb
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - addCartLine
   - createTableReservation
   - joinRestaurantWaitlist
   - leaveRestaurantWaitlist
+  - listBookableOutlets
+  - listMyTableReservations
   - updateTableReservation
   states:
   - emptyFirstRun
@@ -2175,7 +2181,7 @@ screens:
   name: Payment Methods
   module: Account & Self-Service
   requiresModule: core
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - getGiftCard
@@ -2204,7 +2210,7 @@ screens:
   name: Share & Group Booking
   module: Booking & Selection
   requiresModule: core
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - getGroupBooking
@@ -2236,7 +2242,7 @@ screens:
   name: Security & Sign-in
   module: Account & Self-Service
   requiresModule: core
-  wave: 2
+  wave: 1
   density: comfortable
   operations:
   - createMfaChallenge
@@ -2272,7 +2278,7 @@ screens:
   name: Map Booking — Cabanas & Spots
   module: Booking & Selection
   requiresModule: resources
-  wave: 3
+  wave: 1
   density: comfortable
   operations:
   - addCartLine
@@ -2309,7 +2315,7 @@ screens:
   name: Book a Space by the Hour
   module: Booking & Selection
   requiresModule: resources
-  wave: 3
+  wave: 1
   density: comfortable
   operations:
   - addCartLine
@@ -2337,7 +2343,7 @@ screens:
   name: Intercity Trip — Route & Schedule
   module: Transport
   requiresModule: transport
-  wave: 3
+  wave: 1
   density: comfortable
   operations:
   - getNextTransportDeparture
@@ -2367,7 +2373,7 @@ screens:
   name: Intercity Trip — Route & Passengers
   module: Transport
   requiresModule: transport
-  wave: 3
+  wave: 1
   density: comfortable
   operations:
   - addCartLine
@@ -2400,7 +2406,7 @@ screens:
   name: Intercity Trip — Multi-trip Passes
   module: Transport
   requiresModule: transport
-  wave: 3
+  wave: 1
   density: comfortable
   operations:
   - addCartLine
@@ -2426,7 +2432,7 @@ screens:
   name: Intercity Trip — Favourite Routes
   module: Transport
   requiresModule: transport
-  wave: 3
+  wave: 1
   density: comfortable
   operations:
   - deleteFavouriteRoute
