@@ -1820,6 +1820,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Posts to the ledger. The entry is the record; there is no undo that is
         not another entry.
   /journal-entries/{entryId}/reject:

@@ -1,0 +1,65 @@
+id: CHG-RUL-020
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: 'The 20 MFA step-up operations declare x-ticvai-step-up-carrier: session; verifyMfaChallenge documents the session
+  carrier; no SU-CARRIER exemption remains.'
+decision:
+  what: 'subscription, access, approvals, finance, identity and orders: x-ticvai-step-up-carrier: session on approveMembershipProductValidation,
+    approvePartnerStatuLifecycle, approveBookingLimitCommercial, setPartnerCapabilityGrants, setPartnerCommissionRules,
+    setPartnerCreditProfile, actOnPartnerSettlementBatch, setBiometricLifecycleRetention, approveManualOverrideSupervisor,
+    replaceCredential, getFaceReenrolmentImages, approveMatrixMultiLevel, approveRoleAuthorityDelegation, approveVersioningGovernance,
+    approveUnifiedDecision, approveJournalEntry, resetPrincipalCredential, endOwnSession, openPlatformStaffGrant, approveRefund.
+    verifyMfaChallenge: a step-up is recorded on the caller''s own session, bound to the action, short-lived and single-use;
+    the operation reads it from the session, the client sends no token; a sessionless call cannot carry one. check-step-up.py:
+    CARRIER_EXEMPT is empty, and a session carrier on a PIN step-up fails.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay, 3 October 2026, took the defaults on the questions the spec-rules report (CHG-RUL-001..018) left open, relayed
+  by the coordinator: ''(3) declare x-ticvai-step-up-carrier: session on the 20 MFA step-up operations and drop those exemptions
+  (document the session carrier where step-up is described)''. Follows CHG-RUL-014.'
+keys_touched:
+  operations:
+  - verifyMfaChallenge
+  - approveMembershipProductValidation
+  - approvePartnerStatuLifecycle
+  - approveBookingLimitCommercial
+  - setPartnerCapabilityGrants
+  - setPartnerCommissionRules
+  - setPartnerCreditProfile
+  - actOnPartnerSettlementBatch
+  - setBiometricLifecycleRetention
+  - approveManualOverrideSupervisor
+  - replaceCredential
+  - getFaceReenrolmentImages
+  - approveMatrixMultiLevel
+  - approveRoleAuthorityDelegation
+  - approveVersioningGovernance
+  - approveUnifiedDecision
+  - approveJournalEntry
+  - resetPrincipalCredential
+  - endOwnSession
+  - openPlatformStaffGrant
+  - approveRefund
+  files:
+  - contracts/satellite/subscription.yaml
+  - contracts/spine/access.yaml
+  - contracts/spine/approvals.yaml
+  - contracts/spine/finance.yaml
+  - contracts/spine/identity.yaml
+  - contracts/spine/orders.yaml
+  - tools/check-step-up.py
+root_class: 'new: contract-rule-vs-screen'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-step-up.py
+status: open
+notes: 'A vendor extension and description only: no request or response field changes, so additive. The stepUpToken verifyMfaChallenge
+  returns stays for r1 clients. Prevention: tools/check-step-up.py rule SU-CARRIER, which fails on the parent commit and
+  passes here. Batch RUL (spec-rules), 3 October 2026.'

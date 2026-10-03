@@ -40,7 +40,6 @@ prevention:
 status: closed
 closed_by_commit: 112ef275
 notes: 'supervisorStepUp is optional in the schema so a client built at r1 still validates, and refused without it (a newly
-  required request field is breaking against r1). 23 step-up operations had no carrier on 3 October and are exempt in the
-  check with their reason: 20 MFA step-ups (how the token reaches the call is not contracted) and closeShift, acceptShiftVariance,
-  withdrawFromDepositBox (the same gap as rejectShiftVariance, not named by the rule). Prevention: tools/check-step-up.py
-  rule SU-CARRIER, which fails on the parent commit 4e2c56c1 and passes here. Batch RUL (spec-rules), 3 October 2026.'
+  required request field is breaking against r1; kept so in the defaults round). The 23 step-up operations first exempted
+  from SU-CARRIER now carry theirs (CHG-RUL-019, CHG-RUL-020); none is exempt. Prevention: tools/check-step-up.py rule SU-CARRIER,
+  which fails on the parent commit 4e2c56c1 and passes here. Batch RUL (spec-rules), 3 October 2026.'

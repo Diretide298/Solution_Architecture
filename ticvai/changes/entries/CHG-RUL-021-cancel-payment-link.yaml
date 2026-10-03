@@ -1,0 +1,38 @@
+id: CHG-RUL-021
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: cancelPaymentLink (ORDER_CREATE) cancels a live payment link, so a new link can be made for the order.
+decision:
+  what: 'orders.yaml: POST /payment-links/{linkId}/cancel, cancelPaymentLink, ORDER_CREATE, staff, venue scope, Idempotency-Key,
+    a required reason; the link moves to cancelled, its token answers 410, a held inventory lease is released as on expiry,
+    the order stays; 409 payment-link-not-live for a paid, expired, superseded or cancelled link. createPaymentLink names
+    it as the cancel its rule relies on.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay, 3 October 2026, took the defaults on the questions the spec-rules report (CHG-RUL-001..018) left open, relayed
+  by the coordinator: ''(4) add cancelPaymentLink under ORDER_CREATE (follow the new-operation gates)''. CHG-RUL-005 makes
+  a new link only after the old one expires or is cancelled, and nothing could cancel one.'
+keys_touched:
+  operations:
+  - cancelPaymentLink
+  - createPaymentLink
+  screens:
+  - ADM-592
+  - ADM-593
+  files:
+  - contracts/spine/orders.yaml
+root_class: 'new: contract-rule-vs-screen'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-business-rules.py
+status: open
+notes: 'New-operation gates: ORDER_CREATE is in the vocabulary; no config noun (an action on one link); not a list, so no
+  paging. No screen binds it yet (ADM-592 or ADM-593, screens agent). Prevention: tools/check-business-rules.py rule BR-PAY-LINK,
+  which fails on the parent commit and passes here. Batch RUL (spec-rules), 3 October 2026.'

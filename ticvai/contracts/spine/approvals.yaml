@@ -1634,6 +1634,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Changes what needs approving at all, so it sits above every threshold beneath
         it.
   /role-authority-delegation:
@@ -1694,6 +1695,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Grants authority. **The approval that creates approvers** — the one place the
         permission chain widens.
   /sla-escalation-reminder:
@@ -1920,6 +1922,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Publishes a governed version. What everyone downstream then treats as current.
   /workflow:
     get:
@@ -2058,6 +2061,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Decides across modules in one act, so its blast radius is every module it touches.
   /workflow-instance-process:
     get:

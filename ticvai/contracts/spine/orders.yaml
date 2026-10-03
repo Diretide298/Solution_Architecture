@@ -850,6 +850,77 @@ paths:
                 $ref: '#/components/schemas/PaymentLink'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /payment-links/{linkId}/cancel:
+    parameters:
+    - name: linkId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    post:
+      operationId: cancelPaymentLink
+      x-ticvai-consumed-by: []
+      x-ticvai-agreed: '3 October: Chinmay, defaults taken on the business-rules questions ("add cancelPaymentLink under
+        ORDER_CREATE"); CHG-RUL-021; shape follows resendPaymentLink'
+      summary: Cancel a live payment link
+      description: '**The other way a link stops being live** (Chinmay, 3 October 2026, defaults taken; CHG-RUL-021).
+        `createPaymentLink` makes a new link for an order only once the old one has expired or been cancelled
+        (CHG-RUL-005); this is the cancel. The link moves to `cancelled` and its token stops working at once,
+        answering `410` as a superseded link does, so a guest holding it is told it was withdrawn rather than
+        that it never existed. Where the link holds inventory (`releaseHoldOnExpiry`), cancelling releases the
+        hold as expiry would. The order itself is not cancelled: a new link may be created for it straight
+        after. Only an `issued` or `viewed` link can be cancelled; a paid, expired, superseded or already
+        cancelled one is `409 payment-link-not-live`. Under `ORDER_CREATE`, the permission that created it.
+
+        '
+      tags:
+      - orders
+      x-ticvai-permission: ORDER_CREATE
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - reason
+              properties:
+                reason:
+                  type: string
+                  minLength: 3
+                  maxLength: 500
+                  description: Why the link is withdrawn. Kept in the audit trail; never shown to the guest.
+      responses:
+        '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+          description: Cancelled; the token no longer works
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PaymentLink'
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
+        '409':
+          description: The link is not live (paid, expired, superseded or already cancelled;
+            `payment-link-not-live`; CHG-RUL-021).
+          x-ticvai-problem-types:
+          - payment-link-not-live
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /orders/{orderId}/convert-to-term:
     parameters:
     - name: orderId
@@ -2197,7 +2268,7 @@ paths:
         `expiresAt`), a second create makes no new link and sends nothing: it answers `200` with that link, so
         ADM-592 shows the link the guest already holds (re-sending it is `resendPaymentLink`). **A paid order is
         refused `409 order-already-paid`.** A new link is created only once the old one has expired or been
-        cancelled (no operation cancels a link on its own yet; open, CHG-RUL-005). The `Idempotency-Key` still guards a retried call; this
+        cancelled (`cancelPaymentLink`, CHG-RUL-021). The `Idempotency-Key` still guards a retried call; this
         rule also covers two different calls for the same order.
 
         '
@@ -4870,6 +4941,7 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Money leaves. The one approval a compromised session is most obviously
         worth taking.
   /refunds/bulk:

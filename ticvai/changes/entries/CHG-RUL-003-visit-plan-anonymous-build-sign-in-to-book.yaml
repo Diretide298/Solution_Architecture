@@ -43,6 +43,6 @@ prevention:
   ref: tools/check-business-rules.py
 status: closed
 closed_by_commit: 112ef275
-notes: 'Sharing a plan has no operation; the rule is stated (a signed-in act) and the operation is a question for the lead.
-  Prevention: tools/check-business-rules.py rule BR-VISIT-PLAN, which fails on the parent commit 4e2c56c1 and passes here.
-  Batch RUL (spec-rules), 3 October 2026.'
+notes: 'Sharing a plan has no operation; the rule is stated (a signed-in act). shareVisitPlan is left for later (Chinmay,
+  3 October, defaults round: not now). Prevention: tools/check-business-rules.py rule BR-VISIT-PLAN, which fails on the
+  parent commit 4e2c56c1 and passes here. Batch RUL (spec-rules), 3 October 2026.'

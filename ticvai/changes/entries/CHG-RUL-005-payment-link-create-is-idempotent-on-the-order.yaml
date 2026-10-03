@@ -32,5 +32,5 @@ prevention:
   ref: tools/check-business-rules.py
 status: closed
 closed_by_commit: 112ef275
-notes: 'No operation cancels a link on its own; the contract says so and it is a question for the lead. Prevention: tools/check-business-rules.py
+notes: 'The cancel the rule relies on is cancelPaymentLink, added by CHG-RUL-021 (defaults round). Prevention: tools/check-business-rules.py
   rule BR-PAY-LINK, which fails on the parent commit 4e2c56c1 and passes here. Batch RUL (spec-rules), 3 October 2026.'

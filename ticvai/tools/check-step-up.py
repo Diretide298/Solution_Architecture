@@ -28,7 +28,9 @@ approving a journal entry need a second factor?* has to be one answer and not th
   operation whose `security` admits `{}` (no session) can only carry it in the body or a header,
   and says so with `x-ticvai-step-up-when: sessionless`. Operations found without a carrier on
   3 October that no rule named are listed in `CARRIER_EXEMPT`, each with its reason; a new one
-  is not exempt.
+  is not exempt. Since CHG-RUL-019 and CHG-RUL-020 there are none: every PIN step-up travels in the
+  body or a header and every MFA step-up on the session (`verifyMfaChallenge` says how), and a
+  `session` carrier on a PIN step-up is refused.
 
 **And what it reports without refusing:** a screen calling a step-up operation that declares no way
 to present the challenge. That is authoring work on real screens rather than a defect in the
@@ -57,22 +59,10 @@ CHALLENGE = {"createMfaChallenge", "verifyMfaChallenge"}
 # Where a level sits, so "below" is comparable. Widest first.
 LEVELS = ["platform", "tenant", "region", "venue", "outlet"]
 
-# **SU-CARRIER exemptions** (CHG-RUL-014). Step-up operations that, on 3 October 2026, declared no carrier and
-# had none in their body. None was named by the 3 October rules; each is a question for the lead, not a silent skip.
-_MFA = ("MFA step-up: how the token from createMfaChallenge/verifyMfaChallenge reaches the call (a header or the "
-        "session) is not contracted; question for Chinmay (CHG-RUL-014)")
-_PIN = ("supervisor PIN on the device with no field to carry it, the gap rejectShiftVariance had; not named by "
-        "the 3 October rule; question for Chinmay, default: supervisorStepUp in the body (CHG-RUL-014)")
-CARRIER_EXEMPT = {
-    **{o: _MFA for o in (
-        "approveMembershipProductValidation", "approvePartnerStatuLifecycle", "approveBookingLimitCommercial",
-        "setPartnerCapabilityGrants", "setPartnerCommissionRules", "setPartnerCreditProfile",
-        "actOnPartnerSettlementBatch", "setBiometricLifecycleRetention", "approveManualOverrideSupervisor",
-        "replaceCredential", "getFaceReenrolmentImages", "approveMatrixMultiLevel", "approveRoleAuthorityDelegation",
-        "approveVersioningGovernance", "approveUnifiedDecision", "approveJournalEntry", "resetPrincipalCredential",
-        "endOwnSession", "openPlatformStaffGrant", "approveRefund")},
-    **{o: _PIN for o in ("closeShift", "acceptShiftVariance", "withdrawFromDepositBox")},
-}
+# **SU-CARRIER exemptions.** None since 3 October 2026 (CHG-RUL-019, CHG-RUL-020): the 23 operations found without a
+# carrier on CHG-RUL-014 now declare one (supervisor and witness PINs in the body, MFA step-ups on the session). An
+# exemption added here needs its reason beside it; a new operation is never exempt by default.
+CARRIER_EXEMPT: dict = {}
 INFERRED_BODY = ("supervisorStepUp", "stepUpToken")
 
 
@@ -117,6 +107,9 @@ def carrier_problems(oid: str, op: dict, doc: dict, path_params: list) -> list:
             if h not in names:
                 out.append(f"{oid}: step-up carrier header {h} is not a header parameter of the operation")
     elif kind == "session":
+        if op.get("x-ticvai-step-up") != "mfa":
+            out.append(f"{oid}: carries a {op.get('x-ticvai-step-up')} step-up on the session -- only an MFA factor "
+                       "verified on the caller's session travels there; a PIN travels in the body (CHG-RUL-020)")
         if sessionless:
             out.append(f"{oid}: admits a call with no session ({{}}) and carries its step-up in the session")
     else:

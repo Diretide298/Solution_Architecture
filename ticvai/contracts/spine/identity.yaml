@@ -1409,6 +1409,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Replaces somebody else's secret, which is the whole of an account takeover.
       summary: Reset a member of staff's password or PIN
       description: '**A cashier who forgets a PIN had no path back but a new account**, which loses their
@@ -3284,6 +3285,18 @@ paths:
         also answered `requiresRoleSelection`, the client goes on to `selectRole`. For any other action
         it returns a short-lived, single-purpose `stepUpToken`.
 
+
+        **How an MFA step-up reaches the operation that demands it: the session** (Chinmay, 3 October 2026,
+        defaults taken; CHG-RUL-020). A successful step-up is also recorded against the caller''s own session,
+        bound to the challenge''s `action` and to that session, for the token''s short life. Every operation
+        that declares `x-ticvai-step-up: mfa` declares `x-ticvai-step-up-carrier: session` and reads the
+        step-up from the session that calls it: the client sends no token field and no header, and a step-up
+        made on another session or for another action does not count. It is single-use: the operation that
+        consumes it clears it. Without a fresh step-up the operation is refused 403, and the client runs
+        `createMfaChallenge` and this operation, then retries. A call with no session (`{}`) cannot carry an
+        MFA step-up; a supervisor PIN step-up travels in the body or a header instead (`SupervisorStepUp`,
+        CHG-RUL-014). The returned `stepUpToken` stays for clients built at r1.
+
         '
       tags:
       - mfa
@@ -3526,6 +3539,7 @@ paths:
       - session
       x-ticvai-permission: null
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Ending a session elsewhere is an account-security act; the second factor proves it is the owner at the keyboard.
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -4410,6 +4424,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-step-up: mfa
+      x-ticvai-step-up-carrier: session   # the MFA step-up verified on the caller's session (CHG-RUL-020)
       x-ticvai-step-up-reason: Opens a platform operator's access into a tenant's data.
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Hold the Block A business rules of 3 October 2026 (Chinmay) in the contracts, so they cannot quietly come back.
 
-Change log CHG-RUL-001 to CHG-RUL-018 (changes/entries/CHG-RUL-*.yaml); the answers are in
+Change log CHG-RUL-001 to CHG-RUL-021 (changes/entries/CHG-RUL-*.yaml); the answers are in
 `docs/active/decisions/answers-3-october-business-rules.md` ("Block A audit business rules" and "Asked as
 questions instead of defaults"). The r2 Block A audit (CHG-AUD-001 pattern 4) found contract rules that
 disagreed with the screens that call them. Each rule below is one decision; each fails on the package before
@@ -26,8 +26,9 @@ And one rule per decision:
   BR-PO            (CHG-RUL-004) A purchase order request requires neither a requisition nor a quotation (blanket
                    and RFQ-award orders), names its `kind`, and refuses a standard order without an approved
                    requisition (`requisition-required`); the order goes through the approval matrix.
-  BR-PAY-LINK      (CHG-RUL-005) `createPaymentLink` answers 200 with the live link it already has and 409
-                   `order-already-paid` for a paid order.
+  BR-PAY-LINK      (CHG-RUL-005, CHG-RUL-021) `createPaymentLink` answers 200 with the live link it already has
+                   and 409 `order-already-paid` for a paid order; `cancelPaymentLink` (ORDER_CREATE) cancels a live
+                   link and refuses one that is not live.
   BR-REPORT-RUNS   (CHG-RUL-006) `listReportExecutions`: `mineOnly` is a filter, and seeing other people's runs
                    does not need `REPORT_MANAGE`.
   BR-CONTRAST      (CHG-RUL-007) `Theme` lists its WCAG AA pairs (`x-ticvai-contrast-pairs`): every colour named
@@ -48,8 +49,9 @@ And one rule per decision:
   BR-NEW-OPS       (CHG-RUL-013) `listMyTableReservations` (self-scoped, paged), `listBookableOutlets` (public,
                    published, paged), `uploadIncidentMedia` and `addIncidentPerson` exist.
 
-The step-up rule of `rejectShiftVariance` (CHG-RUL-014) is held by `check-step-up.py` (SU-CARRIER), which now
-asks every step-up operation where it carries the step-up.
+The step-up rule of `rejectShiftVariance` (CHG-RUL-014), and of `closeShift`, `acceptShiftVariance`,
+`withdrawFromDepositBox` and the 20 MFA step-ups (CHG-RUL-019, CHG-RUL-020), is held by `check-step-up.py`
+(SU-CARRIER), which asks every step-up operation where it carries the step-up.
 
     python3 tools/check-business-rules.py
 """
@@ -230,6 +232,9 @@ def main() -> int:
     _, _, _, pl, _ = op("createPaymentLink")
     need("BR-PAY-LINK", "200" in (pl.get("responses") or {}), "createPaymentLink has no 200 for the live link it returns")
     need("BR-PAY-LINK", "order-already-paid" in problem_types(pl), "createPaymentLink does not refuse a paid order 409")
+    cpl = op("cancelPaymentLink")[3]
+    need("BR-PAY-LINK", cpl.get("x-ticvai-permission") == "ORDER_CREATE" and "payment-link-not-live" in problem_types(cpl),
+         "cancelPaymentLink is missing, not under ORDER_CREATE, or does not refuse a link that is not live (CHG-RUL-021)")
 
     # -------------------------------------------------------------- BR-REPORT-RUNS
     _, _, _, lr, _ = op("listReportExecutions")
