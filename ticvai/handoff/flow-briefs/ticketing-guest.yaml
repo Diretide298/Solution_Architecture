@@ -324,7 +324,7 @@ flows:
         states: {ready: "download PDF per ticket or as a batch"}
         failure_branches: []
     steps:
-      - {frame: 1, screen: "PTR-001", blockA: true, sees: "partner sign-in", does: "signs in", operation: "identity sign-in", result: "lands on the dashboard"}
+      - {frame: 1, screen: "PTR-001", blockA: true, sees: "partner sign-in", does: "signs in", operation: "identity#login, identity#createMfaChallenge, identity#verifyMfaChallenge, identity#getCurrentSession", result: "lands on the dashboard"}
       - {frame: 2, screen: "PTR-002", blockA: false, sees: "credit position card first", does: "reviews credit", operation: "orders#getB2bCredit", result: "knows available credit before building an order"}
       - {frame: 3, screen: "PTR-007", blockA: false, sees: "B2B allocation per date", does: "searches", operation: "catalogue#getAvailability", result: "what partners may sell"}
       - {frame: 4, screen: "PTR-008", blockA: false, sees: "booking form with the credit remaining", does: "creates the booking", operation: "orders#createOrder", result: "order on credit or a stated refusal"}
@@ -378,7 +378,7 @@ flows:
         failure_branches:
           - {what: "usage disputed", sees: "scan records with recordedAt and syncedAt", recover: "finance settles on the evidence"}
     steps:
-      - {frame: 1, screen: "PTR-001", blockA: true, sees: "partner sign-in", does: "signs in", operation: "identity sign-in", result: "lands on PTR-002"}
+      - {frame: 1, screen: "PTR-001", blockA: true, sees: "partner sign-in", does: "signs in", operation: "identity#login, identity#createMfaChallenge, identity#verifyMfaChallenge, identity#getCurrentSession", result: "lands on PTR-002"}
       - {frame: 2, screen: "PTR-002", blockA: false, sees: "allocation and credit", does: "reviews", operation: "orders#getB2bCredit", result: "knows what it may sell"}
       - {frame: 3, screen: "PTR-008", blockA: false, sees: "booking form", does: "books the block and receives vouchers", operation: "orders#createOrder, orders#listOrders", result: "held on credit; vouchers to distribute"}
       - {frame: 4, screen: "SCN-003", blockA: true, sees: "armed reader", does: "scans a customer's voucher", operation: "access#validateAccess", result: "admitted (possibly offline)"}
@@ -1021,10 +1021,10 @@ flows:
           - {what: "cells disagree on remaining entitlement", sees: "difference on ADM-003", recover: "the owning cell wins"}
     steps:
       - {frame: 1, screen: "GST-015", blockA: true, sees: "annual pass card with where it is valid", does: "opens the pass", operation: "catalogue#listProducts, catalogue#getMyMemberships", result: "knows it works in Abu Dhabi"}
-      - {frame: 2, screen: "ADM-003", blockA: true, sees: "cross-tenant health (propagation status)", does: "nothing (service-to-service)", operation: "propagateCrossRegionEntitlement (service)", result: "right present in the other cell"}
+      - {frame: 2, screen: "ADM-003", blockA: true, sees: "cross-tenant health (propagation status)", does: "nothing (service-to-service)", operation: "cross-region#propagateCrossRegionEntitlement (service-to-service, not called from the screen), subscription#getCellHealth", result: "right present in the other cell"}
       - {frame: 3, screen: "SCN-003", blockA: true, sees: "armed reader at the Abu Dhabi gate", does: "scans the pass", operation: "access#validateAccess, cross-region#consumeCrossRegionEntitlement", result: "admitted from the propagated right"}
       - {frame: 4, screen: "SCN-014", blockA: true, sees: "sync and reconciliation list", does: "sync runs", operation: "access#syncScans", result: "redemption posted"}
-      - {frame: 5, screen: "ADM-003", blockA: true, sees: "reconciliation result", does: "reviews any difference", operation: "reconcileRedemptions (service)", result: "agreed or difference named"}
+      - {frame: 5, screen: "ADM-003", blockA: true, sees: "reconciliation result", does: "reviews any difference", operation: "cross-region#reconcileRedemptions (service-to-service, not called from the screen), subscription#getCellHealth", result: "agreed or difference named"}
     motion:
       - SCN-003 outcome flash as F10.
     decisions: ["ADR-0010 (cross-region pseudonymous lookup is service audience)", "CHG-WIR-021 (propagation and reconciliation are service calls, ADM-003 shows them)", "CF-31"]

@@ -1,0 +1,31 @@
+id: CHG-RONEC-005
+date: '2026-10-03'
+source: cr
+kind: spec
+summary: cancelPaymentLink is bound on ADM-593, the screen that manages a payment link after it is made, with a Cancel link
+  action and a form for the reason.
+decision:
+  what: 'ADM-593 (Payment Link Distribution & Customer Journey Manager, which resends a link and reads its state) gains a
+    destructive "Cancel link" action, the api entry (invalidating getPaymentLink) and formCancelPaymentLink collecting the
+    reason; its permissions banner now names the controls Resend and Cancel sit on. ADM-592 (the builder) only creates.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay, 3 October 2026 (the r1 brief): "bind cancelPaymentLink on its admin screen (ADM-592 or ADM-593, whichever
+  manages payment links)". CHG-RUL-021 added the operation (a new link only after the old one expires or is cancelled,
+  CHG-RUL-005) and no screen declared it.'
+keys_touched:
+  screens: [ADM-593]
+  operations: [cancelPaymentLink]
+  files: [screens/P08-venue-back-office.yaml]
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-r1-additions.py
+status: open
+notes: R1-PAY-LINK fails on the parent (3 findings) and passes after. ADM-593 is wave 3.

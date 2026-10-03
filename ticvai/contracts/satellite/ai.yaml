@@ -828,6 +828,15 @@ paths:
 
         Writes `ai.proposed_action` and stops. `venue-map.acceptWalkwayProposals` is the human half.
 
+
+        **A plan with hand-marked paths** (Chinmay, 3 October 2026, r1 additions). Where the import
+        found marker strokes (`venue-map.VenueMapImportJob.handMarkedPaths`), the proposal follows the
+        marks rather than guessing from the picture: one segment per marked stretch between junctions,
+        `basis: handMarked`, its confidence saying how cleanly the stroke was traced. A gap in a mark is
+        a gap in the network, proposed as two segments, never bridged silently. The operator accepts or
+        rejects **each segment** (BO-093); nothing is a path until then. A scanned PDF read through the
+        OCR step is a raster here too.
+
         '
       tags:
       - ai
@@ -839,6 +848,28 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                importJobId:
+                  type: string
+                  format: uuid
+                  description: The `venue-map` import job whose raster (and hand-marked strokes) to read.
+                    Absent, the map's latest import.
+                basis:
+                  type: string
+                  enum:
+                  - auto
+                  - handMarked
+                  - seen
+                  default: auto
+                  description: '`auto` follows the hand marks where the import found any and sees the paths
+                    otherwise; `handMarked` refuses (422) when there are no marks; `seen` ignores the marks.
+                    Added 3 October 2026 (r1 additions).'
       responses:
         '202':
           headers:
@@ -858,6 +889,15 @@ paths:
             because it arrived in a nicer format.
 
             '
+          content:
+            application/problem+json:
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
+        '422':
+          description: '`basis: handMarked` on an import that found no hand-marked strokes (`hand-marks-not-found`).
+            Re-import with `handMarkedPaths` (and the marker colour), or ask with `auto` (3 October 2026).'
+          x-ticvai-problem-types:
+          - hand-marks-not-found
           content:
             application/problem+json:
               schema:
@@ -891,6 +931,13 @@ paths:
         the day it was drafted.
 
         Proposes and stops. `venue-map.acceptVenueLabelProposals` is the human half.
+
+
+        **Scanned text is a hint** (Chinmay, 3 October 2026, r1 additions: a PDF with an OCR step). Where
+        the import read text off a scanned page (`venue-map.VenueMapImportJob.ocr`), the blocks near a
+        shape ("WC", "First Aid", a ride''s name in Arabic or English) inform the proposed kind and name,
+        and the proposal says which text it used (`ocrHint`) so the operator can see why. Text alone never
+        creates a point and never raises a proposal above what the shape supports.
 
         '
       tags:
@@ -2035,6 +2082,7 @@ paths:
     get:
       operationId: listProposedActions
       x-ticvai-consumed-by:
+        - "P08 BO-093 Map Import & Labelling"
         - "P08 BO-928 AI Conflict Resolution Assistant"
         - "P08 BO-929 Automatic Schedule Optimization"
         - "P09 ADM-492 Configuration Approval Workflow"
@@ -18535,6 +18583,11 @@ components:
           nullable: true
           description: 8.1.5b. Why it thinks so, so an operator can disagree with the reason rather than
             the answer.
+        ocrHint:
+          type: string
+          nullable: true
+          description: The scanned text near the shape that the proposal used (from the import's OCR step,
+            3 October 2026). Null when none was used.
     WalkwayProposal:
       type: object
       x-ticvai-persistence: none — each proposal is an ai.proposed_action row; proposalId is its id
@@ -18566,6 +18619,13 @@ components:
         reasoning:
           type: string
           nullable: true
+        basis:
+          type: string
+          enum:
+          - handMarked
+          - seen
+          description: '`handMarked`: traced from a stroke marked by hand on the plan; `seen`: read from the
+            picture. Added 3 October 2026 (r1 additions).'
     AiMissingSettingProblem:
       x-ticvai-persistence: none — error shape
       description: '`requestSuggestion` 422 (29 September, AI functions review; replaces the insufficient-data

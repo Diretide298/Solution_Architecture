@@ -88,6 +88,14 @@ CHECKS = [
     # required entry parameter is carried, no screen wears another's route, a Block A screen is wave 1 and
     # says so, and Chinmay's 3 October screen decisions stay made.
     "check-screen-patterns",
+    # 3 October (TODO step 9b, CHG-RONEC-006): the Block A flow design briefs (handoff/flow-briefs/*.yaml) carry
+    # every required key, and every screen, flow and contract#operation they name exists, so a brief cannot
+    # send Claude Design to an operation the contracts do not have.
+    "check-flow-briefs",
+    # 3 October (Chinmay's r1 additions, CHG-RONEC-001..005): the venue-map import formats and ADR-0069's closed
+    # items, the blind close in every flow and the decided F32, the concierge's conversation polling, the
+    # BO-1065 residency section and the payment-link cancel.
+    "check-r1-additions",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.

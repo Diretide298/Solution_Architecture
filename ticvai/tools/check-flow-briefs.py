@@ -12,6 +12,10 @@ Checks, per flow:
   - inputs: each has name, formats, limits, validation (non-empty) and source;
   - outputs: each has name, states and failure_branches;
   - steps: non-empty, each with a screen id that exists in screens/P*.yaml;
+  - a step's operation field (`operation`, `operations` or `calls`) names operations, never prose: each
+    entry, split on `,` and `/` once its parenthesised notes are set aside, is `contract#operationId` or
+    `none` (a step that calls nothing, optionally followed by why). "identity sign-in" or a bare
+    `reconcileRedemptions` fails (the lead, 3 October 2026, CHG-RONEC-006);
   - every `contract#operationId` written anywhere in the flow exists in contracts/;
   - every `screen` / `screens` value and every `flow` / `related_flows` value exists;
   - motion is present: a non-empty list, or the string `none`.
@@ -46,6 +50,28 @@ SCREEN_RE = re.compile(r'^([A-Z]{2,5}-\d{2,4})\b')
 SEE_RE = re.compile(r'^([a-z][a-z0-9-]*)#([A-Z]+[-A-Z0-9]*)$')
 BRIEFS = {}  # process -> flows mapping, for resolving `see:` references
 OP_RE = re.compile(r'\b([a-z][a-z0-9-]*)#([a-z][A-Za-z0-9]*)\b')
+STEP_OP_KEYS = ('operation', 'operations', 'calls')
+STEP_OP_TOKEN = re.compile(r'^[a-z][a-z0-9-]*#[a-z][A-Za-z0-9]*$')
+PARENS = re.compile(r'\([^()]*\)')
+
+
+def step_op_problems(value):
+    """The entries of a step's operation field that are neither `contract#operationId` nor `none ...`."""
+    bad = []
+    for item in (value if isinstance(value, list) else [value]):
+        text = str(item).strip()
+        while PARENS.search(text):
+            text = PARENS.sub('', text)
+        if re.match(r'^none\b', text, re.I):
+            continue
+        if not text.strip():
+            bad.append(str(item).strip())
+            continue
+        for part in re.split(r'[,/]', text):
+            part = part.strip()
+            if part and not STEP_OP_TOKEN.match(part):
+                bad.append(part)
+    return bad
 
 
 def load_yaml(path):
@@ -176,6 +202,11 @@ def check_flow(fid, fl, screens, ops, flows, err, warn):
             err(f'{fid}: steps[{i}] has no screen')
         elif len(st) < 3:
             err(f'{fid}: steps[{i}] says too little (screen plus what is seen, done and the result)')
+        if isinstance(st, dict):
+            for k in STEP_OP_KEYS:
+                if k in st:
+                    for part in step_op_problems(st[k]):
+                        err(f'{fid}: steps[{i}] `{k}` names "{part}", not contract#operationId or `none`')
     motion = fl.get('motion')
     if isinstance(motion, str) and motion.strip().lower() != 'none':
         err(f'{fid}: motion is a string other than `none`; give a list')

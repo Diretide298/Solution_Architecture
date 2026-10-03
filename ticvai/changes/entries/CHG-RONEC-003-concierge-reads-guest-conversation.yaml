@@ -1,0 +1,35 @@
+id: CHG-RONEC-003
+date: '2026-10-03'
+source: cr
+kind: spec
+summary: The guest concierge screens WEB-044, GST-031 and GST-032 read the handed-over conversation with getGuestConversation,
+  polled every 5 seconds while on screen and every 30 seconds while hidden.
+decision:
+  what: 'Each of the three screens gains a panel "The agent''s replies" bound to GuestConversation (state, queuePosition,
+    estimatedWaitSeconds, messages) and an api entry for getGuestConversation with trigger onInterval, pollSeconds 5 and
+    pollSecondsHidden 30, fetching with afterMessageId and stopping when the conversation ends.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay, 3 October 2026, r1 additions (docs/active/decisions/answers-3-october-r1-additions.md): "getGuestConversation
+  is bound on WEB-044, GST-031, GST-032 (poll every 5 s, 30 s when hidden)." CHG-GCF-004 added the operation for exactly
+  these screens and sendGuestConversationMessage was bound, but nothing read the agent''s replies, so a guest who handed
+  over saw their own messages and no answer.'
+keys_touched:
+  screens: [WEB-044, GST-031, GST-032]
+  operations: [getGuestConversation]
+  files: [screens/P01-guest-web-storefront.yaml, screens/P02-guest-mobile-app.yaml]
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-r1-additions.py
+status: open
+notes: 'R1-CONCIERGE fails on the parent (3 findings) and passes after. pollSeconds and pollSecondsHidden are new optional
+  keys on a screen api entry (screens/_schema.yaml leaves api items open); the rule also holds that a hidden interval is
+  never faster than the visible one. Moving getGuestConversation and sendGuestConversationMessage into Block A with
+  AI-ENGINE-CONCIERGE is the plan side of the same r1 additions.'

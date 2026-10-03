@@ -1,0 +1,58 @@
+id: CHG-RONEC-002
+date: '2026-10-03'
+source: cr
+kind: spec
+summary: flows/F32 is rewritten to the decided shift flow (POS-000 sign-in, blind close, Under review over the threshold, the
+  next cashier never blocked, a supervisor PIN for accept, reject, close and reopen only, sessions on POS-000 behind the PIN),
+  and F13 and F72 stop describing a variance accepted only at the till or a count that is not said to be blind.
+decision:
+  what: 'F32 now walks the platform-foundation flow brief: 15 steps from the sign-in on POS-000 (login, getCurrentSession,
+    selectRole) through the float on POS-001, selling, a safe drop, a no-sale, the blind count and its submission on POS-007
+    (the cashier sees "Under review", never the amount), the next cashier signing in on POS-000 and opening on POS-001, the
+    supervisor resolving on POS-007 at any till with their PIN (getShiftCountLines, acceptShiftVariance, rejectShiftVariance,
+    closeShift), the reopen on POS-025 and the deposit on BO-024; branches for a till held by another session (forceLogout
+    behind the supervisor PIN on POS-000), a failed health check, the network dropping, a variance beyond the threshold,
+    a recount, a force-close and a reopen; exits settled, underReview, recountRequested, forceClosed, sessionTakenOver and
+    openWithUnsynced. The F13 step 2 note and the F72 step 3 outcome follow it. The platform-foundation brief''s open item
+    on the rewrite is marked done. Then, from the lead''s POS design cross-check the same day: POS-007''s cashier action is
+    "Close and sign out" (submitShiftCount) and lands on POS-000, not POS-001; the brief''s frame 10 no longer calls
+    openShift on POS-000 (it signs in; POS-001 opens the shift); five storyboard moves gain navigation edges (POS-025 to
+    POS-018, POS-007 to POS-025, POS-025 to POS-000, POS-025 to BO-024 across devices, and F34''s POS-005 to POS-011),
+    and the sixth (frame 10 POS-000 to frame 11 POS-007) is a change of person, not a move: the supervisor reaches
+    POS-007 from Till Home, because an edge from the door would land on POS-007''s SHIFT_OPEN reads (check-doors
+    D-LANDING-READ), and the brief''s frame 11 now says so; the brief names the deposit-box withdrawal''s witnessStepUp (the cashier countersigns), not
+    supervisorStepUp, and so does F32 step 7; POS-025''s "Shift takings so far" becomes the cashier''s own "Sales this
+    shift" (one total across tenders and the number of sales, no tender split), with expected cash and the variance
+    supervisor-only, and Shift.salesTotal''s description says so.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay, 3 October 2026, r1 additions (docs/active/decisions/answers-3-october-r1-additions.md): "F32 rewritten to the
+  decided shift flow in r1" and "Supervisor PIN clarified: the four supervisor actions (accept, reject, close, reopen a shift
+  under review) take it; the cashier''s own count never does." The old F32 signed in on POS-001, said "Counted against
+  expected" and had the cashier accept the variance, against CHG-FIN-003 (blind close), DEC-059 and DEC-173 (under review,
+  never blocks the next cashier), DEC-174 and CHG-SPF-012 (sessions on POS-000 behind the PIN).'
+keys_touched:
+  flows: [F32, F13, F72]
+  screens: [POS-000, POS-001, POS-002, POS-005, POS-007, POS-011, POS-018, POS-020, POS-025, BO-024]
+  operations: [login, selectRole, submitShiftCount, acceptShiftVariance, rejectShiftVariance, closeShift, reopenShift,
+    forceLogout, listActiveSessions]
+  files: [flows/F32-a-till-opens-trades-and-settles.yaml, flows/F13-month-end-closes.yaml,
+    flows/F72-a-shift-ends-and-the-summary-is-read.yaml, handoff/flow-briefs/platform-foundation.yaml,
+    screens/P04-point-of-sale.yaml, contracts/spine/shift.yaml]
+root_class: A29 JOURNEY-CONTRACT
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-r1-additions.py
+status: open
+notes: 'R1-BLIND-CLOSE is general: across every flow, a step that submits a count says it is blind, a step that accepts,
+  rejects, closes or reopens a shift names the supervisor, and no step or branch shows a cashier or a steward the expected
+  figure. On the parent commit it finds 3 findings in F32 and R1-F32 finds 7; after, both pass. The witness PIN on a
+  deposit-box withdrawal (CHG-RUL-019) stays: it is a cash control, not one of the four shift acts. check-flows reports two
+  more navigation warnings (POS-007 to POS-000 and POS-025 to BO-024 are not edges yet); the refresh adopts flow steps as
+  transitions (derive-transitions-from-flows).'

@@ -18,6 +18,8 @@ because its absence produced a specific failure, and each is named.
 | **The resource manifest** | **XLSX**, one sheet | Only where guests book cabanas, loungers or tables from the map. See §3a |
 | **The illustrated map** | PNG or JPG, plus the source if you have it | What guests see. Separate from the plan — see §6 |
 | **Georeference points** | Two rows in a spreadsheet, or a note | Without these the map is a picture. See §5 |
+| **A 3D model** (optional) | **GLB** (binary glTF 2.0), at most 40 MB, **with its navigation file** (JSON) | For the in-park 3D view (ADR-0069). Without it guests get the 2D map. See §11 |
+| **A scanned plan or a plan with paths marked by hand** | PDF, PNG or JPG | Accepted since 3 October 2026: the text is read for hints and the marked paths are proposed for you to accept. See §12 |
 
 **Raster-only is accepted and degrades gracefully.** A scan or a photograph of a plan cannot be
 layer-extracted; the manifest still gives you seats and the map still works as an image. **You lose
@@ -307,6 +309,53 @@ already has.
 **Plus the illustrated map** gives them your branding rather than ours.
 
 **Each step is independently useful and none blocks the next.**
+
+---
+
+## 11. A 3D model and its navigation file (added 3 October 2026)
+
+**Optional, and it never blocks the map.** ADR-0069: the guest app shows a 3D view of the venue where a
+model exists and the 2D map otherwise, with the same route either way. Send two files per venue map,
+uploaded together on the Map Import screen (BO-093, source "3D model + navigation file"):
+
+| File | Format | Limits |
+|---|---|---|
+| **The model** | **GLB** (binary glTF 2.0), metres, +Y up, origin on a surveyed point on the ground (ideally the main entrance) | **At most 40 MB: a larger file is refused at upload.** About 25 MB is the target (a zone 6 MB or less). **At most 300,000 triangles at LOD0 in any zone**, 1.5 million across all levels. Draco or meshopt geometry; **KTX2 textures** (uncompressed textures are refused for 3D), 2048 px at most, 128 MB after transcoding; 150 draw calls. Zones as named nodes with `<zone>__LOD0`, `__LOD1`, `__LOD2` meshes; a node a guest taps is named by its location's `ref` |
+| **The navigation file** | **JSON**, format `urn:ticvai:venue-navigation-file:1.0` (the contract's `VenueNavigationFile`) | `anchor` (origin latitude and longitude, heading, scale, two to eight control points far apart), `nodes` (two or more), `edges` (one or more; step-free and indoor flags, an access point where one makes a passage one-way), `locations` (ref, kind, name, the node a guest is routed to, and catalogue **codes**, never ids) |
+
+**What the import does.** The navigation file's nodes, edges and locations become the map's paths and points,
+exactly as a walkway layer would; its anchor becomes the map's georeference. The model is measured and every
+line of the budget comes back as a number. **What keeps the 3D view off** (the 2D map still publishes): more
+than 300,000 triangles at LOD0, uncompressed textures, a control point more than 10 metres from where the
+anchor puts it, or a navigation file that does not validate. **Warnings, with the number:** the 25 MB target,
+1.5 million triangles, 150 draw calls, texture size and memory, a control point more than 3 metres out,
+control points close together, and a catalogue code that matches nothing (that location imports unlinked).
+
+**Start from the graph we already hold.** Where the venue already has a 2D map, the editor exports it in the
+navigation-file format (Map Editor, "Export navigation file"), so the 3D studio builds around the paths and
+points the venue has already checked rather than describing them again.
+
+**The navigation file alone** (no model) is accepted too: it imports the graph and the points, with no 3D view.
+
+---
+
+## 12. A scanned plan, or a plan with the paths marked by hand (added 3 October 2026)
+
+**A scanned PDF** (a page that is an image, with no vector lines) is read through an **OCR step**: the text on
+it, English and Arabic, is found and placed on the plan, and the assistant uses the text near a shape
+("WC", "First Aid", a ride's name) as a hint when it proposes what the shape is. **The text never names a point
+by itself**: every proposal is accepted, edited or rejected by a person, as with any plan. Its geometry is a
+picture's (`rasterOnly`), so its paths are proposed as below.
+
+**A PNG or JPG with the walkways marked by hand** is the quickest way to give a park without CAD a working
+route network. Print the plan, draw a single clear line along every walkway in one colour that the plan does
+not use (a red or blue marker), keep lines joined where paths meet, and leave a gap where there is no way
+through. Photograph or scan it flat, as large as you can, and say on upload that the paths are marked (and in
+what colour, if you know). The assistant traces **one segment per marked stretch** and shows each with its
+confidence; **you accept or reject each segment on its own**, and the map checks what is reachable after every
+decision. A gap in a mark stays a gap: it is never bridged for you.
+
+**Still better:** a walkway or keep-out layer in CAD (§8), which needs no assistant at all.
 
 ---
 

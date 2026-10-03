@@ -384,6 +384,8 @@ paths:
     post:
       operationId: createUpload
       x-ticvai-consumed-by:
+        - "P08 BO-093 Map Import & Labelling"
+        - "P08 BO-094 Map Editor & Publish"
         - "P08 BO-1189 Transport Network Import"
         - "P08 BO-955 Sections & Zones"
         - "P12 SUP-013 Case Investigation & Resolution Workspace"
@@ -398,6 +400,13 @@ paths:
 
         Confirm with `POST /media/uploads/{id}/complete` once the transfer finishes. The
         `MediaAsset.id` that returns is the reference every other contract stores for the file.
+
+        **A 3D venue model is a `model3d` asset** (ADR-0069 section 7, contract item closed 3 October
+        2026, r1 additions): content type `model/gltf-binary` (`.glb`), **at most 41,943,040 bytes
+        (40 MB)**, refused here with `400` beyond that, before the transfer starts. Its navigation
+        file is a `document` (`application/json`). Both stay in the tenant's region (UAE-hosted for a
+        UAE tenant) and are served through the platform's delivery rules; no asset goes to a
+        third-party map service. `venue-map.importVenueGeometry` measures the rest of the budget.
       tags: [upload]
       x-ticvai-permission: ASSET_LIBRARY_MANAGE
       x-ticvai-scope-level: venue
@@ -445,6 +454,8 @@ paths:
     post:
       operationId: completeUpload
       x-ticvai-consumed-by:
+        - "P08 BO-093 Map Import & Labelling"
+        - "P08 BO-094 Map Editor & Publish"
         - "P08 BO-1189 Transport Network Import"
         - "P08 BO-955 Sections & Zones"
         - "P12 SUP-013 Case Investigation & Resolution Workspace"
@@ -1851,7 +1862,11 @@ components:
 
     MediaKind:
       type: string
-      enum: [image, video, audio, document, vector, font, archive]
+      enum: [image, video, audio, document, vector, font, archive, model3d]
+      description: >
+        `model3d` added 3 October 2026 (r1 additions; ADR-0069 action item 4): a glTF binary
+        (`model/gltf-binary`, `.glb`) venue model, at most 40 MB. No rendition or derivative is
+        generated for it; the guest app downloads the file as uploaded.
 
     MediaStatus:
       type: string

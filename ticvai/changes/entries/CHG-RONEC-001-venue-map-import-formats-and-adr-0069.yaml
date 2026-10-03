@@ -1,0 +1,65 @@
+id: CHG-RONEC-001
+date: '2026-10-03'
+source: cr
+kind: contract
+summary: Venue maps ship in r1. The venue-map import accepts DWG/DXF, PDF with an OCR step, SVG, PNG/JPG with hand-marked
+  paths (AI walkway proposal accepted segment by segment) and a GLB with its navigation (pathway) file, and ADR-0069's open
+  items are closed.
+decision:
+  what: 'importVenueGeometry gains formats glbModel and navigationFile, navigationFileRef, an ocr step and handMarkedPaths;
+    VenueMapImportJob reports ocr, handMarkedPaths and model (the measured budget and a closed set of model findings);
+    VenueMap carries modelAssetId, navigationFileAssetId, modelTransform and model3dStatus; VenueMapVersion and
+    VenueMapDetail carry the published 3D layer (VenueModel3d); VenueNavigationFile is the ADR''s navigation file as a
+    contract schema (urn:ticvai:venue-navigation-file:1.0); getVenueNavigationFile exports the graph for a 3D studio;
+    a 422 refuses a GLB without its navigation file, a format mismatch or a GLB over 40 MB. ai.proposeWalkways takes
+    basis (auto / handMarked / seen) and returns it per segment; VenueLabelProposal.ocrHint says which scanned text a
+    proposal used; acceptWalkwayProposals is segment by segment. assets.MediaKind gains model3d (model/gltf-binary, at
+    most 40 MB, refused at createUpload). Limits per ADR-0069: over 40 MB refused; over 300,000 triangles at LOD0,
+    uncompressed textures, an anchor residual over 10 m or an invalid navigation file keep the 3D layer out of the
+    publish (the 2D map still publishes); the other budget lines are warnings. ADR-0069 amended (open items closed);
+    handoff/venue-map-input-spec.md gains sections 11 and 12; BO-093 binds proposeWalkways and the new import fields,
+    BO-094 the export and the 3D-layer status. The F26 flow brief needed no change beyond the new operations in its
+    processing and block_a lists and the GLB size limit now in the contract. Then, from the lead the same day: BO-093
+    binds the uploads the import uses (assets.createUpload, completeUpload; an upload progress control) and re-reads
+    the open walkway proposals (ai.listProposedActions, since proposeWalkways answers 202); BO-094 gains the guest map
+    artwork section (upload, then the new setVenueMapArtwork with two to four alignment pairs, recorded on the published
+    version as VenueMapVersion.baseAssetId and baseImageAlignment), closing the brief''s open item; flows/F26 steps 2 to 4
+    name the uploads, the walkway proposals and the artwork, so the flow, the screens and the brief agree. The OCR and
+    hand-marked options are the named schemas VenueMapOcrOptions and VenueMapHandMarkedPaths, so their controls bind.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay, 3 October 2026, r1 additions (docs/active/decisions/answers-3-october-r1-additions.md): "Venue map in r1:
+  close ADR-0069''s open items; the import contract accepts DXF/DWG, PDF with an OCR step, PNG/JPG with hand-marked paths
+  (AI path proposal, accepted segment by segment) and GLB plus a pathway (navigation) file." ADR-0069 action items 3 to 5
+  were open and the F26 flow brief (handoff/flow-briefs/ticketing-backoffice.yaml) drew four source kinds the contract
+  did not accept.'
+keys_touched:
+  operations: [importVenueGeometry, getVenueMapImportJob, acceptWalkwayProposals, publishVenueMap, getVenueNavigationFile,
+    setVenueMapArtwork, proposeWalkways, proposeVenueLabels, listProposedActions, createUpload, searchMedia, getMediaAsset,
+    updateMediaAsset, replaceMediaAsset, completeUpload]
+  schemas: [VenueMap, VenueMapImportJob, VenueMapVersion, VenueMapDetail, VenueModelTransform, VenueModel3d,
+    VenueNavigationFile, VenueMapImportProblem, VenueMapOcrOptions, VenueMapHandMarkedPaths, WalkwayProposal,
+    VenueLabelProposal, MediaKind]
+  screens: [BO-093, BO-094]
+  flows: [F26]
+  files: [contracts/satellite/venue-map.yaml, contracts/satellite/ai.yaml, contracts/satellite/assets.yaml,
+    docs/adr/0069-in-park-3d-navigation-is-built-natively.md, handoff/venue-map-input-spec.md,
+    handoff/flow-briefs/ticketing-backoffice.yaml, docs/active/breaking-changes.yaml,
+    docs/active/decisions/answers-3-october-r1-additions.md, docs/active/README.md, screens/P08-venue-back-office.yaml,
+    flows/F26-a-venue-maps-its-site.yaml]
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-r1-additions.py
+status: open
+notes: 'Additive against HEAD for venue-map (159 additive changes) and ai (2); assets.MediaKind gaining model3d is a response
+  enum value, so BC-029 to BC-033 in docs/active/breaking-changes.yaml approve it for every operation returning a MediaAsset
+  (tag r1: nothing is built before the fresh r1). check-r1-additions (R1-VENUE-IMPORT, R1-ADR-0069) fails on the parent
+  commit with 24 findings and passes after. getVenueNavigationFile and getVenueMapImportJob reach Block A through BO-093
+  and BO-094; the plan agent decides whether proposeWalkways (AI) is built in Block A with BO-093.'

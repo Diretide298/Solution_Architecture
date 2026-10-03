@@ -321,7 +321,8 @@ flows:
       merged: merged from the fnb-retail brief (3 Oct)
     - name: Witness
       screen: POS-018
-      validation: The cashier whose drawer it is confirms on the same device.
+      validation: The cashier whose drawer it is confirms with their own PIN on the same device (body witnessStepUp, the
+        witness's principal and PIN; never the supervisor's own; DEC-178, CHG-RUL-019).
       source: cashier on POS-018 Safe Drop & Cash Transfer Management
       ref: contracts/spine/shift.yaml#withdrawFromDepositBox
       formats:
@@ -1060,14 +1061,18 @@ flows:
     - frame: 10
       screen: POS-000 Sign In (next cashier)
       sees: the till door again, the previous cashier signed out
-      does: the next cashier signs in and opens a new float on POS-001
+      does: the next cashier signs in; POS-001 then counts their own float and opens the shift (frames 3 and 4 again,
+        shift#openShift on POS-001, which binds it; flows/F32 steps 11 and 12)
       calls:
       - identity#login
-      - shift#openShift
-      result: 'opens: a pendingVariance shift never blocks the next one (DEC-059, DEC-173)'
+      - identity#getCurrentSession
+      result: 'signed in and on to POS-001: a pendingVariance shift never blocks the next one (DEC-059, DEC-173)'
     - frame: 11
       screen: POS-007 Close Shift (supervisor, any till)
-      sees: 'supervisor PIN prompt; after it: counted, expected, variance and the count lines note by note'
+      sees: 'supervisor PIN prompt; after it: counted, expected, variance and the count lines note by note. A different
+        person from frame 10: the supervisor, signed in at any till, comes from Till Home (POS-025 to POS-007), never
+        straight from the door, because a door lands only on screens anyone signed in may open (check-doors
+        D-LANDING-READ; 3 Oct, CHG-RONEC-002)'
       does: >-
         enters PIN and reason; chooses Accept shift variance / Ask for a recount / Close shift for the cashier
       calls:
@@ -1138,8 +1143,9 @@ flows:
       says: reject + recount, counted blind again (DI-804)
     - id: RUL-1, RUL-2, CHG-RUL-019
       says: >-
-        supervisorStepUp travels in the body of closeShift, acceptShiftVariance, rejectShiftVariance, reopenShift, withdrawFromDepositBox;
-        optional in schema, refused without it
+        supervisorStepUp travels in the body of closeShift, acceptShiftVariance, rejectShiftVariance and reopenShift; a deposit-box
+        withdrawal carries witnessStepUp instead (the PIN of the cashier the cash came from, who countersigns on the same device;
+        DEC-178); both optional in schema, refused without them (corrected 3 Oct, CHG-RONEC-002)
     - id: CHG-SPF-012 (answers 3 Oct, Block A business rules)
       says: >-
         session management stays on POS-000 behind a supervisor PIN step-up (reverses CHG-DOOR-003 for this door); BO-053
@@ -1237,9 +1243,10 @@ flows:
     - handoff/design-notes (screens POS-001, POS-002, POS-018, POS-020, POS-007, BO-024)
     open:
     - q: >-
-        flows/F32-*.yaml still carries the old steps (sign-in on POS-001, cashier sees expected, cashier accepts the variance);
-        F32 is rewritten to this decided flow in r1 (answers L436).
-      default: draw this brief; the flows/ rewrite follows it
+        flows/F32-*.yaml carried the old steps (sign-in on POS-001, cashier sees expected, cashier accepts the variance).
+        Done 3 October 2026 (CHG-RONEC-002): flows/F32 now walks this brief (POS-000 sign-in, blind close, Under review,
+        next cashier never blocked, supervisor PIN for accept / reject / close / reopen, sessions on POS-000 behind the PIN).
+      default: none needed; kept here so the storyboard and the flow are read together
     - q: Lock threshold and exact attempt count for PIN sign-in are not in the package.
       default: show "N attempts left" from the problem detail; 5 attempts
     - q: Idle lock (v2 prototype shows "Terminal locks after 90 s idle") has no contract field.

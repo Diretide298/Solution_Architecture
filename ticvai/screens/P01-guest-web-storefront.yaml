@@ -9456,6 +9456,21 @@ screens:
         notes: Replaces the ask box once a person has taken the conversation; the transcript stays above.
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
         bindsTo: ConversationMessage.body
+      - kind: detailPanel
+        label: The agent's replies
+        bindsTo: GuestConversation
+        columns:
+        - GuestConversation.state
+        - GuestConversation.queuePosition
+        - GuestConversation.estimatedWaitSeconds
+        - GuestConversation.messages
+        operation: getGuestConversation
+        notes: '**After a handover the thread is read here** (Chinmay, 3 October 2026, r1 additions; CHG-RONEC-003):
+          the agent''s replies, where the guest is in the queue and the wait, until an agent claims it. Polled
+          every 5 seconds while the chat is on screen and every 30 seconds while the app or tab is hidden, with
+          `afterMessageId` so each poll fetches only what is new; it stops when the conversation ends
+          (`resolved`, `abandoned`, `timedOut`).'
+        provenance: decided 3 October 2026, r1 additions (CHG-RONEC-003)
       - kind: cardList
         label: Earlier conversations
         bindsTo: AiConversation
@@ -9536,6 +9551,15 @@ screens:
     purpose: 'After a handover, the guest writes to the agent, as the guest: sendConversationMessage needs
       CASE_MANAGE (decided by Chinmay, 3 October 2026 (CHG-SPF-013))'
     trigger: onAction
+  - operationId: getGuestConversation
+    contract: marketing-crm
+    purpose: 'The agent''s replies, the queue position and the wait after a handover, polled every 5 s while the
+      chat is on screen and every 30 s while hidden, with afterMessageId (decided by Chinmay, 3 October 2026,
+      r1 additions; CHG-RONEC-003)'
+    trigger: onInterval
+    pollSeconds: 5
+    pollSecondsHidden: 30
+    provenance: decided 3 October 2026, r1 additions (CHG-RONEC-003)
   - operationId: recordAnswerFeedback
     contract: ai
     purpose: Say whether an answer helped

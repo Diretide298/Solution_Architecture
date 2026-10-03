@@ -36,7 +36,7 @@ steps:
   operations:
   - listShifts
   outcome: A shift left open in the period blocks the close
-  note: 'Corrected 2 October (CHG-WIR-008): a variance is accepted only on the till by a supervisor with a PIN step-up (R080 (e)); BO-040 lists the shifts still waiting, which block the close until accepted at the till.'
+  note: 'Corrected 2 October (CHG-WIR-008) and 3 October (CHG-RONEC-002, the decided shift flow F32): a shift under review is accepted, sent back for a recount or closed by a supervisor with their PIN at any till of the venue (POS-007), on BO-040 or in the daily reconciliation (BO-043), never by the cashier, who never sees the expected figure (CHG-FIN-003). BO-040 lists the shifts still waiting; they block the period close, never the next cashier''s shift.'
 - step: 3
   screen: BO-089
   action: Posts the remaining journals

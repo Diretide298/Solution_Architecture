@@ -2352,8 +2352,11 @@ components:
           $ref: '../shared/common.yaml#/components/schemas/Money'
           description: >
             What the till took in sales, as the guest paid it — tax included: the shift's takings, not
-            Gross sales (CHG-FIN-002, CHG-FIN-010). **Never shown to the shift's own cashier before
-            the count is in** (CHG-FIN-003): with the float and the lifts it gives away the expected cash.
+            Gross sales (CHG-FIN-002, CHG-FIN-010). **Shown to the shift's own cashier only as one total
+            across every tender** ("Sales this shift" on POS-025; the lead, 3 October 2026, CHG-RONEC-002):
+            with no cash share it cannot be turned into the expected cash, so the blind close holds
+            (CHG-FIN-003). The cash share, the tender split, `expectedCash` and `variance` stay with the
+            supervisor.
         refundsTotal:
           x-ticvai-column: gross_refunded_amount
           $ref: '../shared/common.yaml#/components/schemas/Money'

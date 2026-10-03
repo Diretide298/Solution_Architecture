@@ -1,0 +1,37 @@
+id: CHG-RONEC-006
+date: '2026-10-03'
+source: cr
+kind: process
+summary: tools/check-flow-briefs.py and the new tools/check-r1-additions.py are registered in tools/run-checks.py, so the
+  flow briefs and the r1 additions gate every run.
+decision:
+  what: 'Add check-flow-briefs (the Block A flow design briefs carry their required keys, and every screen, flow and
+    contract#operation they name exists) and check-r1-additions (CHG-RONEC-001 to CHG-RONEC-005) to CHECKS in
+    tools/run-checks.py. Both pass on the branch. From the lead the same day: check-flow-briefs also requires a step''s
+    operation field (operation, operations or calls) to name contract#operationId or `none` (parenthesised notes set
+    aside), and the five steps that gave prose are fixed: F03 and F10 frame 1 on PTR-001 ("identity sign-in" becomes
+    identity#login, createMfaChallenge, verifyMfaChallenge, getCurrentSession, which PTR-001 binds), F19 frames 2 and 5
+    on ADM-003 (cross-region#propagateCrossRegionEntitlement and cross-region#reconcileRedemptions, service-to-service,
+    with subscription#getCellHealth, which ADM-003 reads), and F77 frame 1 (catalogue#updateChannelCapacity).'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay, 3 October 2026 (the r1 brief): "Register tools/check-flow-briefs.py in tools/run-checks.py and make it pass."
+  The check came with the flow briefs (commit 9a679f3b) and nothing ran it, so a brief naming an operation the contracts
+  lose would pass silently (council of 2 October: a check nobody runs prevents nothing).'
+keys_touched:
+  files: [tools/run-checks.py, tools/check-flow-briefs.py, tools/check-r1-additions.py,
+    handoff/flow-briefs/ticketing-guest.yaml, handoff/flow-briefs/ticketing-backoffice.yaml]
+  flows: [F03, F10, F19, F77]
+root_class: 'new: check-not-registered'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-flow-briefs.py
+status: open
+notes: 'The tool-coverage block in refresh.sh finds both names in run-checks.py, so neither needs an exemption. The step
+  rule finds the five prose steps on the parent briefs and none after.'

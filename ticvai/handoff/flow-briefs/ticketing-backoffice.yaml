@@ -168,7 +168,8 @@ flows:
         (signed URL, maxSizeBytes returned by the server); passed as sourceRef
       - one file per map (park, floor, zone, parking)
       - layers named by role (venue-map-input-spec §2); each role accepts a list of layer names
-      - 'size: not set in the contract (see open)'
+      - 'size: not set in the contract for plans (see open); a GLB is at most 40 MB (assets#createUpload refuses
+        a larger model3d asset, 3 Oct)'
       validation:
       - 'Layers matched by role, case-insensitive, VC- prefix ignored (Paths/Walkways/Circulation/Footpath; Water/Planting/BackOfHouse/Plant
         keep-out; Steps/VC-Steps/Stairs; Buildings; Seats; Accessible; Sections; Stage; Exits; EmergencyExits/FireExits;
@@ -254,7 +255,8 @@ flows:
       - Without alignment points a plan-placed point can land off the illustration
       source:
       - venue design agency, BO-093
-      - Venue (spec §6); screen for it not identified (see open)
+      - 'Venue (spec §6), on BO-094 "Guest map artwork": assets#createUpload / completeUpload, then
+        venue-map#setVenueMapArtwork with two to four alignment pairs (3 Oct, CHG-RONEC-001)'
       also_named:
       - Illustrated map
     - name: 3D venue model and navigation file (ADR-0069)
@@ -429,10 +431,17 @@ flows:
       - ai#proposeWalkways
       - venue-map#acceptWalkwayProposals
     - input: GLB + pathway file
-      does: imports the 3D model and the navigation graph (nodes, edges, locations, anchor); measures the budget and
-        reports over-budget numbers as findings; the 3D layer publishes only when the anchor residual is within 10
-        m (r1, ADR-0069)
+      does: 'imports the 3D model and the navigation graph (nodes, edges, locations, anchor) with format glbModel and
+        navigationFileRef; a GLB over 40 MB is refused (422 modelTooLarge, and at upload); measures the budget and
+        reports each line as a number on VenueMapImportJob.model; the 3D layer publishes only when no model finding
+        is an error (over 300,000 triangles at LOD0, uncompressed textures, anchor residual over 10 m, invalid
+        navigation file), else VenueMap.model3dStatus is blocked and the 2D map still publishes (r1, ADR-0069 as
+        amended 3 Oct, CHG-RONEC-001)'
       operation: venue-map#importVenueGeometry
+    - input: draft graph and points (for a 3D studio)
+      does: exports them in the navigation-file format, codes not ids, so the studio builds the GLB around the graph
+        the venue already checked (ADR-0069 section 8, closed 3 Oct)
+      operation: venue-map#getVenueNavigationFile
     outputs:
     - name: map list (BO-092)
       states:
@@ -667,8 +676,8 @@ flows:
       sees: map editor with point palette and bookable places
       does: places toilets, exits, prayer rooms and links each point (outlet, product, access point); places cabanas
         with price band
-      operation: venue-map#setVenuePoint, venue-map#setPlacedResource
-      result: linked points
+      operation: venue-map#setVenuePoint, venue-map#setPlacedResource, assets#createUpload, assets#completeUpload, venue-map#setVenueMapArtwork
+      result: linked points; the guest map artwork lined up with the plan
     - frame: 6
       screen: BO-094
       blockA: true
@@ -797,8 +806,6 @@ flows:
     - question: Exact error copy for unreadable and wouldStrandPoints
       default: '''We could not read this file. Send it as DWG or DXF if you can.'' and ''Closing this path would leave
         {n} points unreachable: {names}.'''
-    - question: No screen is named for the illustrated map upload and its four alignment points.
-      default: A section on BO-094 "Guest map artwork" with the upload and four alignment-point pairs.
     - question: Exact copy for the finding codes is not in the package (the server sends message).
       default: Use the wording drafted in inputs.validation; one line per finding, linked to the spec section.
     offline: The authoring side cannot go offline and the guest side must. Import, labelling and publish are back-office
@@ -816,7 +823,14 @@ flows:
       - venue-map#getVenueMap
       - venue-map#getVenueMapGraph
       - venue-map#importVenueGeometry
+      - venue-map#getVenueMapImportJob
       - ai#proposeVenueLabels
+      - ai#proposeWalkways
+      - venue-map#acceptWalkwayProposals
+      - venue-map#getVenueNavigationFile
+      - venue-map#setVenueMapArtwork
+      - assets#createUpload
+      - assets#completeUpload
       - venue-map#publishVenueMap
       - venue-map#setPlacedResource
       - venue-map#setVenuePoint
@@ -1000,6 +1014,10 @@ flows:
       - 'scanned PDF: treated as raster (see open on OCR)'
       - upload panel with format guidance (DWG/DXF preferred; PDF and raster weaker) and the 3D model note
     resolved:
+    - q: No screen is named for the illustrated map upload and its four alignment points.
+      was_default: A section on BO-094 "Guest map artwork" with the upload and four alignment-point pairs.
+      resolved_by: 'the lead, 3 Oct (CHG-RONEC-001): BO-094 "Guest map artwork" binds assets#createUpload / completeUpload
+        and the new venue-map#setVenueMapArtwork (two to four alignment pairs, four recommended)'
     - q: GLB and the navigation JSON are not yet accepted by importVenueGeometry (format enum is pdf/svg/dwg/dxf/raster);
         VenueMap.modelAssetId/modelTransform and an assets model3d kind are ADR-0069 action items 3-5, still open.
       was_default: Draw BO-093 with a fourth source kind, "3D model + navigation file", two upload slots and the budget/anchor
@@ -1079,7 +1097,7 @@ flows:
         states: {loading: "answering", ready: "figures and the answer", empty: "no data yet for a new promotion"}
         failure_branches: [{what: "a step not licensed for the tenant", sees: "chain stops at the module boundary (stoppedAtModule)", recover: "none needed; licence boundary, not a failure"}]
     steps:
-      - {frame: 1, screen: "BO-013", blockA: true, sees: "channel allocation bars and OTA listings", does: "sets channel capacity for the quiet Tuesday", operation: "catalogue#createChannelCapacity / updateChannelCapacity", result: "envelopes per channel"}
+      - {frame: 1, screen: "BO-013", blockA: true, sees: "channel allocation bars and OTA listings", does: "sets channel capacity for the quiet Tuesday", operation: "catalogue#createChannelCapacity / catalogue#updateChannelCapacity", result: "envelopes per channel"}
       - {frame: 2, screen: "BO-011", blockA: true, sees: "bundle canvas (components, choice groups, allocation)", does: "builds ticket + meal bundle", operation: "promotions#createBundle", result: "bundle drafted"}
       - {frame: 3, screen: "ANL-009", blockA: false, sees: "AI assistant and action centre", does: "asks a question and decides a proposed action", operation: "reporting#askReportingQuestion, ai#decideProposedAction", result: "answer and decision"}
       - {frame: 4, screen: "BO-010", blockA: true, sees: "promotion form (kind first) and coupon campaign", does: "creates promotion, campaign, generates codes; reads cost", operation: "promotions#createPromotion, promotions#createCouponCampaign, promotions#generateCouponCodes, reporting#getDashboard", result: "promotion live and measured"}

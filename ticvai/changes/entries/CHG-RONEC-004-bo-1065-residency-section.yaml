@@ -1,0 +1,35 @@
+id: CHG-RONEC-004
+date: '2026-10-03'
+source: cr
+kind: spec
+summary: BO-1065's AI residency section is real. It reads the residency class, the allowed residencies and the opt-in
+  evidence from getRegionSettings and saves them with updateRegionSettings.
+decision:
+  what: 'BO-1065 gains a detail panel "AI residency" (aiResidencyClass, allowedAiResidencies, aiResidencyOptIn), three
+    controls bound to those fields that save with updateRegionSettings (the 422 residency-opt-in-required named on the
+    class control), a "Save AI residency" action with its form (formUpdateAiResidency), and updateRegionSettings now
+    invalidates getRegionSettings. PUT semantics are stated: the residency save sends the settings in force with only
+    the residency fields changed.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay, 3 October 2026, r1 additions (docs/active/decisions/answers-3-october-r1-additions.md): "The residency section
+  on BO-1065 is drawn and built in Block A." The fields existed on RegionSettings since CHG-CSP-009 (ADR-0009 as amended
+  2 October, DEC-539) but BO-1065 named them only in its form text, with no control bound to them.'
+keys_touched:
+  screens: [BO-1065]
+  operations: [getRegionSettings, updateRegionSettings]
+  files: [screens/P08-venue-back-office.yaml]
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-r1-additions.py
+status: open
+notes: 'R1-RESIDENCY fails on the parent (3 findings) and passes after. BO-1065 is still wave 3 in screens/; moving it (or
+  its residency section) into Block A is the plan side of the same r1 additions, and once it is a Block A build
+  check-screen-patterns P8 asks for wave 1.'
