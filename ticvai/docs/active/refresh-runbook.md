@@ -1,6 +1,7 @@
 # The refresh gate: how to run it, read it, and keep it fast
 
-> **Owner:** Chinmay. **Decided:** council of 3 October 2026, 23:30 (refresh speed-up; TODO "Refresh speed-up").
+> **Owner:** Chinmay. **Decided:** council of 3 October 2026, 23:30
+> (`docs/active/council/council-report-2026-10-03-refresh.html`).
 > **Change:** `changes/entries/CHG-RSPD-001-refresh-speed-up.yaml`. **Tools:** `tools/refresh-safe.sh`,
 > `tools/refresh-manifest.py` (emits the run), `tools/run-checks.py` (the checks).
 > The release steps around it are in `docs/active/release-runbook.md`.

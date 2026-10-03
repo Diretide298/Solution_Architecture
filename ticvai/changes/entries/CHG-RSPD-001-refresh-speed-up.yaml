@@ -12,8 +12,8 @@ decision:
     cache before Sprint 2.'
   by: Chinmay
   date: '2026-10-03'
-why: 'The council of 3 October 23:30 (audit/ticvai/council/council-transcript-20261003-refresh.md, chairman
-  verdict) found that reruns, not run length, were the cost: about 80 minutes paid six times on 3 October, and
+why: 'The council of 3 October 23:30 (docs/active/council/council-report-2026-10-03-refresh.html, copied into git
+  from the council folder, with its transcript; chairman verdict) found that reruns, not run length, were the cost: about 80 minutes paid six times on 3 October, and
   one run died silently at step 37 (build-service-docs) with nothing after the step banner. The gate is the
   safety net, so speed may not weaken it; every part below either makes a failure cheaper or is proven to give
   the same result.'
@@ -25,6 +25,7 @@ keys_touched:
   - tools/check-screens.py
   - docs/active/refresh-runbook.md
   - docs/active/release-runbook.md
+  - docs/active/council/council-report-2026-10-03-refresh.html
 root_class: A00 TOOLING
 tickets:
   started: []
