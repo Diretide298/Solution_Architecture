@@ -34935,53 +34935,35 @@ screens:
       - tenantId
     - to: ADM-541
       trigger: AI Decision Explanation Workspace
-      provenance: 'authored 3 October 2026 (CHG-SPF-004): ADM-539 holds decisionRecordId and ADM-541
-        cannot load without it, so the edge carries it; was: structural — pack board 3 wiring, 19 September
-        2026'
+      provenance: structural — pack board 3 wiring, 19 September 2026
       carries:
       - tenantId
-      - decisionRecordId
     - to: ADM-542
       trigger: Data, Feature & Evidence Provenance
-      provenance: 'authored 3 October 2026 (CHG-SPF-004): ADM-539 holds decisionRecordId and ADM-542
-        cannot load without it, so the edge carries it; was: structural — pack board 3 wiring, 19 September
-        2026'
+      provenance: structural — pack board 3 wiring, 19 September 2026
       carries:
       - tenantId
-      - decisionRecordId
     - to: ADM-543
       trigger: Candidate, Rule & Decision Path Trace
-      provenance: 'authored 3 October 2026 (CHG-SPF-004): ADM-539 holds decisionRecordId and ADM-543
-        cannot load without it, so the edge carries it; was: structural — pack board 3 wiring, 19 September
-        2026'
+      provenance: structural — pack board 3 wiring, 19 September 2026
       carries:
       - tenantId
-      - decisionRecordId
     - to: ADM-544
       trigger: Model, Provider & AI Runtime Trace
-      provenance: 'authored 3 October 2026 (CHG-SPF-004): ADM-539 holds decisionRecordId and ADM-544
-        cannot load without it, so the edge carries it; was: structural — pack board 3 wiring, 19 September
-        2026'
+      provenance: structural — pack board 3 wiring, 19 September 2026
       carries:
       - tenantId
-      - decisionRecordId
     - to: ADM-545
       trigger: Governance, Approval & Human Decision Trace
-      provenance: 'authored 3 October 2026 (CHG-SPF-004): ADM-539 holds decisionRecordId and ADM-545
-        cannot load without it, so the edge carries it; was: structural — pack board 3 wiring, 19 September
-        2026'
+      provenance: structural — pack board 3 wiring, 19 September 2026
       carries:
       - tenantId
-      - decisionRecordId
     - to: ADM-546
       trigger: Execution & Business Outcome Trace
-      provenance: 'authored 3 October 2026 (CHG-SPF-004): ADM-539 holds decisionRecordId and ADM-546
-        cannot load without it, so the edge carries it; was: structural — pack board 3 wiring, 19 September
-        2026'
+      provenance: structural — pack board 3 wiring, 19 September 2026
       carries:
       - planId
       - tenantId
-      - decisionRecordId
     - to: ADM-547
       trigger: AI Audit Record & Evidence Package
       provenance: structural — pack board 3 wiring, 19 September 2026
@@ -34989,12 +34971,9 @@ screens:
       - tenantId
     - to: ADM-548
       trigger: AI Trace Investigation & Replay Simulator
-      provenance: 'authored 3 October 2026 (CHG-SPF-004): ADM-539 holds decisionRecordId and ADM-548
-        cannot load without it, so the edge carries it; was: structural — pack board 3 wiring, 19 September
-        2026'
+      provenance: structural — pack board 3 wiring, 19 September 2026
       carries:
       - tenantId
-      - decisionRecordId
   density: compact
   pattern: commandCentre
   patternReason: the pack gives this screen a metric directory (§Header KPIs) and no per-row directory

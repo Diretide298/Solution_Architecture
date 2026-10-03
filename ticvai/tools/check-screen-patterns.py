@@ -86,6 +86,9 @@ P5_PACK_SPOKES = {
     ("ADM-191", "bundleId"), ("ADM-195", "bundleId"), ("ADM-593", "token"),
     ("ADM-680", "subjectId"), ("ADM-366", "approvalRequestId"), ("ADM-027", "runId"),
     ("ADM-533", "decisionRecordId"), ("PTR-013", "accountId"), ("ANL-006", "countId"),
+    ("ADM-541", "decisionRecordId"), ("ADM-542", "decisionRecordId"), ("ADM-543", "decisionRecordId"),
+    ("ADM-544", "decisionRecordId"), ("ADM-545", "decisionRecordId"), ("ADM-546", "decisionRecordId"),
+    ("ADM-548", "decisionRecordId"),
 }
 for (_sid, _p), _why in P5_BLOCK_A.items():
     EXEMPT[("P5", _sid, f"requires {_p} ")] = "Block A, open: " + _why

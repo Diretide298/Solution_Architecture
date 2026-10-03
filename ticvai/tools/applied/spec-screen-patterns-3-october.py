@@ -199,6 +199,18 @@ def fix_p1(pk, s, log):
                 field = str(c["bindsTo"]).split(".", 1)[1]
                 sch = pk.request_schema(c["operation"])
                 if sch and field in sch["properties"] and sp.read_only(sch, field):
+                    # **A mis-bound input is rebound, not removed**: ADM-342's MFA list was bound to
+                    # `PasswordPolicy.id` and names the field it edits in `columns`.
+                    alt = [str(x).split(".", 1)[1] for x in c.get("columns") or []
+                           if str(x).startswith(str(c["bindsTo"]).split(".", 1)[0] + ".")]
+                    alt = [f for f in alt if f in sch["properties"] and not sp.read_only(sch, f)]
+                    if len(alt) == 1:
+                        c["bindsTo"] = str(c["bindsTo"]).split(".", 1)[0] + "." + alt[0]
+                        c.pop("columns", None)
+                        log.append(f"P1 {s['id']}: input '{c.get('label')}' rebound {field} -> {alt[0]}")
+                        hit = True
+                        keep.append(c)
+                        continue
                     log.append(f"P1 {s['id']}: input '{c.get('label')}' ({field}) removed")
                     hit = True
                     continue
@@ -343,8 +355,11 @@ def held_by(pk, src: dict, name: str, dst: dict) -> bool:
         got = pk.response_props(x["operationId"])
         if name in got or "{" + name + "}" in o.get("_path", ""):
             return True
-        if any(g.startswith("@") and g[1:].lower().endswith(stem) for g in got):
-            return True                     # it lists, reads or makes the rows `name` identifies
+        # the rows `name` identifies, by the schema's last word (`RentalBooking.id` is `bookingId`),
+        # the rule derive-carries-from-entrystate and check-navigation hold an edge to
+        if any(g.startswith("@") and re.findall(r"[A-Z][a-z0-9]*", g[1:])
+               and re.findall(r"[A-Z][a-z0-9]*", g[1:])[-1].lower() == stem.lower() for g in got):
+            return True
     return False
 
 
