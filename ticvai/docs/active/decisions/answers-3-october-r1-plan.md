@@ -1,0 +1,21 @@
+# Block A completes its apps, and the r1 gate's ticket findings (3 October 2026)
+
+> **The cited copy (3 October 2026, CHG-RONEP-001).** From Chinmay's answers log of 3 October (the lead's working log of
+> batch 1 onward): the first bullet of the section "r1 additions", the hosting bullet of "Gate and hosting", and the
+> lead's findings from the r1 gate handed to the plan batch the same day. Copied into git so the CHG-RONEP entries,
+> `tools/check-plan-closure.py` and `tools/check-ticket-builds.py` can cite them (`ticvai/CLAUDE.md` rule 12). The two
+> answers are verbatim; the findings are as the lead sent them. Applied by CHG-RONEP-001 to CHG-RONEP-005.
+
+## r1 additions (Chinmay, 3 Oct afternoon, all as recommended)
+- Block A completes its apps: every operation a Block A screen binds is built in Block A or earlier (a new rule); getUnifiedReconciliation, createPrincipal, requestProductionAccess, closeFiscalPeriod / listFiscalPeriods, report scheduling and the BO-074/BO-075 writes move into Block A; so do getGuestConversation and sendGuestConversationMessage (AI-ENGINE-CONCIERGE) and setAiProvider / setAiCredential (AI-ENGINE-GATEWAY). The residency section on BO-1065 is drawn and built in Block A.
+- getGuestConversation is bound on WEB-044, GST-031, GST-032 (poll every 5 s, 30 s when hidden). BYOK keys are entered by TICVAI staff under the grant in Block A (no tenant self-service yet).
+
+## Gate and hosting (Chinmay, 3 Oct evening)
+- Hosting: "We are not hosting anything unless client asks it." No in-cell open model (gpt-oss-120b), no GPU node pool. The AI goes through providers: Core42 Compass by default, OpenAI UAE as fallback, BYOK. The guard model (Qwen3Guard) needs a GPU host, so it becomes the provider-side safety service (e.g. Azure AI Content Safety, UAE North) unless the client asks for self-hosting (default; Chinmay may drop the guard). The Presidio scrubber stays: a CPU library inside our own worker, not a hosted model; scrubbing stays mandatory. On-prem / self-hosted models only when a client asks.
+
+## The lead's r1 gate findings for the plan batch (3 October)
+- **Artefacts that left Block A.** Comparing the plan before the fresh map (4e2c56c1) with 3044d8b0 (op-release built with an empty map), ten artefacts built in Block A before are built by no ticket now: payments#listPaymentMethods, payments#listPaymentProviderConnections, payments#setPaymentRules, payments#simulatePaymentConfiguration, payments#testPaymentProviderConnection, screen ADM-031, and the tables marketing.duplicate_candidate, marketing.identity_rules, marketing.privacy_exception, marketing.privacy_request. Put each back into the right block (Block A if a Block A screen or flow needs it; payment configuration is needed before guests can pay), and extend the new check so that no artefact built by an earlier plan disappears without an explicit retire reason.
+- **The completeness rule must cover the design batches' cross-checks.** Venue Management: Block A P08 screens bind 74 operations built only in Block B and 99 built by no ticket, over 63 screens (most on BO-010, BO-054, BO-013); CMS: 8 operations on CMS-025 and CMS-026 built by no ticket; TICVAI Console: 22 (ADM-005, ADM-008, ADM-037, ADM-500, ADM-508, ADM-523, ADM-556); Analytics: ANL-025 listKpis, ANL-066 getSemanticModel. If moving them all pushes Block A past 27 November, report the points and the overflow instead of cutting; Chinmay decides.
+- **G1** Module-test tickets (TEST-AM-*) name nothing to test. Their builds and links must list their app-module's artefacts, and their done-when must name them.
+- **G2** Tickets whose builds do not resolve: PLATFORM-OUTBOX, PLATFORM-SAGA-PAID (builds "operation" with no id), OFFLINE-JOURNAL, the AI-ENGINE tasks (they must name their real operations, e.g. runAiEvaluation, setAiProvider, proposeGuidedChoice, and tables and ADRs). Add a check: every id in a ticket's builds resolves to a real operation, screen, table, service or ADR.
+- **G4** Ticket title scope against links: APP-SETUP-BO-1162 says "2 of its 6 operations" but links all 6. A setup ticket links only its slice's operations; the rest-of-the-screen ticket links the rest.

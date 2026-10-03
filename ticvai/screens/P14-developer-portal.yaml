@@ -64,7 +64,7 @@ screens:
   name: API Reference
   module: Developer & API
   requiresModule: developerApi
-  wave: 2
+  wave: 1
   implementation:
     app: developer-portal-web
     route: /developer/reference

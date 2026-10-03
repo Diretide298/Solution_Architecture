@@ -70,6 +70,25 @@ TEAM = ROOT / "docs" / "active" / "team.json"
 EXTRA = ROOT / "docs" / "active" / "block-a-extra-tasks.json"
 MAX_DEPTH = 3
 
+
+def block_a_decisions() -> dict:
+    """**Block A completes its apps** (Chinmay, 3 October 2026, CHG-RONEP-001; docs/active/decisions/answers-3-october-r1-plan.md).
+    The decided parts of Block A's scope that no screen binding derives, from block-a-extra-tasks.json:
+
+      aiEngineOperations  operation -> the AI engine task that serves it (a task's `operations`: AI-ENGINE-GATEWAY,
+                          AI-ENGINE-CONCIERGE); built in ticvai-ai by the AI engineers, so no back-end task builds it
+      blockAOperations    operation -> why Block A builds it although no Block A screen binds it in this tree
+      blockAScreens       screen -> why Block A builds the whole screen (its setup part and the rest)
+      screenNotes         screen -> a sentence its Block A tasks carry (BO-1065: the AI residency section)
+
+    tools/check-plan-closure.py reads the same file and checks that the plan holds them."""
+    if not EXTRA.exists():
+        return {"aiEngineOperations": {}, "blockAOperations": {}, "blockAScreens": {}, "screenNotes": {}}
+    ex = json.loads(EXTRA.read_text(encoding="utf-8"))
+    ai = {o: t["key"] for t in ex.get("tasks") or [] for o in t.get("operations") or []}
+    return {"aiEngineOperations": ai, "blockAOperations": dict(ex.get("blockAOperations") or {}),
+            "blockAScreens": dict(ex.get("blockAScreens") or {}), "screenNotes": dict(ex.get("screenNotes") or {})}
+
 # **The one authored table in this file.** The decomposition explains each service to an architect
 # ("platform.org_unit is reached by 304 of 379 tables"); a client needs what it does for the venue.
 # A service missing from here fails the run rather than falling back to the architect's sentence.
@@ -1296,9 +1315,16 @@ def main() -> int:
     op_task: dict[str, str] = {}
     svc_points = defaultdict(int)
     chunks = []
+    # **An operation the AI engine serves is built by its AI engine task** (CHG-RONEP-001, 3 October): sendGuestConversationMessage
+    # and getGuestConversation by AI-ENGINE-CONCIERGE, setAiProvider and setAiCredential by AI-ENGINE-GATEWAY
+    # (block-a-extra-tasks.json `operations`). They take no back-end chunk; the task is created with the extra tasks below.
+    decided = block_a_decisions()
+    ai_ops = {o: k for o, k in decided["aiEngineOperations"].items() if o in ops}
     for n, olist in sorted(by_service.items()):
         groups = defaultdict(list)
         for o in olist:
+            if o in ai_ops:
+                continue
             groups[ops[o]["tag"]].append(o)
         for g, gl in sorted(groups.items()):
             gl = sorted(gl)
@@ -1310,6 +1336,7 @@ def main() -> int:
                     op_task[o] = tk
                 svc_points[n] += pts
                 chunks.append((n, g, tk, part, pts))
+    op_task.update(ai_ops)
     # **A service has one owner**, so its tasks stay in one head; whole services are balanced across
     # the backend developers, largest first, counting the DevOps load already carried.
     load = defaultdict(int)
@@ -1693,6 +1720,25 @@ def main() -> int:
             x["assignee"] = who
             load[who] += int(x["points"] or 0)
 
+    def extra_lead(t_):
+        """**What a hand-written task builds leads its text** (CHG-RONEP-001, CHG-RONEP-003): the operations an AI engine task
+        serves (`operations`) and the artefacts it lists (`builds`: operation, table, screen, service or adr ids), in the
+        "Builds:" form ticket_done.builds_of reads. Without it the task's title was read as operations (r1 gate, G2)."""
+        served = sorted(o for o in t_.get("operations") or [] if o in ops)
+        items = [f"operation {ops[o]['contract']}#{o}" for o in served]
+        for b in t_.get("builds") or []:
+            kind, _, name = b.partition(" ")
+            b = f"operation {ops[name]['contract']}#{name}" if kind == "operation" and name in ops else b
+            if b not in items:
+                items.append(b)
+        if not items:
+            return ""
+        lead = "Builds: " + ", ".join(f"`{b}`" for b in items) + ". "
+        if served:
+            lead += (f"{', '.join(served)} {'is' if len(served) == 1 else 'are'} served by ticvai-ai behind the AI gateway, "
+                     "to their contracts at the release tag in ADAM; no back-end task builds them. ")
+        return lead
+
     # **Tasks no screen or operation implies** (docs/active/block-a-extra-tasks.json, 30 September): the
     # platform kernel and offline machinery the system-design review found unticketed (SD-047, SD-063), and
     # the AI engine work the two AI engineers carry. Backend-pool tasks go to the least-loaded owner, as
@@ -1713,8 +1759,8 @@ def main() -> int:
             who = t_.get("assignee") or (min(backend_, key=lambda x: load[x]) if backend_ else "")
             if not is_ai and who:
                 load[who] += pts
-            task(t_["key"], t_["epic"], "Task", t_["subject"], t_["subject"] + ". " + t_["detail"], 1, pts=pts,
-                 area="ai" if is_ai else "backend", assignee=who, depends=t_.get("depends") or ())
+            task(t_["key"], t_["epic"], "Task", t_["subject"], t_["subject"] + ". " + extra_lead(t_) + t_["detail"], 1,
+                 pts=pts, area="ai" if is_ai else "backend", assignee=who, depends=t_.get("depends") or ())
 
     # ================================================================ the rest of the package (1 October)
     # **Every block is planned task by task now**, not only Block A: the PM's replan wants module-wise completion
@@ -1739,6 +1785,29 @@ def main() -> int:
     def screen_ops(sid):
         return [a["operationId"] for a in screens[sid].get("apis") or []
                 if isinstance(a, dict) and a.get("operationId") in ops]
+
+    def nav_hubs(a_set):
+        """The screens outside `a_set` on the shortest paths (fewest such screens) from each app's entry to its
+        screens in `a_set`; repeated until nothing more is added. Shared with tools/check-plan-closure.py's C-REACH."""
+        added = set()
+        while True:
+            hubs = set()
+            for pf, theirs in sorted(screens_by_plat(a_set | added).items()):
+                for path in shortest_paths(pf, a_set | added, theirs).values():
+                    hubs |= {x for x in path if x not in a_set and x not in added}
+            if not hubs:
+                return added
+            added |= hubs
+
+    def screens_by_plat(sids):
+        out = defaultdict(set)
+        for sid in sids:
+            if sid in screens:
+                out[plat_of(sid)].add(sid)
+        return out
+
+    def shortest_paths(pf, a_set, targets):
+        return sp.nav_paths({sid: s_ for sid, s_ in screens.items() if plat_of(sid) == pf}, a_set, targets)
 
     built_screen = {}
     for t_ in tasks:
@@ -1783,6 +1852,10 @@ def main() -> int:
         for br in fd.get("branches") or []:
             if isinstance(br, dict) and br.get("resolvedBy") in screens:
                 need_screens.add(br["resolvedBy"])
+            # a branch resolved by an operation needs it too (CHG-RONEP-002): F02's hold-expiry branches are resolved by
+            # extendSeatHold, which r2 built in Block A only by riding along and the fresh plan dropped to Block C
+            elif isinstance(br, dict) and str(br.get("resolvedBy") or "").split(" ")[0] in ops:
+                need_ops.add(str(br["resolvedBy"]).split(" ")[0])
     # **Block A takes the door of every app it puts a screen in** (CHG-DOOR-004, Chinmay, 2 October 2026: fix
     # the Block A blockers now). Block A's Venue Management screens (BO-084, BO-085, BO-124 and the setup
     # screens) were planned with SUP-001, the only way into Venue Management, in Block B: nothing in this
@@ -1791,6 +1864,19 @@ def main() -> int:
     # the slice builds -- the door of its own platform comes too, or, where its platform has none (P08, P13,
     # P16, P14), every door of its shipped app (`platform.targetApp.app`). A door is a screen calling an
     # operation that opens a session, the same test tools/check-session-entry.py and tools/check-doors.py use.
+    # **Every operation a Block A screen binds is built in Block A or earlier** (Chinmay, 3 October 2026: "Block A
+    # completes its apps"; CHG-RONEP-001, docs/active/decisions/answers-3-october-r1-plan.md). The closure above took the
+    # screens of the Block A apps and of their flows, but not the other screens Block A builds: the setup screens
+    # (APP-SETUP-*, built "only as far as the slice needs") and the slice's own screens on other apps. A setup screen is
+    # drawn whole in Block A, so its Create, Edit and list buttons reached the Block A design and the tickets while
+    # their operations were planned in Blocks B to D: BO-074's createAccount, DEV-003's requestProductionAccess,
+    # ADM-037's setAiProvider. So every screen a Block A task builds is in the closure -- its whole binding set (`apis`,
+    # onLoad and onAction alike), and the rest of the screen with it, in Block A -- and so are the screens and
+    # operations Chinmay decided on although nothing in this tree binds them yet (block-a-extra-tasks.json
+    # `blockAScreens`, `blockAOperations`). tools/check-plan-closure.py checks the plan that comes out.
+    need_screens |= {sid for sid, k in built_screen.items() if by_key[k]["phase"] == 1}
+    need_screens |= set(decided["blockAScreens"]) & set(screens)
+    need_ops |= {o for o in decided["blockAOperations"] if o in ops}
     door_ops = {"login", "verifyGuestOtp", "guestSocialLogin", "guestUaePassLogin"}
     doors_of_plat, doors_of_app = defaultdict(set), defaultdict(set)
     for sid_, s_ in screens.items():
@@ -1800,6 +1886,13 @@ def main() -> int:
     for sid_ in sorted(need_screens | set(setup_screens)):
         app_ = (screens[sid_]["_platform"].get("targetApp") or {}).get("app")
         need_screens |= doors_of_plat.get(plat_of(sid_)) or doors_of_app.get(app_) or set()
+    # **Every Block A screen is reachable from its app's entry through Block A screens** (CHG-RONEP-006, 3 October; the
+    # lead, from the design batches: eight of the nine Block A staff-app screens were reachable only through EMP-003, the
+    # home on duty, in no block, and EMP-002 in Block B). From each app's entry (`navigation.isEntryPoint`), the path to
+    # every Block A screen that passes the fewest screens outside Block A is found (0-1 shortest path over `exitTo` and
+    # `transitions`), and those screens -- the homes and hubs -- join Block A with their bindings. A screen with no path at
+    # all is a navigation gap, reported by tools/check-plan-closure.py (C-REACH), not something the plan can fix.
+    need_screens |= nav_hubs(need_screens)
     for sid in need_screens:
         need_ops |= set(screen_ops(sid))
     gone_screens = replaced_screens()
@@ -1817,8 +1910,11 @@ def main() -> int:
             continue
         if have:
             # **A setup screen is built in Block A only as far as the slice needs** (its setup operations); the rest
-            # of the screen comes with its app-module, as one more task on the same screen.
-            rest = [o for o in screen_ops(sid) if o not in planned_ops]
+            # of the screen comes with its app-module, as one more task on the same screen -- in Block A since
+            # CHG-RONEP-001, as the closure above holds it. The rest is every operation beyond the setup ones, also those
+            # another task builds: until 3 October it was only the unplanned ones, so a screen whose other operations
+            # were all planned elsewhere (BO-1065: listDenominations, getRegionSettings) had nobody wiring them.
+            rest = [o for o in screen_ops(sid) if o not in setup_screens.get(sid, ())]
             if not rest:
                 continue
             pts = max(1, points_of(screen_raw(s_)) - setup_sizes.get(sid, 1))
@@ -1844,6 +1940,19 @@ def main() -> int:
                           "order": order or sp.am_order(module, platform, part, variant)}
         return k
 
+    def setup_am(sid):
+        """Block A's setup screens (only their setup operations) are one app-module per package and app:
+        "Ticketing & Guest Commerce · Venue Management (setup)", not one per module (often one screen). Since
+        CHG-RONEP-001 the rest of each setup screen is built in it too."""
+        mod, pf = screen_module(sid), plat_of(sid)
+        pkg = sp.PACKAGE_OF.get(mod, "Platform Foundation")
+        pi = [x[0] for x in sp.PACKAGES].index(pkg)
+        code = re.sub(r"[^A-Z0-9]+", "-", pkg.upper()).strip("-")
+        return add_am(pkg, pf, None, 1, block="A", key=f"AM-SETUP-{code}-{pf}",
+                      name=f"{pkg} · {sp.PLATFORM_NAME.get(pf, pf)} (setup)",
+                      order=(min(sp.MODULE_PHASE.get(m, 3) for m in sp.PACKAGES[pi][2]), 50 + pi,
+                             sp.PLATFORM_ORDER.index(pf) if pf in sp.PLATFORM_ORDER else 99, 0, 0))
+
     a_plain = set()           # (module, platform) with a Block A app-module of the same name
     parts_total = {}          # (module, platform) -> how many parts it has, Block A's included
     for t_ in tasks:
@@ -1857,6 +1966,10 @@ def main() -> int:
         # one, else a "(Block A)" part of its own
         mine = [x for x in lst if x[0] in need_screens]
         lst = [x for x in lst if x[0] not in need_screens]
+        # the rest of a setup screen goes with its setup part, in the setup app-module (CHG-RONEP-001)
+        for sid, key, pts, kind in [x for x in mine if x[3] == "rest"]:
+            later_items.append((key, sid, setup_am(sid), kind, pts))
+        mine = [x for x in mine if x[3] != "rest"]
         if mine:
             if (module, platform) in a_plain:
                 ka = sp.am_key(module, platform, 1)
@@ -1915,7 +2028,20 @@ def main() -> int:
     for o in sorted(ops):
         if o in planned_ops or ops[o]["provisional"]:
             continue
-        if callers.get(o):
+        # **An operation Block A needs is planned with a Block A app-module** (CHG-RONEP-001), so the four-operation
+        # tasks it is cut into hold only Block A work. Until 3 October it went with its first caller in build order
+        # and the closure pulled that whole task into Block A, three other operations riding along: when new
+        # operations re-cut the chunks, listPaymentMethods and setPaymentRules (r2: SVC-ORDER-PAYMENTS-8 and -9, Block A)
+        # fell to Block C with nobody deciding it.
+        a_callers = [x for x in callers.get(o, ()) if am_info[x]["block"] == "A"] if o in need_ops else []
+        a_home = [a["key"] for a in am_info.values() if a["block"] == "A" and a["module"] == op_module[o]
+                  and a["platform"] != "AI" and not a["key"].startswith("AM-SETUP-")] if o in need_ops else []
+        if a_callers:
+            k = min(a_callers, key=lambda x: am_info[x]["order"])
+        elif o in need_ops:
+            k = (min(a_home, key=lambda x: am_info[x]["order"]) if a_home
+                 else add_am(op_module[o], "API", None, 1, variant="Block A", block="A"))
+        elif callers.get(o):
             k = min(callers[o], key=lambda x: am_info[x]["order"])
         else:
             m_ = op_module[o]
@@ -2059,8 +2185,8 @@ def main() -> int:
             pf = t_.get("platform") or "API"
             k = add_am(m_, pf, None, 1, variant="" if pf != "API" else "platform",
                        name=None if pf != "API" else f"{sp.MODULE_SHORT.get(m_, m_)} · platform (later blocks)")
-            task(t_["key"], k, "Task", t_["subject"], t_["subject"] + ". " + t_["detail"], 3, pts=int(t_["points"]),
-                 area="backend", assignee=t_.get("assignee") or "", depends=t_.get("depends") or ())
+            task(t_["key"], k, "Task", t_["subject"], t_["subject"] + ". " + extra_lead(t_) + t_["detail"], 3,
+                 pts=int(t_["points"]), area="backend", assignee=t_.get("assignee") or "", depends=t_.get("depends") or ())
             am_of[t_["key"]] = k
     later_keys = set(am_of) | set(later_op_task.values()) | set(later_mig.values())
     for t_ in tasks:
@@ -2101,6 +2227,8 @@ def main() -> int:
     # to show and nothing to test against. Readers write nothing, so this can never close a loop.
     writers_of = defaultdict(set)
     for k, found in ops_of.items():
+        if k in by_key and by_key[k]["track"] != "Backend":
+            continue                     # an AI engine task serving operations (CHG-RONEP-001) holds no report back
         for o in found:
             for w in (lineage.get(o) or {}).get("writes") or []:
                 if not w.startswith(("cache:", "qdrant")):
@@ -2233,15 +2361,7 @@ def main() -> int:
             sid = key_identity(k)[1]
             mod, pf = screen_module(sid), plat_of(sid)
             if k.startswith("APP-SETUP-"):
-                # Block A's setup screens (only their setup operations) are one app-module per package and app:
-                # "Ticketing & Guest Commerce · Venue Management (setup)", not one per module (often one screen)
-                pkg = sp.PACKAGE_OF.get(mod, "Platform Foundation")
-                pi = [x[0] for x in sp.PACKAGES].index(pkg)
-                code = re.sub(r"[^A-Z0-9]+", "-", pkg.upper()).strip("-")
-                am_of[k] = add_am(pkg, pf, None, 1, block="A", key=f"AM-SETUP-{code}-{pf}",
-                                  name=f"{pkg} · {sp.PLATFORM_NAME.get(pf, pf)} (setup)",
-                                  order=(min(sp.MODULE_PHASE.get(m, 3) for m in sp.PACKAGES[pi][2]), 50 + pi,
-                                         sp.PLATFORM_ORDER.index(pf) if pf in sp.PLATFORM_ORDER else 99, 0, 0))
+                am_of[k] = setup_am(sid)
             else:
                 am_of[k] = add_am(mod, pf, 1, parts_total.get((mod, pf), 1), block="A")
     a_keys = {t_["key"] for t_ in leaf if t_["phase"] == 1}
@@ -2499,12 +2619,26 @@ def main() -> int:
         tk = f"TEST-{k}"
         a = am_info[k]
         is_a = a["block"] == "A"
+        # **A module test names what it tests** (r1 gate G1, CHG-RONEP-003): the screens, operations and tables its
+        # app-module's tasks build, as its builds (so ADAM links them) and in its done-when. It said "every screen state
+        # its YAML lists" and named no screen, so the judge could not tell what to test.
+        arts = []
+        for x in sorted(ch, key=lambda x: (TRACK_ORDER.get(x["track"], 9), x["key"])):
+            for b_ in ticket_done.builds_of(x, "", lineage):
+                if b_ not in arts and not b_.startswith(("service ", "adr ")):
+                    arts.append(b_)
+        arts.sort(key=lambda b_: ({"screen": 0, "operation": 1, "table": 2}.get(b_.split(" ")[0], 3), b_))
+        names_ = [b_.split(" ", 1)[1] for b_ in arts]
+        named = (", ".join(f"`{n_}`" for n_ in names_[:12]) + (f" and {len(names_) - 12} more" if len(names_) > 12 else "")
+                 if names_ else "")
         task(tk, k, "Task", f"Module test: {a['name']}",
+             (("Builds: " + ", ".join(f"`{b_}`" for b_ in arts) + ". ") if arts else "") +
              f"The module test of {a['name']} on the integration environment (docs/active/block-test-strategy.md): "
              "every screen state its YAML lists, every navigation link, every permission (an allowed and a refused "
              "user), every operation's error responses, and for an offline app its offline behaviour with the network "
-             "cut. Done when it passes with no open severity 1 or 2 defect. By a peer in the module's stack who did not "
-             f"build most of it. {len(ch)} tickets, {pts} points" + (f", {days:g} AI-engineer days" if days else "") + ".",
+             "cut. Done when it passes " + (f"for {named} " if named else "") + "with no open severity 1 or 2 defect. "
+             f"By a peer in the module's stack who did not build most of it. {len(ch)} tickets, {pts} points"
+             + (f", {days:g} AI-engineer days" if days else "") + ".",
              min((int(x["wave"]) for x in ch if str(x["wave"]).isdigit()), default=3), area="test",
              pts=max(tests["minPoints"], round(tests["share"] * pts)) if pts else "",
              depends=[x["key"] for x in ch])
@@ -2914,6 +3048,14 @@ def main() -> int:
     # row and the pointer say the same thing. Written last, after every edit to the descriptions above, and after a
     # full stop: a setup task's "In the slice: a, b" ended the text, and check-ticket-scope reads that list up to
     # the first full stop (S-SETUP-COUNT read none of them in the first refresh with this rule).
+    # A decided sentence a screen's tasks carry comes just before it (block-a-extra-tasks.json `screenNotes`, CHG-RONEP-001:
+    # BO-1065's AI residency section is drawn and built in Block A).
+    for t_ in tasks:
+        m_ = ticket_done.SCREEN.search(t_["key"]) if t_["type"] == "Task" and t_["track"] == "Frontend" else None
+        note_ = decided["screenNotes"].get(m_.group(1)) if m_ else None
+        if note_ and note_ not in (t_["description"] or ""):
+            d_ = (t_["description"] or "").rstrip()
+            t_["description"] = (d_ + ("" if not d_ or d_[-1] in ".!?" else ".") + " " + note_).strip()
     for t_ in tasks:
         if t_["type"] == "Task" and not ticket_done.DONE_WHEN.search(t_["description"] or ""):
             d_ = (t_["description"] or "").rstrip()

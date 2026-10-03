@@ -1,0 +1,51 @@
+id: CHG-RONEP-006
+date: '2026-10-03'
+source: audit
+kind: plan
+summary: Every Block A screen is reachable from its app's entry through Block A screens, so the homes and hubs on the way
+  (EMP-003, EMP-002, BO-100 to BO-108, ADM-002, the command centres above the setup screens) are built in Block A.
+decision:
+  what: 'tools/build-service-docs.py: from each app''s entry (`navigation.isEntryPoint`, and every door), the path to each
+    Block A screen through the fewest screens outside Block A (tools/sprint_plan.py nav_paths, over `exitTo` and
+    `transitions`) is found, and those screens join Block A with their bindings, repeated until nothing more is added.
+    EMP-002 is decided Block A (blockAScreens). 61 screens join: the staff home EMP-003 and EMP-031, the kiosk''s KSK-001
+    and KSK-004, the Venue Management home and section homes BO-100 to BO-108, the TICVAI Console dashboard ADM-002,
+    DEV-001, CMS-021, ANL-001, ANL-021, ANL-061, and 42 other wave-3 hubs the setup screens hang under, most of them
+    command centres.
+    tools/check-plan-closure.py C-REACH fails on a Block A screen reached only through screens outside Block A, C-NO-PATH on
+    one no navigation reaches. With CHG-RONEP-001 and CHG-RONEP-005 Block A goes from 3,806 to 5,561 points (945 to 1,439 tasks); by
+    the sprint a task starts in: +17 points in Sprint 1, +287 in Sprint 2, +614 in Sprint 3, +382 in Sprint 4 and 455
+    starting in Sprint 5 (Blocks B, C and D go to 2,550, 2,682 and 2,776). It does not fit by Friday 27 November: Block A work after the block-test window opens rises from 19.9 to
+    86.7 person-days (72.9 of them developers'', 13.8 the AI engineers''), its last work day moves from 8 to 14 December,
+    and at normal hours it would end in Sprint 6 (25 December) instead of Sprint 5; Block B''s test runs to 28 December.
+    Block A stays fixed at Sprint 4; Chinmay decides the overtime or the cut.'
+  by: Chinmay
+  date: '2026-10-03'
+proposed: '2026-10-03'
+why: 'The lead''s finding from the design batches, 3 October (CHG-RONEP-001 source, docs/active/decisions/answers-3-october-r1-plan.md):
+  in the staff app eight of the nine Block A screens were reachable only through EMP-003 (Home, in no block) and EMP-002
+  (Block B); "extend the rule so every Block A screen is reachable from its app''s entry through Block A screens". The
+  closure of CHG-RONEP-001 took screens by their bindings and flows, never by how a person gets to them.'
+keys_touched:
+  screens: [EMP-002, EMP-003, EMP-031, KSK-001, KSK-004, BO-100, BO-101, BO-102, BO-103, BO-104, BO-105, BO-106, BO-107,
+    BO-108, ADM-002, DEV-001, CMS-021, ANL-001, ANL-021, ANL-061]
+  files: [tools/build-service-docs.py, tools/sprint_plan.py, tools/check-plan-closure.py, docs/active/block-a-extra-tasks.json,
+    checks/baseline.json]
+root_class: 'new: block-scope-incomplete'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-plan-closure.py
+status: open
+notes: 'C-REACH fails on the plan before this rule (139 Block A screens reached only through screens outside Block A; POS-000
+  reached by none until doors count as entries) and passes after it. The command centres are the costly part: pulling only
+  the homes and section homes (wave 1 and 2) gives 4,924 points, but leaves 63 setup screens reachable only through a
+  wave-3 command centre; a navigation edge from their section home (BO-101 to BO-108) would make them reachable without it,
+  which is a screens change for the screens batch, Chinmay''s call (about 566 points). The 50 hubs that were not wave 1 are
+  wave 1 now (CHG-RONEP-005). checks/baseline.json re-recorded
+  again: ticvai-control and venue-management counts moved into Block A, every app total unchanged.'

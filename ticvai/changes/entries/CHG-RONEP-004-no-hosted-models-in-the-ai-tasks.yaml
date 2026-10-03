@@ -1,0 +1,38 @@
+id: CHG-RONEP-004
+date: '2026-10-03'
+source: plan
+kind: plan
+summary: The AI engine tasks plan no model we host and no GPU pool; the fallback after Core42 Compass is OpenAI UAE, then
+  degraded mode, and the guard is the provider's safety service.
+decision:
+  what: 'AI-ENGINE-GATEWAY: the uaeOnly fallback chain is Core42 Compass then OpenAI''s UAE region, with degraded mode when both
+    are down (the in-cell gpt-oss-120b is gone, and its done-when with it); onPrem is built only when a client asks.
+    AI-ENGINE-SCRUB-GUARD: the Presidio scrubber stays a CPU library in our worker and scrubbing stays mandatory; the guard
+    is the provider-side safety service (Azure AI Content Safety, UAE North, by default) instead of a Qwen3Guard host, a
+    guard model of our own only if a client asks. check-ticket-builds B-HOSTED-MODEL fails on a task that plans gpt-oss, a
+    Qwen3Guard host, vLLM, a GPU pool or an in-cell model.'
+  by: Chinmay
+  date: '2026-10-03'
+proposed: '2026-10-03'
+why: 'Chinmay, 3 October, "Gate and hosting" (docs/active/decisions/answers-3-october-r1-plan.md): "We are not hosting anything
+  unless client asks it. No in-cell open model (gpt-oss-120b), no GPU node pool." Amends the AI task text of CHG-TBF-006
+  (ADR-0009 and ADR-0020 as amended on 2 October).'
+keys_touched:
+  tickets: [AI-ENGINE-GATEWAY, AI-ENGINE-SCRUB-GUARD]
+  files: [docs/active/block-a-extra-tasks.json, tools/check-ticket-builds.py]
+root_class: 'new: hosting-decision'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ticket-builds.py
+status: open
+notes: 'B-HOSTED-MODEL fails on the plan of 3044d8b0 (AI-ENGINE-GATEWAY and AI-ENGINE-SCRUB-GUARD) and passes after it. Not
+  changed, for Chinmay: AI-ENGINE-CONCIERGE embeds and reranks on CPU in the cell (BGE-M3 and a cross-encoder) and
+  SETUP-QDRANT runs a 3-node Qdrant cluster (ADR-0049); both are CPU software in our cell, like Presidio, not a model served
+  on a GPU, so the default keeps them. ADR-0009, ADR-0020 and docs/architecture/ai-system-design.md still describe the in-cell
+  fallback and Qwen3Guard: the docs batch owns them.'

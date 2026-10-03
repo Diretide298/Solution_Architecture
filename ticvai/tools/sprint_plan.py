@@ -421,6 +421,56 @@ def flow_claims(flows, screen_block, op_block):
     return out
 
 
+# The operations that open a session: a screen calling one is a door, where its app starts (check-doors, CHG-DOOR-004).
+DOOR_OPS = {"login", "verifyGuestOtp", "guestSocialLogin", "guestUaePassLogin"}
+
+
+def nav_exits(s):
+    """The screens a screen leads to: `navigation.exitTo` and `navigation.transitions[].to`."""
+    nav = s.get("navigation") or {}
+    out = [x if isinstance(x, str) else (x or {}).get("to") for x in nav.get("exitTo") or []]
+    out += [t.get("to") for t in nav.get("transitions") or [] if isinstance(t, dict)]
+    return [x for x in out if x]
+
+
+def nav_paths(app_screens, a_set, targets):
+    """**How a Block A screen is reached** (CHG-RONEP-006, 3 October). Over one app's screens ({id: screen}), from its
+    entries (`navigation.isEntryPoint`, and every door: a screen calling an operation that opens a session), the path to each target that passes the fewest screens outside `a_set` (a 0-1
+    shortest path: a screen in `a_set` costs nothing). Returns {target: [entry, ..., target]} for every target with a path;
+    a target with none is left out. Shared by build-service-docs.py (which pulls the screens on these paths into Block A)
+    and check-plan-closure.py (C-REACH)."""
+    import heapq
+    entries = sorted(sid for sid, s in app_screens.items() if (s.get("navigation") or {}).get("isEntryPoint")
+                     or {a.get("operationId") for a in s.get("apis") or [] if isinstance(a, dict)} & DOOR_OPS)
+    dist, prev, pq = {}, {}, []
+    for e in entries:
+        c = 0 if e in a_set else 1
+        if c < dist.get(e, 1e9):
+            dist[e] = c
+            heapq.heappush(pq, (c, e))
+    while pq:
+        c, u = heapq.heappop(pq)
+        if c > dist.get(u, 1e9):
+            continue
+        for v in nav_exits(app_screens[u]):
+            if v not in app_screens:
+                continue
+            nc = c + (0 if v in a_set else 1)
+            if nc < dist.get(v, 1e9):
+                dist[v], prev[v] = nc, u
+                heapq.heappush(pq, (nc, v))
+    out = {}
+    for t in targets:
+        if t not in dist:
+            continue
+        path, x = [t], prev.get(t)
+        while x is not None:
+            path.append(x)
+            x = prev.get(x)
+        out[t] = path[::-1]
+    return out
+
+
 # ---------------------------------------------------------------------------------------------- scheduler
 def _gap(slots, ready, dur, forbid=()):
     """The first start at or after `ready` where `dur` fits between the busy slots (sorted) and that is not inside a

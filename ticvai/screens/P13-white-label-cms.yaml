@@ -4288,7 +4288,7 @@ screens:
   name: Privacy & Consent Configuration Command Center
   module: Policy
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Privacy__Consent___Preference_Management_Reference.pdf
     board: '1'

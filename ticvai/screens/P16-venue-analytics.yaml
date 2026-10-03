@@ -68,7 +68,7 @@ screens:
   name: Executive Command Center
   module: Analytics
   requiresModule: analytics
-  wave: 3
+  wave: 1
   implementation:
     app: venue-management-web
     route: /analytics/executive-command-center
@@ -3757,7 +3757,7 @@ screens:
   name: Dashboard Library
   module: Analytics
   requiresModule: analytics
-  wave: 3
+  wave: 1
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '2'
@@ -9024,7 +9024,7 @@ screens:
   name: BI & Analytics Administration Command Center
   module: Analytics
   requiresModule: analytics
-  wave: 3
+  wave: 1
   source:
     pack: Unified_BI_Reporting_and_AI_Analytics_Platform_Reference.pdf
     board: '10'

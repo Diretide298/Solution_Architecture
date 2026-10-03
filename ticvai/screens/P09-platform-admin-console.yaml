@@ -15461,7 +15461,7 @@ screens:
   name: Purchase / Trial Journey Selection
   module: Tenants & Licensing
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '5'
@@ -16679,7 +16679,7 @@ screens:
   name: Provisioning Command Center
   module: Tenants & Licensing
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Subscription_Licensing_AI_Self_Service.pdf
     board: '6'
@@ -26339,7 +26339,7 @@ screens:
   name: Forecasting Command Center
   module: Analytics
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: AI_Forecasting_and_Predictive_Intelligence_Reference.pdf
     board: '1'
@@ -30411,7 +30411,7 @@ screens:
   name: AI Governance Command Center
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: AI_Governance_Reference.pdf
     board: '1'
@@ -36723,7 +36723,7 @@ screens:
   name: AI Governance Monitoring Command Center
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: AI_Governance_Reference.pdf
     board: '4'

@@ -1,5 +1,5 @@
 {
- "note": "Block A tasks that come from no screen or operation, so the slice cannot derive them. Read by tools/build-service-docs.py. Edit this file, not the task sheet. Added 30 September 2026 from the system-design review (audit/ticvai/steps/SD, findings SD-016, 024, 026, 028, 030-032, 034, 046-049, 051, 057, 059, 063) and the AI functions review (docs/active/ai-functions-review-30-september.md). `pool: backend` goes to the least-loaded backend owner; `assignee` names a person. AI engine tasks carry no points: they are sized in engineer-days in their text and planned by the two AI engineers, whose capacity is separate from the developers' (decided 30 September). Since 1 October a task may carry `block` (for example `B1`): it is recorded here with the ADR that asks for it and is not ticketed in the Block A sheet; build-service-docs.py skips it until that block is planned. A task without `block` is Block A. Since 1 October (the sprint plan) a later-block task names the app-module it lands in with `module` (a business module) and `platform` (P01-P17; none = that module's platform work), and build-service-docs.py plans it with the rest of the package. **The Block A AI chain split across both AI engineers** (Chinmay, 1 October): the baseline layer (estimators, venue profile, starting patterns) and Qdrant tenancy do not call the LLM gateway, so they start on day one beside it; day-one suggestions and the evaluation harness still wait for the gateway (an answer is recorded through its decision point), and the concierge for Qdrant. Kalpita Mejari: gateway, concierge, Help me choose, translations, planner (33 days); the second AI engineer: baseline, Qdrant, suggestions, evaluation (33 days). `appModule: baseline` puts a task in the second AI engine app-module of Block A, so each engineer's module test is of the other's half.",
+ "note": "Block A tasks that come from no screen or operation, so the slice cannot derive them. Read by tools/build-service-docs.py. Edit this file, not the task sheet. Added 30 September 2026 from the system-design review (audit/ticvai/steps/SD, findings SD-016, 024, 026, 028, 030-032, 034, 046-049, 051, 057, 059, 063) and the AI functions review (docs/active/ai-functions-review-30-september.md). `pool: backend` goes to the least-loaded backend owner; `assignee` names a person. AI engine tasks carry no points: they are sized in engineer-days in their text and planned by the two AI engineers, whose capacity is separate from the developers' (decided 30 September). Since 1 October a task may carry `block` (for example `B1`): it is recorded here with the ADR that asks for it and is not ticketed in the Block A sheet; build-service-docs.py skips it until that block is planned. A task without `block` is Block A. Since 1 October (the sprint plan) a later-block task names the app-module it lands in with `module` (a business module) and `platform` (P01-P17; none = that module's platform work), and build-service-docs.py plans it with the rest of the package. **The Block A AI chain split across both AI engineers** (Chinmay, 1 October): the baseline layer (estimators, venue profile, starting patterns) and Qdrant tenancy do not call the LLM gateway, so they start on day one beside it; day-one suggestions and the evaluation harness still wait for the gateway (an answer is recorded through its decision point), and the concierge for Qdrant. Kalpita Mejari: gateway, concierge, Help me choose, translations, planner (33 days); the second AI engineer: baseline, Qdrant, suggestions, evaluation (33 days). `appModule: baseline` puts a task in the second AI engine app-module of Block A, so each engineer's module test is of the other's half. **Block A completes its apps** (Chinmay, 3 October 2026, CHG-RONEP-001; docs/active/decisions/answers-3-october-r1-plan.md): an AI engine task's `operations` are served by ticvai-ai and built by that task, not by a back-end task; `blockAOperations` and `blockAScreens` are decided Block A scope no screen binding in this tree derives (each with its reason); `screenNotes` is a sentence a screen's tasks carry; `departures` records why an artefact an earlier released plan built in a ticketed block is no longer built there (tools/check-plan-closure.py fails on one without a reason).",
  "epics": [
   {
    "key": "PLATFORM",
@@ -31,7 +31,12 @@
     "SETUP-AUTH"
    ],
    "subject": "Request kernel: hostname to tenant routing, per-transaction scope, error model and 429",
-   "detail": "In ticvai-backend. Resolve the tenant from the hostname (control-plane routing table, SD-021), open every transaction with the tenant and scope settings the row-level policies read (SD-059), one problem-details error model, and 429 with Retry-After on the hot public operations (SD-043). Done when: two seeded tenants on two hostnames cannot read each other's rows, and a flood test returns 429 instead of 500."
+   "detail": "In ticvai-backend. Resolve the tenant from the hostname (control-plane routing table, SD-021), open every transaction with the tenant and scope settings the row-level policies read (SD-059), one problem-details error model, and 429 with Retry-After on the hot public operations (SD-043). Done when: two seeded tenants on two hostnames cannot read each other's rows, and a flood test returns 429 instead of 500.",
+   "builds": [
+    "adr ADR-0038",
+    "adr ADR-0039",
+    "adr ADR-0005"
+   ]
   },
   {
    "key": "PLATFORM-IDEMPOTENCY",
@@ -42,7 +47,10 @@
     "PLATFORM-KERNEL"
    ],
    "subject": "Durable idempotency: the Idempotency-Key store and middleware",
-   "detail": "Idempotency records in PostgreSQL with Redis as a cache only (SD-024), so a retried payment or sale after a restart returns the first answer. Done when: replaying a createOrder with the same key after a service restart returns the original response and creates nothing."
+   "detail": "Idempotency records in PostgreSQL with Redis as a cache only (SD-024), so a retried payment or sale after a restart returns the first answer. Done when: replaying a createOrder with the same key after a service restart returns the original response and creates nothing.",
+   "builds": [
+    "table platform.idempotency_record"
+   ]
   },
   {
    "key": "PLATFORM-OUTBOX",
@@ -54,7 +62,16 @@
     "SETUP-HOSTS"
    ],
    "subject": "Outbox, relay and inbox behind the kernel broker interface, on a local RabbitMQ",
-   "detail": "The transactional outbox per tenant database; one relay per region in the workers host, with a lease and a polling loop per tenant database, and an inbox per tenant database for exactly-once handling (ADR-0058); modules enqueue through IOutbox inside their own transaction, the relay publishes through IBrokerPublisher and consumers subscribe through IEventSubscriber (ADR-0058 amendment, 1 October); the relay drains a full batch at once and its batch size is configuration (Relay:BatchSize, 1,000 in the flash-sale environment). The broker per ADR-0057 is the client's choice between RabbitMQ and Kafka: build behind the kernel interface on a local RabbitMQ until they answer, with ordering per aggregate by an ordering key and dead letters drained into platform.dead_letter. A relay-lag dashboard and alert per tenant database (SD-030, SD-031, SD-032). Done when: an event written in a transaction reaches its consumer once, survives a relay restart and a redelivery, a poison message lands in platform.dead_letter, and relay lag shows on the dashboard and alerts when unpublished rows are older than 60 seconds."
+   "detail": "The transactional outbox per tenant database; one relay per region in the workers host, with a lease and a polling loop per tenant database, and an inbox per tenant database for exactly-once handling (ADR-0058); modules enqueue through IOutbox inside their own transaction, the relay publishes through IBrokerPublisher and consumers subscribe through IEventSubscriber (ADR-0058 amendment, 1 October); the relay drains a full batch at once and its batch size is configuration (Relay:BatchSize, 1,000 in the flash-sale environment). The broker per ADR-0057 is the client's choice between RabbitMQ and Kafka: build behind the kernel interface on a local RabbitMQ until they answer, with ordering per aggregate by an ordering key and dead letters drained into platform.dead_letter. A relay-lag dashboard and alert per tenant database (SD-030, SD-031, SD-032). Done when: an event written in a transaction reaches its consumer once, survives a relay restart and a redelivery, a poison message lands in platform.dead_letter, and relay lag shows on the dashboard and alerts when unpublished rows are older than 60 seconds.",
+   "builds": [
+    "table platform.outbox",
+    "table kernel.inbox",
+    "table platform.dead_letter",
+    "table control.outbox_relay",
+    "adr ADR-0033",
+    "adr ADR-0057",
+    "adr ADR-0058"
+   ]
   },
   {
    "key": "PLATFORM-REPUBLISH",
@@ -65,7 +82,15 @@
     "PLATFORM-OUTBOX"
    ],
    "subject": "Republish from the outbox by tenant and time range",
-   "detail": "The recovery path for a lost broker (ADR-0058 amendment, 1 October; the DR design in ADR-0060 relies on it): republishOutbox, listOutboxRepublishes, getOutboxRepublish and cancelOutboxRepublish in the operations host, carried out by the relay in workers with a keyset cursor over the outbox, published_at left untouched and live batches first; one job per tenant (control.outbox_republish). Done when: after a simulated broker loss, a republish of one tenant's last hour redelivers every event once to each consumer, the inbox drops the duplicates, and a second request for the same tenant while one runs is refused with 409."
+   "detail": "The recovery path for a lost broker (ADR-0058 amendment, 1 October; the DR design in ADR-0060 relies on it): republishOutbox, listOutboxRepublishes, getOutboxRepublish and cancelOutboxRepublish in the operations host, carried out by the relay in workers with a keyset cursor over the outbox, published_at left untouched and live batches first; one job per tenant (control.outbox_republish). Done when: after a simulated broker loss, a republish of one tenant's last hour redelivers every event once to each consumer, the inbox drops the duplicates, and a second request for the same tenant while one runs is refused with 409.",
+   "builds": [
+    "operation republishOutbox",
+    "operation getOutboxRepublish",
+    "operation listOutboxRepublishes",
+    "operation cancelOutboxRepublish",
+    "table control.outbox_republish",
+    "adr ADR-0058"
+   ]
   },
   {
    "key": "PLATFORM-SAGA-PAID",
@@ -76,7 +101,13 @@
     "PLATFORM-OUTBOX"
    ],
    "subject": "Order paid to tickets issued: the saga proven end to end",
-   "detail": "order.paid consumed by the entitlement owner, tickets issued, the ledger posting once from the event, and holds converted with capacity decremented (SD-026, SD-023). Done when: a web purchase in the sandbox ends with a ticket, one ledger posting and sold capacity reduced, and a replayed event changes nothing."
+   "detail": "order.paid consumed by the entitlement owner, tickets issued, the ledger posting once from the event, and holds converted with capacity decremented (SD-026, SD-023). Done when: a web purchase in the sandbox ends with a ticket, one ledger posting and sold capacity reduced, and a replayed event changes nothing.",
+   "builds": [
+    "table ledger.journal_entry",
+    "table ledger.journal_line",
+    "adr ADR-0055",
+    "adr ADR-0058"
+   ]
   },
   {
    "key": "PLATFORM-PAYMENTS",
@@ -87,7 +118,11 @@
     "PLATFORM-OUTBOX"
    ],
    "subject": "Payment adapter and signed webhook against the provider's test mode",
-   "detail": "The provider adapter, the inbound signed webhook, the provider reference on payments, 3-D Secure redirect states and the card-terminal flow for the POS (SD-034). Done when: an approved, a declined and a 3-D Secure payment each end in the right order state from the webhook alone, with polling only as the fallback. Acceptance of the declined, unknown and reconcile paths waits on the client's payment sandbox credentials: see the client's answer in the Decisions Register."
+   "detail": "The provider adapter, the inbound signed webhook, the provider reference on payments, 3-D Secure redirect states and the card-terminal flow for the POS (SD-034). Done when: an approved, a declined and a 3-D Secure payment each end in the right order state from the webhook alone, with polling only as the fallback. Acceptance of the declined, unknown and reconcile paths waits on the client's payment sandbox credentials: see the client's answer in the Decisions Register.",
+   "builds": [
+    "operation receivePaymentProviderWebhook",
+    "table payments.provider_event"
+   ]
   },
   {
    "key": "PLATFORM-AUDIT",
@@ -98,7 +133,10 @@
     "PLATFORM-KERNEL"
    ],
    "subject": "Audit interceptor for every write",
-   "detail": "Who, what, when, tenant and venue for every write, written once by an interceptor rather than per operation (SD-057). Done when: any write in the Block A slice leaves one audit row a support user can read."
+   "detail": "Who, what, when, tenant and venue for every write, written once by an interceptor rather than per operation (SD-057). Done when: any write in the Block A slice leaves one audit row a support user can read.",
+   "builds": [
+    "table platform.audit_record"
+   ]
   },
   {
    "key": "PLATFORM-FLAGS",
@@ -120,7 +158,11 @@
     "PLATFORM-KERNEL"
    ],
    "subject": "Row-level policies without a per-row subquery on hot tables",
-   "detail": "Scope predicates read session settings instead of joining per row (SD-016). Done when: the order and scan-event queries keep their plan with policies on, measured on the seed data."
+   "detail": "Scope predicates read session settings instead of joining per row (SD-016). Done when: the order and scan-event queries keep their plan with policies on, measured on the seed data.",
+   "builds": [
+    "adr ADR-0005",
+    "adr ADR-0044"
+   ]
   },
   {
    "key": "PLATFORM-OBSERVE",
@@ -142,7 +184,10 @@
     "SETUP-DB"
    ],
    "subject": "Migration fan-out across tenant databases, and expand-then-contract changes",
-   "detail": "Apply a migration to every tenant database with progress and resume, and the rule that a schema change ships in two steps so old and new code both run (SD-049). Done when: a column rename reaches three seeded tenant databases with no downtime."
+   "detail": "Apply a migration to every tenant database with progress and resume, and the rule that a schema change ships in two steps so old and new code both run (SD-049). Done when: a column rename reaches three seeded tenant databases with no downtime.",
+   "builds": [
+    "adr ADR-0039"
+   ]
   },
   {
    "key": "SETUP-HOSTS",
@@ -153,7 +198,10 @@
     "SETUP-CI"
    ],
    "subject": "Hosts for the deployables on .NET 10: commerce, access, operations and workers, each composing its modules",
-   "detail": "In **ticvai-backend**, on .NET 10 LTS (decided 30 September; ADR-0055). Four .NET hosts in one solution: commerce (Identity, Tenancy, Catalogue, Order, Ledger, Wallet), access (Access), operations (F&B, Retail, Inventory, VenueOps, Marketing, WhiteLabel, Reporting, Platform, CrossRegion) and workers (the outbox relay, every module's event consumers, scheduled jobs), each composing its modules through IModule. ticvai-ai stays the Python service. Done when: each host starts locally with its modules registered and a health endpoint, CI builds one image per host, and moving a module to another host is a change of one registration."
+   "detail": "In **ticvai-backend**, on .NET 10 LTS (decided 30 September; ADR-0055). Four .NET hosts in one solution: commerce (Identity, Tenancy, Catalogue, Order, Ledger, Wallet), access (Access), operations (F&B, Retail, Inventory, VenueOps, Marketing, WhiteLabel, Reporting, Platform, CrossRegion) and workers (the outbox relay, every module's event consumers, scheduled jobs), each composing its modules through IModule. ticvai-ai stays the Python service. Done when: each host starts locally with its modules registered and a health endpoint, CI builds one image per host, and moving a module to another host is a change of one registration.",
+   "builds": [
+    "adr ADR-0055"
+   ]
   },
   {
    "key": "ARCH-TESTS",
@@ -164,7 +212,11 @@
     "SETUP-HOSTS"
    ],
    "subject": "Architecture tests for 17 modules: no module references another, and no module's SQL names another's schema",
-   "detail": "Extend tests/Ticvai.ArchitectureTests/ModuleBoundaryTests.cs from six modules to 17 (ADR-0055), and add a test that fails when a module's SQL names another module's schema other than through a published read view. Done when: a deliberate cross-module reference and a raw cross-schema query each fail the build in CI."
+   "detail": "Extend tests/Ticvai.ArchitectureTests/ModuleBoundaryTests.cs from six modules to 17 (ADR-0055), and add a test that fails when a module's SQL names another module's schema other than through a published read view. Done when: a deliberate cross-module reference and a raw cross-schema query each fail the build in CI.",
+   "builds": [
+    "adr ADR-0055",
+    "adr ADR-0028"
+   ]
   },
   {
    "key": "DB-READ-VIEWS",
@@ -175,7 +227,11 @@
     "MIG-BASELINE"
    ],
    "subject": "Published read views for cross-module reads, generated from the lineage",
-   "detail": "A deriver reads handoff/api-data-lineage.json and generates, per owning module, the views other modules may read (894 cross-schema reads on 30 September; ADR-0055), applied by the migrations. Done when: every cross-schema read in the Block A slice goes through a published view, the views regenerate with one command, and a raw cross-schema read is reported by the lineage check."
+   "detail": "A deriver reads handoff/api-data-lineage.json and generates, per owning module, the views other modules may read (894 cross-schema reads on 30 September; ADR-0055), applied by the migrations. Done when: every cross-schema read in the Block A slice goes through a published view, the views regenerate with one command, and a raw cross-schema read is reported by the lineage check.",
+   "builds": [
+    "adr ADR-0055",
+    "adr ADR-0016"
+   ]
   },
   {
    "key": "DB-ROLES",
@@ -186,7 +242,11 @@
     "MIG-BASELINE"
    ],
    "subject": "One Postgres role per deployable; the AI role read-only",
-   "detail": "In ticvai-backend, created by the baseline migration (MIG-BASELINE), one PostgreSQL login role per deployable of ADR-0055: commerce, access, operations, workers and ticvai_ai, each reading its password or token from the cell's Key Vault. Each role gets USAGE and SELECT, INSERT, UPDATE, DELETE on the schemas its modules own (the schema owners in handoff/service-decomposition.json; workers runs every module's consumers, the outbox relay and the scheduled jobs, so it gets the schemas those touch), SELECT on the published read views of DB-READ-VIEWS, and nothing else: no CREATE, no ownership, no BYPASSRLS, so FORCE row-level security applies to every host. ticvai_ai writes only the ai schema (and ai.inbox; ADR-0058) and is read-only on the transactional schemas (ADR-0020). The tables are owned by a separate migration role that only SqlMigrationRunner uses. Done when: each host connects with its own role from Key Vault; an INSERT from the ticvai_ai role into a transactional table, and from the commerce role into an operations schema (fnb), are each refused by PostgreSQL; no host role has BYPASSRLS or owns a table (a query on pg_roles and pg_tables in CI shows it); and a host role with no scope set on its session reads no rows from a table under FORCE row-level security."
+   "detail": "In ticvai-backend, created by the baseline migration (MIG-BASELINE), one PostgreSQL login role per deployable of ADR-0055: commerce, access, operations, workers and ticvai_ai, each reading its password or token from the cell's Key Vault. Each role gets USAGE and SELECT, INSERT, UPDATE, DELETE on the schemas its modules own (the schema owners in handoff/service-decomposition.json; workers runs every module's consumers, the outbox relay and the scheduled jobs, so it gets the schemas those touch), SELECT on the published read views of DB-READ-VIEWS, and nothing else: no CREATE, no ownership, no BYPASSRLS, so FORCE row-level security applies to every host. ticvai_ai writes only the ai schema (and ai.inbox; ADR-0058) and is read-only on the transactional schemas (ADR-0020). The tables are owned by a separate migration role that only SqlMigrationRunner uses. Done when: each host connects with its own role from Key Vault; an INSERT from the ticvai_ai role into a transactional table, and from the commerce role into an operations schema (fnb), are each refused by PostgreSQL; no host role has BYPASSRLS or owns a table (a query on pg_roles and pg_tables in CI shows it); and a host role with no scope set on its session reads no rows from a table under FORCE row-level security.",
+   "builds": [
+    "adr ADR-0055",
+    "adr ADR-0020"
+   ]
   },
   {
    "key": "KERNEL-ID",
@@ -197,7 +257,10 @@
     "SETUP-HOSTS"
    ],
    "subject": "One id type: UUIDv7 from Id.New() in the kernel and in offline-core",
-   "detail": "Replace the kernel's ULID generator (Ticvai.Shared.Kernel Primitives/Ulid.cs) with Id.New(), a UUIDv7 Guid (RFC 9562) written big-endian so PostgreSQL's uuid order is time order (ADR-0056), and the same generator in ticvai-frontend packages/offline-core for ids created offline. Done when: ids made by the server and by an offline till sort by creation time in PostgreSQL, a .NET-to-TypeScript round-trip test agrees byte for byte, and no ULID string is generated anywhere."
+   "detail": "Replace the kernel's ULID generator (Ticvai.Shared.Kernel Primitives/Ulid.cs) with Id.New(), a UUIDv7 Guid (RFC 9562) written big-endian so PostgreSQL's uuid order is time order (ADR-0056), and the same generator in ticvai-frontend packages/offline-core for ids created offline. Done when: ids made by the server and by an offline till sort by creation time in PostgreSQL, a .NET-to-TypeScript round-trip test agrees byte for byte, and no ULID string is generated anywhere.",
+   "builds": [
+    "adr ADR-0056"
+   ]
   },
   {
    "key": "MIG-PARTITIONS",
@@ -209,7 +272,19 @@
     "SETUP-HOSTS"
    ],
    "subject": "Monthly partitions: create three months ahead, detach what retention has expired",
-   "detail": "A job in the workers host that keeps monthly range partitions three months ahead on the time-partitioned tables (access.scan_event, platform.outbox, platform.dead_letter, platform.audit_record, ledger.journal_line, marketing.message_dispatch, kernel.inbox; ADR-0056) in every tenant database, and detaches and archives partitions past their retention (ADR-0047). Done when: a new tenant database has partitions three months ahead, a run with the clock moved forward creates the next month, and an expired partition is detached, not deleted row by row."
+   "detail": "A job in the workers host that keeps monthly range partitions three months ahead on the time-partitioned tables (access.scan_event, platform.outbox, platform.dead_letter, platform.audit_record, ledger.journal_line, marketing.message_dispatch, kernel.inbox; ADR-0056) in every tenant database, and detaches and archives partitions past their retention (ADR-0047). Done when: a new tenant database has partitions three months ahead, a run with the clock moved forward creates the next month, and an expired partition is detached, not deleted row by row.",
+   "builds": [
+    "table access.scan_event",
+    "table kernel.inbox",
+    "table ledger.journal_line",
+    "table marketing.message_dispatch",
+    "table platform.audit_record",
+    "table platform.dead_letter",
+    "table platform.outbox",
+    "adr ADR-0044",
+    "adr ADR-0047",
+    "adr ADR-0056"
+   ]
   },
   {
    "key": "SETUP-QDRANT",
@@ -220,7 +295,11 @@
     "SETUP-ENV"
    ],
    "subject": "Qdrant cluster in dev and staging: 3 nodes, TLS, snapshots, monitoring",
-   "detail": "In **ticvai-infra** (Terraform): a self-hosted 3-node Qdrant cluster in Azure UAE North for dev and staging (ADR-0049), pinned to 1.16 or later, with TLS, JWT RBAC on and the signing key in the cell's Key Vault, snapshot storage in the UAE, and monitoring and alerts on node health, disk and latency. Check Qdrant Hybrid Cloud on our own AKS as an alternative before building. Done when: the cluster survives the loss of one node, a snapshot of a test collection restores into a fresh cluster, and a request without a valid token is refused."
+   "detail": "In **ticvai-infra** (Terraform): a self-hosted 3-node Qdrant cluster in Azure UAE North for dev and staging (ADR-0049), pinned to 1.16 or later, with TLS, JWT RBAC on and the signing key in the cell's Key Vault, snapshot storage in the UAE, and monitoring and alerts on node health, disk and latency. Check Qdrant Hybrid Cloud on our own AKS as an alternative before building. Done when: the cluster survives the loss of one node, a snapshot of a test collection restores into a fresh cluster, and a request without a valid token is refused.",
+   "builds": [
+    "adr ADR-0049",
+    "adr ADR-0021"
+   ]
   },
   {
    "key": "OFFLINE-JOURNAL",
@@ -231,7 +310,11 @@
     "SETUP-CLIENTS"
    ],
    "subject": "Offline journal in packages/offline-core: record, replay and the conflict policies",
-   "detail": "In ticvai-frontend packages/offline-core: an append-only journal of sales and scans taken offline, replay on reconnect, and the conflict policies the contracts declare (SD-047). Done when: a POS takes ten cash sales with the network off and all ten reach the server once when it returns."
+   "detail": "In ticvai-frontend packages/offline-core: an append-only journal of sales and scans taken offline, replay on reconnect, and the conflict policies the contracts declare (SD-047). Done when: a POS takes ten cash sales with the network off and all ten reach the server once when it returns.",
+   "builds": [
+    "adr ADR-0013",
+    "adr ADR-0022"
+   ]
   },
   {
    "key": "OFFLINE-BUNDLE",
@@ -242,7 +325,11 @@
     "PLATFORM-KERNEL"
    ],
    "subject": "Signed catalogue and entitlement bundles, and the lease client",
-   "detail": "The signed bundle a till or scanner trades from offline, including entitlements and dynamic access policy for the scanner (SD-052), and the lease each workstation holds (SD-047). Done when: a till with an expired lease stops selling offline and says why."
+   "detail": "The signed bundle a till or scanner trades from offline, including entitlements and dynamic access policy for the scanner (SD-052), and the lease each workstation holds (SD-047). Done when: a till with an expired lease stops selling offline and says why.",
+   "builds": [
+    "operation getOfflinePackage",
+    "adr ADR-0013"
+   ]
   },
   {
    "key": "OFFLINE-SYNC",
@@ -253,7 +340,11 @@
     "OFFLINE-BUNDLE"
    ],
    "subject": "syncOrders: a result per entry, and a bad entry quarantined instead of blocking the till",
-   "detail": "Per-entry outcomes, a quarantine a supervisor resolves, and the till carrying on with the rest (SD-028). Done when: one malformed sale in a batch of twenty is quarantined and the other nineteen are accepted."
+   "detail": "Per-entry outcomes, a quarantine a supervisor resolves, and the till carrying on with the rest (SD-028). Done when: one malformed sale in a batch of twenty is quarantined and the other nineteen are accepted.",
+   "builds": [
+    "operation syncOrders",
+    "adr ADR-0022"
+   ]
   },
   {
    "key": "POS-KDS-ROUTING",
@@ -264,18 +355,38 @@
     "PLATFORM-OUTBOX"
    ],
    "subject": "A POS sale reaches the kitchen: routing online, and the LAN path decision",
-   "detail": "createFnbOrder from the POS creates the kitchen ticket as the guest order does, routed to the right station (SD-046). The offline LAN path to the Kitchen Display is an ADR decision; this task implements the online path and the stub the decision fills. Done when: a POS sale of a burger and a drink shows on the grill and bar stations. 2 October (Chinmay, DEC-187/189): kitchen printers are in release 1 (print template, printer routing) and routing takes category rules with a default/fallback station per outlet. 8 points (was 5)."
+   "detail": "createFnbOrder from the POS creates the kitchen ticket as the guest order does, routed to the right station (SD-046). The offline LAN path to the Kitchen Display is an ADR decision; this task implements the online path and the stub the decision fills. Done when: a POS sale of a burger and a drink shows on the grill and bar stations. 2 October (Chinmay, DEC-187/189): kitchen printers are in release 1 (print template, printer routing) and routing takes category rules with a default/fallback station per outlet. 8 points (was 5).",
+   "builds": [
+    "operation createFnbOrder",
+    "table fnb.kitchen_ticket",
+    "table fnb.kitchen_routing_rule",
+    "table fnb.kitchen_station"
+   ]
   },
   {
    "key": "AI-ENGINE-GATEWAY",
    "epic": "AI-ENGINE",
    "assignee": "Kalpita Mejari",
-   "days": 12,
+   "days": 13,
    "subject": "AI gateway, governance decision point and usage metering",
-   "detail": "In ticvai-ai (Python). One gateway every AI call goes through: capability code calls gateway.run(task, inputs, schema?) and never names a provider (design 3.3). **Routing, in order:** (1) the allowed set: TICVAI's curated catalogue, filtered by the tenant's AI residency class (ADR-0009 amended 2 October, DEC-539): uaeOnly, the default and mandatory for government, bank and health tenants, resolves only to endpoints inside the UAE (Core42 Compass GPT-4.1 mini for the Small tier, Compass GPT-5 for the Strong tier, reached through the existing openaiCompatible provider kind); globalAllowed (a private venue under PDPL Art. 23) resolves to Azure gpt-5-mini / gpt-6-sol Global Standard or the tenant's BYOK provider; onPrem to the in-site open model; then by the task's data classification and the governance policy; (2) the task's tier from TICVAI's curated task-to-tier map: a client never picks a model. BYOK accepts any vendor (CHG-FUP-008), is enabled by TICVAI (PLATFORM_AI_MANAGE) for a globalAllowed tenant only, maps each task to that vendor's equivalent model, and is activated by setAiProvider only after testAiProvider's compatibility probes pass (tool calling, structured output, Arabic, context, latency, residency); the key is a per-tenant write-only Key Vault secret shown only by its last four characters; (3) the cascade, Small to Strong only on a checkable signal (schema validation failed twice, retrieval partial), never on a model's self-reported confidence; (4) a circuit breaker per endpoint (opens at 50% errors over 20 calls or p95 above twice the task budget for 60 s; half-open after 30 s) and the class's fallback chain (uaeOnly: OpenAI's UAE region, then the in-cell gpt-oss-120b); a residency refusal is returned, never failed over to another region; (5) degraded mode when nothing answers (search-only, rules-only or 'a person will help'). **Before each call:** the per-request budget and the capability's ceilingBehaviour, maskedFields (fail closed), then the scrubber and input guard of AI-ENGINE-SCRUB-GUARD, and a stable-first prompt order for prefix caching. **After it:** structured-output validation, the output guard and the re-fill, an ai.activity row and OpenTelemetry spans with no prompt text. evaluateAiGovernance is an in-process decision point (allow, allow with conditions, prepare only, approval required, escalate, block, with the policy version; design 3.8); getAiUsage meters tokens and spend per tenant; every governed answer writes one ai.decision_record (model, prompt template, policy and knowledge versions; design 3.9). About 12 engineer-days. Done when: a uaeOnly tenant's call reaches the Compass endpoint and, with Compass forced down, falls back to the OpenAI UAE endpoint and then the in-cell model and never to a Global endpoint (a test asserts the residency refusal instead of a cross-border call); a BYOK provider that fails a compatibility probe is refused with 409 compatibility-test-required; a tenant over its ceiling gets the capability's ceilingBehaviour; and every call in the test run leaves an ai.activity row, and every governed answer a decision record naming its model, prompt and policy versions.",
+   "detail": "In ticvai-ai (Python). One gateway every AI call goes through: capability code calls gateway.run(task, inputs, schema?) and never names a provider (design 3.3). **Routing, in order:** (1) the allowed set: TICVAI's curated catalogue, filtered by the tenant's AI residency class (ADR-0009 amended 2 October, DEC-539): uaeOnly, the default and mandatory for government, bank and health tenants, resolves only to endpoints inside the UAE (Core42 Compass GPT-4.1 mini for the Small tier, Compass GPT-5 for the Strong tier, reached through the existing openaiCompatible provider kind); globalAllowed (a private venue under PDPL Art. 23) resolves to Azure gpt-5-mini / gpt-6-sol Global Standard or the tenant's BYOK provider; onPrem only when a client asks for it, and nothing is built for it in Block A (we host no model: Chinmay, 3 October, CHG-RONEP-004); then by the task's data classification and the governance policy; (2) the task's tier from TICVAI's curated task-to-tier map: a client never picks a model. BYOK accepts any vendor (CHG-FUP-008), is enabled by TICVAI (PLATFORM_AI_MANAGE) for a globalAllowed tenant only, maps each task to that vendor's equivalent model, and is activated by setAiProvider only after testAiProvider's compatibility probes pass (tool calling, structured output, Arabic, context, latency, residency); the key is a per-tenant write-only Key Vault secret shown only by its last four characters; (3) the cascade, Small to Strong only on a checkable signal (schema validation failed twice, retrieval partial), never on a model's self-reported confidence; (4) a circuit breaker per endpoint (opens at 50% errors over 20 calls or p95 above twice the task budget for 60 s; half-open after 30 s) and the class's fallback chain (uaeOnly: Core42 Compass, then OpenAI's UAE region; no model is hosted in the cell, so with both down the call goes to degraded mode); a residency refusal is returned, never failed over to another region; (5) degraded mode when nothing answers (search-only, rules-only or 'a person will help'). **Before each call:** the per-request budget and the capability's ceilingBehaviour, maskedFields (fail closed), then the scrubber and input guard of AI-ENGINE-SCRUB-GUARD, and a stable-first prompt order for prefix caching. **After it:** structured-output validation, the output guard and the re-fill, an ai.activity row and OpenTelemetry spans with no prompt text. evaluateAiGovernance is an in-process decision point (allow, allow with conditions, prepare only, approval required, escalate, block, with the policy version; design 3.8); getAiUsage meters tokens and spend per tenant; every governed answer writes one ai.decision_record (model, prompt template, policy and knowledge versions; design 3.9). About 12 engineer-days. **setAiProvider and setAiCredential are served here** (Chinmay, 3 October, CHG-RONEP-001): in Block A TICVAI staff enter a tenant's BYOK provider and key under the platform-staff grant on ADM-037 (no tenant self-service yet); the provider is checked against the curated catalogue and the tenant's residency class, and the key goes to the cell's Key Vault, never to a table in clear. About one engineer-day more (13). Done when: a uaeOnly tenant's call reaches the Compass endpoint and, with Compass forced down, falls back to the OpenAI UAE endpoint, and with both forced down answers in degraded mode, never from a Global endpoint (a test asserts the residency refusal instead of a cross-border call); a BYOK provider that fails a compatibility probe is refused with 409 compatibility-test-required; a tenant over its ceiling gets the capability's ceilingBehaviour; and every call in the test run leaves an ai.activity row, and every governed answer a decision record naming its model, prompt and policy versions.",
    "depends": [
     "SETUP-CI",
     "SETUP-ENV"
+   ],
+   "operations": [
+    "setAiCredential",
+    "setAiProvider"
+   ],
+   "builds": [
+    "operation evaluateAiGovernance",
+    "operation getAiUsage",
+    "operation testAiProvider",
+    "table ai.activity",
+    "table ai.decision_record",
+    "table ai.provider",
+    "adr ADR-0009",
+    "adr ADR-0020"
    ]
   },
   {
@@ -283,13 +394,17 @@
    "epic": "AI-ENGINE",
    "assignee": "Second AI engineer",
    "days": 6,
-   "subject": "Offline PII scrubber and guard model in front of every LLM call",
-   "detail": "In ticvai-ai, self-hosted inside the cell for every residency class (ADR-0020 amended 2 October, DEC-542/543; contracts/satellite/ai.yaml AiPolicy.scrubbing, CHG-CSA-003). Between the gateway's maskedFields step and the provider: (1) detection with Microsoft Presidio (offline) and custom recognisers for Emirates ID numbers, UAE phone numbers, passport numbers, IBANs, Luhn-checked card numbers and email addresses, plus an Arabic named-entity model (CAMeL Tools or an Arabic GLiNER) for Arabic names and places; (2) reversible placeholders ([GUEST_1], [PHONE_1]) whose map lives in the cell for the life of the request only, is never logged and never travels with the prompt, and the reply re-filled before the user sees it; (3) Qwen3Guard on the prompt before it leaves and on the answer before it is shown (Qwen3Guard-Stream for streamed answers); (4) mandatory whatever the residency class: a uaeOnly tenant is scrubbed as well; (5) fails closed: scrubber or guard down means 503 scrubber-unavailable and no provider call; a guard refusal is 422 guard-refused. maskedFields stays the first control; the scrubber is the second, for free text. About 6 engineer-days. Done when: on a test corpus in Arabic and English, a prompt carrying an Emirates ID, a UAE phone number, an IBAN, a card number, an email and an Arabic name reaches the provider stub with placeholders only and no raw value, and the reply comes back re-filled; stopping the scrubber or the guard refuses the call with 503 and the provider stub receives nothing; a harmful prompt is refused with 422 guard-refused; and the corpus test runs in CI on every gateway change.",
+   "subject": "PII scrubber in our worker and the provider's safety service in front of every LLM call",
+   "detail": "In ticvai-ai, for every residency class (ADR-0020 amended 2 October, DEC-542/543; contracts/satellite/ai.yaml AiPolicy.scrubbing, CHG-CSA-003). We host no model (Chinmay, 3 October, CHG-RONEP-004): the scrubber is a CPU library inside our own worker, and the guard is the provider-side safety service. Between the gateway's maskedFields step and the provider: (1) detection with Microsoft Presidio (offline) and custom recognisers for Emirates ID numbers, UAE phone numbers, passport numbers, IBANs, Luhn-checked card numbers and email addresses, plus an Arabic named-entity model (CAMeL Tools or an Arabic GLiNER) for Arabic names and places; (2) reversible placeholders ([GUEST_1], [PHONE_1]) whose map lives in the cell for the life of the request only, is never logged and never travels with the prompt, and the reply re-filled before the user sees it; (3) the provider-side safety service (Azure AI Content Safety in UAE North by default, no GPU host of ours) on the prompt before it leaves and on the answer before it is shown, a streamed answer checked as it arrives; a guard model of our own only if a client asks for one; (4) mandatory whatever the residency class: a uaeOnly tenant is scrubbed as well; (5) fails closed: scrubber or safety service down means 503 scrubber-unavailable and no provider call; a guard refusal is 422 guard-refused. maskedFields stays the first control; the scrubber is the second, for free text. About 6 engineer-days. Done when: on a test corpus in Arabic and English, a prompt carrying an Emirates ID, a UAE phone number, an IBAN, a card number, an email and an Arabic name reaches the provider stub with placeholders only and no raw value, and the reply comes back re-filled; stopping the scrubber or the safety service refuses the call with 503 and the provider stub receives nothing; a harmful prompt is refused with 422 guard-refused; and the corpus test runs in CI on every gateway change.",
    "depends": [
     "SETUP-CI",
     "SETUP-ENV"
    ],
-   "appModule": "baseline"
+   "appModule": "baseline",
+   "builds": [
+    "adr ADR-0020",
+    "adr ADR-0009"
+   ]
   },
   {
    "key": "AI-ENGINE-BASELINE",
@@ -302,7 +417,12 @@
     "SETUP-CI",
     "SETUP-ENV"
    ],
-   "appModule": "baseline"
+   "appModule": "baseline",
+   "builds": [
+    "operation setAiVenueSettings",
+    "table ai.capability_maturity",
+    "adr ADR-0051"
+   ]
   },
   {
    "key": "AI-ENGINE-SUGGESTIONS",
@@ -315,18 +435,33 @@
     "AI-ENGINE-BASELINE",
     "AI-ENGINE-GATEWAY"
    ],
-   "appModule": "baseline"
+   "appModule": "baseline",
+   "builds": [
+    "operation requestSuggestion",
+    "table ai.suggestion",
+    "table ai.suggestion_outcome",
+    "adr ADR-0052"
+   ]
   },
   {
    "key": "AI-ENGINE-CONCIERGE",
    "epic": "AI-ENGINE",
    "assignee": "Kalpita Mejari",
-   "days": 8,
+   "days": 9,
    "subject": "Guest concierge: retrieval over the venue's knowledge, answers with sources",
-   "detail": "In ticvai-ai: the guest concierge profile of the one assistant runtime (design 5.10). Knowledge ingest and reindex from the venue's published content into the tenant's Qdrant collection (AI-ENGINE-QDRANT), with embeddings and reranking self-hosted on CPU in the cell (BGE-M3 dense and sparse plus a multilingual cross-encoder; Qwen3-Embedding-0.6B and Qwen3-Reranker-0.6B are the candidates if they win the Arabic evaluation); hybrid retrieval through the single retrieval client (the venue filter always added); answers on the Small tier with sources, the venue's content as the only source, and a reliability category (grounded, partial, conflicting sources, insufficient evidence; design 5.6); the semantic then exact answer cache for FAQ-class answers keyed by tenant, scope path, locale and policy version (threshold 0.95, TTL 60 minutes, never for live numbers; ADR-0034); streaming over sendAiMessage (tokens, then sources and any proposed action; the full message stored); degraded mode: the fallback model, then search-only answers with links, then 'a person will help' (design 3.7). Index lag over 15 minutes alerts (design 4.4). About 8 engineer-days. Done when: on the concierge golden set in English and Arabic groundedness and citation accuracy are each at least 95% (design 3.5); a question about another venue's content returns nothing from it; editing a source page invalidates its cached answer; and with the provider stubbed down the guest gets a search-only answer with links, not an error.",
+   "detail": "In ticvai-ai: the guest concierge profile of the one assistant runtime (design 5.10). Knowledge ingest and reindex from the venue's published content into the tenant's Qdrant collection (AI-ENGINE-QDRANT), with embeddings and reranking self-hosted on CPU in the cell (BGE-M3 dense and sparse plus a multilingual cross-encoder; Qwen3-Embedding-0.6B and Qwen3-Reranker-0.6B are the candidates if they win the Arabic evaluation); hybrid retrieval through the single retrieval client (the venue filter always added); answers on the Small tier with sources, the venue's content as the only source, and a reliability category (grounded, partial, conflicting sources, insufficient evidence; design 5.6); the semantic then exact answer cache for FAQ-class answers keyed by tenant, scope path, locale and policy version (threshold 0.95, TTL 60 minutes, never for live numbers; ADR-0034); streaming over sendAiMessage (tokens, then sources and any proposed action; the full message stored); degraded mode: the fallback model, then search-only answers with links, then 'a person will help' (design 3.7). Index lag over 15 minutes alerts (design 4.4). About 8 engineer-days. **getGuestConversation and sendGuestConversationMessage are served here** (Chinmay, 3 October, CHG-RONEP-001): the guest's conversation with the concierge on WEB-044, GST-031 and GST-032, which poll getGuestConversation every 5 s (30 s while the screen is hidden); a sent message is answered through the gateway and stored whole. About one engineer-day more (9). Done when: on the concierge golden set in English and Arabic groundedness and citation accuracy are each at least 95% (design 3.5); a question about another venue's content returns nothing from it; editing a source page invalidates its cached answer; and with the provider stubbed down the guest gets a search-only answer with links, not an error.",
    "depends": [
     "AI-ENGINE-GATEWAY",
     "AI-ENGINE-QDRANT"
+   ],
+   "operations": [
+    "getGuestConversation",
+    "sendGuestConversationMessage"
+   ],
+   "builds": [
+    "operation sendAiMessage",
+    "adr ADR-0034",
+    "adr ADR-0049"
    ]
   },
   {
@@ -339,7 +474,12 @@
    "depends": [
     "SETUP-QDRANT"
    ],
-   "appModule": "baseline"
+   "appModule": "baseline",
+   "builds": [
+    "table ai.chunk_embedding",
+    "adr ADR-0049",
+    "adr ADR-0021"
+   ]
   },
   {
    "key": "AI-ENGINE-GUIDED",
@@ -350,6 +490,11 @@
    "detail": "In ticvai-ai: Help me choose suggested from the catalogue (design 3.11, decided 29 September; capability C7 at autonomy 'suggest'). Rules first: read each guest-sellable product's category, subcategory, segment tags (level, audience), minimum height and age, duration, price band and language through the catalogue API with the venue's permissions; pick the one or two attributes that split the products most evenly, dropping any where one answer leaves nothing bookable (deterministic: the same catalogue gives the same questions); map each answer to a product, a category or a flow. The Small tier writes the question, answer titles and one-liners in the tenant's languages from the attributes only, never guest data; with the model unavailable the attribute names are used as they are. The draft is saved through proposeGuidedChoice (source aiSuggested, suggestionRef) with a decision record of the inputs, the split each question makes and the model and prompt versions. Publishing is publishGuidedChoice by a person holding TENANT_PUBLISH; nothing is published automatically. A withdrawn mapped product, or new products no answer reaches, raise a new suggestion and never rewrite the published version. About 4 engineer-days. Done when: the same catalogue run twice gives the same questions; the draft lands with source aiSuggested and a decision record; with the model stubbed down a usable draft still lands with attribute names; nothing is live until a person publishes; and withdrawing a mapped product raises a new suggestion.",
    "depends": [
     "AI-ENGINE-GATEWAY"
+   ],
+   "builds": [
+    "operation proposeGuidedChoice",
+    "operation publishGuidedChoice",
+    "table ai.guided_choice_suggestion"
    ]
   },
   {
@@ -361,6 +506,9 @@
    "detail": "In ticvai-ai: proposeTranslations for CMS content, English to Arabic and Arabic to English (and the other locales a tenant enables), on the Small tier with the tenant glossary in the cached prompt prefix so brand terms and register hold (research T03); placeholders, markup and links preserved; scrubbed and guarded like every call (AI-ENGINE-SCRUB-GUARD). The result is an AI draft on the field until an operator saves it, and is never published automatically. With the model unavailable the field is left blank and marked missing, never filled with the source text. About 3 engineer-days. Done when: an English CMS page gets an Arabic draft that keeps every glossary term and placeholder; the draft stays a draft until an operator saves it; and with the provider stubbed down the field reads missing, not English.",
    "depends": [
     "AI-ENGINE-GATEWAY"
+   ],
+   "builds": [
+    "operation proposeTranslations"
    ]
   },
   {
@@ -372,6 +520,10 @@
    "detail": "In ticvai-ai: the planner agent on top of the rules planner in venue-map (design 2.3 and 7; MOB-6). The schedule is solved deterministically (OR-Tools CP-SAT over show times, opening hours, walking times and configured capacity; research T04) and the Small tier reads the guest's intent and writes the why. The agent works only through the plan operations as the guest (the itinerary kind of requestSuggestion and its plan tools), never writes venuemap.visit_plan itself, and is grounded in each day's venue: it proposes only what that day's tools return, and a wish the venue cannot meet is answered from VisitPlan.unmatchedPreferences. When AI is off or fails it falls back to the rules plan, never to an error. About 8 engineer-days. Done when: a refinement in chat (add lunch at one, skip the coasters) produces a valid plan through the plan tools that respects show times and capacity; a request for something at another venue is answered from unmatchedPreferences and updateVisitPlan refuses the point (422 point-not-at-day-venue); and with the model stubbed down the guest gets the rules plan.",
    "depends": [
     "AI-ENGINE-GATEWAY"
+   ],
+   "builds": [
+    "operation updateVisitPlan",
+    "table venuemap.visit_plan"
    ]
   },
   {
@@ -384,7 +536,14 @@
    "depends": [
     "AI-ENGINE-GATEWAY"
    ],
-   "appModule": "baseline"
+   "appModule": "baseline",
+   "builds": [
+    "operation runAiEvaluation",
+    "table ai.eval_run",
+    "table ai.eval_suite",
+    "table ai.governance_alert",
+    "adr ADR-0051"
+   ]
   },
   {
    "key": "KERNEL-TENANT-LIMITS",
@@ -395,7 +554,11 @@
     "PLATFORM-KERNEL"
    ],
    "subject": "Per-tenant request budgets: a token bucket per tenant and audience, and a load-aware share per replica",
-   "detail": "ADR-0064 (accepted 1 October), in the kernel middleware of the commerce, access and operations hosts: a token bucket per tenant and audience (guest/public, staff, service, partner) with counts shared through Azure Managed Redis, sustained rate and a 2x burst for 10 seconds from the tenant's plan (Plan.requestLimits) or the platform default; one tenant held to 25% of a replica's request slots only while the replica is above 70% of its limit; shedding guest and public first, staff and service last (ADR-0032); 429 with Retry-After and the RateLimit-* headers; if Redis is unavailable each replica falls back to its own in-process buckets (the limit divided by the replica count). Done when: in a test with two tenants on one replica, the busy tenant gets the whole replica while the other is quiet, is held to 25% of the slots once the replica passes 70% while the quiet tenant's requests still succeed, a guest burst never spends a till's staff budget, and stopping Redis leaves requests served under the in-process limits."
+   "detail": "ADR-0064 (accepted 1 October), in the kernel middleware of the commerce, access and operations hosts: a token bucket per tenant and audience (guest/public, staff, service, partner) with counts shared through Azure Managed Redis, sustained rate and a 2x burst for 10 seconds from the tenant's plan (Plan.requestLimits) or the platform default; one tenant held to 25% of a replica's request slots only while the replica is above 70% of its limit; shedding guest and public first, staff and service last (ADR-0032); 429 with Retry-After and the RateLimit-* headers; if Redis is unavailable each replica falls back to its own in-process buckets (the limit divided by the replica count). Done when: in a test with two tenants on one replica, the busy tenant gets the whole replica while the other is quiet, is held to 25% of the slots once the replica passes 70% while the quiet tenant's requests still succeed, a guest burst never spends a till's staff budget, and stopping Redis leaves requests served under the in-process limits.",
+   "builds": [
+    "adr ADR-0032",
+    "adr ADR-0064"
+   ]
   },
   {
    "key": "OBS-TENANT-POOL",
@@ -407,7 +570,11 @@
     "KERNEL-TENANT-LIMITS"
    ],
    "subject": "Alerts on one tenant's share of its connection pool and on max_connections",
-   "detail": "ADR-0064 item 4: per-tenant pool caps stay, and two alerts watch them: one tenant holding more than 60% of its pool for five minutes, and the instance passing 80% of max_connections; plus a dashboard panel of 429s per tenant and audience from KERNEL-TENANT-LIMITS. Done when: a load run that holds one tenant's pool fires the first alert after five minutes naming the tenant, and opening connections past 80% of max_connections fires the second."
+   "detail": "ADR-0064 item 4: per-tenant pool caps stay, and two alerts watch them: one tenant holding more than 60% of its pool for five minutes, and the instance passing 80% of max_connections; plus a dashboard panel of 429s per tenant and audience from KERNEL-TENANT-LIMITS. Done when: a load run that holds one tenant's pool fires the first alert after five minutes naming the tenant, and opening connections past 80% of max_connections fires the second.",
+   "builds": [
+    "adr ADR-0032",
+    "adr ADR-0064"
+   ]
   },
   {
    "key": "EDGE-WAITING-ROOM",
@@ -421,7 +588,14 @@
    ],
    "subject": "The on-sale waiting room: Redis positions, the cached page, the release controller, admission tokens",
    "detail": "ADR-0066 (accepted 1 October; B1, or Block A if an on-sale is booked in Block A): enterWaitingRoom gives a position from a Redis counter with no database write; the static branded waiting page is served from Front Door's cache and polls getWaitingRoomPosition; a release controller admits guests per second from the health of commerce (latency and the 429 rate, ADR-0064); an admitted guest gets a short-lived signed token (tenant, performance, expiry, unique id; key in Key Vault) that middleware checks by signature, with no database read, on addCartLine and acquireInventoryHold from guest channels only (till, kiosk and workstation holds are exempt, amendment of 1 October); activation follows the performance's onSaleFrom/onSaleTo or setWaitingRoomSetting. Done when: with the room on, a guest cart hold without a token is refused 403 admission-required, one with a valid token succeeds, a forged or expired token or one for another performance is refused, a till hold needs no token, and the release rate drops when commerce latency rises.",
-   "module": "Foundation & Setup"
+   "module": "Foundation & Setup",
+   "builds": [
+    "operation enterWaitingRoom",
+    "operation getWaitingRoomPosition",
+    "operation setWaitingRoomSetting",
+    "adr ADR-0064",
+    "adr ADR-0066"
+   ]
   },
   {
    "key": "EDGE-WAITING-ROOM-LOAD",
@@ -434,7 +608,11 @@
    ],
    "subject": "Load test the waiting room at 30,000 arrivals in the burst environment",
    "detail": "ADR-0066 item 4, before the first large sale: 30,000 arrivals in the opening seconds against a burst environment (ADR-0035) with the waiting room on, recording position latency, the Front Door cache hit rate, the release rate the controller holds, commerce p95 and 429s, and the relay lag while admitted guests buy (ADR-0058 amendment: 3,500 events a second). Done when: all 30,000 get a position without a database write, admitted guests buy with commerce p95 inside its target, no cart hold succeeds without a token, and the results are recorded against the sizing figures.",
-   "module": "Foundation & Setup"
+   "module": "Foundation & Setup",
+   "builds": [
+    "adr ADR-0035",
+    "adr ADR-0066"
+   ]
   },
   {
    "key": "ACC-RULE-EVAL",
@@ -448,7 +626,13 @@
    "subject": "One admission rule format, two evaluators: .NET and TypeScript proven equal by shared test vectors",
    "detail": "ADR-0068 (accepted 1 October; B1, with the scanner): the closed JSON rule format (AdmissionRule, AdmissionCondition; conditionRule on access.dynamic_policy versions) evaluated by validateAccess online in .NET and by the gate offline in TypeScript (packages/offline-core) against the same active policy version that getOfflinePackage carries; each scan_event records the policy version that decided it. Done when: one set of test vectors runs in CI against both evaluators and they agree on every vector, a rule the format cannot express is refused when the policy is saved, and an offline scan and an online scan of the same credential under the same policy version give the same decision.",
    "module": "Admission & Access Control",
-   "platform": "P07"
+   "platform": "P07",
+   "builds": [
+    "operation validateAccess",
+    "operation getOfflinePackage",
+    "table access.dynamic_policy",
+    "adr ADR-0068"
+   ]
   },
   {
    "key": "ACC-UAEPASS-ICP",
@@ -476,5 +660,128 @@
    "subject": "Same numbers test: till, back-office and Analytics reports agree",
    "detail": "2 October (Chinmay, DEC-559, prevention of CHG-FIN-006): an automated comparison of the same measure (takings, gross sales, net revenue, refunds) for the same period and scope on the till report (POS-008), the back-office report and the Analytics (P16) dashboard; fails when they differ. Done when: the test runs in CI against the seeded demo tenant."
   }
- ]
+ ],
+ "blockAOperations": {
+  "getUnifiedReconciliation": "BO-043 Daily Reconciliation runs the finance validation across every money source (Chinmay, 3 October, r1 additions).",
+  "createPrincipal": "staff accounts are created in Block A (Chinmay, 3 October, r1 additions).",
+  "requestProductionAccess": "DEV-003 Clients & Credentials, a Block A setup screen, binds it (Chinmay, 3 October, r1 additions).",
+  "closeFiscalPeriod": "the period close (Chinmay, 3 October, r1 additions).",
+  "listFiscalPeriods": "the period close (Chinmay, 3 October, r1 additions).",
+  "createReportSchedule": "report scheduling (Chinmay, 3 October, r1 additions; REPORT_MANAGE adds editing and scheduling).",
+  "listReportSchedules": "report scheduling (Chinmay, 3 October, r1 additions).",
+  "updateReportSchedule": "report scheduling (Chinmay, 3 October, r1 additions).",
+  "deleteReportSchedule": "report scheduling (Chinmay, 3 October, r1 additions).",
+  "createAccount": "a BO-074 Chart of Accounts write (Chinmay, 3 October, r1 additions).",
+  "updateAccount": "a BO-074 Chart of Accounts write (Chinmay, 3 October, r1 additions).",
+  "createCostCenter": "a BO-074 Chart of Accounts write (Chinmay, 3 October, r1 additions).",
+  "setAccountMappings": "a BO-075 Account Mapping write (Chinmay, 3 October, r1 additions).",
+  "createTaxExemption": "a BO-075 Account Mapping write (Chinmay, 3 October, r1 additions).",
+  "verifyTaxExemption": "a BO-075 Account Mapping write (Chinmay, 3 October, r1 additions).",
+  "listPaymentMethods": "payment configuration is needed before guests can pay (lead's r1 gate finding, 3 October): Block A in r2 (SVC-ORDER-PAYMENTS-8), it fell to Block C when new operations re-cut the four-operation tasks.",
+  "listPaymentProviderConnections": "payment configuration, as listPaymentMethods; ADM-570, a Block A setup screen, binds it.",
+  "setPaymentRules": "payment configuration, as listPaymentMethods (r2: SVC-ORDER-PAYMENTS-9, Block A).",
+  "simulatePaymentConfiguration": "payment configuration, as listPaymentMethods (r2: SVC-ORDER-PAYMENTS-9, Block A).",
+  "testPaymentProviderConnection": "payment configuration, as listPaymentMethods (r2: SVC-ORDER-PAYMENTS-9, Block A).",
+  "setVenueMapArtwork": "Chinmay put the venue-map inputs in r1 (r1 additions, 3 October): built in Block A with BO-093 and BO-094 (the lead, CHG-RONEP-001); its contract lands from branch r1-contracts.",
+  "getVenueNavigationFile": "Chinmay put the venue-map inputs in r1 (r1 additions, 3 October): built in Block A with BO-093 and BO-094 (the lead, CHG-RONEP-001); its contract lands from branch r1-contracts.",
+  "proposeWalkways": "the AI path proposal of the venue-map import (F26), built in Block A with BO-093 and BO-094 (the lead, 3 October, CHG-RONEP-001)."
+ },
+ "blockAScreens": {
+  "BO-1065": "drawn and built whole in Block A with its AI residency section (Chinmay, 3 October, r1 additions).",
+  "EMP-002": "the staff app's venue and role selection after sign-in (F08, F64): the lead's r1 finding of 3 October, 'pull EMP-002 and EMP-003 into Block A' (CHG-RONEP-006)."
+ },
+ "screenNotes": {
+  "BO-1065": "Includes the AI residency section (aiResidencyClass, aiResidencyOptIn and allowedAiResidencies on the region settings; ADR-0009 as amended on 2 October), drawn and built in Block A (CHG-RONEP-001)."
+ },
+ "departures": {
+  "operation activateJourney": "r2 built it in Block A (SVC-MARKETING-MARKETING-15); it goes with AM-MARKETING-CRM-P08-2 in Block D now: bound on BO-775 (Block D), and no Block A or B screen, flow or decision needs it. r2 had it in Block A only beside work Block A needed (a four-operation task or a migration takes everything of its app-module) (CHG-RONEP-002).",
+  "operation createGroupEnquiry": "r2 built it in Block A (SVC-ORDER-ORDERS-21); it goes with AM-ORDERS-RESERVATIONS-P08-7 in Block C now: bound on BO-265 (Block C), and no Block A or B screen, flow or decision needs it. r2 had it in Block A only beside work Block A needed (a four-operation task or a migration takes everything of its app-module) (CHG-RONEP-002).",
+  "operation getConsentHistory": "r2 built it in Block B (VM-MARKETING-CONSENT-1); it goes with AM-MARKETING-CRM-P08 in Block D now: bound on BO-735 (Block D), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation getCouponCodeBatch": "r2 built it in Block B (SVC-CATALOGUE-COUPON-3); it goes with AM-PRICING-PROMOTIONS-P08-2 in Block C now: bound on ADM-160 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation getJourneyPerformance": "r2 built it in Block A (SVC-MARKETING-MARKETING-15) beside operations that block needed; only Block D screens bind it (BO-774, BO-781, BO-783) and no Block A or B screen, flow or decision needs it (CHG-RONEP-002).",
+  "operation listAdvancedOffer": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-43); it goes with AM-PRICING-PROMOTIONS-P08-2 in Block C now: bound on ADM-168 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listAdvancedOfferGuardrail": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-43); it goes with AM-PRICING-PROMOTIONS-P08-2 in Block C now: bound on ADM-168, ADM-176 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listCampaignCalendarTimeline": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-39); it goes with AM-PRICING-PROMOTIONS-P08 in Block C now: bound on ADM-142, BO-765 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listCampaignPromotionPerformance": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-39); it goes with AM-PRICING-PROMOTIONS-P08 in Block C now: bound on ADM-139, ADM-228, ADM-229 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listCartTransactionThreshold": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-39); it goes with AM-PRICING-PROMOTIONS-P08 in Block C now: bound on ADM-150 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listCheapestLowestValue": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-43); it goes with AM-PRICING-PROMOTIONS-P08-2 in Block C now: bound on ADM-171 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listCodeEligibilityRestriction": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-43); it goes with AM-PRICING-PROMOTIONS-P08-2 in Block C now: bound on ADM-161 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listCodeSecurityFraud": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-44); it goes with AM-PRICING-PROMOTIONS-P08-2 in Block C now: bound on ADM-166 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listCustomerMembershipSegment": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-39); it goes with AM-PRICING-PROMOTIONS-P08 in Block C now: bound on ADM-153 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listDiscountLimitGuardrail": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-44); it goes with AM-PRICING-PROMOTIONS-P08 in Block C now: bound on ADM-156 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listExternalReferenceMappings": "r2 built it in Block A (SVC-ORDER-ORDERS-21); it goes with AM-ORDERS-RESERVATIONS-P08-7 in Block C now: bound on BO-330 (Block C), and no Block A or B screen, flow or decision needs it. r2 had it in Block A only beside work Block A needed (a four-operation task or a migration takes everything of its app-module) (CHG-RONEP-002).",
+  "operation listMessageTriggers": "r2 built it in Block A (SVC-MARKETING-MARKETING-16); it goes with AM-MARKETING-CRM-P08-2 in Block D now: bound on BO-776 (Block D), and no Block A or B screen, flow or decision needs it. r2 had it in Block A only beside work Block A needed (a four-operation task or a migration takes everything of its app-module) (CHG-RONEP-002).",
+  "operation listMultiBuyQuantity": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-44); it goes with AM-PRICING-PROMOTIONS-P08-2 in Block C now: bound on ADM-170 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listPaymentMethodBank": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-44); it goes with AM-PRICING-PROMOTIONS-P08 in Block C now: bound on ADM-154 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listPercentageFixedDiscount": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-40); it goes with AM-PRICING-PROMOTIONS-P08 in Block C now: bound on ADM-149 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listPromotionActivityVersion": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-40); it goes with AM-PRICING-PROMOTIONS-P08 in Block C now: bound on ADM-147 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listPromotionAlertException": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-40); it goes with AM-PRICING-PROMOTIONS-P08 in Block C now: bound on ADM-144, ANL-018 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listPromotionCampaign": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-40); it goes with AM-PRICING-PROMOTIONS-P08 in Block C now: bound on ADM-139, ADM-229 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listPromotionChannel": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-41); it goes with AM-PRICING-PROMOTIONS-P08 in Block C now: bound on ADM-143 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listPromotionHealthPerformance": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-41); it goes with AM-PRICING-PROMOTIONS-P08 in Block C now: bound on ADM-146, ADM-228 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listPromotionLifecycleStatus": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-41); it goes with AM-PRICING-PROMOTIONS-P08 in Block C now: bound on ADM-141 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listPromotionPerformance": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-41); it goes with AM-PRICING-PROMOTIONS-P08 in Block C now: bound on ADM-146, ADM-228, ADM-229 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listRedemption": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-45); it goes with AM-PRICING-PROMOTIONS-P08-2 in Block C now: bound on ADM-167 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listRedemptionCodeLookup": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-45); it goes with AM-PRICING-PROMOTIONS-P08-2 in Block C now: bound on ADM-165 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listRewardSelectionSubstitution": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-45); it goes with AM-PRICING-PROMOTIONS-P08-2 in Block C now: bound on ADM-175 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listSpecialPriceGuest": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-45); it goes with AM-PRICING-PROMOTIONS-P08 in Block C now: bound on ADM-155 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listTargetingConflictFrequency": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-55); it goes with AM-PRICING-PROMOTIONS-P08-3 in Block C now: bound on ADM-206 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listTargetingEligibility": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-55); it goes with AM-PRICING-PROMOTIONS-P08-3 in Block C now: bound on ADM-198 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listTimeBasedSeasonal": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-42); it goes with AM-PRICING-PROMOTIONS-P08 in Block C now: bound on ADM-152 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listUniqueCodeGeneration": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-46); it goes with AM-PRICING-PROMOTIONS-P08-2 in Block C now: bound on ADM-160 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listUpsellCrossSell": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-59); it goes with AM-PRICING-PROMOTIONS-P08-5 in Block C now: bound on ADM-233, ADM-659 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listUsageCapacityFrequency": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-46); it goes with AM-PRICING-PROMOTIONS-P08-2 in Block C now: bound on ADM-162 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listValidityDateTime": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-46); it goes with AM-PRICING-PROMOTIONS-P08-2 in Block C now: bound on ADM-163 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation listVolumeBulkTier": "r2 built it in Block B (SVC-CATALOGUE-DRAFTED-42); it goes with AM-PRICING-PROMOTIONS-P08 in Block C now: bound on ADM-151 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation recordExternalReference": "r2 built it in Block A (SVC-ORDER-ORDERS-21); it goes with AM-ORDERS-RESERVATIONS-P08-7 in Block C now: bound on BO-330 (Block C), and no Block A or B screen, flow or decision needs it. r2 had it in Block A only beside work Block A needed (a four-operation task or a migration takes everything of its app-module) (CHG-RONEP-002).",
+  "operation setAccreditationValidity": "r2 built it in Block A (SVC-TENANCY-ACCREDITATION-15); it goes with AM-ACCREDITATION-P08-3 in Block D now: bound on BO-666 (Block D), and no Block A or B screen, flow or decision needs it. r2 had it in Block A only beside work Block A needed (a four-operation task or a migration takes everything of its app-module) (CHG-RONEP-002).",
+  "operation setGuestCompanionEligibility": "r2 built it in Block B (SVC-ACCESS-ACCESS-39) beside operations that block needed; only Block C screens bind it (BO-218) and no Block A or B screen, flow or decision needs it (CHG-RONEP-002).",
+  "operation submitChargebackEvidence": "r2 built it in Block B (SVC-ORDER-PAYMENTS-17); it goes with AM-PAYMENTS-P08-3 in Block C now: bound on ADM-635 (Block C), and no Block A or B screen, flow or decision needs it. Block B is filled in build order to what the team finishes by its target (Sprint 6), and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "operation updateGroupBooking": "r2 built it in Block A (VM-ORDER-ORDERS-3); it goes with AM-ORDERS-RESERVATIONS-P08 in Block C now: bound on BO-026, BO-272, BO-281 (Block C), and no Block A or B screen, flow or decision needs it. r2 had it in Block A only beside work Block A needed (a four-operation task or a migration takes everything of its app-module) (CHG-RONEP-002).",
+  "screen ADM-031": "r2 built it in Block A only as the setup host of createDashboard and updateDashboard; the setup hosts are the fewest screens covering the setup operations, and ANL-023 (in Block A) now hosts them with deleteDashboard, so ADM-031 is built whole with Reporting on the TICVAI Console (Block D). No Block A flow or door needs it (CHG-RONEP-002).",
+  "screen ADM-139": "r2 built it in Block B (VM-ADM-139); now VM-ADM-139 in Block C (CHG-RONEP-002).",
+  "screen ADM-140": "r2 built it in Block B (VM-ADM-140); now VM-ADM-140 in Block C (CHG-RONEP-002).",
+  "screen ADM-141": "r2 built it in Block B (VM-ADM-141); now VM-ADM-141 in Block C (CHG-RONEP-002).",
+  "screen ADM-142": "r2 built it in Block B (VM-ADM-142); now VM-ADM-142 in Block C (CHG-RONEP-002).",
+  "screen ADM-143": "r2 built it in Block B (VM-ADM-143); now VM-ADM-143 in Block C (CHG-RONEP-002).",
+  "screen ADM-144": "r2 built it in Block B (VM-ADM-144); now VM-ADM-144 in Block C (CHG-RONEP-002).",
+  "screen ADM-146": "r2 built it in Block B (VM-ADM-146); now VM-ADM-146 in Block C (CHG-RONEP-002).",
+  "screen ADM-147": "r2 built it in Block B (VM-ADM-147); now VM-ADM-147 in Block C (CHG-RONEP-002).",
+  "screen ADM-149": "r2 built it in Block B (VM-ADM-149); now VM-ADM-149 in Block C (CHG-RONEP-002).",
+  "screen ADM-150": "r2 built it in Block B (VM-ADM-150); now VM-ADM-150 in Block C (CHG-RONEP-002).",
+  "screen ADM-151": "r2 built it in Block B (VM-ADM-151); now VM-ADM-151 in Block C (CHG-RONEP-002).",
+  "screen ADM-152": "r2 built it in Block B (VM-ADM-152); now VM-ADM-152 in Block C (CHG-RONEP-002).",
+  "screen ADM-153": "r2 built it in Block B (VM-ADM-153); now VM-ADM-153 in Block C (CHG-RONEP-002).",
+  "screen ADM-154": "r2 built it in Block B (VM-ADM-154); now VM-ADM-154 in Block C (CHG-RONEP-002).",
+  "screen ADM-155": "r2 built it in Block B (VM-ADM-155); now VM-ADM-155 in Block C (CHG-RONEP-002).",
+  "screen ADM-156": "r2 built it in Block B (VM-ADM-156); now VM-ADM-156 in Block C (CHG-RONEP-002).",
+  "screen ADM-157": "r2 built it in Block B (VM-ADM-157); now VM-ADM-157 in Block C (CHG-RONEP-002).",
+  "screen ADM-160": "r2 built it in Block B (VM-ADM-160); now VM-ADM-160 in Block C (CHG-RONEP-002).",
+  "screen ADM-161": "r2 built it in Block B (VM-ADM-161); now VM-ADM-161 in Block C (CHG-RONEP-002).",
+  "screen ADM-162": "r2 built it in Block B (VM-ADM-162); now VM-ADM-162 in Block C (CHG-RONEP-002).",
+  "screen ADM-163": "r2 built it in Block B (VM-ADM-163); now VM-ADM-163 in Block C (CHG-RONEP-002).",
+  "screen ADM-165": "r2 built it in Block B (VM-ADM-165); now VM-ADM-165 in Block C (CHG-RONEP-002).",
+  "screen ADM-166": "r2 built it in Block B (VM-ADM-166); now VM-ADM-166 in Block C (CHG-RONEP-002).",
+  "screen ADM-167": "r2 built it in Block B (VM-ADM-167); now VM-ADM-167 in Block C (CHG-RONEP-002).",
+  "screen ADM-168": "r2 built it in Block B (VM-ADM-168); now VM-ADM-168 in Block C (CHG-RONEP-002).",
+  "screen ADM-170": "r2 built it in Block B (VM-ADM-170); now VM-ADM-170 in Block C (CHG-RONEP-002).",
+  "screen ADM-171": "r2 built it in Block B (VM-ADM-171); now VM-ADM-171 in Block C (CHG-RONEP-002).",
+  "screen ADM-175": "r2 built it in Block B (VM-ADM-175); now VM-ADM-175 in Block C (CHG-RONEP-002).",
+  "screen ADM-176": "r2 built it in Block B (VM-ADM-176); now VM-ADM-176 in Block C (CHG-RONEP-002).",
+  "screen BO-119": "r2 built it in Block B (VM-BO-119); now VM-BO-119 in Block C (CHG-RONEP-002).",
+  "table marketing.duplicate_candidate": "r2 created it in Block A (MIG-MARKETING-7); only Block D operations reach it now (decideDuplicateCandidate, listDuplicateCandidates), so MIG-MARKETING-7 (Block D) creates it. Block B is filled in build order to what the team finishes by its target, and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "table marketing.guest_attribute_model": "r2 created it in Block A (MIG-MARKETING-7); only Block D operations reach it now (getGuestAttributeModel, setGuestAttributeModel), so MIG-MARKETING-7 (Block D) creates it. Block B is filled in build order to what the team finishes by its target, and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "table marketing.identity_rules": "r2 created it in Block A (MIG-MARKETING-7); only Block D operations reach it now (getIdentityResolutionRules, setIdentityResolutionRules), so MIG-MARKETING-7 (Block D) creates it. Block B is filled in build order to what the team finishes by its target, and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "table marketing.privacy_exception": "r2 created it in Block A (MIG-MARKETING-7); only Block D operations reach it now (listPrivacy, listPrivacyCompliance, listPrivacyComplianceExceptions ...), so MIG-MARKETING-7 (Block D) creates it. Block B is filled in build order to what the team finishes by its target, and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "table marketing.privacy_request": "r2 created it in Block A (MIG-MARKETING-7); only Block D operations reach it now (listCustomerPrivacyConsent, listDataSubjectCustomer, listPrivacy ...), so MIG-MARKETING-7 (Block D) creates it. Block B is filled in build order to what the team finishes by its target, and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "table orders.external_reference_mapping": "r2 created it in Block A (MIG-ORDERS-11); only Block C operations reach it now (listExternalPaymentPartner, listExternalReferenceMappings, recordExternalReference), so MIG-ORDERS-13 (Block C) creates it. Block B is filled in build order to what the team finishes by its target, and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "table orders.group_enquiry": "r2 created it in Block A (MIG-ORDERS-11); only Block C operations reach it now (approveGroupDiscountException, createGroupEnquiry, listGroupCustomerOrganization ...), so MIG-ORDERS-13 (Block C) creates it. Block B is filled in build order to what the team finishes by its target, and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "table orders.group_quote_line": "r2 created it in Block A (MIG-ORDERS-11); only Block C operations reach it now (approveGroupDiscountException, listQuoteBookingConversion, setGroupPackageExperience ...), so MIG-ORDERS-13 (Block C) creates it. Block B is filled in build order to what the team finishes by its target, and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "table payments.credit_account": "r2 created it in Block B (MIG-PAYMENTS-9); only Block C operations reach it now (createB2bCreditAccount, listB2bCreditAccounts), so MIG-PAYMENTS-9 (Block C) creates it. Block B is filled in build order to what the team finishes by its target, and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "table promotions.promotion_alert": "r2 created it in Block B (MIG-PROMOTIONS-4); only Block C operations reach it now (listCodeSecurityFraud, listPromotionAlertException), so MIG-PROMOTIONS-5 (Block C) creates it. Block B is filled in build order to what the team finishes by its target, and Block A grew (CHG-RONEP-001, CHG-RONEP-006) (CHG-RONEP-002).",
+  "table workforce.employment": "r2 created it in MIG-WORKFORCE-4 (Block B) because a migration takes every table its app-module reaches; only Block D operations reach it now (getEmployee, sendStaffMessage), so the Block D migration creates it (CHG-RONEP-002).",
+  "table workforce.staff_conversation": "r2 created it in MIG-WORKFORCE-4 (Block B) because a migration takes every table its app-module reaches; only Block D operations reach it now (sendStaffMessage, listStaffConversations), so the Block D migration creates it (CHG-RONEP-002).",
+  "table workforce.staff_conversation_participant": "r2 created it in MIG-WORKFORCE-4 (Block B) because a migration takes every table its app-module reaches; only Block D operations reach it now (sendStaffMessage, markStaffConversationRead), so the Block D migration creates it (CHG-RONEP-002).",
+  "table workforce.staff_message": "r2 created it in MIG-WORKFORCE-4 (Block B) because a migration takes every table its app-module reaches; only Block D operations reach it now (sendStaffMessage, listStaffMessages), so the Block D migration creates it (CHG-RONEP-002)."
+ }
 }

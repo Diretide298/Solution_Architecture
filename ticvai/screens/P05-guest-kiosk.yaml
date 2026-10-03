@@ -55,7 +55,7 @@ screens:
   name: Attract Loop
   module: Sell
   requiresModule: core
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: guest-app
@@ -321,7 +321,7 @@ screens:
   name: Choose tickets
   module: Sell
   requiresModule: ticketing
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: guest-app

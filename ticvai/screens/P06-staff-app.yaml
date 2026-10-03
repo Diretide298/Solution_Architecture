@@ -4600,7 +4600,7 @@ screens:
   name: Queue monitor
   module: Operations
   requiresModule: queue
-  wave: 2
+  wave: 1
   capability: C00
   implementation:
     app: venue-staff-app

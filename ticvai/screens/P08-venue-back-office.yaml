@@ -35413,7 +35413,7 @@ screens:
   name: Access Control Command Center
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Access Control Module_Reference.pdf
     board: '1'
@@ -36696,7 +36696,7 @@ screens:
   name: Access Rule Command Center
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Access Control Module_Reference.pdf
     board: '2'
@@ -37975,7 +37975,7 @@ screens:
   name: Digital Credential Security Command Center
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Access Control Module_Reference.pdf
     board: '3'
@@ -40324,7 +40324,7 @@ screens:
   name: Biometric Access Command Center
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Access Control Module_Reference.pdf
     board: '5'
@@ -41601,7 +41601,7 @@ screens:
   name: Device & Gate Command Center
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Access Control Module_Reference.pdf
     board: '6'
@@ -45396,7 +45396,7 @@ screens:
   name: Live Access Operations Command Center
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Access Control Module_Reference.pdf
     board: '9'
@@ -60068,7 +60068,7 @@ screens:
   name: Virtual Ticket Command Center
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Ticket_Media___Credential_Management_Reference.pdf
     board: '1'
@@ -61391,7 +61391,7 @@ screens:
   name: Media Design Studio Command Center
   module: Access & Venue
   requiresModule: access
-  wave: 3
+  wave: 1
   source:
     pack: Ticket_Media___Credential_Management_Reference.pdf
     board: '2'
@@ -67493,7 +67493,7 @@ screens:
   name: Game & Ride Operations Dashboard
   module: Games & Rides
   requiresModule: games
-  wave: 3
+  wave: 1
   source:
     pack: Game_and_Ride_Module.pdf
     board: '1'
@@ -91086,7 +91086,7 @@ screens:
   name: Accreditation Command Center
   module: Access & Venue
   requiresModule: accreditation
-  wave: 3
+  wave: 1
   source:
     pack: ACCREDITATION.pdf
     board: '1'
@@ -99031,7 +99031,7 @@ screens:
   name: Event Catalogue Command Center
   module: Sell
   requiresModule: ticketing
-  wave: 3
+  wave: 1
   source:
     pack: Event_Management_Configuration_Backend_Structure_v1.0.pdf
     board: '1'
@@ -105647,7 +105647,7 @@ screens:
   name: Audience Intelligence
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '3'
@@ -106766,7 +106766,7 @@ screens:
   name: Campaign Command Center
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '4'
@@ -108871,7 +108871,7 @@ screens:
   name: Communications Center
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '6'
@@ -109869,7 +109869,7 @@ screens:
   name: Omnichannel Command Center
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '7'
@@ -110402,7 +110402,7 @@ screens:
   name: Agent Workspace
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '7'
@@ -112957,7 +112957,7 @@ screens:
   name: Gamification Command Center
   module: Engagement & Support
   requiresModule: marketing
-  wave: 3
+  wave: 1
   source:
     pack: Marketing_CRM_Configuration_Reference v1.0.pdf
     board: '10'
@@ -116212,7 +116212,7 @@ screens:
   name: Resource Management Command Center
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   source:
     pack: Resource_Management_Configuration_Reference.pdf
     board: '1'
@@ -117681,7 +117681,7 @@ screens:
   name: Resource Calendar Command Center
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   source:
     pack: Resource_Management_Configuration_Reference.pdf
     board: '2'
@@ -118864,7 +118864,7 @@ screens:
   name: Staff Resource Directory
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   source:
     pack: Resource_Management_Configuration_Reference.pdf
     board: '3'
@@ -122668,7 +122668,7 @@ screens:
   name: Equipment & Asset Command Center
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   source:
     pack: Resource_Management_Configuration_Reference.pdf
     board: '6'
@@ -124163,7 +124163,7 @@ screens:
   name: Event Resource Planning Command Center
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   source:
     pack: Resource_Management_Configuration_Reference.pdf
     board: '7'
@@ -125484,7 +125484,7 @@ screens:
   name: AI Resource Intelligence Command Center
   module: Rentals
   requiresModule: resources
-  wave: 3
+  wave: 1
   source:
     pack: Resource_Management_Configuration_Reference.pdf
     board: '8'
@@ -139022,7 +139022,7 @@ screens:
   name: Revenue Command Center
   module: Access & Venue
   requiresModule: seating
-  wave: 3
+  wave: 1
   source:
     pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf
     board: '10'
@@ -139217,7 +139217,7 @@ screens:
   name: Price Bands & Categories
   module: Access & Venue
   requiresModule: seating
-  wave: 3
+  wave: 1
   source:
     pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf
     board: '10'
@@ -140909,7 +140909,7 @@ screens:
   name: Platform Command Center
   module: Access & Venue
   requiresModule: seating
-  wave: 3
+  wave: 1
   source:
     pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf
     board: '12'
@@ -141029,7 +141029,7 @@ screens:
   name: Tenant & Brand Context
   module: Access & Venue
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf
     board: '12'
@@ -141402,7 +141402,7 @@ screens:
   name: Currency, Timezone & Channels
   module: Setup
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Seat_Management_Venue_Mapping_Reference v1.0.pdf
     board: '12'
@@ -144857,7 +144857,7 @@ screens:
   name: Funding Command Center
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Wallet_Configuration_Backend_Structure_v1.0.pdf
     board: '2'
@@ -145052,7 +145052,7 @@ screens:
   name: Funding Method Configuration
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Wallet_Configuration_Backend_Structure_v1.0.pdf
     board: '2'
@@ -146301,7 +146301,7 @@ screens:
   name: Stored Value & Credit Command Center
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Wallet_Configuration_Backend_Structure_v1.0.pdf
     board: '3'
@@ -147329,7 +147329,7 @@ screens:
   name: Credit Expiry, Extension & Forfeiture Operations
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Wallet_Configuration_Backend_Structure_v1.0.pdf
     board: '3'
@@ -151694,7 +151694,7 @@ screens:
   name: Wallet Operations Command Center
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Wallet_Configuration_Backend_Structure_v1.0.pdf
     board: '7'
@@ -152186,7 +152186,7 @@ screens:
   name: Refund-to-Wallet Policy Configuration
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Wallet_Configuration_Backend_Structure_v1.0.pdf
     board: '7'
@@ -153139,7 +153139,7 @@ screens:
   name: Wallet Security & Risk Command Center
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Wallet_Configuration_Backend_Structure_v1.0.pdf
     board: '8'
@@ -154379,7 +154379,7 @@ screens:
   name: Security Governance, Audit & Rule Publication
   module: Orders & Money
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Wallet_Configuration_Backend_Structure_v1.0.pdf
     board: '8'
@@ -157551,7 +157551,7 @@ screens:
   name: Transport Stations
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /transport/stations
@@ -157727,7 +157727,7 @@ screens:
   name: Transport Routes & Stops
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /transport/routes
@@ -157983,7 +157983,7 @@ screens:
   name: Transport Fares & Passenger Types
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /transport/fares
@@ -158146,7 +158146,7 @@ screens:
   name: Transport Timetables
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /transport/timetables
@@ -158567,7 +158567,7 @@ screens:
   name: Transport Pass Types
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /transport/pass-types
@@ -158736,7 +158736,7 @@ screens:
   name: Transport Network Import
   module: Transport
   requiresModule: transport
-  wave: 2
+  wave: 1
   implementation:
     app: venue-management-web
     route: /transport/import
@@ -171574,7 +171574,7 @@ screens:
   name: Promotion Command Center Dashboard
   module: Commercial
   requiresModule: marketing
-  wave: 3
+  wave: 1
   source:
     pack: Promotions___Bundles_Management_Reference.pdf
     board: '1'
@@ -174439,7 +174439,7 @@ screens:
   name: Coupon & Promo Code Command Center
   module: Commercial
   requiresModule: marketing
-  wave: 3
+  wave: 1
   source:
     pack: Promotions___Bundles_Management_Reference.pdf
     board: '3'
@@ -176885,7 +176885,7 @@ screens:
   name: Bundle & Combo Command Center
   module: Commercial
   requiresModule: marketing
-  wave: 3
+  wave: 1
   source:
     pack: Promotions___Bundles_Management_Reference.pdf
     board: '5'
@@ -184044,7 +184044,7 @@ screens:
   name: Rules & Workflow Command Center
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Rules__Workflow__Approval___Automation_Engine_Reference.pdf
     board: '1'
@@ -185319,7 +185319,7 @@ screens:
   name: Workflow Operations Command Center
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Rules__Workflow__Approval___Automation_Engine_Reference.pdf
     board: '2'
@@ -196259,7 +196259,7 @@ screens:
   name: Payment Orchestration Command Center
   module: Commercial
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Payment_Payment_Orchestration.pdf
     board: '2'
@@ -199937,7 +199937,7 @@ screens:
   name: Mixed Tender & Credit Command Center
   module: Commercial
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Payment_Payment_Orchestration.pdf
     board: '5'
@@ -214765,7 +214765,7 @@ screens:
   name: Governance & Compliance Command Center
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Approval_Workflows_and_Governance_Reference.pdf
     board: '6'
@@ -215875,7 +215875,7 @@ screens:
   name: Approval Integration Command Center
   module: Platform
   requiresModule: core
-  wave: 3
+  wave: 1
   source:
     pack: Approval_Workflows_and_Governance_Reference.pdf
     board: '7'
