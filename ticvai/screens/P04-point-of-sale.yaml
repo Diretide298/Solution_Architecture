@@ -209,18 +209,15 @@ screens:
     - name: contextPanel
       slot: selection
       components:
-      - kind: numberField
-        label: Supervisor PIN
-        notes: '**A supervisor''s PIN step-up opens session management on the door** (decided by Chinmay,
-          3 October 2026 (CHG-SPF-012), not the recommendation; reverses CHG-DOOR-003 for this screen).
-          Nobody is signed in at a till''s door, so the supervisor''s PIN authorises `listActiveSessions`
-          and `forceLogout` here; BO-053 keeps them too. Masked, never stored on the till.'
-        provenance: decided by Chinmay, 3 October 2026 (CHG-SPF-012)
       - kind: detailPanel
         label: Signed in on this till now
         bindsTo: ActiveSession
         operation: listActiveSessions
         provenance: contract identity.yaml GET /auth/sessions
+        notes: '**Opens only after a supervisor''s PIN step-up** (decided by Chinmay, 3 October 2026 (CHG-SPF-012),
+          not the recommendation; reverses CHG-DOOR-003 for this screen). Nobody is signed in at a till''s
+          door, so a supervisor''s PIN, asked in the step-up prompt this panel opens, authorises `listActiveSessions`
+          and `forceLogout` here; BO-053 keeps them too. The PIN is masked and never stored on the till.'
       - kind: destructiveButton
         label: Take the till over
         operation: forceLogout

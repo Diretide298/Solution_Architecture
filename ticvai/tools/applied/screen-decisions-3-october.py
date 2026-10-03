@@ -242,6 +242,17 @@ def d011(S, log):
             p["notes"] = ("Optional (" + prov("CHG-SPF-011") + "): opened without one, the canvas is a "
                           "new dashboard and its first Save creates it.")
             hit = True
+    if not any(o.get("id") == "formCreateDashboard" for o in s.get("overlays") or []):
+        s.setdefault("overlays", []).append({
+            "id": "formCreateDashboard", "component": "modal", "trigger": "Save dashboard",
+            "body": ("**The first Save of a new dashboard** (" + prov("CHG-SPF-011") + "): names it "
+                     "and creates it with `createDashboard`, tiles and all; every later Save goes "
+                     "straight to `updateDashboard`. The refresh budget is checked here too. "
+                     "Dismissing sends nothing; the canvas keeps its tiles."),
+            "confirm": {"label": "Create dashboard", "operation": "createDashboard"},
+            "dismiss": {"label": "Keep editing", "discards": []},
+            "provenance": prov("CHG-SPF-011")})
+        hit = True
     st = s.get("states") or {}
     na = ("Shown when the caller lacks `REPORT_VIEW_VENUE`, which `listReports` requires to show this "
           "screen, and names that permission. A caller without `REPORT_MANAGE` sees the dashboard "
@@ -266,16 +277,17 @@ def d012(S, log):
             a["purpose"] = ("Who holds this till now, read only after a supervisor's PIN step-up: "
                             "nobody is signed in at the door (" + prov("CHG-SPF-012") + ")")
             hit = True
-    if add_component(s, "contextPanel", {
-            "kind": "numberField", "label": "Supervisor PIN",
-            "notes": ("**A supervisor's PIN step-up opens session management on the door** ("
+    # The PIN is asked in the step-up prompt the panel opens (no new control: the step-up input
+    # itself is the contract's to add, see the CHG-SPF-012 notes).
+    panel = comp_by(s, label="Signed in on this till now")
+    if panel and note(panel, "notes", "**Opens only after a supervisor's PIN step-up** ("
                       + prov("CHG-SPF-012") + ", not the recommendation; reverses CHG-DOOR-003 for "
-                      "this screen). Nobody is signed in at a till's door, so the supervisor's PIN "
-                      "authorises `listActiveSessions` and `forceLogout` here; BO-053 keeps them too. "
-                      "Masked, never stored on the till."),
-            "provenance": prov("CHG-SPF-012")}):
-        r = region(s, "contextPanel")["components"]
-        r.insert(0, r.pop())                       # the PIN comes before the list it unlocks
+                      "this screen). Nobody is signed in at a till's door, so a supervisor's PIN, asked "
+                      "in the step-up prompt this panel opens, authorises `listActiveSessions` and "
+                      "`forceLogout` here; BO-053 keeps them too. The PIN is masked and never stored "
+                      "on the till."):
+        hit = True
+    if drop_components(s, lambda c: c.get("label") == "Supervisor PIN"):
         hit = True
     s = S["GST-055"]
     code = comp_by(s, label="Your code")
@@ -387,6 +399,11 @@ def d013(S, log):
                  "can be removed before the report is sent.", "provenance": prov("CHG-SPF-013")})
     h3 |= add_component(s, "actionBar", {
         "kind": "secondaryButton", "label": "Add a person involved", "operation": "addIncidentPerson",
+        "provenance": prov("CHG-SPF-013")})
+    h3 |= add_component(s, "contextPanel", {
+        "kind": "searchField", "label": "Find the guest involved", "operation": "searchGuests",
+        "notes": "Optional, inside Add a person involved: a guest found here fills name and contact "
+                 "from the guest's record, so the person is linked rather than typed again.",
         "provenance": prov("CHG-SPF-013")})
     if not any(o.get("id") == "formAddIncidentPerson" for o in s.get("overlays") or []):
         s.setdefault("overlays", []).append({
