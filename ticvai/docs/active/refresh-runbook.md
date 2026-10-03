@@ -116,16 +116,24 @@ it to finish and runs before anything after it starts.
 
 ## 6. Where the time goes (4 October)
 
-| | Before | After |
+| | Before (3 October, last PASS) | After |
 |---|---|---|
-| Derive (65 steps) | 47.9 min | see CHG-RSPD-001 |
-| Checks | 33.4 min (sequential) | see CHG-RSPD-001 |
-| check-screens alone | 676 s | about 36 s |
+| Derive (65 steps) | 47.9 min | @@DERIVE@@ |
+| Checks | 33.4 min (sequential) | @@CHECKS@@ |
+| Whole run | 84.4 min | @@TOTAL@@ |
+| check-screens alone | 681 s | 36 s |
+| check-package alone (runs alongside) | 638 s | about 121 s |
+| check-wireframes alone | 279 s | 33 s |
 
-check-screens spent 99.7% of its time in PyYAML, parsing the same 16 screens files and 35 contracts about
-twenty times. Each file is now parsed once per run and every rule gets its own fresh copy, so the output is
-byte-identical. The faster libyaml loader was not adopted: it is a different parser, and the gate's results
-must not move.
+The three checkers over two minutes were profiled. Each spent 93 to 99.7% of its time in PyYAML, parsing the
+same 16 screens files and 35 contracts once per rule. Each text is now parsed once per run and every rule gets
+its own fresh copy, so the output is byte-identical (compared before and after for all three). The faster
+libyaml loader was not adopted: it is a different parser (check-package rule 18b exists because it rejects what
+PyYAML accepts), and the gate's results must not move.
+
+The slowest derive steps of the run on 4 October:
+
+@@SLOWEST@@
 
 ## 7. Defender exclusions (Chinmay, as administrator)
 

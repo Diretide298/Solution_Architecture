@@ -3,7 +3,7 @@ date: '2026-10-04'
 source: developer
 kind: process
 summary: The refresh gate fails loudly, times every step, resumes a failed run, holds a release lock, refuses a
-  stale base, runs the checks four at a time, and check-screens parses each file once.
+  stale base, runs the checks four at a time, and the three slowest checkers parse each file once.
 decision:
   what: 'Implement the refresh speed-up the council of 3 October 23:30 decided (TODO "Refresh speed-up"):
     loud failure with a completion marker the judge requires, per-step timings, --resume, a release lock and a
@@ -23,6 +23,8 @@ keys_touched:
   - tools/refresh-manifest.py
   - tools/run-checks.py
   - tools/check-screens.py
+  - tools/check-package.py
+  - tools/check-wireframes.py
   - docs/active/refresh-runbook.md
   - docs/active/release-runbook.md
   - docs/active/council/council-report-2026-10-03-refresh.html
@@ -73,10 +75,17 @@ notes: 'Decisions, each with its reason (4 October 2026, branch refresh-speedup)
   (--write, --csv, --json, --fix, --bless, --freeze, --update-baseline); check-contract-compat''s one
   unflagged write is a fresh mkdtemp per process; the git calls only read. SERIAL stays as a barrier for the
   first checker that ever needs it, with the rule written beside it.
-  (10) check-screens: 99.7% of its time was PyYAML re-parsing the 16 screens files and 35 contracts about
-  twenty times (490 safe_load calls). Each text is now parsed once and every caller gets a fresh pickle copy:
-  same parser, same result (output byte-identical on 857986c1), 676 s to about 36 s. The libyaml loader would
-  be faster still and was not taken: it is a different parser, and the gate''s results must not move.
+  (10) The three checks over two minutes were profiled (cProfile, on 857986c1): check-screens (681 s),
+  check-package (638 s, alongside) and check-wireframes (279 s) each spent 93-99.7% of their time in PyYAML,
+  re-parsing the same 16 screens files and 35 contracts once per rule (490, 969 and 144 safe_load calls). In
+  each, a text is now parsed once and every caller gets a fresh pickle copy of the result: the same parser,
+  so the same result, and no rule sees another''s edits. Output byte-identical before and after for all
+  three; check-screens 681 s to 36 s, check-package 638 s to about 121 s, check-wireframes 279 s to 33 s.
+  check-package''s duplicate-key loader (rule 18) is not cached: it reports while it parses. The libyaml
+  loader would be faster still and was not taken: it is a different parser (check-package rule 18b exists
+  because it rejects what PyYAML accepts), and the gate''s results must not move. The checks between one and
+  two minutes (check-flows, check-lineage, audit-links, check-flow-briefs, check-r1-additions) were left:
+  the parallel run hides them.
   (11) Defender: no system setting was changed; the exclusion commands are in docs/active/refresh-runbook.md
   for Chinmay to run as administrator.
   (12) Policy (docs/active/refresh-runbook.md): scoped runs and single checkers while iterating, the full gate
