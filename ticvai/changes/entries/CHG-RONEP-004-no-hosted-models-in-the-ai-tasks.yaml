@@ -30,7 +30,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-ticket-builds.py
-status: open
+status: closed
+closed_by_commit: 155f591a
 notes: 'B-HOSTED-MODEL fails on the plan of 3044d8b0 (AI-ENGINE-GATEWAY and AI-ENGINE-SCRUB-GUARD) and passes after it. Not
   changed, for Chinmay: AI-ENGINE-CONCIERGE embeds and reranks on CPU in the cell (BGE-M3 and a cross-encoder) and
   SETUP-QDRANT runs a 3-node Qdrant cluster (ADR-0049); both are CPU software in our cell, like Presidio, not a model served

@@ -41,7 +41,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-plan-closure.py
-status: open
+status: closed
+closed_by_commit: 155f591a
 notes: 'C-REACH fails on the plan before this rule (139 Block A screens reached only through screens outside Block A; POS-000
   reached by none until doors count as entries) and passes after it. The command centres are the costly part: pulling only
   the homes and section homes (wave 1 and 2) gives 4,924 points, but leaves 63 setup screens reachable only through a

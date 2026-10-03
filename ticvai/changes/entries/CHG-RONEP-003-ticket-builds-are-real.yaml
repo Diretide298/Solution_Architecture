@@ -36,6 +36,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-ticket-builds.py
-status: open
+status: closed
+closed_by_commit: 155f591a
 notes: On the plan and code of 3044d8b0 check-ticket-builds finds 7 unresolved build ids, 10 Block A AI engine tasks building
   nothing and 279 module tests naming nothing; after it, none. tools/tests/test_op_release.py passes (22).

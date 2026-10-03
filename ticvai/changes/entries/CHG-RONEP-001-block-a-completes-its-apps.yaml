@@ -50,7 +50,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-plan-closure.py
-status: open
+status: closed
+closed_by_commit: 155f591a
 notes: 'check-plan-closure C-BOUND fails on the plan of 3044d8b0 (215 bindings on 77 setup screens built later) and passes
   after it. checks/baseline.json re-recorded: the plan moved staff-app screens between Blocks C and D and design_spec now
   attributes VM, four-digit and rest-of-the-screen tasks to their blocks (CHG-RONEP-005); every app and kind total is

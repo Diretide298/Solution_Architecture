@@ -42,7 +42,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-plan-closure.py
-status: open
+status: closed
+closed_by_commit: 155f591a
 notes: C-UNTICKETED fails on the plan of 3044d8b0 against old-r2 (41 artefacts, the lead's ten among them; 29 even with
   today's departures) and C-FLOW on five flow operations; both pass after it. A `departures` entry no longer needed against the reference is printed, to be
   removed once r1 is the last release.
