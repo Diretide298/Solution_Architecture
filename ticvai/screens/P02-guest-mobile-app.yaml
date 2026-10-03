@@ -2545,7 +2545,7 @@ screens:
     provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-009
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: Mobile App v4, 29 September 2026
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
@@ -2887,7 +2887,7 @@ screens:
     provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-011
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: Mobile App v4, 29 September 2026
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
@@ -3735,7 +3735,7 @@ screens:
     provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-015
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: Mobile App v4, 29 September 2026
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
@@ -4434,7 +4434,7 @@ screens:
     provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-019
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: Mobile App v4, 29 September 2026
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
@@ -5720,6 +5720,17 @@ screens:
       slot: collection
       components:
       - kind: cardList
+        label: Load the parking entitlement being changed
+        operation: getParkingEntitlement
+        bindsTo: ParkingEntitlement
+        columns:
+        - ParkingEntitlement.plateNumber
+        - ParkingEntitlement.plateCountry
+        - ParkingEntitlement.mediaCode
+        - ParkingEntitlement.status
+        - ParkingEntitlement.pushedAt
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+      - kind: cardList
         label: Car parks
         bindsTo: ParkingFacility
         columns:
@@ -5789,6 +5800,11 @@ screens:
     contract: access
     purpose: Car parks at a venue, and how each integrates
     trigger: onLoad
+  - operationId: getParkingEntitlement
+    contract: access
+    purpose: Load the parking entitlement being changed
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: entitlementId
@@ -6434,7 +6450,7 @@ screens:
     provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-031
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: Mobile App v4, 29 September 2026
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
@@ -6655,7 +6671,7 @@ screens:
     provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-032
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: Mobile App v4, 29 September 2026
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
@@ -6795,6 +6811,16 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: dataTable
+        label: Show the guest's earlier conversations with the assistant
+        operation: listAiConversations
+        bindsTo: AiConversation
+        columns:
+        - AiConversation.locale
+        - AiConversation.messageCount
+        - AiConversation.startedAt
+        - AiConversation.lastMessageAt
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: assistantPanel
         label: Ask about this
         operation: sendAiMessage
@@ -6851,6 +6877,11 @@ screens:
     contract: ai
     purpose: Say whether an answer helped
     trigger: onAction
+  - operationId: listAiConversations
+    contract: ai
+    purpose: Show the guest's earlier conversations with the assistant
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: conversationId
@@ -7409,7 +7440,7 @@ screens:
     provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-036
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: Mobile App v4, 29 September 2026
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
@@ -7937,7 +7968,7 @@ screens:
     provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-039
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: Mobile App v4, 29 September 2026
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
@@ -8848,7 +8879,7 @@ screens:
     provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-042
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: Mobile App v4, 29 September 2026
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
@@ -9149,6 +9180,16 @@ screens:
         provenance: contract orders.yaml POST /orders/{orderId}/transfer
     - name: contentBody
       components:
+      - kind: dataTable
+        label: Show the tickets the guest has sent and received
+        operation: listTicketTransfers
+        bindsTo: TicketTransfer
+        columns:
+        - TicketTransfer.status
+        - TicketTransfer.offeredAt
+        - TicketTransfer.claimedAt
+        - TicketTransfer.expiresAt
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: cardList
         label: Tickets to send
         operation: transferOrderTickets
@@ -9176,6 +9217,11 @@ screens:
     contract: orders
     purpose: Transfer tickets to another guest
     trigger: onAction
+  - operationId: listTicketTransfers
+    contract: orders
+    purpose: Show the tickets the guest has sent and received
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: orderId
@@ -9467,6 +9513,17 @@ screens:
     - name: contentBody
       slot: record
       components:
+      - kind: detailPanel
+        label: Show the cart the suggestions are for
+        operation: getCart
+        bindsTo: Cart
+        columns:
+        - Cart.status
+        - Cart.subtotal
+        - Cart.discountTotal
+        - Cart.taxTotal
+        - Cart.total
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: cardList
         label: Suggested for you
         bindsTo: AiRecommendationItem
@@ -9517,6 +9574,11 @@ screens:
     purpose: Report what happened to recommended items
     trigger: onAction
     provenance: build, 29 September 2026
+  - operationId: getCart
+    contract: orders
+    purpose: Show the cart the suggestions are for
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: cartId
@@ -9527,7 +9589,7 @@ screens:
     provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-048
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: Mobile App v4, 29 September 2026
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
@@ -9910,7 +9972,7 @@ screens:
     provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-050
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: Mobile App v4, 29 September 2026
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
@@ -10282,7 +10344,7 @@ screens:
     provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-052
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: Mobile App v4, 29 September 2026
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
@@ -11094,7 +11156,7 @@ screens:
     provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-056
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: Mobile App v4, 29 September 2026
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
@@ -11364,7 +11426,7 @@ screens:
     provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-058
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: Mobile App v4, 29 September 2026
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
@@ -11525,7 +11587,7 @@ screens:
     provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-059
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: Mobile App v4, 29 September 2026
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
@@ -12185,7 +12247,7 @@ screens:
     provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-066
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: Mobile App v4, 29 September 2026
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
@@ -12249,6 +12311,17 @@ screens:
     - name: actionBar
       slot: rowActions
       components:
+      - kind: detailPanel
+        label: Load the order a refund or resale is asked for
+        operation: getOrder
+        bindsTo: Order
+        columns:
+        - Order.orderNumber
+        - Order.status
+        - Order.grossAmount
+        - Order.taxAmount
+        - Order.holdLabel
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: primaryButton
         label: Create refund request
         operation: createRefundRequest
@@ -12281,10 +12354,17 @@ screens:
     contract: orders
     purpose: List an entitlement for resale
     trigger: onAction
+  - operationId: getOrder
+    contract: orders
+    purpose: Load the order a refund or resale is asked for
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: subjectId
       from: session
+    - name: orderId
+      from: navigation
     coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
       here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
   wireframe:
@@ -13585,7 +13665,7 @@ screens:
     provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-073
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: Mobile App v4, 29 September 2026
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
@@ -13859,7 +13939,7 @@ screens:
     provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-074
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: Mobile App v4, 29 September 2026
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
@@ -14034,7 +14114,7 @@ screens:
     provenance: designed
     board: wireframes/P02 Guest App.dc.html#gst-075
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Mobile App v4.dc.html
+      file: sources/designs/guest-rev3-30-september/TICVAI Mobile App v4.dc.html
       rev: Mobile App v4, 29 September 2026
       match: none
       note: 'Mobile App v4 has no view for this screen. Drawn by Claude Code on 30 September 2026 in the
@@ -14314,6 +14394,17 @@ screens:
     - name: contentBody
       slot: record
       components:
+      - kind: cardList
+        label: Load the departure the trip was opened on
+        operation: getTransportDeparture
+        bindsTo: DepartureOffer
+        columns:
+        - DepartureOffer.routeCode
+        - DepartureOffer.departsAt
+        - DepartureOffer.arrivesAt
+        - DepartureOffer.durationMinutes
+        - DepartureOffer.partyTotal
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: timeline
         label: Stops
         bindsTo: RouteMap.stops
@@ -14393,6 +14484,11 @@ screens:
     trigger: onAction
     invalidates:
     - listMyFavouriteRoutes
+  - operationId: getTransportDeparture
+    contract: transport
+    purpose: Load the departure the trip was opened on
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: routeId

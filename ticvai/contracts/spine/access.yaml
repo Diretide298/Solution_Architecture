@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Access Control
   version: 1.0.0
-  x-ticvai-screen-count: 239
+  x-ticvai-screen-count: 246
   x-ticvai-tier: spine
   x-ticvai-module: 3 — Admission and Access
   x-ticvai-requirements: 201
@@ -1445,6 +1445,38 @@ paths:
       schema:
         type: string
         format: uuid
+    get:
+      operationId: getParkingEntitlement
+      x-ticvai-consumed-by:
+        - "P01 WEB-041 Parking – Reserve & Pay"
+        - "P02 GST-027 Parking – Reserve & Pay"
+      security:
+        - guestAuth: []
+        - bearerAuth: []
+      x-ticvai-audience: [guest]
+      x-ticvai-read-routing: replica
+      summary: One of the guest's parking entitlements
+      description: >
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
+        WEB-041 and GST-027 change a parking entitlement with `updateParkingEntitlement` and never read it,
+        so the plate and the dates they edit came from nowhere. Self-scoped, as the update is. Returns what
+        the write stores, in the write's own shape.
+      x-ticvai-permission: null
+      x-ticvai-self-scoped: subject
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: One of the guest's parking entitlements
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ParkingEntitlement'
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     patch:
       operationId: updateParkingEntitlement
       x-ticvai-consumed-by:
@@ -2874,6 +2906,33 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /virtual-ticket-identity:
+    get:
+      operationId: getVirtualTicketIdentity
+      x-ticvai-consumed-by:
+        - "P08 BO-335 Virtual Ticket Identity & Master Record Configuration"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The virtual ticket identity configuration as saved
+      description: >
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
+        BO-335 saves it with `setVirtualTicketIdentity` and read nothing back. The vocabulary has no access
+        view permission, so the write's own gates the read. Returns what the write stores, in the write's
+        own shape.
+      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The virtual ticket identity configuration as saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VirtualTicketIdentityMasterRecordConfigurationView'
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setVirtualTicketIdentity
       x-ticvai-consumed-by:
@@ -3567,6 +3626,32 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /pdf-printable-pos:
+    get:
+      operationId: getPdfPrintablePos
+      x-ticvai-consumed-by:
+        - "P08 BO-346 PDF, Printable & POS Ticket Designer"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The printable ticket design as saved
+      description: >
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
+        BO-346 saves the design with `setPdfPrintablePos` and read nothing back. Returns what the write
+        stores, in the write's own shape.
+      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The printable ticket design as saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PdfPrintablePosTicketDesignerView'
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPdfPrintablePos
       x-ticvai-consumed-by:
@@ -6310,6 +6395,32 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
   /ble-beacon-geofence:
+    get:
+      operationId: getBleBeaconGeofence
+      x-ticvai-consumed-by:
+        - "P08 BO-168 BLE Beacon & Geofence Configuration"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The BLE beacon and geofence configuration as saved
+      description: >
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
+        BO-168 saves it with `setBleBeaconGeofence` and read nothing back. Returns what the write stores, in
+        the write's own shape.
+      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The BLE beacon and geofence configuration as saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BleBeaconGeofenceConfigurationView'
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setBleBeaconGeofence
       x-ticvai-consumed-by:
@@ -7444,6 +7555,32 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/PageSize
       - $ref: ../shared/common.yaml#/components/parameters/PageCursor
   /biometric-verification-profile:
+    get:
+      operationId: getBiometricVerificationProfile
+      x-ticvai-consumed-by:
+        - "P08 BO-185 Biometric Verification Profile Builder"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The biometric verification profile as saved
+      description: >
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
+        BO-185 saves it with `setBiometricVerificationProfile` and read nothing back. Returns what the write
+        stores, in the write's own shape.
+      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The biometric verification profile as saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BiometricVerificationProfileBuilderView'
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setBiometricVerificationProfile
       x-ticvai-consumed-by:
@@ -7502,6 +7639,32 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /face-pass-enrollment:
+    get:
+      operationId: getFacePassEnrollmentConfiguration
+      x-ticvai-consumed-by:
+        - "P08 BO-186 Face Pass Enrollment Configuration"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The FacePass enrolment configuration as saved
+      description: >
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
+        BO-186 saves it with `setFacePassEnrollment` and read nothing back. Not `getFacePassEnrolment`,
+        which is a guest's own enrolment. Returns what the write stores, in the write's own shape.
+      x-ticvai-permission: ACCESS_POINT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The FacePass enrolment configuration as saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FacePassEnrollmentConfigurationView'
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setFacePassEnrollment
       x-ticvai-consumed-by:
@@ -8100,6 +8263,9 @@ paths:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Saved
           content:
             application/json:
@@ -12353,6 +12519,8 @@ paths:
   /admission-rules/{ruleId}/points:
     get:
       operationId: listEntryRulePoints
+      x-ticvai-consumed-by:
+        - "P08 BO-032 Admission Profiles"
       summary: Which access points an admission rule covers
       description: >
         **This is `access.admission_rules.allowedAccessPointIds` as a table**, and it is the

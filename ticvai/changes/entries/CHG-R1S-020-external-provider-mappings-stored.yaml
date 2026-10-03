@@ -1,0 +1,33 @@
+id: CHG-R1S-020
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: approvals.external_provider stores requestMapping and decisionMapping (jsonb), and its outbound credential
+  and signing secret are Key Vault references, never values.
+decision:
+  what: 'ApprovalExternalProvider.requestMapping and decisionMapping x-ticvai-persistence-column jsonb; outboundCredential
+    and signingSecret descriptions: the column keeps the secret''s reference.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'the r1 gate of 3 October 2026 (a judge finding on the Sprint 1 and baseline tickets), SVC-TENANCY-MATRIX-1
+  (blocker): the table had no column for the mappings and stored the secrets as plain text. (The rule table''s subject_types
+  and signature_methods are in the DDL once derived; the committed DDL was stale.)'
+keys_touched:
+  schemas:
+  - ApprovalExternalProvider
+  tables:
+  - approvals.external_provider
+  operations:
+  - setApprovalExternalProvider
+root_class: 'new: field-without-column'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-contract-storage.py
+status: closed
+closed_by_commit: 7abd44b3

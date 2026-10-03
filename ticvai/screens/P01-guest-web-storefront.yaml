@@ -446,8 +446,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-001
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: partial
       view: Header 'Discover' (default view on load)
@@ -653,8 +653,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-002
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3 (29 September build)
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build; the view as verified on the 29 September build, CHG-R1S-015)
       verified: '2026-09-29'
       match: exact
       view: Header 'What's on'
@@ -777,8 +777,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-003
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: partial
       view: Discover → search box in the hero (opens the search panel) → Enter lands on What's on filtered
@@ -1054,8 +1054,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-004
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3 (29 September build)
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build; the view as verified on the 29 September build, CHG-R1S-015)
       verified: '2026-09-29'
       match: partial
       view: Config → Marketing layer → 'Single-event page' on, then Book; or any product card → 'Read
@@ -1218,6 +1218,7 @@ screens:
       - kind: primaryButton
         label: Continue
         provenance: carried from the previous definition
+        operation: addCartLine
   states:
     loading: The ticket type selection list.
     error: Could not load. Names which read failed and leaves the ticket type selection untouched.
@@ -1262,12 +1263,21 @@ screens:
     purpose: 'The published booking flow for this product: which steps it has and in what order (W12)'
     trigger: onLoad
     provenance: decided 29 September 2026, W12
+  - operationId: addCartLine
+    contract: orders
+    purpose: Continue adds the chosen tickets to the cart
+    trigger: onAction
+    provenance: design cross-check, 3 October 2026 (CHG-R1S-023)
   entryState:
     params:
     - name: productId
       from: WEB-004
     - name: venueId
       from: session
+    - name: cartId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `addCartLine` takes it, from the record the user acts on.'
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded:
     - ProductVariant.id
@@ -1906,8 +1916,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-007
     prototype:
-      file: sources/designs/guest-rev3-29-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3 (29 September build)
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (30 September build; the view as verified on the 29 September build, CHG-R1S-015)
       verified: '2026-09-29'
       match: exact
       view: Union Arena → 'Flow 1 · Fixed date → zone → seat map' or 'Flow 2 · Choose date & time → seat
@@ -2143,8 +2153,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-008
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: exact
       view: Book → 'Extras' step (e.g. Summit Peaks → Dated day pass → Continue)
@@ -2317,8 +2327,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-009
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: exact
       view: Discover → 'Wishlist' link (discoverLinks)
@@ -2623,8 +2633,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-010
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: partial
       view: Visible on every booking step as the cart sidebar (Config → Layout & locale → 'Cart & summary'
@@ -2801,6 +2811,10 @@ screens:
       - kind: primaryButton
         label: Continue to payment
         provenance: carried from the previous definition
+      - kind: secondaryButton
+        label: Keep my seats longer
+        operation: extendSeatHold
+        provenance: design cross-check, 3 October 2026 (CHG-R1S-023)
   overlays:
   - id: formUpdateMyProfile
     component: modal
@@ -2865,6 +2879,11 @@ screens:
     contract: marketing-crm
     purpose: Prefill the buyer's contact from their own profile
     trigger: onLoad
+  - operationId: extendSeatHold
+    contract: seating
+    purpose: Extend the seat hold once, from the warning before it lapses
+    trigger: onAction
+    provenance: design cross-check, 3 October 2026 (CHG-R1S-023)
   entryState:
     params:
     - name: subjectId
@@ -2873,6 +2892,10 @@ screens:
       from: session
     - name: venueId
       from: session
+    - name: holdId
+      from: navigation
+      optional: true
+      notes: 'Optional: only `extendSeatHold` takes it, from the record the user acts on.'
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
@@ -2889,8 +2912,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-011
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: exact
       view: Book → 'Your details' step (after Extras)
@@ -3135,8 +3158,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-012
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: partial
       view: Book → 'Payment' step; Config → Layout & locale → 'Payment outcome (demo)' = Interrupted /
@@ -3301,8 +3324,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-013
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: exact
       view: Book → final step 'Confirmed' after paying
@@ -3450,8 +3473,8 @@ screens:
     provenance: designed
     board: wireframes/P01 Guest Web.dc.html#web-014
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       match: none
       note: 'The prototype has no view for this screen. It was drawn in Claude Design on 29 September
         in the prototype''s style and accepted as its design the same day (the frame on this screen''s
@@ -3566,8 +3589,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-015
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: partial
       view: Only when the host tweak 'waitingRoom' is on; it is not in the Config drawer lists, so a reviewer
@@ -3979,8 +4002,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-016
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: partial
       view: Header profile icon (signed out), or automatically when leaving Add-ons / at payment
@@ -4185,8 +4208,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-017
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: exact
       view: Sign in → avatar menu → 'Account overview'
@@ -4433,8 +4456,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-018
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: partial
       view: Header 'My tickets' → a ticket → 'Manage' (ticket sheet)
@@ -4707,8 +4730,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-019
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: partial
       view: Account → 'Order history'
@@ -4940,8 +4963,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-020
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: partial
       view: Account → 'Personal details', 'Notifications', 'Accessibility'
@@ -5235,8 +5258,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-021
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: partial
       view: Account → 'Wallet & gift cards' (and 'Payment methods')
@@ -5413,8 +5436,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-022
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: partial
       view: Summit Peaks → 'Annual pass / membership' flow; Kids Club → 'Membership pass'; Account → Membership
@@ -5637,8 +5660,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-023
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: partial
       view: Account → 'Membership' → 'Billing statement — View'
@@ -6072,8 +6095,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-024
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: partial
       view: Account → 'Security' (devices), 'Face Pass', 'Data & privacy', 'Newsletters' (devices that
@@ -6214,8 +6237,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-025
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: exact
       view: Header 'Help'
@@ -6386,8 +6409,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-026
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: partial
       view: Account → 'Reviews & feedback'
@@ -6557,8 +6580,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-027
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: partial
       view: Account → 'Newsletters'; Contact page → 'Choose newsletters'
@@ -6645,8 +6668,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-028
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: exact
       view: Footer 'Contact', or Discover → 'Contact & venue info'
@@ -6751,8 +6774,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-029
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: exact
       view: Footer 'Service status', or Discover → 'Service status'
@@ -6889,8 +6912,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-030
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: partial
       view: Account → 'Transfer & resale'; My tickets → Manage → 'Transfer ticket'; Confirmation → 'Transfer
@@ -6993,6 +7016,16 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: cardList
+        label: Show the guest's own reservations, the one being changed among them
+        operation: listMyTableReservations
+        bindsTo: MyTableBooking
+        columns:
+        - MyTableBooking.kind
+        - MyTableBooking.outletName
+        - MyTableBooking.reservation
+        - MyTableBooking.waitlistEntry
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: cardList
         label: Your reservations
         bindsTo: Reservation
@@ -7213,6 +7246,11 @@ screens:
     contract: fnb
     purpose: Change or cancel it
     trigger: onAction
+  - operationId: listMyTableReservations
+    contract: fnb
+    purpose: Show the guest's own reservations, the one being changed among them
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: subjectId
@@ -7251,8 +7289,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-031
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: partial
       view: Account → 'Reservations'
@@ -7377,8 +7415,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-032
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: exact
       view: Discover → 'Offers & promotions'
@@ -7548,8 +7586,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-033
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: partial
       view: No pre-arrival shop page; retail items appear as add-ons in the Extras step (images/shop product
@@ -7714,8 +7752,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-034
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: partial
       view: Account → 'Lost & found, reports'; Help → 'Your cases' → Raise a case → topic 'Lost property'
@@ -7917,8 +7955,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-035
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: exact
       view: Discover → 'Prices in your currency'
@@ -7991,6 +8029,16 @@ screens:
     - name: contentBody
       slot: collection
       components:
+      - kind: cardList
+        label: Show the guest's own reservations, the one being changed among them
+        operation: listMyTableReservations
+        bindsTo: MyTableBooking
+        columns:
+        - MyTableBooking.kind
+        - MyTableBooking.outletName
+        - MyTableBooking.reservation
+        - MyTableBooking.waitlistEntry
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: cardList
         label: Where you can eat now
         bindsTo: DiningOutlet
@@ -8172,6 +8220,11 @@ screens:
     contract: fnb
     purpose: Change or cancel the guest's own table booking (web and app parity with GST-070)
     trigger: onAction
+  - operationId: listMyTableReservations
+    contract: fnb
+    purpose: Show the guest's own reservations, the one being changed among them
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: outletId
@@ -8348,8 +8401,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-037
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: exact
       view: At the venue → Order food → tap a dish; Takeaway/Delivery → 'Add' opens the modifier side
@@ -8483,8 +8536,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-038
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: exact
       view: At the venue → Order food → 'Send to the kitchen'
@@ -8846,6 +8899,20 @@ screens:
       slot: collection
       components:
       - kind: cardList
+        label: Load the parking entitlement being changed
+        operation: getParkingEntitlement
+        bindsTo: ParkingEntitlement
+        columns:
+        - ParkingEntitlement.plateNumber
+        - ParkingEntitlement.plateCountry
+        - ParkingEntitlement.mediaCode
+        - ParkingEntitlement.status
+        - ParkingEntitlement.pushedAt
+        - ParkingEntitlement.pushFailureReason
+        - ParkingEntitlement.validFrom
+        - ParkingEntitlement.validTo
+        provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+      - kind: cardList
         label: Car parks
         bindsTo: ParkingFacility
         columns:
@@ -8921,6 +8988,11 @@ screens:
     trigger: onAction
     invalidates:
     - listParkingFacilities
+  - operationId: getParkingEntitlement
+    contract: access
+    purpose: Load the parking entitlement being changed
+    trigger: onLoad
+    provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
   entryState:
     params:
     - name: entitlementId
@@ -9587,8 +9659,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-044
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: exact
       view: Floating 'Ask Sahli' button on every page
@@ -9724,8 +9796,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-045
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: partial
       view: Header 'Help' → 'Policies and accessibility'; footer 'Accessibility'
@@ -10074,8 +10146,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-047
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: exact
       view: Coastal Aqua → 'Cabana & locker rentals' → cabana map ('Remaining time' counter)
@@ -10241,8 +10313,8 @@ screens:
     provenance: client-verified
     board: wireframes/P01 Guest Web.dc.html#web-048
     prototype:
-      file: sources/designs/guest-rev3-28-september/TICVAI Guest Booking v2.dc.html
-      rev: rev 3
+      file: sources/designs/guest-rev3-30-september/TICVAI Guest Booking v2.dc.html
+      rev: rev 3 (pointer moved to the 30 September build, CHG-R1S-015)
       verified: 2026-09-28
       match: exact
       view: House of Pages → 'Meeting room by the hour'

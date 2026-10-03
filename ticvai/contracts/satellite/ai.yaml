@@ -1339,6 +1339,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-044 AI Concierge – Home"
         - "P02 GST-031 AI Concierge – Home"
+        - "P02 GST-033 AI Concierge – Contextual Help"
         - "P02 GST-068 Help & My Cases"
         - "P06 EMP-019 AI assistant — home"
         - "P06 EMP-020 AI assistant — answer"
@@ -1513,11 +1514,14 @@ paths:
         audited step (8.3.61–8.3.64).
 
         **Every message is scrubbed before it leaves the cell** (Chinmay, 2 October; ADR-0020 amended;
-        CHG-CSA-003): the offline scrubber replaces personal data with reversible placeholders, the guard model
+        CHG-CSA-003): the offline scrubber replaces personal data with reversible placeholders, the guard
         checks the input and the reply, and the reply is re-filled in the cell (`AiPolicy.scrubbing`). It
-        applies whatever the tenant''s residency class. With the scrubber or the guard down the call is refused
-        `503 scrubber-unavailable`, never sent raw; a message or reply the guard blocks is refused
-        `422 guard-refused`.
+        applies whatever the tenant''s residency class. **The guard is the provider''s content-safety service,
+        not a model we host** (Chinmay, 3 October: "We are not hosting anything unless client asks it";
+        CHG-R1S-002): Azure AI Content Safety in UAE North for `uaeOnly`, the provider''s own moderation for
+        BYOK and `globalAllowed`. The Presidio scrubber stays a CPU library inside our worker. With the scrubber
+        or the safety service down the call is refused `503 scrubber-unavailable`, never sent raw; a message or
+        reply the guard blocks is refused `422 guard-refused`.
 
 
         **The answer streams** (Chinmay, 3 October 2026, Block A business rules: "stream answers"; CHG-RUL-002).
@@ -1615,8 +1619,9 @@ paths:
           description: 'Every configured provider failed. **Reported rather than retried indefinitely**
             — an assistant that hangs is worse than one that says it cannot answer.
 
-            Also `scrubber-unavailable`: the offline PII scrubber or the guard model is down, so the call fails
-            closed rather than sending an unscrubbed prompt (CHG-CSA-003).
+            Also `scrubber-unavailable`: the offline PII scrubber or the provider''s content-safety service (the
+            guard) is down, so the call fails closed rather than sending an unscrubbed or unchecked prompt
+            (CHG-CSA-003; the guard is the provider''s safety service, CHG-R1S-002).
 
             '
           x-ticvai-problem-types:
@@ -1627,8 +1632,9 @@ paths:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '422':
-          description: The guard model blocked the message or the reply (`guard-refused`, CHG-CSA-003). Nothing
-            unsafe is returned; the refusal is logged with the decision record.
+          description: The guard (the provider''s content-safety service, CHG-R1S-002) blocked the message or the
+            reply (`guard-refused`, CHG-CSA-003). Nothing unsafe is returned; the refusal is logged with the decision
+            record.
           x-ticvai-problem-types:
           - guard-refused
           content:
@@ -16552,8 +16558,11 @@ components:
         **Core42 Compass is reached through `openaiCompatible`** (Chinmay, 2 October: the AI residency decision,
         amending AI-D02; CHG-CSA-002). Compass is the provider of the `uaeOnly` residency class (common
         `AiResidencyClass`): Small tier Compass GPT-4.1 mini (or Seraj), Strong tier Compass GPT-5, with OpenAI
-        UAE and then the in-cell open-weights model as the fallback chain. OpenAI UAE is `openai` with a UAE
-        `endpoint`; the in-cell model is `localLlm`.
+        UAE as the fallback. OpenAI UAE is `openai` with a UAE `endpoint`: OpenAI''s UAE-region API project,
+        `ae.api.openai.com` (in-country processing, on OpenAI sales approval), allowed under `uaeOnly` and the only
+        endpoint a `uaeOnly` BYOK OpenAI key may use (CHG-R1S-016). **We host no model** (Chinmay,
+        3 October, CHG-R1S-002): there is no in-cell open-weights fallback; `localLlm` is used only where a
+        client asks for self-hosting and runs the model on the client''s estate (`onPrem`).
 
         **A kind is a protocol, not a vendor** (Chinmay, 2 October, contract follow-ups: BYOK accepts any provider;
         CHG-FUP-008). Any vendor is accepted, named in `AiProvider.vendor`: Mistral, Cohere or any other is reached
@@ -16863,6 +16872,14 @@ components:
       - priority
       - isActive
       properties:
+        statelessOnly:
+          type: boolean
+          readOnly: true
+          description: '**True for every endpoint outside the UAE** (3 October 2026, CHG-R1S-016; the legal research
+            `docs/active/research/openai-key-uae-3-october.md`, item 8). The adapter calls it statelessly: no Assistants, Threads or
+            Conversations API, `store=false` on Responses, no file upload, no fine-tuning with tenant data.
+            **Failover never widens residency** (item 10): a `uaeOnly` tenant''s call never falls over to an
+            endpoint where this is true. OpenAI''s UAE-region project (`ae.api.openai.com`) is a UAE endpoint.'
         id:
           type: string
           format: uuid
@@ -16991,7 +17008,9 @@ components:
             residency decision; CHG-CSA-002). The gateway routes a call for a tenant only to a provider whose list
             holds the tenant''s class (tenancy, common `AiResidencyClass`, default `uaeOnly`); `setAiProvider`
             refuses a provider that cannot serve the tenant''s class (`409 residency-class-refused`). A `uaeOnly`
-            call can only resolve to an in-UAE endpoint: Core42 Compass, OpenAI UAE, or the in-cell model.
+            call can only resolve to an in-UAE endpoint: Core42 Compass or OpenAI UAE (no in-cell model since 3 October,
+            CHG-R1S-002). **Embedding calls route the same way** (CHG-R1S-026): the provider''s embedding model on the UAE
+            route (OpenAI UAE `text-embedding-3-large` or Core42), scrubbed like any call; no embedding model is hosted.
 
             '
         maxTokens:
@@ -17159,9 +17178,20 @@ components:
             the gateway runs Microsoft Presidio (offline) with UAE recognisers (Emirates ID, UAE phone, passport, IBAN,
             Luhn-checked card, email) and an Arabic NER model; each value found becomes a reversible placeholder
             (`[GUEST_1]`) whose map never leaves the cell, and the reply is re-filled before it reaches the user. An
-            offline guard model (Qwen3Guard, which covers Arabic) checks input and output. **Fails closed**: with the
-            scrubber or the guard down, the call is refused (`503 scrubber-unavailable`), never sent raw. This object
-            reports what is in force.
+            input and output guard checks both directions: **the provider''s content-safety service, not a model we
+            host** (Chinmay, 3 October: we host no LLM unless a client asks, and a guard model is an LLM;
+            CHG-R1S-002): Azure AI Content Safety in UAE North for `uaeOnly`, the provider''s own moderation for BYOK
+            and `globalAllowed`. The scrubber stays a CPU library in our own worker and is mandatory in every
+            residency class. **Fails closed**: with the scrubber or the safety service down, the call is refused
+            (`503 scrubber-unavailable`), never sent raw. This object reports what is in force.
+
+
+            **A second, deterministic pass after Presidio** (3 October 2026, CHG-R1S-016; the legal research
+            `docs/active/research/openai-key-uae-3-october.md`, item 5: Presidio itself says it will not find everything). Fixed
+            patterns run over the scrubbed text: Emirates ID (`784-...`), `+971` numbers, Luhn-valid card numbers
+            (PAN), IBAN and email. **Any survivor blocks the call**, fail closed, `503 scrubber-unavailable` with
+            no provider fallback, never sent. The Presidio version is pinned (`scrubberVersion`): it is
+            community-maintained now, so a release is taken on purpose, after the golden corpus passes.
 
             '
           properties:
@@ -17169,6 +17199,24 @@ components:
               type: string
               enum:
               - mandatory
+            scrubberVersion:
+              type: string
+              readOnly: true
+              description: The pinned Presidio release (and recogniser set) in force, e.g. `presidio-2.2.355+uae-1`
+                (CHG-R1S-016). Recorded on every call's activity row.
+            residualPatternCheck:
+              type: array
+              readOnly: true
+              items:
+                type: string
+                enum:
+                - emiratesId
+                - uaePhone
+                - cardPan
+                - iban
+                - email
+              description: The deterministic patterns run after Presidio; a match blocks the call (fail closed,
+                `503 scrubber-unavailable`). Always all five (CHG-R1S-016).
             recognisers:
               type: array
               items:
@@ -17180,7 +17228,46 @@ components:
               description: Always true; the placeholder map stays in the cell.
             guardModel:
               type: string
-              description: The input and output guard model in force, e.g. `qwen3guard`.
+              description: The input and output guard in force, e.g. `azureContentSafety` (the provider''s
+                content-safety service, CHG-R1S-002); a self-hosted guard model appears only where a client asked
+                for self-hosting.
+        globalEndpointExclusions:
+          type: object
+          readOnly: true
+          description: '**What never goes to a global endpoint** (3 October 2026, CHG-R1S-016; the legal research
+            `docs/active/research/openai-key-uae-3-october.md`, item 6). A field-level exclusion list applied by the prompt builders
+            when the resolved endpoint is outside the UAE (`globalAllowed`): the fields are dropped from the
+            prompt, not masked, and the media kinds are refused. Not a setting: it applies to every tenant.'
+          properties:
+            fieldCategories:
+              type: array
+              items:
+                type: string
+                enum:
+                - allergy
+                - accessibility
+                - familyAndChildren
+                - health
+                - biometric
+                - religion
+                - payment
+              description: Allergy, accessibility and family or children data in F&B and booking prompts,
+                and health, biometric, religion and payment data anywhere.
+            fields:
+              type: array
+              items:
+                type: string
+              description: The schema fields held under those categories, e.g. `Allergen.contains`,
+                `Attendee.accessibilityNeeds`, `Attendee.dateOfBirth`.
+            blockedMedia:
+              type: array
+              items:
+                type: string
+                enum:
+                - image
+                - audio
+                - file
+              description: Images, audio and files are never sent to a global endpoint.
         monthlyTokenCeiling:
           type: integer
           nullable: true
@@ -17684,6 +17771,38 @@ components:
       - outcome
       - createdAt
       properties:
+        scrubAudit:
+          type: object
+          readOnly: true
+          x-ticvai-persistence-kind: valueObject
+          x-ticvai-persistence-column: jsonb
+          description: '**The audit of one call''s scrubbing and routing** (3 October 2026, CHG-R1S-016; the legal
+            research `docs/active/research/openai-key-uae-3-october.md`, item 9). Counts of the entities found by type, **never
+            the values**; the residency class, endpoint and region; the scrubber version; whether the call was
+            allowed or blocked; and a hash of the outbound payload. Exportable to the tenant as controller.'
+          properties:
+            entityCounts:
+              type: object
+              additionalProperties:
+                type: integer
+                minimum: 0
+              description: Per entity type, e.g. emiratesId 1 and uaePhone 2. Counts only, never values.
+            residencyClass:
+              $ref: ../shared/common.yaml#/components/schemas/AiResidencyClass
+            endpointRegion:
+              type: string
+              description: Where the call went, e.g. `uaeNorth`, `ae.api.openai.com`, `global`.
+            scrubberVersion:
+              type: string
+            decision:
+              type: string
+              enum:
+              - allowed
+              - blocked
+            outboundPayloadHash:
+              type: string
+              description: SHA-256 of the prompt as sent (after scrubbing), so a dispute can be checked without
+                keeping the text.
         id:
           type: string
           format: uuid

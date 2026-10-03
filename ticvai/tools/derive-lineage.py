@@ -308,7 +308,25 @@ def stores_by_contract(stored: dict) -> dict:
     return out
 
 
+def event_emitters() -> set:
+    """**An operation that emits an event writes the outbox** (3 October 2026, CHG-R1S-005). The event is
+    written to `platform.outbox` in the same transaction as the change it reports, so the outbox is one of
+    the operation's writes. The HLD/LLD cross-check found ten emitters, `createOrder` among them, whose
+    lineage left it out; the emitters are `emittedBy` in `events/` and `x-ticvai-emits` on the operation."""
+    out = set()
+    for f in sorted((ROOT / "events").glob("*.yaml")):
+        if f.name.startswith("_"):
+            continue
+        try:
+            e = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+        except yaml.YAMLError:
+            continue
+        out |= {str(o).split(".")[-1] for o in e.get("emittedBy") or []}
+    return out
+
+
 def derive(stored: dict) -> dict:
+    emitting = event_emitters()
     persist = persistence_map()
     defs = schema_defs()
     svc = service_by_contract(stored)
@@ -332,7 +350,9 @@ def derive(stored: dict) -> dict:
                     "path": path,
                     "reads": tables_in(op.get("responses"), persist, defs),
                     "writes": sorted(set(tables_in(op.get("requestBody"), persist, defs))
-                                     | set(child_writes(op, path, persist, defs, known))),
+                                     | set(child_writes(op, path, persist, defs, known))
+                                     | ({"platform.outbox"} if (op["operationId"] in emitting
+                                        or op.get("x-ticvai-emits")) and contract != "ai" else set())),
                     # Kept only long enough for the repair below to tell which tables are new
                     # *because refs are now followed*, and stripped before anything is written.
                     "_direct_reads": tables_in(op.get("responses"), persist),

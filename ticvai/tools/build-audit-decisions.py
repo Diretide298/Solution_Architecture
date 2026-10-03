@@ -223,9 +223,9 @@ def guest_fix():
     decisions_2_october()
 
 
-DEC_REF = re.compile(r"\b((?:DEC-\d{3})|(?:DOOR|PRE)-\d+)\b")
-CHG_ID = re.compile(r"^id:\s*'?(CHG-[A-Z]{2,6}-\d{3})'?\s*$", re.M)
-STATUS = {"to-apply": "decided", "already-applied": "already applied", "needs-research": "**open: research first**",
+DEC_REF = re.compile(r"\b((?:DEC-\d{3})|(?:DOOR|PRE|HOST)-\d+)\b")
+CHG_ID = re.compile(r"^id:\s*'?(CHG-[A-Z][A-Z0-9]{1,5}-\d{3})'?\s*$", re.M)
+STATUS = {"to-apply": "decided", "applied": "applied", "already-applied": "already applied", "needs-research": "**open: research first**",
           "needs-client": "**open: needs the client**"}
 PROCESS_ORDER = ["AI", "Platform foundation", "Ticketing (back office)", "Ticketing (guest)", "White label & CMS",
                  "Customer & marketing", "F&B & retail", "Venue operations", "Finance & insights"]
@@ -272,6 +272,21 @@ def decisions_2_october():
         return ", ".join(dict.fromkeys(got)) or "not yet"
 
     counts = collections.Counter(r["status"] for r in rows)
+    # **A row marked applied names what applied it, and every name is a closed entry** (CHG-R1S-003). The
+    # HLD/LLD cross-check of 3 October found twelve decisions still `to-apply` with an empty applied_by while
+    # closed entries had applied them; `applied` now says so, and a claim nothing backs fails the run.
+    closed_ids = {c for cs in by_ref.values() for c in cs if not c.endswith(" (open)")}
+    bad = []
+    for r in list(rows) + list(later):
+        if r.get("status") == "applied":
+            names = r.get("applied_by") or []
+            if not names:
+                bad.append("%s: status applied, applied_by empty" % r["id"])
+            for c in names:
+                if c not in closed_ids:
+                    bad.append("%s: applied_by %s is not a closed change entry citing it" % (r["id"], c))
+    if bad:
+        raise SystemExit("decisions-2-october.json: " + "; ".join(bad))
     reviewable = sum(1 for r in rows if r.get("reviewable"))
     out = [
         "# Decisions of 2 October 2026",
@@ -289,11 +304,11 @@ def decisions_2_october():
         "`docs/active/research/`. **A row is applied when a change entry citing its id is listed in the last",
         "column** (read from `changes/entries/` at each run; \"(open)\" means the entry is not closed yet).",
         "",
-        "**{} decisions** ({} decided, {} already applied before 2 October, {} waiting on research, {} waiting on"
+        "**{} decisions** ({} decided, {} applied, {} already applied before 2 October, {} waiting on research, {} waiting on"
         " the client or a vendor), **{} taken as the drawn default without review** (marked *reviewable*:"
         " Chinmay may still overrule one before its block is broken into tasks), and **{} later-round decisions**"
         " that override them where they conflict.".format(
-            len(rows), counts.get("to-apply", 0), counts.get("already-applied", 0), counts.get("needs-research", 0),
+            len(rows), counts.get("to-apply", 0), counts.get("applied", 0), counts.get("already-applied", 0), counts.get("needs-research", 0),
             counts.get("needs-client", 0), reviewable, len(later)),
         "",
         "## What these decisions change in earlier decisions ({})".format(len(amends)),

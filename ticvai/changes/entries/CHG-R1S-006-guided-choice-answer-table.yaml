@@ -1,0 +1,33 @@
+id: CHG-R1S-006
+date: '2026-10-03'
+source: audit
+kind: spec
+summary: whitelabel.guided_choice_answer is derived from questions[].answers[] with a key to its question, not copied
+  from the question table; updateGuidedChoice lists the tables it writes and names its 409.
+decision:
+  what: 'tools/derive-schema.py: a third table in a `+` persistence tag that matches no top-level array is looked
+    for one level down in the earlier child''s items (a grandchild), keyed to that child. updateGuidedChoice''s
+    lineage writes guided_choice, guided_choice_question and guided_choice_answer; its 409 is guided-choice-published.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'the r1 gate of 3 October 2026 (a judge finding on the Sprint 1 and baseline tickets), SVC-WHITELABEL-CONTENT-7:
+  the answer table was a copy of the question table with no link to its question.'
+keys_touched:
+  tables:
+  - whitelabel.guided_choice_answer
+  operations:
+  - updateGuidedChoice
+  files:
+  - tools/derive-schema.py
+root_class: 'new: nested-child-table'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-schema.py::chain_before
+status: closed
+closed_by_commit: 7abd44b3

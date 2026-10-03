@@ -1,0 +1,41 @@
+id: CHG-R1S-009
+date: '2026-10-03'
+source: audit
+kind: spec
+summary: shift.closed is emitted by every operation that closes a shift (closeShift, submitShiftCount, approveShiftClose,
+  acceptShiftVariance), and order.paid names inquirePaymentStatus.
+decision:
+  what: events/shift-closed.yaml emittedBy gains closeShift, submitShiftCount and approveShiftClose; states/shift.yaml
+    says the within-threshold close lands in their transaction; their lineage writes platform.outbox. events/order-paid.yaml
+    names inquirePaymentStatus, which states/payment.yaml credits with the capture (found by W-EMITS).
+  by: Chinmay
+  date: '2026-10-03'
+why: 'the HLD/LLD cross-check of 3 October 2026 (handoff-out/r1/HLD-LLD/CROSSCHECK.md, a PKG finding): emittedBy
+  named acceptShiftVariance only, so a count within the threshold or a supervisor''s close closed the shift without
+  the event its ledger consumer needs.'
+keys_touched:
+  operations:
+  - closeShift
+  - submitShiftCount
+  - approveShiftClose
+  - acceptShiftVariance
+  - inquirePaymentStatus
+  files:
+  - events/shift-closed.yaml
+  - events/order-paid.yaml
+  - states/shift.yaml
+  other:
+  - shift.closed
+  - order.paid
+root_class: 'new: write-lineage-gaps'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-write-lineage.py
+status: closed
+closed_by_commit: 7abd44b3

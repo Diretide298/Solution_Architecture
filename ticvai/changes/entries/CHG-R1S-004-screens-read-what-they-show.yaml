@@ -1,0 +1,77 @@
+id: CHG-R1S-004
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: 'Every Block A screen that shows or edits data binds a read that returns it: 47 instances fixed (34 edits
+  with no read back, 13 screens with no read), 18 reads added beside their writes, and a READ rule in check-screen-patterns.'
+decision:
+  what: 'tools/screen_patterns.py rule READ (no-read: a screen with a loading state binds no read; edit: a PUT or
+    PATCH whose data no bound read returns). tools/applied/screen-reads-3-october.py adds 18 GETs on the writes''
+    own paths, each list ordered by creation (getTaxProfileJurisdiction, getProductAttributes, getDeviceAssignment,
+    getParkingEntitlement, getTransportDeparture, listCombos, listApiQuotas, listApiAnomalyRules, listApiLicences,
+    getDeveloperAccount, getCustomerServiceCopilot, getPackagePricingDefinition, getVirtualTicketIdentity, getPdfPrintablePos,
+    getBleBeaconGeofence, getBiometricVerificationProfile, getFacePassEnrollmentConfiguration, listSubstitutionRules),
+    binds them or existing reads on 41 screens (BO-877 also lists the resources its rules assign, listResources),
+    gives every bound read a component that reaches it (a table or a panel, P2 columns), gives GuestMerchandiseItem
+    the variantId addCartLine needs (WEB-033), names GuestMenu''s tables and feeds POS-024''s ''86 an item'' picker
+    from getGuestMenu. POS-014, POS-017 and BO-117 name their read''s permission (P3); GST-067 declares orderId.
+    Outside Block A, 574 instances stay on a falling ceiling.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'the r1 gate of 3 October 2026 (a judge finding on the Sprint 1 and baseline tickets): G3, screens that show
+  data but bind no operation that reads it (ADM-069: setTaxProfileJurisdiction is PUT-only; POS-024''s ''86 an item''
+  picker; GST-077 never read its departure; WEB-033''s guest projection lacked variantId).'
+keys_touched:
+  screens:
+  - ADM-069
+  - POS-024
+  - GST-077
+  - WEB-033
+  - BO-007
+  - BO-008
+  - BO-011
+  - BO-012
+  - DEV-002
+  - DEV-008
+  - POS-016
+  - WEB-041
+  - GST-027
+  operations:
+  - getTaxProfileJurisdiction
+  - getProductAttributes
+  - getDeviceAssignment
+  - getParkingEntitlement
+  - getTransportDeparture
+  - listCombos
+  - listApiQuotas
+  - listApiAnomalyRules
+  - listApiLicences
+  - getDeveloperAccount
+  - getCustomerServiceCopilot
+  - getPackagePricingDefinition
+  - getVirtualTicketIdentity
+  - getPdfPrintablePos
+  - getBleBeaconGeofence
+  - getBiometricVerificationProfile
+  - getFacePassEnrollmentConfiguration
+  - listSubstitutionRules
+  schemas:
+  - GuestMerchandiseItem
+  - GuestMenu
+  files:
+  - tools/screen_patterns.py
+  - tools/check-screen-patterns.py
+  - tools/applied/screen-reads-3-october.py
+root_class: 'new: screen-without-read'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: closed
+closed_by_commit: 7abd44b3
+notes: check-screen-patterns READ fails on the parent commit with 47 Block A findings.

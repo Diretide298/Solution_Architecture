@@ -96,3 +96,19 @@ Fixed the six screen patterns the Block A audit on live r2 found (CHG-AUD-001; C
 ## `screen-decisions-3-october.py`
 
 Applied Chinmay's 3 October answers that change a screen (CHG-SPF-007 to -013): `listAnalyticsProviders` off GST-001 and WEB-001; KIT-007 a read-only guest board; BO-056 self clock-in only; BO-078 one `approveRequisition` decision (and flows F92 and F15); ANL-023's first Save creates; POS-000's session management behind a supervisor PIN; GST-055's 30-second QR; GST-053's add-on change kinds and signed-out planning; and, by the agreed names of operations other agents add, the guest chat's `sendGuestConversationMessage` with streamed answers, GST-070's own reservations and bookable restaurants, and EMP-026's photos and person involved. `check-screen-patterns` (DEC) keeps each decision made. Applied 3 October; a second run says there is nothing to do.
+
+## `screen-reads-3-october.py`
+
+Gave every Block A screen that shows or edits data a read that returns it (CHG-R1S-004), after the r1 gate of 3 October found ADM-069 editing a tax profile it could not read, POS-024's "86 an item" picker with nothing to list, GST-077 never reading its departure and WEB-033's guest projection without the `variantId` that `addCartLine` needs. Adds 18 reads beside their writes on the writes' own paths (each list ordered and paged), binds them or existing reads on the 41 screens the READ rule of `tools/screen_patterns.py` found, gives each a component that reaches it (a card list where the screen already shows another entity), and makes the three contract facts additive (`GuestMerchandiseItem.variantId`, `GuestMenu`'s tables, POS-024's picker). `check-screen-patterns` (READ) holds Block A at zero and the rest to a falling ceiling. Applied 3 October; a second run says there is nothing to do.
+
+## `lineage-writes-3-october.py`
+
+Every write operation writes a table or says why not, and every event emitter writes `platform.outbox` (CHG-R1S-005), after the HLD/LLD cross-check of 3 October found `createOrder` emitting without the outbox and six POSTs writing nothing. Gives 108 writes their table, marks 48 `pure` with a reason and 7 generated workspace writes `storageUndecided`, and adds the outbox to every emitter outside the AI contract (AI writes only AI stores, ADR-0020; its publish path is an open question). `tools/derive-lineage.py` now adds the outbox for emitters; `tools/check-write-lineage.py` holds the rest. Applied 3 October; a second run says there is nothing to do.
+
+## `problem-types-3-october.py`
+
+Named the problem types of the 28 Sprint 1 error responses whose descriptions already named their causes in backticks (CHG-R1S-021), after the r1 gate could not contract-test errors with no `type`. A backticked property, parameter, operation, status value or single word is not a cause and is skipped; the 71 Sprint 1 responses with no named cause are left on the falling ceiling of `tools/check-problem-types.py`. Applied 3 October.
+
+## `guest-kiosk-3-october.py`
+
+The lead's guest and kiosk design cross-check of 3 October (CHG-R1S-022, CHG-R1S-023): binds what flow steps call (WEB-005 and KSK-015 `addCartLine`, WEB-011 `extendSeatHold`, made guest-callable within the guest's own session, KSK-014 `getTenantAppStatus`, KSK-013 `handoverToAgent`), applies the eleven open kiosk corrections of the process notes and marks them `status: fixed`, and gives `GuestMenu` items `allergenDetail`. Applied 3 October; a second run says there is nothing to do.

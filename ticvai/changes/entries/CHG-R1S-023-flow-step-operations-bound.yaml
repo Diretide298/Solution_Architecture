@@ -1,0 +1,38 @@
+id: CHG-R1S-023
+date: '2026-10-03'
+source: design-input
+kind: contract
+summary: 'Screens bind what their flow steps call: WEB-005 addCartLine, WEB-011 extendSeatHold (now guest-callable
+  within the guest''s own session), KSK-014 getTenantAppStatus, KSK-015 addCartLine, KSK-013 handoverToAgent.'
+decision:
+  what: Bindings on the five screens; extendSeatHold gains the guest audience, guest security and x-ticvai-guest-callable,
+    as createSeatHold has (additive).
+  by: Chinmay
+  date: '2026-10-03'
+why: 'The lead''s guest/kiosk design cross-check finding of 3 October; extendSeatHold follows Chinmay''s Pattern
+  4 group 3 (3 October, docs/active/decisions/answers-3-october-business-rules.md: purchase actions guest-callable
+  within the guest''s own session).'
+keys_touched:
+  screens:
+  - WEB-005
+  - WEB-011
+  - KSK-013
+  - KSK-014
+  - KSK-015
+  operations:
+  - addCartLine
+  - extendSeatHold
+  - getTenantAppStatus
+  - handoverToAgent
+root_class: 'new: flow-step-actor'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-flows.py
+status: closed
+closed_by_commit: 7abd44b3

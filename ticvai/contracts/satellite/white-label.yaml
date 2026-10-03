@@ -625,6 +625,9 @@ paths:
                   description: The published version to package; the current one where absent.
       responses:
         '202':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Building
           content:
             application/json:
@@ -907,6 +910,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-834 Digital Experience Center"
         - "P09 ADM-018 Interface Languages"
+        - "P13 CMS-009 Navigation & Menus"
         - "P13 CMS-011 Translations"
       x-ticvai-audience:
       - staff
@@ -978,6 +982,7 @@ paths:
         - "P02 GST-047 Maintenance / Upgrade Page"
         - "P02 GST-051 Plan"
         - "P05 KSK-002 Language Select"
+        - "P05 KSK-014 Out of service"
         - "P13 CMS-001 Tenant Workspace"
         - "P13 CMS-014 Publishing Workflow"
         - "P13 CMS-102 Site Builder"
@@ -3402,6 +3407,7 @@ paths:
           $ref: ../shared/common.yaml#/components/responses/NotFound
         '409':
           description: The choice is `published`; unpublish it first
+          x-ticvai-problem-types: [guided-choice-published]
           content:
             application/problem+json:
               schema:

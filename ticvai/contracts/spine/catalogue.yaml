@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Catalogue & Entitlement
   version: 0.1.0
-  x-ticvai-screen-count: 227
+  x-ticvai-screen-count: 231
   x-ticvai-tier: spine
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-requirements: 312
@@ -410,6 +410,8 @@ paths:
         format: uuid
     get:
       operationId: getCatalogueImportJob
+      x-ticvai-consumed-by:
+        - "P08 BO-117 Product Import, Governance & AI Configuration Assistant"
       summary: Progress and findings of a catalogue import
       description: '1.4.2. **The read `importProductCatalogue` points at.** Its `202` hands back the job
         in `parsing`; this is where the job moves to `previewReady` with its findings, or to `failed`,
@@ -1599,6 +1601,7 @@ paths:
         - "P02 GST-075 Book a Space by the Hour"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-003 Sell — Timed Entry"
+        - "P05 KSK-001 Attract Loop"
         - "P05 KSK-003 What are you buying"
         - "P05 KSK-015 Assistant"
         - "P06 EMP-034 Walk-up sale"
@@ -2251,6 +2254,40 @@ paths:
       schema:
         type: string
         format: uuid
+    get:
+      operationId: getProductAttributes
+      x-ticvai-consumed-by:
+        - "P08 BO-007 Product Directory"
+        - "P08 BO-008 Product Detail & Variants"
+        - "P08 BO-012 Membership Products"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: A product's attribute axes
+      description: >
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
+        BO-007, BO-008 and BO-012 replace a product's axes with `setProductAttributes`, whose body is the
+        whole set, and had no way to read the set they were replacing. Returns what the write stores, in the
+        write's own shape.
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: A product's attribute axes
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [axes]
+                properties:
+                  axes:
+                    type: array
+                    items: { $ref: '#/components/schemas/VariantDimension' }
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setProductAttributes
       x-ticvai-consumed-by:
@@ -3196,6 +3233,9 @@ paths:
                   maxLength: 500
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Released to the general pool
           content:
             application/json:
@@ -3848,7 +3888,15 @@ paths:
         else. The order service then re-acquires with `acquireInventoryHold` before taking the payment; it
         never sells against a hold it does not hold. No screen calls this operation.
 
+
+        **The order''s seat holds convert in the same call** (3 October 2026, CHG-R1S-010): each held seat of
+        the order moves to `sold` (`seating.seat_hold`, `seating.seat_hold_item`) and `seat.sold` is written to
+        the outbox once per seat. Seating belongs to this service, so the seat event is published here and not
+        by the order service that called it.
+
         '
+      x-ticvai-emits:
+      - seat.sold
       tags:
       - lease
       x-ticvai-permission: null
@@ -9817,6 +9865,32 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /tax-profile-jurisdiction:
+    get:
+      operationId: getTaxProfileJurisdiction
+      x-ticvai-consumed-by:
+        - "P08 ADM-069 Tax Profile & Jurisdiction Configuration"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The tax profile and jurisdiction configuration as saved
+      description: >
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
+        ADM-069 saves it with `setTaxProfileJurisdiction`, which is PUT-only; the r1 gate found the screen
+        shows a profile it cannot read. Returns what the write stores, in the write's own shape.
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The tax profile and jurisdiction configuration as saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaxProfileJurisdictionConfigurationView'
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setTaxProfileJurisdiction
       x-ticvai-consumed-by:
@@ -16677,6 +16751,32 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /package-pricing:
+    get:
+      operationId: getPackagePricingDefinition
+      x-ticvai-consumed-by:
+        - "P08 BO-011 Packages & Bundles"
+      x-ticvai-audience: [staff]
+      x-ticvai-read-routing: replica
+      summary: The package pricing definition as saved
+      description: >
+        **Added by the r1 gate fix of 3 October 2026 (CHG-R1S-004): the read this write was missing.**
+        BO-011 saves it with `setPackagePricingDefinition` and read nothing back. Returns what the write
+        stores, in the write's own shape.
+      x-ticvai-permission: PRICE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The package pricing definition as saved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PackagePricing'
+        '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
+        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setPackagePricingDefinition
       x-ticvai-consumed-by:

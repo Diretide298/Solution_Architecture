@@ -1,0 +1,45 @@
+id: CHG-R1S-001
+date: '2026-10-03'
+source: audit
+kind: spec
+summary: docs/architecture/ai-system-design.md follows the AI decisions of 2 October and the hosting decision of
+  3 October (section 8a); ADR-0009 and ADR-0020 carry a 3 October amendment; AI-D20 is closed by DEC-001.
+decision:
+  what: The AI design names Core42 Compass (uaeOnly default) with OpenAI UAE as fallback and BYOK, no self-hosted
+    model and no GPU pool, the provider's content-safety service as the guard (Azure AI Content Safety, UAE North),
+    the Presidio scrubber as a CPU library in the worker, the curated range (DEC-544, DEC-002), the PTU step (DEC-540)
+    and DEC-001 closing AI-D20. ADR-0009 drops the in-cell gpt-oss-120b fallback; ADR-0020 item 3 becomes the provider's
+    safety service; AI-D02 in handoff/ai-decisions.json is amended likewise.
+  by: Chinmay
+  date: '2026-10-03'
+why: 'the HLD/LLD cross-check of 3 October 2026 (handoff-out/r1/HLD-LLD/CROSSCHECK.md, a PKG finding): the design
+  still named managed Azure OpenAI as the provider (5.9) and AI-D20 ''Deferred, not decided'' (8 row 15), though
+  DEC-539..544 and DEC-001 (CHG-CSA-001..003) had decided otherwise. Chinmay, 3 October evening (docs/active/decisions/answers-3-october-gate-and-hosting.md):
+  "We are not hosting anything unless client asks it" (decision HOST-1).'
+keys_touched:
+  files:
+  - docs/architecture/ai-system-design.md
+  - docs/adr/0009-ai-data-residency.md
+  - docs/adr/0020-ai-isolation-boundary.md
+  - docs/adr/README.md
+  - handoff/ai-decisions.json
+  - docs/active/decisions/answers-3-october-gate-and-hosting.md
+  other:
+  - AI-D02
+  - AI-D20
+  - DEC-001
+  - DEC-539
+  - DEC-543
+  - HOST-1
+root_class: 'new: design-doc-behind-decisions'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ai-residency.py
+status: closed
+closed_by_commit: 7abd44b3

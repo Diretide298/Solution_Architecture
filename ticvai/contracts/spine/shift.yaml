@@ -554,6 +554,7 @@ paths:
             (problem type `deposit-box-not-open`). `closing` stops the till taking anything
             (`states/deposit-box.yaml`), and a float changed after the count is a variance nobody
             can explain.
+          x-ticvai-problem-types: [deposit-box-not-open]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -561,6 +562,7 @@ paths:
           description: >
             The change would leave the float below zero (problem type `float-below-zero`, audit
             R123 (3)).
+          x-ticvai-problem-types: [float-below-zero]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -1615,6 +1617,9 @@ paths:
                 reason: { type: string, minLength: 3, maxLength: 300 }
       responses:
         '200':
+          headers:
+            X-Consistency-Token:
+              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
           description: Released — `closed`, or `pendingVariance` where the variance needs acceptance
           content:
             application/json:
@@ -1623,6 +1628,7 @@ paths:
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
         '409':
           description: Shift is not `pendingClosure` (problem type `shift-not-pending-closure`)
+          x-ticvai-problem-types: [shift-not-pending-closure]
           content:
             application/problem+json:
               schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
@@ -1698,6 +1704,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-007 Close Shift"
         - "P04 POS-015 Cash Operations Dashboard"
+        - "P04 POS-017 Cash In / Cash Out Operations"
         - "P06 EMP-008 Shift summary"
         - "P06 EMP-009 End shift"
         - "P08 BO-039 Shift Directory"

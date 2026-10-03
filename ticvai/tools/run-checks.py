@@ -96,6 +96,12 @@ CHECKS = [
     # items, the blind close in every flow and the decided F32, the concierge's conversation polling, the
     # BO-1065 residency section and the payment-link cancel.
     "check-r1-additions",
+    # 3 October (the r1 gate and the HLD/LLD cross-check, CHG-R1S-002..021): every write writes a table or
+    # says why not and every emitter writes the outbox; the AI residency and scrubbing safeguards stay in the
+    # contracts; an operation-specific error names its problem types (a falling ceiling).
+    "check-write-lineage",
+    "check-ai-residency",
+    "check-problem-types",
 ]
 
 # Report, do not gate. Each needs its reason stated here or it does not belong in this list.

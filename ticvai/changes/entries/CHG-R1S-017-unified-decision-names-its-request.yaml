@@ -1,0 +1,31 @@
+id: CHG-R1S-017
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: approveUnifiedDecision names the request it decides (approvalRequestId, refused 400 without it) and applies
+  the decision through decideApprovalRequest's rules; return and requestInformation write no decision row.
+decision:
+  what: UnifiedApprovalInboxDecisionWorkspaceInput.approvalRequestId (optional in the schema for r1 clients, refused
+    at runtime); 400 approval-request-required, 409 approval-not-open; the lineage perm is APPROVAL_DECIDE.
+  by: Chinmay
+  date: '2026-10-03'
+why: 'the r1 gate of 3 October 2026 (a judge finding on the Sprint 1 and baseline tickets), SVC-TENANCY-APPROVALS-4
+  (blocker): the operation could not name the request it decides; its lineage named APPROVAL_REQUEST.'
+keys_touched:
+  operations:
+  - approveUnifiedDecision
+  - decideApprovalRequest
+  schemas:
+  - UnifiedApprovalInboxDecisionWorkspaceInput
+root_class: 'new: operation-cannot-name-subject'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-problem-types.py
+status: closed
+closed_by_commit: 7abd44b3

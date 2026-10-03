@@ -1,0 +1,40 @@
+id: CHG-R1S-008
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: 'identity.session is a Postgres table: ActiveSession persists to it (names and hasOpenShift read with it),
+  Redis stays the token cache, and derive-schema lets a contract''s persistence override a remembered redis store.'
+decision:
+  what: ActiveSession x-ticvai-persistence identity.session; principalName, roleName, workstationName and hasOpenShift
+    x-ticvai-persisted false. tools/derive-schema.py drops a `redis` store for a table a contract persists to.
+  by: Chinmay
+  date: '2026-10-03'
+why: 'the HLD/LLD cross-check of 3 October 2026 (handoff-out/r1/HLD-LLD/CROSSCHECK.md, a PKG finding): identity.session
+  was written by 11 operations and created by no SQL; the r1 gate of 3 October 2026 (a judge finding on the Sprint
+  1 and baseline tickets), SVC-IDENTITY-SESSION-1: the Redis registry had no structure to page, filter by workstation
+  or venue, or put under RLS.'
+keys_touched:
+  schemas:
+  - ActiveSession
+  tables:
+  - identity.session
+  operations:
+  - listActiveSessions
+  - forceLogout
+  - login
+  - logout
+  - endOwnSession
+  files:
+  - tools/derive-schema.py
+root_class: 'new: write-lineage-gaps'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/derive-schema.py::_now_pg
+status: closed
+closed_by_commit: 7abd44b3

@@ -1,0 +1,37 @@
+id: CHG-R1S-021
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: 28 Sprint 1 error responses that named their causes in prose now declare x-ticvai-problem-types, and check-problem-types
+  holds the rest to a falling ceiling (707).
+decision:
+  what: tools/applied/problem-types-3-october.py writes the backticked causes (shareNotActive -> share-not-active)
+    as the response's problem types on Sprint 1 operations; tools/check-problem-types.py fails above 707.
+  by: Chinmay
+  date: '2026-10-03'
+why: 'the r1 gate of 3 October 2026 (a judge finding on the Sprint 1 and baseline tickets): on several Sprint 1
+  tickets the judge could not contract-test an operation-specific error whose type nobody named, though the shared
+  Problem says one type per cause (735 such responses, 99 on Sprint 1).'
+keys_touched:
+  files:
+  - tools/applied/problem-types-3-october.py
+  - tools/check-problem-types.py
+  operations:
+  - revokeEntitlementShare
+  - getCart
+  - voidPayment
+  - completeUpload
+  - extendCart
+  - payByLink
+root_class: 'new: problem-type-missing'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-problem-types.py
+status: closed
+closed_by_commit: 7abd44b3

@@ -1,0 +1,35 @@
+id: CHG-R1S-012
+date: '2026-10-03'
+source: design-input
+kind: spec
+summary: CMS-002 shows the Powered-by credit read-only; it is edited on CMS-104 only, and the white-label map no
+  longer lists CMS-002 as its editor.
+decision:
+  what: CMS-002's detail panel shows BrandIdentity.showPoweredBy with a note; its form says the field is sent as
+    read. tools/build-white-label-map.py EDITED_ONLY_ON keeps brand.showPoweredBy's configuredOn to CMS-104 and
+    ADM-016.
+  by: Chinmay
+  date: '2026-10-03'
+why: 'Chinmay''s flow-brief defaults of 3 October (docs/active/decisions/answers-3-october-business-rules.md lineage;
+  the lead''s design-batch cross-check finding): "Powered-by toggle on CMS-104, shown read-only on CMS-002"; the
+  map listed CMS-002 as an editor because it binds setBrandIdentity.'
+keys_touched:
+  screens:
+  - CMS-002
+  - CMS-104
+  files:
+  - tools/build-white-label-map.py
+  other:
+  - brand.showPoweredBy
+root_class: 'new: editor-by-binding'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/build-white-label-map.py::EDITED_ONLY_ON
+status: closed
+closed_by_commit: 7abd44b3

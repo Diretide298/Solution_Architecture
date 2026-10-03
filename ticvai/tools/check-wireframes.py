@@ -325,6 +325,21 @@ def main() -> int:
                 ERRORS.append(f"{_s['id']}: client-verified, but its prototype has no view for it (match: none)")
             elif _pm != "none" and not (_p.get("verified") and _p.get("view") and _p.get("rev")):
                 ERRORS.append(f"{_s['id']}: wireframe.prototype needs rev, verified and view when it matches")
+            # **The latest copy of a dated prototype** (3 October, CHG-R1S-015): 22 guest screens still
+            # pointed at the 29 September copy after the client's 30 September build was filed beside it,
+            # so a designer opened the older build. A file in `<name>-<d>-<month>/` with the same file in a
+            # later-dated sibling folder is a stale pointer.
+            _pp = re.match(r"^(sources/designs/.+?)-(\d{1,2})-(september|october|november|december)/(.+)$",
+                          str(_p.get("file", "")))
+            if _pp:
+                _mo = ["september", "october", "november", "december"]
+                _key = (_mo.index(_pp.group(3)), int(_pp.group(2)))
+                for _sib in (ROOT / _pp.group(1)).parent.glob(Path(_pp.group(1)).name + "-*-*"):
+                    _n = re.match(r"^.+-(\d{1,2})-(september|october|november|december)$", _sib.name)
+                    if _n and (_mo.index(_n.group(2)), int(_n.group(1))) > _key and (_sib / _pp.group(4)).exists():
+                        ERRORS.append(f"{_s['id']}: wireframe.prototype.file points at {_pp.group(1)}-{_pp.group(2)}-"
+                                      f"{_pp.group(3)}; {_sib.name} holds a later copy of the same file")
+                        break
 
 
     # **A screen drawn by a client pack is still drawn by the generator, and that is correct.**
