@@ -1,0 +1,870 @@
+{
+  "date": "2026-10-04",
+  "title": "The AI engine after Block A: phase 1 by 2 April 2027, phase 2 after",
+  "decision": {
+    "by": "Chinmay",
+    "date": "2026-10-04",
+    "source": "docs/active/decisions/answers-4-october-ai-phases.md",
+    "quote": "collect tasks that need data we can do those phase 2. fit what we can till release and rest is phase 2 also pick most beneficial ones to prioritise first. ... do not pick trails that we cannot complete.",
+    "rule": "Phase 1 (by 2 April 2027) is the part of each AI capability that works on day one without tenant history: rules, priors, and the LLM over the venue's own configuration and data. Phase 2 (after 2 April) is every part that learns from tenant data: statistical engines fitted on own history, trained models in shadow, classifiers, learning-to-rank, the training/backtest/shadow job and the promotion rule.",
+    "completionRule": "A capability goes into phase 1 only as a whole unit that finishes by 2 April, with its back end and its screens. No unit is cut across the line."
+  },
+  "note": "Read by tools/build-service-docs.py, which makes one AI engine task per unit below (replacing the 'n of N' chunks of the 30 September review's AI-engineer weeks) and one app-module per module. A phase 1 unit is given to the AI engineer named here and goes in its engineer's queue by `rank` (benefit first); its module test waits on the unit and on everything in `needs` (the owner-side operations and the screens the unit cannot be accepted without, resolved to the tasks that build them), and the generator prints, per unit, when those land against the unit's end and 2 April. A phase 2 unit starts after 2 April (notBefore), has no owner and is not ticketed (nor its app-module). Build items and AI-weeks are the review's (docs/active/ai-functions-review-30-september.json), 1 AI-week = 5 AI-engineer days. The back-end tasks the review names (AI-BE-*: validate-only, the Reporting compile) are still made from the review, except where `reviewBackEnd` is false. **The number of AI app-modules is kept at 14** (11 phase 1, 3 phase 2): each has a module test with no points, and the plan's pace is the average points of every non-AI task (tools/sprint_plan.py pace_model), so a fifteenth module test, or dropping the 72 back-end points of the shared layer, would move every Block A date (Chinmay, 4 October: no Block A change). The learning units of forecasting, fraud and recommendations therefore sit in the shared phase 2 app-module with the training job they wait on. `order` places an app-module in the AI engineers' queue (default: its lowest rank); the shared module keeps its place before the others, as the review's sprints had it, so the back-end tasks under it are scheduled as before.",
+  "doubleCount": {
+    "shared-baseline-then-learn": "The review's 8 AI-weeks (40 days, AI-ENGINE-SHARED-BASELINE-THEN-LEARN-1..4) repeat AI-ENGINE-BASELINE (Block A, 15 days): the estimator interface and maturity block (1.5 AI-weeks), the venue AI profile (0.5; setAiVenueSettings) and the benchmark prior packs with the UAE calendar (1.5; 'a starting pattern per venue type ... and the UAE calendar') are all in BASELINE's description and builds. The feature pipeline (1.5 AI-weeks) is what the review itself counts as 'in plan' inside the B2 rules-first engines (fraud runtime, recommendations runtime, forecasting statistical), whose own weeks carry it. Its historical import back end (1.5 back-end weeks, AI-BE-SHARED-BASELINE-THEN-LEARN-1..9, 72 points) looks like a repeat of importVenueHistory, getVenueHistoryImport and listVenueHistoryImports, built in Block A by SVC-AI-FORECAST-2 and SVC-AI-FORECAST-3; it is kept, because dropping it changes the pace model and so every Block A date (Block A change needed, for Chinmay). What is left is the per-tenant training and backtest job with the shadow runner (2.5) and the promotion rule (0.5): 15 days, phase 2.",
+    "seat-map-layout": "The review's 3 AI-weeks cover extraction, labelling, walkways and change proposals. proposeVenueLabels and proposeWalkways come in Block A with BO-093 and BO-094 (CHG-RONEC-001, CHG-RONEP-001), so 1 AI-week (labels and walkways, 0.5 each) is not counted again; the unit is extraction (generateVenueLayout, 1.5) and change proposals (proposeSeatMapChanges, 0.5)."
+  },
+  "modules": [
+    {
+      "key": "AM-AI-ENGINE-OPERATIONAL-SUGGESTIONS",
+      "capability": "operational-suggestions",
+      "phase": 1,
+      "units": [
+        {
+          "key": "AI-ENGINE-OPERATIONAL-SUGGESTIONS-1",
+          "subject": "Operational suggestions: prior answers for all 16 requestSuggestion kinds",
+          "rank": 0,
+          "assignee": "Second AI engineer",
+          "items": [
+            {
+              "text": "Prior answers for all 16 kinds; remove the history refusal (1.5 AI-weeks, extra; 1 week of it in S2 for the kinds on Block A screens)",
+              "aiWeeks": 1.5
+            },
+            {
+              "text": "Contract change on requestSuggestion (maturity block, 422 only for missing configuration)",
+              "aiWeeks": 0
+            }
+          ],
+          "days": 7.5,
+          "dependsOn": [
+            "AI-ENGINE-GATEWAY"
+          ],
+          "needs": {
+            "operations": [
+              "requestSuggestion",
+              "setSuggestionProvider"
+            ],
+            "screens": [],
+            "tasks": [
+              "AI-ENGINE-EVAL"
+            ]
+          },
+          "backEndNote": "requestSuggestion and setSuggestionProvider are built in Block A; recordSuggestionOutcome (the outcomes the statistical and learned producers learn from) and ANL-006 and ANL-010 (Block D) read or show its answers but are not needed to accept it, so its Block B module test stays where it was",
+          "doneWhen": "every one of the 16 kinds (replenishment, requisition, prep plan, menu engineering, SLA target, waste risk and the rest) answers on a freshly seeded venue with no history, with its maturity stage and Based-on line, and none refuses for little history (422 only for a missing setting, naming it)",
+          "why": "Already assigned in Block B (Chinmay: stays phase 1). Day-one priors, no tenant data needed."
+        }
+      ]
+    },
+    {
+      "key": "AM-AI-ENGINE-CONFIGURATION-ASSISTANT",
+      "capability": "configuration-assistant",
+      "phase": 1,
+      "units": [
+        {
+          "key": "AI-ENGINE-CONFIGURATION-ASSISTANT",
+          "subject": "Configuration assistant: discovery, blueprint, build plan, change and rollback",
+          "rank": 1,
+          "assignee": "Kalpita Mejari",
+          "items": [
+            {
+              "text": "Discovery, blueprint, plan (5 AI-weeks, extra): the configuration knowledge model picks the questions and the LLM only extracts answers against a schema; the blueprint and its dependency map; the plan validated, simulated, approved and executed through the owning modules' APIs, with change and rollback; seating and ticketing products first",
+              "aiWeeks": 5
+            }
+          ],
+          "days": 25,
+          "dependsOn": [
+            "AI-ENGINE-GATEWAY",
+            "AI-ENGINE-SCRUB-GUARD"
+          ],
+          "needs": {
+            "operations": [
+              "startConfigurationSession",
+              "answerConfigurationQuestion",
+              "attachConfigurationSource",
+              "listConfigurationSources",
+              "getConfigurationBlueprint",
+              "decideBlueprintRecommendation",
+              "buildConfigurationPlan",
+              "listConfigurationSessions",
+              "generateConfiguration",
+              "suggestGuidedChoice",
+              "getGuidedChoiceSuggestion",
+              "decideProposedAction",
+              "listProposedActions",
+              "getActionPlan",
+              "simulateActionPlan",
+              "pauseActionPlan",
+              "resumeActionPlan",
+              "cancelActionPlan",
+              "retryActionStep",
+              "rollbackActionPlan",
+              "listAiTools",
+              "setAiTool"
+            ],
+            "screens": [
+              "ADM-469",
+              "ADM-470",
+              "ADM-471",
+              "ADM-472",
+              "ADM-473",
+              "ADM-474",
+              "ADM-475",
+              "ADM-476",
+              "ADM-477",
+              "ADM-478",
+              "ADM-479",
+              "ADM-480",
+              "ADM-481",
+              "ADM-482",
+              "ADM-483",
+              "ADM-484",
+              "ADM-485",
+              "ADM-486",
+              "ADM-487",
+              "ADM-488",
+              "ADM-489",
+              "ADM-490",
+              "ADM-491",
+              "ADM-492",
+              "ADM-493",
+              "ADM-494",
+              "ADM-495",
+              "ADM-496",
+              "ADM-497",
+              "ADM-498",
+              "BO-597",
+              "BO-598",
+              "BO-117"
+            ],
+            "tasks": [
+              "AI-ENGINE-EVAL"
+            ]
+          },
+          "backEndNote": "validate-only on the first 15 tool operations in the owning services (2 back-end weeks, Hrushikant and Deep): AI-BE-CONFIGURATION-ASSISTANT-1..12 in this app-module; the action pipeline (getActionPlan to rollbackActionPlan, decideProposedAction, listProposedActions) before the execute step",
+          "doneWhen": "an admin runs a configuration session from discovery to an approved plan applied through the owning modules (seating and ticketing products first), every value shows its provenance (confirmed, AI-recommended, inferred, unknown) and no confidence number, nothing is applied without approval and a failed step compensates or pauses; plan validation passes on at least 90% of the golden set with zero unsafe steps (the release gate)",
+          "why": "Benefit rank 1: the client's first AI priority (MoM 14 Aug, CF-57; Qossai 17 Aug). Needs no history at all (design 3.12)."
+        }
+      ]
+    },
+    {
+      "key": "AM-AI-ENGINE-SEAT-MAP-LAYOUT",
+      "capability": "seat-map-layout",
+      "phase": 1,
+      "units": [
+        {
+          "key": "AI-ENGINE-SEAT-MAP-LAYOUT",
+          "subject": "Seat-map and layout generation: generateVenueLayout and proposeSeatMapChanges",
+          "rank": 2,
+          "assignee": "Second AI engineer",
+          "items": [
+            {
+              "text": "Extraction from an uploaded plan into a proposed seat map, generateVenueLayout (1.5 AI-weeks of the review's 3)",
+              "aiWeeks": 1.5
+            },
+            {
+              "text": "Change proposals on an existing map, proposeSeatMapChanges (0.5 AI-weeks of the review's 3)",
+              "aiWeeks": 0.5
+            }
+          ],
+          "days": 10,
+          "dependsOn": [
+            "AI-ENGINE-GATEWAY",
+            "AI-ENGINE-SCRUB-GUARD"
+          ],
+          "needs": {
+            "operations": [
+              "generateVenueLayout",
+              "proposeSeatMapChanges",
+              "importVenueGeometry",
+              "proposeVenueLabels",
+              "proposeWalkways"
+            ],
+            "screens": [
+              "BO-093",
+              "BO-094",
+              "BO-959",
+              "BO-970",
+              "BO-975",
+              "BO-982"
+            ],
+            "tasks": [
+              "AI-ENGINE-EVAL"
+            ]
+          },
+          "doneWhen": "from an uploaded plan of TICVAI's evaluation drawings the assistant proposes a seat map, and on an existing map a set of changes, each as a plan a person previews, corrects and approves (BO-975, BO-982), with what it had to guess highlighted; the release gate on the evaluation drawings passes",
+          "why": "Benefit rank 2: the client's priority on 17 Aug, AI-assisted import decided 21 Aug. No history needed. Labels and walkways are not repeated (Block A, CHG-RONEC-001)."
+        }
+      ]
+    },
+    {
+      "key": "AM-AI-ENGINE-FRAUD-RISK",
+      "capability": "fraud-risk",
+      "phase": 1,
+      "units": [
+        {
+          "key": "AI-ENGINE-FRAUD-RISK-RULES",
+          "subject": "Fraud and risk scoring on rules: runtime, entity risk, graph, alerts, cases and strategy templates",
+          "rank": 3,
+          "assignee": "Second AI engineer",
+          "items": [
+            {
+              "text": "Scoring runtime, entity risk, graph edges, alerts, cases (3 AI-weeks + owner-side events, in plan)",
+              "aiWeeks": 3
+            },
+            {
+              "text": "Strategy templates and provider-signal priors (0.5 AI-weeks, extra)",
+              "aiWeeks": 0.5
+            }
+          ],
+          "days": 17.5,
+          "dependsOn": [
+            "AI-ENGINE-GATEWAY",
+            "AI-ENGINE-BASELINE"
+          ],
+          "needs": {
+            "operations": [
+              "scoreTransactionRisk",
+              "getEntityRisk",
+              "configureRiskStrategy",
+              "backtestRiskStrategy",
+              "listRiskAlerts",
+              "decideRiskAlert",
+              "createRiskCase",
+              "getRiskCase",
+              "addRiskCaseEvidence",
+              "expandRiskNetwork",
+              "proposeRiskAction",
+              "closeRiskCase",
+              "checkoutCart",
+              "createPayment",
+              "capturePayment",
+              "login",
+              "validateAccess",
+              "voidOrder",
+              "exchangeOrderLines",
+              "claimTicketTransfer"
+            ],
+            "screens": [
+              "ADM-633",
+              "ADM-637",
+              "ADM-638",
+              "BO-1160"
+            ],
+            "tasks": [
+              "AI-ENGINE-EVAL"
+            ]
+          },
+          "backEndNote": "the Orders scoring call is checkoutCart's call to scoreTransactionRisk (orders.yaml, fail-open with holds); the five owner events are emitted by the operations that own them: payment.attemptFailed (createPayment, capturePayment), identity.loginRecorded (login), order.cancelled (voidOrder) and order.exchanged (exchangeOrderLines), entitlement.transferred (claimTicketTransfer), access.rejected (validateAccess)",
+          "doneWhen": "checkout's scoreTransactionRisk call gets a 0-100 risk score with band and reasons from the tenant's strategy template, velocity counters and provider signals on the first transaction, labelled a risk score and never a probability, fail-open with holds and never a decline; entity risk, graph edges, alerts and cases work end to end on ADM-633, ADM-637, ADM-638 and BO-1160 from the five owner events; no cross-tenant data",
+          "why": "Benefit rank 3: protects revenue from the first sale. The rules score needs no history (M21, the fraud book's Cold Start); the classifier is phase 2."
+        }
+      ]
+    },
+    {
+      "key": "AM-AI-ENGINE-RECOMMENDATIONS",
+      "capability": "recommendations",
+      "phase": 1,
+      "units": [
+        {
+          "key": "AI-ENGINE-RECOMMENDATIONS-RULES",
+          "subject": "Recommendations runtime on rules and priors: candidates, eligibility, ranking, attribution",
+          "rank": 4,
+          "assignee": "Kalpita Mejari",
+          "items": [
+            {
+              "text": "Runtime, decline store, attribution, experiments, POS bundle list (3 AI-weeks + back-end, in plan)",
+              "aiWeeks": 3
+            },
+            {
+              "text": "Attach-rate priors and context features (0.5 AI-weeks, extra)",
+              "aiWeeks": 0.5
+            }
+          ],
+          "days": 17.5,
+          "dependsOn": [
+            "AI-ENGINE-GATEWAY",
+            "AI-ENGINE-BASELINE"
+          ],
+          "needs": {
+            "operations": [
+              "decideRecommendations",
+              "recordRecommendationEvents",
+              "explainRecommendationDecision",
+              "getCustomerRecommendationProfile",
+              "simulateRecommendationDecision"
+            ],
+            "screens": [
+              "ADM-639",
+              "ADM-640",
+              "ADM-641",
+              "ADM-642",
+              "ADM-643",
+              "ADM-644",
+              "ADM-645",
+              "ADM-646",
+              "ADM-647",
+              "ADM-648",
+              "ADM-649",
+              "ADM-650",
+              "ADM-651",
+              "ADM-652",
+              "ADM-653",
+              "ADM-654",
+              "ADM-655",
+              "ADM-656",
+              "ADM-657",
+              "ADM-658",
+              "ADM-659",
+              "ADM-660",
+              "ADM-661",
+              "ADM-662",
+              "ADM-663",
+              "ADM-664",
+              "ADM-665",
+              "ADM-666",
+              "ADM-667",
+              "ADM-668",
+              "ADM-669",
+              "ADM-670",
+              "ADM-671",
+              "ADM-672",
+              "ADM-673",
+              "ADM-674",
+              "ADM-675",
+              "ADM-676",
+              "ADM-677",
+              "ADM-678",
+              "ADM-679",
+              "ADM-680",
+              "ADM-681",
+              "ADM-682",
+              "ADM-683",
+              "ADM-684",
+              "ADM-685",
+              "ADM-686",
+              "ADM-687",
+              "ADM-688",
+              "ADM-689",
+              "ADM-690",
+              "ADM-691",
+              "ADM-692",
+              "ADM-693",
+              "ADM-694",
+              "ADM-695",
+              "ADM-696",
+              "ADM-697",
+              "ADM-698"
+            ],
+            "tasks": [
+              "AI-ENGINE-EVAL"
+            ]
+          },
+          "doneWhen": "the extras step and the other placements get candidates from the relationship map, filtered by eligibility and suppression and ranked by business priority and context (a member is never offered a membership), never against a business rule, with template reasons for guests and a high, medium or low band for staff; attach-rate priors start from the configured relationship strength and update with each shown and accepted event; the admin trace says 'rules'",
+          "why": "Benefit rank 4: revenue from the first checkout. Rules and context work on day one (M21; the Upsell book's cold start); learning-to-rank is phase 2."
+        }
+      ]
+    },
+    {
+      "key": "AM-AI-ENGINE-ANALYTICS-ASSISTANT",
+      "capability": "analytics-assistant",
+      "phase": 1,
+      "units": [
+        {
+          "key": "AI-ENGINE-ANALYTICS-ASSISTANT",
+          "subject": "Analytics assistant: Ask TICVAI, explainMetricChange and narratives over the semantic layer",
+          "rank": 5,
+          "assignee": "Second AI engineer",
+          "items": [
+            {
+              "text": "Semantic spec, follow-ups, explainMetricChange decomposition, narratives (3 AI-weeks, extra)",
+              "aiWeeks": 3
+            }
+          ],
+          "days": 15,
+          "dependsOn": [
+            "AI-ENGINE-GATEWAY",
+            "AI-ENGINE-SCRUB-GUARD"
+          ],
+          "needs": {
+            "operations": [
+              "askReportingQuestion",
+              "explainMetricChange",
+              "decideAiInsight"
+            ],
+            "screens": [
+              "ANL-009",
+              "ANL-019",
+              "ANL-051",
+              "ANL-052",
+              "ANL-053",
+              "ANL-054",
+              "ANL-056"
+            ],
+            "tasks": [
+              "AI-ENGINE-EVAL"
+            ]
+          },
+          "backEndNote": "the Reporting semantic-spec compile (1 back-end week, Hrushikant): AI-BE-ANALYTICS-ASSISTANT-1..6 in this app-module",
+          "doneWhen": "a manager's question becomes a semantic query spec that Reporting compiles and runs (the LLM never sees raw data, AI-D15), and the answer shows its reliability category, data-as-of and the compiled query; explainMetricChange gives a deterministic contribution analysis with the figures bound into the text, comparing with the previous 7 days when there is little history and saying so; groundedness at least 95% on the golden set (the release gate)",
+          "why": "Benefit rank 5: client-named; works on the data that exists from day one (design 3.12). No per-tenant model."
+        }
+      ]
+    },
+    {
+      "key": "AM-AI-ENGINE-FORECASTING",
+      "capability": "forecasting",
+      "phase": 1,
+      "units": [
+        {
+          "key": "AI-ENGINE-FORECAST-PRIOR",
+          "subject": "Forecast prior producer with coldStart: day-one attendance, demand and revenue forecasts",
+          "rank": 6,
+          "assignee": "Kalpita Mejari",
+          "items": [
+            {
+              "text": "Prior producer and forecast definition cold-start settings (1 AI-week, extra)",
+              "aiWeeks": 1
+            },
+            {
+              "text": "Contract: coldStart on AiForecastDefinition, maturity on AiForecastVersion (in contracts/satellite/ai.yaml since 29 September)",
+              "aiWeeks": 0
+            }
+          ],
+          "days": 5,
+          "dependsOn": [
+            "AI-ENGINE-GATEWAY",
+            "AI-ENGINE-BASELINE"
+          ],
+          "needs": {
+            "operations": [
+              "runForecast",
+              "getForecast",
+              "listForecastVersions",
+              "publishForecastVersion",
+              "setForecastDefinition",
+              "listForecastDefinitions",
+              "createForecastScenario"
+            ],
+            "screens": [
+              "ADM-508",
+              "BO-919",
+              "ADM-499",
+              "ADM-500",
+              "ADM-501",
+              "ADM-502",
+              "ADM-503",
+              "ADM-504",
+              "ADM-505",
+              "ADM-506",
+              "ADM-507",
+              "ANL-008",
+              "ANL-057",
+              "BO-926",
+              "BO-931"
+            ],
+            "tasks": [
+              "AI-ENGINE-EVAL"
+            ]
+          },
+          "doneWhen": "a venue with no history gets attendance, demand and revenue forecasts on day one from its venue AI settings x the venue-type starting pattern x the UAE calendar x weather, with bookings on hand as a floor, a wide P10-P90 band, stage starting and the Based-on line; setForecastDefinition's coldStart is honoured; the screens say 'Limited historical data' while the prior weight is above 50%",
+          "why": "Benefit rank 6: operational requirements, queue time, marketing playbooks and (phase 2) dynamic pricing and anomaly all read the forecast. The statistical engine and the learned producer are phase 2."
+        }
+      ]
+    },
+    {
+      "key": "AM-AI-ENGINE-OPERATIONAL-REQUIREMENTS",
+      "capability": "operational-requirements",
+      "phase": 1,
+      "units": [
+        {
+          "key": "AI-ENGINE-OPERATIONAL-REQUIREMENTS",
+          "subject": "Operational requirements and staffing from the forecast, on default standards",
+          "rank": 7,
+          "assignee": "Kalpita Mejari",
+          "items": [
+            {
+              "text": "Default productivity standards in the benchmark pack and their shrinkage to measured (0.5 AI-weeks, extra)",
+              "aiWeeks": 0.5
+            },
+            {
+              "text": "Derivation and handover to owning modules (1 AI-week and 1 back-end week, in plan)",
+              "aiWeeks": 1
+            }
+          ],
+          "days": 7.5,
+          "dependsOn": [
+            "AI-ENGINE-GATEWAY",
+            "AI-ENGINE-FORECAST-PRIOR"
+          ],
+          "needs": {
+            "operations": [
+              "decideOperationalRequirement",
+              "listOperationalRequirements"
+            ],
+            "screens": [
+              "BO-927",
+              "ADM-509",
+              "ADM-510",
+              "ADM-511",
+              "ADM-512",
+              "ADM-513",
+              "ADM-514",
+              "ADM-515",
+              "ADM-516",
+              "ADM-517",
+              "ADM-518",
+              "BO-925"
+            ],
+            "tasks": [
+              "AI-ENGINE-EVAL"
+            ]
+          },
+          "doneWhen": "requirements per role (staff, tills and lanes, gates, F&B and stock) come from the prior forecast divided by the role's standard (benchmark defaults the venue sees and edits), each sent to the owning module as a recommendation a person accepts (autonomy L2); the standards move to measured automatically once 4 weeks of shifts exist, through the baseline layer's statistical producer",
+          "why": "Benefit rank 7: original plan (B2). Needs the forecast and configured standards, not history."
+        }
+      ]
+    },
+    {
+      "key": "AM-AI-ENGINE-QUEUE-WAIT-TIME",
+      "capability": "queue-wait-time",
+      "phase": 1,
+      "units": [
+        {
+          "key": "AI-ENGINE-QUEUE-WAIT-TIME",
+          "subject": "Queue and wait time on nominal capacity: waitTime, queueBalancing, quoteWaitTime",
+          "rank": 8,
+          "assignee": "Kalpita Mejari",
+          "items": [
+            {
+              "text": "Nominal-capacity prior and queue definition wiring (0.5 AI-weeks, extra)",
+              "aiWeeks": 0.5
+            }
+          ],
+          "days": 2.5,
+          "dependsOn": [
+            "AI-ENGINE-GATEWAY",
+            "AI-ENGINE-FORECAST-PRIOR"
+          ],
+          "needs": {
+            "operations": [
+              "quoteWaitTime",
+              "getWaitTimes",
+              "requestSuggestion"
+            ],
+            "screens": [],
+            "tasks": [
+              "AI-ENGINE-EVAL"
+            ]
+          },
+          "doneWhen": "waitTime answers from the first minutes of the first day as people ahead divided by the configured capacity per hour, moving to measured throughput once 30 minutes of it exist; queueBalancing compares the forecast wait with capacity from the prior forecast; quoteWaitTime quotes F&B waits the same way",
+          "why": "Benefit rank 8: original plan (B2). Configured capacity and the live queue give an answer on day one."
+        }
+      ]
+    },
+    {
+      "key": "AM-AI-ENGINE-APPROVAL-SCORING",
+      "capability": "approval-scoring",
+      "phase": 1,
+      "units": [
+        {
+          "key": "AI-ENGINE-APPROVAL-SCORING",
+          "subject": "Approval-request scoring on rules",
+          "rank": 9,
+          "assignee": "Kalpita Mejari",
+          "items": [
+            {
+              "text": "Rules scorer and baseline (0.5 AI-weeks, extra)",
+              "aiWeeks": 0.5
+            }
+          ],
+          "days": 2.5,
+          "dependsOn": [
+            "AI-ENGINE-GATEWAY",
+            "AI-ENGINE-BASELINE"
+          ],
+          "needs": {
+            "operations": [
+              "scoreApprovalRequest",
+              "getApprovalRequestScore"
+            ],
+            "screens": [
+              "ADM-366"
+            ],
+            "tasks": [
+              "AI-ENGINE-EVAL"
+            ]
+          },
+          "doneWhen": "a pending approval request gets a context score with its reasons (amount against limits, deviation from policy, separation of duties, time of day, object sensitivity) from the first request; it informs and never blocks (L1)",
+          "why": "Benefit rank 9: rules on configuration and the request itself work on day one. Small; it fills Kalpita's free days in November."
+        }
+      ]
+    },
+    {
+      "key": "AM-AI-ENGINE-MARKETING-AI",
+      "capability": "marketing-ai",
+      "phase": 1,
+      "units": [
+        {
+          "key": "AI-ENGINE-MARKETING-AI",
+          "subject": "Marketing playbooks, lookalike rules and send-time priors",
+          "rank": 10,
+          "assignee": "Second AI engineer",
+          "items": [
+            {
+              "text": "Playbooks, lookalike rules, send-time priors (1.5 AI-weeks, extra)",
+              "aiWeeks": 1.5
+            }
+          ],
+          "days": 7.5,
+          "dependsOn": [
+            "AI-ENGINE-GATEWAY",
+            "AI-ENGINE-FORECAST-PRIOR"
+          ],
+          "needs": {
+            "operations": [
+              "proposeMarketingContent",
+              "listMarketingRecommendations",
+              "proposeLookalikeSegment"
+            ],
+            "screens": [
+              "BO-761",
+              "BO-762",
+              "BO-764",
+              "BO-772",
+              "BO-782"
+            ],
+            "tasks": [
+              "AI-ENGINE-EVAL"
+            ]
+          },
+          "doneWhen": "playbooks (abandoned cart, membership expiring, low-forecast day: promote) raise campaign suggestions from the prior forecast, proposeLookalikeSegment proposes an audience from a seed by segmentable attributes, and the send hour comes from the channel benchmark until a recipient has three touches; nothing is sent to a guest without consent",
+          "why": "Benefit rank 10: playbooks and attribute lookalikes work on day one; the propensity model is phase 2 territory and not in the review's build."
+        }
+      ]
+    },
+    {
+      "key": "AM-AI-ENGINE-SHARED-BASELINE-THEN-LEARN",
+      "capability": "shared-baseline-then-learn",
+      "phase": 2,
+      "reviewBackEnd": true,
+      "units": [
+        {
+          "key": "AI-ENGINE-TRAINING-PROMOTION",
+          "subject": "The per-tenant training, backtest and shadow job, and the promotion rule",
+          "rank": 11,
+          "items": [
+            {
+              "text": "Per-tenant training and backtest job, shadow runner, registry wiring (2.5 AI-weeks)",
+              "aiWeeks": 2.5
+            },
+            {
+              "text": "Promotion rule: gate evaluation to promotionReady alert to promoteAiRelease (0.5 AI-weeks)",
+              "aiWeeks": 0.5
+            }
+          ],
+          "days": 15,
+          "dependsOn": [
+            "AI-ENGINE-BASELINE",
+            "AI-ENGINE-EVAL"
+          ],
+          "needs": {
+            "operations": [],
+            "screens": [],
+            "tasks": []
+          },
+          "doneWhen": "a tenant's learned producer trains weekly on its own data, is backtested against the statistical producer and runs in shadow; when it passes its capability's gate (design 3.5) a promotionReady alert is raised and only an admin's promoteAiRelease puts it live (AI-D16); a two-tenant test shows no training reads another tenant's rows",
+          "why": "Learns from tenant data, which no tenant has before go-live. The rest of the review's shared layer is AI-ENGINE-BASELINE (Block A); see doubleCount."
+        },
+        {
+          "key": "AI-ENGINE-FORECASTING-STATISTICAL",
+          "subject": "Forecasting statistical engine on the tenant's own history",
+          "rank": 12,
+          "items": [
+            {
+              "text": "Statistical producer with holiday, Ramadan and weather regressors, pace pickup, reconciliation, accuracy, scenarios (6 AI-weeks, in plan)",
+              "aiWeeks": 6
+            }
+          ],
+          "days": 30,
+          "dependsOn": [
+            "AI-ENGINE-FORECAST-PRIOR"
+          ],
+          "needs": {
+            "operations": [],
+            "screens": [],
+            "tasks": []
+          },
+          "doneWhen": "the forecast moves from the prior to the tenant's own day-of-week pattern and pickup curve (k about 4 same weekdays) as data arrives, recorded as producer versions; accuracy is measured over 28 days and shown by horizon; holiday and Ramadan effects come from the prior until seen; scenarios and reconciliation work",
+          "why": "Fitted on the tenant's own history: phase 2."
+        },
+        {
+          "key": "AI-ENGINE-FORECASTING-LEARNED",
+          "subject": "Forecasting learned producer (per-tenant model) in shadow",
+          "rank": 13,
+          "items": [
+            {
+              "text": "Learned producer (per-tenant GBM) in shadow (3 AI-weeks, extra)",
+              "aiWeeks": 3
+            }
+          ],
+          "days": 15,
+          "dependsOn": [
+            "AI-ENGINE-FORECASTING-STATISTICAL",
+            "AI-ENGINE-TRAINING-PROMOTION"
+          ],
+          "needs": {
+            "operations": [],
+            "screens": [],
+            "tasks": []
+          },
+          "doneWhen": "a per-tenant gradient-boosted model trains weekly and runs in shadow for at least 6 weeks; it is raised to the admin only when WAPE is at least 10% better than the baseline at the 7-day horizon, bias within +/-3% and P10-P90 coverage 70-90% (design 3.5); never automatic",
+          "why": "A trained model: phase 2."
+        },
+        {
+          "key": "AI-ENGINE-FRAUD-RISK-CLASSIFIER",
+          "subject": "Fraud classifier in shadow and label capture",
+          "rank": 14,
+          "items": [
+            {
+              "text": "Classifier in shadow and label capture (3 AI-weeks, extra)",
+              "aiWeeks": 3
+            }
+          ],
+          "days": 15,
+          "dependsOn": [
+            "AI-ENGINE-FRAUD-RISK-RULES",
+            "AI-ENGINE-TRAINING-PROMOTION"
+          ],
+          "needs": {
+            "operations": [],
+            "screens": [],
+            "tasks": []
+          },
+          "doneWhen": "analyst-labelled outcomes are captured; a classifier trained on them runs in shadow and is raised to the admin only when, at the same review rate, recall is at least equal to rules, precision at least 20% better and no segment has a worse false-positive rate over at least 6 weeks of shadow (design 3.5); a tenant without enough labels stays on rules",
+          "why": "A classifier on labelled tenant fraud: phase 2."
+        },
+        {
+          "key": "AI-ENGINE-RECOMMENDATIONS-LTR",
+          "subject": "Recommendations learning-to-rank in shadow",
+          "rank": 15,
+          "items": [
+            {
+              "text": "Learning-to-rank in shadow (3 AI-weeks, extra)",
+              "aiWeeks": 3
+            }
+          ],
+          "days": 15,
+          "dependsOn": [
+            "AI-ENGINE-RECOMMENDATIONS-RULES",
+            "AI-ENGINE-TRAINING-PROMOTION"
+          ],
+          "needs": {
+            "operations": [],
+            "screens": [],
+            "tasks": []
+          },
+          "doneWhen": "a learning-to-rank model trained on the tenant's shown and accepted events runs in shadow and in a controlled experiment against rules with a minimum sample and guardrails on refunds, abandonment and checkout time (AIR-145..147); raised to the admin, never automatic",
+          "why": "Learns from tenant purchase history: phase 2."
+        }
+      ],
+      "order": -1,
+      "name": "AI engine · Phase 2: learning from tenant data (training and promotion, forecasting, fraud classifier, learning-to-rank)",
+      "backEndNote": "AI-BE-SHARED-BASELINE-THEN-LEARN-1..9 (the review's 1.5 back-end weeks for the historical import) stay where the plan had them: importVenueHistory, getVenueHistoryImport and listVenueHistoryImports are built in Block A (SVC-AI-FORECAST-2, SVC-AI-FORECAST-3), so they look like a double count, but dropping their 72 points changes the plan's average task size, which sets every developer's pace, and so every Block A date; left for Chinmay to decide (CHG-AIPH-001)"
+    },
+    {
+      "key": "AM-AI-ENGINE-ANOMALY-DETECTION",
+      "capability": "anomaly-detection",
+      "phase": 2,
+      "reviewBackEnd": false,
+      "units": [
+        {
+          "key": "AI-ENGINE-ANOMALY-DETECTION",
+          "subject": "Anomaly detection: detectors, correlation and the insight lifecycle",
+          "rank": 16,
+          "items": [
+            {
+              "text": "Detectors, correlation, insight lifecycle and default thresholds (2.5 AI-weeks, extra)",
+              "aiWeeks": 2.5
+            }
+          ],
+          "days": 12.5,
+          "dependsOn": [
+            "AI-ENGINE-FORECAST-PRIOR"
+          ],
+          "needs": {
+            "operations": [],
+            "screens": [],
+            "tasks": []
+          },
+          "doneWhen": "threshold and forecast-deviation detectors raise grouped insights from the first week, each naming its detector; the Median/MAD baseline per KPI and weekday takes over once 4 same-weekday values exist; a threshold change suggested from dismissals is proposed and approved, never silent",
+          "why": "Chinmay's phase 2 list: its value is the baseline learnt from the tenant's own weeks."
+        }
+      ]
+    },
+    {
+      "key": "AM-AI-ENGINE-DYNAMIC-PRICING-AI",
+      "capability": "dynamic-pricing-ai",
+      "phase": 2,
+      "reviewBackEnd": false,
+      "units": [
+        {
+          "key": "AI-ENGINE-DYNAMIC-PRICING-AI",
+          "subject": "Dynamic pricing suggestions: pace against the forecast",
+          "rank": 17,
+          "items": [
+            {
+              "text": "Pace-against-forecast suggestion kind and governance wiring (1 AI-week, extra)",
+              "aiWeeks": 1
+            }
+          ],
+          "days": 5,
+          "dependsOn": [
+            "AI-ENGINE-FORECASTING-STATISTICAL"
+          ],
+          "needs": {
+            "operations": [],
+            "screens": [],
+            "tasks": []
+          },
+          "doneWhen": "pace above the forecast P90 suggests a step up within the configured band and below P10 a promotion, each through governance and a person's approval (L2); AI never sets a price by itself",
+          "why": "Chinmay's phase 2 list: it rides on the statistical forecast and price elasticity cannot be learnt before prices have varied."
+        }
+      ]
+    }
+  ],
+  "replacesNote": "The old tasks were 'n of N' chunks of ten AI-engineer days with identical descriptions; each is mapped to the unit its days fall in, taking the review's build items in order.",
+  "replaces": {
+    "AI-ENGINE-SHARED-BASELINE-THEN-LEARN-1": "dropped: repeats AI-ENGINE-BASELINE (estimator interface, maturity block, venue AI profile)",
+    "AI-ENGINE-SHARED-BASELINE-THEN-LEARN-2": "dropped: repeats AI-ENGINE-BASELINE (benchmark prior packs and the UAE calendar)",
+    "AI-ENGINE-SHARED-BASELINE-THEN-LEARN-3": "AI-ENGINE-TRAINING-PROMOTION",
+    "AI-ENGINE-SHARED-BASELINE-THEN-LEARN-4": "AI-ENGINE-TRAINING-PROMOTION (the promotion rule; the 1.5 AI-week feature pipeline the review counts in plan is dropped)",
+    "AI-ENGINE-CONFIGURATION-ASSISTANT-1": "AI-ENGINE-CONFIGURATION-ASSISTANT",
+    "AI-ENGINE-CONFIGURATION-ASSISTANT-2": "AI-ENGINE-CONFIGURATION-ASSISTANT",
+    "AI-ENGINE-CONFIGURATION-ASSISTANT-3": "AI-ENGINE-CONFIGURATION-ASSISTANT",
+    "AI-ENGINE-FORECASTING-1": "AI-ENGINE-FORECAST-PRIOR, AI-ENGINE-FORECASTING-STATISTICAL",
+    "AI-ENGINE-FORECASTING-2": "AI-ENGINE-FORECASTING-STATISTICAL",
+    "AI-ENGINE-FORECASTING-3": "AI-ENGINE-FORECASTING-STATISTICAL",
+    "AI-ENGINE-FORECASTING-4": "AI-ENGINE-FORECASTING-STATISTICAL, AI-ENGINE-FORECASTING-LEARNED",
+    "AI-ENGINE-FORECASTING-5": "AI-ENGINE-FORECASTING-LEARNED",
+    "AI-ENGINE-FRAUD-RISK-1": "AI-ENGINE-FRAUD-RISK-RULES",
+    "AI-ENGINE-FRAUD-RISK-2": "AI-ENGINE-FRAUD-RISK-RULES",
+    "AI-ENGINE-FRAUD-RISK-3": "AI-ENGINE-FRAUD-RISK-CLASSIFIER",
+    "AI-ENGINE-FRAUD-RISK-4": "AI-ENGINE-FRAUD-RISK-CLASSIFIER",
+    "AI-ENGINE-OPERATIONAL-REQUIREMENTS-1": "AI-ENGINE-OPERATIONAL-REQUIREMENTS",
+    "AI-ENGINE-QUEUE-WAIT-TIME-1": "AI-ENGINE-QUEUE-WAIT-TIME",
+    "AI-ENGINE-RECOMMENDATIONS-1": "AI-ENGINE-RECOMMENDATIONS-RULES",
+    "AI-ENGINE-RECOMMENDATIONS-2": "AI-ENGINE-RECOMMENDATIONS-RULES",
+    "AI-ENGINE-RECOMMENDATIONS-3": "AI-ENGINE-RECOMMENDATIONS-LTR",
+    "AI-ENGINE-RECOMMENDATIONS-4": "AI-ENGINE-RECOMMENDATIONS-LTR",
+    "AI-ENGINE-ANOMALY-DETECTION-1": "AI-ENGINE-ANOMALY-DETECTION",
+    "AI-ENGINE-ANOMALY-DETECTION-2": "AI-ENGINE-ANOMALY-DETECTION",
+    "AI-ENGINE-SEAT-MAP-LAYOUT-1": "AI-ENGINE-SEAT-MAP-LAYOUT",
+    "AI-ENGINE-SEAT-MAP-LAYOUT-2": "AI-ENGINE-SEAT-MAP-LAYOUT (its labels and walkways part is Block A)",
+    "AI-ENGINE-ANALYTICS-ASSISTANT-1": "AI-ENGINE-ANALYTICS-ASSISTANT",
+    "AI-ENGINE-ANALYTICS-ASSISTANT-2": "AI-ENGINE-ANALYTICS-ASSISTANT",
+    "AI-ENGINE-APPROVAL-SCORING-1": "AI-ENGINE-APPROVAL-SCORING",
+    "AI-ENGINE-DYNAMIC-PRICING-AI-1": "AI-ENGINE-DYNAMIC-PRICING-AI",
+    "AI-ENGINE-MARKETING-AI-1": "AI-ENGINE-MARKETING-AI",
+    "AI-BE-SHARED-BASELINE-THEN-LEARN-1..9": "kept unchanged (possible double count with Block A's SVC-AI-FORECAST-2/3; dropping it would move Block A dates)"
+  }
+}
