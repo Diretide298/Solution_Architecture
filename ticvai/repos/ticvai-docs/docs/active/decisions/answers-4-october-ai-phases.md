@@ -17,3 +17,7 @@
 
 ## No Block A change (Chinmay, 4 Oct 2026, to the plan agent)
 - "do NOT change any Block A or A2 AI task (AI-ENGINE-GATEWAY, GUIDED, TRANSLATE, QDRANT, CONCIERGE, BASELINE, SCRUB-GUARD, EVAL, PLANNER, SUGGESTIONS) or any Block A dependency, dates or assignee. If the phase split seems to need a Block A change (e.g. a dependency you would move earlier into Block A, or the double count touching AI-ENGINE-BASELINE), do not make it: list it in your report under "Block A changes needed" with the reason, and choose phase 2 for the affected unit instead."
+
+## Block A AI items from the phase split (Chinmay, 4 Oct 2026, ~05:05, asked as selections)
+- **Walkway/label AI:** add a ~2.5-day Block A AI task for the AI side of proposeWalkways/proposeVenueLabels (venue maps ship in r1, CHG-RONEC-001) in Kalpita's 13-17 Nov gap; approval scoring moves into her phase 1 buffer. **Why:** no AI-engineer task built the AI side; only the back-end tasks SVC-AI-AI-1/3. No other Block A date may move.
+- **Duplicate historical import back end (AI-BE-SHARED-BASELINE-THEN-LEARN-1..9, 72 points):** drop now, because r1 is not in OpenProject yet. Measure the Block A date shift first: if any Block A task moves more than one working day, stop and report to Chinmay before committing.
