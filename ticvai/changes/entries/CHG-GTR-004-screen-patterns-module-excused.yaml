@@ -1,0 +1,30 @@
+id: CHG-GTR-004
+date: '2026-10-03'
+source: audit
+kind: process
+summary: refresh.sh names tools/screen_patterns.py in _EXCLUDED (imported, no main), so its closing tools/ coverage block
+  passes again.
+decision:
+  what: 'tools/screen_patterns.py, added by the screens branch (CHG-SPF-001..006), holds the six screen-pattern rules that
+    check-screen-patterns, derive-entrystate-params and generate-screens-from-contracts import. It has no main, so
+    refresh.sh does not run it; it is excused in _EXCLUDED with that reason. The applied scripts
+    (tools/applied/spec-screen-patterns-3-october.py, tools/applied/guest-scoping-3-october.py) live under
+    tools/applied/, which the coverage block does not scan, and stay one-off.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'The release refresh for r1 on 233c6251 ended with "tools/ has files this script neither runs nor excuses:
+  screen_patterns" (refresh-safe judged it a new failure). The module name is written with an underscore and the checker
+  with hyphens, so the grep refresh.sh uses never found it (finding, CHG-SPF-001).'
+keys_touched:
+  files: [tools/refresh.sh]
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/refresh.sh
+status: open

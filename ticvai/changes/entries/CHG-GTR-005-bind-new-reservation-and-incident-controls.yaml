@@ -1,0 +1,30 @@
+id: CHG-GTR-005
+date: '2026-10-03'
+source: audit
+kind: spec
+summary: The three controls the screens branch added without a schema field are bound, so the binding counts fall back
+  to the 2 October baseline.
+decision:
+  what: 'EMP-026 Photos binds UploadIncidentMediaRequest.filename (the picked file fills filename, contentType and
+    sizeBytes); EMP-026 Find the guest involved sends ?search= to searchGuests; GST-070 Restaurant binds
+    TableReservation.outletId (the choice scopes Reserve and Join the waitlist). Nothing else on the screens changes.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'check-binding-ratchet failed the r1 release refresh on 233c6251: guest|A|unbound-control 76 -> 77 and
+  venue-staff-mobile|A|unbound-control 20 -> 22. Comparing the findings at 267b6cf2 (the baseline) with HEAD, the rises
+  are these three controls, authored label-only by CHG-SPF-013 for the operations of CHG-RUL-013; EMP-062 Search store
+  stock had left meanwhile. Not an artefact of regeneration: the baseline stays as recorded.'
+keys_touched:
+  screens: [EMP-026, GST-070]
+  files: [screens/P06-staff-app.yaml, screens/P02-guest-mobile-app.yaml]
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-binding-ratchet.py
+status: open

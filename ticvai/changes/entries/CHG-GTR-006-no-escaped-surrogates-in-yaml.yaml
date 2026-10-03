@@ -1,0 +1,28 @@
+id: CHG-GTR-006
+date: '2026-10-03'
+source: audit
+kind: contract
+summary: subscription.yaml writes the red-circle character itself instead of an escaped surrogate pair that libyaml
+  rejects; check-package now fails on any such escape.
+decision:
+  what: 'contracts/satellite/subscription.yaml line 16449 (a description of the snapshot rule) held the escape
+    (backslash-u D83D, backslash-u DD34) inside a double-quoted string; it now holds the character U+1F534 itself, so the text is unchanged.
+    check-package (18b) fails on an escaped UTF-16 surrogate in any contract, screen, flow, state or event file.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'PyYAML''s pure-Python loader accepts the escape, libyaml (CSafeLoader) rejects the whole file, so tools that load
+  contracts with CSafeLoader could not read subscription.yaml while every checker on the pure loader passed (finding
+  of the r1 release refresh on 233c6251).'
+keys_touched:
+  files: [contracts/satellite/subscription.yaml, tools/check-package.py]
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-package.py
+status: open

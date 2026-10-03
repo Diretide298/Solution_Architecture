@@ -1,0 +1,31 @@
+id: CHG-GTR-003
+date: '2026-10-03'
+source: audit
+kind: process
+summary: link-screens-contracts.py strips an x-ticvai-consumed-by written in flow form ([]) before it writes the block,
+  so a newly authored operation no longer ends up with two consumed-by keys.
+decision:
+  what: 'tools/link-screens-contracts.py removes `x-ticvai-consumed-by: [...]` (one line, flow form) as well as the block
+    form before writing the derived block after the operationId. The nine operations the business-rules branch
+    authored with `x-ticvai-consumed-by: []` are left as authored; the refresh replaces the key.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'The release refresh for r1 on 233c6251 (run 20261003-070802) failed check-package with four duplicate keys
+  (fnb.yaml listBookableOutlets and listMyTableReservations, maintenance.yaml uploadIncidentMedia and addIncidentPerson,
+  operations added by CHG-RUL-013 and bound by CHG-SPF-013) and check-screen-wiring with 4 new S-CONSUMED-MIRROR
+  findings on the same operations: YAML kept the authored empty list, so the contracts said no screen calls an
+  operation the screens call. The strip pattern only matched the block form (finding).'
+keys_touched:
+  files: [tools/link-screens-contracts.py]
+  operations: [listBookableOutlets, listMyTableReservations, uploadIncidentMedia, addIncidentPerson]
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-package.py
+status: open

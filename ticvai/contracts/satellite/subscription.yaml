@@ -16446,7 +16446,7 @@ components:
           type: string
           format: date-time
           nullable: true
-          description: "**A snapshot, not a replica.** \uD83D\uDD34 If the permanent platform changes\
+          description: "**A snapshot, not a replica.** 🔴 If the permanent platform changes\
             \ a price after this moment, reconciliation has to decide which one the guest paid. **That\
             \ policy is `priceDivergencePolicy` and it has no default** — somebody chooses per sale."
         priceDivergencePolicy:

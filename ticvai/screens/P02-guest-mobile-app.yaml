@@ -12736,6 +12736,7 @@ screens:
         provenance: decided by Chinmay, 3 October 2026 (CHG-SPF-013)
       - kind: selectField
         label: Restaurant
+        bindsTo: TableReservation.outletId
         operation: listBookableOutlets
         notes: Only the restaurants that take bookings, as published; the choice scopes Reserve and Join
           the waitlist.

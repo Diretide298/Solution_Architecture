@@ -7806,6 +7806,7 @@ screens:
         provenance: contract maintenance.yaml GET /incidents
       - kind: fileUpload
         label: Photos
+        bindsTo: UploadIncidentMediaRequest.filename
         operation: uploadIncidentMedia
         notes: From the camera or the gallery, several at once; each uploads as it is added and can be
           removed before the report is sent.
@@ -7838,8 +7839,9 @@ screens:
       - kind: searchField
         label: Find the guest involved
         operation: searchGuests
-        notes: 'Optional, inside Add a person involved: a guest found here fills name and contact from
-          the guest''s record, so the person is linked rather than typed again.'
+        notes: 'Sends `?search=` to `searchGuests`. Optional, inside Add a person involved: a guest found
+          here fills name and contact from the guest''s record, so the person is linked rather than typed
+          again.'
         provenance: decided by Chinmay, 3 October 2026 (CHG-SPF-013)
     - name: actionBar
       slot: rowActions
