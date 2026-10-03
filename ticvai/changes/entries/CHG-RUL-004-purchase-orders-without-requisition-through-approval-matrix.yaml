@@ -46,7 +46,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-business-rules.py
-status: open
+status: closed
+closed_by_commit: 112ef275
 notes: 'BO-078 still binds rejectRequisition and returnRequisition (screens are another agent''s); it rebinds to approveRequisition.
   sendPurchaseOrder is touched only for the approval gate the rule needs. Prevention: tools/check-business-rules.py rule
   BR-PO, which fails on the parent commit 4e2c56c1 and passes here. Batch RUL (spec-rules), 3 October 2026.'

@@ -34,7 +34,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-business-rules.py
-status: open
+status: closed
+closed_by_commit: 112ef275
 notes: 'BO-056 and BO-889 still offer recordAttendance as a supervisor''s act (screens agent): BO-056 becomes Amend attendance.
   Prevention: tools/check-business-rules.py rule BR-ATTENDANCE, which fails on the parent commit 4e2c56c1 and passes here.
   Batch RUL (spec-rules), 3 October 2026.'

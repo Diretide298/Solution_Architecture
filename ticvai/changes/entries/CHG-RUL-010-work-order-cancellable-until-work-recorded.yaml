@@ -33,7 +33,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-business-rules.py
-status: open
+status: closed
+closed_by_commit: 112ef275
 notes: 'states/work-order.yaml is the state model of this contract enum; edited with the rule (outside contracts/, flagged
   in the report). Prevention: tools/check-business-rules.py rule BR-WO-CANCEL, which fails on the parent commit 4e2c56c1
   and passes here. Batch RUL (spec-rules), 3 October 2026.'

@@ -32,7 +32,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-business-rules.py
-status: open
+status: closed
+closed_by_commit: 112ef275
 notes: 'BR-PAIR-REFUSAL is general: an update taking a create''s body declares the create''s refusals. Five older pairs
   no rule named are exempt in the check, each with its reason (createTableReservation, createTableReservationForGuest, createReport,
   createRotaAssignment, createTicketTemplate). ANL-023 binds createDashboard for the first Save (screens agent). Prevention:

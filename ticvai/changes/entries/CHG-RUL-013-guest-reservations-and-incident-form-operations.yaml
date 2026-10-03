@@ -54,7 +54,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-business-rules.py
-status: open
+status: closed
+closed_by_commit: 112ef275
 notes: 'New-operation gates: permission vocabulary (null with self-scope or public; INCIDENT_REPORT exists), no config noun,
   paging on both lists (BR-NEW-OPS checks it; C-PAGED-ORDER passes). The screens bind them (GST-070, EMP-026: screens agent).
   maintenance.incident_media is a new table: the refresh derives it. Prevention: tools/check-business-rules.py rule BR-NEW-OPS,

@@ -39,8 +39,9 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-business-rules.py
-status: open
+status: closed
 reverses: CHG-DOOR-003
+closed_by_commit: 112ef275
 notes: 'check-doors already allows the two operations on a device door (DEVICE_TAKEOVER, R184); it passes. A PIN in a header
   is never logged, stored or echoed (stated on the parameter). SU-CARRIER (check-step-up) also holds both carriers. Prevention:
   tools/check-business-rules.py rule BR-SESSIONS-DOOR, which fails on the parent commit 4e2c56c1 and passes here. Batch

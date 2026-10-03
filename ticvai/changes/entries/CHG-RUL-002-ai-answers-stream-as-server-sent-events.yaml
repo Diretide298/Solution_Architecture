@@ -42,7 +42,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-business-rules.py
-status: open
+status: closed
+closed_by_commit: 112ef275
 notes: 'sendAiMessage is a Pattern 4 operation (guest-contracts agent, group 4 self-scoped); only its response content and
   the streaming extensions are touched here, not its audience, security or permission. BR-STREAM also fails any operation
   answering text/event-stream without declaring x-ticvai-streaming. Prevention: tools/check-business-rules.py rule BR-STREAM,

@@ -40,7 +40,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-business-rules.py
-status: open
+status: closed
+closed_by_commit: 112ef275
 notes: 'states/incident.yaml is outside contracts/ and edited with the rule (flagged in the report). The old note ''No reopen''
   is replaced by the decision. Prevention: tools/check-business-rules.py rule BR-INCIDENT, which fails on the parent commit
   4e2c56c1 and passes here. Batch RUL (spec-rules), 3 October 2026.'

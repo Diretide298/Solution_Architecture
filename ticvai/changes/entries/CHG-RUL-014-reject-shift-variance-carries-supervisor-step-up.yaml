@@ -37,7 +37,8 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-step-up.py
-status: open
+status: closed
+closed_by_commit: 112ef275
 notes: 'supervisorStepUp is optional in the schema so a client built at r1 still validates, and refused without it (a newly
   required request field is breaking against r1). 23 step-up operations had no carrier on 3 October and are exempt in the
   check with their reason: 20 MFA step-ups (how the token reaches the call is not contracted) and closeShift, acceptShiftVariance,
