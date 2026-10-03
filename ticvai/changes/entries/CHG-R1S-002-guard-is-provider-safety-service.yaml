@@ -39,6 +39,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-ai-residency.py
-status: open
+status: closed
+closed_by_commit: 7abd44b3
 notes: 'Additive: descriptions and enum descriptions only, no field removed (the lead''s instruction). check-ai-residency
   R-NOHOST fails on the parent commit (it names Qwen3Guard as ours).'

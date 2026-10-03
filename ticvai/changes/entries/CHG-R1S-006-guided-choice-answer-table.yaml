@@ -29,4 +29,5 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/derive-schema.py::chain_before
-status: open
+status: closed
+closed_by_commit: 7abd44b3

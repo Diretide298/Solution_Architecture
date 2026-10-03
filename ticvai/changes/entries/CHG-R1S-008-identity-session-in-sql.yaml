@@ -36,4 +36,5 @@ triage: blocker
 prevention:
   type: generator-rule
   ref: tools/derive-schema.py::_now_pg
-status: open
+status: closed
+closed_by_commit: 7abd44b3

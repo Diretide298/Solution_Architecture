@@ -29,4 +29,5 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-contract-storage.py
-status: open
+status: closed
+closed_by_commit: 7abd44b3

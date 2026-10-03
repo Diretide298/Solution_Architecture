@@ -49,5 +49,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-write-lineage.py
-status: open
+status: closed
+closed_by_commit: 7abd44b3
 notes: check-write-lineage fails on the parent commit (10 W-OUTBOX, 163 W-NOTABLE, W-EMITS, W-OWNER kernel).
