@@ -108,6 +108,16 @@ DECIDED = [
     ("CHG-SPF-010", "BO-078", "without", "returnRequisition"),
     ("CHG-SPF-011", "ANL-023", "with", "createDashboard"),
     ("CHG-SPF-012", "POS-000", "not-on-load", "listActiveSessions"),
+    ("CHG-SPF-013", "GST-031", "without", "sendConversationMessage"),
+    ("CHG-SPF-013", "GST-032", "without", "sendConversationMessage"),
+    ("CHG-SPF-013", "WEB-044", "without", "sendConversationMessage"),
+    ("CHG-SPF-013", "GST-031", "with", "sendGuestConversationMessage"),
+    ("CHG-SPF-013", "GST-032", "with", "sendGuestConversationMessage"),
+    ("CHG-SPF-013", "WEB-044", "with", "sendGuestConversationMessage"),
+    ("CHG-SPF-013", "GST-070", "with", "listMyTableReservations"),
+    ("CHG-SPF-013", "GST-070", "with", "listBookableOutlets"),
+    ("CHG-SPF-013", "EMP-026", "with", "uploadIncidentMedia"),
+    ("CHG-SPF-013", "EMP-026", "with", "addIncidentPerson"),
 ]
 BUTTONS = {"primaryButton", "secondaryButton", "destructiveButton", "iconButton"}
 

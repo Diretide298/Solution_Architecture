@@ -6287,7 +6287,11 @@ screens:
         notes: '**The conversation is the content.** The question shows at once and the answer streams
           with its sources; on 503 (every provider failed) "Sahli can''t answer right now" with Hand over
           to a person and Try again. The conversation is opened silently (`createAiConversation`) on the
-          first message, its scope taken from the session; the guest never picks a module.'
+          first message, its scope taken from the session; the guest never picks a module.
+
+
+          **Answers stream** (decided by Chinmay, 3 October 2026 (CHG-SPF-013)): server-sent events carry
+          the tokens, then the sources and any proposed action; the full message is stored once it ends.'
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
       - kind: textField
         label: Your question
@@ -6298,7 +6302,7 @@ screens:
         bindsTo: AiMessage.content
       - kind: textField
         label: Message to the agent
-        operation: sendConversationMessage
+        operation: sendGuestConversationMessage
         notes: Replaces the ask box once a person has taken the conversation; the transcript stays above.
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
         bindsTo: ConversationMessage.body
@@ -6321,8 +6325,8 @@ screens:
         operation: handoverToAgent
         notes: One tap, always visible in the panel header. Sends reason `guestRequested` with Sahli's
           own summary; the platform sets `assistantFailed`, `outOfScope` or `negativeSentiment` itself.
-          The panel becomes the agent chat (`sendConversationMessage`) with queue position and wait; 409
-          offers to raise a case.
+          The panel becomes the agent chat (`sendGuestConversationMessage`) with queue position and wait;
+          409 offers to raise a case.
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
       - kind: secondaryButton
         label: Helpful / Not helpful
@@ -6379,9 +6383,10 @@ screens:
     contract: ai
     purpose: Say whether an answer helped
     trigger: onAction
-  - operationId: sendConversationMessage
+  - operationId: sendGuestConversationMessage
     contract: marketing-crm
-    purpose: After a handover, the guest talks to the agent
+    purpose: 'After a handover, the guest writes to the agent, as the guest: sendConversationMessage needs
+      CASE_MANAGE (decided by Chinmay, 3 October 2026 (CHG-SPF-013))'
     trigger: onAction
   entryState:
     params:
@@ -6516,9 +6521,12 @@ screens:
         label: Send AI message
         operation: sendAiMessage
         provenance: contract ai.yaml POST /conversations/{conversationId}/messages
+        notes: '**Answers stream** (decided by Chinmay, 3 October 2026 (CHG-SPF-013)): server-sent events
+          carry the tokens, then the sources and any proposed action; the full message is stored once
+          it ends.'
       - kind: secondaryButton
-        label: Send conversation message
-        operation: sendConversationMessage
+        label: Send to the agent
+        operation: sendGuestConversationMessage
         provenance: contract marketing-crm.yaml POST /conversations/{conversationId}/messages
       - kind: secondaryButton
         label: Handover to agent
@@ -6566,9 +6574,10 @@ screens:
     contract: ai
     purpose: Ask
     trigger: onAction
-  - operationId: sendConversationMessage
+  - operationId: sendGuestConversationMessage
     contract: marketing-crm
-    purpose: Say something, as a guest or an agent
+    purpose: 'After a handover, the guest writes to the agent, as the guest: sendConversationMessage needs
+      CASE_MANAGE (decided by Chinmay, 3 October 2026 (CHG-SPF-013))'
     trigger: onAction
   - operationId: handoverToAgent
     contract: marketing-crm
@@ -6663,14 +6672,14 @@ screens:
       - content
       - collectionIds
     provenance: client-verified
-  - id: formSendConversationMessage
+  - id: formSendGuestConversationMessage
     component: modal
-    trigger: Send conversation message
-    body: '**Collects what `sendConversationMessage` sends before it is called.** Required: `body`. Optional:
-      `attachments`. Dismissing sends nothing; the screen behind is unchanged.'
+    trigger: Send to the agent
+    body: '**Collects what `sendGuestConversationMessage` sends before it is called.** Required: `body`.
+      Optional: `attachments`. Dismissing sends nothing; the screen behind is unchanged.'
     confirm:
-      label: Send conversation message
-      operation: sendConversationMessage
+      label: Send to the agent
+      operation: sendGuestConversationMessage
     dismiss:
       label: Cancel
       discards:
@@ -12717,6 +12726,20 @@ screens:
         notes: Leaves the guest's own entry (POST /waitlist/{entryId}/leave); the entry returns `cancelled`
           and the table goes to the next party (decided 28 September, audit R073 (d)).
         provenance: contract fnb.yaml POST /waitlist/{entryId}/leave
+    - name: contentBody
+      components:
+      - kind: cardList
+        label: Your reservations and waitlist places
+        operation: listMyTableReservations
+        notes: 'The guest''s own, upcoming first; each opens Change or cancel, or Leave the waitlist.
+          Empty: *No reservations yet* with Reserve.'
+        provenance: decided by Chinmay, 3 October 2026 (CHG-SPF-013)
+      - kind: selectField
+        label: Restaurant
+        operation: listBookableOutlets
+        notes: Only the restaurants that take bookings, as published; the choice scopes Reserve and Join
+          the waitlist.
+        provenance: decided by Chinmay, 3 October 2026 (CHG-SPF-013)
   states:
     loading: Content loads.
     error: Could not load. **Says what failed and offers one way onward**, never a bare failure.
@@ -12751,6 +12774,16 @@ screens:
     contract: orders
     purpose: Add the table deposit to the cart when the venue requires one
     trigger: onAction
+  - operationId: listMyTableReservations
+    contract: fnb
+    purpose: The guest's own table reservations and waitlist places (self-scoped)
+    trigger: onLoad
+    provenance: decided by Chinmay, 3 October 2026 (CHG-SPF-013)
+  - operationId: listBookableOutlets
+    contract: fnb
+    purpose: The restaurants that take bookings, published data
+    trigger: onLoad
+    provenance: decided by Chinmay, 3 October 2026 (CHG-SPF-013)
   entryState:
     params:
     - name: entryId

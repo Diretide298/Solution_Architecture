@@ -9424,7 +9424,11 @@ screens:
         notes: '**The conversation is the content.** The question shows at once and the answer streams
           with its sources; on 503 (every provider failed) "Sahli can''t answer right now" with Hand over
           to a person and Try again. The conversation is opened silently (`createAiConversation`) on the
-          first message, its scope taken from the session; the guest never picks a module.'
+          first message, its scope taken from the session; the guest never picks a module.
+
+
+          **Answers stream** (decided by Chinmay, 3 October 2026 (CHG-SPF-013)): server-sent events carry
+          the tokens, then the sources and any proposed action; the full message is stored once it ends.'
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
       - kind: textField
         label: Your question
@@ -9435,7 +9439,7 @@ screens:
         bindsTo: AiMessage.content
       - kind: textField
         label: Message to the agent
-        operation: sendConversationMessage
+        operation: sendGuestConversationMessage
         notes: Replaces the ask box once a person has taken the conversation; the transcript stays above.
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
         bindsTo: ConversationMessage.body
@@ -9458,8 +9462,8 @@ screens:
         operation: handoverToAgent
         notes: One tap, always visible in the panel header. Sends reason `guestRequested` with Sahli's
           own summary; the platform sets `assistantFailed`, `outOfScope` or `negativeSentiment` itself.
-          The panel becomes the agent chat (`sendConversationMessage`) with queue position and wait; 409
-          offers to raise a case.
+          The panel becomes the agent chat (`sendGuestConversationMessage`) with queue position and wait;
+          409 offers to raise a case.
         provenance: corrected 2 October 2026 (CHG-SGU-016, design-notes correction)
       - kind: secondaryButton
         label: Helpful / Not helpful
@@ -9514,9 +9518,10 @@ screens:
     purpose: Earlier conversations Only when signed in (decided 2 October 2026 by Chinmay, fix before
       Block A starts (GFIX-6)).
     trigger: onLoad
-  - operationId: sendConversationMessage
+  - operationId: sendGuestConversationMessage
     contract: marketing-crm
-    purpose: Ask the concierge something
+    purpose: 'After a handover, the guest writes to the agent, as the guest: sendConversationMessage needs
+      CASE_MANAGE (decided by Chinmay, 3 October 2026 (CHG-SPF-013))'
     trigger: onAction
   - operationId: recordAnswerFeedback
     contract: ai

@@ -7804,6 +7804,12 @@ screens:
         - Incident.locationDescription
         operation: listIncidents
         provenance: contract maintenance.yaml GET /incidents
+      - kind: fileUpload
+        label: Photos
+        operation: uploadIncidentMedia
+        notes: From the camera or the gallery, several at once; each uploads as it is added and can be
+          removed before the report is sent.
+        provenance: decided by Chinmay, 3 October 2026 (CHG-SPF-013)
     - name: contextPanel
       slot: selection
       components:
@@ -7836,6 +7842,10 @@ screens:
         label: Report incident
         operation: reportIncident
         provenance: contract maintenance.yaml POST /incidents
+      - kind: secondaryButton
+        label: Add a person involved
+        operation: addIncidentPerson
+        provenance: decided by Chinmay, 3 October 2026 (CHG-SPF-013)
   states:
     loading: The incident report list.
     error: Could not load. Names which read failed and leaves the incident report untouched.
@@ -7860,6 +7870,21 @@ screens:
     contract: maintenance
     purpose: List incidents
     trigger: onLoad
+  - operationId: uploadIncidentMedia
+    contract: maintenance
+    purpose: Photos of the incident
+    trigger: onAction
+    provenance: decided by Chinmay, 3 October 2026 (CHG-SPF-013)
+  - operationId: addIncidentPerson
+    contract: maintenance
+    purpose: A person involved, stored as a PII subject
+    trigger: onAction
+    provenance: decided by Chinmay, 3 October 2026 (CHG-SPF-013)
+  - operationId: searchGuests
+    contract: marketing-crm
+    purpose: The optional guest lookup for a person involved
+    trigger: onAction
+    provenance: decided by Chinmay, 3 October 2026 (CHG-SPF-013)
   entryState:
     params:
     - name: incidentId
@@ -7913,6 +7938,24 @@ screens:
       - emergencyServicesCalled
       - attachmentRefs
     provenance: contract maintenance.yaml POST /incidents
+  - id: formAddIncidentPerson
+    component: modal
+    trigger: Add a person involved
+    body: '**A person involved in the incident** (decided by Chinmay, 3 October 2026 (CHG-SPF-013)): name,
+      role (guest, staff, contractor, other) and contact, with an optional guest lookup (`searchGuests`)
+      that fills them from the guest''s record. Stored as a PII subject; the consent rules apply, so contact
+      details are asked only with the purpose shown. Dismissing sends nothing; the screen behind is unchanged.'
+    confirm:
+      label: Add person
+      operation: addIncidentPerson
+    dismiss:
+      label: Cancel
+      discards:
+      - name
+      - role
+      - contact
+      - subjectId
+    provenance: decided by Chinmay, 3 October 2026 (CHG-SPF-013)
   gaps:
   - operation: recordAuthorityNotification
     removed: true
