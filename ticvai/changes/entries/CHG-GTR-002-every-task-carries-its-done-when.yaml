@@ -1,0 +1,37 @@
+id: CHG-GTR-002
+date: '2026-10-03'
+source: audit
+kind: process
+summary: Every ticket a developer works from carries a checkable done-when in its plan description, written by the same
+  function the OpenProject pointer uses, so tasks.csv and the pointers agree.
+decision:
+  what: 'builds_of(), DONE_WHEN and done_when() move from tools/op-release.py into tools/ticket_done.py, which
+    build-service-docs.py and op-release.py both import. build-service-docs.py appends done_when() to every Task
+    description in tasks.csv and plan-tasks.csv that has no "Done when" of its own, after every other edit, and op-release.py
+    reads it back from the description, so the pointer says the same words (checked on the refreshed tree: 2,043 tasks,
+    0 disagree). A Block C or D app-module, the ticket a developer works from until its tasks are ticketed, ends with
+    "Done when every screen, its back end and its tests are done and its module test passes end to end ..." instead of
+    "Complete when ...". done_when() is chosen by what the ticket builds, not by its track: a "-REST" screen task and a
+    four-digit screen id (BO-1062) now name their screen, a Venue Management screen on the backend track ([BE] ADM-247)
+    gets the screen wording, and block-test and AI tasks get their own. One task in the plan keeps the generic sentence.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'The r1 release refresh on 233c6251 (run 20261003-070802) failed check-ticket-text with 135 new T-DONE-WHEN findings:
+  106 Block C/D app-modules ticketed at feature level whose text said "Complete when", and 29 tasks (24 APP-SETUP-*-REST,
+  4 TEST-BLOCK-*, AI-ENGINE-OPERATIONAL-SUGGESTIONS-1) with no done-when anywhere. CHG-REL-003 had put a done-when into
+  the pointers only; the plan row ADAM indexes and op-descriptions.py renders still had none (audit R041, R053, R059).'
+keys_touched:
+  files: [tools/ticket_done.py, tools/op-release.py, tools/build-service-docs.py, tools/refresh.sh]
+root_class: A09 TICKET-ACCEPTANCE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ticket-text.py
+status: open
+notes: op-release.py still refuses a bundle in which a task pointer has no done-when (CHG-REL-003); this makes the plan
+  row carry it too.

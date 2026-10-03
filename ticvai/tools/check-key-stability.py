@@ -163,6 +163,20 @@ def self_test(rows, mp, closed=frozenset(), retired=frozenset()):
     the reconciliation gives. Returns [(case, ok, detail)]."""
     work = plan_work(rows)
     fixed = {r["key"] for r in rows} - set(work)
+    if not gen.pushed_items(mp):
+        # **A fresh start pushes nothing yet** (Chinmay, 3 October, CHG-GTR-001): r1 goes into a new OpenProject
+        # project and pms-map.json starts empty (project 153's map is in service-docs/archive/). The cases
+        # below edit a map of pushed tickets, so they run on today's plan as if all of it had been pushed: every
+        # task with an id, and an ops or tables task's work as its KEY#item sub-tasks, as push-openproject.py
+        # records them. Case 2 used to read the real map and died on a KeyError with an empty one.
+        mp, n = {}, 0
+        for r in rows:
+            n += 1
+            mp[r["key"]] = n
+            if r["key"] in work and gen.key_identity(r["key"])[0] != "screen":
+                for item in sorted(work[r["key"]]):
+                    n += 1
+                    mp[f"{r['key']}#{item}"] = n
 
     def without(m, *keys):
         return {k: v for k, v in m.items() if k.partition("#")[0] not in keys}

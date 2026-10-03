@@ -60,7 +60,8 @@ def main() -> int:
     screens = {s["id"]: s for _, s in g.screens()}
 
     for oid, text in sorted(desc.items(), key=lambda kv: key_of.get(kv[0], kv[0])):
-        key = key_of.get(oid, "op-" + oid)
+        # an id through the map; a plan key as it is (a ticket not pushed yet: op-descriptions.py, CHG-GTR-001)
+        key = key_of.get(oid) or ("op-" + oid if oid.isdigit() else oid)
         if "#" in key:
             # A sub-task (`KEY#build`, `KEY#<operationId>`) repeats its parent's text; the parent is
             # checked once.

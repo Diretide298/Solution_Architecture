@@ -206,7 +206,7 @@ def main() -> int:
         pms = g.load_json(g.ROOT / "handoff" / "service-docs" / "pms-map.json", {}) or {}
         desc = g.load_json(g.ROOT / "handoff" / "service-docs" / "op-descriptions.json", {}) or {}
         for task, ts in sorted(listed.items()):
-            body = desc.get(str(pms.get(task, "")), "")
+            body = desc.get(str(pms.get(task, task)), "")   # a ticket not pushed yet is keyed by its plan key
             if not body or "## Tables" not in body:
                 continue
             seg = body.split("## Tables", 1)[1].split("\n## ", 1)[0]
@@ -220,7 +220,7 @@ def main() -> int:
         # R051: a migration follows only migrations ordered before it.
         order = {task: int(n) for n, task in re.findall(r"^\| (\d+) \| `[^`]+` \| (MIG-[A-Z-]+) \|", text, re.M)}
         for task, n in sorted(order.items()):
-            body = desc.get(str(pms.get(task, "")), "")
+            body = desc.get(str(pms.get(task, task)), "")   # a ticket not pushed yet is keyed by its plan key
             follows = re.search(r"^- Follows: (.*)$", body, re.M)
             for dep in re.findall(r"MIG-[A-Z-]+", follows.group(1) if follows else ""):
                 if dep in order and order[dep] >= n:

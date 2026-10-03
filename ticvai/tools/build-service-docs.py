@@ -55,6 +55,7 @@ from openpyxl.styles import Alignment, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import ticket_done  # noqa: E402  (what finishes a ticket: shared with op-release.py, CHG-GTR-002)
 import sprint_plan as sp  # noqa: E402  (the calendar, app-modules and scheduler the plan generators share)
 
 try:
@@ -1903,8 +1904,16 @@ def main() -> int:
             home.setdefault((a["module"], "P08"), k)
         home.setdefault((a["module"], "*"), k)
     am_ops = defaultdict(list)
+    # **A provisional operation is not put on a build ticket** (audit R061; CHG-GTR-007, 3 October). The later blocks
+    # planned every operation no earlier task builds, provisional or not, so the r1 refresh put
+    # listBiometricConsentGuardian (x-ticvai-provisional) on SVC-ACCESS-DRAFTED-2 and check-ticket-text failed
+    # (T-PROVISIONAL). The Venue Management slice already took agreed operations only (agreed() above). Such an
+    # operation is planned by the first refresh after it is agreed (the flag removed).
+    held = sorted(o for o in ops if o not in planned_ops and ops[o]["provisional"])
+    print(f"provisional operations held out of the later blocks until agreed: {len(held)}"
+          + (f" ({', '.join(held[:6])}{' ...' if len(held) > 6 else ''})" if held else ""))
     for o in sorted(ops):
-        if o in planned_ops:
+        if o in planned_ops or ops[o]["provisional"]:
             continue
         if callers.get(o):
             k = min(callers[o], key=lambda x: am_info[x]["order"])
@@ -2853,12 +2862,17 @@ def main() -> int:
         ticketed = a["block"] in settings["ticketBlocks"]
         t_["description"] = (
             f"{a['name']}: {a['module']} on {sp.PLATFORM_NAME.get(a['platform'], 'the platform')}. Block {a['block']}, "
-            f"{when}. Complete when every screen, its back end and its tests are done and it passes end to end. "
+            f"{when}. "
             f"Scope: {len(scr)} screens, {len(opl)} operations, {len(tbl)} tables, {pts} points"
             + (f", {sum(float(x.get('days') or 0) for x in ch):g} AI-engineer days" if any(x.get('days') for x in ch) else "")
             + "." + ("" if ticketed else f" Block {a['block']} is ticketed at this level until it is planned; its "
                      f"{len(ch)} tasks are in plan-tasks.csv with the keys they will have.")
-            + " Builds: " + ", ".join(builds) + ".")
+            + " Builds: " + ", ".join(builds) + "."
+            # Last, so the pointer's done-when (ticket_done.done_when reads "Done when" to the end) is this sentence
+            # alone: a Block C or D app-module is the ticket a developer works from until its tasks are ticketed, and
+            # "Complete when" was no done-when to check-ticket-text (T-DONE-WHEN; CHG-GTR-002).
+            + " Done when every screen, its back end and its tests are done and its module test passes end to end on "
+            "the integration environment with no open severity 1 or 2 defect (block-test-strategy).")
         if sp_:
             block_end[a["block"]] = max(block_end.get(a["block"], 0.0), sp_[2])
     for t_ in tasks:
@@ -2893,6 +2907,15 @@ def main() -> int:
             + (f" The AI engine capabilities in it ({len(ai_late)}) are accepted on their own module tests, by the two "
                "AI engineers' calendar (docs/active/ai-functions-review-30-september.json)." if ai_late else ""))
 
+    # **Every task says what finishes it** (CHG-GTR-002, 3 October). op-release.py wrote a done-when into each pointer
+    # (CHG-REL-003) while the plan row ADAM indexes, and op-descriptions.py turns into ticket text, had none: after the
+    # spec merges of 3 October check-ticket-text found 136 tasks with no Done-when (T-DONE-WHEN). The plan's own
+    # "Done when" stays; any other Task gets ticket_done.done_when(), the function op-release.py uses, so the plan
+    # row and the pointer say the same thing. Written last, after every edit to the descriptions above.
+    for t_ in tasks:
+        if t_["type"] == "Task" and not ticket_done.DONE_WHEN.search(t_["description"] or ""):
+            t_["description"] = ((t_["description"] or "").rstrip() + " " + ticket_done.done_when(
+                t_, "", ticket_done.builds_of(t_, "", lineage))).strip()
     COLS = ["sequence", "queue", "key", "parent", "type", "track", "subject", "phase", "wave", "step", "points",
             "assignee", "area", "platform", "service", "dependsOn", "description",
             # the build phase (0 plumbing, 1 foundation, 2 commerce, 3 operations, 4 engagement, 5 reporting)

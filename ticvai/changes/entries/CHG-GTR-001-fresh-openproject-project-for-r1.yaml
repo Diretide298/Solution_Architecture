@@ -1,0 +1,49 @@
+id: CHG-GTR-001
+date: '2026-10-03'
+source: plan
+kind: plan
+proposed: '2026-10-03'
+summary: r1 is pushed into a new OpenProject project; project 153's key map is archived and pms-map.json starts empty, so
+  no key counts as pushed.
+decision:
+  what: 'Fresh start. handoff/service-docs/pms-map.json (8,559 keys and ids of OpenProject project 153) is kept, unchanged,
+    as handoff/service-docs/archive/pms-map-old-project-153.json, readable for history, and pms-map.json is reset to {}.
+    The tools that read it are made safe with an empty map: check-key-stability runs its twelve self-tests on today''s
+    plan as if it had all been pushed (case 2 died on a KeyError with an empty map); op-descriptions.py writes every plan
+    ticket, keyed by OpenProject id once pushed and by plan key until then (op-descriptions.rb applies ids only,
+    op-review.py skips plan keys), so check-ticket-text, check-ddl-conventions and check-starter-fit still read every
+    ticket instead of passing on an empty file; op-release.py refuses an empty map against project 153 and takes the
+    new project''s id with --project.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'The release refresh for r1 on 233c6251 failed check-key-stability: 2 pushed keys renamed or unstable after the four
+  spec merges (screens, guest contracts, business rules, tables; CHG-SPF-013, CHG-GCF-005, CHG-RUL-013). Chinmay decided
+  on 3 October that r1 starts in a new project, so nothing in project 153 binds a key any more. An empty map also
+  changes the plan it feeds: build-service-docs.py tickets the ticketBlocks only (a key is no longer ticketed because it
+  was pushed), keeps no pinned owner from project 153 and numbers new keys freely.'
+keys_touched:
+  files:
+  - handoff/service-docs/pms-map.json
+  - handoff/service-docs/archive/pms-map-old-project-153.json
+  - tools/check-key-stability.py
+  - tools/op-descriptions.py
+  - tools/op-descriptions.rb
+  - tools/op-review.py
+  - tools/op-release.py
+  - tools/check-ticket-text.py
+  - tools/check-ddl-conventions.py
+  - tools/tests/test_op_release.py
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/op-release.py::ARCHIVED_PROJECT
+status: open
+notes: 'Before the r1 push: create the new project, then build the bundle with tools/op-release.py --release r1 --project
+  <new id>. push-openproject.py and the other per-release op-* tools still default to PROJECT = 153; they are superseded
+  by op-release.py/.rb but should not be run against the new project without changing it.'

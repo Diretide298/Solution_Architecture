@@ -1,0 +1,30 @@
+id: CHG-GTR-007
+date: '2026-10-03'
+source: audit
+kind: process
+summary: The sprint plan holds provisional operations out of the later blocks' build tickets until they are agreed.
+decision:
+  what: 'build-service-docs.py plans, for Blocks B-D, only the operations that are not x-ticvai-provisional, as the Venue
+    Management slice already did (agreed()); the ones held back are printed. Today four: listBiometricConsentGuardian,
+    listBiometricLifecycleRetention, setBiometricLifecycleRetention and listRefundDisputeResale. A held operation is
+    planned by the first refresh after its flag is removed.'
+  by: Chinmay
+  date: '2026-10-03'
+why: 'The r1 release refresh on 233c6251 failed check-ticket-text T-PROVISIONAL: SVC-ACCESS-DRAFTED-2 (Block B) built
+  listBiometricConsentGuardian, which is x-ticvai-provisional; a provisional operation on a build ticket is audit R061.
+  The later blocks took every operation no earlier task builds, provisional or not.'
+keys_touched:
+  files: [tools/build-service-docs.py]
+  operations: [listBiometricConsentGuardian, listBiometricLifecycleRetention, setBiometricLifecycleRetention,
+    listRefundDisputeResale]
+root_class: A09 TICKET-ACCEPTANCE
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ticket-text.py
+status: open
