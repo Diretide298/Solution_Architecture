@@ -13,7 +13,9 @@ decision:
     "Done when every screen, its back end and its tests are done and its module test passes end to end ..." instead of
     "Complete when ...". done_when() is chosen by what the ticket builds, not by its track: a "-REST" screen task and a
     four-digit screen id (BO-1062) now name their screen, a Venue Management screen on the backend track ([BE] ADM-247)
-    gets the screen wording, and block-test and AI tasks get their own. One task in the plan keeps the generic sentence.'
+    gets the screen wording, and block-test and AI tasks get their own. One task in the plan keeps the generic sentence. The done-when follows a full stop: a setup task''s
+    "In the slice: a, b" ended its text, and check-ticket-scope reads that list up to the first full stop (the first
+    refresh with this rule failed S-SETUP-COUNT on 113 setup tasks).'
   by: Chinmay
   date: '2026-10-03'
 why: 'The r1 release refresh on 233c6251 (run 20261003-070802) failed check-ticket-text with 135 new T-DONE-WHEN findings:

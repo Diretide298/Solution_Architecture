@@ -2909,13 +2909,17 @@ def main() -> int:
 
     # **Every task says what finishes it** (CHG-GTR-002, 3 October). op-release.py wrote a done-when into each pointer
     # (CHG-REL-003) while the plan row ADAM indexes, and op-descriptions.py turns into ticket text, had none: after the
-    # spec merges of 3 October check-ticket-text found 136 tasks with no Done-when (T-DONE-WHEN). The plan's own
+    # spec merges of 3 October check-ticket-text found 29 tasks with no Done-when (T-DONE-WHEN). The plan's own
     # "Done when" stays; any other Task gets ticket_done.done_when(), the function op-release.py uses, so the plan
-    # row and the pointer say the same thing. Written last, after every edit to the descriptions above.
+    # row and the pointer say the same thing. Written last, after every edit to the descriptions above, and after a
+    # full stop: a setup task's "In the slice: a, b" ended the text, and check-ticket-scope reads that list up to
+    # the first full stop (S-SETUP-COUNT read none of them in the first refresh with this rule).
     for t_ in tasks:
         if t_["type"] == "Task" and not ticket_done.DONE_WHEN.search(t_["description"] or ""):
-            t_["description"] = ((t_["description"] or "").rstrip() + " " + ticket_done.done_when(
-                t_, "", ticket_done.builds_of(t_, "", lineage))).strip()
+            d_ = (t_["description"] or "").rstrip()
+            if d_ and d_[-1] not in ".!?":
+                d_ += "."
+            t_["description"] = (d_ + " " + ticket_done.done_when(t_, "", ticket_done.builds_of(t_, "", lineage))).strip()
     COLS = ["sequence", "queue", "key", "parent", "type", "track", "subject", "phase", "wave", "step", "points",
             "assignee", "area", "platform", "service", "dependsOn", "description",
             # the build phase (0 plumbing, 1 foundation, 2 commerce, 3 operations, 4 engagement, 5 reporting)

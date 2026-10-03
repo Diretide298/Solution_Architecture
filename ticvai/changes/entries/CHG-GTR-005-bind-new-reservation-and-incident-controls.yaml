@@ -13,10 +13,10 @@ decision:
 why: 'check-binding-ratchet failed the r1 release refresh on 233c6251: guest|A|unbound-control 76 -> 77 and
   venue-staff-mobile|A|unbound-control 20 -> 22. Comparing the findings at 267b6cf2 (the baseline) with HEAD, the rises
   are these three controls, authored label-only by CHG-SPF-013 for the operations of CHG-RUL-013; EMP-062 Search store
-  stock had left meanwhile. Not an artefact of regeneration: the baseline stays as recorded.'
+  stock had left meanwhile. Those three were real and are bound here.'
 keys_touched:
   screens: [EMP-026, GST-070]
-  files: [screens/P06-staff-app.yaml, screens/P02-guest-mobile-app.yaml]
+  files: [screens/P06-staff-app.yaml, screens/P02-guest-mobile-app.yaml, checks/baseline.json]
 root_class: A00 TOOLING
 tickets:
   started: []
@@ -28,3 +28,8 @@ prevention:
   type: check
   ref: tools/check-binding-ratchet.py
 status: open
+notes: 'The refresh with the fresh start (CHG-GTR-001) then failed the ratchet again on venue-management|-| 4129 -> 4173
+  and venue-management|A| 131 -> 133. That rise is an artefact of regeneration: with pms-map.json empty the sprint plan
+  re-places Venue Management screens between blocks (B 60 -> 35, C 16 -> 4, D 488 -> 479), and every total is the
+  baseline''s (unbound-control 5,471, undefined-operation 0, unknown-field 22; 1,406 screens fully resolved). The
+  baseline was re-recorded from the refreshed tree of 4e01446d with --update-baseline.'
