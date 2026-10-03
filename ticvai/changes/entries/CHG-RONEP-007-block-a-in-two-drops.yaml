@@ -48,7 +48,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-plan-closure.py
-status: open
+status: closed
+closed_by_commit: 92bb83fa
 notes: 'Does not fit, for Chinmay: A1 alone still runs past 24 November. Its developers'' work after the window opens is
   about 125 h (15.6 person-days; the AI engineers 13.8 more), against 58 h in the plan of 3044d8b0 and the 43 h accepted:
   the homes the A1 screens are reached through, the flow operations and the payment configuration are A1 core and added to

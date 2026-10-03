@@ -27,7 +27,8 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-ticket-builds.py
-status: open
+status: closed
+closed_by_commit: 92bb83fa
 notes: B-HOSTED-MODEL fails on the plan derived before this change (AI-ENGINE-CONCIERGE, "embeddings and reranking
   self-hosted") and passes after it. ADR-0049 and docs/architecture/ai-system-design.md still name the CPU models; the docs
   batch owns them.
