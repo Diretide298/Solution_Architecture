@@ -69,8 +69,8 @@ screens:
   capability: C35
   implementation:
     app: venue-support-web
-    route: /general/agent-login
-    component: apps/venue-support-web/src/routes/general/AgentLoginList.tsx
+    route: /general/venue-management-sign-in
+    component: apps/venue-support-web/src/routes/general/VenueManagementSignIn.tsx
     status: notStarted
   navigation:
     isEntryPoint: true

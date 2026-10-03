@@ -5680,8 +5680,8 @@ screens:
   capability: C93
   implementation:
     app: guest-web
-    route: /membership-loyalty-and-value/loyalty-and-rewards
-    component: apps/guest-web/src/routes/membership-loyalty-and-value/LoyaltyAndRewardsDetail.tsx
+    route: /membership-loyalty-and-value/devices-wishlist-consent
+    component: apps/guest-web/src/routes/membership-loyalty-and-value/DevicesWishlistConsentDetail.tsx
     status: notStarted
   navigation:
     entryFrom:

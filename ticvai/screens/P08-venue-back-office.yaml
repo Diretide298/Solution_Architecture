@@ -6658,8 +6658,8 @@ screens:
   wave: 1
   implementation:
     app: venue-management-web
-    route: /fnb/bo-020
-    component: apps/venue-management-web/src/routes/fnb/BO020List.tsx
+    route: /fnb/fnb-order-management
+    component: apps/venue-management-web/src/routes/fnb/FnBOrderManagementList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -6985,8 +6985,8 @@ screens:
   wave: 1
   implementation:
     app: venue-management-web
-    route: /fnb/bo-021
-    component: apps/venue-management-web/src/routes/fnb/BO021List.tsx
+    route: /fnb/order-search
+    component: apps/venue-management-web/src/routes/fnb/OrderSearchList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -9795,8 +9795,8 @@ screens:
   capability: C00
   implementation:
     app: venue-management-web
-    route: /venue-operations/access-point-directory
-    component: apps/venue-management-web/src/routes/venue-operations/AccessPointDirectoryDetail.tsx
+    route: /venue-operations/work-order-verification
+    component: apps/venue-management-web/src/routes/venue-operations/WorkOrderVerificationDetail.tsx
     status: notStarted
   navigation:
     exitTo:
@@ -10039,8 +10039,8 @@ screens:
   capability: C00
   implementation:
     app: venue-management-web
-    route: /venue-operations/access-point-configuration
-    component: apps/venue-management-web/src/routes/venue-operations/AccessPointConfigurationDetail.tsx
+    route: /venue-operations/asset-register-bo-031
+    component: apps/venue-management-web/src/routes/venue-operations/AssetRegisterBO031Detail.tsx
     status: notStarted
   navigation:
     inferred: true
@@ -13428,8 +13428,8 @@ screens:
   wave: 1
   implementation:
     app: venue-management-web
-    route: /fnb/bo-045
-    component: apps/venue-management-web/src/routes/fnb/BO045List.tsx
+    route: /fnb/menu-management
+    component: apps/venue-management-web/src/routes/fnb/MenuManagementList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -13889,8 +13889,8 @@ screens:
   wave: 1
   implementation:
     app: venue-management-web
-    route: /fnb/bo-046
-    component: apps/venue-management-web/src/routes/fnb/BO046List.tsx
+    route: /fnb/kitchen-display
+    component: apps/venue-management-web/src/routes/fnb/KitchenDisplayList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -159817,6 +159817,7 @@ screens:
     route: /venue-operations/pricing-rules/price-list-master-configuration-adm-049
     component: apps/venue-management-web/src/routes/venue-operations/PricingRulesDetail.tsx
     status: notStarted
+    sectionOf: BO-009
   navigation:
     entryFrom:
     - ADM-048
@@ -160110,6 +160111,7 @@ screens:
     route: /venue-operations/pricing-rules/rate-structure-builder-adm-051
     component: apps/venue-management-web/src/routes/venue-operations/PricingRulesDetail.tsx
     status: notStarted
+    sectionOf: BO-009
   navigation:
     entryFrom:
     - ADM-048
@@ -160251,6 +160253,7 @@ screens:
     route: /venue-operations/pricing-rules/product-service-price-assignment-adm-052
     component: apps/venue-management-web/src/routes/venue-operations/PricingRulesDetail.tsx
     status: notStarted
+    sectionOf: BO-009
   navigation:
     entryFrom:
     - ADM-048
@@ -160385,6 +160388,7 @@ screens:
     route: /venue-operations/packages-bundles/package-bundle-add-on-pricing-adm-053
     component: apps/venue-management-web/src/routes/venue-operations/PackagesBundlesDetail.tsx
     status: notStarted
+    sectionOf: BO-011
   navigation:
     entryFrom:
     - ADM-048
@@ -169674,6 +169678,7 @@ screens:
     route: /venue-operations/product-directory/product-creation-workspace-adm-119
     component: apps/venue-management-web/src/routes/venue-operations/ProductDirectoryDetail.tsx
     status: notStarted
+    sectionOf: BO-007
   navigation:
     entryFrom:
     - ADM-118
@@ -169873,6 +169878,7 @@ screens:
     route: /sell/product-import-governance-ai-configuration-assistant/bulk-product-creation-catalogue-import-adm-121
     component: apps/venue-management-web/src/routes/sell/ProductImportGovernanceAiConfigurationList.tsx
     status: notStarted
+    sectionOf: BO-117
   navigation:
     entryFrom:
     - ADM-118
@@ -171162,6 +171168,7 @@ screens:
     route: /venue-operations/product-detail-variants/product-version-management-adm-131
     component: apps/venue-management-web/src/routes/venue-operations/ProductDetailVariantsDetail.tsx
     status: notStarted
+    sectionOf: BO-008
   navigation:
     entryFrom:
     - ADM-128
@@ -172084,6 +172091,7 @@ screens:
     route: /venue-operations/promotions-coupons/promotion-command-center-dashboard-adm-138
     component: apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx
     status: notStarted
+    sectionOf: BO-010
   navigation:
     entryFrom:
     - BO-100
@@ -172606,6 +172614,7 @@ screens:
     route: /venue-operations/promotions-coupons/promotion-overview-adm-140
     component: apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx
     status: notStarted
+    sectionOf: BO-010
   navigation:
     entryFrom:
     - ADM-138
@@ -172771,6 +172780,7 @@ screens:
     route: /venue-operations/promotions-coupons/promotion-lifecycle-status-manager-adm-141
     component: apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx
     status: notStarted
+    sectionOf: BO-010
   navigation:
     entryFrom:
     - ADM-138
@@ -173371,6 +173381,7 @@ screens:
     route: /approvals/approval-inbox/promotion-approval-inbox-adm-145
     component: apps/venue-management-web/src/routes/approvals/ApprovalInbox.tsx
     status: notStarted
+    sectionOf: BO-084
   navigation:
     entryFrom:
     - ADM-138
@@ -173821,6 +173832,7 @@ screens:
     route: /venue-operations/promotions-coupons/promotion-rule-builder-adm-148
     component: apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx
     status: notStarted
+    sectionOf: BO-010
   navigation:
     entryFrom:
     - BO-100
@@ -174771,6 +174783,7 @@ screens:
     route: /venue-operations/promotions-coupons/rule-test-simulation-ai-recommendation-workspace-adm-157
     component: apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx
     status: notStarted
+    sectionOf: BO-010
   navigation:
     entryFrom:
     - ADM-148
@@ -174954,6 +174967,7 @@ screens:
     route: /venue-operations/promotions-coupons/coupon-promo-code-command-center-adm-158
     component: apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx
     status: notStarted
+    sectionOf: BO-010
   navigation:
     entryFrom:
     - BO-100
@@ -175188,6 +175202,7 @@ screens:
     route: /venue-operations/promotions-coupons/coupon-promo-code-builder-adm-159
     component: apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx
     status: notStarted
+    sectionOf: BO-010
   navigation:
     entryFrom:
     - ADM-158
@@ -176454,6 +176469,7 @@ screens:
     route: /venue-operations/promotions-coupons/buy-x-get-y-bogo-rule-builder-adm-169
     component: apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx
     status: notStarted
+    sectionOf: BO-010
   navigation:
     entryFrom:
     - ADM-168
@@ -176768,6 +176784,7 @@ screens:
     route: /venue-operations/promotions-coupons/fixed-price-n-for-x-offer-builder-adm-172
     component: apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx
     status: notStarted
+    sectionOf: BO-010
   navigation:
     entryFrom:
     - ADM-168
@@ -176877,6 +176894,7 @@ screens:
     route: /venue-operations/promotions-coupons/gift-free-product-added-value-offer-builder-adm-173
     component: apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx
     status: notStarted
+    sectionOf: BO-010
   navigation:
     entryFrom:
     - ADM-168
@@ -176978,6 +176996,7 @@ screens:
     route: /venue-operations/promotions-coupons/cross-category-promotion-builder-adm-174
     component: apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx
     status: notStarted
+    sectionOf: BO-010
   navigation:
     entryFrom:
     - ADM-168
@@ -177409,6 +177428,7 @@ screens:
     route: /venue-operations/packages-bundles/bundle-combo-command-center-adm-178
     component: apps/venue-management-web/src/routes/venue-operations/PackagesBundlesDetail.tsx
     status: notStarted
+    sectionOf: BO-011
   navigation:
     entryFrom:
     - BO-100
@@ -177628,6 +177648,7 @@ screens:
     route: /venue-operations/packages-bundles/bundle-definition-setup-adm-179
     component: apps/venue-management-web/src/routes/venue-operations/PackagesBundlesDetail.tsx
     status: notStarted
+    sectionOf: BO-011
   navigation:
     entryFrom:
     - ADM-178
@@ -177780,6 +177801,7 @@ screens:
     route: /venue-operations/packages-bundles/bundle-component-builder-adm-180
     component: apps/venue-management-web/src/routes/venue-operations/PackagesBundlesDetail.tsx
     status: notStarted
+    sectionOf: BO-011
   navigation:
     entryFrom:
     - ADM-178
@@ -177895,6 +177917,7 @@ screens:
     route: /venue-operations/packages-bundles/guest-choice-build-your-own-bundle-designer-adm-181
     component: apps/venue-management-web/src/routes/venue-operations/PackagesBundlesDetail.tsx
     status: notStarted
+    sectionOf: BO-011
   navigation:
     entryFrom:
     - ADM-178
@@ -179972,6 +179995,7 @@ screens:
     route: /venue-operations/promotions-coupons/eligibility-rule-builder-adm-199
     component: apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx
     status: notStarted
+    sectionOf: BO-010
   navigation:
     entryFrom:
     - ADM-198
@@ -181142,6 +181166,7 @@ screens:
     route: /venue-operations/promotions-coupons/promotion-stacking-rule-builder-adm-210
     component: apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx
     status: notStarted
+    sectionOf: BO-010
   navigation:
     entryFrom:
     - ADM-208
@@ -185183,6 +185208,7 @@ screens:
     route: /approvals/approval-delegations/roles-authority-delegation-approval-limits-adm-243
     component: apps/venue-management-web/src/routes/approvals/ApprovalDelegations.tsx
     status: notStarted
+    sectionOf: BO-087
   navigation:
     entryFrom:
     - ADM-238
@@ -185338,6 +185364,7 @@ screens:
     route: /venue-operations/approval-sla-policy-configuration-bo-388/sla-escalation-reminder-timeout-rules-adm-244
     component: apps/venue-management-web/src/routes/venue-operations/ApprovalSlaPolicyConfiguration.tsx
     status: notStarted
+    sectionOf: BO-388
   navigation:
     entryFrom:
     - ADM-238

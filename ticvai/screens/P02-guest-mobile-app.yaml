@@ -917,8 +917,8 @@ screens:
   capability: C02
   implementation:
     app: guest-app
-    route: /general/attractions-list
-    component: apps/guest-app/src/routes/general/AttractionsList.tsx
+    route: /general/buy-tickets
+    component: apps/guest-app/src/routes/general/BuyTicketsList.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -1150,8 +1150,8 @@ screens:
   capability: C02
   implementation:
     app: guest-app
-    route: /general/attraction-details
-    component: apps/guest-app/src/routes/general/AttractionDetailsDetail.tsx
+    route: /general/item-detail
+    component: apps/guest-app/src/routes/general/ItemDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -7566,8 +7566,8 @@ screens:
   capability: C105
   implementation:
     app: guest-app
-    route: /general/digital-companion-mode
-    component: apps/guest-app/src/routes/general/DigitalCompanionModeDetail.tsx
+    route: /general/at-the-venue
+    component: apps/guest-app/src/routes/general/AtTheVenueDetail.tsx
     status: notStarted
   navigation:
     entryFrom:
@@ -10252,8 +10252,8 @@ screens:
   capability: C02
   implementation:
     app: guest-app
-    route: /general/build-your-own-itinerary
-    component: apps/guest-app/src/routes/general/BuildYourOwnItineraryDetail.tsx
+    route: /general/your-plan
+    component: apps/guest-app/src/routes/general/YourPlanDetail.tsx
     status: notStarted
   navigation:
     inferred: false
@@ -10514,8 +10514,8 @@ screens:
   capability: AI-35
   implementation:
     app: guest-app
-    route: /general/ai-optimized-itinerary
-    component: apps/guest-app/src/routes/general/AiOptimizedItineraryDetail.tsx
+    route: /general/ai-planner
+    component: apps/guest-app/src/routes/general/AIPlannerDetail.tsx
     status: notStarted
   navigation:
     inferred: false
