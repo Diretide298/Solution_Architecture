@@ -22,5 +22,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-ai-residency.py
-status: open
+status: closed
+closed_by_commit: 114261ce
 notes: A rename that a checker reads by name must update the checker in the same change; the full refresh caught it.
