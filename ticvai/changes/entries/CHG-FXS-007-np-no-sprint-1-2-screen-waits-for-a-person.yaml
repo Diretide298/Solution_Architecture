@@ -1,0 +1,33 @@
+id: CHG-FXS-007
+date: '2026-10-04'
+source: audit
+kind: spec
+summary: 'A new rule NP in check-screen-patterns: a screen a Sprint 1 or 2 task builds must not say a person must
+  define it and must bind an operation; later sprints may only fall; the generator says the gap in the rule''s words.'
+decision:
+  what: Add NP to tools/screen_patterns.py and tools/check-screen-patterns.py (sprints from block-a-schedule.json,
+    builds from op-release.json), NP_LATER_CEILING 191; generate-screens-from-pack.py takes NEEDS_PERSON from screen_patterns.
+  by: Chinmay
+  date: '2026-10-04'
+why: 'Sprint 1-2 judging of 4 October 2026 (runs/fix-s12/screens.tsv, finding rows: 159 tickets, 73 not buildable;
+  shared brief audit/ticvai/apply/FIX-S12-BRIEF.md). Chinmay, 4 October: fix all of it in one round, then one refresh,
+  then r1. Operations and fields another agent adds are the names agreed in runs/fix-s12/LEDGER.md (contracts CHG-FXC-003,
+  CHG-FXC-010; plan CHG-FXP-004).'
+keys_touched:
+  screens: []
+  files:
+  - tools/screen_patterns.py
+  - tools/check-screen-patterns.py
+  - tools/generate-screens-from-pack.py
+root_class: A00 TOOLING
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: open
+notes: 'Batch FXS (fix-s12-screens), 4 October 2026. Tickets: none started (Sprint 1 starts Monday 5 October).'

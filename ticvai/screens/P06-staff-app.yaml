@@ -74,6 +74,8 @@ screens:
     - to: EMP-002
       trigger: Selects venue and role
       provenance: flow F08 step 1→2, F64 step 1→2
+      carries:
+      - availableRoles
     - to: EMP-003
       trigger: Home — on duty
       provenance: structural — EMP-001 is P06's home screen and its exits are its launcher
@@ -310,7 +312,12 @@ screens:
     **Bulk-attach residue** — the 18 August defect that put identical operation sets on unrelated screens.
     A till does not cancel a performance, a staff app does not create roles, and **a scanner does not
     run a cash shift.** ** restored** — a role-select screen must read the roles. Over-stripped and caught
-    by F08.'
+    by F08.
+
+
+    **Roles come from the login response EMP-001 holds (LoginResponse.availableRoles, preloaded) 4 October
+    2026; selectRole sends the picked roleId. A role carries its venue scope, so there is no separate
+    venue pick** (CHG-FXS-003)'
   density: comfortable
   pattern: listDetail
   patternReason: '`listMfaMethods` reads the population and `getCurrentSession` reads one of them — list,
@@ -321,7 +328,18 @@ screens:
     regions:
     - name: contentBody
       slot: collection
-      components: []
+      components:
+      - kind: cardList
+        label: Choose your role for today
+        bindsTo: LoginResponse.availableRoles
+        columns:
+        - RoleSummary.name
+        - RoleSummary.code
+        - RoleSummary.isPrimary
+        notes: Handed over by EMP-001 from the login response (requiresRoleSelection true); nothing is
+          fetched. The primary role is first. The venue is the role's scope, shown on the session after
+          selectRole.
+        provenance: defined 4 October 2026 (CHG-FXS-003)
     - name: contextPanel
       slot: selection
       components:
@@ -369,11 +387,7 @@ screens:
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded:
-    - MfaMethod.id
-    - MfaMethod.kind
-    - MfaMethod.label
-    - MfaMethod.maskedTarget
-    - MfaMethod.isActive
+    - LoginResponse.availableRoles
   wireframe:
     status: notStarted
     provenance: generated
@@ -13326,7 +13340,11 @@ screens:
     board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen,
     so the title is the only join — *Stock Count &amp; Cycle Count Management* matched at 1.0. **A cross-platform
     title match was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which
-    is how a mapping goes wrong quietly.'
+    is how a mapping goes wrong quietly.
+
+
+    **The count lines are read with listStockCountLines (added by the contracts agent, runs/fix-s12/LEDGER.md
+    (CHG-FXC-011), 4 October 2026)** (CHG-FXS-003)'
   density: comfortable
   boardFrames:
   - Retail Board 4.dc.html#ret-4f
@@ -13344,11 +13362,13 @@ screens:
         label: Search stock count
         provenance: carried from the previous definition
       - kind: cardList
-        notes: '**Cards rather than a table.** One thumb, arm’s length, and a person who is walking. **The
-          lines arrive pre-filled from on-hand stock** — one card per item at the location, with a blank
-          count and no expected figure; the counter enters what is on the shelf (audit R110 (a), R171
-          (7)).'
-        provenance: carried from the previous definition
+        notes: One card per line (item, counted); the expected quantity stays hidden while a blind count
+          is open. Each card's itemId is what enterCountLine sends.
+        provenance: agreed operation `listStockCountLines`, runs/fix-s12/LEDGER.md (defined 4 October
+          2026, CHG-FXS-003)
+        label: Lines to count
+        bindsTo: CountLine
+        operation: listStockCountLines
       - kind: primaryButton
         label: Confirm
         provenance: carried from the previous definition
@@ -13401,6 +13421,12 @@ screens:
     purpose: The open counts to enter lines on
     trigger: onLoad
     provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
+  - operationId: listStockCountLines
+    contract: inventory
+    purpose: 'The pre-filled lines of the count being entered (countId): added by the contracts agent,
+      runs/fix-s12/LEDGER.md (CHG-FXC-011), 4 October 2026'
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
     - name: venueId
@@ -13531,7 +13557,10 @@ screens:
   notes: '**Added 20 August from the client design board.** P06 had no table or stock operations at all
     — **twenty screens of floor work with nothing behind them** — and every operation these need already
     existed. **Food-safety operations wired 20 August** — boards 5G and 5J of the client F&B pack, and
-    **HACCP is a regulatory obligation nothing in the package touched.**'
+    **HACCP is a regulatory obligation nothing in the package touched.**
+
+
+    **The action to sign is picked from listCorrectiveActions (agreed, ledger), 4 October 2026** (CHG-FXS-003)'
   density: comfortable
   boardFrames:
   - FnB Board 5.dc.html#fnb-5e
@@ -13601,6 +13630,17 @@ screens:
         label: Food safety checks due
         operation: getHaccpStatus
         provenance: contract fnb.yaml GET /food-safety/status; wiring fix, 2 October 2026
+      - kind: cardList
+        label: Waiting for my signature
+        bindsTo: CorrectiveAction
+        operation: listCorrectiveActions
+        columns:
+        - CorrectiveAction.raisedAt
+        - CorrectiveAction.source
+        - CorrectiveAction.status
+        notes: Query status recorded; tapping one gives Sign its actionId.
+        provenance: agreed operation `listCorrectiveActions`, runs/fix-s12/LEDGER.md (defined 4 October
+          2026, CHG-FXS-003)
   states:
     loading: The saved damage loss shrinkage.
     error: Could not load. Names which read failed and leaves the damage loss shrinkage untouched.
@@ -13637,6 +13677,12 @@ screens:
     purpose: Food-safety checks due and open findings
     trigger: onLoad
     provenance: wiring fix, 2 October 2026 (CHG-WIR-008)
+  - operationId: listCorrectiveActions
+    contract: fnb
+    purpose: 'The actions waiting for this supervisor''s signature: agreed with the contracts agent, runs/fix-s12/LEDGER.md,
+      4 October 2026'
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
     - name: venueId

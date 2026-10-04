@@ -495,7 +495,7 @@ screens:
     **Rev 3 (decided 29 September).** The in-venue notifications feed (GST-030) is back in the first release
     (GAP-C1, reversing audit R242). A transport venue''s home opens the trip search (GST-076, REV3-21).
     The venue picked here (audit R267) is the venue whose booking-flow settings apply; the booking screens''
-    *Booking at* bar changes it (REV3-18). Every booking-flow setting named here is read from `getTenantConfig`
+    *Booking at* bar changes it (REV3-18). Every booking-flow setting named here is read from `getPublishedTenantConfig`
     `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant''s values with that
     venue''s `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).
 
@@ -806,9 +806,9 @@ screens:
     **Rev 3 (decided 29 September).** Category → subcategory tiles or a flat list per `ticketCategories`
     (REV3-16); grid or row per `cardLayout` (the retired `categoryDisplay` is removed, W7). Info-only
     products are listed with their label and open details (REV3-14). Every booking-flow setting named
-    here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit
-    R267): the tenant''s values with that venue''s `venueOverrides` entry laid over field by field (decided
-    29 September, rev 3 CFG-11).
+    here is read from `getPublishedTenantConfig` `bookingFlow`, resolved for the venue the guest picked
+    (audit R267): the tenant''s values with that venue''s `venueOverrides` entry laid over field by field
+    (decided 29 September, rev 3 CFG-11).
 
 
     **Mobile v4 (decided 29 September, MOB-1).** Retitled **Explore** and made the Explore tab root: search,
@@ -895,6 +895,8 @@ screens:
     - Product.name
     - Product.description
     - Product.kind
+    - PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with
+      getPublishedTenantConfig (WEB-001, GST-001, KSK-002)
   wireframe:
     status: notStarted
     provenance: client-verified
@@ -991,7 +993,7 @@ screens:
     `notBookableLabel` (default *Info only / Not bookable online*) and open their details instead of adding
     to the basket; hidden when `BookingFlowConfig.showInfoOnly` is off (REV3-14). Categories per `ticketCategories`
     (REV3-16). Each product shows its own primary image (`Product.media`, 23SEP-4). Card layout, size
-    and density are the enums of DG-6. Every booking-flow setting named here is read from `getTenantConfig`
+    and density are the enums of DG-6. Every booking-flow setting named here is read from `getPublishedTenantConfig`
     `bookingFlow`, resolved for the venue the guest picked (audit R267): the tenant''s values with that
     venue''s `venueOverrides` entry laid over field by field (decided 29 September, rev 3 CFG-11).
 
@@ -1128,6 +1130,8 @@ screens:
     - WaitTime.attractionProductId
     - WaitTime.status
     - WaitTime.waitMinutes
+    - PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with
+      getPublishedTenantConfig (WEB-001, GST-001, KSK-002)
   wireframe:
     status: notStarted
     provenance: client-verified
@@ -1794,16 +1798,16 @@ screens:
     (REV3-20).** **Consent questions (REV3-26)** pop up once after the session or date; the *Swim consent
     pop-up (on/off)* toggle is dropped. Per-guest eligibility is `checkBookingEligibility`, unchanged
     (DG-3). Guest copy may say *Session* (CFG-10); code keeps `Performance`. Every booking-flow setting
-    named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest picked (audit
-    R267): the tenant''s values with that venue''s `venueOverrides` entry laid over field by field (decided
-    29 September, rev 3 CFG-11).
+    named here is read from `getPublishedTenantConfig` `bookingFlow`, resolved for the venue the guest
+    picked (audit R267): the tenant''s values with that venue''s `venueOverrides` entry laid over field
+    by field (decided 29 September, rev 3 CFG-11).
 
 
     **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow`
     returns the flow the product (or its category, else the venue default for its kind) uses, with its
     enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
     flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
-    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig`
     `bookingFlow`.
 
 
@@ -1964,7 +1968,9 @@ screens:
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
       names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
       Arrives with `eventId`.'
-    preloaded: []
+    preloaded:
+    - PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with
+      getPublishedTenantConfig (WEB-001, GST-001, KSK-002)
   wireframe:
     status: notStarted
     provenance: client-verified
@@ -2086,16 +2092,16 @@ screens:
     categories (REV3-16); info-only products show their label and open details (REV3-14); ticket-type
     descriptions (23SEP-6) and tags (23SEP-3); Help me choose as a region and a sheet (REV3-11); Booking
     at (REV3-18). On mobile the basket stays a bottom bar with the running total (REV3-10). Every booking-flow
-    setting named here is read from `getTenantConfig` `bookingFlow`, resolved for the venue the guest
-    picked (audit R267): the tenant''s values with that venue''s `venueOverrides` entry laid over field
-    by field (decided 29 September, rev 3 CFG-11).
+    setting named here is read from `getPublishedTenantConfig` `bookingFlow`, resolved for the venue the
+    guest picked (audit R267): the tenant''s values with that venue''s `venueOverrides` entry laid over
+    field by field (decided 29 September, rev 3 CFG-11).
 
 
     **The step order comes from the published booking flow** (W12, 29 September): `getPublishedBookingFlow`
     returns the flow the product (or its category, else the venue default for its kind) uses, with its
     enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
     flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
-    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig`
     `bookingFlow`.
 
 
@@ -2245,6 +2251,9 @@ screens:
       from: session
     coldEntry: '**A link to a product no longer on sale** says so and offers the listing; a performance
       that has passed offers the next one.'
+    preloaded:
+    - PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with
+      getPublishedTenantConfig (WEB-001, GST-001, KSK-002)
   wireframe:
     status: notStarted
     provenance: client-verified
@@ -2348,7 +2357,7 @@ screens:
     returns the flow the product (or its category, else the venue default for its kind) uses, with its
     enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
     flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
-    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig`
     `bookingFlow`.
 
 
@@ -2540,6 +2549,9 @@ screens:
       from: session
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
+    preloaded:
+    - PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with
+      getPublishedTenantConfig (WEB-001, GST-001, KSK-002)
   wireframe:
     status: notStarted
     provenance: designed
@@ -2606,7 +2618,17 @@ screens:
     review**: getOrder. **The operations existed and this screen could not call them** — reviewers reported
     them as missing APIs, which is what an unreachable operation looks like from a wireframe. **Cross-surface
     parity, 31 August**: added reprintOrder. **A guest does not know which surface they are on** — the
-    same named screen on web and app now calls the same guest-callable operations.'
+    same named screen on web and app now calls the same guest-callable operations.
+
+
+    **''Set a password'' is ''Create an account'' (4 October 2026), the same as its web twin WEB-013:
+    registerGuest and verifyGuestEmail make and prove the account, then linkGuestCheckout** (CHG-FXS-003)
+
+
+    **Create an account collects the email and the code its two calls send** (CHG-FXS-003)
+
+
+    **The code is collected by the verify form (formVerifyGuestEmail)** (CHG-FXS-003)'
   density: comfortable
   pattern: statusTracker
   patternReason: '`getOrder` reads one record and nothing reads a population — the screen is about that
@@ -2629,6 +2651,20 @@ screens:
         - Order.netAmount
         operation: getOrder
         provenance: contract orders.yaml GET /orders/{orderId}
+      - kind: secondaryButton
+        label: Send me a code
+        operation: registerGuest
+        provenance: defined 4 October 2026 (CHG-FXS-003)
+      - kind: secondaryButton
+        label: Verify the code
+        operation: verifyGuestEmail
+        provenance: defined 4 October 2026 (CHG-FXS-003)
+      - kind: textField
+        label: Email for the account
+        bindsTo: RegisterGuestRequest.identifier
+        operation: registerGuest
+        notes: The order's email, prefilled; channel email.
+        provenance: contract identity.yaml RegisterGuestRequest.identifier (defined 4 October 2026, CHG-FXS-003)
     - name: actionBar
       slot: rowActions
       components:
@@ -2641,21 +2677,21 @@ screens:
         notes: Opens Ticket Transfer (WEB-030 on the web, GST-014 in the app), after the tickets.
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
       - kind: secondaryButton
-        label: Set a password
+        label: Create an account
         operation: linkGuestCheckout
-        notes: 'Offered after a guest checkout: keeps these tickets in an account.'
-        provenance: corrected 2 October 2026 (CHG-SGU-020, design-notes correction)
+        notes: 'Guest accounts are passwordless: registerGuest with the order''s email, verifyGuestEmail
+          with the code, then linkGuestCheckout.'
+        provenance: defined 4 October 2026 (CHG-FXS-003)
   states:
     loading: The booking confirmation, read by `getOrder`.
     error: Could not load. Names which read failed and leaves the booking confirmation untouched.
     emptyFirstRun: No booking confirmation yet. **Offers no create action** — this screen declares no
       operation that makes one — and says so rather than showing an empty table.
-    emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
-      is what a staff caller must hold; a guest call resolves to the guest''s own data; decided by Chinmay,
-      fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told
-      apart by the response: not signed in, where the guest is offered sign-in and brought back to this
-      screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty
-      table** — that reads as *there is no data* and sends somebody to support with the wrong question.'
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen,
+      and names that permission. **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question. A caller who can see the screen but lacks what an action
+      needs sees that action disabled, naming its permission: `GUEST_VIEW` for `verifyGuestEmail`; `ORDER_REPRINT`
+      for `reprintOrder`.'
     offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
@@ -2674,6 +2710,16 @@ screens:
     contract: identity
     purpose: 'Set a password: turn the guest-checkout order into an account'
     trigger: onAction
+  - operationId: registerGuest
+    contract: identity
+    purpose: 'Create an account for the order''s email: sends a code'
+    trigger: onAction
+    provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: verifyGuestEmail
+    contract: identity
+    purpose: Prove the code; then linkGuestCheckout moves the order to the account
+    trigger: onAction
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
     - name: orderId
@@ -2723,6 +2769,19 @@ screens:
     dismiss:
       label: Cancel
     provenance: corrected 2 October 2026 (CHG-SGU-020, design-notes correction)
+  - id: formVerifyGuestEmail
+    component: modal
+    trigger: Verify the code
+    body: '**Collects what `verifyGuestEmail` sends before it is called.** Required: `mode` (code), the
+      six-digit `code` sent to the order''s email. Dismissing sends nothing.'
+    confirm:
+      label: Verify the code
+      operation: verifyGuestEmail
+    dismiss:
+      label: Cancel
+      discards:
+      - code
+    provenance: contract identity.yaml POST /auth/guest/verify-email (4 October 2026, CHG-FXS-003)
   gaps:
   - operation: transferOrderTickets
     removed: true
@@ -2764,8 +2823,13 @@ screens:
       operation: getGameCard
       crossesDevice: true
       back: false
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement.
+
+
+    **The guest''s saved cards are read with listPaymentTokens (4 October 2026) so the auto top-up and
+    a stored-card exit settlement have a paymentTokenId to send; the walletId is the wallet''s own id
+    (Wallet.id, agreed with contracts in the ledger)** (CHG-FXS-003)'
   density: comfortable
   pattern: listDetail
   patternReason: '`listWalletTransactions` reads the population and `getWallet` reads one of them — list,
@@ -2818,6 +2882,34 @@ screens:
         notes: An arcade card's balance, read by its code, as the web wallet WEB-021 shows it (flow F18
           step 2; CHG-CLN-006).
         provenance: contract games.yaml GET /game-cards/{cardCode}
+      - kind: toggle
+        label: Auto top-up
+        bindsTo: WalletAutoReloadSetting.enabled
+        operation: setWalletAutoReloadSetting
+        provenance: contract wallet.yaml WalletAutoReloadSetting.enabled (defined 4 October 2026, CHG-FXS-003)
+      - kind: numberField
+        label: When the balance falls below
+        bindsTo: WalletAutoReloadSetting.thresholdAmount
+        operation: setWalletAutoReloadSetting
+        provenance: contract wallet.yaml WalletAutoReloadSetting.thresholdAmount (defined 4 October 2026,
+          CHG-FXS-003)
+      - kind: numberField
+        label: Top up by
+        bindsTo: WalletAutoReloadSetting.reloadAmount
+        operation: setWalletAutoReloadSetting
+        provenance: contract wallet.yaml WalletAutoReloadSetting.reloadAmount (defined 4 October 2026,
+          CHG-FXS-003)
+      - kind: selectField
+        label: Card
+        bindsTo: WalletAutoReloadSetting.paymentTokenId
+        operation: listPaymentTokens
+        columns:
+        - PaymentToken.maskedIdentifier
+        - PaymentToken.expiresAt
+        - PaymentToken.isDefault
+        notes: Options from listPaymentTokens; none saved shows Add a card (GST-071).
+        provenance: contract orders.yaml WalletAutoReloadSetting.paymentTokenId (defined 4 October 2026,
+          CHG-FXS-003)
   states:
     loading: The wallet overview list.
     error: Could not load. Names which read failed and leaves the wallet overview untouched.
@@ -2825,12 +2917,11 @@ screens:
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: 'Never shown: `listWalletTransactions` takes no filter, so an empty list is always
       the first-run state above.'
-    emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
-      is what a staff caller must hold; a guest call resolves to the guest''s own data; decided by Chinmay,
-      fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told
-      apart by the response: not signed in, where the guest is offered sign-in and brought back to this
-      screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty
-      table** — that reads as *there is no data* and sends somebody to support with the wrong question.'
+    emptyNoAccess: 'Shown when the caller lacks `WALLET_VIEW`, which `getWallet` requires to show this
+      screen, and names that permission (the screen''s other reads need `ORDER_VIEW` and say so in their
+      own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support
+      with the wrong question. A caller who can see the screen but lacks what an action needs sees that
+      action disabled, naming its permission: `WALLET_OPERATE` for `setWalletAutoReloadSetting`, `settleWalletAtExit`.'
     offline: '**The offline banner shows.** Balances and stored cards already loaded stay visible with
       their age, cards masked. Storing a card and transferring value need the server.'
   apis:
@@ -2867,14 +2958,23 @@ screens:
     purpose: Balance on a game card
     trigger: onAction
     provenance: flow F18 step 2, 2 October 2026 (CHG-CLN-006)
+  - operationId: listPaymentTokens
+    contract: orders
+    purpose: 'The guest''s saved cards: the auto top-up card and a stored-card exit settlement pick one
+      (paymentTokenId)'
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
-    - name: cardCode
-      from: deepLink
     - name: subjectId
       from: session
+    - name: cardCode
+      from: deepLink
+      optional: true
     - name: walletId
       from: navigation
+      optional: true
+      notes: Read from the wallet itself (Wallet.id, agreed field) when not carried.
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
     preloaded:
     - WalletTransaction.id
@@ -4648,7 +4748,11 @@ screens:
     **3D navigation (client meeting 30 September, MoM 4.8): ADR-0069.** Where the venue map has a GLB
     model, this view renders it natively (react-three-fiber) and the walking-navigation mode follows the
     guest in 3D; the route still comes from `getVenueMapGraph`, snapped from live GPS, with no external
-    mapping service. No model, a weak phone or failed rendering: the 2D map, same route.'
+    mapping service. No model, a weak phone or failed rendering: the 2D map, same route.
+
+
+    **The map comes from listBookableVenueMaps?venueId (contracts, ledger: the venue -> map read exists),
+    so a normal visit has a map to load** (CHG-FXS-003)'
   density: comfortable
   boardFrames:
   - Seat Board 4.dc.html#seat-4b
@@ -4675,6 +4779,12 @@ screens:
           one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was the
           generated table 'Every product'; staff and plumbing columns removed (decided by Chinmay, fix
           before Block A starts, 2 October 2026 (GFIX-3)).
+      - kind: selectField
+        label: Map
+        bindsTo: BookableVenueMaps.maps
+        operation: listBookableVenueMaps
+        notes: Picked by itself when the venue has one published map.
+        provenance: contract venue-map.yaml BookableVenueMaps.maps (defined 4 October 2026, CHG-FXS-003)
     - name: contextPanel
       slot: selection
       components:
@@ -4715,12 +4825,10 @@ screens:
     emptyFirstRun: No interactive map yet. **Offers no create action** — this screen declares no operation
       that makes one — and says so rather than showing an empty table.
     emptyNoResults: No point of that category on this map; the other categories stay.
-    emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
-      is what a staff caller must hold; a guest call resolves to the guest''s own data; decided by Chinmay,
-      fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told
-      apart by the response: not signed in, where the guest is offered sign-in and brought back to this
-      screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty
-      table** — that reads as *there is no data* and sends somebody to support with the wrong question.'
+    emptyNoAccess: Shown when the caller lacks `PRODUCT_VIEW`, which `listProducts` requires to show this
+      screen, and names that permission (the screen's other reads need `VENUE_MAP_VIEW` and say so in
+      their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question.
     offline: '**The offline banner shows.** A map and route graph already loaded stay usable, so directions
       do not need a signal. Wait times show their last reading marked out of date, never as live — a queue
       length from an hour ago sends a guest to the wrong ride. With no map loaded yet, the screen asks
@@ -4752,10 +4860,19 @@ screens:
     contract: venue-map
     purpose: The navigation graph, ready to route over
     trigger: onLoad
+  - operationId: listBookableVenueMaps
+    contract: venue-map
+    purpose: The venue's published map (query venueId), whose mapId getVenueMap and getVenueMapGraph take
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
     - name: mapId
       from: deepLink
+      optional: true
+      notes: Otherwise the venue's published map from listBookableVenueMaps.
+    - name: venueId
+      from: session
     coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
       way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
@@ -5707,7 +5824,11 @@ screens:
 
 
     **Rev 3 (decided 29 September).** The web and app waves of this capability differ; they are aligned
-    to one wave once the client picks it (GAP-D2, open).'
+    to one wave once the client picks it (GAP-D2, open).
+
+
+    **The car park''s parking product is ParkingFacility.productVariantId (agreed with contracts in the
+    ledger 4 October 2026): Add parking to my cart sends it as addCartLine''s variantId** (CHG-FXS-003)'
   density: comfortable
   pattern: listDetail
   patternReason: '`listParkingFacilities` reads a population and nothing reads one of them; the detail
@@ -5735,12 +5856,12 @@ screens:
         bindsTo: ParkingFacility
         columns:
         - ParkingFacility.name
+        - ParkingFacility.capacity
+        - ParkingFacility.productVariantId
         operation: listParkingFacilities
-        provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
-        notes: The venue's car parks by name; no live free-bay count in the first release. The venue is
-          the one the guest picked on Home (`venueId` from the session, audit R267), never typed. Was
-          the generated table 'Every parking facility'; staff and plumbing columns removed (decided by
-          Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
+        provenance: contract access.yaml ParkingFacility (defined 4 October 2026, CHG-FXS-003)
+        notes: Choosing one puts its parking product (productVariantId, agreed field) in the basket with
+          addCartLine.
     - name: contextPanel
       slot: selection
       components:
@@ -5916,7 +6037,15 @@ screens:
 
 
     **Rev 3 (decided 29 September).** The web and app waves of this capability differ; they are aligned
-    to one wave once the client picks it (GAP-D2, open).'
+    to one wave once the client picks it (GAP-D2, open).
+
+
+    **The plate, car park and pass are read from the parking entitlement (listMyEntitlements, then getParkingEntitlement),
+    bound 4 October 2026** (CHG-FXS-003)
+
+
+    **entitlementId comes from the order''s parking entitlement in listMyEntitlements (check-screens)**
+    (CHG-FXS-003)'
   density: comfortable
   pattern: listDetail
   patternReason: '`listParkingFacilities` reads a population and nothing reads one of them; the detail
@@ -5948,6 +6077,28 @@ screens:
           September, audit R166); this screen confirms the order and shows the car park and plate from
           it, and never creates the entitlement itself.'
         provenance: contract orders.yaml GET /orders/{orderId}
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        label: Your parking
+        bindsTo: ParkingEntitlement
+        operation: getParkingEntitlement
+        columns:
+        - ParkingEntitlement.plateNumber
+        - ParkingEntitlement.plateCountry
+        - ParkingEntitlement.mediaCode
+        notes: The entitlement of this order (listMyEntitlements filtered by orderId).
+        provenance: contract access.yaml ParkingEntitlement (defined 4 October 2026, CHG-FXS-003)
+      - kind: cardList
+        label: Parking passes
+        bindsTo: Entitlement
+        operation: listMyEntitlements
+        columns:
+        - Entitlement.orderId
+        - Entitlement.validFrom
+        - Entitlement.status
+        notes: Filtered to this order; the parking one gives entitlementId.
+        provenance: contract access.yaml Entitlement (defined 4 October 2026, CHG-FXS-003)
   states:
     loading: The parking reservation confirmed list.
     error: Could not load. Names which read failed and leaves the parking reservation confirmed untouched.
@@ -5955,12 +6106,10 @@ screens:
       at payment; until it appears the screen shows the order and says the car park pass follows (audit
       R166).'
     emptyNoResults: 'Never shown: the confirmation shows one order''s parking.'
-    emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
-      is what a staff caller must hold; a guest call resolves to the guest''s own data; decided by Chinmay,
-      fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told
-      apart by the response: not signed in, where the guest is offered sign-in and brought back to this
-      screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty
-      table** — that reads as *there is no data* and sends somebody to support with the wrong question.'
+    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `getOrder` requires to show this screen,
+      and names that permission (the screen's other reads need `PARKING_CONFIGURE` and say so in their
+      own panels). **Never an empty table** — that reads as *there is no data* and sends somebody to support
+      with the wrong question.
     offline: '**The offline banner shows.** A reservation already confirmed stays on screen with its plate
       and car park. Reserving, paying and changing the plate need the connection.'
   apis:
@@ -5974,10 +6123,27 @@ screens:
     contract: access
     purpose: Car parks at a venue, and how each integrates
     trigger: onLoad
+  - operationId: listMyEntitlements
+    contract: access
+    purpose: The guest's parking entitlement from this order
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: getParkingEntitlement
+    contract: access
+    purpose: The plate, car park and pass of that entitlement
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
     - name: orderId
       from: previousScreen
+    - name: subjectId
+      from: session
+    - name: entitlementId
+      from: navigation
+      optional: true
+      notes: The parking entitlement of this order, from listMyEntitlements (the one whose orderId is
+        the order's).
     coldEntry: '**Opened cold, it needs the order.** Without `orderId` it sends the guest to their orders
       rather than showing an empty confirmation.'
     preloaded:
@@ -8304,7 +8470,7 @@ screens:
     returns the flow the product (or its category, else the venue default for its kind) uses, with its
     enabled steps in `sortOrder`; this screen renders when that flow has its step and in the order the
     flow gives. Flow-level settings (`performanceReveal`, `signInAt`, `seatEventDateMode`, `extrasStep`,
-    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getTenantConfig`
+    `quickTour`, `consentQuestionIds`) are read from the flow; venue-wide settings stay on `getPublishedTenantConfig`
     `bookingFlow`.
 
 
@@ -8495,6 +8661,9 @@ screens:
     coldEntry: Resolves from the session; a cold arrival is the ordinary case. **A cold arrival without
       a verified sign-in is offered the fork here** — sign in, or prove the contact where the site's `guestCheckout`
       is on — and keeps the cart either way (ADR-0045).
+    preloaded:
+    - PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with
+      getPublishedTenantConfig (WEB-001, GST-001, KSK-002)
   wireframe:
     status: notStarted
     provenance: client-verified
@@ -9164,7 +9333,11 @@ screens:
 
 
     **Rev 3 (decided 29 September).** GST-014 and GST-045 (and the old GST-008 transfer reading) are one
-    implementation with several screen ids; the ids are kept (GAP-D3).'
+    implementation with several screen ids; the ids are kept (GAP-D3).
+
+
+    **The tickets to send are read with listMyEntitlements (4 October 2026); orderId is optional and comes
+    from the chosen tickets'' orderId when the screen opens from Home** (CHG-FXS-003)'
   density: comfortable
   pattern: configEditor
   patternReason: the screen declares only writes (`transferOrderTickets`) and no read of a population
@@ -9194,9 +9367,15 @@ screens:
         provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
       - kind: cardList
         label: Tickets to send
-        operation: transferOrderTickets
-        notes: The guest's tickets as cards; ticking a card picks it.
-        provenance: contract orders.yaml POST /orders/{orderId}/transfer
+        operation: listMyEntitlements
+        notes: Valid, unused tickets of one order at a time (a transfer is per order); opened from a link,
+          the link's order is preselected.
+        provenance: contract access.yaml Entitlement (defined 4 October 2026, CHG-FXS-003)
+        bindsTo: Entitlement
+        columns:
+        - Entitlement.productId
+        - Entitlement.validFrom
+        - Entitlement.status
       - kind: textField
         label: Send to
         operation: transferOrderTickets
@@ -9224,10 +9403,22 @@ screens:
     purpose: Show the tickets the guest has sent and received
     trigger: onLoad
     provenance: r1 gate, 3 October 2026 (CHG-R1S-004)
+  - operationId: listMyEntitlements
+    contract: access
+    purpose: The guest's own tickets to choose from; each carries its orderId, which transferOrderTickets
+      takes in its path
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
     - name: orderId
       from: deepLink
+      optional: true
+      notes: 'From Home there is none: the guest picks tickets from listMyEntitlements and the order is
+        the tickets'' orderId.'
+    - name: subjectId
+      from: session
+      notes: 'The signed-in guest: the screen reads their own tickets (4 October 2026).'
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
   wireframe:
@@ -9681,8 +9872,8 @@ screens:
     seats per booking (default 10, bounds 1-50; `422 seat-limit-exceeded` reads *Up to {maxSeats} seats
     per booking*) and the basket lists each seat (REV3-7); may render with GST-007 as one step (REV3-7);
     fixture strip and a direct path from GST-004 (23SEP-16). A cabana map is GST-074, not this screen
-    (REV3-15). Every booking-flow setting named here is read from `getTenantConfig` `bookingFlow`, resolved
-    for the venue the guest picked (audit R267): the tenant''s values with that venue''s `venueOverrides`
+    (REV3-15). Every booking-flow setting named here is read from `getPublishedTenantConfig` `bookingFlow`,
+    resolved for the venue the guest picked (audit R267): the tenant''s values with that venue''s `venueOverrides`
     entry laid over field by field (decided 29 September, rev 3 CFG-11).
 
 
@@ -9796,6 +9987,9 @@ screens:
         a link or an edge that holds one opens it instead.'
     coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
       event.'
+    preloaded:
+    - PublishedTenantConfig (bookingFlow and the venue-wide settings), loaded once by the app shell with
+      getPublishedTenantConfig (WEB-001, GST-001, KSK-002)
   wireframe:
     status: notStarted
     provenance: client-verified
@@ -11345,7 +11539,7 @@ screens:
     - to: GST-074
       trigger: Choose on the map (a venue with its spots on a map)
       carries:
-      - productId
+      - mapId
       provenance: decided 29 September, rev 3 REV3-15
   notes: '**Deliberately separate from GST-050**, and checked on 18 August. Board 8 panel 8 is availability
     across areas with counts remaining; board 7 panel 10 is one cabana with a price and a Book Now. **A
@@ -11359,7 +11553,12 @@ screens:
     **29 September (W6).** Map booking of cabanas stays **optional per flow**: the venue picks *Cabana:
     pick on map* (GST-074) or *Cabana: by size* (GST-050 / GST-058) as its booking flow (CMS-103), and
     the resource selection policy (`guestMayChoose`, REV3-15) decides whether the guest chooses the unit.
-    Same venue-map back end as F&B and locations.'
+    Same venue-map back end as F&B and locations.
+
+
+    **Availability is the map''s (4 October 2026): listBookableVenueMaps gives the mapId and getMapResourceAvailability
+    every cabana''s status for the day, as GST-074 books them; getAvailability needs a performance, event
+    or capacity id no cabana product has, and left the screen** (CHG-FXS-003)'
   density: comfortable
   pattern: listDetail
   patternReason: '`listProducts` reads the population and `getAvailability` reads one of them — list,
@@ -11369,60 +11568,59 @@ screens:
     template: split
     regions:
     - name: contentBody
-      slot: collection
       components:
+      - kind: selectField
+        label: Map
+        bindsTo: BookableVenueMaps.maps
+        operation: listBookableVenueMaps
+        notes: The venue's published map with cabanas (query kind cabana); picked by itself when there
+          is one, shown when there are several.
+        provenance: contract venue-map.yaml BookableVenueMaps.maps (defined 4 October 2026, CHG-FXS-003)
       - kind: datePicker
         label: Date
-        operation: getAvailability
-        notes: 'The list is for a date: today by default.'
-        provenance: corrected 2 October 2026 (CHG-SGU-020, design-notes correction)
-        bindsTo: PerformanceAvailability.performanceId
+        bindsTo: MapResourceAvailability.from
+        operation: getMapResourceAvailability
+        notes: from and to are the chosen day; today by default.
+        provenance: contract resources.yaml MapResourceAvailability.from (defined 4 October 2026, CHG-FXS-003)
+      - kind: selectField
+        label: Area
+        bindsTo: MapResourceAvailability.resources
+        operation: getMapResourceAvailability
+        notes: The zones the spots are in; All by default.
+        provenance: contract resources.yaml MapResourceAvailability.resources (defined 4 October 2026,
+          CHG-FXS-003)
       - kind: cardList
         label: Cabanas
-        bindsTo: Product
-        columns:
-        - Product.name
-        - Product.description
-        - Product.media
-        operation: listProducts
-        provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
-        notes: The venue's cabanas and other bookable spaces. The venue is the one the guest picked on
-          Home (`venueId` from the session, audit R267), never typed. Was the generated table 'Every product';
-          staff and plumbing columns removed (decided by Chinmay, fix before Block A starts, 2 October
-          2026 (GFIX-3)).
-      - kind: dataTable
-        label: Availability
-        operation: getAvailability
-        notes: 'From `getAvailability`, now a `PerformanceAvailabilityPage` (a Page of `PerformanceAvailability`,
-          each with `startsAt`): `channelCapacityId`, `performanceId`, `startsAt`, `capacity`, `sold`,
-          `leased`, `remaining`, `byChannel`. The time grid calls it once with `eventId`, `from` and `to`
-          for every performance in the window (decided 29 September, rev 3 REV3-1), not once per tile.'
-        provenance: contract catalogue.yaml GET /availability
-        bindsTo: PerformanceAvailability
+        bindsTo: MapResourceAvailability.resources
+        operation: getMapResourceAvailability
+        notes: Each cabana with its label, zone, capacity and status (free, held, booked); a free one
+          opens the map booking (GST-074) on it.
+        provenance: contract resources.yaml MapResourceAvailability.resources (defined 4 October 2026,
+          CHG-FXS-003)
   states:
     loading: The resource availability (cabana) list.
     error: Could not load. Names which read failed and leaves the resource availability (cabana) untouched.
     emptyFirstRun: No resource availability (cabana) yet. **Offers no create action** — this screen declares
       no operation that makes one — and says so rather than showing an empty table.
     emptyNoResults: Nothing free on the date picked; offers the next free date.
-    emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
-      is what a staff caller must hold; a guest call resolves to the guest''s own data; decided by Chinmay,
-      fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told
-      apart by the response: not signed in, where the guest is offered sign-in and brought back to this
-      screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty
-      table** — that reads as *there is no data* and sends somebody to support with the wrong question.'
+    emptyNoAccess: Shown when the caller lacks `VENUE_MAP_VIEW`, which `listBookableVenueMaps` requires
+      to show this screen, and names that permission (the screen's other reads need `RESOURCE_VIEW` and
+      say so in their own panels). **Never an empty table** — that reads as *there is no data* and sends
+      somebody to support with the wrong question.
     offline: '**The offline banner shows.** What was already loaded stays on screen, marked with its age.
       Anything that spends money, holds capacity or changes the account waits for the connection, and
       its button says so rather than failing.'
   apis:
-  - operationId: getAvailability
-    contract: catalogue
-    purpose: Live remaining capacity
+  - operationId: listBookableVenueMaps
+    contract: venue-map
+    purpose: The venue's published map with bookable cabanas (kind cabana)
     trigger: onLoad
-  - operationId: listProducts
-    contract: catalogue
-    purpose: List products
+    provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: getMapResourceAvailability
+    contract: resources
+    purpose: Every cabana's status for the chosen date, by zone
     trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     preloaded: []
   wireframe:
@@ -11780,7 +11978,11 @@ screens:
       carries:
       - dropId
       - orderId
-  notes: 4.4.7. Claimed by the entitlement the guest is already carrying, not a paper slip.
+  notes: '4.4.7. Claimed by the entitlement the guest is already carrying, not a paper slip.
+
+
+    **The guest''s drops are found by their own tickets (listMyEntitlements, then lookupShopAndDrop per
+    entitlementId), bound 4 October 2026** (CHG-FXS-003)'
   density: comfortable
   pattern: statusTracker
   patternReason: A status list of every shop-and-drop waiting for the guest, read by `lookupShopAndDrop`
@@ -11795,25 +11997,30 @@ screens:
       - kind: cardList
         label: Waiting for you
         operation: lookupShopAndDrop
-        provenance: contract retail.yaml GET /shop-and-drop/lookup
-        notes: Each drop with its collection point, collect-by time and a code large enough to show at
-          the desk; claimed by the ticket the guest carries.
+        provenance: defined 4 October 2026 (CHG-FXS-003)
+        notes: One lookupShopAndDrop per ticket the guest carries (listMyEntitlements), merged; a receipt
+          number or drop reference can be typed as well.
     - name: contentBody
       slot: carried
       components:
       - kind: banner
         notes: Collect-by time. Usually venue close
         provenance: carried from the previous definition
+      - kind: cardList
+        label: My tickets
+        bindsTo: Entitlement
+        operation: listMyEntitlements
+        columns:
+        - Entitlement.productId
+        - Entitlement.validTo
+        provenance: contract access.yaml Entitlement (defined 4 October 2026, CHG-FXS-003)
   states:
     loading: Finding what is waiting for you.
     error: Could not load. Names which read failed and leaves the shop drop collection untouched.
     emptyFirstRun: 'Nothing waiting: no shop-and-drop for this guest.'
-    emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
-      is what a staff caller must hold; a guest call resolves to the guest''s own data; decided by Chinmay,
-      fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told
-      apart by the response: not signed in, where the guest is offered sign-in and brought back to this
-      screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty
-      table** — that reads as *there is no data* and sends somebody to support with the wrong question.'
+    emptyNoAccess: Shown when the caller lacks `ORDER_VIEW`, which `listMyEntitlements` requires to show
+      this screen, and names that permission. **Never an empty table** — that reads as *there is no data*
+      and sends somebody to support with the wrong question.
     offline: '**The offline banner shows, and lookup cannot run.** A drop reference already on screen
       stays visible so the guest can quote it at the collection point. Reserving merchandise needs the
       connection.'
@@ -11822,6 +12029,12 @@ screens:
     contract: retail
     purpose: Find a guest's dropped goods
     trigger: onLoad
+  - operationId: listMyEntitlements
+    contract: access
+    purpose: The guest's tickets; lookupShopAndDrop is called once per entitlementId to find the goods
+      waiting
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   wireframe:
     status: notStarted
     provenance: client-verified
@@ -11836,6 +12049,11 @@ screens:
   apisNote: 'Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
     — it has none. Columns narrowed on 3 October 2026 to the fields the screen is about (CHG-SPF-002):
     at most five on a phone or handheld, plumbing and foreign ids left to the record itself.'
+  entryState:
+    params:
+    - name: subjectId
+      from: session
+      notes: 'The signed-in guest: the screen reads their own tickets (4 October 2026).'
 - id: GST-063
   name: Explore – Search Results
   module: Discovery
@@ -12618,7 +12836,15 @@ screens:
 
     **Who is this for** (decided 28 September, audit R205): the signed-in adult enrols themselves or a
     linked child, and is recorded as guardian by the server. The age below which a subject is a minor
-    is an open value client counsel sets.'
+    is an open value client counsel sets.
+
+
+    **The passes come from listMyEntitlements (4 October 2026): entitlementId for enrolFacePass, facePassEnrolmentId
+    for getFacePassEnrolment. The template comes from the facial-reader vendor''s SDK, a client choice
+    still open (ADR-0063); the build uses a stub until it is named** (CHG-FXS-003)
+
+
+    **The face is captured inside the enrol form (formEnrolFacePass) by the vendor SDK** (CHG-FXS-003)'
   density: comfortable
   offline: false
   pattern: statusTracker
@@ -12660,6 +12886,18 @@ screens:
         - FacePassEnrolment.expiresAt
         operation: getFacePassEnrolment
         provenance: contract access.yaml GET /face-pass/enrolments/{enrolmentId}
+      - kind: cardList
+        label: Passes
+        bindsTo: Entitlement
+        operation: listMyEntitlements
+        columns:
+        - Entitlement.productId
+        - Entitlement.validTo
+        - Entitlement.facePassEnrolmentId
+        - Entitlement.status
+        notes: Passes of the selected person (self or a linked child). A pass with a facePassEnrolmentId
+          shows its enrolment (getFacePassEnrolment); one without offers Enrol.
+        provenance: contract access.yaml Entitlement (defined 4 October 2026, CHG-FXS-003)
     - name: actionBar
       slot: rowActions
       components:
@@ -12689,7 +12927,9 @@ screens:
       shown before the camera opens; for a child the signed-in guest consents as guardian, and the form
       version is recorded with the enrolment (CHG-SGU-004). **Where:** in this app, at a ticket or annual-pass
       counter, or at a self-service kiosk with the consent shown (`enrolmentChannel` selfServiceKiosk);
-      never at a turnstile (CHG-CSP-021) (CHG-SGU-021).'
+      never at a turnstile (CHG-CSP-021) (CHG-SGU-021). The face is captured by the facial-reader vendor''s
+      SDK behind a FaceCapture interface, which returns the write-only `template`; until the client names
+      the vendor (ADR-0063) the build uses a stub returning a fixed test template (CHG-FXS-003).'
     confirm:
       label: Enrol face pass
       operation: enrolFacePass
@@ -12710,12 +12950,11 @@ screens:
       does — **before** the camera opens.'
     emptyNoResults: '**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops
       somebody concluding the record does not exist.'
-    emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
-      is what a staff caller must hold; a guest call resolves to the guest''s own data; decided by Chinmay,
-      fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told
-      apart by the response: not signed in, where the guest is offered sign-in and brought back to this
-      screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty
-      table** — that reads as *there is no data* and sends somebody to support with the wrong question.'
+    emptyNoAccess: 'Shown when the caller lacks `GUEST_VIEW`, which `listDelegations` requires to show
+      this screen, and names that permission (the screen''s other reads need `ORDER_VIEW` and say so in
+      their own panels). **Never an empty table** — that reads as *there is no data* and sends somebody
+      to support with the wrong question. A caller who can see the screen but lacks what an action needs
+      sees that action disabled, naming its permission: `GUEST_MANAGE` for `enrolFacePass`, `revokeFacePass`.'
     offline: '**Not available, and the offline banner says why.** Biometric enrolment never happens offline
       — a face captured and queued is a face the guest cannot withdraw until it uploads.'
     subjectNotLinked: '**Refused: that person is not linked to you** (403 `subject-not-linked`). A guest
@@ -12740,15 +12979,19 @@ screens:
     contract: access
     purpose: Remove a facial profile
     trigger: onAction
+  - operationId: listMyEntitlements
+    contract: access
+    purpose: The passes a face can be registered on (entitlementId), each with its facePassEnrolmentId
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
+    - name: subjectId
+      from: session
     - name: enrolmentId
       from: deepLink
       optional: true
-      notes: 'Optional (3 October 2026, CHG-SPF-004): opened without it, the screen makes one with `enrolFacePass`;
-        a link or an edge that holds one opens it instead.'
-    - name: subjectId
-      from: session
+      notes: Otherwise the selected pass's Entitlement.facePassEnrolmentId.
     coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
       here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
   wireframe:
@@ -13068,7 +13311,15 @@ screens:
 
 
     **Wallet transfer and loyalty redemption sit here** because to a guest they are all *how I pay*, whatever
-    the contracts call them.'
+    the contracts call them.
+
+
+    **storePaymentToken''s providerId comes from the published tenant config (paymentTokenisation, agreed
+    with contracts in the ledger) and its consentPurposeId from listConsentPurposes; the transfer''s walletId
+    is the guest''s wallet id from getWallet (Wallet.id, agreed). Bound 4 October 2026** (CHG-FXS-003)
+
+
+    **The card is entered in the provider''s secure fields, named by the published config** (CHG-FXS-003)'
   density: comfortable
   offline: false
   pattern: listDetail
@@ -13094,6 +13345,30 @@ screens:
         provenance: decided by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)
         notes: Was the generated table 'Every payment token'; staff and plumbing columns removed (decided
           by Chinmay, fix before Block A starts, 2 October 2026 (GFIX-3)).
+      - kind: detailPanel
+        label: My wallet
+        bindsTo: Wallet
+        operation: getWallet
+        columns:
+        - Wallet.balance
+        - Wallet.status
+        provenance: contract wallet.yaml Wallet (defined 4 October 2026, CHG-FXS-003)
+      - kind: consentBlock
+        label: Save this card for future payments
+        bindsTo: ConsentPurposeConfig.purpose
+        operation: listConsentPurposes
+        notes: The purpose for stored cards; its id is storePaymentToken's consentPurposeId.
+        provenance: contract marketing-crm.yaml ConsentPurposeConfig.purpose (defined 4 October 2026,
+          CHG-FXS-003)
+      - kind: detailPanel
+        label: Card provider
+        bindsTo: PublishedTenantConfig
+        operation: getPublishedTenantConfig
+        columns:
+        - PublishedTenantConfig.paymentTokenisation
+        notes: The tokenising provider; its secure card fields take the card, which never reaches the
+          platform.
+        provenance: contract white-label.yaml PublishedTenantConfig (defined 4 October 2026, CHG-FXS-003)
     - name: contextPanel
       slot: selection
       components:
@@ -13130,12 +13405,12 @@ screens:
       is the common one.'
     emptyNoResults: '**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops
       somebody concluding the record does not exist.'
-    emptyNoAccess: '**There is no permission to name — a guest holds none** (ADR-0025: `x-ticvai-permission`
-      is what a staff caller must hold; a guest call resolves to the guest''s own data; decided by Chinmay,
-      fix before Block A starts, 2 October 2026 (GFIX-4)). No access here means one of two things, told
-      apart by the response: not signed in, where the guest is offered sign-in and brought back to this
-      screen, or a record that is not theirs, which says so without saying whose it is. **Never an empty
-      table** — that reads as *there is no data* and sends somebody to support with the wrong question.'
+    emptyNoAccess: 'Shown when the caller lacks `ORDER_VIEW`, which `listPaymentTokens` requires to show
+      this screen, and names that permission (the screen''s other reads need `GUEST_VIEW`, `WALLET_VIEW`
+      and say so in their own panels). **Never an empty table** — that reads as *there is no data* and
+      sends somebody to support with the wrong question. A caller who can see the screen but lacks what
+      an action needs sees that action disabled, naming its permission: `LOYALTY_REDEEM` for `redeemLoyaltyPoints`;
+      `ORDER_CREATE` for `storePaymentToken`; `WALLET_OPERATE` for `transferWalletBalance`.'
     offline: '**The offline banner shows.** Balances and stored cards already loaded stay visible with
       their age, cards masked. Storing a card and transferring value need the server.'
   apis:
@@ -13165,6 +13440,22 @@ screens:
     contract: wallet
     purpose: Balance on a gift card
     trigger: onAction
+  - operationId: listConsentPurposes
+    contract: marketing-crm
+    purpose: 'The consent purpose a saved card is stored under (consentPurposeId: storing a card for future
+      payments)'
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: getPublishedTenantConfig
+    contract: white-label
+    purpose: The provider the app tokenises cards with (paymentTokenisation.providerId, agreed field)
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
+  - operationId: getWallet
+    contract: wallet
+    purpose: The guest's wallet and its id, for a balance transfer
+    trigger: onLoad
+    provenance: defined 4 October 2026 (CHG-FXS-003)
   entryState:
     params:
     - name: subjectId
@@ -13773,7 +14064,11 @@ screens:
     **29 September (W6).** Map booking of cabanas stays **optional per flow**: the venue picks *Cabana:
     pick on map* (GST-074) or *Cabana: by size* (GST-050 / GST-058) as its booking flow (CMS-103), and
     the resource selection policy (`guestMayChoose`, REV3-15) decides whether the guest chooses the unit.
-    Same venue-map back end as F&B and locations.'
+    Same venue-map back end as F&B and locations.
+
+
+    **addCartLine''s variantId is the placed spot''s PlacedResource.variantId (it exists in venue-map;
+    the pull did not carry it), 4 October 2026** (CHG-FXS-003)'
   density: comfortable
   pattern: listDetail
   patternReason: '`getMapResourceAvailability` reads the population of spots and a tap holds one of them
@@ -14561,7 +14856,11 @@ screens:
     routes, *Book this route* prefills one-way; remove. *Change your trip free up to two hours before
     departure* is the proposed default of the venue''s modification policy, client to correct. **The real
     network (stations, fares, timetable) is an open value from the client**; the prototype''s Emirates
-    Link data is illustrative.'
+    Link data is illustrative.
+
+
+    **Choose sends the PassOffer''s variants[] variantId for the passenger type (added by the contracts
+    agent, runs/fix-s12/LEDGER.md (CHG-FXC-011), 4 October 2026)** (CHG-FXS-003)'
   density: comfortable
   pattern: listDetail
   patternReason: '`listTransportPassOffers` reads the population of passes for the station pair'

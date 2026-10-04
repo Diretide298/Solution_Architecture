@@ -1,0 +1,40 @@
+id: CHG-FXS-006
+date: '2026-10-04'
+source: audit
+kind: spec
+summary: BO-822, BO-1069, BO-1072 and ADM-408 cannot be defined from the package (no operation exists for what they
+  are for); the plan holds them out of Sprints 1-2.
+decision:
+  what: Leave the four screens marked; ask the plan in the ledger to move them out (done by plan, CHG-FXP-004);
+    exempt them in NP with the reason until they leave.
+  by: Chinmay
+  date: '2026-10-04'
+why: 'Sprint 1-2 judging of 4 October 2026 (runs/fix-s12/screens.tsv, finding rows: 159 tickets, 73 not buildable;
+  shared brief audit/ticvai/apply/FIX-S12-BRIEF.md). Chinmay, 4 October: fix all of it in one round, then one refresh,
+  then r1. Operations and fields another agent adds are the names agreed in runs/fix-s12/LEDGER.md (contracts CHG-FXC-003,
+  CHG-FXC-010; plan CHG-FXP-004).'
+keys_touched:
+  screens:
+  - ADM-408
+  - BO-1069
+  - BO-1072
+  - BO-822
+  files:
+  - tools/applied/s12-screens-4-october.py
+  - tools/applied/s12-screens-4-october-specs.py
+root_class: A28 MISSING-OPERATION
+tickets:
+  started: []
+  unstarted:
+  - APP-CONSOLE-ADM-408
+  - VM-BO-1069
+  - VM-BO-1072
+  - VM-BO-822
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: open
+notes: 'Batch FXS (fix-s12-screens), 4 October 2026. Tickets: none started (Sprint 1 starts Monday 5 October).'

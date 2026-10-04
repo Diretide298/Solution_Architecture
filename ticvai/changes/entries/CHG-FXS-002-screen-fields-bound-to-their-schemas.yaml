@@ -1,0 +1,76 @@
+id: CHG-FXS-002
+date: '2026-10-04'
+source: audit
+kind: spec
+summary: Inputs, pick lists and actions that bound no schema property, or asked for fields a request does not have,
+  are bound to the request and response schemas.
+decision:
+  what: Bind every input to the request property it sends and every pick list to the operation that fills it; replace
+    pack labels that have no property; add the fields a request requires (mode, code, parent, outputFormat); move
+    a design's model to the one its operations use.
+  by: Chinmay
+  date: '2026-10-04'
+why: 'Sprint 1-2 judging of 4 October 2026 (runs/fix-s12/screens.tsv, finding rows: 159 tickets, 73 not buildable;
+  shared brief audit/ticvai/apply/FIX-S12-BRIEF.md). Chinmay, 4 October: fix all of it in one round, then one refresh,
+  then r1. Operations and fields another agent adds are the names agreed in runs/fix-s12/LEDGER.md (contracts CHG-FXC-003,
+  CHG-FXC-010; plan CHG-FXP-004).'
+keys_touched:
+  screens:
+  - ADM-412
+  - ADM-421
+  - ADM-424
+  - ADM-523
+  - BO-024
+  - BO-087
+  - BO-1094
+  - BO-1146
+  - BO-185
+  - BO-201
+  - BO-293
+  - BO-335
+  - BO-346
+  - BO-857
+  - CMS-026
+  - KIT-005
+  files:
+  - tools/applied/s12-screens-4-october.py
+  - tools/applied/s12-screens-4-october-specs.py
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted:
+  - APP-CONSOLE-ADM-421
+  - APP-POS-KIT-005
+  - APP-SETUP-ADM-412
+  - APP-SETUP-ADM-412-REST
+  - APP-SETUP-ADM-523
+  - APP-SETUP-ADM-523-REST
+  - APP-SETUP-BO-1094
+  - APP-SETUP-BO-1094-REST
+  - APP-SETUP-BO-1146
+  - APP-SETUP-BO-1146-REST
+  - APP-SETUP-BO-185
+  - APP-SETUP-BO-185-REST
+  - APP-SETUP-BO-201
+  - APP-SETUP-BO-201-REST
+  - APP-SETUP-BO-335
+  - APP-SETUP-BO-335-REST
+  - APP-SETUP-BO-346
+  - APP-SETUP-BO-346-REST
+  - APP-SETUP-BO-857
+  - APP-SETUP-BO-857-REST
+  - APP-SETUP-CMS-026
+  - APP-SETUP-CMS-026-REST
+  - APP-WL-ADM-424
+  - TEST-AM-SETUP-CUSTOMER-MARKETING-P13
+  - TEST-AM-SETUP-TICKETING-GUEST-COMMERCE-P08
+  - VM-BO-024
+  - VM-BO-293
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: 'Batch FXS (fix-s12-screens), 4 October 2026. Tickets: none started (Sprint 1 starts Monday 5 October).'
