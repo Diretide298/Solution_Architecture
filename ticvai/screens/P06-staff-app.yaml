@@ -2042,6 +2042,7 @@ screens:
         operation: listScans
         provenance: contract access.yaml GET /access/scans
       - kind: scanTarget
+        bindsTo: ValidateRequest.mediaCode
         derived: true
         impliedBy: listScans
         notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
@@ -2052,7 +2053,7 @@ screens:
         derived: true
         impliedBy: lookupTicket
         label: Search
-        notes: A search that returns nothing must say so differently from a search not yet run.
+        notes: Sends `?mediaCode=` to `lookupTicket` (a code typed when the camera cannot read it) (CHG-RFM-012). A search that returns nothing must say so differently from a search not yet run.
         provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
@@ -2323,6 +2324,7 @@ screens:
         operation: listScans
         provenance: contract access.yaml GET /access/scans
       - kind: scanTarget
+        bindsTo: ValidateRequest.mediaCode
         derived: true
         impliedBy: syncScans
         notes: '**A screen that validates a credential needs somewhere to point the camera.** `denied`
@@ -2333,7 +2335,7 @@ screens:
         derived: true
         impliedBy: lookupTicket
         label: Search
-        notes: A search that returns nothing must say so differently from a search not yet run.
+        notes: Sends `?mediaCode=` to `lookupTicket` (a code typed when the camera cannot read it) (CHG-RFM-012). A search that returns nothing must say so differently from a search not yet run.
         provenance: carried from the previous definition
     - name: contextPanel
       slot: selection
@@ -14309,7 +14311,7 @@ screens:
         - Status
         kind: multiSelect
         label: Filter by
-        notes: The pack filters this screen by location, product, start time, booking type, group/individual,
+        notes: Sends `?status=` to `listRentalBookings` (the booking status; location goes as `locationId`) (CHG-RFM-012). The pack filters this screen by location, product, start time, booking type, group/individual,
           readiness and 1 more — which are present is a decision the pack already made.
         provenance: pack Rental_Management.pdf, page 64 §Filters
       name: contentBody
@@ -14763,7 +14765,7 @@ screens:
         impliedBy: lookupAsset
         kind: searchField
         label: Search
-        notes: A search that returns nothing must say so differently from a search not yet run.
+        notes: Sends `?assetTag=` to `lookupAsset` (the tag typed or scanned on the equipment) (CHG-RFM-012). A search that returns nothing must say so differently from a search not yet run.
       - derived: true
         impliedBy: assignRentalEquipment
         kind: secondaryButton
@@ -15352,7 +15354,7 @@ screens:
         - Group/Individual
         kind: multiSelect
         label: Filter by
-        notes: The pack filters this screen by venue, location, product, customer, rental status, expected
+        notes: Sends `?status=` to `listRentalBookings` (the rental status; location goes as `locationId`) (CHG-RFM-012). The pack filters this screen by venue, location, product, customer, rental status, expected
           return and 2 more — which are present is a decision the pack already made.
         provenance: pack Rental_Management.pdf, page 78 §Filters
       name: contentBody
@@ -15617,7 +15619,7 @@ screens:
       components:
       - kind: selectField
         label: Additional duration
-        notes: +30, +60, +90 min or Custom; sets the `to` sent to `getRentalAvailability`.
+        notes: Sends `?to=` to `getRentalAvailability` (the expected return plus the added time) (CHG-RFM-012). +30, +60, +90 min or Custom; sets the `to` sent to `getRentalAvailability`.
         operation: getRentalAvailability
         provenance: contract rental.yaml GET /rental-availability
       - kind: textField

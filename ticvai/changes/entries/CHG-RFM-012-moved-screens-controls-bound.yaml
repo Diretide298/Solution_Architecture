@@ -1,0 +1,40 @@
+id: CHG-RFM-012
+date: '2026-10-04'
+source: audit
+kind: spec
+summary: Eleven controls on staff, scanner and console screens are bound to the query parameter or field they send, so the
+  binding counts of the blocks the merged plan moved them into do not rise.
+decision:
+  what: 'Search and scan controls bind what they send: EMP-015 and EMP-017 (scan target ValidateRequest.mediaCode; search
+    ?mediaCode= to lookupTicket), SCN-009 (scan and search, ?mediaCode= to lookupTicket), EMP-075 (?assetTag= to lookupAsset);
+    EMP-083''s Additional duration sends ?to= to getRentalAvailability; the Filter by of EMP-071 and EMP-081 sends ?status=
+    to listRentalBookings and ADM-198''s ?guestType= to listTargetingEligibility. Each is what the control already did in
+    its notes or the screen''s operations; no operation or field is added.'
+  by: Chinmay
+  date: '2026-10-04'
+why: 'check-binding-ratchet on the merged branch (e13d7ad5): venue-management|B unbound-control 953 to 954 and venue-staff-mobile|C
+  21 to 30. No binding got worse: the merged plan moved screens between blocks (EMP-071, EMP-075, EMP-080, EMP-081, EMP-083
+  from Block D to C; ADM-182 and others from C to B). Chinmay, 4 October: fix the bindings so the ratchet does not rise,
+  no baseline exception.'
+keys_touched:
+  screens:
+  - EMP-015
+  - EMP-017
+  - SCN-009
+  - EMP-075
+  - EMP-083
+  - EMP-071
+  - EMP-081
+  - ADM-198
+root_class: 'new: merge-interaction'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-binding-ratchet.py
+status: open
+notes: Batch RFM (r1-fix-merge), 4 October 2026.

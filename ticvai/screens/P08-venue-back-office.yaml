@@ -182185,7 +182185,7 @@ screens:
         - Payment
         - Contextual
         - AI-generated
-        notes: The pack filters this screen by guest type, crm segment, membership, loyalty, demographic,
+        notes: Sends `?guestType=` to `listTargetingEligibility`; each other dimension is its own query parameter of that read (CHG-RFM-012). The pack filters this screen by guest type, crm segment, membership, loyalty, demographic,
           behavioral and 8 more — which are present is a decision the pack already made.
         provenance: pack Promotions___Bundles_Management_Reference.pdf, page 94 §Filter by
     - name: contentBody
