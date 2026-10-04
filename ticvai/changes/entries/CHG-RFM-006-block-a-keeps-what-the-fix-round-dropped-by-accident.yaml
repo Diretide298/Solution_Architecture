@@ -3,22 +3,26 @@ date: '2026-10-04'
 source: plan
 kind: plan
 summary: What left Block A by accident of the fix round comes back (four wallet operations, BO-1111, BO-346, ADM-506 as
-  setup host), the AI forecast screens ADM-503/504/505 default into Block A, and every Block A setup screen is reached from
-  its app's home.
+  setup host), the AI forecast screens ADM-503/504/505 go back to Block B where r2 had them, and every Block A setup screen
+  is reached from its app's home.
 decision:
   what: '(1) build-service-docs.py prefers the setup hosts of the plan it replaces after the pushed ones (a tie had swapped
     ADM-506 for ADM-505). (2) block-a-extra-tasks.json blockAOperations: holdWalletFunds, captureWalletHold, releaseWalletHold,
     expireCreditLots (they left the slice when topUpWallet''s lineage began to write wallet.balance and wallet.credit_lot);
-    blockAScreens: BO-1111, BO-346 (its ticket-template operations moved off it), ADM-503, ADM-504, ADM-505 (binding listForecastDefinitions
-    made them AI app-module screens, moved to Block D; r2 had them in Block B; defaulted into Block A, for Chinmay to confirm
-    as an AI change in Block A). (3) Venue Home BO-100 links to ADM-340, ADM-606, BO-1018 and BO-1034, and Platform Dashboard
-    ADM-002 to ADM-503, ADM-504 and ADM-505, as lever A does (CHG-RONEP-007): their command centres are not in Block A.'
+    blockAScreens: BO-1111, BO-346 (its ticket-template operations moved off it). ADM-503, ADM-504, ADM-505 (binding listForecastDefinitions
+    made them AI app-module screens, moved to Block D) go back to Block B: block-a-extra-tasks.json screenModules keeps
+    them in Identity & Security, the app-module r2 built them in (build-service-docs.py screen_module reads it); Chinmay,
+    4 October, no AI change in Block A. (3) Venue Home BO-100 links to ADM-340, ADM-606, BO-1018 and BO-1034, as lever A
+    does (CHG-RONEP-007): their command centres are not in Block A. Platform Dashboard ADM-002''s links to ADM-503, ADM-504
+    and ADM-505 stay (Chinmay, 4 October).'
   by: Chinmay
   date: '2026-10-04'
 proposed: 2026-10-04T12:00
 why: 'check-plan-closure findings on the merged branch (e13d7ad5): C-UNTICKETED (9, nothing gave a reason; none is a decision)
   and C-REACH (5). Chinmay, 4 October: restore what left Block A by accident; AI screens default into Block A and the cause
-  is reported to him (council rule: AI changes in Block A go to him first).'
+  is reported to him (council rule: AI changes in Block A go to him first). Chinmay, 4 October ~14:00 (answers-2-oct-batch1,
+  last entry): ADM-503/504/505 back to Block B, where r2 had them; ADM-506 setup, the wallet hold operations, BO-346 and
+  BO-1111 stay restored in Block A.'
 keys_touched:
   operations:
   - holdWalletFunds
@@ -41,6 +45,7 @@ keys_touched:
   files:
   - docs/active/block-a-extra-tasks.json
   - tools/build-service-docs.py
+  - screens/P09-platform-admin-console.yaml
 root_class: 'new: merge-interaction'
 tickets:
   started: []

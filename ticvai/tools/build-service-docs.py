@@ -89,11 +89,14 @@ def block_a_decisions() -> dict:
                           the navigation closure pulls into Block A (lever A, CHG-RONEP-007)
       blockAScreens       screen -> why Block A builds the whole screen (its setup part and the rest)
       screenNotes         screen -> a sentence its Block A tasks carry (BO-1065: the AI residency section)
+      screenModules       screen -> {module, why}: the business module a screen's tasks are grouped under when its
+                          operations' majority would put it elsewhere (CHG-RFM-006: ADM-503/504/505 stay in Identity &
+                          Security, Block B, as r2 had them, after binding listForecastDefinitions made them AI's)
 
     tools/check-plan-closure.py reads the same file and checks that the plan holds them."""
     if not EXTRA.exists():
         return {"aiEngineOperations": {}, "blockA1Operations": {}, "blockAOperations": {}, "blockAScreens": {},
-                "screenNotes": {}, "navHomes": {}, "screensNotBuilt": {}}
+                "screenNotes": {}, "navHomes": {}, "screensNotBuilt": {}, "screenModules": {}}
     ex = json.loads(EXTRA.read_text(encoding="utf-8"))
     ai = {o: t["key"] for t in ex.get("tasks") or [] for o in t.get("operations") or []}
     return {"aiEngineOperations": ai, "blockA1Operations": dict(ex.get("blockA1Operations") or {}),
@@ -102,7 +105,8 @@ def block_a_decisions() -> dict:
             "navHomes": dict(ex.get("navHomes") or {}),
             # screen -> {kind, into, why}: a replaced page or a screen nobody could define, given no build task
             # (CHG-FXP-002, ticket_done.screen_hold)
-            "screensNotBuilt": dict(ex.get("screensNotBuilt") or {})}
+            "screensNotBuilt": dict(ex.get("screensNotBuilt") or {}),
+            "screenModules": {k: v["module"] for k, v in (ex.get("screenModules") or {}).items()}}
 
 # **The one authored table in this file.** The decomposition explains each service to an architect
 # ("platform.org_unit is reached by 304 of 379 tables"); a client needs what it does for the venue.
@@ -1866,6 +1870,8 @@ def main() -> int:
     op_module = {o: sp.MODULE_OF_CONTRACT.get(x["contract"], "Platform Operations") for o, x in ops.items()}
 
     def screen_module(sid):
+        if sid in decided["screenModules"]:
+            return decided["screenModules"][sid]
         s_ = screens[sid]
         mods = Counter(op_module[a["operationId"]] for a in s_.get("apis") or []
                        if isinstance(a, dict) and a.get("operationId") in op_module)

@@ -708,20 +708,20 @@ screens:
       - tenantId
     - to: ADM-503
       trigger: Opens Ticket, Product & Timeslot Demand Forecast
-      provenance: 'CHG-RFM-006: the section home links to the Block A screen it leads to (lever A,
-        CHG-RONEP-007); its command centre is not in Block A'
+      provenance: 'CHG-RFM-006: the home links to the forecast screen directly (lever A, CHG-RONEP-007); kept when
+        it went back to Block B with Identity & Security (Chinmay, 4 October)'
       carries:
       - tenantId
     - to: ADM-504
       trigger: Opens Channel & Booking Pace Forecast
-      provenance: 'CHG-RFM-006: the section home links to the Block A screen it leads to (lever A,
-        CHG-RONEP-007); its command centre is not in Block A'
+      provenance: 'CHG-RFM-006: the home links to the forecast screen directly (lever A, CHG-RONEP-007); kept when
+        it went back to Block B with Identity & Security (Chinmay, 4 October)'
       carries:
       - tenantId
     - to: ADM-505
       trigger: Opens Revenue & Commercial Forecast
-      provenance: 'CHG-RFM-006: the section home links to the Block A screen it leads to (lever A,
-        CHG-RONEP-007); its command centre is not in Block A'
+      provenance: 'CHG-RFM-006: the home links to the forecast screen directly (lever A, CHG-RONEP-007); kept when
+        it went back to Block B with Identity & Security (Chinmay, 4 October)'
       carries:
       - tenantId
     - to: ADM-506
