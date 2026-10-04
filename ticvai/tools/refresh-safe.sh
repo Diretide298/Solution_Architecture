@@ -75,10 +75,32 @@
 #                            and HEAD as changed (REF = the last commit whose outputs were fully refreshed)
 #            --keep-worktree debugging only: leave the worktree (and the trace) for inspection;
 #                            the next run removes it. Never merges.
+#            --jobs N        checkers run N at a time (default 4; 1 = the original sequential loop).
+#                            The table, the verdict and every checker's output are the same either way.
+#            --resume        after a failed run: reuse its worktree and skip the steps it completed.
+#                            Refused (and a fresh run started instead) if HEAD or any step's script
+#                            changed since. A resumed run never merges: it is for iterating, and a
+#                            release gate is always a fresh run (docs/active/refresh-runbook.md).
+#
+# **Speed-up of 4 October (council of 3 October 23:30, CHG-RSPD-001):**
+#   * every refresh step's exit code and expected outputs are checked; a failure prints
+#     `FAILED at step N <name>` and stops the run, and the judge refuses a PASS unless the refresh
+#     printed `== refresh completed: all N selected steps of T` -- a silent death cannot pass;
+#   * per-step timings in <run>/steps.tsv (step, name, start, seconds, exit, status), the ten
+#     slowest and the time of each phase printed at the end (<run>/phases.tsv);
+#   * a failed run keeps its worktree for --resume (state in <run>/state.tsv, validity in
+#     <wt-dir>/resume.json: HEAD and the fingerprint of every step's script);
+#   * one run at a time: a release lock in the repository's git directory
+#     (ticvai-refresh-safe.lock: pid, start, HEAD), a stale one (holder gone) is removed; and before
+#     merging, HEAD must still be the commit the run started from, or it is a STALE BASE;
+#   * the checks run --jobs at a time, per-check output kept in <run>/checks/<name>.txt.
 #
 # Exit codes: 0 pass (merged unless --no-merge) · 1 refresh or checks failed · 2 usage ·
-#             3 uncommitted authored changes · 4 merge refused (conflict or drift) · 130 interrupted
-# Logs of every run are kept in <wt-dir>/runs/<stamp>/ (refresh.log, checks.log, merge.log).
+#             3 uncommitted authored changes · 4 merge refused (conflict or drift) ·
+#             5 STALE BASE (HEAD moved during the run; nothing merged) ·
+#             6 another run holds the release lock · 130 interrupted
+# Logs of every run are kept in <wt-dir>/runs/<stamp>/ (refresh.log, steps.tsv, checks.log,
+# checks/, merge.log, phases.tsv).
 #
 # **The whole script is one brace group**, so bash parses all of it before running any of it. Bash
 # reads a script as it goes; a `git pull` that changed this file during an hour-long run would
@@ -108,8 +130,9 @@ done
 [ -n "$PY" ] || die "no working Python found"
 
 INCLUDE_WORKING=0; IGNORE_UNTRACKED=0; HEAD_ONLY=0; MERGE=1; TRACE=0; SKIP_CHECKS=0; ALLOW_DRIFT=0; QUIET=0
-MANIFEST_OUT=""; CHANGED=(); STEPS_ARG=""; KEEP_WT=0; SINCE=""
+MANIFEST_OUT=""; CHANGED=(); STEPS_ARG=""; KEEP_WT=0; SINCE=""; RESUME=0; JOBS=4
 WT_BASE="${REFRESH_SAFE_WT:-${TMPDIR:-${TEMP:-/tmp}}/ticvai-refresh-safe}"
+T_RUN0=$(date +%s)
 while [ $# -gt 0 ]; do
   case "$1" in
     --include-working) INCLUDE_WORKING=1 ;;
@@ -129,6 +152,9 @@ while [ $# -gt 0 ]; do
     --keep-worktree) KEEP_WT=1 ;;
     --since) shift; [ $# -gt 0 ] || die "--since needs a commit"; SINCE="$1" ;;
     --steps) shift; [ $# -gt 0 ] || die "--steps needs a list"; STEPS_ARG="$1" ;;
+    --resume) RESUME=1 ;;
+    --jobs) shift; [ $# -gt 0 ] || die "--jobs needs a number"; JOBS="$1"
+      case "$JOBS" in ''|*[!0-9]*|0) die "--jobs needs a whole number of at least 1" ;; esac ;;
     -h|--help) sed -n '2,/^{$/p' "$0" | sed '$d; s/^# \{0,1\}//'; exit 0 ;;
     *) die "unknown option: $1 (see --help)" ;;
   esac
@@ -142,6 +168,13 @@ if [ -n "$MANIFEST_OUT" ]; then
   [ "$TRACE" = 1 ] || die "--manifest-out needs --trace"
   case "$MANIFEST_OUT" in /*|[A-Za-z]:*) ;; *) MANIFEST_OUT="$PKG_MAIN/$MANIFEST_OUT" ;; esac
 fi
+if [ "$RESUME" = 1 ]; then
+  # A resumed run repeats the failed run's selection on the failed run's worktree; scoping it again
+  # would mix two runs' state.
+  [ ${#CHANGED[@]} -eq 0 ] && [ -z "$STEPS_ARG" ] && [ -z "$SINCE" ] && [ "$TRACE" = 0 ] \
+    && [ "$INCLUDE_WORKING" = 0 ] && [ "$HEAD_ONLY" = 0 ] && [ "$SKIP_CHECKS" = 0 ] \
+    || die "--resume reuses the failed run's options; it combines only with --jobs, --quiet, --wt-dir, --no-merge, --keep-worktree"
+fi
 
 mkdir -p "$WT_BASE"
 WT_BASE="$(mixed "$(cd "$WT_BASE" && pwd)")"
@@ -150,6 +183,72 @@ RUN="$WT_BASE/runs/$STAMP-$$"
 mkdir -p "$RUN"
 MAIN_MANIFEST="$PKG_MAIN/handoff/refresh-manifest.json"
 HELPER="$RUN/helper.py"
+RESUME_FILE="$WT_BASE/resume.json"
+
+# ------------------------------------------------------------------------------------------------
+# **The release lock: one refresh-safe at a time** (council of 3 October 23:30, CHG-RSPD-001). Two
+# gates overlapping on a machine shared with agents is how a step dies under load, and two merges
+# from two runs is how a PASS approves a base that no longer exists. The lock is a directory (mkdir
+# is atomic) in the repository's common git directory, so every worktree of the repository shares
+# it. It records who holds it; a lock whose holder is no longer running is stale and is removed.
+LOCK_DIR="$(mixed "$(git -C "$REPO" rev-parse --path-format=absolute --git-common-dir)")/ticvai-refresh-safe.lock"
+LOCKED=0
+lock_alive() {
+  local pid wpid
+  pid="$(sed -n 's/^pid=//p' "$1" 2>/dev/null | head -1)"
+  wpid="$(sed -n 's/^winpid=//p' "$1" 2>/dev/null | head -1)"
+  if [ -n "$pid" ] && kill -0 "$pid" 2>/dev/null; then return 0; fi
+  # a holder started from another shell runtime is invisible to kill -0; Windows still sees it
+  if [ -n "$wpid" ] && command -v tasklist >/dev/null 2>&1 \
+     && tasklist //FI "PID eq $wpid" //NH 2>/dev/null | grep -qi 'bash'; then return 0; fi
+  return 1
+}
+take_lock() {
+  local i
+  for i in 1 2 3; do
+    if mkdir "$LOCK_DIR" 2>/dev/null; then
+      { echo "pid=$$"
+        echo "winpid=$(cat "/proc/$$/winpid" 2>/dev/null || true)"
+        echo "started=$(date '+%Y-%m-%d %H:%M:%S %z')"
+        echo "head=$(git -C "$REPO" rev-parse HEAD)"
+        echo "tree=$PKG_MAIN"
+        echo "run=$RUN"
+      } > "$LOCK_DIR/info"
+      LOCKED=1
+      return 0
+    fi
+    if [ ! -f "$LOCK_DIR/info" ]; then
+      # another run between its mkdir and its info file -- or one killed exactly there
+      sleep 2
+      if [ ! -f "$LOCK_DIR/info" ] && [ -n "$(find "$LOCK_DIR" -maxdepth 0 -mmin +1 2>/dev/null)" ]; then
+        echo "refresh-safe: removing a stale release lock with no holder recorded: $LOCK_DIR"
+        rm -rf "$LOCK_DIR"
+      fi
+      continue
+    fi
+    if lock_alive "$LOCK_DIR/info"; then
+      echo "refresh-safe: REFUSED -- another refresh-safe run holds the release lock ($LOCK_DIR):" >&2
+      sed 's/^/    /' "$LOCK_DIR/info" >&2
+      echo "  One gate at a time (docs/active/refresh-runbook.md). Wait for it or stop it; if you are" >&2
+      echo "  certain it is gone, remove the directory above. The main tree was not touched." >&2
+      exit 6
+    fi
+    echo "refresh-safe: removing a stale release lock (its holder is no longer running):"
+    sed 's/^/    /' "$LOCK_DIR/info"
+    rm -rf "$LOCK_DIR"
+  done
+  echo "refresh-safe: could not take the release lock $LOCK_DIR" >&2
+  exit 6
+}
+release_lock() {
+  if [ "$LOCKED" = 1 ] && grep -qx "pid=$$" "$LOCK_DIR/info" 2>/dev/null; then rm -rf "$LOCK_DIR"; fi
+  LOCKED=0
+}
+take_lock
+trap 'release_lock' EXIT
+trap 'echo; echo "refresh-safe: INTERRUPTED"; exit 130' INT TERM HUP
+HEAD0="$(git -C "$REPO" rev-parse HEAD)"
+fmt_s() { printf '%dm%02ds' $(( $1 / 60 )) $(( $1 % 60 )); }
 
 # ------------------------------------------------------------------------------------------------
 # The Python half: status, include, hydrate, normalise, judge, merge. Written per run so the
@@ -284,7 +383,7 @@ def cmd_normalise(pkg, t0):
     print("  %d file(s) set to one mtime" % n)
 
 # ---------------------------------------------------------------------------------------------
-def cmd_judge(pkg, baseline_path, log_path, tail_path=""):
+def cmd_judge(pkg, baseline_path, log_path, tail_path="", jobs="1", out_dir="", refresh_log="", plan_path=""):
     spec = importlib.util.spec_from_file_location("run_checks", os.path.join(pkg, "tools", "run-checks.py"))
     rc_mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(rc_mod)
@@ -311,11 +410,12 @@ def cmd_judge(pkg, baseline_path, log_path, tail_path=""):
     threads = [threading.Thread(target=run_detail, args=(c,)) for c in detail]
     for th in threads:
         th.start()
-    print("  running %d checker(s) through run-checks.py; %s alongside, in full, for the baseline"
-          % (len(others), ", ".join(detail)))
+    print("  running %d checker(s) through run-checks.py, %s at a time; %s alongside, in full, for the baseline"
+          % (len(others), jobs, ", ".join(detail)))
     sys.stdout.flush()
     verdicts = {}
-    p = subprocess.Popen([sys.executable, os.path.join(pkg, "tools", "run-checks.py"), "--no-gate", *others],
+    extra = ["--jobs", str(jobs)] + (["--out-dir", out_dir] if out_dir else [])
+    p = subprocess.Popen([sys.executable, os.path.join(pkg, "tools", "run-checks.py"), "--no-gate", *extra, *others],
                          cwd=pkg, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
                          text=True, encoding="utf-8", errors="replace")
     for line in p.stdout:
@@ -376,6 +476,19 @@ def cmd_judge(pkg, baseline_path, log_path, tail_path=""):
                          "them from tools/refresh-safe-baseline.json" % len(gone))
     else:
         print("  %-26s --    not run (no refresh step ran)" % "refresh.sh tools/ cover")
+    # **No PASS without the refresh saying it finished** (CHG-RSPD-001). On 3 October a run died at
+    # step 37 with no line after the step's banner; whatever stops the derive phase, a log without
+    # the marker is a failure here, not a shorter run.
+    if plan_path:
+        plan = json.load(open(plan_path, encoding="utf-8"))
+        marker = "== refresh completed: all %d selected steps of %d" % (len(plan["selected"]), plan["total"])
+        txt = open(refresh_log, encoding="utf-8", errors="replace").read() if os.path.exists(refresh_log) else ""
+        if any(l.rstrip() == marker for l in txt.splitlines()):
+            print("  %-26s ok    %s" % ("refresh.sh steps", marker[3:]))
+        else:
+            print("  %-26s FAIL  no '%s' line in the refresh log" % ("refresh.sh steps", marker))
+            new.append("refresh: the derive phase never reported completing all %d selected steps"
+                       % len(plan["selected"]))
     rpt = [c for c in others if verdicts.get(c) == "rpt"]
     print()
     print("  baseline: %s" % ", ".join("%s (%d known)" % (c, len(base[c].get("known", []))) for c in detail))
@@ -513,6 +626,71 @@ def cmd_merge(repo, wt, pkg_rel, base_tree, t0, tools_dir, manifest_path, apply,
     print("  full list: %s" % log_path)
     return 0
 
+# ---------------------------------------------------------------------------------------------
+# --resume (CHG-RSPD-001): what a failed run leaves, and whether it may still be trusted
+def cmd_resume_write(path, run, wt, wpkg, head, base_tree, t0, steps, fp_path):
+    doc = {"run": run, "wt": wt, "wpkg": wpkg, "head": head, "base_tree": base_tree, "t0": t0,
+           "steps": steps, "fingerprint": json.load(open(fp_path, encoding="utf-8")),
+           "written": time.strftime("%Y-%m-%d %H:%M:%S")}
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(doc, fh, indent=1)
+    return 0
+
+def cmd_resume_check(path, head_now, fp_path):
+    """Shell assignments for the run to resume (exit 0), or the reasons it may not be (exit 1)."""
+    import shlex
+    try:
+        d = json.load(open(path, encoding="utf-8"))
+    except (OSError, ValueError) as e:
+        print("the resume record %s cannot be read (%s)" % (path, e))
+        return 1
+    now = json.load(open(fp_path, encoding="utf-8"))
+    old = d.get("fingerprint") or {}
+    why = []
+    if d.get("head") != head_now:
+        why.append("HEAD moved: the failed run started on %s, HEAD is now %s"
+                   % ((d.get("head") or "?")[:10], head_now[:10]))
+    if old.get("frame") != now.get("frame"):
+        why.append("tools/refresh.sh or tools/refresh-manifest.py changed since the state was written")
+    os_, ns_ = old.get("steps") or {}, now.get("steps") or {}
+    changed = sorted((n for n in set(os_) | set(ns_) if os_.get(n) != ns_.get(n)), key=int)
+    if changed:
+        why.append("the script of step(s) %s changed since the state was written" % ", ".join(changed))
+    if not os.path.isdir(d.get("wpkg") or ""):
+        why.append("its worktree %s is gone" % d.get("wt"))
+    state = os.path.join(d.get("run") or "", "state.tsv")
+    if why:
+        for w in why:
+            print(w)
+        return 1
+    done = sum(1 for l in open(state, encoding="utf-8") if l.strip()) if os.path.exists(state) else 0
+    for k, v in (("R_RUN", d["run"]), ("R_WT", d["wt"]), ("R_WPKG", d["wpkg"]), ("R_HEAD", d["head"]),
+                 ("R_BASE_TREE", d["base_tree"]), ("R_T0", d["t0"]), ("R_STEPS", d["steps"]),
+                 ("R_STATE", state), ("R_DONE", str(done))):
+        print("%s=%s" % (k, shlex.quote(str(v))))
+    return 0
+
+def cmd_timings(steps_tsv, top="10"):
+    """The slowest steps of this run, from the per-step log the refresh writes."""
+    if not os.path.exists(steps_tsv):
+        return 0
+    rows = []
+    for l in open(steps_tsv, encoding="utf-8", errors="replace").read().splitlines()[1:]:
+        f = l.split("\t")
+        if len(f) >= 6 and f[5] != "resumed":
+            try:
+                rows.append((float(f[3]), f[0], f[1], f[4], f[5]))
+            except ValueError:
+                pass
+    if not rows:
+        return 0
+    total = sum(r[0] for r in rows)
+    print("  %d slowest of %d timed step(s) (derive steps sum %.1f min; %s):"
+          % (min(int(top), len(rows)), len(rows), total / 60, steps_tsv))
+    for s, n, name, rc, st in sorted(rows, key=lambda r: -r[0])[:int(top)]:
+        print("    %7.1fs  step %-3s %s%s" % (s, n, name[:80], "" if st == "ok" else "  [%s, exit %s]" % (st, rc)))
+    return 0
+
 if __name__ == "__main__":
     cmd, args = sys.argv[1], sys.argv[2:]
     sys.exit(globals()["cmd_" + cmd](*args) or 0)
@@ -520,30 +698,66 @@ PYHELPER
 helper() { "$PY" "$HELPER" "$@"; }
 
 # ------------------------------------------------------------------------------------------------
-# Leftovers from a run killed too hard for its trap (a closed terminal, kill -9).
+# **--resume is decided before the leftovers are cleared** (CHG-RSPD-001), because the worktree a
+# valid resume needs is one of them. Valid means: HEAD is the commit the failed run started from,
+# and every step's script (the step's text, its tool, the modules the tool imports, refresh.sh and
+# the emitter) hashes as it did then. Anything else is refused and the run starts over.
+RESUMING=0; R_WT=""; RESUMABLE=0
+"$PY" "$SELF_DIR/refresh-manifest.py" fingerprint --pkg "$PKG_MAIN" > "$RUN/fingerprint.json"
+if [ "$RESUME" = 1 ]; then
+  if [ ! -f "$RESUME_FILE" ]; then
+    echo "refresh-safe: --resume: no failed run to resume under $WT_BASE -- starting a fresh run"
+  elif helper resume_check "$RESUME_FILE" "$HEAD0" "$RUN/fingerprint.json" > "$RUN/resume.env"; then
+    . "$RUN/resume.env"
+    RESUMING=1
+    MERGE=0
+  else
+    echo "refresh-safe: --resume REFUSED -- the failed run's state no longer describes this tree:"
+    sed 's/^/    /' "$RUN/resume.env"
+    echo "  starting over with a fresh run"
+    rm -f "$RESUME_FILE"
+  fi
+elif [ -f "$RESUME_FILE" ]; then
+  echo "refresh-safe: a fresh run: the state kept for --resume is discarded ($RESUME_FILE)"
+  rm -f "$RESUME_FILE"
+fi
+
+# ------------------------------------------------------------------------------------------------
+# Leftovers from a run killed too hard for its trap (a closed terminal, kill -9), and the worktree a
+# failed run kept for --resume when this run is not resuming it.
 PIDF=""
 git -C "$REPO" worktree prune
 while IFS= read -r _wt; do
   [ -n "$_wt" ] || continue
   _m="$(mixed "$_wt")"
   case "${_m,,}" in "${WT_BASE,,}"/w*) ;; *) continue ;; esac
+  if [ "$RESUMING" = 1 ] && [ "${_m,,}" = "${R_WT,,}" ]; then continue; fi
   if [ -f "$_m.pid" ] && kill -0 "$(cat "$_m.pid")" 2>/dev/null; then
     echo "refresh-safe: another run is using $_m (pid $(cat "$_m.pid")); leaving it"
     continue
   fi
-  echo "refresh-safe: removing a worktree left by an interrupted run: $_m"
-  git -C "$REPO" worktree remove --force "$_m" 2>/dev/null || rm -rf "$_m"
+  echo "refresh-safe: removing a worktree left by an earlier run: $_m"
+  git -C "$REPO" worktree remove --force "$_m" 2>/dev/null || rm -rf "$_m" 2>/dev/null \
+    || echo "refresh-safe: could not remove $_m yet (a process still holds a file in it); the next run tries again"
   rm -f "$_m.pid"
 done < <(git -C "$REPO" worktree list --porcelain | sed -n 's/^worktree //p')
 for _d in "$WT_BASE"/w*; do
   [ -d "$_d" ] || continue
+  if [ "$RESUMING" = 1 ] && [ "${_d,,}" = "${R_WT,,}" ]; then continue; fi
   if [ -f "$_d.pid" ] && kill -0 "$(cat "$_d.pid")" 2>/dev/null; then continue; fi
-  echo "refresh-safe: removing a leftover directory: $_d"; rm -rf "$_d" "$_d.pid"
+  echo "refresh-safe: removing a leftover directory: $_d"
+  rm -rf "$_d" "$_d.pid" 2>/dev/null || echo "refresh-safe: could not remove $_d yet; the next run tries again"
 done
 git -C "$REPO" worktree prune
 
 # ------------------------------------------------------------------------------------------------
 echo "refresh-safe: $(git -C "$REPO" rev-parse --short HEAD) on $(git -C "$REPO" rev-parse --abbrev-ref HEAD) · run log $RUN"
+if [ "$RESUMING" = 1 ]; then
+  echo "1-3. resuming $R_RUN: its worktree $R_WT at ${R_HEAD:0:10}, $R_DONE step(s) completed there"
+  echo "  HEAD and every step's script are unchanged since. A resumed run never merges: the release"
+  echo "  gate is a fresh run."
+  STEPS="$R_STEPS"
+else
 echo "1. uncommitted changes under $PKG_REL/"
 helper status "$REPO" "$PKG_REL" "$SELF_DIR" "$MAIN_MANIFEST" "$RUN/authored.txt" "$RUN/derived.txt" "$IGNORE_UNTRACKED"
 if [ -s "$RUN/authored.txt" ] && [ "$HEAD_ONLY" = 1 ]; then
@@ -585,11 +799,13 @@ if [ ${#CHANGED[@]} -gt 0 ]; then
   fi
   echo "  A SCOPED RUN IS NOT A RELEASE: a full run is required before a release tag."
 fi
+fi
 
 # ------------------------------------------------------------------------------------------------
-WT="$WT_BASE/w$$"
+if [ "$RESUMING" = 1 ]; then WT="$R_WT"; else WT="$WT_BASE/w$$"; fi
 PIDF="$WT.pid"
 CHILD=""; TAILP=""; MERGED=0; FINISHED=0
+T_DERIVE0=""; T_DERIVE1=""; T_CHECKS0=""; T_CHECKS1=""; T_MERGE0=""
 kill_tree() {
   local p="$1" w
   if [ -r "/proc/$p/winpid" ] && command -v taskkill >/dev/null 2>&1; then
@@ -598,8 +814,9 @@ kill_tree() {
   pkill -TERM -P "$p" 2>/dev/null || true
   kill -TERM "$p" 2>/dev/null || true
 }
+_ph() { if [ -n "$1" ]; then fmt_s $(( ${2:-$T_END} - $1 )); else printf -- '-'; fi; }
 on_exit() {
-  local rc=$?
+  local rc=$? keep=0
   set +e
   trap - INT TERM HUP
   if [ -n "$CHILD" ] && kill -0 "$CHILD" 2>/dev/null; then
@@ -607,43 +824,80 @@ on_exit() {
     kill_tree "$CHILD"; wait "$CHILD" 2>/dev/null
   fi
   [ -z "$TAILP" ] || kill "$TAILP" 2>/dev/null
+  T_END=$(date +%s)
+  # A run that failed (or was interrupted) keeps its worktree for --resume; a pass, a merge refusal
+  # or a stale base has nothing to resume.
+  if [ "$RESUMABLE" = 1 ] && { [ "$rc" = 1 ] || [ "$rc" = 130 ]; }; then keep=1; fi
   if [ "$KEEP_WT" = 1 ]; then
     echo "refresh-safe: --keep-worktree: left $WT (the next run removes it)"
+  elif [ "$keep" = 1 ]; then
+    echo "refresh-safe: kept the worktree $WT for --resume:"
+    echo "  bash tools/refresh-safe.sh --resume   skips the $( [ -f "$RUN/state.tsv" ] && grep -c . "$RUN/state.tsv" || true) completed step(s), never merges;"
+    echo "  any other run removes it. Resume is refused if HEAD or a step's script changes."
   elif [ -d "$WT" ] || git -C "$REPO" worktree list --porcelain | grep -qi "^worktree $WT\$"; then
     echo "refresh-safe: removing the worktree $WT"
     git -C "$REPO" worktree remove --force "$WT" >/dev/null 2>&1 || { rm -rf "$WT"; git -C "$REPO" worktree prune; }
     [ ! -d "$WT" ] || { sleep 2; rm -rf "$WT"; git -C "$REPO" worktree prune; }
   fi
+  if [ "$RESUMABLE" = 1 ] && [ "$keep" != 1 ] && { [ "$KEEP_WT" != 1 ] || [ "$rc" = 0 ]; }; then
+    rm -f "$RESUME_FILE"
+  fi
   rm -f "$PIDF"
   [ "$KEEP_WT" = 1 ] || rm -rf "$RUN/trace/objects" "$RUN/trace/index" 2>/dev/null
+  # **Where the time went** (CHG-RSPD-001): the ten slowest steps and every phase, at the end.
+  helper timings "$RUN/steps.tsv" 10
+  printf 'phase\tseconds\nsetup\t%s\nderive\t%s\nchecks\t%s\nmerge\t%s\ntotal\t%s\n' \
+    "$(( ${T_DERIVE0:-${T_CHECKS0:-$T_END}} - T_RUN0 ))" \
+    "$( [ -n "$T_DERIVE0" ] && echo $(( ${T_DERIVE1:-$T_END} - T_DERIVE0 )) || echo 0)" \
+    "$( [ -n "$T_CHECKS0" ] && echo $(( ${T_CHECKS1:-$T_END} - T_CHECKS0 )) || echo 0)" \
+    "$( [ -n "$T_MERGE0" ] && echo $(( T_END - T_MERGE0 )) || echo 0)" \
+    "$(( T_END - T_RUN0 ))" > "$RUN/phases.tsv"
+  echo "refresh-safe: times -- setup $(_ph "$T_RUN0" "${T_DERIVE0:-${T_CHECKS0:-$T_END}}") · derive $(_ph "$T_DERIVE0" "$T_DERIVE1")" \
+       "· checks $(_ph "$T_CHECKS0" "$T_CHECKS1") · merge $(_ph "$T_MERGE0") · total $(_ph "$T_RUN0")"
   if [ "$MERGED" = 1 ]; then
     echo "refresh-safe: done -- merged into $PKG_MAIN (not committed)"
   else
     echo "refresh-safe: the main tree was not touched (exit $rc; logs in $RUN)"
   fi
+  release_lock
   exit $rc
 }
 trap on_exit EXIT
 trap 'echo; echo "refresh-safe: INTERRUPTED"; exit 130' INT TERM HUP
 echo $$ > "$PIDF"
 
-echo "3. worktree $WT at $(git -C "$REPO" rev-parse --short HEAD)"
-git -C "$REPO" -c core.longpaths=true worktree add --detach --quiet "$WT" HEAD
-WPKG="$WT/$PKG_REL"
-if [ "$INCLUDE_WORKING" = 1 ] && [ -s "$RUN/authored.txt" ]; then
-  helper include "$REPO" "$WT" "$RUN/authored.txt"
+if [ "$RESUMING" = 1 ]; then
+  WPKG="$R_WPKG"; BASE_TREE="$R_BASE_TREE"; T0="$R_T0"
+  if [ -f "$R_STATE" ]; then cp "$R_STATE" "$RUN/state.tsv"; else : > "$RUN/state.tsv"; fi
+  helper resume_write "$RESUME_FILE" "$RUN" "$WT" "$WPKG" "$HEAD0" "$BASE_TREE" "$T0" "$STEPS" "$RUN/fingerprint.json"
+  RESUMABLE=1
+else
+  echo "3. worktree $WT at $(git -C "$REPO" rev-parse --short HEAD)"
+  git -C "$REPO" -c core.longpaths=true worktree add --detach --quiet "$WT" HEAD
+  WPKG="$WT/$PKG_REL"
+  if [ "$INCLUDE_WORKING" = 1 ] && [ -s "$RUN/authored.txt" ]; then
+    helper include "$REPO" "$WT" "$RUN/authored.txt"
+  fi
+  helper hydrate "$REPO" "$WT" "$PKG_REL"
+  T0=$(( $(date +%s) - 60 ))
+  helper normalise "$WPKG" "$T0"
+  git -C "$WT" add -A -- "$PKG_REL"
+  BASE_TREE="$(git -C "$WT" write-tree)"
+  echo "  base tree $BASE_TREE (HEAD$( [ "$INCLUDE_WORKING" = 1 ] && [ -s "$RUN/authored.txt" ] && echo " + included working changes"))"
+  : > "$RUN/state.tsv"
+  # A traced run measures the pipeline; its trace cannot be stitched from two runs, so it is not resumable.
+  if [ "$TRACE" = 0 ]; then
+    helper resume_write "$RESUME_FILE" "$RUN" "$WT" "$WPKG" "$HEAD0" "$BASE_TREE" "$T0" "$STEPS" "$RUN/fingerprint.json"
+    RESUMABLE=1
+  fi
 fi
-helper hydrate "$REPO" "$WT" "$PKG_REL"
-T0=$(( $(date +%s) - 60 ))
-helper normalise "$WPKG" "$T0"
-git -C "$WT" add -A -- "$PKG_REL"
-BASE_TREE="$(git -C "$WT" write-tree)"
-echo "  base tree $BASE_TREE (HEAD$( [ "$INCLUDE_WORKING" = 1 ] && [ -s "$RUN/authored.txt" ] && echo " + included working changes"))"
 
 # ------------------------------------------------------------------------------------------------
 if [ "$STEPS" != "none" ]; then
-  echo "4. refresh in the worktree ($( [ "$STEPS" = all ] && echo "all steps" || echo "steps $STEPS"))$( [ "$TRACE" = 1 ] && echo ", traced")"
-  EMIT=(emit --refresh "$WPKG/tools/refresh.sh" --steps "$STEPS" --out "$RUN/run.sh")
+  T_DERIVE0=$(date +%s)
+  echo "4. refresh in the worktree ($( [ "$STEPS" = all ] && echo "all steps" || echo "steps $STEPS"))$( [ "$TRACE" = 1 ] && echo ", traced")$( [ "$RESUMING" = 1 ] && echo ", resumed")"
+  EMIT=(emit --refresh "$WPKG/tools/refresh.sh" --steps "$STEPS" --out "$RUN/run.sh"
+        --manifest "$WPKG/handoff/refresh-manifest.json" --plan-out "$RUN/plan.json")
   if [ "$TRACE" = 1 ]; then
     TD="$RUN/trace"
     mkdir -p "$TD/objects"
@@ -654,12 +908,12 @@ if [ "$STEPS" != "none" ]; then
     export REFRESH_TRACE_DIR="$TD" REFRESH_TRACE_ALT="$ALT"
   fi
   "$PY" "$SELF_DIR/refresh-manifest.py" "${EMIT[@]}"
-  export REFRESH_TICVAI="$WPKG" REFRESH_TAIL_OUT="$RUN/tail.log"
-  T_START=$(date +%s)
+  export REFRESH_TICVAI="$WPKG" REFRESH_TAIL_OUT="$RUN/tail.log" REFRESH_STEP_LOG="$RUN/steps.tsv" \
+         REFRESH_STATE="$RUN/state.tsv" REFRESH_RESUME="$RESUMING"
   bash "$RUN/run.sh" > "$RUN/refresh.log" 2>&1 &
   CHILD=$!
   if [ "$QUIET" = 1 ]; then
-    tail -n +1 -f --pid="$CHILD" "$RUN/refresh.log" 2>/dev/null | grep --line-buffered '^== refresh step' &
+    tail -n +1 -f --pid="$CHILD" "$RUN/refresh.log" 2>/dev/null | grep -E --line-buffered '^(== refresh|FAILED)' &
   else
     tail -n +1 -f --pid="$CHILD" "$RUN/refresh.log" 2>/dev/null &
   fi
@@ -667,12 +921,27 @@ if [ "$STEPS" != "none" ]; then
   set +e; wait "$CHILD"; RRC=$?; set -e
   CHILD=""
   sleep 1; kill "$TAILP" 2>/dev/null || true; TAILP=""
-  echo "  refresh finished rc=$RRC in $(( ($(date +%s) - T_START) / 60 )) min"
+  T_DERIVE1=$(date +%s)
+  echo "  refresh finished rc=$RRC in $(fmt_s $(( T_DERIVE1 - T_DERIVE0 )))"
   if [ "$RRC" != 0 ]; then
-    echo "refresh-safe: FAIL -- refresh.sh stopped (rc=$RRC); last lines of $RUN/refresh.log:" >&2
+    echo "refresh-safe: FAIL -- the refresh stopped (rc=$RRC):" >&2
+    if grep -q '^FAILED' "$RUN/refresh.log"; then
+      grep '^FAILED' "$RUN/refresh.log" | tail -1 | sed 's/^/  /' >&2
+    else
+      echo "  no FAILED line: the refresh process itself was killed (last step started: $(grep '^== refresh step' "$RUN/refresh.log" | tail -1))" >&2
+    fi
+    echo "  last lines of $RUN/refresh.log:" >&2
     tail -n 15 "$RUN/refresh.log" >&2
     exit 1
   fi
+  # **No marker, no pass** -- checked here and again by the judge.
+  MARK="$("$PY" -c 'import json, sys; p = json.load(open(sys.argv[1], encoding="utf-8")); print("== refresh completed: all %d selected steps of %d" % (len(p["selected"]), p["total"]))' "$RUN/plan.json")"
+  if ! grep -qxF "$MARK" "$RUN/refresh.log"; then
+    echo "refresh-safe: FAIL -- the refresh exited 0 but never printed '$MARK'" >&2
+    tail -n 15 "$RUN/refresh.log" >&2
+    exit 1
+  fi
+  echo "  ${MARK#== }"
   if [ "$TRACE" = 1 ]; then
     echo "  building the step manifest from the trace"
     "$PY" "$SELF_DIR/refresh-manifest.py" build --trace-dir "$TD" --pkg "$WPKG" \
@@ -689,14 +958,29 @@ if [ "$SKIP_CHECKS" = 1 ]; then
   echo "5. checks skipped (--skip-checks); nothing is merged"
   exit 0
 fi
-echo "5. checks, judged against tools/refresh-safe-baseline.json"
+T_CHECKS0=$(date +%s)
+echo "5. checks, $JOBS at a time, judged against tools/refresh-safe-baseline.json"
 set +e
-( cd "$WPKG" && helper judge "$WPKG" "$SELF_DIR/refresh-safe-baseline.json" "$RUN/checks.log" "$RUN/tail.log" )
+( cd "$WPKG" && helper judge "$WPKG" "$SELF_DIR/refresh-safe-baseline.json" "$RUN/checks.log" "$RUN/tail.log" \
+    "$JOBS" "$RUN/checks" "$RUN/refresh.log" "$( [ "$STEPS" != none ] && echo "$RUN/plan.json")" )
 JRC=$?
 set -e
-[ "$JRC" = 0 ] || { echo "refresh-safe: FAIL -- checks (full output in $RUN/checks.log)" >&2; exit 1; }
+T_CHECKS1=$(date +%s)
+[ "$JRC" = 0 ] || { echo "refresh-safe: FAIL -- checks (full output in $RUN/checks.log and $RUN/checks/)" >&2; exit 1; }
 
+T_MERGE0=$(date +%s)
 echo "6. merge"
+# **STALE BASE** (CHG-RSPD-001): the verdict is for the commit the run started from. If HEAD moved
+# meanwhile, a merge would put that commit's derived output on top of a different one.
+HEAD_NOW="$(git -C "$REPO" rev-parse HEAD)"
+if [ "$HEAD_NOW" != "$HEAD0" ]; then
+  if [ "$MERGE" = 1 ]; then
+    echo "refresh-safe: STALE BASE -- HEAD moved from ${HEAD0:0:10} to ${HEAD_NOW:0:10} during the run." >&2
+    echo "  This PASS is for ${HEAD0:0:10}; nothing is merged. Run again on the new HEAD." >&2
+    exit 5
+  fi
+  echo "  STALE BASE (no merge requested): HEAD moved from ${HEAD0:0:10} to ${HEAD_NOW:0:10}; this verdict is for ${HEAD0:0:10}"
+fi
 trap '' INT HUP   # a copy half-done is worse than a copy finished: no interrupting it
 set +e
 helper merge "$REPO" "$WT" "$PKG_REL" "$BASE_TREE" "$T0" "$SELF_DIR" "$MAIN_MANIFEST" "$MERGE" "$ALLOW_DRIFT" "$RUN/merge.log" "$IGNORE_UNTRACKED"
@@ -706,5 +990,6 @@ trap 'echo; echo "refresh-safe: INTERRUPTED"; exit 130' INT TERM HUP
 [ "$MRC" = 0 ] || exit 4
 [ "$MERGE" = 1 ] && MERGED=1
 [ "$STEPS" = all ] || echo "  scoped run -- a full run is still required before a release tag"
+[ "$RESUMING" = 0 ] || echo "  resumed run -- never merged; the release gate is a fresh run"
 exit 0
 }

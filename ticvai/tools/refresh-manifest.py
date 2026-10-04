@@ -37,7 +37,11 @@ need, and must never skip one it did.
     python3 tools/refresh-manifest.py select PATH...      the steps a change to PATH reaches
     python3 tools/refresh-manifest.py classify PATH...    derived-only vs authored, per path
 
-`emit` and `build` are the halves refresh-safe.sh calls; they are not meant to be run by hand.
+`emit`, `build` and `fingerprint` are what refresh-safe.sh calls; they are not meant to be run by
+hand. Since 4 October (CHG-RSPD-001) `emit` wraps every step: its exit code and the files the
+manifest says it writes are checked, it is timed into REFRESH_STEP_LOG, it is recorded as done in
+REFRESH_STATE (skipped on a resume), and the script ends with the `== refresh completed` marker the
+judge requires. `fingerprint` hashes each step's script, so a resume can refuse a changed one.
 **A scoped run is a convenience, not a release.** A full refresh is required before a tag.
 """
 import argparse
@@ -268,15 +272,139 @@ __snap 0
 '''
 
 
-def emit(parsed, selected, trace, total=None):
-    """The script text. `selected` is a set of step indexes (None = all)."""
+# **Every step fails loudly, is timed, and can be resumed** (council of 3 October 23:30, CHG-RSPD-001).
+# On 3 October a refresh died at step 37 with nothing after the step's banner: no exit code, no
+# line saying which step or why. Each step is now wrapped: its exit code is caught (set -e, and
+# an EXIT trap that names the step), the files the manifest says it writes must exist afterwards,
+# be non-empty and -- for JSON and Office files -- still parse, and the run ends with a marker that
+# refresh-safe's judge requires: a run that stops anywhere without saying so can never PASS.
+STEP_RUNTIME = r"""
+# --- step runtime (tools/refresh-manifest.py emit; CHG-RSPD-001) -----------------------------
+# REFRESH_STEP_LOG  TSV, one row per step: step, name, start, seconds, exit, status
+# REFRESH_STATE     one line per completed step (N<TAB>name); with REFRESH_RESUME=1 the steps it
+#                   already lists are skipped -- refresh-safe.sh --resume checks it is still valid
+__T=@@TOTAL@@; __N=@@SELECTED@@
+__LOG="${REFRESH_STEP_LOG:-/dev/null}"; __STATE="${REFRESH_STATE:-}"
+__CUR=""; __CURNAME=""; __T0=0; __START=""; __DONE=0; __WHY=""; __FINISHED=0; __NOW=0
+declare -A __RESUMED=()
+if [ "${REFRESH_RESUME:-0}" = 1 ] && [ -n "$__STATE" ] && [ -f "$__STATE" ]; then
+  while IFS=$'\t' read -r __n __rest; do [ -z "$__n" ] || __RESUMED[$__n]=1; done < "$__STATE"
+fi
+[ "$__LOG" = /dev/null ] || [ -s "$__LOG" ] || printf 'step\tname\tstart\tseconds\texit\tstatus\n' > "$__LOG"
+__us() { __NOW=${EPOCHREALTIME/[.,]/}; }
+__secs() { printf '%d.%d' $(( $1 / 1000000 )) $(( $1 % 1000000 / 100000 )); }
+__step_begin() {
+  if [ -n "${__RESUMED[$1]:-}" ]; then
+    echo "== refresh step $1/$__T: $2 -- completed by the run being resumed; skipped"
+    printf '%s\t%s\t-\t0.0\t0\tresumed\n' "$1" "$2" >> "$__LOG"
+    __DONE=$(( __DONE + 1 ))
+    return 1
+  fi
+  echo "== refresh step $1/$__T: $2"
+  __CUR=$1; __CURNAME=$2; __us; __T0=$__NOW; printf -v __START '%(%Y-%m-%dT%H:%M:%S)T' -1
+  return 0
+}
+__VERIFY_PY='import json, sys, zipfile
+bad = []
+for f in sys.argv[1:]:
+    try:
+        if f.endswith(".json"):
+            with open(f, encoding="utf-8") as fh:
+                json.load(fh)
+        elif not zipfile.is_zipfile(f):
+            bad.append(f + " (not a readable Office file)")
+    except Exception as e:
+        bad.append("%s (%s)" % (f, str(e)[:80]))
+print(" ".join(bad))'
+__step_end() {
+  local n=$1 f miss="" parse=() bad
+  shift
+  for f in "$@"; do
+    if [ ! -s "$f" ]; then miss="$miss $f"; continue; fi
+    case "$f" in *.json|*.xlsx|*.docx|*.pptx) parse+=("$f") ;; esac
+  done
+  if [ -z "$miss" ] && [ ${#parse[@]} -gt 0 ]; then
+    # REFRESH_TRACE_DIR emptied: a traced run must not record this check's reads as the step's
+    bad="$(REFRESH_TRACE_DIR= "$_PY" -c "$__VERIFY_PY" "${parse[@]}")" || bad="(the output check itself failed)"
+    [ -z "$bad" ] || miss=" $bad"
+  fi
+  if [ -n "$miss" ]; then
+    __WHY="the step exited 0 but an expected output is missing, empty or unreadable:$miss"
+    exit 1
+  fi
+  __us
+  printf '%s\t%s\t%s\t%s\t0\tok\n' "$n" "$__CURNAME" "$__START" "$(__secs $(( __NOW - __T0 )))" >> "$__LOG"
+  [ -z "$__STATE" ] || printf '%s\t%s\n' "$n" "$__CURNAME" >> "$__STATE"
+  __DONE=$(( __DONE + 1 )); __CUR=""; __CURNAME=""
+}
+__finish() {
+  if [ "$__DONE" -ne "$__N" ]; then
+    __WHY="the script reached its end with $__DONE of $__N selected steps completed"
+    exit 1
+  fi
+  __FINISHED=1
+  echo "== refresh completed: all $__N selected steps of $__T"
+}
+__on_exit() {
+  local rc=$? s
+  if [ -n "$__CUR" ]; then
+    [ "$rc" -ne 0 ] || rc=1
+    __us
+    s="$(__secs $(( __NOW - __T0 )))"
+    printf '%s\t%s\t%s\t%s\t%s\tFAILED\n' "$__CUR" "$__CURNAME" "$__START" "$s" "$rc" >> "$__LOG"
+    echo "FAILED at step $__CUR $__CURNAME -- exit $rc after ${s}s (step $__CUR of $__T)${__WHY:+; $__WHY}" >&2
+  elif [ "$__FINISHED" != 1 ]; then
+    [ "$rc" -ne 0 ] || rc=1
+    echo "FAILED after step $__DONE of $__N selected -- exit $rc${__WHY:+; $__WHY} (no 'refresh completed' marker)" >&2
+  fi
+  exit "$rc"
+}
+trap __on_exit EXIT
+"""
+
+
+def _label(it):
+    return it["command"].replace("\n", " ").replace('"', "'").replace("$", "").replace("\t", " ")[:110]
+
+
+def _sq(s):
+    return "'" + s.replace("'", "'\"'\"'") + "'"
+
+
+def expected_outputs(parsed, manifest, pkg):
+    """{step: [paths]}: the files a step is expected to leave behind -- the concrete (non-glob)
+    writes the traced manifest records for the step's command that exist in `pkg` before the run.
+    Matched by command rather than by step number, so a manifest traced before a step was added or
+    moved still covers every step it knows; a step it does not know is checked on its exit code
+    alone. A file that did not exist before the run is a conditional write and is not expected."""
+    if not manifest:
+        return {}
+    by_cmd = {}
+    for r in manifest.get("steps") or []:
+        by_cmd.setdefault(r.get("command"), r)
+    out = {}
+    for st in steps_of(parsed):
+        r = by_cmd.get(st["command"])
+        if not r:
+            continue
+        out[st["index"]] = sorted(w for w in r.get("writes") or []
+                                  if "*" not in w and os.path.isfile(os.path.join(pkg, w)))
+    return out
+
+
+def emit(parsed, selected, trace, total=None, expected=None):
+    """The script text. `selected` is a set of step indexes (None = all); `expected` maps a step
+    to the files it must leave behind (expected_outputs)."""
     steps = steps_of(parsed)
     total = total or len(steps)
+    n_sel = len([s for s in steps if selected is None or s["index"] in selected])
+    expected = expected or {}
     out = ["#!/usr/bin/env bash",
            "# GENERATED by tools/refresh-manifest.py from tools/refresh.sh -- do not edit, do not keep.",
            "# Steps: %s" % ("all" if selected is None else ",".join(map(str, sorted(selected))))]
     out += parsed["preamble"]
     out.append('cd "${REFRESH_TICVAI:?REFRESH_TICVAI must name the ticvai/ directory to refresh}"')
+    out.append(STEP_RUNTIME.replace("@@TOTAL@@", str(total)).replace("@@SELECTED@@", str(n_sel)))
     if trace:
         out.append(SNAP)
     for it in parsed["items"]:
@@ -286,13 +414,15 @@ def emit(parsed, selected, trace, total=None):
             if selected is not None and n not in selected:
                 out.append(": # skipped step %d: %s" % (n, it["command"].replace("\n", " ")[:120]))
                 continue
-            out.append('echo "== refresh step %d/%d: %s"' % (
-                n, total, it["command"].replace('"', "'").replace("$", "")[:110]))
+            # The banner ("== refresh step N/T: ...") is printed by __step_begin; --quiet greps it.
+            out.append("if __step_begin %d %s; then" % (n, _sq(_label(it))))
             if trace:
                 out.append("export REFRESH_TRACE_STEP=%d" % n)
             out.append(it["text"])
             if trace:
                 out.append("__snap %d" % n)
+            out.append("__step_end %d%s" % (n, "".join(" " + _sq(p) for p in expected.get(n, []))))
+            out.append("fi")
         elif k == "checks":
             if trace:
                 out.append("export REFRESH_TRACE_STEP=post")
@@ -311,7 +441,44 @@ def emit(parsed, selected, trace, total=None):
                        % it["text"].rstrip())
         else:
             out.append(it["text"])
+    # The marker refresh-safe's judge requires. Last, so it says the whole script ran.
+    out.append("__finish")
     return "\n".join(out) + "\n"
+
+
+def plan_of(parsed, selected, expected):
+    """The emitted run's plan, written beside it: refresh-safe reads the step count the marker must
+    name, and the names for the timing report."""
+    steps = steps_of(parsed)
+    return {"total": len(steps),
+            "selected": [s["index"] for s in steps if selected is None or s["index"] in selected],
+            "names": {str(s["index"]): _label(s) for s in steps},
+            "expected_outputs": {str(k): v for k, v in sorted(expected.items())}}
+
+
+def fingerprint(parsed, pkg):
+    """Hashes of what makes the steps what they are: each step's text plus the source of every tool
+    it runs and the local modules those import, and refresh.sh with this emitter. refresh-safe.sh
+    --resume refuses a state written under a different fingerprint."""
+    def sha(paths, extra=""):
+        h = hashlib.sha1(extra.encode("utf-8"))
+        for p in sorted(paths):
+            h.update(("\0%s\0" % p).encode("utf-8"))
+            try:
+                with open(os.path.join(pkg, p), "rb") as fh:
+                    h.update(fh.read())
+            except OSError:
+                h.update(b"<missing>")
+        return h.hexdigest()
+    steps = {}
+    for st in steps_of(parsed):
+        files = set(st["tools"])
+        for t in st["tools"]:
+            files |= local_imports(os.path.join(pkg, t), pkg)
+        steps[str(st["index"])] = sha(files, st["text"])
+    frame = sha(["tools/refresh.sh", "tools/refresh-manifest.py"])
+    joined = frame + "".join(v for _, v in sorted(steps.items(), key=lambda kv: int(kv[0])))
+    return {"total": hashlib.sha1(joined.encode("utf-8")).hexdigest(), "frame": frame, "steps": steps}
 
 
 # ---------------------------------------------------------------------------------------------
@@ -862,6 +1029,12 @@ def main():
     e.add_argument("--trace", action="store_true")
     e.add_argument("--out", required=True)
     e.add_argument("--hook-dir")
+    e.add_argument("--manifest", help="the traced manifest whose writes become each step's expected "
+                   "outputs (none: exit codes only)")
+    e.add_argument("--plan-out", help="write the run's plan (step count, names, expected outputs) here")
+    f = sub.add_parser("fingerprint")
+    f.add_argument("--refresh", default=REFRESH)
+    f.add_argument("--pkg", default=ROOT)
     b = sub.add_parser("build")
     b.add_argument("--trace-dir", required=True)
     b.add_argument("--pkg", required=True)
@@ -889,13 +1062,34 @@ def main():
     if a.cmd == "emit":
         parsed = parse_refresh(a.refresh)
         sel = None if a.steps == "all" else {int(x) for x in a.steps.split(",") if x.strip()}
+        expected = {}
+        if a.manifest:
+            try:
+                expected = expected_outputs(parsed, load_manifest(a.manifest),
+                                            os.path.dirname(os.path.dirname(os.path.abspath(a.refresh))))
+            except (OSError, ValueError):
+                print("  (no readable manifest at %s: steps are checked on their exit codes only)"
+                      % a.manifest)
         with open(a.out, "w", encoding="utf-8", newline="\n") as fh:
-            fh.write(emit(parsed, sel, a.trace))
+            fh.write(emit(parsed, sel, a.trace, expected=expected))
+        if a.plan_out:
+            plan = plan_of(parsed, sel, expected)
+            with open(a.plan_out, "w", encoding="utf-8", newline="\n") as fh:
+                json.dump(plan, fh, indent=1)
+            known = [n for n in plan["selected"] if str(n) in plan["expected_outputs"]]
+            print("  %d of %d steps selected; %d expected output file(s) checked over %d of them "
+                  "(the manifest's concrete writes); the rest on exit codes"
+                  % (len(plan["selected"]), plan["total"],
+                     sum(len(plan["expected_outputs"][str(n)]) for n in known), len(known)))
         if a.trace:
             os.makedirs(a.hook_dir, exist_ok=True)
             with open(os.path.join(a.hook_dir, "sitecustomize.py"), "w", encoding="utf-8",
                       newline="\n") as fh:
                 fh.write(HOOK)
+        return 0
+
+    if a.cmd == "fingerprint":
+        print(json.dumps(fingerprint(parse_refresh(a.refresh), os.path.abspath(a.pkg)), indent=1))
         return 0
 
     if a.cmd == "build":
