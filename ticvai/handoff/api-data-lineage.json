@@ -76317,5 +76317,27 @@
    "redis"
   ],
   "fixNote": "4 October 2026 (CHG-FXC-004): reads what its write stores (the r1 gate's added reads had none)"
+ },
+ "getAccreditationValidity": {
+  "contract": "accreditation",
+  "verb": "GET",
+  "path": "/accreditation-validity",
+  "reads": [
+   "accreditation.validity"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "ACCREDITATION_VIEW",
+  "offline": false,
+  "summary": "The validity and renewal rules of a programme",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres"
+  ]
  }
 }

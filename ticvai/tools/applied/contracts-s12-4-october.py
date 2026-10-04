@@ -1351,6 +1351,48 @@ E(Y.replace_in_op, IDN, "exportSubjectData",
   "              $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'\n"
   "          description: 'Export started, as a data-subject request")
 
+# VM-BO-669 and BO-666: the accreditation validity a whole-record PUT writes and nothing read (CHG-FXC-010)
+E(add_operation, C("satellite/accreditation.yaml"), "/accreditation-validity", "get", """
+operationId: getAccreditationValidity
+x-ticvai-consumed-by:
+  - "P08 BO-669 Accreditation Validity & Renewal"
+  - "P08 BO-666 Accreditation Programme Setup"
+summary: The validity and renewal rules of a programme
+description: |-
+  **Added 4 October 2026 (CHG-FXC-010; VM-BO-669, BO-666): `setAccreditationValidity` is a whole-record PUT that
+  nothing read.** Returns the programme's `accreditation.validity` row at the caller's venue, or the default before the
+  first save (`validityKind` eventDuration, `renewalRequiresReverification` true, `onExpiry` revokeAccess, the schema's
+  own defaults; no months, renewal window or grace period).
+tags:
+- accreditation
+x-ticvai-permission: ACCREDITATION_VIEW
+x-ticvai-audience:
+- staff
+x-ticvai-scope-level: venue
+x-ticvai-read-routing: replica
+x-ticvai-offline-capable: false
+x-ticvai-conflict-policy: serverWins
+parameters:
+- name: programmeId
+  in: query
+  required: true
+  schema:
+    type: string
+    format: uuid
+responses:
+  '200':
+    description: The validity rules
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/AccreditationValidity'
+  '404':
+    $ref: '../shared/common.yaml#/components/responses/NotFound'
+  '429':
+    $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+""")
+LINEAGE["getAccreditationValidity"] = (["accreditation.validity"], [], [], [], "reads what setAccreditationValidity stores")
+
 # [plan -> contracts] requests (CHG-FXC-010)
 E(Y.insert_after_in_op, C("satellite/payments.yaml"), "receivePaymentProviderWebhook",
   "      x-ticvai-conflict-policy: append", """
