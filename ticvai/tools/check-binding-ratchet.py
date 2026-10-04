@@ -97,7 +97,15 @@ def findings(coverage: str | None = None) -> tuple[list[tuple], dict]:
             ds.render_screen(s, plat, st)
             stats_by[sid] = st
     out, full = [], 0
+    # **A screen the plan does not build is not counted** (4 October, CHG-FXP-002): merged into another, listed in
+    # block-a-extra-tasks.json `screensNotBuilt`, or binding an operation that is not built. Its controls are built,
+    # if at all, on its target; counted under no block they read as a rise of 67 in venue-management "-".
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    import ticket_done
+    not_built = ticket_done.load_holds(pathlib.Path(__file__).resolve().parents[1])[1]
     for sid, st in stats_by.items():
+        if sid in not_built:
+            continue
         s, plat = pkg.screens.get(sid, ({}, {}))
         app = (plat.get("targetApp") or {}).get("app") or plat.get("code") or "?"
         blk = pkg.blocks.get(sid)
