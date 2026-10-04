@@ -598,7 +598,10 @@ def spare_text(b):
 def _style():
     from openpyxl.styles import Font, PatternFill
     return {"HEAD": PatternFill("solid", fgColor="1F3864"), "SUB": PatternFill("solid", fgColor="D9E1F2"),
-            "BLOCK": {"A": PatternFill("solid", fgColor="2E75B6"), "B": PatternFill("solid", fgColor="70AD47"),
+            # A2 (Block A's second half, sprint_plan.BLOCKS) in a lighter shade of A's blue: without it the Gantt
+            # stopped on the first A2 app-module (KeyError 'A2').
+            "BLOCK": {"A": PatternFill("solid", fgColor="2E75B6"), "A2": PatternFill("solid", fgColor="9DC3E6"),
+                      "B": PatternFill("solid", fgColor="70AD47"),
                       "C": PatternFill("solid", fgColor="FFC000"), "D": PatternFill("solid", fgColor="A5A5A5")},
             "TEST": PatternFill("solid", fgColor="C00000"), "OVER": PatternFill("solid", fgColor="F4B084"),
             "WHITE": Font(color="FFFFFF", bold=True)}

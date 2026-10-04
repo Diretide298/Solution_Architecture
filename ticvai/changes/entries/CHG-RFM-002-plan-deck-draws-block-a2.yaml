@@ -1,0 +1,29 @@
+id: CHG-RFM-002
+date: '2026-10-04'
+source: audit
+kind: process
+summary: build-plan-deck.py draws Block A2; it stopped with KeyError 'A2' on the Gantt because its block colours
+  named only A, B, C and D.
+decision:
+  what: Give A2 its own fill (a lighter shade of A's blue) in the deck's block colours; nothing else in the deck
+    changes.
+  by: Chinmay
+  date: '2026-10-04'
+why: 'The fix round list of 4 October (r1-fix-merge brief: "tools/build-plan-deck.py crashes on the A2 colour").
+  sprint_plan.BLOCKS gained A2 with the AI cut to A2 (857986c1); the deck''s colour map did not.'
+keys_touched:
+  files:
+  - tools/build-plan-deck.py
+root_class: 'new: block-list-drift'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/build-plan-deck.py::_style
+status: open
+notes: 'Batch RFM (r1-fix-merge), 4 October 2026. Proven by a run into a scratch PLAN_OUT on the merged branch:
+  every block, A2 included, written to build-plan.json, both workbooks and the presentation.'
