@@ -1196,7 +1196,7 @@ def readme():
 | `TICVAI - Azure Cloud Specs & Cost.xlsx` | Specs and monthly cost, without and with high availability, for production and pre-production; editable rate, margin and prices |
 
 Monthly totals (USD, prices of 30 September 2026): with high availability ${month(PROD_HA):,.2f}; without zone-level
-HA ${month(PROD_NO_HA):,.2f} (PostgreSQL stays zone-redundant; recomputed 1 October, see the sheet's notes);
+HA ${month(PROD_NO_HA):,.2f} (PostgreSQL stays zone-redundant; recomputed 1 and 4 October, see the sheet's notes; the AI pool is one GPU node pool since 4 October, CHG-R11-001);
 pre-production ${month(PREPROD):,.2f}.
 
 The polished drawings are made in Claude Design from [`../design-batches/HLD-LLD/`](../design-batches/HLD-LLD/BRIEF.md).

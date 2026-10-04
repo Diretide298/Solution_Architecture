@@ -10,8 +10,8 @@
 | [`TICVAI-LLD.md`](TICVAI-LLD.md) and [`TICVAI-LLD.svg`](TICVAI-LLD.svg) | Low-level design on Azure: region, VNet and subnets, tiers, replica floors, events, security, availability, environments |
 | `TICVAI - Azure Cloud Specs & Cost.xlsx` | Specs and monthly cost, without and with high availability, for production and pre-production; editable rate, margin and prices |
 
-Monthly totals (USD, prices of 30 September 2026): with high availability $8,047.50; without zone-level
-HA $5,553.50 (PostgreSQL stays zone-redundant; recomputed 1 October, see the sheet's notes);
+Monthly totals (USD, prices of 30 September 2026): with high availability $8,295.04; without zone-level
+HA $5,327.27 (PostgreSQL stays zone-redundant; recomputed 1 and 4 October, see the sheet's notes; the AI pool is one GPU node pool since 4 October, CHG-R11-001);
 pre-production $1,535.50.
 
 The polished drawings are made in Claude Design from [`../design-batches/HLD-LLD/`](../design-batches/HLD-LLD/BRIEF.md).
