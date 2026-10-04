@@ -1,0 +1,31 @@
+id: CHG-RFM-011
+date: '2026-10-04'
+source: audit
+kind: contract
+summary: listTableCombinations takes PageSize and PageCursor and answers a Page of TableCombination, as every list over
+  a growing table does.
+decision:
+  what: 'fnb.yaml GET /outlets/{outletId}/table-combinations: the shared PageSize and PageCursor parameters, a Page envelope
+    with items of TableCombination, and the shared 403. The operation was added on 4 October and is on no released contract,
+    so nothing pulled has the bare-array shape.'
+  by: Chinmay
+  date: '2026-10-04'
+why: 'check-package finding (rule 35, the new-operation gates) on the merged branch (e13d7ad5): fnb.listTableCombinations
+  had no page size and reads fnb.table_combination, a high-volume table. Added in 33a92f60 (CHG-FXC-011) without paging.'
+keys_touched:
+  operations:
+  - listTableCombinations
+  screens:
+  - POS-024
+root_class: 'new: list-without-paging'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-package.py
+status: open
+notes: Batch RFM (r1-fix-merge), 4 October 2026.

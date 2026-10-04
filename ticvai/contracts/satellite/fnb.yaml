@@ -1867,15 +1867,24 @@ paths:
         schema:
           type: string
           format: uuid
+      - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+      - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
       responses:
         '200':
           description: The outlet's table combinations
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/TableCombination'
+                allOf:
+                - $ref: '../shared/common.yaml#/components/schemas/Page'
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/TableCombination'
+        '403':
+          $ref: '../shared/common.yaml#/components/responses/Forbidden'
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     parameters:
