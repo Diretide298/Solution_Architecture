@@ -49,5 +49,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-parameter-columns.py
-status: open
+status: closed
+closed_by_commit: 33a92f60
 notes: Each new read takes or returns the id its write needed; P-PARAM-NO-COLUMN holds a new one to a column.
