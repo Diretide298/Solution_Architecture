@@ -166,7 +166,7 @@ LLD_NODES = {
     "sys":     ("AKS system pool", ["D4s v5, 2-4 nodes, zones 1-3", "+ ingress gateway pods"], 690, 145, 190, 70, "#EEF4FF"),
     "wl":      ("AKS workload pool", ["D8s v5, 3-20 nodes, 3 zones", "floors: commerce 3, access 2,", "operations 2, workers 2"],
                 690, 227, 190, 90, "#EEF4FF"),
-    "aip":     ("AKS AI pool", ["D8s v5, 2-4 nodes, tainted", "ticvai-ai: real-time 2,", "interactive 1, batch 0; models"],
+    "aip":     ("AKS AI GPU pool", ["NV6ads A10 v5 x2, 1 a zone", "tainted; ticvai-ai 2/1/0,", "BGE-M3, reranker, NER"],
                 690, 329, 190, 90, "#EEF4FF"),
     "qdrant":  ("AKS qdrant pool", ["E4s v5 x3, one per zone", "Qdrant, replication 2, TLS"], 690, 431, 190, 72, "#EEF4FF"),
     "broker":  ("AKS broker pool", ["D2s v5 x3, while self-run;", "recommended: CloudAMQP", "UAE North, Private Link"],
@@ -215,7 +215,8 @@ SUBNETS = [
      "No NSG; egress through the NAT Gateway"),
     ("snet-aks-workload", "10.20.8.0/21", "Workload pool: commerce, access, operations, workers",
      "No NSG; Cilium policy: inbound from the ingress gateway; egress through the NAT Gateway"),
-    ("snet-aks-ai", "10.20.16.0/22", "AI pool: ticvai-ai, embeddings, reranker",
+    ("snet-aks-ai", "10.20.16.0/22", "AI GPU pool (the only AI pool): ticvai-ai, BGE-M3 and its reranker, Presidio and "
+     "the Arabic NER",
      "No NSG; Cilium policy: inbound from the ingress gateway and the workload pool; read-only role on "
      "transactional schemas (ADR-0020, amended by ADR-0049)"),
     ("snet-aks-data", "10.20.20.0/23", "The qdrant pool (Qdrant cluster) and, while the broker is self-run, the broker "
@@ -492,8 +493,10 @@ AED = 3.6725
 MARGIN = 0.20
 # (group, service type, description, specs, qty, unit USD, scaled qty or None = same)
 # Node counts carry ADR-0061's floors. Pod sizes are assumptions until tools/bench.py measures them: a .NET
-# replica requests about 1 vCPU and 2 GB; an AI pod 2 vCPU (AI design 4.3); the embedding model and reranker
-# about 8 vCPU together (AI design 4.3, "2 x 4 vCPU"). A D8s v5 node leaves about 7 vCPU to pods.
+# replica requests about 1 vCPU and 2 GB; an AI pod about 1 vCPU (4 October, CHG-R11-001: it mostly waits on the
+# provider's streamed answer). A D8s v5 node leaves about 7 vCPU to pods. The AI pool is a GPU node pool and the only
+# AI pool (Chinmay, 4 October: "Naaa dont keep AI CPU node at all"): NV6ads A10 v5, $0.649/h = $473.77 a month,
+# carrying the ticvai-ai pods, Presidio, and on the GPU at fp16 BGE-M3, its reranker and the Arabic NER.
 PROD_HA = [
     ("Compute (AKS)", "Azure Kubernetes Service", "Control plane, Standard tier",
      "Uptime SLA, zone-redundant control plane", 1, 73, None),
@@ -505,10 +508,14 @@ PROD_HA = [
      "commerce 3 (one per zone), access 2, operations 2, workers 2 = 9 replicas, three to a node at about 1 vCPU "
      "each. Scaled up, 6 nodes hold a large cell's peak of 34 (commerce 17, operations 12, access 3, workers 2)",
      3, 350, 6),
-    ("Compute (AKS)", "Virtual Machines (AKS nodes)", "AI pool: ticvai-ai, embedding model, reranker (CPU)",
-     "D8s v5 (8 vCPU, 32 GB), Linux, autoscale 2-4, tainted. Carries the floors: real-time 2, interactive 1, "
-     "batch 0 (2 vCPU a pod) beside the embedding model and reranker (about 8 vCPU). A large cell's third "
-     "real-time replica takes a third node", 2, 350, 4),
+    ("Compute (AKS)", "Virtual Machines (AKS nodes)",
+     "AI GPU pool: ticvai-ai, BGE-M3 and its reranker, Presidio and the Arabic NER (CHG-R11-001)",
+     "NV6ads A10 v5 (6 vCPU, 55 GB, 1/6 A10 with 4 GB), Linux, tainted, one node per zone. Carries the floors: real-time 2, "
+     "interactive 1, batch 0 (about 1 vCPU a pod), Presidio on the CPU, and on the GPU at fp16 BGE-M3 (about "
+     "1.1 GB), its reranker (about 1.1 GB) and the Arabic NER (about 0.3 GB); a large cell's third real-time "
+     "replica fits. No AI CPU pool and no Presidio pool. Sizing to confirm by the Sprint 2 benchmark; step up to "
+     "NV12ads A10 v5 ($947.54) on CPU saturation or GPU memory pressure. AWS me-central-1: a g6.2xlarge-class "
+     "node, price to confirm", 2, 473.77, 4),
     ("Vector store", "Virtual Machines (AKS nodes)", "Qdrant cluster, one collection per tenant (ADR-0049)",
      "qdrant node pool: E4s v5 (4 vCPU, 32 GB) x3, one per zone, replication factor 2. Open-source Qdrant 1.16 or "
      "later from the official Helm chart; TLS; collection-scoped JWT per tenant", 3, 225, None),
@@ -581,10 +588,12 @@ PROD_NO_HA = [
     ("Compute (AKS)", "Virtual Machines (AKS nodes)", "Workload pool: commerce, access, operations, workers",
      "D8s v5 (8 vCPU, 32 GB), Linux, autoscale 2-10. Carries the floors (ADR-0061): 9 replicas on 2 nodes; in "
      "one zone commerce's three replicas cannot be one per zone", 2, 350, 4),
-    ("Compute (AKS)", "Virtual Machines (AKS nodes)", "AI pool: ticvai-ai, embedding model, reranker (CPU)",
-     "D8s v5 (8 vCPU, 32 GB), Linux, autoscale 2-3. Two nodes are the least that carries the floors "
-     "(real-time 2, interactive 1, 2 vCPU a pod) beside the embedding model and reranker (about 8 vCPU)",
-     2, 350, 3),
+    ("Compute (AKS)", "Virtual Machines (AKS nodes)",
+     "AI GPU pool: ticvai-ai, BGE-M3 and its reranker, Presidio and the Arabic NER (CHG-R11-001)",
+     "NV6ads A10 v5 (6 vCPU, 55 GB, 1/6 A10 with 4 GB), Linux, tainted, one node. Carries the floors (real-time 2, interactive 1, "
+     "about 1 vCPU a pod) beside Presidio and, on the GPU, BGE-M3, its reranker and the Arabic NER. With the node "
+     "down the scrubber is down and LLM calls are refused (503 scrubber-unavailable), never sent raw",
+     1, 473.77, 2),
     ("Vector store", "Virtual Machines (AKS nodes)", "Qdrant, one collection per tenant (ADR-0049)",
      "E4s v5 (4 vCPU, 32 GB), single node", 1, 225, None),
     ("Vector store", "Managed Disks", "Qdrant storage", "Premium SSD P15 256 GB", 1, 38, None),
@@ -658,9 +667,16 @@ NOTES_PROD = [
     "collection with a collection-scoped key.",
     "Node counts carry the replica floors of ADR-0061 (accepted 1 October): commerce 3, access 2, operations 2, "
     "workers 2, ticvai-ai real-time 2 (3 in a large cell), interactive 1, batch 0: 12 a cell, 13 in a large one. "
-    "Pod sizes are assumptions until tools/bench.py measures them: about 1 vCPU for a .NET replica, 2 vCPU for "
-    "an AI pod, about 8 vCPU for the embedding model and reranker together (AI design 4.3).",
-    "\"When scaled up\" doubles the autoscaled lines (workload and AI pools, Front Door traffic, bandwidth) for "
+    "Pod sizes are assumptions until tools/bench.py measures them: about 1 vCPU for a .NET replica and about "
+    "1 vCPU for an AI pod, which mostly waits on the provider's streamed answer (AI design 4.3).",
+    "AI hosting (Chinmay, 4 October, CHG-R11-001): we host the embedding model (BGE-M3), its reranker, Presidio "
+    "and the Arabic NER, together with the ticvai-ai pods, on one AI GPU node pool (NV6ads A10 v5, $473.77 a "
+    "month a node; one node without HA, two with HA, one per zone); never an LLM, which stays with the providers "
+    "(Core42 Compass, OpenAI UAE, BYOK). The 2 x D8s v5 AI CPU pool ($700) is gone: $8,047.50 became $8,295.04 "
+    "with HA, $5,553.50 became $5,327.27 without. Defender for Containers is not re-priced for the GPU nodes' "
+    "vCores (6 a node against the D8s v5's 8, so slightly lower). On AWS (me-central-1) the node is a "
+    "g6.2xlarge-class instance (one L4, 8 vCPU), price and regional availability to confirm.",
+    "\"When scaled up\" doubles the autoscaled lines (workload and AI GPU pools, Front Door traffic, bandwidth) for "
     "busy periods such as a holiday peak. A large on-sale runs in its own burst environment (ADR-0035, amended "
     "3 September; deploy/c-flash-sale.yml), not priced here.",
     "Not included: Azure OpenAI tokens (billed per use), SMS, email and WhatsApp fees, payment provider fees, "
@@ -693,6 +709,9 @@ NOTES_NO_HA = [
     "+$196. A second AI node, because one node cannot hold the AI floors beside the embedding model and "
     "reranker (ADR-0061): +$350. The Private Link line the sheet lacked: +$50. Defender for the extra 8 vCores "
     "and the fourth PostgreSQL server: +$70.",
+    "Recomputed 4 October 2026 (Chinmay, CHG-R11-001): the AI pool is one GPU node, NV6ads A10 v5 at $473.77, "
+    "carrying the ticvai-ai pods, Presidio, the Arabic NER, BGE-M3 and its reranker, in place of the two D8s v5 "
+    "AI nodes ($700): $5,553.50 became $5,327.27.",
 ]
 NOTES_PREPROD = [
     "One pre-production environment for acceptance testing and client demos; development runs locally on "
@@ -799,7 +818,7 @@ def build_workbook(path):
     ws = wb.create_sheet("Deployables")
     ws.append(["Deployable", "What it is", "Modules", "Runs on", "Replica floor (ADR-0061)"])
     runs = {"commerce": "Workload pool", "access": "Workload pool (and the venue edge node)",
-            "operations": "Workload pool", "ticvai-ai": "AI pool (tainted)", "workers": "Workload pool"}
+            "operations": "Workload pool", "ticvai-ai": "AI GPU pool (tainted)", "workers": "Workload pool"}
     floor_text = {}
     for unit, dep, f, why in FLOORS:
         floor_text.setdefault(dep, []).append((unit, f, why))
@@ -1008,7 +1027,7 @@ def lld_md():
 | AKS cluster | Azure CNI Overlay (pods from `{POD_CIDR}`, outside the VNet), Cilium network policy and data plane, egress through the NAT Gateway (`userAssignedNATGateway`), five node pools, a subnet per pool (the qdrant and broker pools share `snet-aks-data`) | Standard tier |
 | AKS system pool | Kubernetes system services, the ingress gateway | D4s v5, autoscale 2-4 nodes, zones 1-3 |
 | AKS workload pool | `commerce`, `access`, `operations`, `workers`: floors 3, 2, 2 and 2 | D8s v5, autoscale 3-20 nodes, zones 1-3 |
-| AKS AI pool | `ticvai-ai` (real-time 2, 3 in a large cell; interactive 1; batch 0), the embedding model and the reranker (CPU); tainted `ticvai.io/pool=ai` | D8s v5, autoscale 2-4 nodes |
+| AKS AI GPU pool | The only AI pool (CHG-R11-001): `ticvai-ai` (real-time 2, 3 in a large cell; interactive 1; batch 0; about 1 vCPU a pod), Presidio, and on the GPU BGE-M3, its reranker and the Arabic NER; never an LLM; tainted `ticvai.io/pool=ai` | NV6ads A10 v5 (6 vCPU, 55 GB, 1/6 A10 with 4 GB): 2 nodes, one per zone (1 without HA); step up to NV12ads A10 v5 on CPU or GPU memory pressure |
 | AKS qdrant pool | Qdrant 1.16 or later, open source, official Helm chart: 3 nodes, one per zone, replication factor 2, TLS on the service; tainted `ticvai.io/pool=data` | E4s v5 x3, Premium SSD P15 256 GB each |
 | AKS broker pool | The broker while it is self-run: RabbitMQ on the Cluster Operator, 3 nodes, quorum queues on persistent disks; tainted `ticvai.io/pool=data`. Not built (`broker_self_hosted = false`) if the client takes the recommended CloudAMQP | D2s v5 x3, Premium SSD P10 128 GB each |
 | Database | PostgreSQL Flexible Server 16: primary with a zone-redundant standby on every production tier, the shared cell included (ADR-0060, decided 1 October); 2 read replicas; a reporting replica; the AI log database (a server of its own, ADR-0020 as amended by ADR-0049; not yet in the Terraform cell module) | General Purpose D4ds v5, 256 GB each; reporting D2ds v5; AI log D4ds v5 with 1 TB |
@@ -1024,9 +1043,10 @@ def lld_md():
 A floor is survivability, not load: enough replicas to lose one zone and keep serving. It is each Deployment's
 `minReplicas`, from the Terraform output `replica_floors`; above it each unit autoscales on requests per second
 (ADR-0032, amended by ADR-0038 and ADR-0064), with no maximum. **The node counts carry the floors:** three workload nodes hold the nine .NET floor
-replicas, one `commerce` replica per zone; two AI nodes hold the three AI floor pods beside the embedding model
-and reranker, and a large cell's third real-time pod takes a third. Pod sizes are assumptions (about 1 vCPU for a
-.NET replica, 2 vCPU for an AI pod) until `tools/bench.py` measures them in sprint 2.
+replicas, one `commerce` replica per zone; two AI GPU nodes hold the three AI floor pods beside Presidio,
+BGE-M3, its reranker and the Arabic NER, and a large cell's third real-time pod fits on them. Pod sizes are
+assumptions (about 1 vCPU for a .NET replica, about 1 vCPU for an AI pod) until `tools/bench.py` measures them in
+sprint 2.
 
 ## Network
 

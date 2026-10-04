@@ -284,8 +284,16 @@ one node and three, and it costs recall — **a decision, not a default.**
 | Qdrant self-hosted, 3 nodes HA (4 vCPU / 16 GB each) | $694 | $596 |
 | Qdrant self-hosted, 1 node | $231 | $199 |
 | AI cache tier — `cache:answer` + `cache:embedding`, 8 GB | $274 | $286 |
-| Index and embedding workers, 2 × 2 vCPU / 4 GB batch | $180 | $152 |
-| **AI tier total, HA** | **$1,148** | **$1,034** |
+| AI GPU node, two with HA (one per zone): the `ticvai-ai` pods, Presidio, the Arabic NER, BGE-M3 and its reranker (4 October, CHG-R11-001); AWS me-central-1 g6.2xlarge class (1 × L4 24 GB, 8 vCPU) | to confirm | not priced |
+| **AI tier total, HA** | **$968 + the GPU nodes** | **$882 + the GPU nodes** |
+
+**Corrected 4 October 2026 (Chinmay, CHG-R11-001).** We host the embedding model (BGE-M3), its reranker, Presidio
+and the Arabic NER on a GPU node pool in our cell in the UAE, on Azure (UAE North) and on AWS (me-central-1),
+and never an LLM. The CPU "index and embedding workers" line ($180 / $152) is gone. On AWS the node is a
+g6.2xlarge-class instance (g6.xlarge's 4 vCPU is too few for the AI pods); its price and its availability in
+me-central-1 are to confirm, so no figure is given. Azure, the priced platform: NV6ads A10 v5 at $473.77 a month a
+node, totals $5,327.27 a month without high availability and $8,295.04 with it (`handoff/hld-lld/`, the cost
+workbook built by `tools/build-hld-lld.py`).
 
 **Neither provider offers managed Qdrant.** Both mean self-hosting on the compute tier or buying
 Qdrant Cloud, and **the 12 August minute made this conditional**: Qdrant was proposed over Postgres

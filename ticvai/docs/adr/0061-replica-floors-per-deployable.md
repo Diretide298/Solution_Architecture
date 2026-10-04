@@ -43,6 +43,13 @@ deployable.**
 | `ticvai-ai` batch | 0 | Scales from zero on queue depth |
 | **Total, small cell** | **12** | Down from 34 per service; up from the 10 in `sizing.json` today |
 
+**Where the `ticvai-ai` floors run (4 October 2026, Chinmay, CHG-R11-001):** on the AI GPU node pool, the only AI
+pool ("Naaa dont keep AI CPU node at all"): Azure NV6ads A10 v5 (6 vCPU, 55 GB, 4 GB of GPU memory), one node
+without high availability and two with it, one per zone. Each AI pod requests about 1 vCPU (they mostly wait on
+the provider's streamed answer), beside Presidio, the Arabic NER, BGE-M3 and its reranker on the same node; a
+large cell's third real-time replica fits on the two nodes. The floors themselves are unchanged. The pod size is
+an assumption until the Sprint 2 benchmark; the step up is NV12ads A10 v5.
+
 - Above the floor, each deployable autoscales on RPS (not CPU), as ADR-0032 says.
 - **Peak, from the package's own arithmetic** (`sizing.json`, large cell, 7,036 rps): `commerce` 17, `operations` 12, `access` 3, `ticvai-ai` 2, `workers` 2 = 36, against 50 per service. It rests on the `rpsPerReplica` hypotheses until the benchmark replaces them.
 - **Burst environment** (ADR-0035, amended 3 September): the floor is the expected peak, as today, computed for `commerce` instead of three services.

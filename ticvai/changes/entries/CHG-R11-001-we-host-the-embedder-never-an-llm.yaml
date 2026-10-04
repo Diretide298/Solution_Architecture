@@ -1,0 +1,86 @@
+id: CHG-R11-001
+date: '2026-10-04'
+source: audit
+kind: spec
+summary: We host the embedding model (BGE-M3), its reranker, Presidio and the Arabic NER on one AI GPU node pool in our
+  cell in UAE North (Azure NV6ads A10 v5; AWS me-central-1 g6.2xlarge class, price to confirm), which also carries the
+  ticvai-ai pods; never an LLM. No AI CPU pool, no Presidio pool. Corrects the mis-recorded CHG-R1S-026.
+decision:
+  what: 'The embedding model (BGE-M3) and its reranker are ours, self-hosted in the cell; tenant content is never sent
+    to a provider to be embedded. Hybrid retrieval: our BGE-M3 dense vectors with Qdrant''s BM25 sparse index, reranked
+    by our reranker; Qdrant stays in the cell. Presidio (its recognisers on the CPU) and the Arabic NER run on the same
+    node; scrubbing stays mandatory and, with the node down, the LLM call is refused 503 scrubber-unavailable, never
+    sent raw. LLM calls stay with the providers (Core42 Compass by default, OpenAI UAE as fallback, BYOK) and the guard
+    stays the provider''s content-safety service; we never host an LLM unless a client asks. The AI pool IS the GPU
+    node pool (no separate AI CPU pool, no separate Presidio pool): Azure NV6ads A10 v5 (1/6 A10 with 4 GB of GPU
+    memory, 6 vCPU, 55 GB, UAE North), $0.649/h = $473.77 a month, one node without HA and two with HA (one per zone),
+    tainted and isolated per ADR-0020; it runs the ticvai-ai pods at about 1 vCPU each (floors real-time 2,
+    interactive 1, batch 0; a large cell''s third real-time replica fits) and, at fp16 on the GPU, BGE-M3 (about
+    1.1 GB), the reranker (about 1.1 GB) and the Arabic NER (about 0.3 GB). The sizing is an assumption until the
+    Sprint 2 benchmark; the step up to NV12ads A10 v5 ($947.54) is taken on CPU saturation or GPU memory pressure.
+    AWS (me-central-1): a g6.2xlarge-class node (1 x L4 24 GB, 8 vCPU; g6.xlarge''s 4 vCPU is too few), price and
+    regional availability to confirm. Cost (Azure, a month): $5,327.27 without HA, $8,295.04 with HA (the 1 October
+    $5,553.50 / $8,047.50, less the $700 2 x D8s v5 AI CPU pool, plus $473.77 / $947.54 of GPU). Applied to:
+    ai-system-design.md (diagram, 3.3, 4.3, 4.5, 5.8, phasing, 8a), ADR-0009, ADR-0020 and ADR-0061 (amended
+    4 October), ai.yaml (the uaeOnly routing text, the scrubbing text, sendAiMessage), the AI engine task texts in
+    block-a-extra-tasks.json (gateway, scrub-guard, concierge), the cost workbook and HLD/LLD data in
+    tools/build-hld-lld.py, deployment-configs-costed.md (the AI tier, AWS), the HOST-1 row (superseded in part),
+    a dated correction note in the 3 October decision copies, and the AI design notes'' sample provider list.
+    check-ai-residency R-EMBED now requires the embedder and reranker on the GPU node pool in the cell and still
+    refuses an LLM of ours; check-ticket-builds B-HOSTED-MODEL no longer refuses BGE-M3, a GPU pool or a self-hosted
+    embedder, only an LLM.'
+  by: Chinmay
+  date: '2026-10-04'
+why: 'Chinmay, 4 October 2026, evening (the correction note of 4 October in
+  docs/active/decisions/answers-3-october-gate-and-hosting.md, copied from the lead''s answers log, section "AI hosting
+  correction"): "we have to host for embeddings only not for LLM", "GPu in Azure and aws hosted in UAAE north", "its a
+  sdk we can host it wihtin our embeddings server cant we ? also the arabic NER", "For embeddings and scrubber we can
+  gpu server", then "Naaa dont keep AI CPU node at all" and, of NV12ads A10 v5, "a bit costly even for a gpu node".
+  CHG-R1S-026 (3 October) mis-recorded his remark "We have a GPU server" as "provider embeddings, no embedding model
+  hosted by us"; it is a correction of the record, not a reversal of his decision.'
+keys_touched:
+  schemas:
+  - AiProvider
+  - AiPolicy
+  operations:
+  - sendAiMessage
+  files:
+  - contracts/satellite/ai.yaml
+  - docs/architecture/ai-system-design.md
+  - docs/adr/0009-ai-data-residency.md
+  - docs/adr/0020-ai-isolation-boundary.md
+  - docs/adr/0061-replica-floors-per-deployable.md
+  - docs/active/block-a-extra-tasks.json
+  - docs/active/decisions/answers-3-october-gate-and-hosting.md
+  - docs/active/decisions/answers-3-october-r1-plan.md
+  - docs/active/deployment-configs-costed.md
+  - handoff/decisions-2-october.json
+  - handoff/design-notes/ai.yaml
+  - tools/build-hld-lld.py
+  - tools/check-ai-residency.py
+  - tools/check-ticket-builds.py
+  other:
+  - HOST-1
+  - CHG-R1S-026
+  - CHG-RONEP-008
+root_class: 'new: decision-mis-recorded'
+tickets:
+  started: []
+  unstarted:
+  - AI-ENGINE-GATEWAY
+  - AI-ENGINE-SCRUB-GUARD
+  - AI-ENGINE-CONCIERGE
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ai-residency.py
+status: open
+notes: 'Batch R11 (r1.1, branch r11-ai-hosting), 4 October 2026. Supersedes CHG-R1S-026 (and the embeddings half of
+  CHG-RONEP-008); `reverses` is not used because Chinmay''s decision did not change, only its record. Tickets: none
+  started (Sprint 1 starts Monday 5 October); the three AI engine tasks pick the new text up through their pointer
+  bodies at the next tag. Open for Chinmay: confirm github.com/data-privacy-stack/presidio is the Microsoft Presidio
+  project before a release is pinned; the AWS g6.2xlarge price and me-central-1 availability; no Block A task yet
+  provisions the AI GPU node pool in the Terraform cell module (a plan change if one is added). Close on the commit
+  that merges it.'

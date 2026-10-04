@@ -23,7 +23,7 @@
 ## Block A size and embeddings (Chinmay, 3 Oct evening)
 - Block A ships in two drops: A1 by 27 Nov (the original Block A core plus the completeness work that fits, incl. the accepted 43 h overtime, prioritised so every A1 app works end to end); A2 = the rest of the pulled-in work, right after, ahead of Block B. Chinmay: "before we were completing in Feb, so work is definitely getting pulled into A from others" - the program end should stay about where it was.
 - Keep A2 small: apply lever A (pull in app homes only, not the 42 command centres; section homes link to their setup screens) and lever B (don't pull a service's writers into Block A just because its reads are there).
-- Embeddings: provider embeddings on the UAE route (OpenAI UAE text-embedding-3-large / Core42), no embedding model hosted by us; Qdrant stays in our cell for the vectors (ADR-0049). "We have a GPU server" noted, not used for tenant data.
+- **[Corrected 4 October 2026, CHG-R11-001: we host the embedding model, its reranker, Presidio and the Arabic NER on an AI GPU node pool in our cell, never an LLM; `answers-3-october-gate-and-hosting.md`, last section.]** Embeddings: provider embeddings on the UAE route (OpenAI UAE text-embedding-3-large / Core42), no embedding model hosted by us; Qdrant stays in our cell for the vectors (ADR-0049). "We have a GPU server" noted, not used for tenant data.
 
 ## Block A pace and AI scope (Chinmay, 3 Oct evening)
 - Block A pace: 6 tasks a day per developer in Sprints 1 to 4 instead of overtime; the ramp after it unchanged (from 5 tasks a day to 2x by Block D). Applied by CHG-RONEP-009.
