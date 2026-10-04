@@ -62749,6 +62749,18 @@ screens:
         label: Import supported template definition
         operation: importTicketTemplate
         provenance: pack Ticket_Media___Credential_Management_Reference.pdf, page 23 §Allow
+      - kind: secondaryButton
+        label: New ticket template
+        operation: createTicketTemplate
+        provenance: contract orders.yaml POST /ticket-templates (4 October 2026, the ticket-template operations moved here from BO-346; CHG-FXS-002, CHG-RFM-014)
+      - kind: secondaryButton
+        label: Save ticket template
+        operation: updateTicketTemplate
+        provenance: contract orders.yaml PATCH /ticket-templates/{templateId} (4 October 2026, the ticket-template operations moved here from BO-346; CHG-FXS-002, CHG-RFM-014)
+      - kind: secondaryButton
+        label: Print a proof
+        operation: printTicketProof
+        provenance: contract orders.yaml POST /ticket-templates/{templateId}/proof (4 October 2026, the ticket-template operations moved here from BO-346; CHG-FXS-002, CHG-RFM-014)
       - kind: destructiveButton
         label: Archive media template
         operation: archiveMediaTemplate
@@ -62782,6 +62794,22 @@ screens:
     contract: orders
     purpose: Import
     trigger: onAction
+  - operationId: createTicketTemplate
+    contract: orders
+    purpose: Create a ticket template (the orders template a sale issues from)
+    trigger: onAction
+    invalidates:
+    - listTicketTemplates
+  - operationId: updateTicketTemplate
+    contract: orders
+    purpose: Change or retire a ticket template
+    trigger: onAction
+    invalidates:
+    - listTicketTemplates
+  - operationId: printTicketProof
+    contract: orders
+    purpose: Print a sample without selling anything
+    trigger: onAction
   - operationId: archiveMediaTemplate
     contract: access
     purpose: Archive a media template
@@ -62812,6 +62840,31 @@ screens:
       just counted. **Collects what `archiveMediaTemplate` sends before it is called.** Nothing in the
       body is required. Optional: `reason`.'
     provenance: contract access.yaml POST /media-templates/{templateId}/archive
+  - id: formCreateTicketTemplate
+    component: modal
+    trigger: New ticket template
+    body: '**Collects what `createTicketTemplate` sends before it is called** (TicketTemplateRequest): name, mediaType, isRecyclable, recycleAfterDays, appliesToProductKinds, appliesToChannels, selectionPriority, layoutRef, localeVariants, isActive.
+      `name` and `mediaType` are what a template cannot be saved without; `selectionPriority` with the product kinds,
+      channels and media type decides which template a sale issues from. Dismissing sends nothing.'
+    bindsTo: TicketTemplateRequest
+    confirm:
+      label: Create ticket template
+      operation: createTicketTemplate
+    dismiss:
+      label: Cancel
+    provenance: contract orders.yaml POST /ticket-templates (CHG-RFM-014)
+  - id: formUpdateTicketTemplate
+    component: modal
+    trigger: Save ticket template
+    body: '**Collects what `updateTicketTemplate` sends before it is called**, for the template selected: the same fields
+      as a new template; `isActive` false retires it. Dismissing sends nothing; the screen behind is unchanged.'
+    bindsTo: TicketTemplateRequest
+    confirm:
+      label: Save ticket template
+      operation: updateTicketTemplate
+    dismiss:
+      label: Cancel
+    provenance: contract orders.yaml PATCH /ticket-templates/{templateId} (CHG-RFM-014)
 - id: BO-345
   name: Digital QR & Barcode Ticket Designer
   module: Access & Venue

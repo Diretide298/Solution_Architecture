@@ -1,0 +1,37 @@
+id: CHG-RFM-014
+date: '2026-10-04'
+source: audit
+kind: spec
+summary: createTicketTemplate, updateTicketTemplate and printTicketProof are bound on BO-344 Media Design Studio Command
+  Center, which already lists, duplicates and imports ticket templates.
+decision:
+  what: BO-344 gains the three operations (onAction; the two writes invalidate listTicketTemplates), New ticket template,
+    Save ticket template and Print a proof buttons, and the forms formCreateTicketTemplate and formUpdateTicketTemplate
+    collecting TicketTemplateRequest. x-ticvai-consumed-by follows from link-screens-contracts.py.
+  by: Chinmay
+  date: '2026-10-04'
+why: 'Since CHG-FXS-002 (d060fe01; sources/audit-4-october/fix-s12/LEDGER.md: the designer on BO-346 edits access.media_template,
+  so the orders ticket-template operations left it) no screen bound createTicketTemplate, a setup operation of the slice,
+  nor updateTicketTemplate and printTicketProof. BO-344 is the studio''s entry for creating and managing every ticket and
+  credential media template and already binds listTicketTemplates, cloneTicketTemplate and importTicketTemplate. Chinmay,
+  4 October: bind it where the ticket-template setup now lives.'
+keys_touched:
+  screens:
+  - BO-344
+  - BO-346
+  operations:
+  - createTicketTemplate
+  - updateTicketTemplate
+  - printTicketProof
+root_class: 'new: operation-without-screen'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: Batch RFM (r1-fix-merge), 4 October 2026.

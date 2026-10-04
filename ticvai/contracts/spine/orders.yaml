@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 205
+  x-ticvai-screen-count: 208
   x-ticvai-tier: spine
   x-ticvai-module: 2 — Ticketing Sales
   x-ticvai-requirements: 343
@@ -1786,6 +1786,8 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createTicketTemplate
+      x-ticvai-consumed-by:
+        - "P08 BO-344 Media Design Studio Command Center"
       summary: Create a ticket template
       description: '**Selection is automatic.** `selectionPriority`, `mediaType`, `appliesToProductKinds`
         and `appliesToChannels` decide which template a sale issues from, so the caller never chooses
@@ -1845,6 +1847,8 @@ paths:
         format: uuid
     patch:
       operationId: updateTicketTemplate
+      x-ticvai-consumed-by:
+        - "P08 BO-344 Media Design Studio Command Center"
       summary: Change or retire a ticket template
       description: '**Tickets already issued keep the template they were issued from.** Changing artwork
         affects the next ticket, never one a guest already holds. Retire with `isActive: false` rather
@@ -1905,6 +1909,8 @@ paths:
         format: uuid
     post:
       operationId: printTicketProof
+      x-ticvai-consumed-by:
+        - "P08 BO-344 Media Design Studio Command Center"
       summary: Print a sample without selling anything
       description: '2.16.6. **Artwork is checked by looking at it, and the only way to look at it was
         to sell something.**
