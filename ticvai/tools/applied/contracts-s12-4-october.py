@@ -1665,6 +1665,72 @@ LINEAGE.update({
     "listDeviceBindingSession": (["access.device_binding"], [], [], [], "bindingId per row"),
 })
 
+# ── third batch of ledger requests (CHG-FXC-011) ─────────────────────────────────────────────────────────────────
+E(add_operation, FNB, "/outlets/{outletId}/table-combinations", "get", _read_op(
+    "listTableCombinations", "PRODUCT_VIEW", "venue", None, "fnb", "The outlet's table combinations",
+    SINCE % "POS-024: setTableCombinations is a whole-set PUT nothing read" +
+    "Every `fnb.table_combination` of the outlet, ordered by `combinedCovers`, as `setTableCombinations` stores "
+    "them.",
+    """
+- name: outletId
+  in: path
+  required: true
+  schema:
+    type: string
+    format: uuid
+""", "type: array\nitems:\n  $ref: '#/components/schemas/TableCombination'", ["P04 POS-024 Table Plan"]))
+E(Y.add_props, FNB, "KitchenTicket", """
+visitId:
+  type: string
+  format: uuid
+  nullable: true
+  readOnly: true
+  description: '**The table visit the ticket is for** (4 October 2026, CHG-FXC-011; KIT-002): the `{visitId}`
+    `notifyServer` takes. Null for a counter or delivery order with no visit.'
+""")
+E(Y.add_props, ORD, "GroupArrivalCheckInAdmissionOperationsView", """
+groupBookingId:
+  type: string
+  format: uuid
+  readOnly: true
+  description: '**The group booking this row is** (4 October 2026, CHG-FXC-011; POS-031, SVC-ORDER-DRAFTED-1): the id
+    `getGroupBooking` and `recordGroupCheckIn` take.'
+""")
+E(Y.add_props, TRN, "PassOffer", """
+variants:
+  type: array
+  description: '**What `addCartLine` sells for this pass** (4 October 2026, CHG-FXC-011; GST-050, GST-056): one
+    catalogue variant of `catalogueProductId` per passenger type.'
+  items:
+    type: object
+    required:
+    - passengerTypeId
+    - variantId
+    properties:
+      passengerTypeId:
+        type: string
+        format: uuid
+      variantId:
+        type: string
+        format: uuid
+""")
+E(Y.add_props, CAT, "Product", """
+eventId:
+  type: string
+  format: uuid
+  nullable: true
+  description: '**The event this product sells admission to** (4 October 2026, CHG-FXC-011; WEB-002, WEB-004): a
+    product page finds its event and the event''s performances (`Performance.eventId`) give it dates. Null for a product
+    not tied to an event (merchandise, a pass, a membership).'
+""")
+E(Y.append_op_description, MKT, "recordLostItem", """
+**A guest caller** (4 October 2026, CHG-FXC-011; WEB-034): reports only, with `kind` `lost`, under their guest
+session; CASE_MANAGE is what a staff caller needs (a cleaner handing in, `kind` `found`). A guest's report is tied to
+their own subject and they can read back only their own reports.""", "CHG-FXC-011")
+LINEAGE.update({
+    "listTableCombinations": (["fnb.table_combination"], [], [], [], "what setTableCombinations stores"),
+})
+
 # [plan -> contracts] requests (CHG-FXC-010)
 E(Y.insert_after_in_op, C("satellite/payments.yaml"), "receivePaymentProviderWebhook",
   "      x-ticvai-conflict-policy: append", """

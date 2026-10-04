@@ -26181,6 +26181,12 @@ components:
             - missingCredential
             - accessibilityRequirement
           description: Arrival issues raised.
+        groupBookingId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: '**The group booking this row is** (4 October 2026, CHG-FXC-011; POS-031, SVC-ORDER-DRAFTED-1): the id
+            `getGroupBooking` and `recordGroupCheckIn` take.'
     GroupAmendmentsCancellationRefundOperationsView:
       type: object
       x-ticvai-drafted-shape: true

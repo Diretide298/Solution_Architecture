@@ -76586,5 +76586,30 @@
    "postgres",
    "redis"
   ]
+ },
+ "listTableCombinations": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/outlets/{outletId}/table-combinations",
+  "reads": [
+   "fnb.table_combination"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The outlet's table combinations",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
  }
 }

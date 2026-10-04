@@ -1822,11 +1822,12 @@ paths:
       - guestAuth: []
       - bearerAuth: []
       summary: Report something lost, or hand something in
-      description: '**One operation for both sides**, distinguished by `kind`. A guest reports; a cleaner
-        hands in. **Modelling them separately would mean matching across two shapes**, which is how a
-        match gets missed.
+      description: |-
+        **One operation for both sides**, distinguished by `kind`. A guest reports; a cleaner hands in. **Modelling them separately would mean matching across two shapes**, which is how a match gets missed.
 
-        '
+        **A guest caller** (4 October 2026, CHG-FXC-011; WEB-034): reports only, with `kind` `lost`, under their guest
+        session; CASE_MANAGE is what a staff caller needs (a cleaner handing in, `kind` `found`). A guest's report is tied to
+        their own subject and they can read back only their own reports.
       tags:
       - marketing
       x-ticvai-permission: CASE_MANAGE

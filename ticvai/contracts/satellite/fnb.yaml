@@ -1844,6 +1844,40 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /outlets/{outletId}/table-combinations:
+    get:
+      operationId: listTableCombinations
+      x-ticvai-consumed-by:
+        - "P04 POS-024 Table Plan"
+      summary: The outlet's table combinations
+      description: |-
+        **Added 4 October 2026 (CHG-FXC-011; POS-024: setTableCombinations is a whole-set PUT nothing read).** Every `fnb.table_combination` of the outlet, ordered by `combinedCovers`, as `setTableCombinations` stores them.
+      tags:
+      - fnb
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: outletId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: The outlet's table combinations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TableCombination'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     parameters:
     - name: outletId
       in: path
@@ -11738,6 +11772,13 @@ components:
           nullable: true
         elapsedSeconds:
           type: integer
+        visitId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: '**The table visit the ticket is for** (4 October 2026, CHG-FXC-011; KIT-002): the `{visitId}`
+            `notifyServer` takes. Null for a counter or delivery order with no visit.'
     KitchenStation:
       x-ticvai-persistence: fnb.kitchen_station
       type: object

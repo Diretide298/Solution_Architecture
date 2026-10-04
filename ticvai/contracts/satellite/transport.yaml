@@ -2405,6 +2405,22 @@ components:
         validityDays: { type: integer }
         price: { $ref: '../shared/common.yaml#/components/schemas/Money' }
         saving: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+        variants:
+          type: array
+          description: '**What `addCartLine` sells for this pass** (4 October 2026, CHG-FXC-011; GST-050, GST-056): one
+            catalogue variant of `catalogueProductId` per passenger type.'
+          items:
+            type: object
+            required:
+            - passengerTypeId
+            - variantId
+            properties:
+              passengerTypeId:
+                type: string
+                format: uuid
+              variantId:
+                type: string
+                format: uuid
 
     FavouriteRoute:
       x-ticvai-persistence: "transport.favourite_route"
