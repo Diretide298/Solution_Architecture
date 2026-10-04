@@ -1014,6 +1014,7 @@
   "BO-822": {"kind": "undefined", "into": "", "why": "cannot be defined yet: no operation stores service-recovery automation rules (contract gap CHG-WIR-007); the rules, cases and approvals need a contract design a person decides (the screens agent, 4 October; CHG-FXP-004)"},
   "BO-1069": {"kind": "undefined", "into": "", "why": "cannot be defined yet: no tenant-facing operation reports platform service status (contract gap CHG-WIR-024) (the screens agent, 4 October; CHG-FXP-004)"},
   "BO-1072": {"kind": "undefined", "into": "", "why": "cannot be defined yet: no staff read of the published API definitions for the seat API catalogue (contract gap CHG-WIR-027) (the screens agent, 4 October; CHG-FXP-004)"},
+  "BO-1179": {"kind": "undefined", "part": "rest", "into": "", "why": "the rest cannot be defined yet: its setup operation setApiClientStatus stays on APP-SETUP-BO-1179, but the rest is an integration-exception console (endpoint, error code, attempts, owner) with no operation or table holding wallet integration exceptions; WalletDispute is a guest dispute record (the contracts agent, 4 October; CHG-FXP-004)"},
   "ADM-408": {"kind": "undefined", "into": "", "why": "cannot be defined yet: no operation approves a prospect's commercial package and hands it to purchase and contract activation (contract gap CHG-WIR-024); a commercial process the lead has not specified (the screens agent, 4 October; CHG-FXP-004)"}
  }
 }

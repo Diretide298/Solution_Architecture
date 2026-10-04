@@ -225,6 +225,14 @@ def build_plan():
                         "hold and off the board; it comes back with the first refresh after that is settled.")
                 plan += [(x, "defer", note) for x in [k] + subs]
             covered.add(k)
+    ex_ = ROOT / "docs" / "active" / "block-a-extra-tasks.json"
+    for sid, why in td.rest_held((json.loads(ex_.read_text(encoding="utf-8")).get("screensNotBuilt") or {})
+                                 if ex_.exists() else {}).items():
+        for k in [k_ for k_ in gone if k_.endswith(f"-{sid}-REST") and k_ not in covered]:
+            note = (f"**Out of the plan for now** (4 October 2026, CHG-FXP-004): the rest of {sid} {why}. Its setup "
+                    "part stays on its own ticket. This ticket is on hold and comes back when the screen is defined.")
+            plan += [(x, "defer", note) for x in [k] + [s_ for s_ in mp if s_.startswith(k + "#")]]
+            covered.add(k)
     for g in gone:
         if g in covered:
             continue

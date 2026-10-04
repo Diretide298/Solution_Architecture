@@ -2020,8 +2020,8 @@ def main() -> int:
             # another task builds: until 3 October it was only the unplanned ones, so a screen whose other operations
             # were all planned elsewhere (BO-1065: listDenominations, getRegionSettings) had nobody wiring them.
             rest = [o for o in screen_ops(sid) if o not in setup_screens.get(sid, ())]
-            if not rest:
-                continue
+            if not rest or sid in ticket_done.rest_held(decided["screensNotBuilt"]):
+                continue                 # nothing more, or the rest cannot be defined yet (CHG-FXP-004)
             pts = max(1, points_of(screen_raw(s_)) - setup_sizes.get(sid, 1))
             later_ams.setdefault((screen_module(sid), plat_of(sid)), []).append((sid, f"{have}-REST", pts, "rest"))
             continue

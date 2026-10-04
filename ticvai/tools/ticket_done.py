@@ -156,9 +156,10 @@ def screen_hold(s: dict, listed: dict | None = None):
       merged    its notes lead with "**Merged into X**": X's ticket builds it (CHG-FXP-002)
       listed    block-a-extra-tasks.json `screensNotBuilt` names it (a replaced page, or a screen a person could not
                 define: moved out of Block A), with `kind`, `into` and `why`
+    An entry with `"part": "rest"` holds only the rest of a setup screen (rest_held): its setup part is still built.
     A screen that only needs a person is not held here: it is built after its definition (define_needed)."""
     entry = (listed or {}).get(s.get("id"))
-    if entry:
+    if entry and entry.get("part") != "rest":
         return entry.get("kind") or "listed", entry.get("into") or "", entry.get("why") or ""
     m = MERGED_NOTE.search(str(s.get("notes") or ""))
     if m:
@@ -288,3 +289,9 @@ def merge_bindings(screens: dict) -> dict:
                 have.add(a["operationId"])
                 added.setdefault(into, []).append(a["operationId"])
     return added
+
+
+def rest_held(listed: dict | None) -> dict:
+    """{screen: why} for the setup screens whose rest-of-the-screen task is not built (`screensNotBuilt` entries with
+    `"part": "rest"`, CHG-FXP-004): BO-1179's setup operation stays, its wallet-exception console waits for a design."""
+    return {sid: e.get("why") or "" for sid, e in (listed or {}).items() if isinstance(e, dict) and e.get("part") == "rest"}

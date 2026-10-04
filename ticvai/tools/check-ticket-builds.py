@@ -197,10 +197,14 @@ def main() -> int:
     op_hold, scr_hold, raw_screens = td.load_holds(g.ROOT)
     blocks = g.load_json(g.ROOT / "handoff" / "service-docs" / "block-a-schedule.json", {}) or {}
     starts, blk = blocks.get("start") or {}, blocks.get("block") or {}
+    rest_out = td.rest_held(extra.get("screensNotBuilt") or {})
     for k, bl in sorted(builds.items()):
         r = rows[k]
         if r["type"] != "Task" or k.startswith("TEST-"):
             continue
+        m_rest = re.match(r"^APP-SETUP-([A-Z]+-\d{3,4})-REST$", k)
+        if m_rest and m_rest.group(1) in rest_out:
+            guard.add("B-NOT-BUILT", k, f"{k} builds the rest of {m_rest.group(1)}, which is held: {rest_out[m_rest.group(1)]}")
         for b in bl:
             kind, _, name = b.partition(" ")
             if kind == "screen" and name in scr_hold:
