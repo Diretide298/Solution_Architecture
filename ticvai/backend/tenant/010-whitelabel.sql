@@ -242,6 +242,8 @@ CREATE TABLE IF NOT EXISTS whitelabel.guided_choice_question (
     sort_order                        integer NOT NULL
 );
 
+-- Holds 3 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 6 operations read it and 1 write it; 2 tables reference it.
 CREATE TABLE IF NOT EXISTS whitelabel.homepage_layout (
     template_key                      text,
     landing_source                    text DEFAULT 'storefront' CONSTRAINT homepage_layout_landing_source_chk CHECK (landing_source IN ('storefront', 'ownSite')),
@@ -273,6 +275,8 @@ CREATE TABLE IF NOT EXISTS whitelabel.module_enablement (
     tenant_config_id                  uuid NOT NULL
 );
 
+-- Holds 3 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 5 operations read it and 1 write it; 2 tables reference it.
 CREATE TABLE IF NOT EXISTS whitelabel.navigation_config (
     id                                uuid PRIMARY KEY NOT NULL,
     kind                              text NOT NULL CONSTRAINT navigation_config_kind_chk CHECK (kind IN ('bottomNavigation', 'drawer', 'tabs')),
@@ -280,7 +284,8 @@ CREATE TABLE IF NOT EXISTS whitelabel.navigation_config (
 );
 
 -- One entry in a tenant’s own navigation. Hangs off: reaches whitelabel.footer_config through its
--- keys. Reached by: 5 operations read it and 2 write it; 1 tables reference it.
+-- keys; references whitelabel.navigation_config. Reached by: 5 operations read it and 2 write it;
+-- 1 tables reference it.
 CREATE TABLE IF NOT EXISTS whitelabel.navigation_item (
     navigation_config_id              uuid NOT NULL,
     id                                uuid PRIMARY KEY NOT NULL,

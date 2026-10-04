@@ -132,7 +132,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-609` | Refund & Payment Adjustment Command Center | C | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `ADM-610` | Refund Request & Eligibility Workspace | C | 10 | 10 | 6 | 2 | 0 | 6 | — | notStarted (—) |
-| `ADM-611` | Refund Policy & Rule Configuration | B | 9 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-611` | Refund Policy & Rule Configuration | B–D | 9 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `ADM-612` | Refund Allocation & Original Tender Manager | C | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `ADM-613` | Void, Reversal & Cancellation Manager | C | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-614` | Refund Approval & Exception Workflow | C | 0 | 20 | 6 | 6 | 0 | 6 | — | notStarted (—) |
@@ -480,7 +480,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | Block B · task VM-ADM-611 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |

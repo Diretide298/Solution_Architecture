@@ -594,7 +594,7 @@ Errors to draw in the form: 400 An asset is larger than 2 MB, or is not PNG or S
 - → `CMS-005` Theme Editor: *Sets the colour theme*
 - → `CMS-001` Tenant Workspace: *Tenant Workspace*
 - → `CMS-003` Typography: *Typography*
-- → `CMS-004` Logo & Assets: *Logo & Assets*
+- → `CMS-004` Logo & Assets: *Logo & Assets*; carries `uploadId`
 
 #### States
 

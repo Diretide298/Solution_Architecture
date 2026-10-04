@@ -579,8 +579,8 @@ screens:
       trigger: White-Label Branding Management
       carries:
       - tenantId
-      provenance: derived — ADM-016 declares entryState.params packageId, tenantId, version and ADM-002
-        holds tenantId, so an edge into it carries them
+      provenance: derived — ADM-016 declares entryState.params packageId, tenantId, uploadId, version
+        and ADM-002 holds tenantId, so an edge into it carries them
     - to: ADM-017
       trigger: Domain & Certificate Management
       carries:

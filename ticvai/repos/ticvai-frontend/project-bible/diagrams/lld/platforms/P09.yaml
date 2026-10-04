@@ -677,6 +677,7 @@ screens:
   - tenantId<-navigation
   - packageId<-navigation
   - version<-navigation
+  - uploadId<-navigation
   goesTo:
   - ADM-001
   - ADM-002

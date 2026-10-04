@@ -1880,8 +1880,8 @@ CREATE TABLE IF NOT EXISTS marketing.segment (
 );
 
 -- One condition in a segment rule. Hangs off: a child of marketing.segment; reaches
--- marketing.guest_profile through its keys; references marketing.segment. Reached by: 11
--- operations read it and 5 write it.
+-- marketing.guest_profile through its keys; references marketing.segment. Reached by: 13
+-- operations read it and 4 write it.
 CREATE TABLE IF NOT EXISTS marketing.segment_criterion (
     segment_id                        uuid NOT NULL,
     attribute                         text NOT NULL,

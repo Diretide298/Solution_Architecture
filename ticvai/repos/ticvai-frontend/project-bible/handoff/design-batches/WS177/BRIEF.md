@@ -131,7 +131,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-1071` | Integration Command Center | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1072` | Seat Management APIs | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1072` | Seat Management APIs | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1073` | API Access & OAuth | B | 1 | 17 | 6 | 1 | 2 | 0 | — | notStarted (—) |
 | `BO-1074` | Webhook Configuration | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1075` | Seat Event Catalog | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |

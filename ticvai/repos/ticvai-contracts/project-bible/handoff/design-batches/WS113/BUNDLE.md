@@ -102,7 +102,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-666` | Validity Period Configuration | D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 | `BO-667` | Event & Venue Accreditation Assignment | D | 25 | 20 | 6 | 1 | 0 | 6 | — | notStarted (—) |
 | `BO-668` | Multi-Venue Accreditation Management | D | 0 | 16 | 6 | 6 | 0 | 6 | — | notStarted (—) |
-| `BO-669` | Temporary & Seasonal Accreditation | B | 15 | 3 | 6 | 3 | 0 | 6 | — | notStarted (—) |
+| `BO-669` | Temporary & Seasonal Accreditation | B–D | 15 | 3 | 6 | 3 | 0 | 6 | — | notStarted (—) |
 | `BO-670` | Suspension & Reactivation Management | D | 9 | 0 | 6 | 4 | 0 | 0 | — | notStarted (—) |
 | `BO-671` | Accreditation Revocation Management | D | 0 | 0 | 6 | 4 | 0 | 6 | — | notStarted (—) |
 | `BO-672` | Expiry Monitor & Expiration Rules | D | 0 | 14 | 6 | 6 | 0 | 0 | — | notStarted (—) |
@@ -1046,7 +1046,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `accreditation` module |
-| Block | Block B · task VM-BO-669 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `ACCREDITATION_CONFIGURE`, `ACCREDITATION_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): One programme's validity edited as a whole record, with presets for temporary and seasonal programmes (defined 4 October 2026 from AccreditationValidity, CHG-FXS-001). |

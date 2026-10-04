@@ -105,7 +105,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-065` | Newsletter & Preferences | A | 9 | 13 | 6 | 10 | 1 | 0 | guest | notStarted (client-verified) |
+| `GST-065` | Newsletter & Preferences | B–D | 9 | 13 | 6 | 10 | 1 | 0 | guest | notStarted (client-verified) |
 
 ## Design inputs from the client meetings
 

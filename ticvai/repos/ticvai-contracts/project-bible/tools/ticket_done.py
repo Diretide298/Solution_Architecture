@@ -81,7 +81,7 @@ def done_when(r, part, builds):
     tables but no task's done-when, so most tickets reached developers with none."""
     m = DONE_WHEN.search(r.get("description") or "")
     if m and not part:
-        return "Done when " + " ".join(m.group(1).split())[:700]
+        return "Done when " + " ".join(m.group(1).split())   # whole: a 700-character cut ended 11 pointers mid-word (CHG-RFM-016)
     names = [b.split(" ", 1)[1] for b in builds]
     named = ", ".join(f"`{n}`" for n in names[:8]) + (f" and {len(names) - 8} more" if len(names) > 8 else "")
     kind, typ = r.get("track"), r.get("type")

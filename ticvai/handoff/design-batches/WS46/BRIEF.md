@@ -115,7 +115,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-154` | Payment Method, Bank & Partner Discount Rules | B | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-155` | Special Price & Guest Offer Configurator | B | 12 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-156` | Discount Limits, Guardrails & Commercial Controls | B | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-157` | Rule Test, Simulation & AI Recommendation Workspace | B | 15 | 0 | 6 | 18 | 0 | 0 | — | notStarted (generated) |
+| `ADM-157` | Rule Test, Simulation & AI Recommendation Workspace | B–D | 15 | 0 | 6 | 18 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

@@ -105,7 +105,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-046` | Kitchen Display | C | 8 | 14 | 6 | 7 | 0 | 3 | — | notStarted (generated) |
 | `BO-104` | Food & Beverage | A | 1 | 12 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-134` | Kitchen & Preparation Stations | C | 15 | 16 | 6 | 1 | 1 | 6 | — | notStarted (generated) |
-| `BO-135` | Order Routing & KDS/Printer Rules | C | 7 | 7 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-135` | Order Routing & KDS/Printer Rules | B–D | 7 | 7 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-136` | F&B Global Settings & Controls | A | 84 | 5 | 6 | 17 | 1 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
@@ -1911,7 +1911,7 @@ Also apply: 2 for P08 · Food & Beverage, 24 for all of P08, 29 for every app (s
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Food & Beverage · wave 2 · needs the `fnb` module |
-| Block | Block C · task VM-BO-135 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listWorkstations` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

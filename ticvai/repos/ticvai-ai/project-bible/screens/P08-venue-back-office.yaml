@@ -28154,9 +28154,9 @@ screens:
         its own'
     - to: BO-048
       trigger: Retail Products
-      provenance: 'derived — BO-048 declares entryState.params merchandiseId and BO-101 holds none of
-        them. The edge carries nothing: merchandiseId only pre-selects (deep link or optional), and BO-048
-        opens on its own'
+      provenance: 'derived — BO-048 declares entryState.params merchandiseId, productId and BO-101 holds
+        none of them. The edge carries nothing: merchandiseId, productId only pre-select (deep link or
+        optional), and BO-048 opens on its own'
     - to: BO-059
       trigger: Sales Reports
       provenance: 'derived — BO-059 declares entryState.params conversationId, reportId and BO-101 holds
@@ -28851,9 +28851,9 @@ screens:
         on its own'
     - to: BO-093
       trigger: Map Import & Labelling
-      provenance: 'derived — BO-093 declares entryState.params jobId, mapId, uploadId and BO-103 holds
-        none of them. The edge carries nothing: mapId, jobId, uploadId only pre-select (deep link or optional),
-        and BO-093 opens on its own'
+      provenance: 'derived — BO-093 declares entryState.params actionId, jobId, mapId, uploadId and BO-103
+        holds none of them. The edge carries nothing: mapId, jobId, uploadId, actionId only pre-select
+        (deep link or optional), and BO-093 opens on its own'
     - to: BO-094
       trigger: Map Editor & Publish
       provenance: 'derived — BO-094 declares entryState.params mapId, pathId, uploadId and BO-103 holds
@@ -29726,6 +29726,8 @@ screens:
       trigger: Opens Template Library
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
         3 October 2026); its command centre is not in Block A'
+      carries:
+      - templateId
     - to: BO-798
       trigger: Opens Intent & Knowledge Management
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,

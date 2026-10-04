@@ -13,8 +13,8 @@
 | Apps | 5 |
 | Tables | 1124 |
 | Stores | 10 |
-| Foreign Keys | 813 |
-| Indexes | 2899 |
+| Foreign Keys | 815 |
+| Indexes | 2924 |
 | Relationships | 3173 |
 | Flows | 97 |
 | Boards | 218 |

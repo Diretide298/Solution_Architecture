@@ -115,7 +115,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-094` | Dynamic Price Bands, Ladders & Adjustment Matrix | B | 24 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `ADM-095` | Dynamic Pricing Guardrails & Commercial Protection | B | 47 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
 | `ADM-096` | Dynamic Pricing Automation Policy & Control | B | 50 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
-| `ADM-097` | Rule Priority, Conflict Resolution & Dynamic Pricing Test Console | B | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-097` | Rule Priority, Conflict Resolution & Dynamic Pricing Test Console | B–D | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -1702,7 +1702,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block B · task VM-ADM-097 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Identify; Show) and no metric row |

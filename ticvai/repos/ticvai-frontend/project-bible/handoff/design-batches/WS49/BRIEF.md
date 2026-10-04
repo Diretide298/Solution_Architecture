@@ -106,16 +106,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-178` | Bundle & Combo Command Center | C | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-178` | Bundle & Combo Command Center | B–D | 2 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-179` | Bundle Definition & Setup | B–D | 15 | 5 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-180` | Bundle Component Builder | B–D | 5 | 20 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-181` | Guest Choice & Build-Your-Own Bundle Designer | B–D | 3 | 20 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-182` | Bundle Pricing & Commercial Model | C | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-183` | Bundle Availability, Capacity & Validation | C | 0 | 4 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-184` | Bundle Validity, Scheduling & Redemption Rules | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-185` | Partner & External Product Bundle Manager | C | 13 | 8 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-186` | Revenue Allocation, Cost & Settlement Rules | C | 8 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-187` | Bundle Preview, Simulation & AI Recommendation | C | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-182` | Bundle Pricing & Commercial Model | B | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-183` | Bundle Availability, Capacity & Validation | B | 0 | 4 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-184` | Bundle Validity, Scheduling & Redemption Rules | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-185` | Partner & External Product Bundle Manager | B | 13 | 8 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-186` | Revenue Allocation, Cost & Settlement Rules | B | 8 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-187` | Bundle Preview, Simulation & AI Recommendation | B | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

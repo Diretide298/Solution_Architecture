@@ -400,8 +400,10 @@ screens:
         carries nothing: CMS-003 needs nothing to open'
     - to: CMS-004
       trigger: Logo & Assets
-      provenance: 'derived — CMS-004 declares entryState.params  and CMS-002 holds none of them. The edge
-        carries nothing: CMS-004 needs nothing to open'
+      carries:
+      - uploadId
+      provenance: derived — CMS-004 declares entryState.params uploadId and CMS-002 holds uploadId, so
+        an edge into it carries them
   notes: "Definition derived from the wireframe board on 14 August. Components, states and operations\
     \ still to be written. States derived from the screen pattern on 17 August, not individually considered\
     \ — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.\n\
@@ -548,8 +550,9 @@ screens:
         on its own'
     - to: CMS-004
       trigger: Logo & Assets
-      provenance: 'derived — CMS-004 declares entryState.params  and CMS-003 holds none of them. The edge
-        carries nothing: CMS-004 needs nothing to open'
+      provenance: 'derived — CMS-004 declares entryState.params uploadId and CMS-003 holds none of them.
+        The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-004 opens
+        on its own'
     - to: CMS-006
       trigger: Component Preview
       provenance: flow F102 step 2→3

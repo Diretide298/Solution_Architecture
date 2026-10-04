@@ -97,7 +97,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-364` | Approval Command Center Dashboard | B | 1 | 158 | 6 | 14 | 1 | 3 | — | notStarted (—) |
-| `BO-365` | My Approval Inbox | B | 0 | 22 | 6 | 0 | 1 | 3 | — | notStarted (—) |
+| `BO-365` | My Approval Inbox | B–D | 0 | 22 | 6 | 0 | 1 | 3 | — | notStarted (—) |
 | `BO-366` | Team / Shared Approval Queue | B | 0 | 0 | 6 | 7 | 1 | 6 | — | notStarted (—) |
 | `BO-367` | Approval Request Detail | B | 0 | 0 | 6 | 13 | 2 | 3 | — | notStarted (—) |
 | `BO-368` | AI Decision Support | B | 0 | 16 | 6 | 7 | 1 | 0 | — | notStarted (—) |

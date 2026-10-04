@@ -128,7 +128,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-124` | Layout & Journey Builder | B | 38 | 22 | 6 | 9 | 2 | 6 | — | notStarted (generated) |
 | `BO-125` | Product & Category Button Configuration | B | 19 | 6 | 6 | 14 | 3 | 0 | — | notStarted (generated) |
 | `BO-126` | Deployment, Preview & Audit | B | 23 | 47 | 5 | 2 | 0 | 0 | — | notStarted (generated) |
-| `BO-142` | Store Rules, Controls & Permissions | C | 11 | 5 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
+| `BO-142` | Store Rules, Controls & Permissions | B–D | 11 | 5 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
 | `BO-143` | Retail Global Settings & Controls | C | 10 | 10 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
@@ -1208,7 +1208,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `core` module |
-| Block | Block C · task VM-BO-142 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listRoles` reads the population and `getVenueSettings` reads one of them — list, select, act |

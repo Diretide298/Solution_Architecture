@@ -434,7 +434,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "What requires approval where. Versioned, because a request must be decided by the rules it was raised under **Hangs off**: reaches `approvals.request` through its keys. **Reached by**: 8 operations read it and 2 write it"
+   "note": "What requires approval where. Versioned, because a request must be decided by the rules it was raised under **Hangs off**: reaches `approvals.request` through its keys. **Reached by**: 9 operations read it and 2 write it"
   },
   {
    "table": "approvals.rule",
@@ -665,7 +665,7 @@
    "contention": null,
    "contended": false,
    "contentionIndeterminate": false,
-   "note": "One request per action needing authorisation. The subject is a reference, never a copy **Hangs off**: **a root** — nothing above it in its schema; references `identity.principal`. **Reached by**: 34 operations read it an"
+   "note": "One request per action needing authorisation. The subject is a reference, never a copy **Hangs off**: **a root** — nothing above it in its schema; references `identity.principal`. **Reached by**: 36 operations read it an"
   },
   {
    "table": "catalogue.channel_allocation",

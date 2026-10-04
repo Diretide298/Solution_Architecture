@@ -115,7 +115,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-154` | Payment Method, Bank & Partner Discount Rules | B | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-155` | Special Price & Guest Offer Configurator | B | 12 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-156` | Discount Limits, Guardrails & Commercial Controls | B | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-157` | Rule Test, Simulation & AI Recommendation Workspace | B | 15 | 0 | 6 | 18 | 0 | 0 | — | notStarted (generated) |
+| `ADM-157` | Rule Test, Simulation & AI Recommendation Workspace | B–D | 15 | 0 | 6 | 18 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -1213,7 +1213,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block B · task VM-ADM-157 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

@@ -157,7 +157,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `WEB-025` | Help Centre / FAQ | A | 8 | 33 | 5 | 0 | 5 | 0 | guest | review (client-verified) |
 | `WEB-026` | Survey & Feedback | A | 28 | 20 | 5 | 82 | 2 | 0 | guest | review (client-verified) |
-| `WEB-027` | Newsletter Subscription | A | 3 | 13 | 6 | 10 | 1 | 0 | guest | review (client-verified) |
+| `WEB-027` | Newsletter Subscription | B–D | 3 | 13 | 6 | 10 | 1 | 0 | guest | review (client-verified) |
 | `WEB-028` | Contact & Venue Information | A | 0 | 20 | 5 | 0 | 0 | 0 | guest | review (client-verified) |
 | `WEB-044` | AI Concierge – Home | A | 8 | 27 | 6 | 32 | 4 | 0 | guest | review (client-verified) |
 | `WEB-046` | In-Venue Notifications | A | 3 | 12 | 6 | 0 | 2 | 0 | guest | review (client-verified) |
@@ -675,7 +675,7 @@ This is a white-label guest screen: it is drawn in the venue's brand, never TICV
 |---|---|
 | App · platform | TICVAI Guest · P01 Guest Web (web) |
 | Module | Engagement & Support · wave 1 · needs the `marketing` module |
-| Block | Block A · task APP-WEB-WEB-027 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025) |
 | Device and orientation | This is the guest website, responsive: 1440 desktop and 390 phone widths, in the venue's brand. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (compact density): `listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act |

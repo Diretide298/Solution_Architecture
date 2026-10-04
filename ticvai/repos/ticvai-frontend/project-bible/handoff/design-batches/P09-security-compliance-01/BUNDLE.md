@@ -127,7 +127,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-031` | Security & Compliance Dashboard | D | 42 | 26 | 7 | 19 | 0 | 0 | — | notStarted (generated) |
-| `ADM-032` | WAF & Security Policy View | B | 9 | 6 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-032` | WAF & Security Policy View | B–D | 9 | 6 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -444,7 +444,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Security & Compliance · wave 3 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-032 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCellJobs` reads the population and `getCellHealth` reads one of them — list, select, act |

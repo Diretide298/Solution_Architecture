@@ -100,7 +100,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-350` | Module Integration Registry | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-351` | Approval API Management | B | 9 | 37 | 5 | 21 | 0 | 3 | — | notStarted (—) |
 | `ADM-352` | Workflow Event Framework | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-353` | Webhook Configuration & Subscription Manager | B | 5 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-353` | Webhook Configuration & Subscription Manager | B–D | 5 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-354` | External Workflow System Integration | A | 22 | 16 | 5 | 1 | 1 | 0 | — | notStarted (—) |
 | `ADM-355` | Data & Workflow Mapping Studio | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-356` | Integration Security & Access Control | B | 2 | 34 | 6 | 18 | 0 | 0 | — | notStarted (—) |
@@ -710,7 +710,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | Block B · task VM-ADM-353 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Delivery Configuration) and no display directory — it is settings, not a population |

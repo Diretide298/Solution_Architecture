@@ -113,7 +113,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-292` | Resale Fraud & Duplicate Sale Protection | C | 0 | 24 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 | `ADM-293` | Capacity & Inventory Reconciliation | C | 0 | 20 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
 | `ADM-294` | Seller Settlement & Payout Management | C | 2 | 28 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-295` | Refunds, Disputes & Resale Exceptions | C | 2 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-295` | Refunds, Disputes & Resale Exceptions | B–D | 2 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 | `ADM-296` | Resale Audit & Ownership History | C | 19 | 0 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
 | `ADM-297` | Resale Analytics & AI Intelligence | C | 2 | 0 | 6 | 0 | 0 | 5 | — | notStarted (generated) |
 
@@ -1185,7 +1185,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block C · task VM-ADM-295 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `ORDER_VIEW`, `SETTLEMENT_RECONCILE` (1 read, 1 operate); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

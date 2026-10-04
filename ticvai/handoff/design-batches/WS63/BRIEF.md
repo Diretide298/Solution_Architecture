@@ -113,7 +113,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-292` | Resale Fraud & Duplicate Sale Protection | C | 0 | 24 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 | `ADM-293` | Capacity & Inventory Reconciliation | C | 0 | 20 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
 | `ADM-294` | Seller Settlement & Payout Management | C | 2 | 28 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-295` | Refunds, Disputes & Resale Exceptions | C | 2 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `ADM-295` | Refunds, Disputes & Resale Exceptions | B–D | 2 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 | `ADM-296` | Resale Audit & Ownership History | C | 19 | 0 | 6 | 0 | 1 | 5 | — | notStarted (generated) |
 | `ADM-297` | Resale Analytics & AI Intelligence | C | 2 | 0 | 6 | 0 | 0 | 5 | — | notStarted (generated) |
 

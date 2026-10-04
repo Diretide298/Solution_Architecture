@@ -265,7 +265,7 @@ CREATE TABLE IF NOT EXISTS games.reader_deployment (
 
 -- How a game reader behaves and what it shows (BL-153). A guest at an arcade machine cannot read a
 -- message, they can only see a light. Hangs off: reaches games.game through its keys. Reached by:
--- 3 operations read it and 1 write it; 1 tables reference it.
+-- 4 operations read it and 2 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS games.reader_profile (
     id                                uuid PRIMARY KEY NOT NULL,
     name                              text NOT NULL,

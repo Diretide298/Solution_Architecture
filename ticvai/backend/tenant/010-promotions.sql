@@ -135,6 +135,8 @@ CREATE TABLE IF NOT EXISTS promotions.campaign_budget (
     threshold_policy                  jsonb
 );
 
+-- Holds 9 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 1 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS promotions.code_assignment (
     id                                uuid PRIMARY KEY NOT NULL,
     batch_id                          uuid NOT NULL,

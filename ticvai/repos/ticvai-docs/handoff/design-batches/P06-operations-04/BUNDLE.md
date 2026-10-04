@@ -173,7 +173,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `EMP-039` | Announcements | D | 1 | 9 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `EMP-038` | Broadcast to team | D | 12 | 14 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
 | `EMP-040` | Knowledge base | D | 6 | 0 | 5 | 2 | 0 | 0 | — | notStarted (generated) |
-| `EMP-041` | Training | D | 3 | 9 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
+| `EMP-041` | Training | B–D | 3 | 9 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
 | `EMP-042` | Profile | B | 3 | 18 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
 | `EMP-043` | Device settings | B | 13 | 9 | 6 | 48 | 0 | 0 | — | notStarted (generated) |
 | `EMP-044` | Accessibility | D | 0 | 0 | 4 | 0 | 0 | 0 | — | notStarted (generated) |
@@ -1334,7 +1334,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 3 · needs the `ai` module |
-| Block | Block D · task APP-STAFF-EMP-041 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `AI_USE`, `WORKFORCE_VIEW` (1 operate, 1 read) |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listTrainingRecords` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

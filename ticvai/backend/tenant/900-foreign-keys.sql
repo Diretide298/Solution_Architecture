@@ -3,7 +3,7 @@
 -- its use** — orders reaches catalogue, catalogue reaches platform, and something
 -- reaches back. Tables first, constraints last, is the only ordering that terminates.
 --
--- 784 of 817 declared references. The ones that reach the
+-- 786 of 819 declared references. The ones that reach the
 -- other database are in ../990-cross-database-references.sql and are not constraints
 -- any more.
 
@@ -770,7 +770,9 @@ ALTER TABLE whitelabel.navigation_item ADD CONSTRAINT navigation_item_navigation
 ALTER TABLE whitelabel.policy ADD CONSTRAINT policy_published_by_principal_id_fkey FOREIGN KEY (published_by_principal_id) REFERENCES identity.principal(id);
 ALTER TABLE whitelabel.promo_block ADD CONSTRAINT promo_block_promotion_id_fkey FOREIGN KEY (promotion_id) REFERENCES promotions.promotion(id);
 ALTER TABLE whitelabel.tenant_config ADD CONSTRAINT tenant_config_footer_config_id_fkey FOREIGN KEY (footer_config_id) REFERENCES whitelabel.footer_config(id);
+ALTER TABLE whitelabel.tenant_config ADD CONSTRAINT tenant_config_homepage_layout_id_fkey FOREIGN KEY (homepage_layout_id) REFERENCES whitelabel.homepage_layout(id);
 ALTER TABLE whitelabel.tenant_config ADD CONSTRAINT tenant_config_homepage_section_id_fkey FOREIGN KEY (homepage_section_id) REFERENCES whitelabel.homepage_section(id);
+ALTER TABLE whitelabel.tenant_config ADD CONSTRAINT tenant_config_navigation_config_id_fkey FOREIGN KEY (navigation_config_id) REFERENCES whitelabel.navigation_config(id);
 ALTER TABLE whitelabel.tenant_config ADD CONSTRAINT tenant_config_navigation_item_id_fkey FOREIGN KEY (navigation_item_id) REFERENCES whitelabel.navigation_item(id);
 ALTER TABLE whitelabel.tenant_config ADD CONSTRAINT tenant_config_tenant_id_fkey FOREIGN KEY (tenant_id) REFERENCES platform.tenant(id);
 ALTER TABLE workforce.announcement ADD CONSTRAINT announcement_venue_id_fkey FOREIGN KEY (venue_id) REFERENCES platform.scope(id);

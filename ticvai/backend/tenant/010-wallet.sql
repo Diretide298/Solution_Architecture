@@ -330,8 +330,9 @@ CREATE TABLE IF NOT EXISTS wallet.restriction (
     scope_path                        ltree NOT NULL
 );
 
+-- Holds 12 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
 CREATE TABLE IF NOT EXISTS wallet.risk_rule (
-    id                                uuid PRIMARY KEY NOT NULL,
     risk_rules_id                     uuid NOT NULL,
     code                              text,
     signal                            text,
@@ -342,7 +343,8 @@ CREATE TABLE IF NOT EXISTS wallet.risk_rule (
     does_alert_on_action              boolean,
     status                            text,
     status_reason                     text,
-    status_until                      timestamptz
+    status_until                      timestamptz,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- Holds 2 columns. No description has been written for this table — the name is the only thing

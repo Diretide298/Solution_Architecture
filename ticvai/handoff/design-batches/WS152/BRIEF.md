@@ -132,7 +132,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-609` | Refund & Payment Adjustment Command Center | C | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `ADM-610` | Refund Request & Eligibility Workspace | C | 10 | 10 | 6 | 2 | 0 | 6 | — | notStarted (—) |
-| `ADM-611` | Refund Policy & Rule Configuration | B | 9 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `ADM-611` | Refund Policy & Rule Configuration | B–D | 9 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `ADM-612` | Refund Allocation & Original Tender Manager | C | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `ADM-613` | Void, Reversal & Cancellation Manager | C | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-614` | Refund Approval & Exception Workflow | C | 0 | 20 | 6 | 6 | 0 | 6 | — | notStarted (—) |

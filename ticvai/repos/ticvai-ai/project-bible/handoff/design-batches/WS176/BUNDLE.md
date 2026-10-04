@@ -165,7 +165,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1066` | Roles, Permissions & Masking | B | 92 | 16 | 6 | 15 | 1 | 5 | — | notStarted (—) |
 | `BO-1067` | Seat Approval Workflows | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1068` | Lifecycle & Environment Promotion | B | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (—) |
-| `BO-1069` | Platform Health & Observability | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1069` | Platform Health & Observability | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1070` | Setup, Clone & Inheritance | C | 0 | 30 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch
@@ -1724,7 +1724,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `seating` module |
-| Block | Block B · task VM-BO-1069 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

@@ -2461,12 +2461,12 @@ Every table this service owns that the slice reads or writes, with its columns a
 
 | Column | Type | Required | Notes |
 |---|---|---|---|
-| id | uuid | yes | Synthesised key. |
 | subject_id | uuid | yes |  |
 | password_hash | text | yes | Argon2id, with its parameters, never the password. |
 | failed_attempts | integer | yes |  |
 | locked_until | timestamptz | no |  |
 | password_set_at | timestamptz | no |  |
+| id | uuid | yes | Synthesised key. |
 
 ### `identity.guest_identity_verification`
 

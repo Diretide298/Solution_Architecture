@@ -97,7 +97,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-339` | Governance & Compliance Command Center | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `ADM-340` | Segregation of Duties Policy Manager | B | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
+| `ADM-340` | Segregation of Duties Policy Manager | A | 9 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
 | `ADM-341` | Four-Eyes & Dual-Control Policy | B | 7 | 0 | 5 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-342` | Authentication & MFA Policy Manager | A | 27 | 33 | 6 | 11 | 2 | 0 | — | notStarted (—) |
 | `ADM-343` | Sensitive Action Confirmation | B | 6 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
@@ -273,7 +273,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | Block B · task VM-ADM-340 |
+| Block | Block A · task APP-SETUP-ADM-340 |
 | Who uses it | venue staff holding `ROLE_MANAGE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Price Configuration User) and no display directory — it is settings, not a population |

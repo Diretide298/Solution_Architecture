@@ -163,7 +163,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-063` | Opening Hours & Calendar | B | 16 | 9 | 6 | 17 | 2 | 0 | — | notStarted (generated) |
 | `BO-102` | Sell | A | 2 | 37 | 6 | 57 | 0 | 0 | — | notStarted (generated) |
 | `BO-109` | Menu Builder & POS Layout Designer | A | 49 | 7 | 6 | 8 | 2 | 2 | — | notStarted (generated) |
-| `BO-110` | Recipe & BOM Management | B | 0 | 0 | 6 | 0 | 2 | 2 | — | notStarted (generated) |
+| `BO-110` | Recipe & BOM Management | B–D | 0 | 0 | 6 | 0 | 2 | 2 | — | notStarted (generated) |
 | `BO-111` | Ingredient Substitution, Allergen & Nutrition | A | 21 | 39 | 5 | 6 | 1 | 0 | — | notStarted (generated) |
 | `BO-112` | Production Planning & Production Sheets | A | 35 | 20 | 5 | 17 | 1 | 0 | — | notStarted (generated) |
 
@@ -1951,7 +1951,7 @@ Also apply: 4 for P08 · Sell, 24 for all of P08, 29 for every app (section *Des
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Sell · wave 2 · needs the `fnb` module |
-| Block | Block B · task VM-BO-110 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listRecipes` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

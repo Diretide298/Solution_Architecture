@@ -111,7 +111,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-819` | Review Collection & Rating Rules | D | 0 | 0 | 6 | 2 | 0 | 0 | — | notStarted (—) |
 | `BO-820` | Moderation & Publishing | D | 0 | 0 | 6 | 3 | 0 | 6 | — | notStarted (—) |
 | `BO-821` | AI Sentiment & Topic Analysis | D | 0 | 0 | 6 | 3 | 0 | 0 | — | notStarted (—) |
-| `BO-822` | Service Recovery Automation | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-822` | Service Recovery Automation | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-823` | VOC Analytics & Audit | D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch

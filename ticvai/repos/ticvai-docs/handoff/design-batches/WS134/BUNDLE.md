@@ -124,8 +124,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-727` | F&B Command Center | B | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
-| `BO-728` | Outlet Management | B | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
-| `BO-729` | Create / Edit Outlet | B | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
+| `BO-728` | Outlet Management | B–D | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
+| `BO-729` | Create / Edit Outlet | B–D | 0 | 0 | 6 | 0 | 3 | 0 | — | notStarted (—) |
 | `BO-730` | Outlet Types & Templates | C | 10 | 0 | 6 | 0 | 2 | 0 | — | notStarted (—) |
 | `BO-731` | Operating Hours & Service Periods | B | 16 | 20 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-732` | POS & Device Assignment | B | 7 | 22 | 6 | 11 | 3 | 0 | — | notStarted (—) |
@@ -305,7 +305,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Operations · wave 3 · needs the `fnb` module |
-| Block | Block B · task VM-BO-728 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -412,7 +412,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Operations · wave 3 · needs the `fnb` module |
-| Block | Block B · task VM-BO-729 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

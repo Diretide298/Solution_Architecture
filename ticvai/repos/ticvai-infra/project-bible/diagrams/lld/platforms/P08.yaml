@@ -1671,6 +1671,7 @@ screens:
   offlineState: false
   entryParams:
   - merchandiseId<-deepLink
+  - productId<-navigation
   goesTo:
   - BO-008
   boardFrames: null
@@ -3058,6 +3059,7 @@ screens:
   - mapId<-deepLink
   - jobId<-navigation
   - uploadId<-navigation
+  - actionId<-navigation
   goesTo:
   - BO-092
   - BO-094
@@ -20172,6 +20174,7 @@ screens:
   offlineState: false
   entryParams:
   - translationJobId<-BO-785
+  - templateId<-navigation
   goesTo:
   - BO-784
   boardFrames: null
@@ -20487,6 +20490,7 @@ screens:
   offlineState: false
   entryParams:
   - collectionId<-navigation
+  - uploadId<-navigation
   goesTo:
   - BO-794
   boardFrames: null

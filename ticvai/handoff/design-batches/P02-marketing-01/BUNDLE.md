@@ -105,7 +105,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `GST-065` | Newsletter & Preferences | A | 9 | 13 | 6 | 10 | 1 | 0 | guest | notStarted (client-verified) |
+| `GST-065` | Newsletter & Preferences | B–D | 9 | 13 | 6 | 10 | 1 | 0 | guest | notStarted (client-verified) |
 
 ---
 
@@ -121,7 +121,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Guest · P02 Guest App (mobile) |
 | Module | Marketing · wave 1 · needs the `marketing` module |
-| Block | Block A · task APP-MOB-GST-065 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | a guest, signed in or not (a guest holds no permission; ADR-0025); in the flows as guest |
 | Device and orientation | This is the guest phone app, 390 x 844, in the venue's brand, with the v4 tab bar (Home, Explore, Plan, Tickets) and the Buy tickets button. · LTR and RTL · the venue's theme |
 | Pattern | listDetail (comfortable density): `listConsentPurposes` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

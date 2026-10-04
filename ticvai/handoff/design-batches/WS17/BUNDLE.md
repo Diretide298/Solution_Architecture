@@ -101,8 +101,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-386` | Temporary Delegation & Availability Calendar | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-387` | Out-of-Office & Substitute Routing | B | 7 | 0 | 5 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-388` | Approval SLA Policy Configuration | B | 8 | 0 | 5 | 0 | 1 | 3 | — | notStarted (—) |
-| `BO-389` | Reminder & Breach Notification Rules | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-390` | Escalation Policy Builder | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-389` | Reminder & Breach Notification Rules | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-390` | Escalation Policy Builder | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-391` | Live Escalation Operations Center | B | 9 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-392` | SLA & Escalation Performance Analytics | B | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-393` | AI SLA & Escalation Advisor | B | 2 | 16 | 6 | 9 | 0 | 0 | — | notStarted (—) |
@@ -800,7 +800,7 @@ Also apply: 1 for P08 · Venue Operations, 24 for all of P08, 29 for every app (
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 3 · needs the `core` module |
-| Block | Block B · task VM-BO-389 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |
@@ -902,7 +902,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 3 · needs the `core` module |
-| Block | Block B · task VM-BO-390 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

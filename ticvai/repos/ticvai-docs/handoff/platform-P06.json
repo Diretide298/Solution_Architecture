@@ -74,11 +74,11 @@
    "operations": 22
   },
   {
-   "contract": "identity",
+   "contract": "workforce",
    "operations": 14
   },
   {
-   "contract": "workforce",
+   "contract": "identity",
    "operations": 14
   },
   {
@@ -98,19 +98,19 @@
    "operations": 8
   },
   {
-   "contract": "access",
-   "operations": 7
-  },
-  {
    "contract": "queue",
    "operations": 7
   },
   {
-   "contract": "reporting",
-   "operations": 6
+   "contract": "access",
+   "operations": 7
   },
   {
    "contract": "ai",
+   "operations": 6
+  },
+  {
+   "contract": "reporting",
    "operations": 6
   },
   {
@@ -126,7 +126,11 @@
    "operations": 2
   },
   {
-   "contract": "accreditation",
+   "contract": "payments",
+   "operations": 1
+  },
+  {
+   "contract": "assets",
    "operations": 1
   },
   {
@@ -134,11 +138,7 @@
    "operations": 1
   },
   {
-   "contract": "payments",
-   "operations": 1
-  },
-  {
-   "contract": "assets",
+   "contract": "accreditation",
    "operations": 1
   }
  ],

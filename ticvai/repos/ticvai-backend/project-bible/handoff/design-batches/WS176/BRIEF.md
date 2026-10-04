@@ -165,7 +165,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1066` | Roles, Permissions & Masking | B | 92 | 16 | 6 | 15 | 1 | 5 | — | notStarted (—) |
 | `BO-1067` | Seat Approval Workflows | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1068` | Lifecycle & Environment Promotion | B | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (—) |
-| `BO-1069` | Platform Health & Observability | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-1069` | Platform Health & Observability | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1070` | Setup, Clone & Inheritance | C | 0 | 30 | 6 | 3 | 0 | 0 | — | notStarted (—) |
 
 ## Thin screens in this batch

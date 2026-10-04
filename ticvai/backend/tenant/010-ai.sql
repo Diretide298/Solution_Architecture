@@ -744,7 +744,7 @@ CREATE TABLE IF NOT EXISTS ai.index_failure (
 
 -- A build in flight. recordsFailed is the number to watch — a source failing on 3% of rows is a
 -- search missing 3% of answers Hangs off: reaches ai.decision_record through its keys; references
--- ai.index_source. Reached by: 3 operations read it and 1 write it; 1 tables reference it.
+-- ai.index_source. Reached by: 3 operations read it and 1 write it; 2 tables reference it.
 CREATE TABLE IF NOT EXISTS ai.index_job (
     id                                uuid PRIMARY KEY NOT NULL,
     source_id                         uuid NOT NULL,
@@ -1041,7 +1041,7 @@ CREATE TABLE IF NOT EXISTS ai.prompt_template (
 
 -- A draft the assistant produced and a person must approve. Nothing executes from here Hangs off:
 -- reaches ai.decision_record through its keys; references ai.action_plan, ai.activity,
--- approvals.request. Reached by: 6 operations read it and 11 write it; 2 tables reference it.
+-- approvals.request. Reached by: 7 operations read it and 11 write it; 2 tables reference it.
 CREATE TABLE IF NOT EXISTS ai.proposed_action (
     id                                uuid PRIMARY KEY NOT NULL,
     interaction_id                    uuid,

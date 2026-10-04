@@ -80,7 +80,11 @@
    "operations": 7
   },
   {
-   "contract": "promotions",
+   "contract": "marketing-crm",
+   "operations": 5
+  },
+  {
+   "contract": "reporting",
    "operations": 5
   },
   {
@@ -88,11 +92,7 @@
    "operations": 5
   },
   {
-   "contract": "marketing-crm",
-   "operations": 5
-  },
-  {
-   "contract": "reporting",
+   "contract": "promotions",
    "operations": 5
   },
   {
@@ -104,10 +104,6 @@
    "operations": 4
   },
   {
-   "contract": "access",
-   "operations": 2
-  },
-  {
    "contract": "wallet",
    "operations": 2
   },
@@ -116,7 +112,11 @@
    "operations": 2
   },
   {
-   "contract": "games",
+   "contract": "access",
+   "operations": 2
+  },
+  {
+   "contract": "assets",
    "operations": 1
   },
   {
@@ -124,7 +124,7 @@
    "operations": 1
   },
   {
-   "contract": "assets",
+   "contract": "games",
    "operations": 1
   }
  ],

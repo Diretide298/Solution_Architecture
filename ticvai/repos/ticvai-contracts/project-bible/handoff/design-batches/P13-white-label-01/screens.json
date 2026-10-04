@@ -430,7 +430,10 @@
     {
      "to": "CMS-004",
      "trigger": "Logo & Assets",
-     "provenance": "derived — CMS-004 declares entryState.params  and CMS-002 holds none of them. The edge carries nothing: CMS-004 needs nothing to open"
+     "carries": [
+      "uploadId"
+     ],
+     "provenance": "derived — CMS-004 declares entryState.params uploadId and CMS-002 holds uploadId, so an edge into it carries them"
     }
    ]
   },
@@ -622,7 +625,7 @@
     {
      "to": "CMS-004",
      "trigger": "Logo & Assets",
-     "provenance": "derived — CMS-004 declares entryState.params  and CMS-003 holds none of them. The edge carries nothing: CMS-004 needs nothing to open"
+     "provenance": "derived — CMS-004 declares entryState.params uploadId and CMS-003 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-004 opens on its own"
     },
     {
      "to": "CMS-006",

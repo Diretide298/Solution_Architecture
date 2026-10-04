@@ -151,7 +151,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `EMP-020` | AI assistant — answer | D | 7 | 9 | 6 | 17 | 1 | 0 | — | notStarted (generated) |
 | `EMP-021` | Roster | D | 6 | 9 | 6 | 15 | 1 | 0 | — | notStarted (generated) |
 | `EMP-022` | My rota | D | 6 | 9 | 6 | 15 | 2 | 0 | — | notStarted (generated) |
-| `EMP-023` | Swap request | D | 6 | 12 | 6 | 15 | 2 | 0 | — | notStarted (generated) |
+| `EMP-023` | Swap request | B–D | 6 | 12 | 6 | 15 | 2 | 0 | — | notStarted (generated) |
 | `EMP-024` | Clock in / out | D | 9 | 14 | 6 | 4 | 3 | 0 | — | notStarted (generated) |
 
 ---
@@ -1917,7 +1917,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Operations · wave 2 · needs the `core` module |
-| Block | Block D · task APP-STAFF-EMP-023 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `WORKFORCE_VIEW` (1 read); in the flows as supervisor |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | listDetail (comfortable density): `listRotaAssignments` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

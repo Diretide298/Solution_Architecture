@@ -166,7 +166,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - uploadId<-navigation
   goesTo:
   - CMS-001
   - CMS-002

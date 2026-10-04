@@ -125,12 +125,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-054` | Role Assignment | A | 16 | 16 | 6 | 6 | 1 | 5 | — | notStarted (generated) |
 | `BO-055` | Rota & Scheduling | A | 32 | 19 | 6 | 21 | 0 | 0 | — | notStarted (generated) |
 | `BO-056` | Time & Attendance | D | 5 | 19 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
-| `BO-057` | Training & Certification | B | 2 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `BO-057` | Training & Certification | B–D | 2 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `BO-066` | Notification Settings | D | 12 | 23 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
 | `BO-084` | Approval Inbox | A | 11 | 11 | 6 | 22 | 0 | 3 | — | notStarted (generated) |
 | `BO-085` | Approval Request | A | 8 | 12 | 6 | 24 | 0 | 3 | — | notStarted (generated) |
 | `BO-086` | Approval Matrix | B | 34 | 10 | 6 | 49 | 0 | 3 | — | notStarted (generated) |
-| `BO-087` | Approval Delegations | B | 43 | 22 | 6 | 51 | 0 | 3 | — | notStarted (generated) |
+| `BO-087` | Approval Delegations | A | 43 | 22 | 6 | 51 | 0 | 3 | — | notStarted (generated) |
 
 ---
 
@@ -1133,7 +1133,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 3 · needs the `core` module |
-| Block | Block B · task VM-BO-057 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `USER_MANAGE`, `WORKFORCE_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listPrincipals` reads a population and nothing reads one of them; the detail is the row until a `get` exists |
@@ -2172,7 +2172,7 @@ Also apply: 2 for P08 · People & Access Rights, 24 for all of P08, 29 for every
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | People & Access Rights · wave 2 · needs the `core` module |
-| Block | Block B · task VM-BO-087 |
+| Block | Block A · task APP-SETUP-BO-087 |
 | Who uses it | venue staff holding `APPROVAL_CONFIGURE`, `APPROVAL_DECIDE`, `APPROVAL_VIEW` (1 configure, 1 operate, 1 read) |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listApprovalDelegations` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

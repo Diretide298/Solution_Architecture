@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-158` | Coupon & Promo Code Command Center | B | 0 | 16 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
+| `ADM-158` | Coupon & Promo Code Command Center | B–D | 0 | 16 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
 | `ADM-159` | Coupon & Promo Code Builder | B–D | 9 | 20 | 5 | 0 | 0 | 2 | — | notStarted (generated) |
 | `ADM-160` | Unique Code Generation & Batch Manager | B | 14 | 12 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
 | `ADM-161` | Code Eligibility & Restriction Manager | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |

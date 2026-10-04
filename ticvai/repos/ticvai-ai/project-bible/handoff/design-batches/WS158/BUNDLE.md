@@ -131,7 +131,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-884` | Attraction & Operational Staffing Roster | D | 0 | 77 | 6 | 11 | 1 | 0 | — | notStarted (—) |
 | `BO-885` | Minimum Staffing & Coverage Rule Configuration | D | 5 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-886` | Staffing Gap & Coverage Control Center | D | 4 | 22 | 6 | 1 | 2 | 0 | — | notStarted (—) |
-| `BO-887` | Shift Marketplace & Workforce Requests | D | 0 | 8 | 6 | 0 | 1 | 6 | — | notStarted (—) |
+| `BO-887` | Shift Marketplace & Workforce Requests | B–D | 0 | 8 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-888` | Attendance & Live Workforce Command Center | D | 0 | 22 | 6 | 1 | 1 | 0 | — | notStarted (—) |
 | `BO-889` | Staff Check-In, Check-Out & Attendance Exceptions | D | 19 | 5 | 6 | 4 | 1 | 0 | — | notStarted (—) |
 | `BO-890` | Workforce Compliance Validation Center | D | 0 | 12 | 6 | 0 | 1 | 0 | — | notStarted (—) |
@@ -1002,7 +1002,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block D · task VM-BO-887 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `WORKFORCE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

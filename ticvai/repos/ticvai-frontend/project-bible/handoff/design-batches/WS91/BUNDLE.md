@@ -137,7 +137,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-525` | Pricing Profile Builder | D | 8 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-526` | Duration & Tiered Pricing Configuration | D | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-527` | Calendar, Peak & Seasonal Pricing | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-528` | Dynamic Pricing & AI Recommendation | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-528` | Dynamic Pricing & AI Recommendation | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-529` | Deposit & Security Hold Policy | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-530` | Deposit Lifecycle & Settlement Rules | D | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-531` | Late Fee, Grace Period & Extension Pricing | D | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
@@ -646,7 +646,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Rentals · wave 3 · needs the `resources` module |
-| Block | Block B · task VM-BO-528 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

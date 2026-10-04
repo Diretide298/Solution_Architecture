@@ -270,7 +270,7 @@ CREATE TABLE IF NOT EXISTS orders.deposit (
 -- takes their float, which is what makes a variance attributable. withdrawnTotal reduces the
 -- expected close: cash skimmed for banking is not a shortfall Hangs off: reaches
 -- orders.sales_order through its keys; references identity.principal, orders.pos_shift,
--- platform.scope. Reached by: 5 operations read it
+-- platform.scope. Reached by: 6 operations read it
 CREATE TABLE IF NOT EXISTS orders.deposit_box (
     id                                uuid PRIMARY KEY NOT NULL,
     cashier_principal_id              uuid NOT NULL,
@@ -641,7 +641,7 @@ CREATE TABLE IF NOT EXISTS orders.group_visit_plan (
 );
 
 -- Holds 6 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 1 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS orders.guest_credit_account (
     id                                uuid PRIMARY KEY NOT NULL,
     subject_id                        uuid NOT NULL,

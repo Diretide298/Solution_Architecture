@@ -173,7 +173,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `EMP-039` | Announcements | D | 1 | 9 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `EMP-038` | Broadcast to team | D | 12 | 14 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
 | `EMP-040` | Knowledge base | D | 6 | 0 | 5 | 2 | 0 | 0 | — | notStarted (generated) |
-| `EMP-041` | Training | D | 3 | 9 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
+| `EMP-041` | Training | B–D | 3 | 9 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
 | `EMP-042` | Profile | B | 3 | 18 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
 | `EMP-043` | Device settings | B | 13 | 9 | 6 | 48 | 0 | 0 | — | notStarted (generated) |
 | `EMP-044` | Accessibility | D | 0 | 0 | 4 | 0 | 0 | 0 | — | notStarted (generated) |

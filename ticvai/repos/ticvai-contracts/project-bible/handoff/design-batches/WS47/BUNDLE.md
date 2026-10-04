@@ -106,7 +106,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-158` | Coupon & Promo Code Command Center | B | 0 | 16 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
+| `ADM-158` | Coupon & Promo Code Command Center | B–D | 0 | 16 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
 | `ADM-159` | Coupon & Promo Code Builder | B–D | 9 | 20 | 5 | 0 | 0 | 2 | — | notStarted (generated) |
 | `ADM-160` | Unique Code Generation & Batch Manager | B | 14 | 12 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
 | `ADM-161` | Code Eligibility & Restriction Manager | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
@@ -135,7 +135,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block B · task VM-ADM-158 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen both a metric directory (§KPI Cards) and a per-row directory (§Show) — counts over a population, then the population |

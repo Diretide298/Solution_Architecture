@@ -110,8 +110,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-049` | Price List Master Configuration | B–D | 21 | 20 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-050` | Price Category & Rate Type Library | B | 12 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-051` | Rate Structure Builder | B–D | 0 | 12 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
-| `ADM-052` | Product & Service Price Assignment | B | 0 | 2 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
-| `ADM-053` | Package, Bundle & Add-On Pricing | B | 21 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-052` | Product & Service Price Assignment | B–D | 0 | 2 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `ADM-053` | Package, Bundle & Add-On Pricing | B–D | 21 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-054` | Market, Venue & Currency Pricing Structure | B | 23 | 0 | 5 | 0 | 1 | 4 | — | notStarted (generated) |
 | `ADM-055` | Price Hierarchy & Inheritance Configuration | B | 10 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `ADM-056` | Price List Templates, Clone & Reuse | B | 18 | 0 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
@@ -911,7 +911,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block B · task VM-ADM-052 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Product configuration should display) and no metric row |
@@ -1058,7 +1058,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `ticketing` module |
-| Block | Block B · task VM-ADM-053 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `PRICE_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure pricing for; Configure whether the customer sees) and no display directory — it is settings, not a population |

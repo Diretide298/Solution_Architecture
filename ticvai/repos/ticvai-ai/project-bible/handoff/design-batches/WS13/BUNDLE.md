@@ -97,7 +97,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-364` | Approval Command Center Dashboard | B | 1 | 158 | 6 | 14 | 1 | 3 | — | notStarted (—) |
-| `BO-365` | My Approval Inbox | B | 0 | 22 | 6 | 0 | 1 | 3 | — | notStarted (—) |
+| `BO-365` | My Approval Inbox | B–D | 0 | 22 | 6 | 0 | 1 | 3 | — | notStarted (—) |
 | `BO-366` | Team / Shared Approval Queue | B | 0 | 0 | 6 | 7 | 1 | 6 | — | notStarted (—) |
 | `BO-367` | Approval Request Detail | B | 0 | 0 | 6 | 13 | 2 | 3 | — | notStarted (—) |
 | `BO-368` | AI Decision Support | B | 0 | 16 | 6 | 7 | 1 | 0 | — | notStarted (—) |
@@ -532,7 +532,7 @@ Also apply: 1 for P08 · Venue Operations, 24 for all of P08, 29 for every app (
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Venue Operations · wave 3 · needs the `core` module |
-| Block | Block B · task VM-BO-365 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Display) and no metric row |

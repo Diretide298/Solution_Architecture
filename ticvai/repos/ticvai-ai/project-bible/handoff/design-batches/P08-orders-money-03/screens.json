@@ -1647,7 +1647,7 @@
     {
      "to": "BO-048",
      "trigger": "Retail Products",
-     "provenance": "derived — BO-048 declares entryState.params merchandiseId and BO-101 holds none of them. The edge carries nothing: merchandiseId only pre-selects (deep link or optional), and BO-048 opens on its own"
+     "provenance": "derived — BO-048 declares entryState.params merchandiseId, productId and BO-101 holds none of them. The edge carries nothing: merchandiseId, productId only pre-select (deep link or optional), and BO-048 opens on its own"
     },
     {
      "to": "BO-059",

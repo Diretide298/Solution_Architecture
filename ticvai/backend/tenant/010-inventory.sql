@@ -46,6 +46,8 @@ CREATE TABLE IF NOT EXISTS inventory.count_line (
     note                              text
 );
 
+-- Holds 6 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS inventory.daily_count_list (
     id                                uuid PRIMARY KEY NOT NULL,
     item_ids                          text[] NOT NULL,

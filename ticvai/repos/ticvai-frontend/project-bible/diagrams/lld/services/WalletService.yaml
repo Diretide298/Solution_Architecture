@@ -837,7 +837,7 @@ tables:
 - table: wallet.risk_rule
   columns: 12
   store: postgres
-  parent: null
+  parent: wallet.risk_rules
   writtenBy:
   - wallet
   foreignWriters: null

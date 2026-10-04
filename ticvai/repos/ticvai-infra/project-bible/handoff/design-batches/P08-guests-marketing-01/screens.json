@@ -812,7 +812,10 @@
     {
      "to": "BO-785",
      "trigger": "Opens Template Library",
-     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+     "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+     "carries": [
+      "templateId"
+     ]
     },
     {
      "to": "BO-798",

@@ -97,10 +97,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-248` | Workflow Operations Command Center | B | 0 | 254 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-249` | Unified Approval Inbox & Decision Workspace | B | 0 | 18 | 6 | 7 | 1 | 3 | — | notStarted (generated) |
+| `ADM-249` | Unified Approval Inbox & Decision Workspace | B–D | 0 | 18 | 6 | 7 | 1 | 3 | — | notStarted (generated) |
 | `ADM-250` | Workflow Instance Monitor & Process Timeline | B | 9 | 20 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-251` | Workflow Exception, Failure & Recovery Center | B | 10 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-252` | SLA, Escalation & Bottleneck Monitor | B | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-252` | SLA, Escalation & Bottleneck Monitor | B–D | 0 | 14 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-253` | Automation Execution & Autonomous Action Monitor | B | 0 | 34 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-254` | Cross-Module Orchestration Monitor | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-255` | Workflow Analytics & Process Performance | B | 2 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |

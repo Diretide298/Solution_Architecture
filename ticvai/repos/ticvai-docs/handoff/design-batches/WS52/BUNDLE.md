@@ -108,7 +108,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `ADM-208` | Stacking & Conflict Command Center | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-209` | Promotion Priority & Hierarchy Manager | C | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
-| `ADM-210` | Promotion Stacking Rule Builder | C | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
+| `ADM-210` | Promotion Stacking Rule Builder | B–D | 0 | 0 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
 | `ADM-211` | Promotion Exclusion & Compatibility Matrix | C | 0 | 16 | 6 | 0 | 0 | 2 | — | notStarted (generated) |
 | `ADM-212` | Discount Calculation & Application Sequence | C | 6 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-213` | Best Offer & Customer Benefit Resolver | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
@@ -400,7 +400,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block C · task VM-ADM-210 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `PRICE_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

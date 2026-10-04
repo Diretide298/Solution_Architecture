@@ -41,10 +41,6 @@
    "operations": 30
   },
   {
-   "contract": "finance",
-   "operations": 4
-  },
-  {
    "contract": "tenancy",
    "operations": 4
   },
@@ -53,15 +49,19 @@
    "operations": 4
   },
   {
-   "contract": "marketing-crm",
-   "operations": 3
+   "contract": "finance",
+   "operations": 4
   },
   {
    "contract": "inventory",
    "operations": 3
   },
   {
-   "contract": "orders",
+   "contract": "marketing-crm",
+   "operations": 3
+  },
+  {
+   "contract": "promotions",
    "operations": 1
   },
   {
@@ -69,7 +69,7 @@
    "operations": 1
   },
   {
-   "contract": "promotions",
+   "contract": "orders",
    "operations": 1
   }
  ],

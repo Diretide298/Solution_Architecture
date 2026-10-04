@@ -1050,7 +1050,7 @@ Errors to draw in the form: 400 Validation failed
 - → `BO-755` Dynamic Segment Builder: *Opens Dynamic Segment Builder*; carries `segmentId`
 - → `BO-766` Campaign Builder: *Opens Campaign Builder*; carries `campaignId`
 - → `BO-772` A/B & AI Optimization: *Opens A/B & AI Optimization*; carries `campaignId`
-- → `BO-785` Template Library: *Opens Template Library*
+- → `BO-785` Template Library: *Opens Template Library*; carries `templateId`
 - → `BO-798` Intent & Knowledge Management: *Opens Intent & Knowledge Management*
 - → `BO-799` Agent Workspace: *Opens Agent Workspace*
 - → `BO-825` Challenge Builder: *Opens Challenge Builder*

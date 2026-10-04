@@ -131,7 +131,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-674` | Accreditation Communications Command Center | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-675` | Notification Rule Management | D | 9 | 0 | 6 | 5 | 1 | 0 | — | notStarted (—) |
 | `BO-676` | Expiry & Renewal Notification Scheduler | D | 6 | 0 | 6 | 5 | 0 | 0 | — | notStarted (—) |
-| `BO-677` | Communication Template Library | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
+| `BO-677` | Communication Template Library | B–D | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-678` | Channel, Language & Branding Configuration | B | 9 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-679` | Manual & Bulk Communication Center | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-680` | Accreditation Bulk Import | D | 0 | 0 | 6 | 1 | 1 | 6 | — | notStarted (—) |

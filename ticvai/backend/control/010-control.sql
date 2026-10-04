@@ -370,6 +370,8 @@ CREATE TABLE IF NOT EXISTS control.developer_account (
     verified_at                       timestamptz
 );
 
+-- Holds 7 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 2 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS control.developer_member (
     id                                uuid PRIMARY KEY NOT NULL,
     developer_account_id              uuid,

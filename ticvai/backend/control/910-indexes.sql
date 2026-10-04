@@ -7,6 +7,8 @@
 -- enforcing one fails on the first row that legitimately points nowhere.
 -- Names follow naming-and-style 6.1: `<table>_<columns>_idx`.
 
+-- convention, not declared: control.api_anomaly_rule.tenant_id -> control.tenant
+CREATE INDEX IF NOT EXISTS api_anomaly_rule_tenant_id_idx ON control.api_anomaly_rule (tenant_id);
 -- convention, not declared: control.api_client.developer_id -> control.developer_account
 CREATE INDEX IF NOT EXISTS api_client_developer_id_idx ON control.api_client (developer_id);
 -- convention, not declared: control.api_limit.client_id -> control.api_client
@@ -53,6 +55,8 @@ CREATE INDEX IF NOT EXISTS credit_note_issued_by_principal_id_idx ON control.cre
 CREATE INDEX IF NOT EXISTS credit_note_tenant_id_idx ON control.credit_note (tenant_id);
 -- convention, not declared: control.developer_account.partner_id -> control.partner
 CREATE INDEX IF NOT EXISTS developer_account_partner_id_idx ON control.developer_account (partner_id);
+-- convention, not declared: control.developer_member.developer_account_id -> control.developer_account
+CREATE INDEX IF NOT EXISTS developer_member_developer_account_id_idx ON control.developer_member (developer_account_id);
 -- convention, not declared: control.integration_listing.developer_id -> control.developer_account
 CREATE INDEX IF NOT EXISTS integration_listing_developer_id_idx ON control.integration_listing (developer_id);
 -- convention, not declared: control.invoice.tenant_id -> control.tenant
@@ -281,6 +285,8 @@ CREATE INDEX IF NOT EXISTS tenant_migration_plan_from_cell_id_idx ON control.ten
 CREATE INDEX IF NOT EXISTS tenant_migration_plan_to_cell_id_idx ON control.tenant_migration_plan (to_cell_id);
 -- convention, not declared: control.upgrade_schedule.tenant_id -> control.tenant
 CREATE INDEX IF NOT EXISTS upgrade_schedule_tenant_id_idx ON control.upgrade_schedule (tenant_id);
+-- convention, not declared: control.usage_record.tenant_id -> control.tenant
+CREATE INDEX IF NOT EXISTS usage_record_tenant_id_idx ON control.usage_record (tenant_id);
 -- convention, not declared: control.waf_rule.cell_id -> control.cell
 CREATE INDEX IF NOT EXISTS waf_rule_cell_id_idx ON control.waf_rule (cell_id);
 -- convention, not declared: control.webhook_delivery.subscription_id -> control.webhook_subscription

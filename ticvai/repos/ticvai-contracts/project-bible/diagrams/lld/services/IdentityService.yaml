@@ -1057,7 +1057,7 @@ tables:
 - table: identity.guest_credential
   columns: 6
   store: postgres
-  parent: null
+  parent: pii.subject
   writtenBy:
   - identity
   foreignWriters: null

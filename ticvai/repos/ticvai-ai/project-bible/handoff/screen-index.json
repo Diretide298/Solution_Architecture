@@ -48281,7 +48281,7 @@
    {
     "to": "BO-048",
     "trigger": "Retail Products",
-    "provenance": "derived \u2014 BO-048 declares entryState.params merchandiseId and BO-101 holds none of them. The edge carries nothing: merchandiseId only pre-selects (deep link or optional), and BO-048 opens on its own"
+    "provenance": "derived \u2014 BO-048 declares entryState.params merchandiseId, productId and BO-101 holds none of them. The edge carries nothing: merchandiseId, productId only pre-select (deep link or optional), and BO-048 opens on its own"
    },
    {
     "to": "BO-059",
@@ -48824,7 +48824,7 @@
    {
     "to": "BO-093",
     "trigger": "Map Import & Labelling",
-    "provenance": "derived \u2014 BO-093 declares entryState.params jobId, mapId, uploadId and BO-103 holds none of them. The edge carries nothing: mapId, jobId, uploadId only pre-select (deep link or optional), and BO-093 opens on its own"
+    "provenance": "derived \u2014 BO-093 declares entryState.params actionId, jobId, mapId, uploadId and BO-103 holds none of them. The edge carries nothing: mapId, jobId, uploadId, actionId only pre-select (deep link or optional), and BO-093 opens on its own"
    },
    {
     "to": "BO-094",
@@ -49438,7 +49438,10 @@
    {
     "to": "BO-785",
     "trigger": "Opens Template Library",
-    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A"
+    "provenance": "CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay, 3 October 2026); its command centre is not in Block A",
+    "carries": [
+     "templateId"
+    ]
    },
    {
     "to": "BO-798",
@@ -154055,7 +154058,7 @@
     "carries": [
      "tenantId"
     ],
-    "provenance": "derived \u2014 ADM-016 declares entryState.params packageId, tenantId, version and ADM-002 holds tenantId, so an edge into it carries them"
+    "provenance": "derived \u2014 ADM-016 declares entryState.params packageId, tenantId, uploadId, version and ADM-002 holds tenantId, so an edge into it carries them"
    },
    {
     "to": "ADM-017",
@@ -182248,7 +182251,10 @@
    {
     "to": "CMS-004",
     "trigger": "Logo & Assets",
-    "provenance": "derived \u2014 CMS-004 declares entryState.params  and CMS-002 holds none of them. The edge carries nothing: CMS-004 needs nothing to open"
+    "carries": [
+     "uploadId"
+    ],
+    "provenance": "derived \u2014 CMS-004 declares entryState.params uploadId and CMS-002 holds uploadId, so an edge into it carries them"
    }
   ],
   "machine": null,
@@ -182338,7 +182344,7 @@
    {
     "to": "CMS-004",
     "trigger": "Logo & Assets",
-    "provenance": "derived \u2014 CMS-004 declares entryState.params  and CMS-003 holds none of them. The edge carries nothing: CMS-004 needs nothing to open"
+    "provenance": "derived \u2014 CMS-004 declares entryState.params uploadId and CMS-003 holds none of them. The edge carries nothing: uploadId only pre-selects (deep link or optional), and CMS-004 opens on its own"
    },
    {
     "to": "CMS-006",

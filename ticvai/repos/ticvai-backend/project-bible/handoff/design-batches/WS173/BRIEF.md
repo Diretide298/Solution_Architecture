@@ -107,7 +107,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-1033` | Recommendation Command Center | C | 0 | 15 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1034` | Best Seat Recommendations | C | 0 | 10 | 6 | 0 | 2 | 6 | — | notStarted (—) |
+| `BO-1034` | Best Seat Recommendations | A | 0 | 10 | 6 | 0 | 2 | 6 | — | notStarted (—) |
 | `BO-1035` | Best Value Recommendations | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1036` | Closest-to-Stage Recommendations | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1037` | Family Seating Recommendations | C | 0 | 10 | 6 | 0 | 0 | 6 | — | notStarted (—) |

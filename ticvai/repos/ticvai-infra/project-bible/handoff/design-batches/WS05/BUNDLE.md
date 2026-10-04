@@ -100,12 +100,12 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-184` | Biometric Access Command Center | C | 0 | 240 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-185` | Biometric Verification Profile Builder | A | 16 | 4 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
 | `BO-186` | Face Pass Enrollment Configuration | A | 19 | 8 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-187` | Biometric Consent & Guardian Management | B | 84 | 20 | 5 | 17 | 1 | 6 | — | notStarted (generated) |
+| `BO-187` | Biometric Consent & Guardian Management | B–D | 84 | 20 | 5 | 17 | 1 | 6 | — | notStarted (generated) |
 | `BO-188` | Face Tag Temporary Enrollment | A | 10 | 17 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-189` | Face Matching & Verification Thresholds | A | 21 | 0 | 5 | 0 | 0 | 6 | — | notStarted (generated) |
 | `BO-190` | Face Change, Re-enrollment & Identity Protection | C | 2 | 16 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-191` | Biometric Validation at Gate | C | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `BO-192` | Biometric Lifecycle, Retention & Deletion | C | 9 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
+| `BO-192` | Biometric Lifecycle, Retention & Deletion | B–D | 9 | 0 | 5 | 0 | 1 | 6 | — | notStarted (generated) |
 | `BO-193` | Biometric Simulation, Audit & Publication | C | 7 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
@@ -962,7 +962,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | Block B · task VM-BO-187 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `SCOPE_VIEW`, `TENANT_CONFIGURE`, `TENANT_VIEW` (2 read, 1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure by) and no display directory — it is settings, not a population |
@@ -1953,7 +1953,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `access` module |
-| Block | Block C · task VM-BO-192 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `ACCESS_POINT_CONFIGURE`, `SCOPE_VIEW`, `TENANT_VIEW` (1 configure, 2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure separately for) and no display directory — it is settings, not a population |

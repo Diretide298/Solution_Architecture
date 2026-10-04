@@ -180,7 +180,7 @@ CREATE TABLE IF NOT EXISTS retail.shop_and_drop (
 
 -- One item bought for later collection. Hangs off: a child of retail.shop_and_drop; reaches
 -- retail.sale through its keys; references retail.merchandise, retail.shop_and_drop. Reached by: 3
--- operations read it and 0 write it.
+-- operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS retail.shop_and_drop_line (
     shop_and_drop_id                  uuid NOT NULL,
     line_id                           text,

@@ -135,7 +135,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-005` | Queue Monitor | A | 55 | 38 | 6 | 34 | 3 | 6 | — | notStarted (generated) |
 | `BO-006` | Parking Configuration | A | 12 | 6 | 6 | 3 | 2 | 2 | — | notStarted (generated) |
 | `BO-030` | Work Order Verification | A | 7 | 22 | 6 | 10 | 0 | 2 | — | notStarted (generated) |
-| `BO-031` | Asset Register | B | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
+| `BO-031` | Asset Register | B–D | 0 | 0 | 6 | 0 | 2 | 0 | — | notStarted (generated) |
 | `BO-032` | Admission Profiles | A | 94 | 16 | 6 | 12 | 1 | 0 | — | notStarted (generated) |
 | `BO-033` | Blacklist Management | A | 5 | 10 | 6 | 2 | 0 | 0 | — | notStarted (generated) |
 
@@ -2115,7 +2115,7 @@ Also apply: 1 for P08 · Access & Venue, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 1 · needs the `maintenance` module |
-| Block | Block B · task VM-BO-031 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listAssets` reads the population and `getAsset` reads one of them — list, select, act |

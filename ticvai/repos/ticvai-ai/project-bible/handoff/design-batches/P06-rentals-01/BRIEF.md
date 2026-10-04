@@ -100,16 +100,16 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `EMP-071` | Rental Checkout Command Center | D | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-072` | Voucher Scan & Reservation Retrieval | D | 0 | 0 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
-| `EMP-073` | Checkout Readiness Validation | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-074` | Equipment Assignment Workspace | D | 0 | 11 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-075` | Equipment Scan & Validation | D | 1 | 0 | 6 | 3 | 1 | 0 | — | notStarted (generated) |
-| `EMP-076` | Pre-Rental Condition Inspection | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-077` | Safety & Handover Checklist | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-078` | Deposit & Financial Handover Validation | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `EMP-079` | Group & Multi-Item Checkout | D | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
-| `EMP-080` | Checkout Confirmation & Rental Activation | D | 2 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
+| `EMP-071` | Rental Checkout Command Center | C | 2 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-072` | Voucher Scan & Reservation Retrieval | C | 0 | 0 | 6 | 0 | 1 | 2 | — | notStarted (generated) |
+| `EMP-073` | Checkout Readiness Validation | C | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-074` | Equipment Assignment Workspace | C | 0 | 11 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-075` | Equipment Scan & Validation | C | 1 | 0 | 6 | 3 | 1 | 0 | — | notStarted (generated) |
+| `EMP-076` | Pre-Rental Condition Inspection | C | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-077` | Safety & Handover Checklist | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-078` | Deposit & Financial Handover Validation | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `EMP-079` | Group & Multi-Item Checkout | C | 0 | 0 | 6 | 0 | 1 | 6 | — | notStarted (generated) |
+| `EMP-080` | Checkout Confirmation & Rental Activation | C | 2 | 0 | 6 | 0 | 0 | 6 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

@@ -100,9 +100,9 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-239` | Visual Business Rule Builder | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-240` | Conditions, Decision Logic & Decision Tables | B | 0 | 0 | 6 | 0 | 0 | 1 | — | notStarted (generated) |
 | `ADM-241` | Visual Workflow Designer | B | 21 | 12 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-242` | Approval Matrix & Multi-Level Approval Configuration | B | 7 | 0 | 5 | 0 | 0 | 3 | — | notStarted (generated) |
-| `ADM-243` | Roles, Authority, Delegation & Approval Limits | A | 14 | 3 | 5 | 51 | 0 | 6 | — | notStarted (generated) |
-| `ADM-244` | SLA, Escalation, Reminder & Timeout Rules | B | 21 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-242` | Approval Matrix & Multi-Level Approval Configuration | B–D | 7 | 0 | 5 | 0 | 0 | 3 | — | notStarted (generated) |
+| `ADM-243` | Roles, Authority, Delegation & Approval Limits | B–D | 14 | 3 | 5 | 51 | 0 | 6 | — | notStarted (generated) |
+| `ADM-244` | SLA, Escalation, Reminder & Timeout Rules | B–D | 21 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-245` | Trigger, Action & Cross-Module Orchestration Configuration | B | 12 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-246` | Workflow Testing, Simulation & Impact Analysis | B | 0 | 16 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-247` | Versioning, Governance, Approval & Publication | B | 25 | 20 | 6 | 0 | 0 | 3 | — | notStarted (generated) |
@@ -688,7 +688,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | Block B · task VM-ADM-242 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |
@@ -816,7 +816,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 1 · needs the `core` module |
-| Block | Block A · task APP-SETUP-ADM-243 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `APPROVAL_CONFIGURE`, `APPROVAL_DECIDE`, `APPROVAL_VIEW` (1 configure, 1 operate, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Define by; Capture) and no display directory — it is settings, not a population |
@@ -1004,7 +1004,7 @@ Also apply: 24 for all of P08, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Platform · wave 3 · needs the `core` module |
-| Block | Block B · task VM-ADM-244 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `APPROVAL_CONFIGURE`, `APPROVAL_VIEW` (1 configure, 1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | configEditor (compact density): the pack gives this screen a configuration directory (§Configure) and no display directory — it is settings, not a population |

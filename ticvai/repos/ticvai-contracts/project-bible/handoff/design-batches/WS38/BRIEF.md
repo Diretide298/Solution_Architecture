@@ -115,7 +115,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-094` | Dynamic Price Bands, Ladders & Adjustment Matrix | B | 24 | 0 | 5 | 0 | 2 | 0 | — | notStarted (generated) |
 | `ADM-095` | Dynamic Pricing Guardrails & Commercial Protection | B | 47 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
 | `ADM-096` | Dynamic Pricing Automation Policy & Control | B | 50 | 0 | 5 | 3 | 0 | 0 | — | notStarted (generated) |
-| `ADM-097` | Rule Priority, Conflict Resolution & Dynamic Pricing Test Console | B | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-097` | Rule Priority, Conflict Resolution & Dynamic Pricing Test Console | B–D | 0 | 2 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 

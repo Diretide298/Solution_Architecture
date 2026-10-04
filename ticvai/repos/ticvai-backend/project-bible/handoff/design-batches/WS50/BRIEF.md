@@ -106,8 +106,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-188` | Dynamic Bundle Operations Command Center | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-189` | Component Inventory & Availability Matrix | C | 0 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `ADM-188` | Dynamic Bundle Operations Command Center | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-189` | Component Inventory & Availability Matrix | B | 0 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
 | `ADM-190` | Bundle Sellability & Dependency Rule Engine | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-191` | Capacity Pool & Reservation Manager | C | 19 | 6 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-192` | Dynamic Component Substitution Engine | C | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |

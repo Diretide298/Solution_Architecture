@@ -96,10 +96,10 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-014` | Auto-Scaling Configuration | B | 0 | 43 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-030` | Infrastructure Sizing & Scaling Policy | B | 8 | 13 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-033` | Backup & DR Status | B | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
-| `ADM-034` | Archival Job Monitor | B | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-014` | Auto-Scaling Configuration | B–D | 0 | 43 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-030` | Infrastructure Sizing & Scaling Policy | B–D | 8 | 13 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-033` | Backup & DR Status | B–D | 0 | 22 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
+| `ADM-034` | Archival Job Monitor | B–D | 0 | 7 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 
 ## Thin screens in this batch
 
@@ -119,7 +119,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Infrastructure & Resilience · wave 3 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-014 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_VIEW` (1 read); in the flows as platform admin |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCellJobs` reads the population and `getCellCapacity` reads one of them — list, select, act |
@@ -322,7 +322,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Infrastructure & Resilience · wave 3 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-030 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_MANAGE`, `PLATFORM_CELL_VIEW` (1 configure, 1 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCellJobs` reads the population and `getCellCapacity` reads one of them — list, select, act |
@@ -495,7 +495,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Infrastructure & Resilience · wave 2 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-033 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_VIEW` (1 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCellJobs` reads the population and `getCellHealth` reads one of them — list, select, act |
@@ -656,7 +656,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Control · P09 TICVAI Web (web) |
 | Module | Infrastructure & Resilience · wave 3 · needs the `core` module |
-| Block | Block B · task APP-CONSOLE-ADM-034 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | ticvai staff holding `PLATFORM_CELL_VIEW` (1 read) |
 | Device and orientation | This is the TICVAI console on a desktop browser, 1440 wide: a left navigation rail, a top bar with the tenant switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listCellJobs` reads the population and `getCell` reads one of them — list, select, act |

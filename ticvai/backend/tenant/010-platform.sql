@@ -231,7 +231,7 @@ CREATE TABLE IF NOT EXISTS platform.offline_policy (
 
 -- Written in the same transaction as the state change, by the platform, not by an operation. That
 -- is what makes it exactly-once Hangs off: reaches platform.scope through its keys; references
--- catalogue.event, platform.tenant. Reached by: 4 operations read it and 107 write it; 1 tables
+-- catalogue.event, platform.tenant. Reached by: 4 operations read it and 109 write it; 1 tables
 -- reference it; written by 20 contracts — access, accreditation, approvals, catalogue.
 CREATE TABLE IF NOT EXISTS platform.outbox (
     id                                uuid NOT NULL,
@@ -333,7 +333,7 @@ CREATE TABLE IF NOT EXISTS platform.sale_board_page (
 );
 
 -- Child of sale_board_page, which is a child of sale_board. Two levels down, returned nested Hangs
--- off: reaches platform.scope through its keys; references platform.sale_board_page. Reached by: 1
+-- off: reaches platform.scope through its keys; references platform.sale_board_page. Reached by: 2
 -- operations read it and 2 write it.
 CREATE TABLE IF NOT EXISTS platform.sale_board_tile (
     id                                uuid PRIMARY KEY NOT NULL,

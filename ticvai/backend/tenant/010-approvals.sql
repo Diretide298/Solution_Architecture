@@ -125,7 +125,7 @@ CREATE TABLE IF NOT EXISTS approvals.control_policy (
 
 -- Every decision at every level. Immutable once the request completes — an approval is evidence
 -- Hangs off: reaches approvals.request through its keys; references approvals.request,
--- identity.principal. Reached by: 19 operations read it and 3 write it.
+-- identity.principal. Reached by: 20 operations read it and 3 write it.
 CREATE TABLE IF NOT EXISTS approvals.decision (
     id                                uuid PRIMARY KEY NOT NULL,
     level                             integer NOT NULL,
@@ -269,7 +269,7 @@ CREATE TABLE IF NOT EXISTS approvals.external_provider (
 );
 
 -- What requires approval where. Versioned, because a request must be decided by the rules it was
--- raised under Hangs off: reaches approvals.request through its keys. Reached by: 8 operations
+-- raised under Hangs off: reaches approvals.request through its keys. Reached by: 9 operations
 -- read it and 2 write it; 1 tables reference it.
 CREATE TABLE IF NOT EXISTS approvals.matrix (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -281,7 +281,7 @@ CREATE TABLE IF NOT EXISTS approvals.matrix (
 );
 
 -- One request per action needing authorisation. The subject is a reference, never a copy Hangs
--- off: a root — nothing above it in its schema; references identity.principal. Reached by: 34
+-- off: a root — nothing above it in its schema; references identity.principal. Reached by: 36
 -- operations read it and 27 write it; 51 tables reference it; written by 3 contracts — approvals,
 -- subscription, workforce.
 CREATE TABLE IF NOT EXISTS approvals.request (
@@ -333,7 +333,7 @@ CREATE TABLE IF NOT EXISTS approvals.retention_policy (
 
 -- Ordered within a matrix. First match wins, so adding a rule cannot silently change another Hangs
 -- off: reaches approvals.request through its keys; references approvals.external_provider,
--- approvals.matrix. Reached by: 15 operations read it and 2 write it; 2 tables reference it.
+-- approvals.matrix. Reached by: 16 operations read it and 2 write it; 2 tables reference it.
 CREATE TABLE IF NOT EXISTS approvals.rule (
     id                                uuid PRIMARY KEY NOT NULL,
     sort_order                        integer NOT NULL,

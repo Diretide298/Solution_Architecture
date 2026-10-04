@@ -126,6 +126,8 @@ CREATE TABLE IF NOT EXISTS maintenance.incident_authority_notification (
     recorded_at                       timestamptz
 );
 
+-- Holds 8 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 0 operations read it and 1 write it.
 CREATE TABLE IF NOT EXISTS maintenance.incident_history (
     id                                uuid PRIMARY KEY NOT NULL,
     incident_id                       uuid NOT NULL,

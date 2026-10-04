@@ -131,7 +131,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-1071` | Integration Command Center | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1072` | Seat Management APIs | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1072` | Seat Management APIs | B–D | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1073` | API Access & OAuth | B | 1 | 17 | 6 | 1 | 2 | 0 | — | notStarted (—) |
 | `BO-1074` | Webhook Configuration | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1075` | Seat Event Catalog | B | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
@@ -287,7 +287,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Access & Venue · wave 3 · needs the `seating` module |
-| Block | Block B · task VM-BO-1072 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue; in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

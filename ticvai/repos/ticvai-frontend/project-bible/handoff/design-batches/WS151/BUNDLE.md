@@ -113,7 +113,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-603` | B2B Invoice, On-Account & Payment Terms Configuration | A | 10 | 8 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-604` | Stored Value, Gift Card & Voucher Tender Controls | C | 11 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `ADM-605` | Advanced Payment Eligibility, Sequence & Restriction Rules | C | 0 | 11 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-606` | Partial Payment, Failure & Recovery Manager | C | 0 | 4 | 6 | 1 | 0 | 0 | — | notStarted (—) |
+| `ADM-606` | Partial Payment, Failure & Recovery Manager | A | 0 | 4 | 6 | 1 | 0 | 0 | — | notStarted (—) |
 | `ADM-607` | Mixed Tender Transaction Trace & Allocation Audit | C | 11 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-608` | Mixed Tender Simulator, Credit Exposure & AI Advisor | C | 0 | 10 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 
@@ -1097,7 +1097,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `core` module |
-| Block | Block C · task VM-ADM-606 |
+| Block | Block A · task APP-SETUP-ADM-606 |
 | Who uses it | venue staff holding `PAYMENT_CONFIGURE` (1 configure); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): the pack gives this screen a display directory (§Gift Card; Card) and no metric row |

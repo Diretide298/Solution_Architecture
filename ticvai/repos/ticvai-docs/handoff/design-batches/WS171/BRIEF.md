@@ -111,7 +111,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-1015` | Buffer Seat Rules | C | 0 | 18 | 6 | 0 | 1 | 6 | — | notStarted (—) |
 | `BO-1016` | Companion Seat Rules | C | 0 | 18 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1017` | Wheelchair Companion Rules | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `BO-1018` | Accessible Seating Master | C | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
+| `BO-1018` | Accessible Seating Master | A | 0 | 0 | 6 | 0 | 0 | 6 | — | notStarted (—) |
 | `BO-1019` | Accessible Route Mapping | C | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1020` | Accessible Filters & Eligibility | C | 0 | 9 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `BO-1021` | Flexible Spacing Rules | C | 0 | 18 | 6 | 0 | 1 | 0 | — | notStarted (—) |

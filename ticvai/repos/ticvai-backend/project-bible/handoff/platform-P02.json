@@ -171,10 +171,6 @@
    "operations": 12
   },
   {
-   "contract": "white-label",
-   "operations": 8
-  },
-  {
    "contract": "wallet",
    "operations": 8
   },
@@ -183,15 +179,19 @@
    "operations": 8
   },
   {
+   "contract": "white-label",
+   "operations": 8
+  },
+  {
    "contract": "ai",
    "operations": 7
   },
   {
-   "contract": "finance",
+   "contract": "resources",
    "operations": 6
   },
   {
-   "contract": "resources",
+   "contract": "finance",
    "operations": 6
   },
   {
@@ -199,19 +199,19 @@
    "operations": 5
   },
   {
-   "contract": "promotions",
-   "operations": 4
-  },
-  {
    "contract": "payments",
    "operations": 4
   },
   {
-   "contract": "retail",
+   "contract": "seating",
    "operations": 4
   },
   {
-   "contract": "seating",
+   "contract": "promotions",
+   "operations": 4
+  },
+  {
+   "contract": "retail",
    "operations": 4
   },
   {

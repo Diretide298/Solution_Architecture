@@ -137,7 +137,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `BO-525` | Pricing Profile Builder | D | 8 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-526` | Duration & Tiered Pricing Configuration | D | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-527` | Calendar, Peak & Seasonal Pricing | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
-| `BO-528` | Dynamic Pricing & AI Recommendation | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
+| `BO-528` | Dynamic Pricing & AI Recommendation | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-529` | Deposit & Security Hold Policy | D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-530` | Deposit Lifecycle & Settlement Rules | D | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |
 | `BO-531` | Late Fee, Grace Period & Extension Pricing | D | 7 | 0 | 6 | 0 | 1 | 0 | — | notStarted (—) |

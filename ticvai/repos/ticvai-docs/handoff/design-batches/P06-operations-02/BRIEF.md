@@ -151,7 +151,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `EMP-020` | AI assistant — answer | D | 7 | 9 | 6 | 17 | 1 | 0 | — | notStarted (generated) |
 | `EMP-021` | Roster | D | 6 | 9 | 6 | 15 | 1 | 0 | — | notStarted (generated) |
 | `EMP-022` | My rota | D | 6 | 9 | 6 | 15 | 2 | 0 | — | notStarted (generated) |
-| `EMP-023` | Swap request | D | 6 | 12 | 6 | 15 | 2 | 0 | — | notStarted (generated) |
+| `EMP-023` | Swap request | B–D | 6 | 12 | 6 | 15 | 2 | 0 | — | notStarted (generated) |
 | `EMP-024` | Clock in / out | D | 9 | 14 | 6 | 4 | 3 | 0 | — | notStarted (generated) |
 
 ## Design inputs from the client meetings

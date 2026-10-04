@@ -59,12 +59,14 @@ CREATE TABLE IF NOT EXISTS fnb.combo_slot (
     sort_order                        integer DEFAULT 100
 );
 
+-- Holds 5 columns. No description has been written for this table — the name is the only thing
+-- saying what it is
 CREATE TABLE IF NOT EXISTS fnb.combo_slot_option (
-    id                                uuid PRIMARY KEY NOT NULL,
     combo_slot_id                     uuid NOT NULL,
     menu_item_id                      uuid NOT NULL,
     upcharge                          numeric(18,4),
-    is_default                        boolean
+    is_default                        boolean,
+    id                                uuid PRIMARY KEY NOT NULL
 );
 
 -- What was done about a finding and who signed it. The signature is the record — *discarded and
@@ -201,7 +203,7 @@ CREATE TABLE IF NOT EXISTS fnb.kitchen_routing_rule (
 );
 
 -- Holds 3 columns. No description has been written for this table — the name is the only thing
--- saying what it is. Reached by: 2 operations read it and 1 write it.
+-- saying what it is
 CREATE TABLE IF NOT EXISTS fnb.kitchen_sla (
     outlet_id                         uuid PRIMARY KEY NOT NULL,
     targets                           jsonb,

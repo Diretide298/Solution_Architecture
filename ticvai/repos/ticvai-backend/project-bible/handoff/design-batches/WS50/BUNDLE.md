@@ -106,8 +106,8 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 
 | id | name | block | inputs | outputs | states | requirements | meeting inputs | tracker | white label | wireframe |
 |---|---|---|---|---|---|---|---|---|---|---|
-| `ADM-188` | Dynamic Bundle Operations Command Center | C | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
-| `ADM-189` | Component Inventory & Availability Matrix | C | 0 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
+| `ADM-188` | Dynamic Bundle Operations Command Center | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `ADM-189` | Component Inventory & Availability Matrix | B | 0 | 0 | 6 | 0 | 0 | 4 | — | notStarted (generated) |
 | `ADM-190` | Bundle Sellability & Dependency Rule Engine | C | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (generated) |
 | `ADM-191` | Capacity Pool & Reservation Manager | C | 19 | 6 | 5 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-192` | Dynamic Component Substitution Engine | C | 10 | 0 | 5 | 0 | 0 | 0 | — | notStarted (generated) |
@@ -135,7 +135,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block C · task VM-ADM-188 |
+| Block | Block B · task VM-ADM-188 |
 | Who uses it | venue staff holding `PRICE_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | commandCentre (compact density): the pack gives this screen a metric directory (§KPI Cards) and no per-row directory — measures over a population the screen does not itself list. The tiles are the pack's, not a tenant licence's |
@@ -287,7 +287,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Commercial · wave 3 · needs the `marketing` module |
-| Block | Block C · task VM-ADM-189 |
+| Block | Block B · task VM-ADM-189 |
 | Who uses it | venue staff holding `PRICE_VIEW`, `PRODUCT_VIEW` (2 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

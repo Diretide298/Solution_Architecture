@@ -131,7 +131,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 |---|---|---|---|---|---|---|---|---|---|---|
 | `BO-105` | Stock & Supply | A | 17 | 6 | 6 | 18 | 1 | 4 | — | notStarted (generated) |
 | `BO-137` | Recipe Consumption & Theoretical Inventory | C | 3 | 27 | 6 | 10 | 1 | 6 | — | notStarted (generated) |
-| `BO-138` | Production Execution & Batch Management | B | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
+| `BO-138` | Production Execution & Batch Management | B–D | 0 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `BO-139` | Wastage, Spoilage, Returns & Write-Off | C | 21 | 6 | 5 | 15 | 1 | 0 | — | notStarted (generated) |
 | `BO-140` | Product Availability, 86 & Operational Food Safety | C | 8 | 51 | 6 | 4 | 0 | 0 | — | notStarted (generated) |
 | `BO-141` | Operational Alerts, AI Replenishment & Action Center | D | 18 | 18 | 6 | 6 | 0 | 0 | — | notStarted (generated) |
@@ -625,7 +625,7 @@ Also apply: 2 for P08 · Stock & Supply, 24 for all of P08, 29 for every app (se
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Stock & Supply · wave 2 · needs the `fnb` module |
-| Block | Block B · task VM-BO-138 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): `listExpiringBatches` reads a population and nothing reads one of them; the detail is the row until a `get` exists |

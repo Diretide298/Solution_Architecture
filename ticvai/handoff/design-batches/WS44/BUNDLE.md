@@ -109,7 +109,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-128` | Product Governance Command Center | B | 6 | 228 | 6 | 0 | 3 | 0 | — | notStarted (generated) |
 | `ADM-129` | Approval Workflow Designer | B | 18 | 20 | 5 | 0 | 2 | 3 | — | notStarted (generated) |
 | `ADM-130` | Approval Review & Decision Workspace | B | 0 | 20 | 6 | 7 | 1 | 3 | — | notStarted (generated) |
-| `ADM-131` | Product Version Management | B | 0 | 0 | 6 | 4 | 2 | 0 | — | notStarted (generated) |
+| `ADM-131` | Product Version Management | B–D | 0 | 0 | 6 | 4 | 2 | 0 | — | notStarted (generated) |
 | `ADM-132` | Rollback & Recovery Management | B | 21 | 0 | 6 | 1 | 2 | 0 | — | notStarted (generated) |
 | `ADM-133` | Change Impact Analysis | B | 6 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
 | `ADM-134` | Change Propagation & Dependency Control | B | 6 | 0 | 6 | 0 | 1 | 0 | — | notStarted (generated) |
@@ -921,7 +921,7 @@ Also apply: 1 for P08 · Catalogue, 24 for all of P08, 29 for every app (section
 |---|---|
 | App · platform | TICVAI Venue Management · P08 Venue Management (web) |
 | Module | Catalogue · wave 3 · needs the `ticketing` module |
-| Block | Block B · task VM-ADM-131 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | venue staff holding `PRODUCT_VIEW` (1 read); in the flows as venue manager |
 | Device and orientation | This is the back office on a desktop browser, 1440 wide: a left navigation rail with the module sections, a top bar with the venue switcher, and the screen in the main area. · LTR and RTL · light, dark theme |
 | Pattern | listDetail (compact density): **nothing in the pack chooses a pattern for this screen** — no metric directory, no display directory, no configuration directory. It falls to the default, and the fallback is recorded rather than … |

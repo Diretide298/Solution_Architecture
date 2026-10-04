@@ -105,7 +105,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `ADM-405` | Add-Ons, Capacity & Commercial Options | B | 0 | 0 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-406` | Commercial Package Simulator | B | 0 | 20 | 6 | 0 | 0 | 0 | — | notStarted (—) |
 | `ADM-407` | Package Review & Commercial Summary | B | 0 | 12 | 6 | 0 | 0 | 0 | — | notStarted (—) |
-| `ADM-408` | Final Package Approval & Handoff | B | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
+| `ADM-408` | Final Package Approval & Handoff | B–D | 0 | 0 | 6 | 0 | 0 | 3 | — | notStarted (—) |
 
 ## Thin screens in this batch
 

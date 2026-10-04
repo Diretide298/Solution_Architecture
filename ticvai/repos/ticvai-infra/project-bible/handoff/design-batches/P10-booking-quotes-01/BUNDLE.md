@@ -121,7 +121,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `PTR-008` | Booking Creation | C | 105 | 39 | 6 | 66 | 0 | 6 | — | notStarted (generated) |
 | `PTR-009` | Group / Bulk Booking | C | 11 | 12 | 6 | 14 | 2 | 6 | — | notStarted (generated) |
 | `PTR-010` | Cart & Quote | C | 46 | 29 | 6 | 30 | 0 | 6 | — | notStarted (generated) |
-| `PTR-011` | Quote Management | B | 10 | 26 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
+| `PTR-011` | Quote Management | B–D | 10 | 26 | 6 | 17 | 0 | 0 | — | notStarted (generated) |
 
 ---
 
@@ -1006,7 +1006,7 @@ Also apply: 12 for all of P10, 29 for every app (section *Design inputs from the
 |---|---|
 | App · platform | TICVAI Control · P10 Partner Web (web) |
 | Module | Booking & Quotes · wave 3 · needs the `partner` module |
-| Block | Block B · task APP-PARTNER-PTR-011 |
+| Block | after Block A (B to D: set per app-module by the sprint plan) |
 | Who uses it | partner staff holding `PARTNER_MANAGE`, `PARTNER_VIEW` (1 configure, 1 read) |
 | Device and orientation | web · LTR and RTL · light theme |
 | Pattern | listDetail (compact density): `listPartnerAgreements` reads the population and `getCommissionStatement` reads one of them — list, select, act |

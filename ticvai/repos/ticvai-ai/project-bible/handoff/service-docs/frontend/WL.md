@@ -375,7 +375,7 @@ White Labelling is a module, not an app. Its screens live in the CMS (P13) and t
 | CMS-005 | Sets the colour theme |  |  |
 | CMS-001 | Tenant Workspace |  |  |
 | CMS-003 | Typography |  |  |
-| CMS-004 | Logo & Assets |  |  |
+| CMS-004 | Logo & Assets | uploadId |  |
 
 ## CMS-003 Typography
 

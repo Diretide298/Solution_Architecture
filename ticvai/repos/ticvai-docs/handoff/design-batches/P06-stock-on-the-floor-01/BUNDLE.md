@@ -135,7 +135,7 @@ Each has a full block in `BUNDLE.md` (*Screen by screen*). Inputs and outputs co
 | `EMP-063` | Requisition & Smart Store Replenishment | D | 18 | 21 | 6 | 9 | 2 | 0 | — | notStarted (generated) |
 | `EMP-064` | Store-to-Store & Warehouse Transfers | D | 14 | 48 | 6 | 11 | 1 | 0 | — | notStarted (generated) |
 | `EMP-065` | Receiving | A | 31 | 25 | 5 | 7 | 2 | 0 | — | notStarted (generated) |
-| `EMP-066` | Stock Count & Cycle Count Management | A | 17 | 37 | 5 | 1 | 3 | 4 | — | notStarted (generated) |
+| `EMP-066` | Stock Count & Cycle Count Management | D | 17 | 37 | 5 | 1 | 3 | 4 | — | notStarted (generated) |
 | `EMP-067` | Damage, Loss, Shrinkage & Stock Adjustment | A | 37 | 9 | 5 | 16 | 1 | 4 | — | notStarted (generated) |
 | `EMP-068` | Reservation, Allocation & Omnichannel Inventory | C | 8 | 5 | 5 | 14 | 1 | 4 | — | notStarted (generated) |
 | `EMP-069` | Barcode, RFID, Serialized Stock & Traceability | D | 3 | 8 | 6 | 0 | 2 | 4 | — | notStarted (generated) |
@@ -1365,7 +1365,7 @@ No tracker row concerns this screen; the rows for its platform are listed once, 
 |---|---|
 | App · platform | TICVAI Venue Staff · P06 Venue Staff App (mobile) |
 | Module | Stock on the Floor · wave 2 · needs the `inventory` module |
-| Block | Block A · task APP-SETUP-EMP-066 |
+| Block | Block D · task APP-STAFF-EMP-066 |
 | Who uses it | venue staff holding `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` (1 configure, 1 read); in the flows as storekeeper |
 | Device and orientation | This is a staff phone, 390 x 844, dark theme, bottom navigation Home, Tasks, Scan, AI, More, with the offline strip. · LTR and RTL · light theme |
 | Pattern | statusTracker (comfortable density): `getCountVariance` reads one record and nothing reads a population — the screen is about that one thing |
