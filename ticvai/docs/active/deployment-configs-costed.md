@@ -284,8 +284,8 @@ one node and three, and it costs recall — **a decision, not a default.**
 | Qdrant self-hosted, 3 nodes HA (4 vCPU / 16 GB each) | $694 | $596 |
 | Qdrant self-hosted, 1 node | $231 | $199 |
 | AI cache tier — `cache:answer` + `cache:embedding`, 8 GB | $274 | $286 |
-| AI GPU node, two with HA (one per zone): the `ticvai-ai` pods, Presidio, the Arabic NER, BGE-M3 and its reranker (4 October, CHG-R11-001); AWS me-central-1 g6.2xlarge class (1 × L4 24 GB, 8 vCPU) | to confirm | not priced |
-| **AI tier total, HA** | **$968 + the GPU nodes** | **$882 + the GPU nodes** |
+| AI GPU node, two with HA (one per zone): the `ticvai-ai` pods, Presidio, the Arabic NER, BGE-M3 and its reranker (4 October, CHG-R11-001); AWS me-central-1 g6.2xlarge (1 × L4 24 GB, 8 vCPU), $1.20043 an hour, $876.31 a node, offered in the region (AWS Price List API, pulled 4 October; CHG-R3-001, the AWS workbook) | $1,752.62 | not priced |
+| **AI tier total, HA** | **$2,720.62** | **$882 + the GPU nodes** |
 
 **Staged, 4 October 2026 (Chinmay, CHG-R11-003: "Staged: start ~$1.9k").** The platform launches on **Stage 1**
 and grows to the full cell (**Stage 2**) later, on Azure UAE North (the Stages sheet of the cost workbook,
@@ -318,14 +318,35 @@ a load balancer, PostgreSQL Multi-AZ, about $1,053 plus the GPU; Stage 2 the sha
 Chinmay's ~$1.9k was the servers, PostgreSQL and the GPU node alone ($1,885.77 above). ADR-0061's floors apply from
 Stage 2 (one replica per deployable at Stage 1); PostgreSQL stays zone-redundant at every stage (ADR-0060). The move
 to Stage 2: a paying venue needing ADR-0060's targets, traffic beyond Stage 1 sustained, a large on-sale booked, or
-a client needing the Premium WAF or a private origin. On AWS (me-central-1) the stages keep the same shape; the GPU
-node is a g6.2xlarge-class instance whose price and availability are to confirm.
+a client needing the Premium WAF or a private origin. On AWS (me-central-1) the stages keep the same shape, priced
+line by line in the AWS workbook (below).
+
+**The cell on Azure and on AWS, 4 October 2026 (CHG-R3-001).** The same cell, service for service, is priced on AWS
+me-central-1 (UAE) from the AWS Price List API's public offer files, pulled 4 October:
+`handoff/hld-lld/TICVAI - AWS Cloud Specs & Cost.xlsx` (built by `tools/build-hld-lld.py`, beside the Azure workbook;
+its "Azure vs AWS" sheet sets the two side by side) and `handoff/hld-lld/TICVAI-LLD-AWS.md`. It replaces the Fargate
+figures above for the cell; the per-configuration table above is the older, indicative basis.
+
+| Production, a month (USD, on demand) | Azure UAE North | AWS me-central-1 |
+|---|---:|---:|
+| Stage 1 (launch) | 2,254.47 | 2,679.99 |
+| Stage 1 pre-production | 566.00 | 615.65 |
+| Full cell without zone-level HA | 5,327.27 | 4,753.96 |
+| Full cell with HA | 8,295.04 | 7,923.57 |
+
+On AWS: EKS (five managed node groups), RDS for PostgreSQL 16 Multi-AZ (not Aurora: cheaper like for like and the
+same shape as Flexible Server), ElastiCache for Valkey, the broker and Qdrant self-run on EKS as on Azure, S3, ECR,
+Secrets Manager and KMS, CloudFront and AWS WAF, an internal ALB, NAT Gateways, Session Manager in place of Bastion,
+PrivateLink endpoints, CloudWatch, GuardDuty with Inspector and Security Hub, AWS Backup. The AI GPU node is a
+g6.2xlarge ($876.31 a node). **Disaster recovery on AWS is open**: AWS has one region in the UAE; the options (in-region
+backups only, Bahrain, which breaks UAE residency, or another provider in the UAE) are in the AWS LLD.
 
 **Corrected 4 October 2026 (Chinmay, CHG-R11-001).** We host the embedding model (BGE-M3), its reranker, Presidio
 and the Arabic NER on a GPU node pool in our cell in the UAE, on Azure (UAE North) and on AWS (me-central-1),
 and never an LLM. The CPU "index and embedding workers" line ($180 / $152) is gone. On AWS the node is a
 g6.2xlarge-class instance (g6.xlarge's 4 vCPU is too few for the AI pods); its price and its availability in
-me-central-1 are to confirm, so no figure is given. Azure, the priced platform: NV6ads A10 v5 at $473.77 a month a
+me-central-1 are to confirm, so no figure is given (priced later the same day, CHG-R3-001: offered in me-central-1,
+$1.20043 an hour, $876.31 a month a node). Azure, the priced platform: NV6ads A10 v5 at $473.77 a month a
 node, totals $5,327.27 a month without high availability and $8,295.04 with it (`handoff/hld-lld/`, the cost
 workbook built by `tools/build-hld-lld.py`).
 

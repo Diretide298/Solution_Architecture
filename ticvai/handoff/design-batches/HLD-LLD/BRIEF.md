@@ -17,6 +17,10 @@
    each inbound path, public IPs only where `architecture.json` says so, and a side panel for operations
    (monitor, backup, Defender). The DR region (UAE Central, the `dr` box) sits outside the UAE North outline.
    Venue site on the right with the Internet cloud between. The draft is `../../hld-lld/TICVAI-LLD.svg`.
+3. **`#lld-aws`: the AWS low-level design** (CHG-R3-001). The same layout and the same boxes and lines as `#lld`
+   (`lldAws` in `architecture.json`), in the AWS style: the region me-central-1 as the outline, the VPC inside it,
+   the EKS node groups, the data tier, AWS service icons drawn inline. The `dr` box is **open** (no DR decided on
+   AWS): draw it dashed and amber, outside the region. The draft is `../../hld-lld/TICVAI-LLD-AWS.svg`.
 
 ## Reference
 
@@ -31,7 +35,7 @@ logos or content from them. Use TICVAI's names only, and no client names.
 - Each page fits a 16:9 slide at 1920 x 1080 and prints on A3 landscape.
 - The legend lists only the connection types the page uses.
 - No external requests except Google Fonts. Azure icons are drawn inline as simple SVG, not fetched.
-- Also export each page as `return/TICVAI-HLD.svg` and `return/TICVAI-LLD.svg`.
+- Also export each page as `return/TICVAI-HLD.svg`, `return/TICVAI-LLD.svg` and `return/TICVAI-LLD-AWS.svg`.
 
 ## When it comes back
 

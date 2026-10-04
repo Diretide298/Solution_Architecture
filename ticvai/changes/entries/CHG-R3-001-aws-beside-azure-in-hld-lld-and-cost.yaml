@@ -1,0 +1,71 @@
+id: CHG-R3-001
+date: '2026-10-04'
+source: audit
+kind: spec
+summary: The HLD/LLD pack and the cost cover AWS beside Azure. The same cell, service for service, on AWS me-central-1
+  (UAE) - an AWS LLD (TICVAI-LLD-AWS.md and .svg) and an AWS cost workbook in the Azure workbook's layout, with an
+  Azure-vs-AWS sheet - priced from the AWS Price List API pulled 4 October 2026. AWS Stage 1 $2,679.99 a month plus
+  $615.65 pre-production; full cell $4,753.96 without zone-level HA, $7,923.57 with it. The AI GPU node is a
+  g6.2xlarge ($876.31). Disaster recovery on AWS is left open.
+decision:
+  what: 'tools/build-hld-lld.py gains the AWS cell: AWS_MAP (Azure service to AWS service: Front Door + WAF to
+    CloudFront + AWS WAF; AKS to EKS with the same five node groups; Flexible Server to RDS for PostgreSQL 16 Multi-AZ,
+    not Aurora, because it is cheaper like for like and keeps the Azure shape; Azure Managed Redis to ElastiCache for
+    Valkey; the broker and Qdrant self-run on EKS as on Azure, Amazon MQ for RabbitMQ the managed option; Blob to S3;
+    Container Registry to ECR; Key Vault to Secrets Manager + KMS; NAT Gateway to one NAT Gateway per AZ; Bastion to
+    Session Manager; Private Link to PrivateLink endpoints; Log Analytics to CloudWatch; Defender for Cloud to
+    GuardDuty + Inspector + Security Hub; Azure Backup to AWS Backup), AWS_SUBNETS (the Azure address plan split per
+    AZ), AWS_LLD_NODES (the Azure LLD box for box), AWS_RATE (every me-central-1 rate with its offer file and date) and
+    the AWS cost rows for Stage 1, its pre-production, Stage 0, the full cell without and with HA and pre-production.
+    It writes handoff/hld-lld/TICVAI-LLD-AWS.md, TICVAI-LLD-AWS.svg and TICVAI - AWS Cloud Specs & Cost.xlsx (Stages,
+    Infra without HA, Infra with High Availability, Deployables, Network, Service map, DR (open), AWS rates, Azure vs
+    AWS; the same AED rate and margin cells), an "On AWS" section in the HLD, and lldAws in architecture.json. The AWS
+    AI GPU node is g6.2xlarge (8 vCPU, 1 x L4 24 GB), offered in me-central-1 at $1.20043 an hour ($876.31 a month);
+    g6.xlarge ($721.42) has 4 vCPU, too few; g5.xlarge ($900.82) costs more. DR on AWS is not decided (AWS has one UAE
+    region): the options - Multi-AZ with in-region backups only; Bahrain me-south-1, which breaks UAE residency;
+    on-premises or another provider in the UAE - are laid out with their consequences, and the LLD draws the DR box as
+    open. deployment-configs-costed.md: the AWS GPU line priced ($1,752.62 for two) and a cell cost table pointing at
+    the AWS workbook. The prices the files do not settle are listed as to confirm (AWS_TO_CONFIRM).'
+  by: Chinmay
+  date: '2026-10-04'
+why: 'Chinmay, 4 October 2026 (recorded in docs/active/decisions/answers-3-october-gate-and-hosting.md, section "AWS
+  beside Azure"): "HLD and LLD you didnt add AWS you just did azure add that in as well". Earlier the same day the AI
+  GPU node was to run "in Azure and aws hosted in UAE north" (CHG-R11-001) and hosting was staged (CHG-R11-003), but
+  the HLD/LLD and the cost workbook covered Azure only and left the AWS GPU price to confirm.'
+keys_touched:
+  files:
+  - tools/build-hld-lld.py
+  - handoff/hld-lld/TICVAI-LLD-AWS.md
+  - handoff/hld-lld/TICVAI-LLD-AWS.svg
+  - handoff/hld-lld/TICVAI - AWS Cloud Specs & Cost.xlsx
+  - handoff/hld-lld/TICVAI - Azure Cloud Specs & Cost.xlsx
+  - handoff/hld-lld/TICVAI-HLD.md
+  - handoff/hld-lld/TICVAI-HLD.svg
+  - handoff/hld-lld/TICVAI-LLD.md
+  - handoff/hld-lld/README.md
+  - handoff/design-batches/HLD-LLD/BRIEF.md
+  - handoff/design-batches/HLD-LLD/architecture.json
+  - docs/active/deployment-configs-costed.md
+  - docs/active/decisions/answers-3-october-gate-and-hosting.md
+  other:
+  - CHG-R11-001
+  - CHG-R11-003
+  - ADR-0060
+  - ADR-0009
+root_class: 'new: cost-basis-one-cloud'
+tickets:
+  started: []
+  unstarted: []
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/build-hld-lld.py::clouds_agree
+status: open
+notes: 'Batch R3 (branch r3-aws, from r2 = 9cce86a0), 4 October 2026. clouds_agree() stops the build if the AWS LLD
+  loses a box or a line of the Azure one, a cost group is missing on any AWS sheet, an Azure service type is not
+  mapped, an AWS line has no price and does not say why, or the AWS DR box stops saying open with no DR decision
+  recorded. Resolves the AWS GPU price CHG-R11-001 and CHG-R11-003 left open. Open for Chinmay and the client: DR on
+  AWS (A, B or C); g6 capacity per AZ; the prices to confirm in the AWS LLD. No Block A task builds an AWS Terraform
+  cell module (a plan change if one is added). Close on the commit that merges it.'
