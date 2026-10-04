@@ -134,7 +134,7 @@ paths:
 
         **Where a draft is stored** (4 October 2026, CHG-FXC-004; the Sprint 1-2 judging found "a draft on the block" and a
         lineage that never writes the block, which ADR-0020 forbids anyway). Each proposal is an `ai.proposed_action` row:
-        the block or template it is for (`control.content_block`, `marketing.message_template`), the language, the proposed
+        the block or template it is for (`control.content_block`, `marketing.message_template`), its job (`translationJobId`), the language, the proposed
         text. Nothing outside the AI schema is written. The CMS shows the proposal beside the block's field as an AI draft; an
         operator's save goes through the block's own operation (`white-label` or `marketing-crm`), which is when it becomes
         content; `getTranslationProposals` reads the rows back by job.
@@ -211,7 +211,7 @@ paths:
 
         **Where a draft is stored** (4 October 2026, CHG-FXC-004; the Sprint 1-2 judging found "a draft on the block" and a
         lineage that never writes the block, which ADR-0020 forbids anyway). Each proposal is an `ai.proposed_action` row:
-        the block or template it is for (`control.content_block`, `marketing.message_template`), the language, the proposed
+        the block or template it is for (by id: a storefront content block or a marketing message template), its job (`translationJobId`), the language, the proposed
         text. Nothing outside the AI schema is written. The CMS shows the proposal beside the block's field as an AI draft; an
         operator's save goes through the block's own operation (`white-label` or `marketing-crm`), which is when it becomes
         content; `getTranslationProposals` reads the rows back by job.
@@ -17670,6 +17670,13 @@ components:
         interactionId:
           type: string
           format: uuid
+        translationJobId:
+          type: string
+          format: uuid
+          nullable: true
+          readOnly: true
+          description: The `proposeTranslations` job that drafted this proposal; `getTranslationProposals` reads a
+            job's rows by it. Null on every other proposal (CHG-RFM-004).
         kind:
           type: string
           enum:

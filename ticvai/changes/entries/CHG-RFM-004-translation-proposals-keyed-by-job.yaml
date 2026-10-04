@@ -1,0 +1,36 @@
+id: CHG-RFM-004
+date: '2026-10-04'
+source: audit
+kind: contract
+summary: A translation draft's ai.proposed_action row carries the job that drafted it (translationJobId), so getTranslationProposals
+  can read a job's rows; its description no longer names tables it does not read.
+decision:
+  what: ProposedAction gains translationJobId (uuid, nullable, read-only; the proposeTranslations job). getTranslationProposals'
+    description names the block or template a draft is for by id instead of naming control.content_block and marketing.message_template,
+    which it does not read; proposeTranslations' description adds the job. Additive; no operation, path or required field
+    changes.
+  by: Chinmay
+  date: '2026-10-04'
+why: 'The check-parameter-columns finding on the merged branch (e13d7ad5): getTranslationProposals takes translationJobId
+  and ai.proposed_action had no translation_job_id, and its description named two tables its lineage does not list (both
+  from 52401fca, CHG-FXC-004).'
+keys_touched:
+  operations:
+  - getTranslationProposals
+  - proposeTranslations
+  schemas:
+  - ProposedAction
+  tables:
+  - ai.proposed_action
+root_class: 'new: parameter-without-column'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-parameter-columns.py
+status: open
+notes: Batch RFM (r1-fix-merge), 4 October 2026.
