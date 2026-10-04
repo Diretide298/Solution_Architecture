@@ -1,0 +1,41 @@
+id: CHG-RFM-007
+date: '2026-10-04'
+source: audit
+kind: process
+summary: The known S-DUP-SCREEN finding for the top-up rule screens is rekeyed without BO-1094, which left the group when
+  it began to read listWalletTypes; no new duplicate.
+decision:
+  what: 'In handoff/audit-baseline.json, check-screen-wiring S-DUP-SCREEN: the key BO-1094+BO-1095+BO-1096+BO-1097+BO-1098+BO-1099+BO-1101+BO-417+BO-418
+    becomes BO-1095+BO-1096+BO-1097+BO-1098+BO-1099+BO-1101+BO-417+BO-418. The eight screens still declare only getWalletFundingRules
+    and setWalletFundingRules, as they did when the finding was baselined; their division is the screens owner''s open item,
+    unchanged.'
+  by: Chinmay
+  date: '2026-10-04'
+why: 'check-screen-wiring finding S-DUP-SCREEN on the merged branch (e13d7ad5) and on the screens branch alone (d060fe01):
+  the screens agent bound listWalletTypes on BO-1094 (CHG-FXS-003), so the duplicate group''s key changed while the group
+  shrank. Chinmay, 4 October: rekey the known finding with the reason; no new duplicate.'
+keys_touched:
+  screens:
+  - BO-1094
+  - BO-1095
+  - BO-1096
+  - BO-1097
+  - BO-1098
+  - BO-1099
+  - BO-1101
+  - BO-417
+  - BO-418
+  files:
+  - handoff/audit-baseline.json
+root_class: 'new: baseline-key-drift'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-wiring.py
+status: open
+notes: Batch RFM (r1-fix-merge), 4 October 2026.
