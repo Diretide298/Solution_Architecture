@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Access Control
   version: 1.0.0
-  x-ticvai-screen-count: 246
+  x-ticvai-screen-count: 247
   x-ticvai-tier: spine
   x-ticvai-module: 3 — Admission and Access
   x-ticvai-requirements: 201
@@ -226,9 +226,14 @@ paths:
         - "P01 WEB-001 Home / Landing"
         - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-018 My Tickets"
+        - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-001 Home"
         - "P02 GST-012 My Tickets"
+        - "P02 GST-028 Parking – Reservation Confirmed"
+        - "P02 GST-045 Ticket Delivery & Sharing"
         - "P02 GST-055 Dynamic QR Ticket"
+        - "P02 GST-062 Shop & Drop Collection"
+        - "P02 GST-069 Face Pass"
         - "P04 POS-002 Sell — Ticket Catalogue"
       security:
       - guestAuth: []
@@ -1450,6 +1455,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-041 Parking – Reserve & Pay"
         - "P02 GST-027 Parking – Reserve & Pay"
+        - "P02 GST-028 Parking – Reservation Confirmed"
       security:
         - guestAuth: []
         - bearerAuth: []
@@ -2302,7 +2308,6 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-032 Admission Profiles"
         - "P08 BO-154 Access Rule Command Center"
-        - "P08 BO-155 Visual Access Rule Builder"
         - "P08 BO-156 Entry, Exit & Re-entry Rules"
         - "P08 BO-158 Access Validity & Time Rules"
         - "P08 BO-160 Multi-Park & Crossover Rules"

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 208
+  x-ticvai-screen-count: 205
   x-ticvai-tier: spine
   x-ticvai-module: 2 — Ticketing Sales
   x-ticvai-requirements: 343
@@ -1726,7 +1726,6 @@ paths:
       operationId: listTicketTemplates
       x-ticvai-consumed-by:
         - "P08 BO-344 Media Design Studio Command Center"
-        - "P08 BO-346 PDF, Printable & POS Ticket Designer"
       summary: The ticket templates a venue issues from
       description: 'BL-102. **`orders.ticket_template` was read by `printTicketProof` and `issueWalletPass`
         and written by nothing**, so the proof operation had nothing to print and a venue changing its
@@ -1787,8 +1786,6 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createTicketTemplate
-      x-ticvai-consumed-by:
-        - "P08 BO-346 PDF, Printable & POS Ticket Designer"
       summary: Create a ticket template
       description: '**Selection is automatic.** `selectionPriority`, `mediaType`, `appliesToProductKinds`
         and `appliesToChannels` decide which template a sale issues from, so the caller never chooses
@@ -1848,8 +1845,6 @@ paths:
         format: uuid
     patch:
       operationId: updateTicketTemplate
-      x-ticvai-consumed-by:
-        - "P08 BO-346 PDF, Printable & POS Ticket Designer"
       summary: Change or retire a ticket template
       description: '**Tickets already issued keep the template they were issued from.** Changing artwork
         affects the next ticket, never one a guest already holds. Retire with `isActive: false` rather
@@ -1910,8 +1905,6 @@ paths:
         format: uuid
     post:
       operationId: printTicketProof
-      x-ticvai-consumed-by:
-        - "P08 BO-346 PDF, Printable & POS Ticket Designer"
       summary: Print a sample without selling anything
       description: '2.16.6. **Artwork is checked by looking at it, and the only way to look at it was
         to sell something.**
@@ -2164,6 +2157,7 @@ paths:
       operationId: listPaymentTokens
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
+        - "P02 GST-011 Wallet Overview"
         - "P02 GST-071 Payment Methods"
       security:
       - guestAuth: []
@@ -3335,6 +3329,7 @@ paths:
       operationId: checkoutCart
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
+        - "P01 WEB-012 Checkout — Payment"
         - "P01 WEB-033 Shop"
         - "P02 GST-009 Review & Payment"
         - "P02 GST-032 AI Concierge – Chat"
@@ -3971,7 +3966,6 @@ paths:
     post:
       operationId: createOrder
       x-ticvai-consumed-by:
-        - "P01 WEB-012 Checkout — Payment"
         - "P02 GST-009 Review & Payment"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-004 Sell — Seat Map"
@@ -4108,6 +4102,7 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
         - "P04 POS-014 Sales Exceptions, Controls & Operational Actions"
+        - "P04 POS-026 Receipt & Reprint"
         - "P04 POS-030 Sales Journal"
         - "P05 KSK-009 Ticket issued"
         - "P05 KSK-011 Collect a booking"

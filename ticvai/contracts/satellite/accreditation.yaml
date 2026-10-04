@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Accreditation
   version: 1.0.0
-  x-ticvai-screen-count: 47
+  x-ticvai-screen-count: 48
   x-ticvai-tier: satellite
   x-ticvai-module: 12 — Accreditation & Credential Management
   x-ticvai-platforms:
@@ -56,6 +56,7 @@ paths:
         - "P08 BO-619 Accreditation Category Management"
         - "P08 BO-620 Accreditation Program Setup"
         - "P08 BO-667 Event & Venue Accreditation Assignment"
+        - "P08 BO-669 Temporary & Seasonal Accreditation"
       summary: Programmes, their categories and their applicant types
       description: 'Boards 1.5, 1.6 and 1.7. **A programme is the thing an application is made
         against** — a season, a tournament, a venue''s standing contractor scheme — and it carries the
@@ -1224,8 +1225,7 @@ paths:
     get:
       operationId: getAccreditationValidity
       x-ticvai-consumed-by:
-        - "P08 BO-669 Accreditation Validity & Renewal"
-        - "P08 BO-666 Accreditation Programme Setup"
+        - "P08 BO-669 Temporary & Seasonal Accreditation"
       summary: The validity and renewal rules of a programme
       description: |-
         **Added 4 October 2026 (CHG-FXC-010; VM-BO-669, BO-666): `setAccreditationValidity` is a whole-record PUT that
@@ -1263,6 +1263,7 @@ paths:
       operationId: setAccreditationValidity
       x-ticvai-consumed-by:
         - "P08 BO-666 Validity Period Configuration"
+        - "P08 BO-669 Temporary & Seasonal Accreditation"
       x-ticvai-conflict-policy: serverWins
       summary: Validity periods, renewal windows and expiry behaviour
       description: 'Boards 6.3 and 6.10. **Expiry is the control that keeps an accreditation estate

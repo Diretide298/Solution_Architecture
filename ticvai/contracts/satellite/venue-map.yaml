@@ -1310,7 +1310,10 @@ paths:
     get:
       operationId: listBookableVenueMaps
       x-ticvai-consumed-by:
+        - "P01 WEB-039 Venue Map & Wait Times"
         - "P01 WEB-047 Map Booking — Cabanas & Spots"
+        - "P02 GST-021 Interactive Map"
+        - "P02 GST-058 Resource Availability (Cabana)"
         - "P02 GST-074 Map Booking — Cabanas & Spots"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.

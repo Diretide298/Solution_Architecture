@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Subscription & Licensing
   version: 0.1.0
-  x-ticvai-screen-count: 128
+  x-ticvai-screen-count: 130
   x-ticvai-tier: satellite
   x-ticvai-module: 20 — Subscription & Licensing Management
   x-ticvai-requirements: 59
@@ -869,6 +869,7 @@ paths:
         - "P09 ADM-424 Module Activation & Dependency Validation"
         - "P09 ADM-425 Venue Template Application"
         - "P09 ADM-426 Initial Configuration & Regional Defaults"
+        - "P09 ADM-460 Billing Calculation & Charge Breakdown"
         - "P09 ADM-469 AI Configuration Home & Start"
         - "P09 ADM-470 Setup Type & Business Intent Discovery"
         - "P09 ADM-471 Venue & Business Model Discovery"
@@ -3059,6 +3060,7 @@ paths:
         - "P09 ADM-008 Subscription & Plan Management"
         - "P09 ADM-009 Tenant Billing & Invoicing"
         - "P09 ADM-459 Billing & Commercial Command Center"
+        - "P09 ADM-460 Billing Calculation & Charge Breakdown"
         - "P09 ADM-462 Invoice & Payment Management"
       x-ticvai-audience:
       - staff
@@ -4007,7 +4009,7 @@ paths:
     get:
       operationId: getMembershipProductValidation
       x-ticvai-consumed-by:
-        - "P09 BO-293 Membership Product Validation, Approval & Publication"
+        - "P08 BO-293 Membership Product Validation, Approval, Publication & Versioning"
       summary: A membership product's validation, as the approver sees it
       description: |-
         **Added 4 October 2026 (CHG-FXC-010; VM-BO-293): `approveMembershipProductValidation` was the only operation, and the
@@ -9920,7 +9922,7 @@ paths:
     get:
       operationId: listCells
       x-ticvai-consumed-by:
-        - "P09 ADM-003 Platform Command Centre"
+        - "P09 ADM-003 Cross-Tenant Health Dashboard"
       summary: The cells, with their health
       description: |-
         **Added 4 October 2026 (CHG-FXC-011; ADM-003, the cross-tenant dashboard had only per-cell and per-tenant reads).** Every cell, in the shape `getCell` returns, ordered by name; `region` and `status` narrow it.

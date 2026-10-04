@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Public API and developer access
   version: 1.0.0
-  x-ticvai-screen-count: 34
+  x-ticvai-screen-count: 35
   x-ticvai-tier: satellite
   x-ticvai-module: "13 — Developer & API Management"
   x-ticvai-platforms:
@@ -1034,6 +1034,7 @@ paths:
       operationId: listIntegrationListings
       x-ticvai-consumed-by:
         - "P14 DEV-007 Marketplace Listing"
+        - "P14 DEV-008 Programme Administration"
       security:
       - bearerAuth: []
       - {}

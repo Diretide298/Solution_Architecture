@@ -88,6 +88,7 @@ paths:
         - "P02 GST-002 Explore"
         - "P02 GST-007 Select Date & Time"
         - "P02 GST-008 Tickets & Add-ons"
+        - "P08 BO-048 Retail Products"
         - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
         - "P13 CMS-101 Help Me Choose"
         - "P13 CMS-103 Booking Flows"
@@ -1597,7 +1598,6 @@ paths:
         - "P02 GST-051 Plan"
         - "P02 GST-052 Suggested Itineraries"
         - "P02 GST-053 Your Plan"
-        - "P02 GST-058 Resource Availability (Cabana)"
         - "P02 GST-075 Book a Space by the Hour"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-003 Sell — Timed Entry"
@@ -1609,8 +1609,10 @@ paths:
         - "P08 BO-012 Membership Products"
         - "P08 BO-013 Channel & Distribution"
         - "P08 BO-014 Catalogue Publishing"
+        - "P08 BO-048 Retail Products"
         - "P08 BO-094 Map Editor & Publish"
         - "P08 BO-125 Product & Category Button Configuration"
+        - "P08 BO-877 Qualification & Assignment Rule Engine"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
         - "P13 CMS-101 Help Me Choose"
         - "P13 CMS-103 Booking Flows"
@@ -2402,6 +2404,7 @@ paths:
         - "P08 BO-007 Product Directory"
         - "P08 BO-008 Product Detail & Variants"
         - "P08 BO-012 Membership Products"
+        - "P08 BO-048 Retail Products"
         - "P10 PTR-006 Product Catalog (B2B Pricing)"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
@@ -3971,7 +3974,6 @@ paths:
         - "P02 GST-004 Item Detail"
         - "P02 GST-007 Select Date & Time"
         - "P02 GST-050 Resource Booking – Cabana"
-        - "P02 GST-058 Resource Availability (Cabana)"
         - "P04 POS-003 Sell — Timed Entry"
         - "P05 KSK-004 Choose tickets"
         - "P05 KSK-005 Choose a performance"
@@ -17432,8 +17434,6 @@ paths:
   /tax-profiles:
     get:
       operationId: listTaxProfiles
-      x-ticvai-consumed-by:
-        - "P08 ADM-069 Tax Profile & Jurisdiction Configuration"
       summary: The tax profiles
       description: |-
         **Added 4 October 2026 (CHG-FXC-010; ADM-069): the screen manages many reusable tax profiles and the contract had one

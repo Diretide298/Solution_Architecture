@@ -125,6 +125,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-785 Template Library"
         - "P08 BO-793 AI Content, Translation & Audit"
+        - "P13 CMS-011 Translations"
       summary: Fill translation gaps with a first pass, for a human to edit
       description: |-
         BL-071, 2.6.34. **`setLanguages` already measures the gap** — `translationGaps` reports content missing a version. What was absent is filling it.
@@ -200,6 +201,7 @@ paths:
     get:
       operationId: getTranslationProposals
       x-ticvai-consumed-by:
+        - "P08 BO-785 Template Library"
         - "P13 CMS-011 Translations"
       x-ticvai-agreed: '2 October: contract gap CHG-WIR-017 (CMS-011: no read follows a proposeTranslations job, which
         answers 202); shape follows proposeTranslations'
@@ -2141,6 +2143,7 @@ paths:
     post:
       operationId: decideProposedAction
       x-ticvai-consumed-by:
+        - "P08 BO-093 Map Import & Labelling"
         - "P08 BO-598 AI Draft Review & Approval"
         - "P08 BO-762 Predictive Audiences"
         - "P08 BO-793 AI Content, Translation & Audit"
@@ -5399,6 +5402,7 @@ paths:
     post:
       operationId: explainMetricChange
       x-ticvai-consumed-by:
+        - "P09 ADM-505 Revenue & Commercial Forecast"
         - "P09 ADM-506 Forecast Drivers, Confidence & Explainability"
         - "P16 ANL-019 AI Management Insights"
         - "P16 ANL-056 Root-Cause Analysis Explorer"
@@ -5658,8 +5662,13 @@ paths:
     get:
       operationId: listForecastDefinitions
       x-ticvai-consumed-by:
+        - "P08 BO-919 AI Event Resource Forecasting"
         - "P09 ADM-499 Forecasting Command Center"
         - "P09 ADM-500 Forecast Configuration & Forecasting Strategy"
+        - "P09 ADM-503 Ticket, Product & Timeslot Demand Forecast"
+        - "P09 ADM-504 Channel & Booking Pace Forecast"
+        - "P09 ADM-505 Revenue & Commercial Forecast"
+        - "P09 ADM-506 Forecast Drivers, Confidence & Explainability"
         - "P16 ANL-057 Forecasting & Predictive Analytics Studio"
       x-ticvai-agreed: '29 September: AI system design 2.3 forecast, 5.2; our build plan, shape follows listIndexSources'
       summary: What is forecast
@@ -6269,6 +6278,7 @@ paths:
     get:
       operationId: getForecastAccuracy
       x-ticvai-consumed-by:
+        - "P09 ADM-503 Ticket, Product & Timeslot Demand Forecast"
         - "P09 ADM-506 Forecast Drivers, Confidence & Explainability"
         - "P09 ADM-508 Forecast Accuracy, Review & Publication Center"
       x-ticvai-agreed: '29 September: AI system design 2.3 forecast; our build plan, shape follows listAiInteractions'

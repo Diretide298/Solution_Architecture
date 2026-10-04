@@ -572,7 +572,6 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-005 Payment"
-        - "P04 POS-023 Sell — Merchandise"
       x-ticvai-audience: [staff]
       summary: Sell merchandise
       description: >

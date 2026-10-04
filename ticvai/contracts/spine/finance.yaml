@@ -2915,6 +2915,8 @@ paths:
     get:
       operationId: listLegalEntities
       x-ticvai-consumed-by:
+        - "P08 ADM-069 Tax Profile & Jurisdiction Configuration"
+        - "P08 ADM-077 Calculation Validation, Reconciliation & Service Interface"
         - "P08 BO-074 Chart of Accounts"
       x-ticvai-audience:
       - staff
@@ -3655,6 +3657,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-019 Order History"
         - "P02 GST-019 Order History"
+        - "P04 POS-026 Receipt & Reprint"
         - "P08 BO-022 Order Detail"
         - "P08 BO-1081 Finance Dashboard"
         - "P09 ADM-068 Tax, Fee & Calculation Command Center"

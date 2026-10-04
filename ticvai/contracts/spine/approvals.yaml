@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Approvals
   version: 1.0.0
-  x-ticvai-screen-count: 46
+  x-ticvai-screen-count: 47
   x-ticvai-module: 11 — Approval Workflows and Governance
   x-ticvai-platforms:
   - P04 POS
@@ -97,6 +97,7 @@ paths:
     get:
       operationId: listApprovalRequests
       x-ticvai-consumed-by:
+        - "P04 POS-020 Shift Exceptions & Alerts"
         - "P06 EMP-037 Notifications"
         - "P08 ADM-130 Approval Review & Decision Workspace"
         - "P08 ADM-145 Promotion Approval Inbox"
@@ -921,6 +922,7 @@ paths:
         - "P08 ADM-329 Approval Matrix Command Center"
         - "P08 ADM-338 AI Routing Advisor & Matrix Optimization"
         - "P08 BO-086 Approval Matrix"
+        - "P08 BO-087 Approval Delegations"
         - "P08 BO-1120 Corporate Budget, Policy & Approval Rules"
         - "P08 BO-1149 Administrative Balance Adjustment Studio"
         - "P09 ADM-530 AI Approval Requirement & Routing Configuration"
@@ -975,6 +977,7 @@ paths:
         - "P08 ADM-334 Value & Threshold Routing"
         - "P08 ADM-335 Risk-Based & Conditional Routing"
         - "P08 BO-086 Approval Matrix"
+        - "P08 BO-087 Approval Delegations"
         - "P08 BO-1120 Corporate Budget, Policy & Approval Rules"
         - "P08 BO-1149 Administrative Balance Adjustment Studio"
         - "P08 BO-639 Reviewer Assignment & Delegation"
@@ -3846,7 +3849,7 @@ paths:
     get:
       operationId: getApprovalRequest
       x-ticvai-consumed-by:
-        - "P08 BO-085 Approval Inbox"
+        - "P08 BO-085 Approval Request"
       summary: One approval request
       description: |-
         **Added 4 October 2026 (CHG-FXC-011; VM-BO-085: listApprovalRequests has no id filter).** One request with its decisions so far.

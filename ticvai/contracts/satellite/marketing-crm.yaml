@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 233
+  x-ticvai-screen-count: 234
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -2850,6 +2850,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-794 Omnichannel Command Center"
         - "P08 BO-795 Unified Inbox"
+        - "P08 BO-799 Agent Workspace"
         - "P12 SUP-002 Agent Dashboard"
         - "P12 SUP-004 Conversation Queue"
         - "P12 SUP-008 Agent Performance & SLA View"
@@ -2916,6 +2917,7 @@ paths:
       operationId: getConversation
       x-ticvai-consumed-by:
         - "P08 BO-796 Guest Conversation 360"
+        - "P08 BO-799 Agent Workspace"
         - "P12 SUP-005 Live Chat Workspace"
       x-ticvai-audience:
       - staff
@@ -3747,6 +3749,7 @@ paths:
         - "P08 BO-737 Customer 360 Profile"
         - "P08 BO-738 Activity Timeline"
         - "P08 BO-740 Family & Guardians"
+        - "P08 BO-799 Agent Workspace"
       security:
       - guestAuth: []
       - bearerAuth: []
@@ -4185,6 +4188,7 @@ paths:
         - "P02 GST-039 Profile"
         - "P02 GST-065 Newsletter & Preferences"
         - "P02 GST-066 Privacy & My Data"
+        - "P02 GST-071 Payment Methods"
         - "P08 BO-747 Consent Policy Configuration"
         - "P13 CMS-018 Consent & Legal"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
@@ -4743,6 +4747,7 @@ paths:
         - "P08 BO-754 Audience Intelligence"
         - "P08 BO-755 Dynamic Segment Builder"
         - "P08 BO-757 Behavioral Segmentation"
+        - "P08 BO-766 Campaign Builder"
         - "P16 ANL-007 Guest & Conversion Intelligence"
       x-ticvai-audience:
       - staff
@@ -5051,6 +5056,7 @@ paths:
       operationId: getCampaign
       x-ticvai-consumed-by:
         - "P08 BO-771 Budget, Goals & Forecast"
+        - "P08 BO-772 A/B & AI Optimization"
       x-ticvai-audience:
       - staff
       x-ticvai-read-routing: replica
@@ -5539,8 +5545,10 @@ paths:
     get:
       operationId: listMessageTemplates
       x-ticvai-consumed-by:
+        - "P08 BO-766 Campaign Builder"
         - "P08 BO-768 Multichannel Composer"
         - "P08 BO-769 Schedule & Trigger Rules"
+        - "P08 BO-772 A/B & AI Optimization"
         - "P08 BO-785 Template Library"
         - "P12 SUP-007 Canned Response Management"
       x-ticvai-audience:
@@ -6176,8 +6184,10 @@ paths:
     get:
       operationId: listLoyaltyProgrammes
       x-ticvai-consumed-by:
+        - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-036 Loyalty & Rewards"
+        - "P08 BO-827 Points & Activity Rules"
         - "P08 BO-828 Milestones & Reward Rules"
         - "P08 BO-833 Gamification Analytics & Audit"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
@@ -6224,8 +6234,6 @@ paths:
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: createLoyaltyProgramme
-      x-ticvai-consumed-by:
-        - "P08 BO-828 Milestones & Reward Rules"
       x-ticvai-audience:
       - staff
       x-ticvai-config-scope: tenant
@@ -15029,6 +15037,7 @@ paths:
       operationId: getLoyaltyRules
       x-ticvai-consumed-by:
         - "P08 BO-827 Points & Activity Rules"
+        - "P08 BO-828 Milestones & Reward Rules"
       summary: Every rule a loyalty programme runs on
       description: 'Decision 8 of the schema merge. **`marketing.loyalty_programme` holds no rules** —
         it is a header with a code, a name and an expiry. The rules were taken from the backend
@@ -15074,6 +15083,7 @@ paths:
       operationId: setLoyaltyRules
       x-ticvai-consumed-by:
         - "P08 BO-827 Points & Activity Rules"
+        - "P08 BO-828 Milestones & Reward Rules"
       summary: Replace a programme's rules as one set
       description: '**Applied whole or not at all.** Setting rules one at a time leaves a live
         programme inconsistent in the middle, which means guests earning under one rule and
@@ -17434,7 +17444,7 @@ paths:
     patch:
       operationId: updateMessageTemplate
       x-ticvai-consumed-by:
-        - "P08 BO-785 Message Template Library"
+        - "P08 BO-785 Template Library"
       summary: Change a message template
       description: |-
         **Added 4 October 2026 (CHG-FXC-010; BO-785, design-notes correction CHG-SBO-005).** A tenant's own template is
@@ -17512,7 +17522,7 @@ paths:
     patch:
       operationId: updateLoyaltyProgramme
       x-ticvai-consumed-by:
-        - "P08 BO-827 Loyalty Programme Configuration"
+        - "P08 BO-827 Points & Activity Rules"
       summary: Change a loyalty programme
       description: |-
         **Added 4 October 2026 (CHG-FXC-010; BO-827).** The earning rules are `LoyaltyProgramme.earnRules` and nothing wrote

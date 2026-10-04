@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI White Label Builder
   version: 0.1.0
-  x-ticvai-screen-count: 91
+  x-ticvai-screen-count: 93
   x-ticvai-tier: satellite
   x-ticvai-module: 19 — Guest Mobile App & Branding (builder)
   x-ticvai-requirements: 107
@@ -804,7 +804,7 @@ paths:
     get:
       operationId: listContentBlocks
       x-ticvai-consumed-by:
-        - "P13 CMS-007 Homepage & Page Builder"
+        - "P13 CMS-007 Page Builder"
       summary: The content blocks of a page
       description: |-
         **Added 4 October 2026 (CHG-FXC-011; CMS-007: the builder could create and publish a block and not load one).** The blocks of one page (`pageKey`, a content page's id or a homepage section key), ordered by `position`, drafts and published alike.
@@ -3883,6 +3883,7 @@ paths:
         - "P02 GST-001 Home"
         - "P02 GST-043 Arabic / RTL Experience"
         - "P02 GST-047 Maintenance / Upgrade Page"
+        - "P02 GST-071 Payment Methods"
         - "P05 KSK-002 Language Select"
       x-ticvai-audience:
       - anonymous
@@ -4945,7 +4946,7 @@ paths:
     patch:
       operationId: updateContentBlock
       x-ticvai-consumed-by:
-        - "P13 CMS-007 Homepage & Page Builder"
+        - "P13 CMS-007 Page Builder"
       summary: Change a draft content block
       description: |-
         **Added 4 October 2026 (CHG-FXC-011; CMS-007).** Changes a block's `body`, `localeVariants`, `position`,

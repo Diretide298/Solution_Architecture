@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Resources
   version: 1.0.0
-  x-ticvai-screen-count: 61
+  x-ticvai-screen-count: 62
   x-ticvai-tier: satellite
   x-ticvai-module: 1 — Ticketing Catalogue
   x-ticvai-platforms:
@@ -69,6 +69,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-095 Resources"
         - "P08 BO-854 Resource Management Command Center"
+        - "P08 BO-857 Resource Creation & Profile"
         - "P08 BO-874 Staff Resource Profile"
         - "P08 BO-877 Qualification & Assignment Rule Engine"
         - "P08 BO-903 Equipment & Asset Command Center"
@@ -1129,6 +1130,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-857 Resource Creation & Profile"
         - "P08 BO-862 Multi-Venue Resource Assignment"
+        - "P08 BO-866 Resource Availability Schedule Configuration"
         - "P08 BO-935 Assignment Detail & Operational Brief"
       summary: One resource, with every configured section
       description: 'Board 1.04. Identity, organisation, operational configuration, location, commercial,
@@ -1873,7 +1875,7 @@ paths:
     get:
       operationId: getResourceBooking
       x-ticvai-consumed-by:
-        - "P08 BO-097 Rental Desk"
+        - "P08 BO-097 Check Out & Check In"
       summary: One resource booking
       description: |-
         **Added 4 October 2026 (CHG-FXC-011; VM-BO-097: no read of a ResourceBooking).** One `resources.booking` row: status, `conditionOut`, `conditionIn`, `depositAuthorisationId`. A rental booking (`rental.getRentalBooking`) names the resource bookings it holds; this reads one of them.
@@ -2666,6 +2668,7 @@ paths:
       operationId: getMapResourceAvailability
       x-ticvai-consumed-by:
         - "P01 WEB-047 Map Booking — Cabanas & Spots"
+        - "P02 GST-058 Resource Availability (Cabana)"
         - "P02 GST-074 Map Booking — Cabanas & Spots"
       # Public, with an optional token (decided 2 October, GFIX-5): a visitor browses before signing in; a guest
       # or staff token is still accepted. `{}` makes the credential optional.
