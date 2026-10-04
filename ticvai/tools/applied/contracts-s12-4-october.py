@@ -1731,6 +1731,20 @@ LINEAGE.update({
     "listTableCombinations": (["fnb.table_combination"], [], [], [], "what setTableCombinations stores"),
 })
 
+# ── AI-ENGINE-TRANSLATE: where a translation draft is stored (CHG-FXC-004; the contract only, not the AI task) ────
+E(Y.set_persistence, C("satellite/ai.yaml"), "TranslationProposals",
+  "none — each draft is an ai.proposed_action row (one per block and language), applied to the block only when an "
+  "operator saves it through the block's own write (ADR-0020); CHG-FXC-004")
+for _op in ("proposeTranslations", "getTranslationProposals"):
+    E(Y.append_op_description, C("satellite/ai.yaml"), _op, """
+**Where a draft is stored** (4 October 2026, CHG-FXC-004; the Sprint 1-2 judging found "a draft on the block" and a
+lineage that never writes the block, which ADR-0020 forbids anyway). Each proposal is an `ai.proposed_action` row:
+the block or template it is for (`control.content_block`, `marketing.message_template`), the language, the proposed
+text. Nothing outside the AI schema is written. The CMS shows the proposal beside the block's field as an AI draft; an
+operator's save goes through the block's own operation (`white-label` or `marketing-crm`), which is when it becomes
+content; `getTranslationProposals` reads the rows back by job.""", "CHG-FXC-004")
+LINEAGE["getTranslationProposals"] = (["ai.proposed_action"], [], [], [], "the job's proposals")
+
 # [plan -> contracts] requests (CHG-FXC-010)
 E(Y.insert_after_in_op, C("satellite/payments.yaml"), "receivePaymentProviderWebhook",
   "      x-ticvai-conflict-policy: append", """

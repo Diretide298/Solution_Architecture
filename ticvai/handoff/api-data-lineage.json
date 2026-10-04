@@ -74535,7 +74535,9 @@
   "contract": "ai",
   "verb": "GET",
   "path": "/ai/translate/{translationJobId}",
-  "reads": [],
+  "reads": [
+   "ai.proposed_action"
+  ],
   "writes": [],
   "routing": "primary",
   "scope": "tenant",
@@ -74552,7 +74554,8 @@
    "postgres-analytical",
    "qdrant",
    "redis"
-  ]
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the job's proposals"
  },
  "getWalletMovementSummary": {
   "contract": "wallet",
