@@ -1,0 +1,38 @@
+id: CHG-FXP-001
+date: '2026-10-04'
+source: audit
+kind: plan
+proposed: '2026-10-04'
+summary: A screen split across a setup ticket and a rest-of-the-screen ticket names, on each, exactly the operations it
+  builds and the ticket that builds the others, and its done-when tests that part.
+decision:
+  what: 'build-service-docs.py writes a "Scope:" sentence on every APP-SETUP-<screen> and APP-SETUP-<screen>-REST task
+    whose screen has more operations than its part ("Scope: decideAiInsight and updateCampaign, 2 of BO-772''s 6
+    operations; the other 4 (...) are APP-SETUP-BO-772-REST"); ticket_done.done_when says "calls only the operations its
+    scope names" for such a task; op-release.py carries the sentence into the pointer (**Scope:**). The links were
+    already scoped by adam-links.py (CHG-RONEP-003); the judge''s local packer was not, and is fixed outside the repo
+    (audit/kit/pack-local.py now links through tools/adam-links.py).'
+  by: Chinmay
+  date: '2026-10-04'
+why: 'Sprint 1-2 judging of 4 October (finding kind rest-scope, plan.tsv): APP-SETUP-BO-857-REST, BO-772, BO-772-REST
+  and ADM-506-REST were not buildable and ADM-037, BO-001, BO-010, BO-015, BO-075 and BO-344-REST guessed: the title said
+  "3 of its 7 operations", the pull linked all seven and "calls only its bound operations" could not be tested. Follows
+  CHG-RONEP-003 and CHG-TBF-005.'
+keys_touched:
+  tickets: [APP-SETUP-BO-857-REST, APP-SETUP-BO-772, APP-SETUP-BO-772-REST, APP-SETUP-ADM-506-REST, APP-SETUP-ADM-037,
+    APP-SETUP-BO-001, APP-SETUP-BO-010, APP-SETUP-BO-015, APP-SETUP-BO-075, APP-SETUP-BO-344-REST]
+  files: [tools/build-service-docs.py, tools/ticket_done.py, tools/op-release.py, tools/check-ticket-builds.py]
+root_class: A14 TICKET-LINKS
+tickets:
+  started: []
+  unstarted: [APP-SETUP-BO-857-REST, APP-SETUP-BO-772, APP-SETUP-BO-772-REST, APP-SETUP-ADM-506-REST]
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ticket-builds.py
+status: closed
+closed_by_commit: 611e02c9
+notes: 'check-ticket-builds B-SCOPE-NAMED: every split screen''s ticket has a Scope naming as many operations as its
+  title and the right sibling. 234 setup and rest tickets carry one after the derive.'

@@ -1,0 +1,40 @@
+id: CHG-FXP-004
+date: '2026-10-04'
+source: audit
+kind: plan
+proposed: '2026-10-04'
+summary: The build of a screen whose spec says a person must define it waits for the definition; a screen nobody can
+  define yet leaves the plan by name.
+decision:
+  what: 'ticket_done.define_needed reads the gap "it needs a person before it is built". Every task that builds such a
+    screen gets notBefore DEFINE_DAY (working day 5, Monday 12 October) and the line "Waits for its definition: ... no
+    earlier than 12 October 2026; until then build nothing from the default layout", which the pointer carries. The
+    screens agent defines what it can in this round (its definitions drop the gap and the wait); the four it could not
+    (BO-822, BO-1069, BO-1072, ADM-408) are in block-a-extra-tasks.json `screensNotBuilt` (kind undefined) and leave the
+    plan until defined. Defaults taken (Needs Chinmay): the lead owns the definitions, due by 12 October.'
+  by: Chinmay
+  date: '2026-10-04'
+why: 'Sprint 1-2 judging of 4 October (finding on APP-SETUP-ADM-506-REST, CHG-FXP-001): it was not buildable (a table with no operation and sample
+  values for columns), and the lead''s brief for the fix round: "the generator plans screens whose spec says a person must
+  define them; make it respect that flag". Ledger lines from the screens agent ([screens -> plan] VM-BO-822, VM-BO-1069,
+  VM-BO-1072, APP-CONSOLE-ADM-408: not definable, move out).'
+keys_touched:
+  screens: [ADM-506, BO-822, BO-1069, BO-1072, ADM-408]
+  tickets: [APP-SETUP-ADM-506-REST, VM-BO-822, VM-BO-1069, VM-BO-1072, APP-CONSOLE-ADM-408]
+  files: [tools/ticket_done.py, tools/build-service-docs.py, tools/op-release.py, docs/active/block-a-extra-tasks.json,
+    tools/check-ticket-builds.py]
+root_class: A30 SCREEN-GENERATED
+tickets:
+  started: []
+  unstarted: [APP-SETUP-ADM-506-REST, VM-BO-822, VM-BO-1069, VM-BO-1072, APP-CONSOLE-ADM-408]
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ticket-builds.py
+status: closed
+closed_by_commit: 611e02c9
+notes: 'check-ticket-builds B-DEFINE-WAIT fails a Block A or A2 build of such a screen without the wait. On main''s
+  screens 57 Block A tasks carried the flag (28 setup screens, 28 rest, ADM-424); the number after the screens agent''s
+  merge is what the refresh shows. ADM-506 itself has no needs-a-person gap: asked of the screens agent to bind or flag it.'
