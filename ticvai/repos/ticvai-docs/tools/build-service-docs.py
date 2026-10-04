@@ -2182,12 +2182,52 @@ def main() -> int:
              pts=pts, area=area)
         am_of[key] = k
     # **The AI engine beyond Block A** (docs/active/ai-functions-review-30-september.json): each capability is an
-    # app-module of its own, its AI-engineer weeks cut into tasks of at most one sprint (ten engineer-days, no
-    # points: the AI engineers' capacity is separate) and its extra back-end weeks into tasks of at most 8 points.
-    # The review's sprint for a capability (its own three-week sprints) orders the AI engineers' queue but does not
-    # hold them idle (as the plan of 30 September); for its back-end weeks it is the earliest they start. A
+    # app-module of its own; its extra back-end weeks (the review's `backendWeeksExtra`) are cut into tasks of at most 8
+    # points, and the review's sprint for a capability (its own three-week sprints) is the earliest they start. A
     # capability the review puts in Block A (the planner agent, translations) is Block A's AI-ENGINE tasks already.
+    # **Phase 1 by 2 April, phase 2 after** (Chinmay, 4 October, CHG-AIPH-001; docs/active/ai-phase-plan.json): the
+    # AI-engineer weeks are no longer cut into "n of N" chunks of ten days with one description. Each is one task per
+    # completable unit, with its build items, AI-days, dependencies and done-when. Phase 1 (what works on day one:
+    # rules, priors, the LLM over the venue's own data) goes to the AI engineer the file names, in benefit order; its
+    # module test also waits on the owner-side operations and the screens it needs (`needs`, resolved below), so the
+    # unit is complete when the test passes. Phase 2 (what learns from tenant data) starts after 2 April, has no owner
+    # and is not ticketed. A capability the phase plan does not list keeps the old chunks (none at present).
     later_ai = []
+    ai_phase = {"modules": []}
+    ai_unit = {}                  # task key -> its unit in ai-phase-plan.json
+    ai_phase2 = set()             # phase 2 keys: app-modules and tasks, never ticketed for r1
+    ai_needs = {}                 # app-module -> the operations, screens and tasks its module test also waits on
+    ai_cut_day = sp.index_of(sp.PLAN_END) + 1
+    phase_file = ROOT / "docs" / "active" / "ai-phase-plan.json"
+    if phase_file.exists():
+        ai_phase = json.loads(phase_file.read_text(encoding="utf-8"))
+    phase_mods = defaultdict(list)
+    for m_ in ai_phase.get("modules") or []:
+        phase_mods[m_["capability"]].append(m_)
+
+    def ai_unit_text(m_, u_):
+        items = "; ".join(f"({i + 1}) {x['text']}" for i, x in enumerate(u_["items"]))
+        weeks = sum(float(x.get("aiWeeks") or 0) for x in u_["items"])
+        need = u_.get("needs") or {}
+        need_txt = "; ".join(x for x in (
+            ("operations " + ", ".join(need.get("operations") or [])) if need.get("operations") else "",
+            ("screens " + ", ".join(need.get("screens") or [])) if need.get("screens") else "",
+            ("tasks " + ", ".join(need.get("tasks") or [])) if need.get("tasks") else "") if x)
+        if m_["phase"] == 1:
+            lead = (f"Phase 1 of the AI engine (by 2 April 2027; Chinmay, 4 October, CHG-AIPH-001), benefit rank "
+                    f"{u_['rank']}" + (" (Block B, already assigned)" if not u_["rank"] else "") + ". ")
+        else:
+            lead = ("Phase 2 of the AI engine (after 2 April 2027; Chinmay, 4 October, CHG-AIPH-001): it learns from "
+                    "tenant data, which no tenant has before go-live; not ticketed for r1. ")
+        return (lead + f"{u_['subject']}. Build items: {items}. AI-days: {float(u_['days']):g} ({weeks:g} AI-weeks x 5). "
+                + f"Waits on: {', '.join(u_.get('dependsOn') or ['AI-ENGINE-GATEWAY'])}. "
+                + (f"Back end and owner side: {u_['backEndNote']}. " if u_.get("backEndNote") else "")
+                + (f"Its module test also waits on what it cannot be accepted without: {need_txt}. " if need_txt else "")
+                + f"Why: {u_['why']} "
+                + f"Done when {u_['doneWhen']}; it answers through the AI gateway with the scrubber and the guard on, its "
+                "evaluation set passes the gate of docs/architecture/ai-system-design.md 3.5, it degrades as 3.7 says "
+                "when its provider is down, and a peer AI engineer has reviewed it.")
+
     rev = ROOT / "docs" / "active" / "ai-functions-review-30-september.json"
     if rev.exists():
         for c in json.loads(rev.read_text(encoding="utf-8")).get("capabilities") or []:
@@ -2198,22 +2238,59 @@ def main() -> int:
             m_ = re.search(r"S(\d)", str(c.get("sprint") or ""))
             nb = sp.index_of(sp.START + dt.timedelta(days=21 * (int(m_.group(1)) - 1))) if m_ else 0
             short = re.split(r" \(|,", c["name"])[0].strip()[:48]
-            k = add_am("AI & Intelligence", "AI", None, 1, variant=cid, key=f"AM-AI-ENGINE-{cid}",
-                       name=f"AI engine · {short}", order=(4, sp.MODULES.index("AI & Intelligence"), 98, 0, nb))
-            days = float(b_.get("aiEngineerWeeksTotal") or 0) * 5
-            n_ = 0
-            while days > 1e-6:
-                d_ = min(10.0, days)
-                n_ += 1
-                tk = f"AI-ENGINE-{cid}-{n_}"
-                task(tk, k, "Task", f"AI engine: {short} ({n_} of {math.ceil(float(b_.get('aiEngineerWeeksTotal') or 0) * 5 / 10)})",
-                     f"{c['name']}. " + " ".join(f"- {x}" for x in (b_.get("items") or [])[:6]) +
-                     " Sized by the AI review in engineer-weeks; built by the two AI engineers, baseline first, learning "
-                     "per tenant (ADR-0051, ADR-0059).", 3, area="ai", depends=["AI-ENGINE-GATEWAY"])
-                by_key[tk]["days"] = d_
-                later_ai.append(tk)
-                am_of[tk] = k
-                days -= d_
+            mods = phase_mods.get(str(c.get("id") or ""))
+            if mods:
+                for pm in mods:
+                    p2 = pm["phase"] == 2
+                    rank0 = min(u_["rank"] for u_ in pm["units"])
+                    k = add_am("AI & Intelligence", "AI", None, 1, variant=cid, key=pm["key"],
+                               name=pm.get("name") or f"AI engine · {short}" + (" (phase 2, after 2 April)" if p2 else ""),
+                               order=(4, sp.MODULES.index("AI & Intelligence"), 98, 0,
+                                      pm.get("order", (100 if p2 else 0) + rank0)))
+                    if p2:
+                        ai_phase2.add(k)
+                    ai_needs[k] = {"operations": [], "screens": [], "tasks": []}
+                    for u_ in pm["units"]:
+                        tk = u_["key"]
+                        task(tk, k, "Task", f"AI engine: {u_['subject']}" + (" (phase 2, after 2 April)" if p2 else ""),
+                             ai_unit_text(pm, u_), 3, area="ai", assignee="" if p2 else u_.get("assignee") or "",
+                             depends=u_.get("dependsOn") or ["AI-ENGINE-GATEWAY"])
+                        by_key[tk]["days"] = float(u_["days"])
+                        if p2:
+                            by_key[tk]["notBefore"] = ai_cut_day
+                            ai_phase2.add(tk)
+                        ai_unit[tk] = dict(u_, phase=pm["phase"], module=k)
+                        later_ai.append(tk)
+                        am_of[tk] = k
+                        for kind_ in ("operations", "screens", "tasks"):
+                            ai_needs[k][kind_] += [x for x in (u_.get("needs") or {}).get(kind_) or []
+                                                   if x not in ai_needs[k][kind_]]
+                # the review's back-end weeks go with the capability's phase 1 app-module, unless the phase plan says
+                # they are built elsewhere already (`reviewBackEnd: false`, its doubleCount)
+                be_mod = next((pm for pm in mods if pm["phase"] == 1 and pm.get("reviewBackEnd", True)), None) \
+                    or next((pm for pm in mods if pm.get("reviewBackEnd", True)), None)
+                if not be_mod:
+                    continue
+                k = be_mod["key"]
+                be_note = f" {be_mod['backEndNote']}." if be_mod.get("backEndNote") else ""
+            else:
+                be_note = ""
+                k = add_am("AI & Intelligence", "AI", None, 1, variant=cid, key=f"AM-AI-ENGINE-{cid}",
+                           name=f"AI engine · {short}", order=(4, sp.MODULES.index("AI & Intelligence"), 98, 0, nb))
+                days = float(b_.get("aiEngineerWeeksTotal") or 0) * 5
+                n_ = 0
+                while days > 1e-6:
+                    d_ = min(10.0, days)
+                    n_ += 1
+                    tk = f"AI-ENGINE-{cid}-{n_}"
+                    task(tk, k, "Task", f"AI engine: {short} ({n_} of {math.ceil(float(b_.get('aiEngineerWeeksTotal') or 0) * 5 / 10)})",
+                         f"{c['name']}. " + " ".join(f"- {x}" for x in (b_.get("items") or [])[:6]) +
+                         " Sized by the AI review in engineer-weeks; built by the two AI engineers, baseline first, learning "
+                         "per tenant (ADR-0051, ADR-0059).", 3, area="ai", depends=["AI-ENGINE-GATEWAY"])
+                    by_key[tk]["days"] = d_
+                    later_ai.append(tk)
+                    am_of[tk] = k
+                    days -= d_
             pts_be = float(b_.get("backendWeeksExtra") or 0) * 48
             n_ = 0
             while pts_be > 1e-6:
@@ -2223,7 +2300,7 @@ def main() -> int:
                 task(tk, k, "Task", f"AI back end: {short} (part {n_})",
                      f"The back-end work the AI review names for {c['name']} beyond the AI engineers' own "
                      "(validate-only tool operations, semantic-spec compile, historical import). Additive to AiService "
-                     "and the owning services; their owners review.", 3, service="AiService", pts=p_, area="backend",
+                     "and the owning services; their owners review." + be_note, 3, service="AiService", pts=p_, area="backend",
                      depends=["PLATFORM-KERNEL"])
                 by_key[tk]["notBefore"] = nb
                 am_of[tk] = k
@@ -2748,6 +2825,39 @@ def main() -> int:
     def is_ai_engine(k):
         return am_info[k]["platform"] == "AI" and k not in A_AI
 
+    # **What a phase 1 AI unit cannot be accepted without** (CHG-AIPH-001): ai-phase-plan.json `needs` names operations,
+    # screens and tasks; each resolves to the leaf tasks that build it (an operation's back-end task, a screen's tasks,
+    # its setup and rest-of-the-screen parts included), and the unit's module test waits on them.
+    leaf_keys = {t_["key"] for t_ in leaf}
+    op_builders = defaultdict(set)
+    for k_, os_ in ops_of.items():
+        for o in os_:
+            if k_ in leaf_keys:
+                op_builders[o].add(k_)
+    ai_need_missing = defaultdict(list)
+
+    def ai_need_keys(k):
+        need = ai_needs.get(k) or {}
+        out = set()
+        for o in need.get("operations") or []:
+            if op_builders.get(o):
+                out |= op_builders[o]
+            else:
+                ai_need_missing[k].append(f"operation {o}")
+        for s_ in need.get("screens") or []:
+            hit = {x for x in leaf_keys if re.search(rf"(?:^|-){re.escape(s_)}(?:-REST)?$", x)
+                   and not x.startswith("TEST-")}
+            if hit:
+                out |= hit
+            else:
+                ai_need_missing[k].append(f"screen {s_}")
+        for x in need.get("tasks") or []:
+            if x in leaf_keys:
+                out.add(x)
+            else:
+                ai_need_missing[k].append(f"task {x}")
+        return sorted(out - {x["key"] for x in am_tasks.get(k, ())})
+
     for k, ch in sorted(am_tasks.items()):
         pts = sum(int(x["points"] or 0) for x in ch)
         days = sum(float(x.get("days") or days_ex.get(x["key"]) or 0) for x in ch)
@@ -2782,7 +2892,7 @@ def main() -> int:
              + (f", {days:g} AI-engineer days" if days else "") + ".",
              min((int(x["wave"]) for x in ch if str(x["wave"]).isdigit()), default=3), area="test",
              pts=max(tests["minPoints"], round(tests["share"] * pts)) if pts else "",
-             depends=[x["key"] for x in ch])
+             depends=[x["key"] for x in ch] + ai_need_keys(k))
         t_ = by_key[tk]
         t_["track"], t_["subject"] = "Test", f"[Test] Module test: {a['name']}"
         t_["phase"] = 1 if is_a else 2
@@ -2794,7 +2904,9 @@ def main() -> int:
         elif not pts:
             t_["days"] = max(1.0, round(tests["share"] * days, 1))
         t_["tier"] = 0
-        step[tk] = 1 + max((step.get(x["key"], 0) for x in ch), default=0)
+        step[tk] = 1 + max((step.get(x, 0) for x in t_["dependsOn"].split()), default=0)
+        if k in ai_phase2:
+            ai_phase2.add(tk)
         am_of[tk] = k
         leaf.append(t_)
         later_set.add(tk) if not is_a else a_keys.add(tk)
@@ -2837,8 +2949,13 @@ def main() -> int:
         a_ = am_info[am_of[t_["key"]]]
         if t_["track"] == "Test" and t_.get("pool") == "ai":
             # an AI engine module test is placed after every AI engine task of its block, so the peer engineer
-            # finishes their own block's work (the evaluation harness) before testing the other's (CHG-RONEP-010)
-            return (BRANK[a_["block"]], (8, 99, 99, 9, 99), (9, 0), 9, step[t_["key"]], 6, t_["key"])
+            # finishes their own block's work (the evaluation harness) before testing the other's (CHG-RONEP-010).
+            # A phase 1 unit's test in a block not ticketed yet also waits on its back end and screens (CHG-AIPH-001):
+            # it goes after every AI engine unit, so a one-day test placed early cannot split the gap a long unit needs
+            # (the configuration assistant's 25 days waited behind lower-ranked units until it did).
+            late_ = am_of[t_["key"]] in ai_needs and a_["block"] not in settings["ticketBlocks"]
+            return (len(sp.BLOCKS) if late_ else BRANK[a_["block"]], (8, 99, 99, 9, 99), (9, 0), 9, step[t_["key"]], 6,
+                    t_["key"])
         return (BRANK[a_["block"]], a_["order"], (t_["tier"], -ai_waiters.get(t_["key"], 0)), int(t_["wave"] or 9),
                 step[t_["key"]], TRACK_ORDER[t_["track"]], t_["key"])
 
@@ -3073,13 +3190,53 @@ def main() -> int:
     # **The AI engine past 2 April** (Chinmay, 1 October): every task is created, and those the two AI engineers
     # cannot finish by the end of the six months stay unassigned for the AI developers joining later.
     ai_cut = sp.index_of(sp.PLAN_END) + 1
-    ai_open = [t_ for t_ in leaf if t_["area"] == "ai" and t_["key"] not in kmap
+    # A phase 2 unit (CHG-AIPH-001) is past 2 April by its notBefore and has no owner by design; its text says so.
+    for t_ in leaf:
+        if t_["key"] in ai_phase2 and t_["area"] == "ai":
+            t_["assignee"] = ""
+    ai_open = [t_ for t_ in leaf if t_["area"] == "ai" and t_["key"] not in kmap and t_["key"] not in ai_phase2
                and (second.get(t_["key"]) or {}).get("end", 0) > ai_cut]
     for t_ in ai_open:
         t_["assignee"] = ""
         t_["description"] = (t_["description"].rstrip() + " Unassigned (1 October): past what the two AI engineers "
                              "finish by 2 April; for the AI developers joining.")
-    print(f"AI engine: {len(ai_open)} task(s) past 2 April left unassigned")
+    print(f"AI engine: {len(ai_open)} task(s) of phase 1 past 2 April left unassigned (should be none), "
+          f"{sum(1 for k in ai_phase2 if k in ai_unit)} phase 2 unit(s) after 2 April, unassigned and not ticketed")
+    # **The completion check of every phase 1 unit** (CHG-AIPH-001, "do not pick trails that we cannot complete"): the
+    # unit's own work, its module test and everything the test waits on (its back end, the owner-side operations,
+    # its screens) end by 2 April. Printed on every run; written into the unit's description.
+    ai_completion = {}
+
+    def fmt_day(i):
+        if i is None:
+            return "unscheduled"
+        d_ = sp.day(max(i - 1e-6, 0))
+        return f"{d_.strftime('%a')} {d_.day} {d_.strftime('%b %Y')}"
+
+    for tk, u_ in sorted(ai_unit.items(), key=lambda x: (x[1]["phase"], x[1]["rank"])):
+        if u_["phase"] != 1:
+            continue
+        test_k = f"TEST-{u_['module']}"
+        own = second.get(tk) or {}
+        tst = second.get(test_k) or {}
+        waits = [d for d in by_key[test_k]["dependsOn"].split() if d != tk] if test_k in by_key else []
+        last = max(waits, key=lambda d: (second.get(d) or {}).get("end", 0.0), default=None)
+        last_end = (second.get(last) or {}).get("end", 0.0) if last else 0.0
+        ok = own.get("end", 1e9) <= ai_cut + 1e-6 and tst.get("end", 1e9) <= ai_cut + 1e-6 and last_end <= ai_cut + 1e-6
+        ai_completion[tk] = {"start": own.get("start"), "end": own.get("end"), "test": test_k,
+                             "testEnd": tst.get("end"), "lastNeed": last, "lastNeedEnd": last_end, "ok": ok,
+                             "missing": ai_need_missing.get(u_["module"], [])}
+        print(f"  AI phase 1 #{u_['rank']} {tk} ({by_key[tk]['assignee'] or 'unassigned'}): "
+              f"{sp.day(own.get('start', 0)).isoformat()} to {sp.day(max(own.get('end', 0) - 1e-6, 0)).isoformat()}; "
+              f"its needs land by {sp.day(max(last_end - 1e-6, 0)).isoformat()} ({last}); module test ends "
+              f"{sp.day(max(tst.get('end', 0) - 1e-6, 0)).isoformat()} -> {'OK' if ok else 'PAST 2 APRIL'}"
+              + (f"; not found in the plan: {', '.join(ai_completion[tk]['missing'])}" if ai_completion[tk]["missing"] else ""))
+        if not ok:
+            print(f"WARNING: AI phase 1 unit {tk} does not complete by 2 April: move a dependency or the unit to phase 2")
+        by_key[tk]["description"] = by_key[tk]["description"].replace(
+            "Done when ", f"Completion check (derived): its work ends {fmt_day(own.get('end'))}, what its module test "
+            f"waits on lands by {fmt_day(last_end)}, the module test ends {fmt_day(tst.get('end'))}"
+            f"{', inside the six months' if ok else ', PAST 2 April'}. Done when ", 1)
     queue_n = defaultdict(int)
     for t_ in tasks:
         if t_["type"] == "Task" and t_["assignee"]:
@@ -3154,7 +3311,10 @@ def main() -> int:
             f"{when}. "
             f"Scope: {len(scr)} screens, {len(opl)} operations, {len(tbl)} tables, {pts} points"
             + (f", {sum(float(x.get('days') or 0) for x in ch):g} AI-engineer days" if any(x.get('days') for x in ch) else "")
-            + "." + ("" if ticketed else f" Block {a['block']} is ticketed at this level until it is planned; its "
+            + "." + ("" if ticketed else
+                     f" Phase 2 of the AI engine (after 2 April 2027; Chinmay, 4 October, CHG-AIPH-001): not ticketed for "
+                     f"r1, and its {len(ch)} tasks are in plan-tasks.csv with the keys they will have." if t_["key"] in ai_phase2
+                     else f" Block {a['block']} is ticketed at this level until it is planned; its "
                      f"{len(ch)} tasks are in plan-tasks.csv with the keys they will have.")
             + " Builds: " + ", ".join(builds) + "."
             # Last, so the pointer's done-when (ticket_done.done_when reads "Done when" to the end) is this sentence
@@ -3229,6 +3389,8 @@ def main() -> int:
     ticket_blocks = set(settings["ticketBlocks"])
     for t_ in tasks:
         t_["ticketed"] = "yes" if (t_["type"] != "Task" or t_["block"] in ticket_blocks or t_["key"] in kmap) else "no"
+        if t_["key"] in ai_phase2 and t_["key"] not in kmap:
+            t_["ticketed"] = "no"            # phase 2 of the AI engine, its app-modules too (CHG-AIPH-001)
         t_["sprint"] = (sp.sprint_of_index(sched_of[t_["key"]]["start"]) if t_["key"] in sched_of else "")
     # A follows link exists only between two tickets: a ticketed task keeps, in tasks.csv, its waits on ticketed
     # tasks; its waits on work of a block not ticketed yet are in plan-tasks.csv and become links when it is.

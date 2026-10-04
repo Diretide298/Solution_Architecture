@@ -513,6 +513,22 @@
    ]
   },
   {
+   "key": "AI-ENGINE-VENUE-MAP-PROPOSALS",
+   "epic": "AI-ENGINE",
+   "assignee": "Kalpita Mejari",
+   "days": 2.5,
+   "subject": "Venue-map proposals: walkways from a raster plan and labels for extracted shapes",
+   "detail": "In ticvai-ai: the AI side of proposeWalkways and proposeVenueLabels for the venue-map import that ships in r1 (CHG-RONEC-001; BO-093 Map Import & Labelling, BO-094; ADR-0069; Chinmay, 4 October, CHG-AIPH-002). The operations' endpoints and their writes are the back-end tasks SVC-AI-AI-3 (proposeWalkways) and SVC-AI-AI-1 (proposeVenueLabels); this task is the model work behind them. Walkways: only for a raster plan (a scan, a photograph, an illustrated map, a scanned PDF read through the OCR step), where there is no geometry to subtract; where the import found hand-marked paths (VenueMapImportJob.handMarkedPaths) the proposal follows the marks, one segment per marked stretch between junctions with basis handMarked and a confidence for how cleanly the stroke was traced, a gap in a mark proposed as two segments and never bridged; otherwise basis auto or seen, with a confidence per segment, low-confidence segments shown and never filtered out. Labels: read the shapes venue-map.importVenueGeometry already extracted (never the drawing itself) and propose what each one is (kind and name), using scanned text near a shape as a hint (ocrHint says which text was used); text alone never creates a point or raises a proposal above what the shape supports. Both write ai.proposed_action through the gateway's decision point and stop: nothing is a path or a label until an operator accepts it, segment by segment (venue-map.acceptWalkwayProposals) and proposal by proposal (acceptVenueLabelProposals), on BO-093. The proposals are scrubbed and guarded like every call (AI-ENGINE-SCRUB-GUARD) and read only the tenant's own map and knowledge collection (ADR-0020; the label proposals read the venue's Qdrant collection, AI-ENGINE-QDRANT). An evaluation set of TICVAI's own drawings (raster plans with and without hand marks, CAD exports with labelled and unlabelled layers, Arabic and English text) joins the harness (AI-ENGINE-EVAL). With the provider down the import still completes: no proposals are raised and BO-093 says the AI proposals are unavailable, never an empty network presented as complete. About 2.5 engineer-days. Done when: a raster plan with hand-marked paths gets one proposed segment per marked stretch with basis handMarked and its confidence, and a gap stays a gap; a raster plan without marks gets segments with a confidence each, the low ones shown; extracted shapes get kind and name proposals that cite their ocrHint where they used scanned text; nothing is applied until an operator accepts it, segment by segment and proposal by proposal, on BO-093; it answers through the AI gateway with the scrubber and the guard on, its evaluation set passes the gate of docs/architecture/ai-system-design.md 3.5, it degrades as 3.7 says when its provider is down, and a peer AI engineer has reviewed it.",
+   "depends": [
+    "AI-ENGINE-GATEWAY",
+    "AI-ENGINE-QDRANT"
+   ],
+   "builds": [
+    "table ai.proposed_action",
+    "adr ADR-0069"
+   ]
+  },
+  {
    "key": "AI-ENGINE-PLANNER",
    "epic": "AI-ENGINE",
    "assignee": "Kalpita Mejari",

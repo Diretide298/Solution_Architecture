@@ -1,0 +1,62 @@
+id: CHG-AIPH-002
+date: '2026-10-04'
+source: plan
+kind: plan
+summary: The AI side of proposeWalkways and proposeVenueLabels gets its Block A task (AI-ENGINE-VENUE-MAP-PROPOSALS, 2.5
+  days, Kalpita, 13-17 November) and approval scoring moves into her phase 1 buffer; the duplicate historical import back
+  end is measured and kept, because dropping it moves 17 Block A tasks by more than a working day.
+decision:
+  what: 'docs/active/block-a-extra-tasks.json gains AI-ENGINE-VENUE-MAP-PROPOSALS (epic AI-ENGINE, app-module "AI engine ·
+    Block A: gateway and guest AI", Kalpita Mejari, 2.5 engineer-days, waits on AI-ENGINE-GATEWAY and AI-ENGINE-QDRANT,
+    builds table ai.proposed_action and ADR-0069): the model work behind proposeWalkways (raster plans only; hand-marked
+    paths followed, one segment per marked stretch, a gap kept a gap, a confidence per segment and low ones shown) and
+    proposeVenueLabels (kind and name for shapes importVenueGeometry extracted, ocrHint for scanned text), proposing into
+    ai.proposed_action and stopping, accepted segment by segment and proposal by proposal on BO-093, with the full AI
+    done-when (gateway, scrubber and guard, evaluation set, degradation, peer review). The back-end tasks SVC-AI-AI-1 and
+    SVC-AI-AI-3 stay. It runs 13 to 17 November, the slot AI-ENGINE-APPROVAL-SCORING had; approval scoring now runs 8 to
+    15 March in Kalpita''s phase 1 buffer, its module test ending 16 March. Block A shift (against 08354886): three AI tasks
+    move 0.3 of a working day, because the module test of "AI engine · Block A: gateway and guest AI" now also tests the
+    new task (3.1 to 3.4 days): TEST-AM-AI-ENGINE-A ends 23 Nov as before (0.3 day later in the day), AI-ENGINE-SUGGESTIONS
+    (A2) and TEST-AM-AI-ENGINE-A2 start 0.3 day later (the A2 test ends 10 Dec instead of 9 Dec); no other Block A or A2
+    task, no owner and no developer task moves. AI-BE-SHARED-BASELINE-THEN-LEARN-1..9: dropping them was measured first
+    and moves 17 Block A tasks by more than one working day (up to 5.2: SVC-REPORTING-NATURALLANGUAGE-2,
+    SVC-REPORTING-REPORTING-6, SVC-VENUEOPS-GAMES-1 and others; 12 owner changes), because the plan''s pace is the average
+    points of every non-AI task; by Chinmay''s rule they are not dropped and the list went back to him. All 11 phase 1
+    units still complete by 23 March. Load after A2: Kalpita 64.8 of 77.7 days (12.9 free, 17%), the second AI engineer
+    68.8 of 79.3 (10.5 free, 13%); together 15%.'
+  by: Chinmay
+  date: '2026-10-04'
+proposed: '2026-10-04T05:00'
+why: 'Chinmay, 4 October 2026 (docs/active/decisions/answers-4-october-ai-phases.md, "Block A AI items from the phase
+  split"): "add a ~2.5-day Block A AI task for the AI side of proposeWalkways/proposeVenueLabels (venue maps ship in r1,
+  CHG-RONEC-001) in Kalpita''s 13-17 Nov gap; approval scoring moves into her phase 1 buffer", because no AI-engineer task
+  built the AI side; and "drop now ... Measure the Block A date shift first: if any Block A task moves more than one
+  working day, stop and report". Found by CHG-AIPH-001.'
+keys_touched:
+  tickets: [AI-ENGINE-VENUE-MAP-PROPOSALS, AI-ENGINE-APPROVAL-SCORING, TEST-AM-AI-ENGINE-A, TEST-AM-AI-ENGINE-A2,
+    AI-ENGINE-SUGGESTIONS]
+  operations: [proposeWalkways, proposeVenueLabels]
+  screens: [BO-093, BO-094]
+  files: [docs/active/block-a-extra-tasks.json, docs/active/ai-phase-plan.json,
+    docs/active/decisions/answers-4-october-ai-phases.md, handoff/service-docs/plan-tasks.csv,
+    handoff/service-docs/tasks.csv, handoff/service-docs/block-a-schedule.json, handoff/service-docs/op-descriptions.json,
+    handoff/service-docs/TICKET-LINKS.md]
+root_class: 'new: block-scope-incomplete'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py::ai_unit_text
+status: closed
+closed_by_commit: 8c83a80a
+notes: 'Scoped derive only (build-service-docs, derive-block-a-schedule, op-descriptions, build-ticket-links,
+  derive-mirrors). Every task after build order #99 moves down one build-order number (the new row); the Block D epic''s
+  first sprint reads 7 again, as on main. Closing note (Chinmay, 4 October, after this entry closed): the 0.3-day shift
+  of TEST-AM-AI-ENGINE-A, AI-ENGINE-SUGGESTIONS and TEST-AM-AI-ENGINE-A2 is accepted; AI-BE-SHARED-BASELINE-THEN-LEARN-1..9
+  stay in the plan with their points, dates and owners and are marked in their descriptions (docs/active/ai-phase-plan.json
+  backEndNote) as duplicates of SVC-AI-FORECAST-2 and SVC-AI-FORECAST-3, to be closed as merged when those close; that
+  marking moved no task (0 schedule changes, Block A/A2 included).'

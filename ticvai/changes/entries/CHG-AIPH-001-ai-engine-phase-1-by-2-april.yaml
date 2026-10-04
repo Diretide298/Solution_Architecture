@@ -1,0 +1,78 @@
+id: CHG-AIPH-001
+date: '2026-10-04'
+source: plan
+kind: plan
+summary: The AI engine after Block A is planned as one task per completable unit, phase 1 (what works on day one) by 2
+  April 2027 on the two AI engineers in benefit order, phase 2 (what learns from tenant data) after it, unassigned and not
+  ticketed; the "n of N" chunks of the AI review's weeks are gone, and Block A is unchanged.
+decision:
+  what: 'docs/active/ai-phase-plan.json (new, authored) lists every unit: its build items and AI-weeks from the AI review
+    (1 AI-week = 5 days), AI-days, the AI engine tasks it waits on, what its module test also waits on (`needs`: the
+    owner-side operations and the screens), its done-when, why, and for phase 1 its engineer and benefit rank.
+    tools/build-service-docs.py makes one task per unit instead of ten-day chunks with one description, gives a phase 1
+    unit to the engineer named, makes its module test wait on its needs (resolved to the tasks that build them), places a
+    phase 1 test of an unticketed block after every AI unit so a one-day test cannot split the gap a long unit needs, and
+    prints and writes into each unit the completion check (its work, what its test waits on and the test, against 2
+    April). A phase 2 unit starts after 2 April (notBefore), has no owner and is not ticketed, nor is its app-module.
+    Phase 1, 117.5 AI-days with operational suggestions: configuration assistant (25 d, Kalpita, 18 Dec to 25 Jan),
+    seat-map and layout generation (10 d, second AI engineer, 17 to 31 Dec), fraud and risk scoring on rules (17.5 d,
+    second, 31 Dec to 27 Jan), recommendations runtime on rules and priors (17.5 d, Kalpita, 25 Jan to 18 Feb), analytics
+    assistant (15 d, second, 27 Jan to 17 Feb), forecast prior with coldStart (5 d, Kalpita, 9 to 16 Dec), operational
+    requirements (7.5 d, Kalpita, 22 Feb to 3 Mar), queue and wait time (2.5 d, Kalpita, 3 to 5 Mar), approval scoring
+    (2.5 d, Kalpita, 13 to 17 Nov in her free days), marketing playbooks (7.5 d, second, 22 Feb to 3 Mar), and operational
+    suggestions (7.5 d, second, Block B, unchanged dates). Every unit''s needs land by 9 February and every phase 1 module
+    test ends by 19 March; nothing moved to phase 2 for the completion rule and no dependency was moved. Load after A2:
+    Kalpita 66.8 days of 80.5 (13.7 free, 17%), the second AI engineer 66.8 of 79.6 including operational suggestions
+    (12.8 free, 16%). Phase 2, 107.5 AI-days after 2 April: the training, backtest and shadow job with the promotion rule
+    (15 d), the forecasting statistical engine (30 d) and learned producer (15 d), the fraud classifier (15 d) and
+    learning-to-rank (15 d), all in the shared app-module, and anomaly detection (12.5 d) and dynamic pricing suggestions
+    (5 d) in their own. Double count: the shared layer''s 40 days repeat AI-ENGINE-BASELINE (estimator and maturity 7.5 d,
+    venue profile 2.5 d, benchmark packs and calendar 7.5 d) and carry the feature pipeline the review counts in plan
+    (7.5 d); 15 days remain, phase 2. Seat-map labels and walkways (5 d) are Block A''s (CHG-RONEC-001). 30 AI-days are
+    dropped in all. Kept for Chinmay (each would move Block A dates through the pace model, which averages the points of
+    every non-AI task): AI-BE-SHARED-BASELINE-THEN-LEARN-1..9 (72 points, the historical import Block A builds in
+    SVC-AI-FORECAST-2 and -3), and the number of AI app-modules (14), which is why the learning units of forecasting,
+    fraud and recommendations sit in the shared phase 2 app-module. No Block A or A2 task, dependency, date or assignee
+    changed; no other task''s date or owner changed (only build-order numbers and the Block D epic''s first sprint).'
+  by: Chinmay
+  date: '2026-10-04'
+proposed: '2026-10-04T04:00'
+why: 'Chinmay, 4 October 2026 (docs/active/decisions/answers-4-october-ai-phases.md): "collect tasks that need data we can
+  do those phase 2. fit what we can till release and rest is phase 2 also pick most beneficial ones to prioritise first."
+  And: "do not pick trails that we cannot complete." Then: "do NOT change any Block A or A2 AI task ... or any Block A
+  dependency, dates or assignee." The plan of 1 October (CHG-RONEP-010 and before) cut the AI review''s weeks into ten-day
+  chunks with identical descriptions, so no ticket said what it built or when it was done; 15 were unassigned and a
+  capability could start before 2 April and finish after it (operational requirements, 31 March to 12 April). The configuration assistant is
+  the client''s first AI priority (MoM 14 Aug, CF-57).'
+keys_touched:
+  tickets: [AI-ENGINE-OPERATIONAL-SUGGESTIONS-1, AI-ENGINE-CONFIGURATION-ASSISTANT, AI-ENGINE-SEAT-MAP-LAYOUT,
+    AI-ENGINE-FRAUD-RISK-RULES, AI-ENGINE-RECOMMENDATIONS-RULES, AI-ENGINE-ANALYTICS-ASSISTANT, AI-ENGINE-FORECAST-PRIOR,
+    AI-ENGINE-OPERATIONAL-REQUIREMENTS, AI-ENGINE-QUEUE-WAIT-TIME, AI-ENGINE-APPROVAL-SCORING, AI-ENGINE-MARKETING-AI,
+    AI-ENGINE-TRAINING-PROMOTION, AI-ENGINE-FORECASTING-STATISTICAL, AI-ENGINE-FORECASTING-LEARNED,
+    AI-ENGINE-FRAUD-RISK-CLASSIFIER, AI-ENGINE-RECOMMENDATIONS-LTR, AI-ENGINE-ANOMALY-DETECTION,
+    AI-ENGINE-DYNAMIC-PRICING-AI, AI-BE-SHARED-BASELINE-THEN-LEARN-1]
+  files: [docs/active/ai-phase-plan.json, docs/active/decisions/answers-4-october-ai-phases.md,
+    tools/build-service-docs.py, handoff/service-docs/plan-tasks.csv, handoff/service-docs/tasks.csv,
+    handoff/service-docs/block-a-schedule.json, handoff/service-docs/op-descriptions.json,
+    handoff/service-docs/TICKET-LINKS.md]
+  other: ['retired keys (never pushed): AI-ENGINE-SHARED-BASELINE-THEN-LEARN-1..4, AI-ENGINE-CONFIGURATION-ASSISTANT-1..3,
+      AI-ENGINE-FORECASTING-1..5, AI-ENGINE-FRAUD-RISK-1..4, AI-ENGINE-OPERATIONAL-REQUIREMENTS-1, AI-ENGINE-QUEUE-WAIT-TIME-1,
+      AI-ENGINE-RECOMMENDATIONS-1..4, AI-ENGINE-ANOMALY-DETECTION-1..2, AI-ENGINE-SEAT-MAP-LAYOUT-1..2,
+      AI-ENGINE-ANALYTICS-ASSISTANT-1..2, AI-ENGINE-APPROVAL-SCORING-1, AI-ENGINE-DYNAMIC-PRICING-AI-1, AI-ENGINE-MARKETING-AI-1']
+root_class: 'new: block-scope-incomplete'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py::ai_unit_text
+status: closed
+closed_by_commit: 1caa2544
+notes: 'Branch r1-ai-phase from main 857986c1. Scoped derive only (build-service-docs, derive-block-a-schedule,
+  op-descriptions, build-ticket-links, derive-mirrors, build-changelog-index); the full refresh happens on main. Kept for
+  Chinmay: whether to drop AI-BE-SHARED-BASELINE-THEN-LEARN-1..9 (a Block A change through the pace model), and whether
+  AI-ENGINE-OPERATIONAL-SUGGESTIONS-1 (7.5 d) also repeats part of AI-ENGINE-SUGGESTIONS (A2, 8 d): the review gives the
+  capability 1.5 AI-weeks in all, one of them for the Block A kinds.'
