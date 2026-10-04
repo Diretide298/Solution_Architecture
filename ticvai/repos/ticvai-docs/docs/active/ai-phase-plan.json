@@ -769,7 +769,7 @@
       ],
       "order": -1,
       "name": "AI engine · Phase 2: learning from tenant data (training and promotion, forecasting, fraud classifier, learning-to-rank)",
-      "backEndNote": "AI-BE-SHARED-BASELINE-THEN-LEARN-1..9 (the review's 1.5 back-end weeks for the historical import) stay where the plan had them, although importVenueHistory, getVenueHistoryImport and listVenueHistoryImports are built in Block A (SVC-AI-FORECAST-2, SVC-AI-FORECAST-3). Chinmay decided to drop them if no Block A task moved more than one working day (4 October, CHG-AIPH-002); measured, dropping their 72 points changes the plan's average task size, which sets every developer's pace, and moves 17 Block A tasks by more than a day (up to 5.2, 12 owner changes), so they are kept and the list went back to Chinmay"
+      "backEndNote": "Duplicate of SVC-AI-FORECAST-2 and SVC-AI-FORECAST-3 (Block A), which build importVenueHistory, getVenueHistoryImport and listVenueHistoryImports: do not build it again; close this ticket as merged when those two close (Chinmay, 4 October, CHG-AIPH-002). It stays in the plan with its points, dates and owner because dropping its 72 points changes the plan's average task size, which sets every developer's pace, and moves 17 Block A tasks by more than a working day. Done when SVC-AI-FORECAST-2 and SVC-AI-FORECAST-3 are done and this ticket is closed as merged into them, with no code of its own"
     },
     {
       "key": "AM-AI-ENGINE-ANOMALY-DETECTION",
@@ -865,6 +865,6 @@
     "AI-ENGINE-APPROVAL-SCORING-1": "AI-ENGINE-APPROVAL-SCORING",
     "AI-ENGINE-DYNAMIC-PRICING-AI-1": "AI-ENGINE-DYNAMIC-PRICING-AI",
     "AI-ENGINE-MARKETING-AI-1": "AI-ENGINE-MARKETING-AI",
-    "AI-BE-SHARED-BASELINE-THEN-LEARN-1..9": "kept unchanged: a double count of Block A's SVC-AI-FORECAST-2/3, but dropping it moves 17 Block A tasks by more than one working day (CHG-AIPH-002)"
+    "AI-BE-SHARED-BASELINE-THEN-LEARN-1..9": "kept and marked a duplicate of SVC-AI-FORECAST-2/3, to be closed as merged when those close (dropping it moves 17 Block A tasks by more than one working day; CHG-AIPH-002)"
   }
 }
