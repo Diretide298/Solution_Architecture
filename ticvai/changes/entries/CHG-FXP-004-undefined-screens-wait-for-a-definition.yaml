@@ -11,7 +11,8 @@ decision:
     earlier than 12 October 2026; until then build nothing from the default layout", which the pointer carries. The
     screens agent defines what it can in this round (its definitions drop the gap and the wait); the four it could not
     (BO-822, BO-1069, BO-1072, ADM-408) are in block-a-extra-tasks.json `screensNotBuilt` (kind undefined) and leave the
-    plan until defined. Defaults taken (Needs Chinmay): the lead owns the definitions, due by 12 October.'
+    plan until defined; for BO-1179, which the contracts agent could not define, only the rest of the screen leaves
+    (`"part": "rest"`), so its setup operation setApiClientStatus keeps its Block A host. Defaults taken (Needs Chinmay): the lead owns the definitions, due by 12 October.'
   by: Chinmay
   date: '2026-10-04'
 why: 'Sprint 1-2 judging of 4 October (finding on APP-SETUP-ADM-506-REST, CHG-FXP-001): it was not buildable (a table with no operation and sample
@@ -19,10 +20,10 @@ why: 'Sprint 1-2 judging of 4 October (finding on APP-SETUP-ADM-506-REST, CHG-FX
   define them; make it respect that flag". Ledger lines from the screens agent ([screens -> plan] VM-BO-822, VM-BO-1069,
   VM-BO-1072, APP-CONSOLE-ADM-408: not definable, move out).'
 keys_touched:
-  screens: [ADM-506, BO-822, BO-1069, BO-1072, ADM-408]
-  tickets: [APP-SETUP-ADM-506-REST, VM-BO-822, VM-BO-1069, VM-BO-1072, APP-CONSOLE-ADM-408]
+  screens: [ADM-506, BO-822, BO-1069, BO-1072, ADM-408, BO-1179]
+  tickets: [APP-SETUP-ADM-506-REST, VM-BO-822, VM-BO-1069, VM-BO-1072, APP-CONSOLE-ADM-408, APP-SETUP-BO-1179-REST]
   files: [tools/ticket_done.py, tools/build-service-docs.py, tools/op-release.py, docs/active/block-a-extra-tasks.json,
-    tools/check-ticket-builds.py]
+    tools/check-ticket-builds.py, tools/op-retire.py]
 root_class: A30 SCREEN-GENERATED
 tickets:
   started: []
@@ -34,7 +35,7 @@ prevention:
   type: check
   ref: tools/check-ticket-builds.py
 status: closed
-closed_by_commit: 611e02c9
+closed_by_commit: 87df95aa
 notes: 'check-ticket-builds B-DEFINE-WAIT fails a Block A or A2 build of such a screen without the wait. On main''s
   screens 57 Block A tasks carried the flag (28 setup screens, 28 rest, ADM-424); the number after the screens agent''s
   merge is what the refresh shows. ADM-506 itself has no needs-a-person gap: asked of the screens agent to bind or flag it.'
