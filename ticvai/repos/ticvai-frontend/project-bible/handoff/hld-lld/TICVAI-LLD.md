@@ -7,6 +7,8 @@
 > pre-production; the figures before it are Stage 2, the full cell
 > **Source of sizes:** the Terraform cell module (`repos/ticvai-infra/terraform/modules/cell`), `handoff/sizing.json`,
 > the decisions of 30 September and the ADRs of 1 October. The generator checks the Terraform before it writes.
+> **AWS:** the same cell, service for service, on AWS me-central-1 (UAE): [`TICVAI-LLD-AWS.md`](TICVAI-LLD-AWS.md) and
+> its own cost workbook (CHG-R3-001, 4 October 2026)
 
 ![TICVAI LLD](TICVAI-LLD.svg)
 

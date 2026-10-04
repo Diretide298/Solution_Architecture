@@ -50,7 +50,7 @@
  "hld": {
   "zones": [
    {
-    "label": "TICVAI AZURE CLOUD - UAE North (one cell per region)",
+    "label": "TICVAI CLOUD - Azure UAE North or AWS me-central-1 (one cell per region)",
     "x": 40,
     "y": 20,
     "w": 1160,
@@ -125,8 +125,8 @@
    },
    {
     "id": "redis",
-    "label": "Azure Managed Redis",
-    "sub": "sessions, budgets, 1 s cache",
+    "label": "Redis",
+    "sub": "Managed Redis / ElastiCache",
     "x": 270,
     "y": 310,
     "w": 180,
@@ -188,8 +188,8 @@
    },
    {
     "id": "waf",
-    "label": "Front Door + WAF",
-    "sub": "one entry, origin in UAE",
+    "label": "Edge + WAF",
+    "sub": "Front Door / CloudFront",
     "x": 780,
     "y": 60,
     "w": 170,
@@ -1182,6 +1182,636 @@
     "rule": "Not created"
    }
   ]
+ },
+ "lldAws": {
+  "date": "4 October 2026",
+  "region": "AWS me-central-1 (UAE), AZs a-c, VPC 10.20.0.0/16; DR OPEN (the dr box, outside the region)",
+  "nodes": [
+   {
+    "id": "users",
+    "label": "Users",
+    "lines": [
+     "B2C guests",
+     "B2B partners",
+     "Venue operators"
+    ],
+    "x": 30,
+    "y": 330,
+    "w": 150,
+    "h": 110
+   },
+   {
+    "id": "fd",
+    "label": "CloudFront + AWS WAF",
+    "lines": [
+     "WAF: OWASP core + bot rules,",
+     "rate rules per client IP",
+     "on-sale waiting-room page",
+     "TLS 1.2+, custom domains",
+     "VPC origin to the ALB"
+    ],
+    "x": 220,
+    "y": 310,
+    "w": 190,
+    "h": 140
+   },
+   {
+    "id": "ilb",
+    "label": "Ingress (internal ALB)",
+    "lines": [
+     "AWS Load Balancer Controller",
+     "Gateway API / Ingress",
+     "CloudFront VPC origin"
+    ],
+    "x": 470,
+    "y": 330,
+    "w": 170,
+    "h": 110
+   },
+   {
+    "id": "sys",
+    "label": "EKS system node group",
+    "lines": [
+     "m6i.xlarge, 2-4 nodes, AZs a-c",
+     "+ ingress controller pods"
+    ],
+    "x": 690,
+    "y": 145,
+    "w": 190,
+    "h": 70
+   },
+   {
+    "id": "wl",
+    "label": "EKS workload node group",
+    "lines": [
+     "m6i.2xlarge, 3-20 nodes, 3 AZs",
+     "floors: commerce 3, access 2,",
+     "operations 2, workers 2"
+    ],
+    "x": 690,
+    "y": 227,
+    "w": 190,
+    "h": 90
+   },
+   {
+    "id": "aip",
+    "label": "EKS AI GPU node group",
+    "lines": [
+     "g6.2xlarge x2 (L4), 1 an AZ",
+     "tainted; ticvai-ai 2/1/0,",
+     "BGE-M3, reranker, NER"
+    ],
+    "x": 690,
+    "y": 329,
+    "w": 190,
+    "h": 90
+   },
+   {
+    "id": "qdrant",
+    "label": "EKS qdrant node group",
+    "lines": [
+     "r6i.xlarge x3, one per AZ",
+     "Qdrant, replication 2, TLS"
+    ],
+    "x": 690,
+    "y": 431,
+    "w": 190,
+    "h": 72
+   },
+   {
+    "id": "broker",
+    "label": "EKS broker node group",
+    "lines": [
+     "m6i.large x3, while self-run;",
+     "managed option: Amazon MQ",
+     "for RabbitMQ, 3 nodes"
+    ],
+    "x": 690,
+    "y": 515,
+    "w": 190,
+    "h": 90
+   },
+   {
+    "id": "pg",
+    "label": "RDS for PostgreSQL 16",
+    "lines": [
+     "db.m6g.xlarge, Multi-AZ",
+     "on every production tier",
+     "control DB + DB per tenant",
+     "PITR 35 days, UAE only"
+    ],
+    "x": 950,
+    "y": 150,
+    "w": 220,
+    "h": 110
+   },
+   {
+    "id": "ro",
+    "label": "Read replicas x2",
+    "lines": [
+     "db.m6g.xlarge",
+     "gate checks never read here"
+    ],
+    "x": 950,
+    "y": 280,
+    "w": 220,
+    "h": 70
+   },
+   {
+    "id": "rpt",
+    "label": "Reporting + AI log DB",
+    "lines": [
+     "reporting replica (db.m6g.large)",
+     "AI log DB (db.m6g.xlarge, 1 TB)"
+    ],
+    "x": 950,
+    "y": 370,
+    "w": 220,
+    "h": 80
+   },
+   {
+    "id": "pe",
+    "label": "VPC endpoints + services",
+    "lines": [
+     "ElastiCache Valkey r7g.large x2",
+     "Secrets Manager, KMS",
+     "S3 (gateway endpoint)",
+     "ECR",
+     "Amazon MQ, if chosen"
+    ],
+    "x": 950,
+    "y": 470,
+    "w": 220,
+    "h": 125
+   },
+   {
+    "id": "bastion",
+    "label": "SSM Session Manager",
+    "lines": [
+     "admin access only",
+     "no SSH, no inbound port"
+    ],
+    "x": 470,
+    "y": 560,
+    "w": 170,
+    "h": 80
+   },
+   {
+    "id": "nat",
+    "label": "NAT Gateway x3",
+    "lines": [
+     "one per AZ, Elastic IPs;",
+     "the allow-listed egress"
+    ],
+    "x": 470,
+    "y": 700,
+    "w": 170,
+    "h": 80
+   },
+   {
+    "id": "extp",
+    "label": "External providers",
+    "lines": [
+     "Payments, e-invoicing",
+     "messaging, LLM providers"
+    ],
+    "x": 220,
+    "y": 700,
+    "w": 190,
+    "h": 80
+   },
+   {
+    "id": "ops",
+    "label": "Operations",
+    "lines": [
+     "CloudWatch, AWS Backup",
+     "GuardDuty, Security Hub",
+     "Inspector, IAM Identity Ctr"
+    ],
+    "x": 30,
+    "y": 560,
+    "w": 180,
+    "h": 100
+   },
+   {
+    "id": "dr",
+    "label": "DR: OPEN (not decided)",
+    "lines": [
+     "one AWS region in the UAE;",
+     "A in-region backups, B Bahrain",
+     "(not UAE), C other provider"
+    ],
+    "x": 950,
+    "y": 690,
+    "w": 230,
+    "h": 95
+   },
+   {
+    "id": "venue",
+    "label": "Venue site",
+    "lines": [
+     "POS, kiosks, KDS",
+     "venue edge node (offline)",
+     "turnstiles, handhelds on LAN"
+    ],
+    "x": 1250,
+    "y": 300,
+    "w": 190,
+    "h": 110
+   },
+   {
+    "id": "vpn",
+    "label": "Site-to-site VPN",
+    "lines": [
+     "dedicated tier: VGW or TGW;",
+     "others: Internet + mTLS"
+    ],
+    "x": 1250,
+    "y": 450,
+    "w": 190,
+    "h": 80
+   }
+  ],
+  "frames": {
+   "aks": {
+    "label": "EKS cluster",
+    "x": 670,
+    "y": 130,
+    "w": 230,
+    "h": 510
+   }
+  },
+  "links": [
+   {
+    "source": "users",
+    "target": "fd",
+    "type": "internet",
+    "via": null
+   },
+   {
+    "source": "fd",
+    "target": "ilb",
+    "type": "api",
+    "via": null
+   },
+   {
+    "source": "ilb",
+    "target": "wl",
+    "type": "api",
+    "via": null
+   },
+   {
+    "source": "ilb",
+    "target": "aip",
+    "type": "api",
+    "via": null
+   },
+   {
+    "source": "wl",
+    "target": "pg",
+    "type": "direct",
+    "via": null
+   },
+   {
+    "source": "wl",
+    "target": "ro",
+    "type": "direct",
+    "via": null
+   },
+   {
+    "source": "wl",
+    "target": "pe",
+    "type": "direct",
+    "via": null
+   },
+   {
+    "source": "aip",
+    "target": "rpt",
+    "type": "direct",
+    "via": null
+   },
+   {
+    "source": "aip",
+    "target": "qdrant",
+    "type": "direct",
+    "via": null
+   },
+   {
+    "source": "wl",
+    "target": "broker",
+    "type": "event",
+    "via": [
+     [
+      912,
+      300
+     ],
+     [
+      912,
+      560
+     ]
+    ]
+   },
+   {
+    "source": "pg",
+    "target": "ro",
+    "type": "repl",
+    "via": null
+   },
+   {
+    "source": "pg",
+    "target": "rpt",
+    "type": "repl",
+    "via": [
+     [
+      1180,
+      215
+     ],
+     [
+      1180,
+      405
+     ]
+    ]
+   },
+   {
+    "source": "pg",
+    "target": "dr",
+    "type": "repl",
+    "via": [
+     [
+      1195,
+      185
+     ],
+     [
+      1195,
+      737
+     ]
+    ]
+   },
+   {
+    "source": "aks",
+    "target": "nat",
+    "type": "api",
+    "via": [
+     [
+      785,
+      740
+     ]
+    ]
+   },
+   {
+    "source": "nat",
+    "target": "extp",
+    "type": "api",
+    "via": null
+   },
+   {
+    "source": "bastion",
+    "target": "sys",
+    "type": "internet",
+    "via": [
+     [
+      660,
+      600
+     ],
+     [
+      660,
+      180
+     ]
+    ]
+   },
+   {
+    "source": "venue",
+    "target": "fd",
+    "type": "internet",
+    "via": [
+     [
+      1345,
+      85
+     ],
+     [
+      315,
+      85
+     ]
+    ]
+   },
+   {
+    "source": "venue",
+    "target": "vpn",
+    "type": "internet",
+    "via": null
+   },
+   {
+    "source": "vpn",
+    "target": "ilb",
+    "type": "sync",
+    "via": [
+     [
+      1225,
+      490
+     ],
+     [
+      1225,
+      676
+     ],
+     [
+      650,
+      676
+     ],
+     [
+      650,
+      420
+     ]
+    ]
+   }
+  ],
+  "subnets": [
+   {
+    "name": "ingress",
+    "block": "10.20.0.0/24",
+    "perAz": "10.20.0.0/26, 10.20.0.64/26, 10.20.0.128/26",
+    "holds": "Internal Application Load Balancer, CloudFront's VPC origin (snet-ingress)",
+    "rule": "Security group: inbound 443 only from the CloudFront origin-facing prefix list"
+   },
+   {
+    "name": "public",
+    "block": "10.20.2.0/24",
+    "perAz": "10.20.2.0/26, 10.20.2.64/26, 10.20.2.128/26",
+    "holds": "NAT Gateways and their Elastic IPs, nothing else (takes snet-agc's reserved block)",
+    "rule": "Route to the Internet gateway; no instance, no load balancer"
+   },
+   {
+    "name": "eks-system",
+    "block": "10.20.4.0/22",
+    "perAz": "10.20.4.0/24, 10.20.5.0/24, 10.20.6.0/24",
+    "holds": "EKS system node group and the ingress controller pods",
+    "rule": "Egress through the NAT Gateway of its AZ"
+   },
+   {
+    "name": "eks-workload",
+    "block": "10.20.8.0/21",
+    "perAz": "10.20.8.0/23, 10.20.10.0/23, 10.20.12.0/23",
+    "holds": "Workload node group: commerce, access, operations, workers",
+    "rule": "Network policy: inbound from the ingress controller; egress through the NAT Gateway"
+   },
+   {
+    "name": "eks-ai",
+    "block": "10.20.16.0/22",
+    "perAz": "10.20.16.0/24, 10.20.17.0/24, 10.20.18.0/24",
+    "holds": "AI GPU node group (the only AI group): ticvai-ai, BGE-M3 and its reranker, Presidio and the Arabic NER",
+    "rule": "Network policy: inbound from the ingress controller and the workload group; read-only role on transactional schemas (ADR-0020, amended by ADR-0049)"
+   },
+   {
+    "name": "eks-data",
+    "block": "10.20.20.0/23",
+    "perAz": "10.20.20.0/25, 10.20.20.128/25, 10.20.21.0/25",
+    "holds": "qdrant node group and, while the broker is self-run, the broker node group; both tainted ticvai.io/pool=data",
+    "rule": "Network policy: inbound from the workload and AI groups only; Qdrant needs each tenant's collection-scoped JWT"
+   },
+   {
+    "name": "db",
+    "block": "10.20.24.0/24",
+    "perAz": "10.20.24.0/26, 10.20.24.64/26, 10.20.24.128/26",
+    "holds": "RDS DB subnet group: the primary and its Multi-AZ standby, replicas, the AI log DB",
+    "rule": "Security group: 5432 from the EKS node and pod security groups; not publicly accessible"
+   },
+   {
+    "name": "endpoints",
+    "block": "10.20.25.0/24",
+    "perAz": "10.20.25.0/26, 10.20.25.64/26, 10.20.25.128/26",
+    "holds": "Interface VPC endpoints, the ElastiCache subnet group (and Amazon MQ if chosen)",
+    "rule": "Security group: inbound from the EKS subnets only; private DNS on; no public endpoint"
+   },
+   {
+    "name": "(none: no Bastion)",
+    "block": "10.20.26.0/26",
+    "perAz": "-",
+    "holds": "Not created: Session Manager reaches the nodes through the ssm endpoints or the NAT Gateway",
+    "rule": "Reserved"
+   },
+   {
+    "name": "tgw-attach",
+    "block": "10.20.27.0/27",
+    "perAz": "10.20.27.0/28, 10.20.27.16/28 (a third /28 needs 10.20.27.32/28)",
+    "holds": "Transit Gateway or VPN attachment for dedicated-tier venues' site-to-site VPN (GatewaySubnet)",
+    "rule": "Created when a venue needs it"
+   },
+   {
+    "name": "pods (secondary CIDR)",
+    "block": "100.64.0.0/16",
+    "perAz": "100.64.0.0/18, 100.64.64.0/18, 100.64.128.0/18",
+    "holds": "Pod addresses: VPC CNI custom networking, so pods do not use the node subnets (the CNI Overlay range on Azure)",
+    "rule": "Must not overlap the client's ranges or a venue LAN on the VPN"
+   },
+   {
+    "name": "EKS services",
+    "block": "10.100.0.0/16",
+    "perAz": "-",
+    "holds": "Kubernetes service range (service_ipv4_cidr)",
+    "rule": "Internal only"
+   }
+  ],
+  "serviceMap": [
+   {
+    "azure": "Azure Front Door Premium + WAF (waiting-room page from cache)",
+    "aws": "Amazon CloudFront + AWS WAF (managed core rule set, Bot Control, rate-based rules); the waiting-room page from CloudFront's cache"
+   },
+   {
+    "azure": "Internal load balancer + Private Link service; AKS App Routing (Gateway API)",
+    "aws": "Internal Application Load Balancer (AWS Load Balancer Controller, Gateway API or Ingress), CloudFront VPC origin"
+   },
+   {
+    "azure": "AKS, Standard tier: system, workload, AI GPU, qdrant and broker pools",
+    "aws": "Amazon EKS: system, workload, AI GPU, qdrant and broker managed node groups, the same taints"
+   },
+   {
+    "azure": "AKS AI GPU pool: NV6ads A10 v5 (1/6 A10, 4 GB)",
+    "aws": "EKS GPU node group: g6.2xlarge (1 x L4, 24 GB)"
+   },
+   {
+    "azure": "Azure Database for PostgreSQL Flexible Server 16, zone-redundant HA",
+    "aws": "Amazon RDS for PostgreSQL 16, Multi-AZ DB instance (not Aurora)"
+   },
+   {
+    "azure": "Read replicas x2, reporting replica, AI log DB",
+    "aws": "RDS read replicas x2 (db.m6g.xlarge), a reporting replica (db.m6g.large), an AI log DB instance"
+   },
+   {
+    "azure": "Azure Managed Redis (Balanced B10, HA)",
+    "aws": "Amazon ElastiCache for Valkey (cache.r7g.large, primary + replica, Multi-AZ)"
+   },
+   {
+    "azure": "Event broker self-run on the AKS broker pool (CloudAMQP recommended)",
+    "aws": "Self-run on the EKS broker node group (RabbitMQ Cluster Operator), as on Azure; Amazon MQ for RabbitMQ the managed option"
+   },
+   {
+    "azure": "Qdrant on the AKS qdrant pool, Premium SSD",
+    "aws": "Qdrant on the EKS qdrant node group (r6i.xlarge), EBS gp3"
+   },
+   {
+    "azure": "Managed Disks (Premium SSD)",
+    "aws": "Amazon EBS gp3"
+   },
+   {
+    "azure": "Blob storage (ZRS)",
+    "aws": "Amazon S3 Standard (multi-AZ), S3 gateway endpoint"
+   },
+   {
+    "azure": "Container Registry",
+    "aws": "Amazon ECR"
+   },
+   {
+    "azure": "Key Vault (secrets; Premium HSM keys for ADR-0063)",
+    "aws": "AWS Secrets Manager + AWS KMS customer managed keys (HSM-backed; BYOK by import)"
+   },
+   {
+    "azure": "NAT Gateway (one static egress IP)",
+    "aws": "NAT Gateway, one per AZ, with Elastic IPs (three IPs to allow-list)"
+   },
+   {
+    "azure": "Azure Bastion",
+    "aws": "AWS Systems Manager Session Manager"
+   },
+   {
+    "azure": "Private Link private endpoints + private DNS zones",
+    "aws": "AWS PrivateLink interface VPC endpoints + Route 53 private hosted zones"
+   },
+   {
+    "azure": "NSGs at the edges, Cilium network policy inside",
+    "aws": "Security groups at the edges, Cilium (or VPC CNI) network policy inside"
+   },
+   {
+    "azure": "VPN gateway in GatewaySubnet (dedicated-tier venues)",
+    "aws": "AWS Site-to-Site VPN on a virtual private gateway or Transit Gateway"
+   },
+   {
+    "azure": "Azure Monitor + Log Analytics",
+    "aws": "Amazon CloudWatch (Logs, metrics, Container Insights)"
+   },
+   {
+    "azure": "Microsoft Defender for Cloud",
+    "aws": "Amazon GuardDuty (EKS Runtime, RDS Protection) + Amazon Inspector + AWS Security Hub"
+   },
+   {
+    "azure": "Azure Backup",
+    "aws": "AWS Backup (EBS snapshots); RDS automated backups and PITR"
+   },
+   {
+    "azure": "Entra ID (administrators); managed identities (workload identity)",
+    "aws": "IAM Identity Center (administrators); EKS Pod Identity (or IRSA) for workloads"
+   },
+   {
+    "azure": "DR in UAE Central (ADR-0060)",
+    "aws": "OPEN: AWS has one UAE region (see Disaster recovery)"
+   }
+  ],
+  "dr": {
+   "status": "open",
+   "options": [
+    "A. Multi-AZ only, backups in-region",
+    "B. Cross-region to Bahrain (me-south-1)",
+    "C. On-premises or another provider in the UAE"
+   ]
+  }
  },
  "deployables": {
   "commerce": {

@@ -9,11 +9,18 @@
 | [`TICVAI-HLD.md`](TICVAI-HLD.md) and [`TICVAI-HLD.svg`](TICVAI-HLD.svg) | High-level design: the cloud, the venue site and the outside world, every connection typed |
 | [`TICVAI-LLD.md`](TICVAI-LLD.md) and [`TICVAI-LLD.svg`](TICVAI-LLD.svg) | Low-level design on Azure: region, VNet and subnets, tiers, replica floors, events, security, availability, environments |
 | `TICVAI - Azure Cloud Specs & Cost.xlsx` | Specs and monthly cost, without and with high availability, for production and pre-production; editable rate, margin and prices |
+| [`TICVAI-LLD-AWS.md`](TICVAI-LLD-AWS.md) and [`TICVAI-LLD-AWS.svg`](TICVAI-LLD-AWS.svg) | The same cell on AWS me-central-1 (UAE), service for service: the mapping, VPC and subnets, tiers, the RDS and GPU choices, DR (open) (CHG-R3-001, 4 October 2026) |
+| `TICVAI - AWS Cloud Specs & Cost.xlsx` | The AWS workbook in the same layout (Stages, without and with HA, Deployables, Network), plus the service map, the DR options, the AWS rates with their offer files, and an Azure-vs-AWS sheet |
 
 Monthly totals (USD, prices of 30 September 2026): with high availability $8,295.04; without zone-level
 HA $5,327.27 (PostgreSQL stays zone-redundant; recomputed 1 and 4 October, see the sheet's notes; the AI pool is one GPU node pool since 4 October, CHG-R11-001);
 pre-production $1,535.50. **Staged (CHG-R11-003):** the platform launches on Stage 1, $2,254.47
 a month in production plus $566.00 of pre-production (the workbook's Stages sheet); the totals above
 are Stage 2, the full cell.
+
+**AWS me-central-1** (CHG-R3-001; AWS Price List API, pulled 4 October 2026): Stage 1 $2,679.99 a month in
+production plus $615.65 of pre-production; the full cell $4,753.96 without
+zone-level HA and $7,923.57 with it; pre-production $1,510.53. Disaster recovery on AWS
+is open (one AWS region in the UAE).
 
 The polished drawings are made in Claude Design from [`../design-batches/HLD-LLD/`](../design-batches/HLD-LLD/BRIEF.md).

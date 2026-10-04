@@ -11,7 +11,8 @@
 
 ## The shape in one paragraph
 
-One cell per region, in Azure UAE North. Inside it, 17 modules in one .NET solution run as five deployables
+One cell per region, in Azure UAE North or, the same cell service for service, in AWS me-central-1 (UAE; see
+"On AWS" below and [`TICVAI-LLD-AWS.md`](TICVAI-LLD-AWS.md)). Inside it, 17 modules in one .NET solution run as five deployables
 (ADR-0055), each with a replica floor that survives the loss of one zone (ADR-0061): 12 replicas a cell,
 13 in a large one. Each tenant has its own PostgreSQL database and its own Qdrant collection (ADR-0038,
 amended by ADR-0040 on instance count; ADR-0049). Modules in different deployables talk through events on the
@@ -76,16 +77,16 @@ in `deploy/a-independent-tenant.yml` and `deploy/b-shared-platform.yml`, and `DE
 | B2B partner | Partner Portal | Internet (TLS) / VPN |
 | Venue operators | Back office | Internet (TLS) / VPN |
 | 3rd parties | Public API | Internet (TLS) / VPN |
-| Guest web | Front Door + WAF | Real-time API call (HTTPS) |
-| Partner Portal | Front Door + WAF | Real-time API call (HTTPS) |
-| Back office | Front Door + WAF | Real-time API call (HTTPS) |
-| Public API | Front Door + WAF | Real-time API call (HTTPS) |
-| Front Door + WAF | commerce | Real-time API call (HTTPS) |
-| Front Door + WAF | operations | Real-time API call (HTTPS) |
-| Front Door + WAF | Waiting room | Real-time API call (HTTPS) |
+| Guest web | Edge + WAF | Real-time API call (HTTPS) |
+| Partner Portal | Edge + WAF | Real-time API call (HTTPS) |
+| Back office | Edge + WAF | Real-time API call (HTTPS) |
+| Public API | Edge + WAF | Real-time API call (HTTPS) |
+| Edge + WAF | commerce | Real-time API call (HTTPS) |
+| Edge + WAF | operations | Real-time API call (HTTPS) |
+| Edge + WAF | Waiting room | Real-time API call (HTTPS) |
 | Waiting room | commerce | Real-time API call (HTTPS) |
 | commerce | PostgreSQL 16 | Real-time direct call (database, cache) |
-| commerce | Azure Managed Redis | Real-time direct call (database, cache) |
+| commerce | Redis | Real-time direct call (database, cache) |
 | operations | PostgreSQL 16 | Real-time direct call (database, cache) |
 | operations | Reporting replica | Real-time direct call (database, cache) |
 | access | PostgreSQL 16 | Real-time direct call (database, cache) |
@@ -140,4 +141,41 @@ in `deploy/a-independent-tenant.yml` and `deploy/b-shared-platform.yml`, and `DE
 
 Per-screen flows (see `diagrams/lld/`), the AI internals (`docs/architecture/ai-system-design.md`) and sizing
 (`handoff/sizing.json`). The Azure network, security, availability and cost are in [`TICVAI-LLD.md`](TICVAI-LLD.md)
-and the cost workbook.
+and the Azure cost workbook; the AWS ones in [`TICVAI-LLD-AWS.md`](TICVAI-LLD-AWS.md) and the AWS cost workbook.
+
+## On AWS (me-central-1)
+
+Added 4 October 2026 (CHG-R3-001; Chinmay: "HLD and LLD you didnt add AWS you just did azure add that in as well"). The
+cell above runs on AWS in me-central-1 (Middle East, UAE, three AZs) with the same deployables, floors, stores and
+lines; only the services under them change. **Disaster recovery on AWS is open**: AWS has one region in the UAE
+(see [`TICVAI-LLD-AWS.md`](TICVAI-LLD-AWS.md)).
+
+| Azure (UAE North) | AWS (me-central-1) |
+|---|---|
+| Azure Front Door Premium + WAF (waiting-room page from cache) | Amazon CloudFront + AWS WAF (managed core rule set, Bot Control, rate-based rules); the waiting-room page from CloudFront's cache |
+| Internal load balancer + Private Link service; AKS App Routing (Gateway API) | Internal Application Load Balancer (AWS Load Balancer Controller, Gateway API or Ingress), CloudFront VPC origin |
+| AKS, Standard tier: system, workload, AI GPU, qdrant and broker pools | Amazon EKS: system, workload, AI GPU, qdrant and broker managed node groups, the same taints |
+| AKS AI GPU pool: NV6ads A10 v5 (1/6 A10, 4 GB) | EKS GPU node group: g6.2xlarge (1 x L4, 24 GB) |
+| Azure Database for PostgreSQL Flexible Server 16, zone-redundant HA | Amazon RDS for PostgreSQL 16, Multi-AZ DB instance (not Aurora) |
+| Read replicas x2, reporting replica, AI log DB | RDS read replicas x2 (db.m6g.xlarge), a reporting replica (db.m6g.large), an AI log DB instance |
+| Azure Managed Redis (Balanced B10, HA) | Amazon ElastiCache for Valkey (cache.r7g.large, primary + replica, Multi-AZ) |
+| Event broker self-run on the AKS broker pool (CloudAMQP recommended) | Self-run on the EKS broker node group (RabbitMQ Cluster Operator), as on Azure; Amazon MQ for RabbitMQ the managed option |
+| Qdrant on the AKS qdrant pool, Premium SSD | Qdrant on the EKS qdrant node group (r6i.xlarge), EBS gp3 |
+| Managed Disks (Premium SSD) | Amazon EBS gp3 |
+| Blob storage (ZRS) | Amazon S3 Standard (multi-AZ), S3 gateway endpoint |
+| Container Registry | Amazon ECR |
+| Key Vault (secrets; Premium HSM keys for ADR-0063) | AWS Secrets Manager + AWS KMS customer managed keys (HSM-backed; BYOK by import) |
+| NAT Gateway (one static egress IP) | NAT Gateway, one per AZ, with Elastic IPs (three IPs to allow-list) |
+| Azure Bastion | AWS Systems Manager Session Manager |
+| Private Link private endpoints + private DNS zones | AWS PrivateLink interface VPC endpoints + Route 53 private hosted zones |
+| NSGs at the edges, Cilium network policy inside | Security groups at the edges, Cilium (or VPC CNI) network policy inside |
+| VPN gateway in GatewaySubnet (dedicated-tier venues) | AWS Site-to-Site VPN on a virtual private gateway or Transit Gateway |
+| Azure Monitor + Log Analytics | Amazon CloudWatch (Logs, metrics, Container Insights) |
+| Microsoft Defender for Cloud | Amazon GuardDuty (EKS Runtime, RDS Protection) + Amazon Inspector + AWS Security Hub |
+| Azure Backup | AWS Backup (EBS snapshots); RDS automated backups and PITR |
+| Entra ID (administrators); managed identities (workload identity) | IAM Identity Center (administrators); EKS Pod Identity (or IRSA) for workloads |
+| DR in UAE Central (ADR-0060) | OPEN: AWS has one UAE region (see Disaster recovery) |
+
+Monthly, production, on-demand: Stage 1 **$2,679.99** on AWS against $2,254.47 on Azure;
+the full cell **$4,753.96** without zone-level HA (Azure $5,327.27) and
+**$7,923.57** with it (Azure $8,295.04). The AWS workbook has the lines and an Azure-vs-AWS sheet.
