@@ -36,5 +36,6 @@ prevention:
   reason: 'a one-off merge artefact: a text replacement appended instead of applied (7abd44b3); nothing generates this text,
     and the rewrite leaves one statement of the chain in the task.'
   approved_by: Chinmay (4 October, relayed in the r1-fix-merge instructions)
-status: open
+status: closed
+closed_by_commit: 3bce964d
 notes: Batch RFM (r1-fix-merge), 4 October 2026. Ticket not started (Sprint 1 starts Monday 5 October).

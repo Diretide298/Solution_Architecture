@@ -32,5 +32,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-parameter-columns.py
-status: open
+status: closed
+closed_by_commit: 37f206b8
 notes: Batch RFM (r1-fix-merge), 4 October 2026.

@@ -35,5 +35,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-migration-tickets.py
-status: open
+status: closed
+closed_by_commit: 5751e8c4
 notes: Batch RFM (r1-fix-merge), 4 October 2026.

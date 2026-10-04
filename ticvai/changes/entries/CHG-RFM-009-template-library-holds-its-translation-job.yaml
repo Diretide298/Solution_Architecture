@@ -29,5 +29,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-screen-patterns.py
-status: open
+status: closed
+closed_by_commit: d68339d2
 notes: Batch RFM (r1-fix-merge), 4 October 2026.

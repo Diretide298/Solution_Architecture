@@ -36,5 +36,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-binding-ratchet.py
-status: open
+status: closed
+closed_by_commit: b220c672
 notes: Batch RFM (r1-fix-merge), 4 October 2026.

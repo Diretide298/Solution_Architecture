@@ -27,5 +27,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-package.py
-status: open
+status: closed
+closed_by_commit: 8ff3bfba
 notes: Batch RFM (r1-fix-merge), 4 October 2026.

@@ -30,5 +30,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/check-cited-sources.py
-status: open
+status: closed
+closed_by_commit: 37a136df
 notes: Batch RFM (r1-fix-merge), 4 October 2026.
