@@ -1,0 +1,33 @@
+id: CHG-RFM-013
+date: '2026-10-04'
+source: plan
+kind: plan
+summary: 'The team calendar has no holidays: every weekday is a working day, and leave is handled when it comes up.'
+decision:
+  what: 'tools/sprint_plan.py HOLIDAYS is empty (it held 1-3 December 2026, 1 January and 9-11 March 2027 as UAE public
+    holidays); everything that schedules reads it there (derive-block-a-schedule, build-service-docs, the plan deck and
+    document). The deck and document say there are no holidays instead of listing them. The AI phase plan has no calendar
+    text of its own to change: its phase 1 capacity comes from the same scheduler.'
+  by: Chinmay
+  date: '2026-10-04'
+proposed: 2026-10-04T12:00
+why: 'Chinmay, 4 October ~14:00 (answers-2-oct-batch1, last entry): "No holidays at all"; "1-3 are not holidays"; leave
+  handled when it comes up. Found while checking the Block A module test end of the merged branch (e13d7ad5 and after),
+  which the 1-3 December holidays pushed to 4 December.'
+keys_touched:
+  files:
+  - tools/sprint_plan.py
+  - tools/build-plan-deck.py
+  - tools/build-plan-doc.py
+root_class: 'new: calendar-decision'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/sprint_plan.py::HOLIDAYS
+status: open
+notes: Batch RFM (r1-fix-merge), 4 October 2026.
