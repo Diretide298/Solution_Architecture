@@ -1,0 +1,41 @@
+id: CHG-FXP-002
+date: '2026-10-04'
+source: audit
+kind: plan
+proposed: '2026-10-04'
+summary: A screen merged into another, or listed as not built, gets no build task; its operations are built on the screen
+  it renders inside; POS-003 and POS-004 are built as steps of the POS-002 drawer.
+decision:
+  what: 'ticket_done.screen_hold: a screen whose notes say "**Merged into X**" or that block-a-extra-tasks.json
+    `screensNotBuilt` lists gets no task anywhere in the plan (46 merged screens, among them VM-BO-669, VM-BO-110 and
+    APP-SETUP-ADM-243), and ticket_done.merge_bindings adds its bindings to its target in memory, so the target''s tickets
+    build them (setApprovalMatrix, hosted on ADM-243, is set up on BO-087). op-retire.py closes a pushed ticket of a merged
+    screen into its target''s ticket. Default taken (Needs Chinmay): POS-003 and POS-004 are built as steps two and three
+    of the POS-002 sale drawer, not pages, and no full-screen tablet seat map is in Block A (screenNotes, carried by the
+    pointer).'
+  by: Chinmay
+  date: '2026-10-04'
+why: 'Sprint 1-2 judging of 4 October (finding kind merged-replaced): VM-BO-669 (merged into BO-666, CHG-WIR-001) and
+  APP-POS-POS-004 were not buildable, VM-BO-110 (merged into BO-111, CHG-SBO-021) and APP-POS-POS-003 guessed. The plan
+  read no merge note, so a screen "nothing on it is built separately" was planned in Sprint 2.'
+keys_touched:
+  screens: [BO-669, BO-110, ADM-243, BO-087, POS-003, POS-004]
+  tickets: [VM-BO-669, VM-BO-110, APP-POS-POS-003, APP-POS-POS-004, APP-SETUP-ADM-243, APP-SETUP-BO-087]
+  files: [tools/ticket_done.py, tools/build-service-docs.py, tools/op-retire.py, tools/op-release.py,
+    docs/active/block-a-extra-tasks.json, tools/check-ticket-builds.py, tools/check-ticket-scope.py,
+    tools/check-plan-closure.py, tools/check-binding-ratchet.py, tools/adam-links.py]
+root_class: A10 TICKET-DRIFT
+tickets:
+  started: []
+  unstarted: [VM-BO-669, VM-BO-110, APP-POS-POS-003, APP-POS-POS-004, APP-SETUP-ADM-243]
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ticket-builds.py
+status: closed
+closed_by_commit: 611e02c9
+notes: 'check-ticket-builds B-NOT-BUILT fails a task that builds a held screen. check-plan-closure excuses a departure the
+  spec makes (printed); check-binding-ratchet no longer counts a screen that is not built. Asked of the screens agent
+  through the ledger: BO-087 to bind setApprovalMatrix, POS-003/004 route and notes to say the drawer step.'

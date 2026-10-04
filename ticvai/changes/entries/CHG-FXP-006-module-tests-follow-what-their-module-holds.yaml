@@ -1,0 +1,39 @@
+id: CHG-FXP-006
+date: '2026-10-04'
+source: audit
+kind: plan
+proposed: '2026-10-04'
+summary: A module test says what to test from what its app-module holds, tests only the operations its own screens call,
+  and names what waits on the client.
+decision:
+  what: 'build-service-docs.py: a module of migrations only is tested as migrations (forward on empty and previous schema,
+    a second run applies nothing, records match, scope and foreign keys hold); a module of tickets that build nothing
+    re-runs each ticket''s done-when; a module with screens tests those screens and only the operations they call (an
+    operation riding in the module for another app is proven by its own contract tests); tickets that build nothing in a
+    mixed module are named; an offline path is tested as far as its ticket''s done-when goes when the rest waits on an
+    open decision; an operation with x-ticvai-make-or-break is tested against the provider''s documented test payloads
+    until the client delivers, and its live run is accepted then. PLATFORM-PAYMENTS says the same. The AI engine''s
+    module tests keep their words (branch r1-ai-phase).'
+  by: Chinmay
+  date: '2026-10-04'
+why: 'Sprint 1-2 judging of 4 October: TEST-AM-FOUNDATION-SETUP was not buildable (nothing to test), and
+  TEST-AM-FOUNDATION-DATABASE, -OFFLINE, -PLATFORM, TEST-AM-RESOURCES-CAPACITY-P01 and PLATFORM-PAYMENTS guessed (screen
+  and API wording on migrations; an open ADR and the client''s sandbox credentials; four staff operations WEB-047 never
+  calls). Follows CHG-RONEP-003 (module tests name what they test).'
+keys_touched:
+  tickets: [TEST-AM-FOUNDATION-SETUP, TEST-AM-FOUNDATION-DATABASE, TEST-AM-FOUNDATION-OFFLINE,
+    TEST-AM-FOUNDATION-PLATFORM, TEST-AM-RESOURCES-CAPACITY-P01, PLATFORM-PAYMENTS]
+  files: [tools/build-service-docs.py, docs/active/block-a-extra-tasks.json]
+root_class: A09 TICKET-ACCEPTANCE
+tickets:
+  started: []
+  unstarted: [TEST-AM-FOUNDATION-SETUP, TEST-AM-FOUNDATION-DATABASE, TEST-AM-RESOURCES-CAPACITY-P01]
+release_tag: pending
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: generator-rule
+  ref: tools/build-service-docs.py
+status: closed
+closed_by_commit: 611e02c9
+notes: 'check-ticket-builds B-MODULE-TEST still fails a module test that names nothing it tests.'

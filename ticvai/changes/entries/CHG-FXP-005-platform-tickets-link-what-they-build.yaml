@@ -1,0 +1,46 @@
+id: CHG-FXP-005
+date: '2026-10-04'
+source: audit
+kind: plan
+proposed: '2026-10-04'
+summary: The hand-written platform, offline, migration and setup tickets link the operations and tables they build and
+  state the rules of the ADRs they cite, so a pull carries their spec.
+decision:
+  what: 'block-a-extra-tasks.json: PLATFORM-KERNEL (control.tenant_domain, control.tenant, control.cell_tenant,
+    platform.scope; the session settings ticvai.scope_paths and ticvai.subject_id), PLATFORM-RLS (the hot tables and the
+    per-statement predicate), PLATFORM-SAGA-PAID (createPayment, convertInventoryHold, issueOrderEntitlements and their
+    tables; the saga from events/order-paid.yaml), OFFLINE-JOURNAL (the six operations whose conflict policies it
+    implements), OFFLINE-BUNDLE (getLatestBundle, reportBundleApplied, acquireInventoryHold; the lease of ADR-0013 and a
+    testable done-when), PLATFORM-OBSERVE, PLATFORM-MIGRATE, KERNEL-TENANT-LIMITS, DB-READ-VIEWS, DB-ROLES, OBS-TENANT-POOL
+    and PLATFORM-FLAGS get their spec in their text; a task with nothing a pull can carry says why
+    (`linksNothingBecause`). build-service-docs.py: MIG-FOREIGN-KEYS names its 35 keys (table, column, referenced table,
+    constraint) and links the tables they alter; SETUP-AUTH names login, refreshToken, logout and getCurrentSession.
+    Default taken (Needs Chinmay): release flags in Azure App Configuration, keyed by app-module, an operation of a
+    switched-off module answers 404 for that tenant.'
+  by: Chinmay
+  date: '2026-10-04'
+why: 'Sprint 1-2 judging of 4 October (finding kind missing-link): OFFLINE-JOURNAL, OFFLINE-BUNDLE, PLATFORM-SAGA-PAID,
+  PLATFORM-RLS, PLATFORM-KERNEL, PLATFORM-FLAGS, MIG-FOREIGN-KEYS, SETUP-AUTH and TEST-AM-FOUNDATION-SETUP were not
+  buildable: they built only ADRs (ADAM lists an ADR, it does not pull it) or nothing. ADR-0005, ADR-0013, ADR-0022,
+  ADR-0038, ADR-0039, ADR-0044, ADR-0055, ADR-0058, ADR-0064.'
+keys_touched:
+  tickets: [OFFLINE-JOURNAL, OFFLINE-BUNDLE, PLATFORM-SAGA-PAID, PLATFORM-RLS, PLATFORM-KERNEL, PLATFORM-FLAGS,
+    PLATFORM-OBSERVE, PLATFORM-MIGRATE, KERNEL-TENANT-LIMITS, DB-READ-VIEWS, DB-ROLES, OBS-TENANT-POOL, PLATFORM-PAYMENTS,
+    MIG-FOREIGN-KEYS, SETUP-AUTH, TEST-SAME-NUMBERS]
+  files: [docs/active/block-a-extra-tasks.json, tools/build-service-docs.py, tools/check-ticket-builds.py]
+root_class: A14 TICKET-LINKS
+tickets:
+  started: []
+  unstarted: [OFFLINE-JOURNAL, OFFLINE-BUNDLE, PLATFORM-SAGA-PAID, PLATFORM-RLS, PLATFORM-KERNEL, PLATFORM-FLAGS,
+    MIG-FOREIGN-KEYS, SETUP-AUTH]
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ticket-builds.py
+status: closed
+closed_by_commit: 611e02c9
+notes: 'check-ticket-builds B-BARE-TASK fails a hand-written task that links only ADRs or nothing, unless it says why
+  (printed on every run; seven infrastructure and tooling tasks do). The judge''s packer (audit/kit/pack-local.py, outside
+  the repo) also opened schemas only one or two levels and did not follow nested $refs; fixed there.'

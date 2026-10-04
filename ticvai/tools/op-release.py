@@ -83,6 +83,9 @@ builds_of, DONE_WHEN, done_when, SCREEN = _done.builds_of, _done.DONE_WHEN, _don
 push = _load("push_openproject", "push-openproject.py")
 assign_sync = _load("op_assign_sync", "op-assign-sync.py")
 OP_NAME = assign_sync.OP_NAME                   # plan name -> OpenProject name (Surendra -> Surendra Loke)
+_EXTRA = ROOT / "docs" / "active" / "block-a-extra-tasks.json"
+# screen -> the decided sentence its tickets carry (block-a-extra-tasks.json `screenNotes`, CHG-RONEP-001, CHG-FXP-002)
+SCREEN_NOTES = (json.loads(_EXTRA.read_text(encoding="utf-8")).get("screenNotes") or {}) if _EXTRA.exists() else {}
 
 
 def pushed(mp):
@@ -99,9 +102,12 @@ def summary_line(subject):
 # builds_of / DONE_WHEN / done_when: shared with build-service-docs.py so a tasks.csv description and its pointer
 # say the same done-when (tools/ticket_done.py, CHG-GTR-002).
 
-def pointer(key, summary, builds, release, what="", done=""):
+def pointer(key, summary, builds, release, what="", done="", carry=()):
     """The description a ticket carries from this release on. %ID% is its OpenProject id, filled in on the server.
-    A ticket that builds nothing ADAM indexes keeps its plan text (`what`): ADAM has nothing else to give it."""
+    A ticket that builds nothing ADAM indexes keeps its plan text (`what`): ADAM has nothing else to give it.
+    `carry`: the plan sentences every ticket of a screen keeps whatever it builds (CHG-FXP-001, -004): its scope when
+    the screen is split across two tickets, its wait for a definition, and a decided note on the screen. The judge of
+    4 October read "BO-857 (the rest of the screen: 3 of its 7 operations)" with no word of which three."""
     shown = builds[:MAX_BUILDS]
     more = f" and {len(builds) - MAX_BUILDS} more (all listed in ADAM)" if len(builds) > MAX_BUILDS else ""
     lines = [f"**{summary}**", "",
@@ -113,6 +119,10 @@ def pointer(key, summary, builds, release, what="", done=""):
     if what:
         what = DONE_WHEN.sub("", what).strip() if done else what   # the done-when gets its own line below
         lines += ["**What:** " + " ".join(what.split()), ""]
+    for c in carry:
+        if c and c not in (what or ""):
+            head, _, rest = c.partition(": ")
+            lines += [f"**{head}:** {rest}" if rest and len(head) < 40 else c, ""]
     if done:
         lines += ["**Done when:** " + done[len("Done when"):].lstrip(" ,:"), ""]
     lines.append("The rest of the spec (contract, tables, screens) lives in ADAM at the release tag. "
@@ -203,6 +213,10 @@ def build(rows, mp, sched, lineage, retire_plan, unexplained, release):
             assignee, n = r["assignee"] or None, None
         summ = summary_line(subject)
         builds = builds_of(r, part, lineage)
+        carry = list(_done.carried(r))
+        m_ = SCREEN.search(base) if r["track"] == "Frontend" or base.startswith("VM-") else None
+        if m_ and SCREEN_NOTES.get(m_.group(1)):
+            carry.append("Decided: " + " ".join(str(SCREEN_NOTES[m_.group(1)]).split()))
         tickets.append({
             "key": key, "type": typ, "type_id": push.TYPES[typ], "parent": parent or None,
             "subject": subject[:255], "priority_id": push.PRIORITY.get(r["wave"] or "2", 8),
@@ -216,7 +230,8 @@ def build(rows, mp, sched, lineage, retire_plan, unexplained, release):
             "pointer": pointer(key, summ, builds, release,
                                what=(r.get("description") or "") if (not builds or (typ != "Sub Task"
                                      and _done.listed_builds(r.get("description")))) else "",
-                               done=done_when(r, part, builds) if typ != "Sub Task" or builds else "")})
+                               done=done_when(r, part, builds) if typ != "Sub Task" or builds else "",
+                               carry=carry)})
 
     for r in rows:
         add(r["key"], r["type"], r["parent"], r["subject"], r, "")

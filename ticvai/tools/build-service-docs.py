@@ -69,6 +69,9 @@ OUT = HANDOFF / "service-docs"
 TEAM = ROOT / "docs" / "active" / "team.json"
 EXTRA = ROOT / "docs" / "active" / "block-a-extra-tasks.json"
 MAX_DEPTH = 3
+# The working day (from Monday 5 October 2026) a screen whose spec needs a person may start being built: its definition
+# is due in the first week of Sprint 1, by the lead (CHG-FXP-004; Needs Chinmay: the date and who defines).
+DEFINE_DAY = 5.0
 
 
 def block_a_decisions() -> dict:
@@ -89,13 +92,16 @@ def block_a_decisions() -> dict:
     tools/check-plan-closure.py reads the same file and checks that the plan holds them."""
     if not EXTRA.exists():
         return {"aiEngineOperations": {}, "blockA1Operations": {}, "blockAOperations": {}, "blockAScreens": {},
-                "screenNotes": {}, "navHomes": {}}
+                "screenNotes": {}, "navHomes": {}, "screensNotBuilt": {}}
     ex = json.loads(EXTRA.read_text(encoding="utf-8"))
     ai = {o: t["key"] for t in ex.get("tasks") or [] for o in t.get("operations") or []}
     return {"aiEngineOperations": ai, "blockA1Operations": dict(ex.get("blockA1Operations") or {}),
             "blockAOperations": dict(ex.get("blockAOperations") or {}),
             "blockAScreens": dict(ex.get("blockAScreens") or {}), "screenNotes": dict(ex.get("screenNotes") or {}),
-            "navHomes": dict(ex.get("navHomes") or {})}
+            "navHomes": dict(ex.get("navHomes") or {}),
+            # screen -> {kind, into, why}: a replaced page or a screen nobody could define, given no build task
+            # (CHG-FXP-002, ticket_done.screen_hold)
+            "screensNotBuilt": dict(ex.get("screensNotBuilt") or {})}
 
 # **The one authored table in this file.** The decomposition explains each service to an architect
 # ("platform.org_unit is reached by 304 of 379 tables"); a client needs what it does for the venue.
@@ -326,7 +332,12 @@ def read_operations() -> dict[str, dict]:
                     "stepUp": op.get("x-ticvai-step-up"),
                     "lock": op.get("x-ticvai-lock"),
                     "guestCallable": op.get("x-ticvai-guest-callable"),
-                    "provisional": bool(op.get("x-ticvai-provisional")),
+                    # **held**: provisional, a stub whose shape is a proposal, or deprecated (CHG-FXP-003): not put on
+                    # a build ticket. `provisional` stays the name every rule below reads.
+                    "provisional": ticket_done.operation_hold(op) is not None,
+                    "hold": ticket_done.operation_hold(op),
+                    # what only the client can unblock (sandbox credentials ...): a module test says it waits on it
+                    "makeOrBreak": op.get("x-ticvai-make-or-break"),
                     "params": params, "body": body, "bodyType": body_type,
                     "responses": responses, "success": success, "successType": success_type,
                     "successSchema": success_schema,
@@ -849,6 +860,9 @@ def main() -> int:
     tiers = decomp["tiers"]
     ops = read_operations()
     screens = all_screens()
+    merged_in = ticket_done.merge_bindings(screens)     # a merged screen's operations are its target's (CHG-FXP-002)
+    print(f"operations a merged screen brings to the screen it is merged into: {sum(map(len, merged_in.values()))} "
+          f"on {len(merged_in)} screens")
     state_models = read_state_models()
     models_by_op: dict[str, list[dict]] = defaultdict(list)
     for m in state_models.values():
@@ -1086,7 +1100,9 @@ def main() -> int:
                     if x.get(key):
                         facts.append([label, first_sentence(x[key], 300) if key == "offlineNote" else x[key]])
                 if x["provisional"]:
-                    facts.append(["Status", "**Provisional**: not yet agreed; do not build"])
+                    facts.append(["Status", {"stub": "**Stub**: its shape is a proposal; do not build until confirmed",
+                                             "deprecated": "**Deprecated**: superseded; do not build"}.get(
+                        x.get("hold"), "**Provisional**: not yet agreed; do not build")])
                 facts.append(["Reads", ", ".join(f"`{t}`" for t in lin.get("reads") or []) or "-"])
                 facts.append(["Writes", ", ".join(f"`{t}`" for t in lin.get("writes") or []) or "-"])
                 # Audit R174: an operation no screen lists in its apis has no Back Office screen to set it up
@@ -1275,6 +1291,13 @@ def main() -> int:
          "a typed call, the build fails if the contracts change without a re-generate, and screen tickets stop "
          "stubbing calls."),
         ("SETUP-AUTH", "Sign-in working end to end against IdentityService", 5, ["SETUP-DB"],
+         # **Names the operations it wires** (4 October, the Sprint 1-2 judging; CHG-FXP-005): "the identity sign-in
+         # operations" named none and the pull linked nothing, so request, response and the permission set were unknown.
+         "Builds: `operation login`, `operation refreshToken`, `operation logout`, `operation getCurrentSession`. "
+         "The staff sign-in path of contracts/spine/identity.yaml: `login` issues the session and refresh token, "
+         "`getCurrentSession` returns the Session with `effectivePermissions` and `permissionsByScope` (the effective "
+         "permissions the done-when reads), `refreshToken` and `logout` end the loop; the operations themselves are "
+         "built on their IdentityService tickets, this task wires them through the host. "
          "In **ticvai-backend** and **ticvai-frontend**: the identity sign-in operations, `ICurrentPrincipal` and "
          "`ITenantContext` filled from the session, signing keys from the cell's Azure Key Vault (audit R057). "
          "Done when: a seeded staff member signs in from a web app and an app, gets their effective permissions, "
@@ -1327,11 +1350,23 @@ def main() -> int:
     # and getGuestConversation by AI-ENGINE-CONCIERGE, setAiProvider and setAiCredential by AI-ENGINE-GATEWAY
     # (block-a-extra-tasks.json `operations`). They take no back-end chunk; the task is created with the extra tasks below.
     decided = block_a_decisions()
+    # **A screen the spec says is not built gets no task** (4 October, the Sprint 1-2 judging; CHG-FXP-002, -003):
+    # merged into another screen ("**Merged into BO-666**": VM-BO-669 was planned in Sprint 2), listed in
+    # block-a-extra-tasks.json `screensNotBuilt` (a replaced page, a screen nobody could define), or binding an
+    # operation that is not built (provisional, a stub whose shape is a proposal, deprecated: WEB-027 was planned on
+    # getMarketingSubscription and setMarketingSubscription). Its pushed ticket gets its reason from op-retire.py.
+    held_screen = ticket_done.screen_holds(screens, {o: x["hold"] for o, x in ops.items() if x.get("hold")},
+                                           decided["screensNotBuilt"])
+    print(f"screens given no build task (merged, listed or binding a held operation): {len(held_screen)}")
     ai_ops = {o: k for o, k in decided["aiEngineOperations"].items() if o in ops}
     for n, olist in sorted(by_service.items()):
         groups = defaultdict(list)
         for o in olist:
             if o in ai_ops:
+                continue
+            # a slice operation the contract marks a stub, provisional or deprecated is not put on a build ticket
+            # either (CHG-FXP-003: SVC-MARKETING-MARKETING-2 built getMarketingSubscription, a proposal)
+            if ops[o]["provisional"]:
                 continue
             groups[ops[o]["tag"]].append(o)
         for g, gl in sorted(groups.items()):
@@ -1445,9 +1480,31 @@ def main() -> int:
                            ", ".join(r.replace("MIG-", "").lower() for r in refs), who, pts, svc])
     if deferred:
         n_def = sum(deferred.values())
+        # **The ticket names its keys and links their tables** (4 October, the Sprint 1-2 judging; CHG-FXP-005): it said
+        # "From 900-foreign-keys.sql." and linked nothing, so the 35 keys were in no file the developer pulled. Each
+        # key is named (table, column, referenced table, constraint) and each table it alters is a build, whose table
+        # record carries the key's full DDL. "Builds:", not "Tables:": the tables are created by their own migrations.
+        pos_ = {g: i for i, g in enumerate(mig_order)}
+        fk_rows = []
+        for db_ in ("tenant", "control"):
+            f_ = ROOT / "backend" / db_ / "900-foreign-keys.sql"
+            for ln_ in (f_.read_text(encoding="utf-8").splitlines() if f_.exists() else []):
+                m_ = re.match(r"ALTER TABLE (\w+\.\w+) ADD CONSTRAINT (\w+) FOREIGN KEY \(([^)]*)\) REFERENCES (\w+\.\w+)", ln_)
+                if not m_ or m_.group(1) not in rel or m_.group(4) not in rel:
+                    continue
+                ga_, gb_ = (db_, m_.group(1).split(".")[0]), (db_, m_.group(4).split(".")[0])
+                if ga_ in pos_ and gb_ in pos_ and pos_[gb_] > pos_[ga_]:
+                    fk_rows.append((m_.group(1), m_.group(3).replace(" ", ""), m_.group(4), m_.group(2), db_))
+        fk_tables = sorted({r_[0] for r_ in fk_rows})
         task("MIG-FOREIGN-KEYS", "MIG", "Task", f"Migration V{len(mig_order) + 2:04d}__cross_schema_foreign_keys.sql "
-             f"({n_def} keys)", "The foreign keys that point from a schema into one created after it: "
-             + ", ".join(f"{g[1]} ({n})" for g, n in sorted(deferred.items())) + ". From 900-foreign-keys.sql.",
+             f"({n_def} keys)", ("Builds: " + ", ".join(f"`table {t_}`" for t_ in fk_tables) + ". " if fk_tables else "")
+             + "The foreign keys that point from a schema into one created after it: "
+             + ", ".join(f"{g[1]} ({n})" for g, n in sorted(deferred.items())) + ". Each is the ALTER TABLE ... ADD "
+             "CONSTRAINT line of backend/<db>/900-foreign-keys.sql with that constraint name, unchanged (each linked "
+             "table's record lists its keys with ON DELETE): "
+             + "; ".join(f"{a_}({c_}) -> {b_} as {n_}" for a_, c_, b_, n_, _ in sorted(fk_rows)) + ". Done when: "
+             "after every schema migration, this one adds exactly these keys on an empty database and on the previous "
+             "release's schema, a second run applies nothing, and a row pointing at a missing parent is refused.",
              1, pts=points_of(1 + n_def / 10), area="backend", assignee=devops,
              depends=[mig_key[g] for g in groups])
         migrations.append([len(mig_order) + 1, "MIG-FOREIGN-KEYS",
@@ -1526,6 +1583,8 @@ def main() -> int:
         pk = f"APP-{k}"
         rows = []
         for sid in sorted(p["screens"]):
+            if sid in held_screen:
+                continue
             s = screens[sid]
             deps = {op_task[a["operationId"]] for a in s.get("apis") or [] if a.get("operationId") in op_task}
             rows.append((sid, s, deps, points_of(screen_raw(s))))
@@ -1542,17 +1601,28 @@ def main() -> int:
     # **The fewest screens that cover every setup operation**, not every screen that declares one:
     # `createProduct` is declared on a dozen Back Office screens and needs building on one.
     first_release = {sid for p in plat.values() for sid in p["screens"]}
-    uncovered = {o for o, d in slice_ops.items() if d["part"] == "setup"}
+    uncovered = {o for o, d in slice_ops.items() if d["part"] == "setup" and not ops[o]["provisional"]}
     hosts = defaultdict(set)
     for o in uncovered:
         for sid in slice_ops[o]["screens"]:
-            if sid not in first_release:
+            # a merged screen's operation is set up on the screen it renders inside (CHG-FXP-002: ADM-243's
+            # setApprovalMatrix on BO-087)
+            if (held_screen.get(sid) or ("",))[0] == "merged" and held_screen[sid][1] in screens:
+                sid = held_screen[sid][1]
+            if sid not in first_release and sid not in held_screen:
                 hosts[sid].add(o)
     no_screen = sorted(o for o in uncovered if not any(o in v for v in hosts.values()))
     uncovered -= set(no_screen)
     setup_screens = {}
+    # **A pushed setup screen stays the host** (4 October, CHG-FXP-002): taking a merged screen out of the hosts
+    # (ADM-243) re-ran the greedy cover and moved createAiGovernancePolicyDraft from ADM-523, a Sprint 2 ticket, to
+    # ADM-530. A screen whose APP-SETUP ticket is pushed is preferred while it still hosts something uncovered.
+    _mp = OUT / "pms-map.json"
+    pushed_hosts = ({k[len("APP-SETUP-"):] for k in json.loads(_mp.read_text(encoding="utf-8"))
+                     if k.startswith("APP-SETUP-") and "#" not in k and not k.endswith("-REST")} if _mp.exists() else set())
     while uncovered:
-        sid = max(sorted(hosts), key=lambda x: (len(hosts[x] & uncovered), x.startswith("BO")))
+        sid = max(sorted(hosts), key=lambda x: (bool(hosts[x] & uncovered) and x in pushed_hosts,
+                                                len(hosts[x] & uncovered), x.startswith("BO")))
         setup_screens[sid] = hosts[sid] & uncovered
         uncovered -= hosts[sid]
     if setup_screens:
@@ -1588,7 +1658,7 @@ def main() -> int:
 
         cand = []
         for sid, s_ in sorted(screens.items()):
-            if not sid.startswith("BO-") or s_.get("wave") not in vm["waves"] or sid in setup_screens:
+            if not sid.startswith("BO-") or s_.get("wave") not in vm["waves"] or sid in setup_screens                     or sid in held_screen:
                 continue
             ol = [a["operationId"] for a in s_.get("apis") or [] if a.get("operationId")]
             if ol and all(agreed(o) for o in ol):
@@ -1925,6 +1995,7 @@ def main() -> int:
     # all is a navigation gap, reported by tools/check-plan-closure.py (C-REACH), not something the plan can fix.
     need_screens |= nav_hubs(need_screens)
     add_doors()
+    need_screens -= set(held_screen)       # not built (CHG-FXP-002): its operations are not Block A's for its sake
     for sid in need_screens:
         need_ops |= set(screen_ops(sid))
     print(f"Block A closure: {len(core_screens)} screens and {len(core_ops)} operations in its core (A1), "
@@ -1934,8 +2005,8 @@ def main() -> int:
         s_ = screens[sid]
         if str(s_.get("wave")) == "4" and sid not in need_screens:
             continue
-        if sid in gone_screens:
-            continue                     # built inside its venue screen; its ticket is replaced (CHG-CLN-002)
+        if sid in gone_screens or sid in held_screen:
+            continue                     # built inside its venue screen (CHG-CLN-002), or not built (CHG-FXP-002)
         have = built_screen.get(sid)
         if have and not have.startswith("APP-SETUP-"):
             if have.startswith("VM-"):           # Venue Management waves 1-2: ticketed, planned with the rest of P08
@@ -1949,8 +2020,8 @@ def main() -> int:
             # another task builds: until 3 October it was only the unplanned ones, so a screen whose other operations
             # were all planned elsewhere (BO-1065: listDenominations, getRegionSettings) had nobody wiring them.
             rest = [o for o in screen_ops(sid) if o not in setup_screens.get(sid, ())]
-            if not rest:
-                continue
+            if not rest or sid in ticket_done.rest_held(decided["screensNotBuilt"]):
+                continue                 # nothing more, or the rest cannot be defined yet (CHG-FXP-004)
             pts = max(1, points_of(screen_raw(s_)) - setup_sizes.get(sid, 1))
             later_ams.setdefault((screen_module(sid), plat_of(sid)), []).append((sid, f"{have}-REST", pts, "rest"))
             continue
@@ -2181,6 +2252,20 @@ def main() -> int:
              s_.get("wave") or "", platform=s_["_platform"].get("shortName", ""), depends=deps | {"SETUP-CLIENTS"},
              pts=pts, area=area)
         am_of[key] = k
+    # **A screen whose spec says a person must define it is built only after its definition** (4 October, the Sprint
+    # 1-2 judging; CHG-FXP-004). ADM-506's table had no operation and its columns were sample values ("92% / High"):
+    # the screen's gaps say "it needs a person before it is built", and the plan gave it a build task in Sprint 2 anyway.
+    # Its build task now waits for the definition: it starts no earlier than DEFINE_DAY, and its text says why. The
+    # screens a person cannot define in time leave Block A by name (block-a-extra-tasks.json `screensNotBuilt`).
+    define_wait = set()
+    for t_ in tasks:
+        if t_["type"] != "Task" or t_["key"].startswith("TEST-"):
+            continue
+        sids_ = [b_.split(" ", 1)[1] for b_ in ticket_done.builds_of(t_, "", lineage) if b_.startswith("screen ")]
+        if any(x in screens and ticket_done.define_needed(screens[x]) for x in sids_):
+            t_["notBefore"] = max(float(t_.get("notBefore") or 0), DEFINE_DAY)
+            define_wait.add(t_["key"])
+    print(f"screen tasks waiting for their screen's definition (day {DEFINE_DAY:g}): {len(define_wait)}")
     # **The AI engine beyond Block A** (docs/active/ai-functions-review-30-september.json): each capability is an
     # app-module of its own; its extra back-end weeks (the review's `backendWeeksExtra`) are cut into tasks of at most 8
     # points, and the review's sprint for a capability (its own three-week sprints) is the earliest they start. A
@@ -2878,16 +2963,60 @@ def main() -> int:
             for b_ in ticket_done.builds_of(x, "", lineage):
                 if b_ not in arts and not b_.startswith(("service ", "adr ")):
                     arts.append(b_)
+        # **A module test tests what its app reaches** (4 October, the Sprint 1-2 judging; CHG-FXP-006): an app-module
+        # with screens tests those screens and the operations they call; an operation that rides in the module for
+        # another app (TEST-AM-RESOURCES-CAPACITY-P01 named four staff-only Venue Management operations WEB-047 never
+        # calls) is proven by its own ticket's contract tests, not by this module's.
+        scr_ = [b_.split(" ", 1)[1] for b_ in arts if b_.startswith("screen ")]
+        if scr_ and am_info[k]["platform"] != "AI":
+            called_ = {o for x in scr_ if x in screens for o in screen_ops(x)}
+            arts = [b_ for b_ in arts if not b_.startswith("operation ") or b_.split(" ", 1)[1].split("#")[-1] in called_]
         arts.sort(key=lambda b_: ({"screen": 0, "operation": 1, "table": 2}.get(b_.split(" ")[0], 3), b_))
         names_ = [b_.split(" ", 1)[1] for b_ in arts]
         named = (", ".join(f"`{n_}`" for n_ in names_[:12]) + (f" and {len(names_) - 12} more" if len(names_) > 12 else "")
                  if names_ else "")
+        kinds_ = {b_.split(" ")[0] for b_ in arts}
+        # **What the test does follows what the module holds** (CHG-FXP-006): screen and API wording on a module of
+        # migrations (TEST-AM-FOUNDATION-DATABASE) or of setup tickets with nothing to link (TEST-AM-FOUNDATION-SETUP)
+        # gave the tester nothing to run.
+        if am_info[k]["platform"] == "AI":     # the AI engine's module tests keep their words (branch r1-ai-phase owns them)
+            what_ = ("every screen state its YAML lists, every navigation link, every permission (an allowed and a refused "
+                     "user), every operation's error responses, and for an offline app its offline behaviour with the network "
+                     "cut. ")
+            done_ = "Done when it passes " + (f"for {named} " if named else "") + "with no open severity 1 or 2 defect. "
+        elif not arts:
+            what_ = ("re-run, on the integration environment, the done-when of each of its tickets ("
+                     + ", ".join(sorted(x["key"] for x in ch)) + "), as a peer who did not do them, and record the "
+                     "evidence each asks for. ")
+            done_ = "Done when every one of those done-whens holds on the integration environment with no open severity 1 or 2 defect. "
+        elif kinds_ == {"table"}:
+            what_ = ("the migrations of its tickets, in plan order, on an empty database and on the previous release's "
+                     "schema: each applies once and a second run applies nothing, every table matches its record in ADAM "
+                     "(columns, keys, indexes, row-level security forced), a row in another tenant's or venue's scope is "
+                     "not visible under a scoped session, and a row pointing at a missing parent is refused. ")
+            done_ = f"Done when it passes for {named} with no open severity 1 or 2 defect. "
+        else:
+            what_ = ("every screen state its YAML lists, every navigation link, every permission (an allowed and a refused "
+                     "user), every operation's error responses, and, where its tickets build an offline path, that path "
+                     "with the network cut (a part a ticket leaves to an open decision is tested as that ticket's "
+                     "done-when says, no further). ")
+            done_ = f"Done when it passes for {named} with no open severity 1 or 2 defect. "
+        bare_ = sorted(x["key"] for x in ch if not [b_ for b_ in ticket_done.builds_of(x, "", lineage)
+                                                    if not b_.startswith(("service ", "adr "))])
+        if arts and bare_ and am_info[k]["platform"] != "AI":
+            what_ += ("It also re-runs the done-when of each of its tickets that builds no artefact ("
+                      + ", ".join(bare_) + ") and records the evidence each asks for. ")
+        waits_ = sorted({o for o in (n_.split("#")[-1] for n_ in names_) if (ops.get(o) or {}).get("makeOrBreak")}
+                        ) if am_info[k]["platform"] != "AI" else []
+        if waits_:
+            done_ += ("Waiting on the client: " + ", ".join(f"`{o}` ({first_sentence(ops[o]['makeOrBreak'], 160).rstrip('.')})"
+                                                            for o in waits_)
+                      + "; until it arrives each is tested against the provider's documented test payloads with a "
+                      "locally generated secret, and its live-sandbox run is accepted when it arrives. ")
         task(tk, k, "Task", f"Module test: {a['name']}",
              (("Builds: " + ", ".join(f"`{b_}`" for b_ in arts) + ". ") if arts else "") +
              f"The module test of {a['name']} on the integration environment (docs/active/block-test-strategy.md): "
-             "every screen state its YAML lists, every navigation link, every permission (an allowed and a refused "
-             "user), every operation's error responses, and for an offline app its offline behaviour with the network "
-             "cut. Done when it passes " + (f"for {named} " if named else "") + "with no open severity 1 or 2 defect. "
+             + what_ + done_ +
              f"By a peer in the module's stack who did not build most of it. {len(ch)} tickets, {pts} points"
              + (f", {days:g} AI-engineer days" if days else "") + ".",
              min((int(x["wave"]) for x in ch if str(x["wave"]).isdigit()), default=3), area="test",
@@ -3148,7 +3277,12 @@ def main() -> int:
                 reached[t].add(o)
     storage_only = []
     for t in sorted(set(ddl) - assigned):
-        if reached.get(t):
+        if reached.get(t) and all((ops.get(o) or {}).get("hold") for o in reached[t]):
+            # only operations the plan holds out reach it (CHG-FXP-003): its migration comes with them
+            storage_only.append((t, "held: only operations not built until their contract is agreed reach it ("
+                                 + ", ".join(f"{o}: {ops[o]['hold']}" for o in sorted(reached[t])[:4])
+                                 + "); its forward migration is planned with them"))
+        elif reached.get(t):
             storage_only.append((t, "GAP: read or written by " + ", ".join(sorted(reached[t])[:4])
                                  + " but in no migration"))
         else:
@@ -3356,6 +3490,48 @@ def main() -> int:
                                                           for p_, n in apps.most_common()) + "."
             + (f" The AI engine capabilities in it ({len(ai_late)}) are accepted on their own module tests, by the two "
                "AI engineers' calendar (docs/active/ai-functions-review-30-september.json)." if ai_late else ""))
+
+    # **A split screen's two tickets each name what they build and who builds the rest** (4 October, the Sprint 1-2
+    # judging; CHG-FXP-001). "BO-857 (the rest of the screen: 3 of its 7 operations)" linked all seven in the pull and
+    # never said which three; its done-when "calls only its bound operations" could not be tested. The sentence goes
+    # after the slice list (check-ticket-scope reads "In the slice: a, b" up to its full stop) and op-release.py puts it
+    # in the pointer.
+    for t_ in tasks:
+        if t_["type"] != "Task" or not t_["key"].startswith("APP-SETUP-") or ticket_done.scope_of(t_):
+            continue
+        m_ = ticket_done.SCREEN.search(t_["key"])
+        sid_ = m_.group(1) if m_ else None
+        if sid_ not in setup_screens:
+            continue
+        all_ = sorted(set(screen_ops(sid_)) | set(setup_screens[sid_]))
+        mine_ = set(setup_screens[sid_])
+        if len(mine_) >= len(all_):
+            continue
+        d_ = t_["description"] or ""
+        if t_["key"].endswith("-REST"):
+            sib_ = t_["key"][:-len("-REST")]
+            sent_ = ticket_done.scope_sentence(sid_, set(all_) - mine_, all_, sib_ if sib_ in by_key else None, False)
+            cut_ = d_.find("this task adds the others. ")
+            cut_ = cut_ + len("this task adds the others. ") if cut_ >= 0 else 0
+        else:
+            sib_ = t_["key"] + "-REST"
+            sent_ = ticket_done.scope_sentence(sid_, mine_, all_, sib_ if sib_ in by_key else None, True)
+            m2_ = re.match(r"In the slice: [A-Za-z0-9, ]+", d_)
+            cut_ = m2_.end() if m2_ else 0
+            if m2_:
+                d_ = d_[:cut_] + "." + d_[cut_:].lstrip(".")
+                cut_ += 1
+        t_["description"] = (d_[:cut_].rstrip() + " " + sent_ + " " + d_[cut_:].lstrip()).strip()
+    # The build of a screen that needs a person says so (CHG-FXP-004; the wait itself is `notBefore` above).
+    for t_ in tasks:
+        if t_["type"] != "Task" or t_["key"].startswith("TEST-") or "Waits for its definition:" in (t_["description"] or ""):
+            continue
+        sids_ = [b_.split(" ", 1)[1] for b_ in ticket_done.builds_of(t_, "", lineage) if b_.startswith("screen ")]
+        und_ = [x for x in sids_ if x in screens and ticket_done.define_needed(screens[x])]
+        if und_:
+            d_ = (t_["description"] or "").rstrip()
+            t_["description"] = (d_ + ("" if not d_ or d_[-1] in ".!?" else ".") + " " + ticket_done.define_sentence(
+                und_[0], DEFINE_DAY)).strip()
 
     # **Every task says what finishes it** (CHG-GTR-002, 3 October). op-release.py wrote a done-when into each pointer
     # (CHG-REL-003) while the plan row ADAM indexes, and op-descriptions.py turns into ticket text, had none: after the

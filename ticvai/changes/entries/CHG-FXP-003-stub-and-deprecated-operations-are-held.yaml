@@ -1,0 +1,44 @@
+id: CHG-FXP-003
+date: '2026-10-04'
+source: audit
+kind: plan
+proposed: '2026-10-04'
+summary: An operation whose contract says its shape is a proposal, or that is deprecated, is held off build tickets like a
+  provisional one, and so is every screen that binds one.
+decision:
+  what: 'ticket_done.operation_hold: provisional (x-ticvai-provisional), stub (description "The shape below is a
+    proposal": 16 operations drafted on 4 September) or deprecated (8, among them claimTableSession). build-service-docs.py
+    reads it as `provisional` everywhere (slice chunks, Venue Management, later blocks, setup hosts), labels the service
+    doc "Stub" or "Deprecated", and a screen binding a held operation gets no task (WEB-027, GST-065, VM-BO-057 and seven
+    later-block screens). Tables only held operations reach are listed in MIGRATIONS.md as held, not as gaps.
+    op-retire.py puts a pushed ticket whose operations are all held on hold with the reason. The operations come back on
+    the first refresh after their contract is confirmed.'
+  by: Chinmay
+  date: '2026-10-04'
+why: 'Sprint 1-2 judging of 4 October (finding kinds unconfirmed-stub and merged-replaced): APP-WEB-WEB-027 and VM-BO-057
+  were not buildable, SVC-MARKETING-MARKETING-2/-6, SVC-TENANCY-APPROVALS-4 and SVC-FNB-GUESTORDERING-5 guessed: the
+  contracts say "want confirming before anything is built against them" or "Superseded by claimLocationSession", and the
+  plan scheduled them in Sprints 1-2. Extends CHG-GTR-007 (provisional operations off build tickets).'
+keys_touched:
+  operations: [getMarketingSubscription, setMarketingSubscription, issueAccreditationBadge, listAccreditationBadges,
+    listTrainingRecords, claimTableSession]
+  tickets: [APP-WEB-WEB-027, VM-BO-057, SVC-MARKETING-MARKETING-2, SVC-MARKETING-MARKETING-6, SVC-TENANCY-APPROVALS-4,
+    SVC-FNB-GUESTORDERING-5]
+  files: [tools/ticket_done.py, tools/build-service-docs.py, tools/op-retire.py, tools/check-ticket-builds.py,
+    tools/check-migration-tickets.py, tools/check-plan-closure.py, docs/active/block-a-extra-tasks.json]
+root_class: A10 TICKET-DRIFT
+tickets:
+  started: []
+  unstarted: [APP-WEB-WEB-027, VM-BO-057, SVC-MARKETING-MARKETING-2, SVC-MARKETING-MARKETING-6, SVC-TENANCY-APPROVALS-4,
+    SVC-FNB-GUESTORDERING-5]
+release_tag: pending
+decision_owner: Chinmay
+triage: blocker
+prevention:
+  type: check
+  ref: tools/check-ticket-builds.py
+status: closed
+closed_by_commit: 611e02c9
+notes: 'check-ticket-builds B-NOT-BUILT fails an operations task that builds a held operation. Three promotions tables
+  explainRecommendation alone pulled into Block B go to Block C with their other users (departures). The contracts agent
+  was asked through the ledger to confirm any stub Block A needs.'

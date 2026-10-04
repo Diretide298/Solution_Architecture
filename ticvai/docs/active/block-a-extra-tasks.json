@@ -31,8 +31,12 @@
     "SETUP-AUTH"
    ],
    "subject": "Request kernel: hostname to tenant routing, per-transaction scope, error model and 429",
-   "detail": "In ticvai-backend. Resolve the tenant from the hostname (control-plane routing table, SD-021), open every transaction with the tenant and scope settings the row-level policies read (SD-059), one problem-details error model, and 429 with Retry-After on the hot public operations (SD-043). Done when: two seeded tenants on two hostnames cannot read each other's rows, and a flood test returns 429 instead of 500.",
+   "detail": "In ticvai-backend. Resolve the tenant from the hostname (control-plane routing table, SD-021), open every transaction with the tenant and scope settings the row-level policies read (SD-059), one problem-details error model, and 429 with Retry-After on the hot public operations (SD-043). Done when: two seeded tenants on two hostnames cannot read each other's rows, and a flood test returns 429 instead of 500. Spec (4 October, CHG-FXP-005): the routing table is `control.tenant_domain` (hostname, verified, redirect) in the control database, joined to `control.tenant` and `control.cell_tenant` for the tenant's cell and database (ADR-0038: one database per tenant inside its region's cell; ADR-0039: `control` is a database of its own and `control.cell` has no tenant_id, the relation is `control.cell_tenant`). The row-level policies of backend/tenant/920-row-level-security.sql read two session settings, set with SET LOCAL at the start of every transaction from the resolved session: `ticvai.scope_paths` (the comma-separated ltree scope paths the principal may see; unset or empty means no rows) and `ticvai.subject_id` (the guest's own rows). Venues stay partitions of the tenant database (ADR-0005), not databases.",
    "builds": [
+    "table control.tenant_domain",
+    "table control.tenant",
+    "table control.cell_tenant",
+    "table platform.scope",
     "adr ADR-0038",
     "adr ADR-0039",
     "adr ADR-0005"
@@ -101,8 +105,14 @@
     "PLATFORM-OUTBOX"
    ],
    "subject": "Order paid to tickets issued: the saga proven end to end",
-   "detail": "order.paid consumed by the entitlement owner, tickets issued, the ledger posting once from the event, and holds converted with capacity decremented (SD-026, SD-023). Done when: a web purchase in the sandbox ends with a ticket, one ledger posting and sold capacity reduced, and a replayed event changes nothing.",
+   "detail": "order.paid consumed by the entitlement owner, tickets issued, the ledger posting once from the event, and holds converted with capacity decremented (SD-026, SD-023). Done when: a web purchase in the sandbox ends with a ticket, one ledger posting and sold capacity reduced, and a replayed event changes nothing. Spec (4 October, CHG-FXP-005), from events/order-paid.yaml and events/entitlement-issued.yaml (adam_search order.paid): the payment transaction (createPayment, or the provider webhook) converts the inventory holds (`catalogue#convertInventoryHold`: the hold becomes sold capacity), posts the cash receipt to ledger.journal_entry and ledger.journal_line, and writes `order.paid` to the outbox in the same transaction; AccessService consumes it (`access#issueOrderEntitlements`, idempotency key orderId + lineId; on failure retry, then dead-letter, which pages) and publishes `entitlement.issued`; the orders consumer of that completes the order. A dead-lettered issuance is replayed, never compensated by an automatic refund. ADR-0055: modules in different deployables talk by event; ADR-0058: one relay per region and an inbox per tenant database, so a replayed event is a no-op.",
    "builds": [
+    "operation createPayment",
+    "operation convertInventoryHold",
+    "operation issueOrderEntitlements",
+    "table access.entitlement",
+    "table catalogue.inventory_hold",
+    "table catalogue.channel_capacity",
     "table ledger.journal_entry",
     "table ledger.journal_line",
     "adr ADR-0055",
@@ -118,7 +128,7 @@
     "PLATFORM-OUTBOX"
    ],
    "subject": "Payment adapter and signed webhook against the provider's test mode",
-   "detail": "The provider adapter, the inbound signed webhook, the provider reference on payments, 3-D Secure redirect states and the card-terminal flow for the POS (SD-034). Done when: an approved, a declined and a 3-D Secure payment each end in the right order state from the webhook alone, with polling only as the fallback. Acceptance of the declined, unknown and reconcile paths waits on the client's payment sandbox credentials: see the client's answer in the Decisions Register.",
+   "detail": "The provider adapter, the inbound signed webhook, the provider reference on payments, 3-D Secure redirect states and the card-terminal flow for the POS (SD-034). Done when: an approved, a declined and a 3-D Secure payment each end in the right order state from the webhook alone, with polling only as the fallback. Acceptance of the declined, unknown and reconcile paths waits on the client's payment sandbox credentials: see the client's answer in the Decisions Register. Until the client's sandbox credentials arrive (CLIENT-PAY-SANDBOX), the three outcomes are proven with signed webhook fixtures built from the provider's documented test payloads and a locally generated signing secret (CHG-FXP-006); the run against the provider's test mode follows when they arrive and is the acceptance of those paths.",
    "builds": [
     "operation receivePaymentProviderWebhook",
     "table payments.provider_event"
@@ -147,7 +157,8 @@
     "PLATFORM-KERNEL"
    ],
    "subject": "Release flags per tenant",
-   "detail": "Half-built features stay dark per tenant between sprints (SD-051). Done when: a flag switched off for one tenant hides a screen and refuses its operations for that tenant only."
+   "detail": "Half-built features stay dark per tenant between sprints (SD-051). Spec (default taken 4 October, CHG-FXP-005; for the lead to confirm): flags live in Azure App Configuration in the cell's region, read by every .NET host through Microsoft.FeatureManagement with a tenant targeting filter; a flag's key is an app-module key of the plan (for example `AM-MARKETING-CRM-P01`) and covers that app-module's screens and the operations they bind (their `apis` in screens/*.yaml). Off for a tenant: the apps leave its screens out of that tenant's navigation, and the kernel answers its operations with the shared 404 problem of contracts/shared/common.yaml, as if absent. Done when: with one app-module's flag off for tenant A only, A's guest web no longer shows that module's screens and its operations return 404 for A, while tenant B still sees and calls them; switching it back on restores A within a minute.",
+   "linksNothingBecause": "flags live in Azure App Configuration, not in a package artefact; the spec is in its text"
   },
   {
    "key": "PLATFORM-RLS",
@@ -158,8 +169,11 @@
     "PLATFORM-KERNEL"
    ],
    "subject": "Row-level policies without a per-row subquery on hot tables",
-   "detail": "Scope predicates read session settings instead of joining per row (SD-016). Done when: the order and scan-event queries keep their plan with policies on, measured on the seed data.",
+   "detail": "Scope predicates read session settings instead of joining per row (SD-016). Done when: the order and scan-event queries keep their plan with policies on, measured on the seed data. Spec (4 October, CHG-FXP-005): the policies are generated in backend/tenant/920-row-level-security.sql by `platform.apply_scope_rls` and its siblings; today each USING clause calls `platform.in_scope(scope_path)`, which unnests `ticvai.scope_paths` for every row. On the hot tables (the order and scan-event tables linked here, partitioned by venue_id with venue_id leading the key: ADR-0044, ADR-0005), rewrite the predicate so the planner evaluates the session setting once per statement (an InitPlan over `platform.current_scope_paths()`, or a `venue_id = ANY(...)` predicate that keeps partition pruning) instead of per row; the policy names and deny-by-default stay. Measured with EXPLAIN (ANALYZE) on the seed data before and after.",
    "builds": [
+    "table orders.sales_order",
+    "table access.scan_event",
+    "table platform.scope",
     "adr ADR-0005",
     "adr ADR-0044"
    ]
@@ -173,7 +187,14 @@
     "SETUP-OBS"
    ],
    "subject": "Observability with tenant and venue on every trace, and the first dashboards",
-   "detail": "OpenTelemetry attributes for tenant, venue and workstation; dashboards for the sale path and sync; alerts on error rate and latency (SD-048). Done when: a failed POS sale can be found by venue and till within a minute."
+   "detail": "OpenTelemetry attributes for tenant, venue and workstation; dashboards for the sale path and sync; alerts on error rate and latency (SD-048). Done when: a failed POS sale can be found by venue and till within a minute. Spec (4 October, CHG-FXP-005), docs/architecture/observability.md: every log, metric and span carries tenant_id, region_id and venue_id (plus cell, correlation and session id on traces, and workstation on POS metrics), set by the kernel from the resolved session and the workstation. The sale path is the operations linked here (createOrder and createPayment in OrderService, validateAccess in AccessService); sync is syncOrders and syncScans. The first alerts are that document's list (outbox backlog per device, replication lag per cell, PgBouncer pool saturation, Redis-Postgres capacity divergence, the venue edge heartbeat) on the stack SETUP-OBS sets up.",
+   "builds": [
+    "operation createOrder",
+    "operation createPayment",
+    "operation syncOrders",
+    "operation syncScans",
+    "operation validateAccess"
+   ]
   },
   {
    "key": "PLATFORM-MIGRATE",
@@ -184,8 +205,13 @@
     "SETUP-DB"
    ],
    "subject": "Migration fan-out across tenant databases, and expand-then-contract changes",
-   "detail": "Apply a migration to every tenant database with progress and resume, and the rule that a schema change ships in two steps so old and new code both run (SD-049). Done when: a column rename reaches three seeded tenant databases with no downtime.",
+   "detail": "Apply a migration to every tenant database with progress and resume, and the rule that a schema change ships in two steps so old and new code both run (SD-049). Done when: a column rename reaches three seeded tenant databases with no downtime. Spec (4 October, CHG-FXP-005), ADR-0039 section 3: the fan-out unit is a tenant database and the canary is a tenant inside a canary cell; one `control.migration_run_tenant` row per tenant per run (status, from_version, to_version, error, timings), with `control.migration_run_cell` as the rollup; `control.migration_plan_cell` names all tenants of a cell or a named set. A failed tenant stops its wave and is resumed from its row; tenants already done stay done.",
    "builds": [
+    "table control.migration",
+    "table control.migration_run",
+    "table control.migration_run_cell",
+    "table control.migration_run_tenant",
+    "table control.migration_plan_cell",
     "adr ADR-0039"
    ]
   },
@@ -199,6 +225,7 @@
    ],
    "subject": "Hosts for the deployables on .NET 10: commerce, access, operations and workers, each composing its modules",
    "detail": "In **ticvai-backend**, on .NET 10 LTS (decided 30 September; ADR-0055). Four .NET hosts in one solution: commerce (Identity, Tenancy, Catalogue, Order, Ledger, Wallet), access (Access), operations (F&B, Retail, Inventory, VenueOps, Marketing, WhiteLabel, Reporting, Platform, CrossRegion) and workers (the outbox relay, every module's event consumers, scheduled jobs), each composing its modules through IModule. ticvai-ai stays the Python service. Done when: each host starts locally with its modules registered and a health endpoint, CI builds one image per host, and moving a module to another host is a change of one registration.",
+   "linksNothingBecause": "the hosts and their solution layout, infrastructure only; its text names them",
    "builds": [
     "adr ADR-0055"
    ]
@@ -213,6 +240,7 @@
    ],
    "subject": "Architecture tests for 17 modules: no module references another, and no module's SQL names another's schema",
    "detail": "Extend tests/Ticvai.ArchitectureTests/ModuleBoundaryTests.cs from six modules to 17 (ADR-0055), and add a test that fails when a module's SQL names another module's schema other than through a published read view. Done when: a deliberate cross-module reference and a raw cross-schema query each fail the build in CI.",
+   "linksNothingBecause": "architecture tests over the code, not a package artefact; its text names the test file",
    "builds": [
     "adr ADR-0055",
     "adr ADR-0028"
@@ -227,7 +255,8 @@
     "MIG-BASELINE"
    ],
    "subject": "Published read views for cross-module reads, generated from the lineage",
-   "detail": "A deriver reads handoff/api-data-lineage.json and generates, per owning module, the views other modules may read (894 cross-schema reads on 30 September; ADR-0055), applied by the migrations. Done when: every cross-schema read in the Block A slice goes through a published view, the views regenerate with one command, and a raw cross-schema read is reported by the lineage check.",
+   "detail": "A deriver reads handoff/api-data-lineage.json and generates, per owning module, the views other modules may read (894 cross-schema reads on 30 September; ADR-0055), applied by the migrations. Done when: every cross-schema read in the Block A slice goes through a published view, the views regenerate with one command, and a raw cross-schema read is reported by the lineage check. Spec (4 October, CHG-FXP-005), ADR-0055 rule 2: another module reads a schema only through views its owner publishes (or the owner's in-process query interface), never raw tables; the owner is the schema's module in handoff/service-decomposition.json. Default for the shape: one view per (reader module, owned table) pair the lineage actually reads, in the owner's schema, named `<table>_for_<reader module>`, exposing only the columns the reader's operations read, with SELECT granted to the reader's deployable role (DB-ROLES). Reads routed `analytical` go to the reporting replica, never the primary (ADR-0016).",
+   "linksNothingBecause": "the views are generated from handoff/api-data-lineage.json; the rules and the naming are in its text",
    "builds": [
     "adr ADR-0055",
     "adr ADR-0016"
@@ -242,7 +271,8 @@
     "MIG-BASELINE"
    ],
    "subject": "One Postgres role per deployable; the AI role read-only",
-   "detail": "In ticvai-backend, created by the baseline migration (MIG-BASELINE), one PostgreSQL login role per deployable of ADR-0055: commerce, access, operations, workers and ticvai_ai, each reading its password or token from the cell's Key Vault. Each role gets USAGE and SELECT, INSERT, UPDATE, DELETE on the schemas its modules own (the schema owners in handoff/service-decomposition.json; workers runs every module's consumers, the outbox relay and the scheduled jobs, so it gets the schemas those touch), SELECT on the published read views of DB-READ-VIEWS, and nothing else: no CREATE, no ownership, no BYPASSRLS, so FORCE row-level security applies to every host. ticvai_ai writes only the ai schema (and ai.inbox; ADR-0058) and is read-only on the transactional schemas (ADR-0020). The tables are owned by a separate migration role that only SqlMigrationRunner uses. Done when: each host connects with its own role from Key Vault; an INSERT from the ticvai_ai role into a transactional table, and from the commerce role into an operations schema (fnb), are each refused by PostgreSQL; no host role has BYPASSRLS or owns a table (a query on pg_roles and pg_tables in CI shows it); and a host role with no scope set on its session reads no rows from a table under FORCE row-level security.",
+   "detail": "In ticvai-backend, created by the baseline migration (MIG-BASELINE), one PostgreSQL login role per deployable of ADR-0055: commerce, access, operations, workers and ticvai_ai, each reading its password or token from the cell's Key Vault. Each role gets USAGE and SELECT, INSERT, UPDATE, DELETE on the schemas its modules own (the schema owners in handoff/service-decomposition.json; workers runs every module's consumers, the outbox relay and the scheduled jobs, so it gets the schemas those touch), SELECT on the published read views of DB-READ-VIEWS, and nothing else: no CREATE, no ownership, no BYPASSRLS, so FORCE row-level security applies to every host. ticvai_ai writes only the ai schema (and ai.inbox; ADR-0058) and is read-only on the transactional schemas (ADR-0020). The tables are owned by a separate migration role that only SqlMigrationRunner uses. Done when: each host connects with its own role from Key Vault; an INSERT from the ticvai_ai role into a transactional table, and from the commerce role into an operations schema (fnb), are each refused by PostgreSQL; no host role has BYPASSRLS or owns a table (a query on pg_roles and pg_tables in CI shows it); and a host role with no scope set on its session reads no rows from a table under FORCE row-level security. The schemas each role owns (handoff/service-decomposition.json under ADR-0055's five deployables, 4 October, CHG-FXP-005): commerce: identity, pii, platform, workforce, approvals, accreditation, tenancy, kernel, catalogue, pricing, promotions, seating, orders, payments, ledger, wallet; access: access; operations: inventory, fnb, retail, marketing, queue, maintenance, resources, venuemap, assets, games, rental, transport, subscription, whitelabel, reporting, sync (and control, in the control database, ADR-0039); ticvai_ai: ai (and ai.inbox), read-only on the rest; workers: the schemas its consumers, the outbox relay and the scheduled jobs write, which is every module's.",
+   "linksNothingBecause": "roles and grants on every schema, not a table or operation of its own: the owners are listed in its text",
    "builds": [
     "adr ADR-0055",
     "adr ADR-0020"
@@ -258,6 +288,7 @@
    ],
    "subject": "One id type: UUIDv7 from Id.New() in the kernel and in offline-core",
    "detail": "Replace the kernel's ULID generator (Ticvai.Shared.Kernel Primitives/Ulid.cs) with Id.New(), a UUIDv7 Guid (RFC 9562) written big-endian so PostgreSQL's uuid order is time order (ADR-0056), and the same generator in ticvai-frontend packages/offline-core for ids created offline. Done when: ids made by the server and by an offline till sort by creation time in PostgreSQL, a .NET-to-TypeScript round-trip test agrees byte for byte, and no ULID string is generated anywhere.",
+   "linksNothingBecause": "the id generator in the kernel and offline-core; its text names the files",
    "builds": [
     "adr ADR-0056"
    ]
@@ -296,6 +327,7 @@
    ],
    "subject": "Qdrant cluster in dev and staging: 3 nodes, TLS, snapshots, monitoring",
    "detail": "In **ticvai-infra** (Terraform): a self-hosted 3-node Qdrant cluster in Azure UAE North for dev and staging (ADR-0049), pinned to 1.16 or later, with TLS, JWT RBAC on and the signing key in the cell's Key Vault, snapshot storage in the UAE, and monitoring and alerts on node health, disk and latency. Check Qdrant Hybrid Cloud on our own AKS as an alternative before building. Done when: the cluster survives the loss of one node, a snapshot of a test collection restores into a fresh cluster, and a request without a valid token is refused.",
+   "linksNothingBecause": "infrastructure (Terraform) only; its text names the cluster's settings",
    "builds": [
     "adr ADR-0049",
     "adr ADR-0021"
@@ -310,8 +342,14 @@
     "SETUP-CLIENTS"
    ],
    "subject": "Offline journal in packages/offline-core: record, replay and the conflict policies",
-   "detail": "In ticvai-frontend packages/offline-core: an append-only journal of sales and scans taken offline, replay on reconnect, and the conflict policies the contracts declare (SD-047). Done when: a POS takes ten cash sales with the network off and all ten reach the server once when it returns.",
+   "detail": "In ticvai-frontend packages/offline-core: an append-only journal of sales and scans taken offline, replay on reconnect, and the conflict policies the contracts declare (SD-047). Done when: a POS takes ten cash sales with the network off and all ten reach the server once when it returns. Spec (4 October, CHG-FXP-005): the conflict policies are the `x-ticvai-conflict-policy` of each operation the journal records (linked here): `append` for createOrder, createPayment, createCashMovement and validateAccess (nothing is overwritten, so a replayed entry is a new fact, deduplicated by its idempotency key); `lastWriterWins` only where an operation declares it (holdOrder); `serverWins` for everything else (the server's version stands and the till re-reads). Replay goes through `orders#syncOrders` and `access#syncScans` in journal order, each entry with the idempotency key it was taken with. ADR-0013: the catalogue is read locally on every transaction, online or not, and contended inventory sells only from a lease; ADR-0022: the four policies and why the set is closed.",
    "builds": [
+    "operation createOrder",
+    "operation createPayment",
+    "operation createCashMovement",
+    "operation validateAccess",
+    "operation syncOrders",
+    "operation syncScans",
     "adr ADR-0013",
     "adr ADR-0022"
    ]
@@ -325,8 +363,13 @@
     "PLATFORM-KERNEL"
    ],
    "subject": "Signed catalogue and entitlement bundles, and the lease client",
-   "detail": "The signed bundle a till or scanner trades from offline, including entitlements and dynamic access policy for the scanner (SD-052), and the lease each workstation holds (SD-047). Done when: a till with an expired lease stops selling offline and says why.",
+   "detail": "The signed bundle a till or scanner trades from offline, including entitlements and dynamic access policy for the scanner (SD-052), and the lease each workstation holds (SD-047). Two bundles: the till's signed catalogue bundle (`catalogue#getLatestBundle`, applied whole or not at all and acknowledged with `catalogue#reportBundleApplied`; table catalogue.published_bundle) and the scanner's offline package (`access#getOfflinePackage`). The lease is ADR-0013 section 2: a till holds N units of contended timed capacity for a TTL through `catalogue#acquireInventoryHold` (catalogue.inventory_hold), renewed while the link is up; unsold units return on expiry; seated inventory stays blocked offline (CHG-FXP-005). Done when: a till whose lease has expired refuses the next offline sale of that capacity and the POS-002 sale drawer says why (the offline allowance has expired; reconnect to sell more) instead of selling; a till with a valid lease sells down to zero and then refuses the same way; it never oversells.",
    "builds": [
+    "operation getLatestBundle",
+    "operation reportBundleApplied",
+    "operation acquireInventoryHold",
+    "table catalogue.published_bundle",
+    "table catalogue.inventory_hold",
     "operation getOfflinePackage",
     "adr ADR-0013"
    ]
@@ -572,8 +615,9 @@
     "PLATFORM-KERNEL"
    ],
    "subject": "Per-tenant request budgets: a token bucket per tenant and audience, and a load-aware share per replica",
-   "detail": "ADR-0064 (accepted 1 October), in the kernel middleware of the commerce, access and operations hosts: a token bucket per tenant and audience (guest/public, staff, service, partner) with counts shared through Azure Managed Redis, sustained rate and a 2x burst for 10 seconds from the tenant's plan (Plan.requestLimits) or the platform default; one tenant held to 25% of a replica's request slots only while the replica is above 70% of its limit; shedding guest and public first, staff and service last (ADR-0032); 429 with Retry-After and the RateLimit-* headers; if Redis is unavailable each replica falls back to its own in-process buckets (the limit divided by the replica count). Done when: in a test with two tenants on one replica, the busy tenant gets the whole replica while the other is quiet, is held to 25% of the slots once the replica passes 70% while the quiet tenant's requests still succeed, a guest burst never spends a till's staff budget, and stopping Redis leaves requests served under the in-process limits.",
+   "detail": "ADR-0064 (accepted 1 October), in the kernel middleware of the commerce, access and operations hosts: a token bucket per tenant and audience (guest/public, staff, service, partner) with counts shared through Azure Managed Redis, sustained rate and a 2x burst for 10 seconds from the tenant's plan (Plan.requestLimits) or the platform default; one tenant held to 25% of a replica's request slots only while the replica is above 70% of its limit; shedding guest and public first, staff and service last (ADR-0032); 429 with Retry-After and the RateLimit-* headers; if Redis is unavailable each replica falls back to its own in-process buckets (the limit divided by the replica count). Done when: in a test with two tenants on one replica, the busy tenant gets the whole replica while the other is quiet, is held to 25% of the slots once the replica passes 70% while the quiet tenant's requests still succeed, a guest burst never spends a till's staff budget, and stopping Redis leaves requests served under the in-process limits. Contract (4 October, CHG-FXP-005): the plan's limits are `Plan.requestLimits` in contracts/satellite/subscription.yaml (read with `subscription#getPlan`); the refusal is the shared `rate-limited` problem (429) of contracts/shared/common.yaml with `Retry-After` and the RateLimit-Limit, RateLimit-Remaining and RateLimit-Reset headers it defines.",
    "builds": [
+    "operation getPlan",
     "adr ADR-0032",
     "adr ADR-0064"
    ]
@@ -588,7 +632,8 @@
     "KERNEL-TENANT-LIMITS"
    ],
    "subject": "Alerts on one tenant's share of its connection pool and on max_connections",
-   "detail": "ADR-0064 item 4: per-tenant pool caps stay, and two alerts watch them: one tenant holding more than 60% of its pool for five minutes, and the instance passing 80% of max_connections; plus a dashboard panel of 429s per tenant and audience from KERNEL-TENANT-LIMITS. Done when: a load run that holds one tenant's pool fires the first alert after five minutes naming the tenant, and opening connections past 80% of max_connections fires the second.",
+   "detail": "ADR-0064 item 4: per-tenant pool caps stay, and two alerts watch them: one tenant holding more than 60% of its pool for five minutes, and the instance passing 80% of max_connections; plus a dashboard panel of 429s per tenant and audience from KERNEL-TENANT-LIMITS. Done when: a load run that holds one tenant's pool fires the first alert after five minutes naming the tenant, and opening connections past 80% of max_connections fires the second. Where the numbers come from (4 October, CHG-FXP-005): one tenant's share is PgBouncer's SHOW POOLS for that tenant database (cl_active plus cl_waiting against pool_size); the instance figure is the count of pg_stat_activity against max_connections; both are scraped into the Prometheus-compatible metrics of SETUP-OBS and alert through its Azure Monitor action group, labelled with tenant_id and cell.",
+   "linksNothingBecause": "alerts on PgBouncer and PostgreSQL statistics; the thresholds and where they come from are in its text",
    "builds": [
     "adr ADR-0032",
     "adr ADR-0064"
@@ -626,6 +671,7 @@
    ],
    "subject": "Load test the waiting room at 30,000 arrivals in the burst environment",
    "detail": "ADR-0066 item 4, before the first large sale: 30,000 arrivals in the opening seconds against a burst environment (ADR-0035) with the waiting room on, recording position latency, the Front Door cache hit rate, the release rate the controller holds, commerce p95 and 429s, and the relay lag while admitted guests buy (ADR-0058 amendment: 3,500 events a second). Done when: all 30,000 get a position without a database write, admitted guests buy with commerce p95 inside its target, no cart hold succeeds without a token, and the results are recorded against the sizing figures.",
+   "linksNothingBecause": "a load run on a burst environment; its text gives the numbers to record",
    "module": "Foundation & Setup",
    "builds": [
     "adr ADR-0035",
@@ -664,7 +710,8 @@
     "PLATFORM-KERNEL"
    ],
    "subject": "Identity verification for accreditation: UAE Pass and ICP",
-   "detail": "2 October (Chinmay, DEC-457): UAE Pass sign-in/verification and ICP (Federal Authority for Identity, Citizenship, Customs and Port Security) document checks for accreditation applicants, alongside manual review. Needs client access to both (external dependencies register). Done when: an applicant verified through UAE Pass shows the verified identity on the reviewer workspace, and an ICP check result is recorded on the application."
+   "detail": "2 October (Chinmay, DEC-457): UAE Pass sign-in/verification and ICP (Federal Authority for Identity, Citizenship, Customs and Port Security) document checks for accreditation applicants, alongside manual review. Needs client access to both (external dependencies register). Done when: an applicant verified through UAE Pass shows the verified identity on the reviewer workspace, and an ICP check result is recorded on the application.",
+   "linksNothingBecause": "external integrations that wait on client access to UAE Pass and ICP; its text names them"
   },
   {
    "key": "TEST-SAME-NUMBERS",
@@ -676,7 +723,8 @@
    "platform": "API",
    "depends": [],
    "subject": "Same numbers test: till, back-office and Analytics reports agree",
-   "detail": "2 October (Chinmay, DEC-559, prevention of CHG-FIN-006): an automated comparison of the same measure (takings, gross sales, net revenue, refunds) for the same period and scope on the till report (POS-008), the back-office report and the Analytics (P16) dashboard; fails when they differ. Done when: the test runs in CI against the seeded demo tenant."
+   "detail": "2 October (Chinmay, DEC-559, prevention of CHG-FIN-006): an automated comparison of the same measure (takings, gross sales, net revenue, refunds) for the same period and scope on the till report (POS-008), the back-office report and the Analytics (P16) dashboard; fails when they differ. Done when: the test runs in CI against the seeded demo tenant.",
+   "builds": ["screen POS-008"]
   }
  ],
  "blockA1Operations": {
@@ -711,9 +759,14 @@
   "EMP-002": "the staff app's venue and role selection after sign-in (F08, F64): the lead's r1 finding of 3 October, 'pull EMP-002 and EMP-003 into Block A' (CHG-RONEP-006)."
  },
  "screenNotes": {
+  "POS-003": "Built as step two of the POS-002 sale drawer (date and session), not as a page of its own: the 3 August workshop replaced the full-page navigation, so the component is the drawer step and the spec's route is not built (default, 4 October, CHG-FXP-002).",
+  "POS-004": "Built as step three of the POS-002 sale drawer (seat selection inside the drawer), not as a full-screen page: the 3 August workshop replaced the page, and a full-screen tablet seat map is not in Block A (default, 4 October, CHG-FXP-002).",
   "BO-1065": "Includes the AI residency section (aiResidencyClass, aiResidencyOptIn and allowedAiResidencies on the region settings; ADR-0009 as amended on 2 October), drawn and built in Block A (CHG-RONEP-001)."
  },
  "departures": {
+  "table promotions.product_relationship": "old-r2 built it in Block B (MIG-PROMOTIONS-4) only because explainRecommendation, a Block B operation, reads it; explainRecommendation is deprecated (superseded) and no longer planned (CHG-FXP-003), so the table goes with the operations that still use it, in Block C.",
+  "table promotions.recommendation_strategy": "old-r2 built it in Block B (MIG-PROMOTIONS-4) only because explainRecommendation, a Block B operation, reads it; explainRecommendation is deprecated (superseded) and no longer planned (CHG-FXP-003), so the table goes with the operations that still use it, in Block C.",
+  "table promotions.recommendation_suppression": "old-r2 built it in Block B (MIG-PROMOTIONS-4) only because explainRecommendation, a Block B operation, reads it; explainRecommendation is deprecated (superseded) and no longer planned (CHG-FXP-003), so the table goes with the operations that still use it, in Block C.",
   "operation activateJourney": "r2 built it in Block A (SVC-MARKETING-MARKETING-15); it goes with AM-MARKETING-CRM-P08-2 in Block D now: bound on BO-775 (Block D), and no Block A or B screen, flow or decision needs it. r2 had it in Block A only beside work Block A needed (a four-operation task or a migration takes everything of its app-module) (CHG-RONEP-002).",
   "operation addRiskCaseEvidence": "r2 built it in Block B (SVC-AI-RISK-3); it goes with AM-AI-P08 in Block D now: bound on ADM-633 (Block D), and no Block A or B screen, flow or decision needs it. A read no longer pulls its own service's writers forward (lever B, CHG-RONEP-007), and Block B is filled in build order to what the team finishes by its target (CHG-RONEP-002).",
   "operation adjustLoyaltyPoints": "r2 built it in Block B (VM-MARKETING-LOYALTY-1); it goes with AM-MARKETING-CRM-P08 in Block D now: bound on BO-735 (Block D), and no Block A or B screen, flow or decision needs it. A read no longer pulls its own service's writers forward (lever B, CHG-RONEP-007), and Block B is filled in build order to what the team finishes by its target (CHG-RONEP-002).",
@@ -971,5 +1024,13 @@
   "BO-107": "a section home of Venue Management: lever A, Chinmay, 3 October (CHG-RONEP-007): the navigation closure pulls in app homes only, and the section homes link to their setup screens",
   "BO-108": "a section home of Venue Management: lever A, Chinmay, 3 October (CHG-RONEP-007): the navigation closure pulls in app homes only, and the section homes link to their setup screens",
   "EMP-003": "the staff app's home on duty: the lead's finding of 3 October, 'pull EMP-002 and EMP-003 into Block A' (CHG-RONEP-006, CHG-RONEP-007)"
+ },
+ "screensNotBuiltNote": "screen -> {kind, into, why}: screens given no build task although their notes do not say \"Merged into\" (tools/ticket_done.py screen_hold, CHG-FXP-002): a replaced page (kind \"replaced\", into the screen that carries it) or a screen nobody could define in time (kind \"undefined\": out of the plan until a person defines it). A screen whose notes lead with \"**Merged into X**\" needs no entry.",
+ "screensNotBuilt": {
+  "BO-822": {"kind": "undefined", "into": "", "why": "cannot be defined yet: no operation stores service-recovery automation rules (contract gap CHG-WIR-007); the rules, cases and approvals need a contract design a person decides (the screens agent, 4 October; CHG-FXP-004)"},
+  "BO-1069": {"kind": "undefined", "into": "", "why": "cannot be defined yet: no tenant-facing operation reports platform service status (contract gap CHG-WIR-024) (the screens agent, 4 October; CHG-FXP-004)"},
+  "BO-1072": {"kind": "undefined", "into": "", "why": "cannot be defined yet: no staff read of the published API definitions for the seat API catalogue (contract gap CHG-WIR-027) (the screens agent, 4 October; CHG-FXP-004)"},
+  "BO-1179": {"kind": "undefined", "part": "rest", "into": "", "why": "the rest cannot be defined yet: its setup operation setApiClientStatus stays on APP-SETUP-BO-1179, but the rest is an integration-exception console (endpoint, error code, attempts, owner) with no operation or table holding wallet integration exceptions; WalletDispute is a guest dispute record (the contracts agent, 4 October; CHG-FXP-004)"},
+  "ADM-408": {"kind": "undefined", "into": "", "why": "cannot be defined yet: no operation approves a prospect's commercial package and hands it to purchase and contract activation (contract gap CHG-WIR-024); a commercial process the lead has not specified (the screens agent, 4 October; CHG-FXP-004)"}
  }
 }
