@@ -22,5 +22,6 @@ triage: fix-forward
 prevention:
   type: check
   ref: tools/refresh.sh
-status: open
+status: closed
+closed_by_commit: a9296266
 notes: Batch RFM (r1-fix-merge), 4 October 2026. Closes on its commit.
