@@ -24,6 +24,7 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/build-plan-deck.py::_style
-status: open
+status: closed
+closed_by_commit: 9725f76d
 notes: 'Batch RFM (r1-fix-merge), 4 October 2026. Proven by a run into a scratch PLAN_OUT on the merged branch:
-  every block, A2 included, written to build-plan.json, both workbooks and the presentation.'
+  every block, A2 included, written to build-plan.json, both workbooks and the presentation. Closed on 9725f76d.'

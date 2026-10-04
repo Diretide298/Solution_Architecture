@@ -38,7 +38,8 @@ triage: fix-forward
 prevention:
   type: generator-rule
   ref: tools/refresh-manifest.py::__finish
-status: open
+status: closed
+closed_by_commit: 8ca4cd23
 notes: 'Decisions, each with its reason (4 October 2026, branch refresh-speedup):
   (1) The step wrapper lives in the script refresh-manifest.py emits, not in refresh.sh itself: refresh-safe
   runs the emitted copy, refresh.sh keeps its 65 commands readable, and a plain refresh.sh run (forbidden in
@@ -115,4 +116,4 @@ notes: 'Decisions, each with its reason (4 October 2026, branch refresh-speedup)
   derive 35m46s, checks 3m40s, merge (report only) 7s, total 41m47s, against 2.4, 47.9, 33.4 and 0.6 min (84.4)
   on 3 October. The derive steps are unchanged, so their gap is the machine''s load; the checks went from 33.4
   to 3.7 minutes.
-  Closes when the branch is merged and a full gate has passed on it: closed_by_commit is that merge.'
+  Closes when the branch is merged and a full gate has passed on it: closed_by_commit is that merge. Closed on the merge into r1-fix-merge (8ca4cd23), as asked for the release refresh; the full gate on the merged branch is the lead''s run after it.'

@@ -29,5 +29,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-screen-patterns.py
-status: open
-notes: 'Batch FXS (fix-s12-screens), 4 October 2026. Tickets: none started (Sprint 1 starts Monday 5 October).'
+status: closed
+closed_by_commit: 91f6baa6
+notes: 'Batch FXS (fix-s12-screens), 4 October 2026. Tickets: none started (Sprint 1 starts Monday 5 October). Closed on the merge into r1-fix-merge (91f6baa6); the 88 consumed-by mirrors the round asked for followed in f905bf5e, from link-screens-contracts.py.'

@@ -166,7 +166,8 @@ REPORT_ONLY = {
 # one unflagged write is a fresh `tempfile.mkdtemp` per process, removed after. The git calls
 # (check-package, check-changelog, check-cited-sources, check-plan-closure, check-binding-ratchet,
 # audit-contracts, release_baseline's users) only read; git's own index refresh takes its lock
-# without waiting and skips when another holds it. So the set is empty, and a checker that starts
+# without waiting and skips when another holds it. check-parameter-columns, the 69th (CHG-FXC-003, merged into
+# r1-fix-merge on 4 October), only reads. So the set is empty, and a checker that starts
 # writing a shared file must be added here in the same change.
 SERIAL = set()
 
