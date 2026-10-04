@@ -75,6 +75,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-parameter-columns.py
-status: open
+status: closed
+closed_by_commit: 68736bcb
 notes: 'check-parameter-columns is a ratchet: 226 known findings baselined (104 P-PARAM-NO-COLUMN, 57 P-NAMED-TABLE, 65
   P-DRAFTED-UNMAPPED); a new operation must not add one.'

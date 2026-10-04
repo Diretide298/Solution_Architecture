@@ -38,5 +38,6 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-parameter-columns.py
-status: open
+status: closed
+closed_by_commit: 68736bcb
 notes: P-NAMED-TABLE fails a new operation whose description names a table its lineage does not list.

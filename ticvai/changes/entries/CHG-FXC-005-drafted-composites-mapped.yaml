@@ -39,6 +39,7 @@ triage: blocker
 prevention:
   type: check
   ref: tools/check-parameter-columns.py
-status: open
+status: closed
+closed_by_commit: 68736bcb
 notes: P-DRAFTED-UNMAPPED fails a new drafted write that says no table stores it while it writes one; the 65 known are the
   drafted-storage backlog, listed for Chinmay.
