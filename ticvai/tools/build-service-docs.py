@@ -90,8 +90,8 @@ def block_a_decisions() -> dict:
       blockAScreens       screen -> why Block A builds the whole screen (its setup part and the rest)
       screenNotes         screen -> a sentence its Block A tasks carry (BO-1065: the AI residency section)
       screenModules       screen -> {module, why}: the business module a screen's tasks are grouped under when its
-                          operations' majority would put it elsewhere (CHG-RFM-006: ADM-503/504/505 stay in Identity &
-                          Security, Block B, as r2 had them, after binding listForecastDefinitions made them AI's)
+                          operations' majority would put it elsewhere (CHG-RFM-006: ADM-503/504/505 stay in Identity, Roles
+                          & Security, Block B, as r2 had them, after binding listForecastDefinitions made them AI's)
 
     tools/check-plan-closure.py reads the same file and checks that the plan holds them."""
     if not EXTRA.exists():
@@ -1871,7 +1871,10 @@ def main() -> int:
 
     def screen_module(sid):
         if sid in decided["screenModules"]:
-            return decided["screenModules"][sid]
+            m_ = decided["screenModules"][sid]
+            if m_ not in sp.MODULE_PHASE:          # a display name ("Identity & Security") made an AM-X app-module
+                raise SystemExit(f"block-a-extra-tasks.json screenModules {sid}: {m_!r} is not a module of sprint_plan")
+            return m_
         s_ = screens[sid]
         mods = Counter(op_module[a["operationId"]] for a in s_.get("apis") or []
                        if isinstance(a, dict) and a.get("operationId") in op_module)
