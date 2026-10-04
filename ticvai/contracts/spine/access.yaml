@@ -31577,6 +31577,12 @@ components:
           - suspicious
           - blocked
           description: Security status
+        bindingId:
+          type: string
+          format: uuid
+          readOnly: true
+          description: '**The binding this row is** (4 October 2026, CHG-FXC-011; BO-167): the `access.device_binding` id
+            `releaseCredentialDevice` takes as `{bindingId}`.'
     DeviceBindingSessionSecurityViewSummary:
       type: object
       x-ticvai-persistence: none - aggregate computed at read time over the rows the page lists

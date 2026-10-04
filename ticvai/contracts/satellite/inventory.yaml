@@ -1235,6 +1235,50 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /stock-counts/{countId}/lines:
+    get:
+      operationId: listStockCountLines
+      x-ticvai-consumed-by:
+        - "P06 EMP-066 Stock Count & Cycle Count Management"
+      summary: The lines of a stock count
+      description: |-
+        **Added 4 October 2026 (CHG-FXC-011; EMP-066: the count screen needs its pre-filled lines).** The count's `inventory.count_line` rows (CountLine), ordered by item. **A blind count hides what is expected**: while an `isBlind` count is open, `theoreticalQuantity`, `variance` and `variancePercent` are null; they appear once the count is submitted.
+      tags:
+      - count
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: countId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The lines of a stock count
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/CountLine'
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     parameters:
     - name: countId
       in: path

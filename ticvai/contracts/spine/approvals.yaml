@@ -3842,6 +3842,41 @@ paths:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+  /approval-requests/{requestId}:
+    get:
+      operationId: getApprovalRequest
+      x-ticvai-consumed-by:
+        - "P08 BO-085 Approval Inbox"
+      summary: One approval request
+      description: |-
+        **Added 4 October 2026 (CHG-FXC-011; VM-BO-085: listApprovalRequests has no id filter).** One request with its decisions so far.
+      tags:
+      - request
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: requestId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: One approval request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalRequest'
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   securitySchemes:
     bearerAuth:

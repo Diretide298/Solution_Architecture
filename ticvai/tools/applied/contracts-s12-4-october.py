@@ -930,7 +930,7 @@ description: |-
   `marketing.message_template_version`, so a campaign already sent keeps the version it used. A template whose
   `ownership` is `platform` is TICVAI's and is refused with 409; copy it with `createMessageTemplate` instead.
 tags:
-- marketing
+- message
 x-ticvai-permission: MARKETING_MANAGE
 x-ticvai-audience:
 - staff
@@ -1008,7 +1008,7 @@ description: |-
   rows), `pointsExpireAfterMonths` and `isActive`. Points already earned keep the rule and the expiry they were earned
   under; the change applies to what is earned from now. Tiers are not changed here.
 tags:
-- marketing
+- loyalty
 x-ticvai-permission: MARKETING_MANAGE
 x-ticvai-audience:
 - staff
@@ -1154,7 +1154,7 @@ description: |-
   screen must show the checks, the impact and the stage before anyone decides.** Returns the view the PUT returns for
   one membership product version; without `version`, the latest.
 tags:
-- subscription
+- drafted
 x-ticvai-permission: PLATFORM_CELL_MANAGE
 x-ticvai-audience:
 - staff
@@ -1281,7 +1281,7 @@ description: |-
   `getTaxProfileJurisdiction?taxProfileId=` and saved with `setTaxProfileJurisdiction`, which creates a profile when the
   body's `taxProfileId` is empty and updates that profile otherwise.
 tags:
-- catalogue
+- drafted
 x-ticvai-permission: PRODUCT_VIEW
 x-ticvai-audience:
 - staff
@@ -1393,6 +1393,278 @@ responses:
 """)
 LINEAGE["getAccreditationValidity"] = (["accreditation.validity"], [], [], [], "reads what setAccreditationValidity stores")
 
+# ── second batch of ledger requests, and recordCorrectiveAction's body (CHG-FXC-011) ──────────────────────────────
+def _read_op(oid, perm, scope, path_doc, tag, summary, desc, params, schema, consumed, more_responses=""):
+    return ("operationId: %s\nx-ticvai-consumed-by:\n%s\nsummary: %s\ndescription: |-\n%s\ntags:\n- %s\n"
+            "x-ticvai-permission: %s\nx-ticvai-audience:\n- staff\nx-ticvai-scope-level: %s\n"
+            "x-ticvai-read-routing: replica\nx-ticvai-offline-capable: false\nx-ticvai-conflict-policy: serverWins\n"
+            "%sresponses:\n  '200':\n    description: %s\n    content:\n      application/json:\n        schema:\n%s\n%s"
+            "  '429':\n    $ref: '../shared/common.yaml#/components/responses/TooManyRequests'\n") % (
+        oid, "\n".join('  - "%s"' % c for c in consumed), summary,
+        Y.textwrap.indent(Y.textwrap.dedent(desc).strip("\n"), "  "), tag, perm, scope,
+        ("parameters:\n" + Y.textwrap.indent(Y.textwrap.dedent(params).strip("\n"), "") + "\n") if params else "",
+        summary, Y.textwrap.indent(Y.textwrap.dedent(schema).strip("\n"), "          "), more_responses)
+
+
+PAGED = """
+- $ref: ../shared/common.yaml#/components/parameters/PageSize
+- $ref: ../shared/common.yaml#/components/parameters/PageCursor
+"""
+
+
+def _page_of(ref):
+    return ("allOf:\n- $ref: ../shared/common.yaml#/components/schemas/Page\n- type: object\n  properties:\n"
+            "    items:\n      type: array\n      items:\n        $ref: '%s'" % ref)
+
+
+NOTFOUND = "  '404':\n    $ref: '../shared/common.yaml#/components/responses/NotFound'\n"
+SINCE = "**Added 4 October 2026 (CHG-FXC-011; %s).** "
+
+E(add_operation, SUB, "/cells", "get", _read_op(
+    "listCells", "PLATFORM_CELL_VIEW", "platform", None, "cell", "The cells, with their health",
+    SINCE % "ADM-003, the cross-tenant dashboard had only per-cell and per-tenant reads" +
+    "Every cell, in the shape `getCell` returns, ordered by name; `region` and `status` narrow it.",
+    """
+- name: region
+  in: query
+  required: false
+  schema:
+    type: string
+- name: status
+  in: query
+  required: false
+  schema:
+    type: string
+""" + PAGED, _page_of("#/components/schemas/CellDetail"), ["P09 ADM-003 Platform Command Centre"]))
+E(add_operation, FNB, "/food-safety/corrective-actions", "get", _read_op(
+    "listCorrectiveActions", "INCIDENT_VIEW", "venue", None, "fnb", "The corrective actions",
+    SINCE % "BO-044, EMP-067: record, sign, escalate and close take an actionId nothing listed" +
+    "The venue's corrective actions, newest raised first; `status` narrows it.",
+    """
+- name: status
+  in: query
+  required: false
+  schema:
+    type: string
+""" + PAGED, _page_of("#/components/schemas/CorrectiveAction"),
+    ["P08 BO-044 Food Safety & HACCP", "P06 EMP-067 Food Safety Checks"]))
+E(add_operation, FNB, "/production-plans", "get", _read_op(
+    "listProductionPlans", "PRODUCT_VIEW", "venue", None, "fnb", "The production plans",
+    SINCE % "BO-112: release and the prep sheet take a planId nothing read" +
+    "The venue's production plans, ordered by `forDate` then outlet; `forDate` and `status` narrow it.",
+    """
+- name: forDate
+  in: query
+  required: false
+  schema:
+    type: string
+    format: date
+- name: status
+  in: query
+  required: false
+  schema:
+    type: string
+""" + PAGED, _page_of("#/components/schemas/ProductionPlan"), ["P08 BO-112 Production Planning"]))
+E(add_operation, WAL, "/wallet-risk-rules", "get", _read_op(
+    "getWalletRiskRules", "WALLET_VIEW", "tenant", None, "wallet", "The wallet risk rules",
+    SINCE % "BO-1162: setWalletRiskRuleStatus takes a ruleCode nothing returned" +
+    "The tenant's risk rules with each rule's `code` and `status` (the `wallet.risk_rule` rows), as "
+    "`setWalletRiskRules` stores them.", None, "$ref: '#/components/schemas/WalletRiskRules'",
+    ["P08 BO-1162 Wallet Risk & Fraud Rules"]))
+E(add_operation, WL, "/content-blocks", "get", _read_op(
+    "listContentBlocks", "TENANT_CONFIGURE", "tenant", None, "whiteLabel", "The content blocks of a page",
+    SINCE % "CMS-007: the builder could create and publish a block and not load one" +
+    "The blocks of one page (`pageKey`, a content page's id or a homepage section key), ordered by `position`, "
+    "drafts and published alike.",
+    """
+- name: pageKey
+  in: query
+  required: true
+  schema:
+    type: string
+""" + PAGED, _page_of("#/components/schemas/ContentBlock"), ["P13 CMS-007 Homepage & Page Builder"]))
+E(add_operation, WL, "/content-blocks/{blockId}", "patch", """
+operationId: updateContentBlock
+x-ticvai-consumed-by:
+  - "P13 CMS-007 Homepage & Page Builder"
+summary: Change a draft content block
+description: |-
+  **Added 4 October 2026 (CHG-FXC-011; CMS-007).** Changes a block's `body`, `localeVariants`, `position`,
+  `publishAt`, `expireAt` or `audienceSegmentId`. A published block is not edited in place: it is refused with 409
+  (`content-block-published`) and changed by creating a new draft and publishing it, so what a guest saw stays on
+  record.
+tags:
+- whiteLabel
+x-ticvai-permission: TENANT_CONFIGURE
+x-ticvai-audience:
+- staff
+x-ticvai-scope-level: tenant
+x-ticvai-offline-capable: false
+x-ticvai-conflict-policy: serverWins
+parameters:
+- $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+- name: blockId
+  in: path
+  required: true
+  schema:
+    type: string
+    format: uuid
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        minProperties: 1
+        properties:
+          body:
+            type: object
+            additionalProperties: true
+            description: As `ContentBlock.body`.
+          localeVariants:
+            type: object
+            additionalProperties: true
+            description: As `ContentBlock.localeVariants`.
+          position:
+            type: integer
+          publishAt:
+            type: string
+            format: date-time
+            nullable: true
+          expireAt:
+            type: string
+            format: date-time
+            nullable: true
+          audienceSegmentId:
+            type: string
+            format: uuid
+            nullable: true
+responses:
+  '200':
+    headers:
+      X-Consistency-Token:
+        $ref: '../shared/common.yaml#/components/headers/ConsistencyToken'
+    description: Changed
+    content:
+      application/json:
+        schema:
+          $ref: '#/components/schemas/ContentBlock'
+  '404':
+    $ref: '../shared/common.yaml#/components/responses/NotFound'
+  '409':
+    description: The block is published (`content-block-published`).
+    x-ticvai-problem-types:
+    - content-block-published
+    content:
+      application/problem+json:
+        schema:
+          $ref: ../shared/common.yaml#/components/schemas/Problem
+  '429':
+    $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
+""")
+E(add_operation, APR, "/approval-requests/{requestId}", "get", _read_op(
+    "getApprovalRequest", "APPROVAL_VIEW", "venue", None, "request", "One approval request",
+    SINCE % "VM-BO-085: listApprovalRequests has no id filter" + "One request with its decisions so far.",
+    """
+- name: requestId
+  in: path
+  required: true
+  schema:
+    type: string
+    format: uuid
+""", "$ref: '#/components/schemas/ApprovalRequest'", ["P08 BO-085 Approval Inbox"], NOTFOUND))
+E(add_operation, INV, "/stock-counts/{countId}/lines", "get", _read_op(
+    "listStockCountLines", "PRODUCT_VIEW", "venue", None, "count", "The lines of a stock count",
+    SINCE % "EMP-066: the count screen needs its pre-filled lines" +
+    "The count's `inventory.count_line` rows (CountLine), ordered by item. **A blind count hides what is expected**: while "
+    "an `isBlind` count is open, `theoreticalQuantity`, `variance` and `variancePercent` are null; they appear once "
+    "the count is submitted.",
+    """
+- name: countId
+  in: path
+  required: true
+  schema:
+    type: string
+    format: uuid
+""" + PAGED, _page_of("#/components/schemas/CountLine"), ["P06 EMP-066 Stock Count & Cycle Count Management"],
+    NOTFOUND))
+E(add_operation, PUB, "/developers/{developerId}/members", "get", _read_op(
+    "listDeveloperMembers", "DEVELOPER_VIEW", "tenant", None, "publicApi", "Who is in a developer organisation",
+    SINCE % "DEV-002: setDeveloperMembers wrote members nothing read" +
+    "The organisation's `control.developer_member` rows (DeveloperMember), owner first, then by email; removed "
+    "members are left out.",
+    """
+- name: developerId
+  in: path
+  required: true
+  schema:
+    type: string
+    format: uuid
+""", "type: array\nitems:\n  $ref: '#/components/schemas/DeveloperMember'", ["P14 DEV-002 Register & Organisation"],
+    NOTFOUND))
+E(add_operation, RES, "/resource-bookings/{bookingId}", "get", _read_op(
+    "getResourceBooking", "RESOURCE_VIEW", "venue", None, "resources", "One resource booking",
+    SINCE % "VM-BO-097: no read of a ResourceBooking" +
+    "One `resources.booking` row: status, `conditionOut`, `conditionIn`, `depositAuthorisationId`. A rental "
+    "booking (`rental.getRentalBooking`) names the resource bookings it holds; this reads one of them.", None,
+    "$ref: '#/components/schemas/ResourceBooking'", ["P08 BO-097 Rental Desk"], NOTFOUND))
+E(Y.replace_in_op, WAL, "listCreditLots",
+  "      - name: walletId\n        in: query\n        required: true\n",
+  "      - name: walletId\n        in: query\n        required: false\n"
+  "        description: '**Optional for staff** (4 October 2026, CHG-FXC-011; BO-1111): absent, the lots of every "
+  "wallet at\n          the caller''s venue, as `expiringWithinDays` narrows them. A guest always reads their own "
+  "wallet''s.'\n")
+E(Y.insert_after_in_op, WAL, "listCreditLots", "      - name: includeExhausted", """
+- name: expiringWithinDays
+  in: query
+  required: false
+  description: Only active lots whose `expiresAt` falls within this many days (4 October 2026, CHG-FXC-011; BO-1111).
+  schema:
+    type: integer
+    minimum: 1
+""", 6)
+E(Y.add_props, ACC, "DeviceBindingSessionSecurityView", """
+bindingId:
+  type: string
+  format: uuid
+  readOnly: true
+  description: '**The binding this row is** (4 October 2026, CHG-FXC-011; BO-167): the `access.device_binding` id
+    `releaseCredentialDevice` takes as `{bindingId}`.'
+""")
+E(Y.insert_after_in_op, FNB, "recordCorrectiveAction", "      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey", """
+requestBody:
+  required: true
+  content:
+    application/json:
+      schema:
+        type: object
+        required:
+        - actionTaken
+        properties:
+          actionTaken:
+            type: string
+            maxLength: 1000
+            description: '**What was done** (4 October 2026, CHG-FXC-011; SVC-FNB-FNB-17: the operation had no body
+              to receive it): discard, re-chill, recalibrate ... Stored as `CorrectiveAction.actionTaken`.'
+          disposal:
+            type: string
+            nullable: true
+            description: What happened to the affected product, as `CorrectiveAction.disposal`.
+""", 6)
+LINEAGE.update({
+    "listCells": (["control.cell", "control.cell_instance", "control.cell_tenant"], [], [], [], "the cells and health"),
+    "listCorrectiveActions": (["fnb.corrective_action"], [], [], [], "the venue's corrective actions"),
+    "listProductionPlans": (["fnb.production_plan", "fnb.production_plan_line"], [], [], [], "the plans"),
+    "getWalletRiskRules": (["wallet.risk_rules", "wallet.risk_rule"], [], [], [], "what setWalletRiskRules stores"),
+    "listContentBlocks": (["control.content_block"], [], [], [], "a page's blocks"),
+    "updateContentBlock": (["control.content_block"], ["control.content_block"], [], [], "a draft block changed"),
+    "getApprovalRequest": (["approvals.request", "approvals.decision"], [], [], [], "one request and its decisions"),
+    "listStockCountLines": (["inventory.count", "inventory.count_line"], [], [], [], "the count's lines"),
+    "listDeveloperMembers": (["control.developer_member"], [], [], [], "what setDeveloperMembers stores"),
+    "getResourceBooking": (["resources.booking"], [], [], [], "one booking"),
+    "listDeviceBindingSession": (["access.device_binding"], [], [], [], "bindingId per row"),
+})
+
 # [plan -> contracts] requests (CHG-FXC-010)
 E(Y.insert_after_in_op, C("satellite/payments.yaml"), "receivePaymentProviderWebhook",
   "      x-ticvai-conflict-policy: append", """
@@ -1439,7 +1711,8 @@ LINEAGE.update({
                                        [], [], [], "what approveMembershipProductValidation checks"),
 })
 NEW_TABLES = {"inventory.daily_count_list", "control.developer_member", "promotions.code_assignment",
-              "maintenance.incident_history", "identity.guest_credential"}
+              "maintenance.incident_history", "identity.guest_credential", "wallet.risk_rule",
+              "fnb.combo_slot_option", "whitelabel.navigation_config", "whitelabel.homepage_layout"}
 
 
 def apply_lineage(apply: bool) -> int:

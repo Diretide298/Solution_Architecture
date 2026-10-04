@@ -481,7 +481,9 @@ paths:
       parameters:
       - name: walletId
         in: query
-        required: true
+        required: false
+        description: '**Optional for staff** (4 October 2026, CHG-FXC-011; BO-1111): absent, the lots of every wallet at
+          the caller''s venue, as `expiringWithinDays` narrows them. A guest always reads their own wallet''s.'
         schema:
           type: string
           format: uuid
@@ -490,6 +492,13 @@ paths:
         schema:
           type: boolean
           default: false
+      - name: expiringWithinDays
+        in: query
+        required: false
+        description: Only active lots whose `expiresAt` falls within this many days (4 October 2026, CHG-FXC-011; BO-1111).
+        schema:
+          type: integer
+          minimum: 1
       responses:
         '200':
           description: Lots
@@ -1396,6 +1405,31 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /wallet-risk-rules:
+    get:
+      operationId: getWalletRiskRules
+      x-ticvai-consumed-by:
+        - "P08 BO-1162 Wallet Risk & Fraud Rules"
+      summary: The wallet risk rules
+      description: |-
+        **Added 4 October 2026 (CHG-FXC-011; BO-1162: setWalletRiskRuleStatus takes a ruleCode nothing returned).** The tenant's risk rules with each rule's `code` and `status` (the `wallet.risk_rule` rows), as `setWalletRiskRules` stores them.
+      tags:
+      - wallet
+      x-ticvai-permission: WALLET_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: The wallet risk rules
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletRiskRules'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     put:
       operationId: setWalletRiskRules
       x-ticvai-consumed-by:

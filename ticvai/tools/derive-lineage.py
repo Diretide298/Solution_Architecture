@@ -473,6 +473,12 @@ def main() -> int:
                 # derivation, not a judgement — so a missing one is filled. Nothing is ever
                 # removed; a narrowing IS a judgement and `--audit` reports it instead.
                 add = sorted(set(fresh[o].get(key) or []) - set(stored[o].get(key) or []))
+                # **A `pure` entry writes nothing, whatever its body refs** (4 October 2026, CHG-FXC-004).
+                # `previewSegmentDraft` takes a draft segment and counts it; its body refs the criterion schema,
+                # so the repair kept writing `marketing.segment_criterion` back into an operation whose contract
+                # says it stores nothing, and the Sprint 1-2 judge found the two disagreeing.
+                if key == "writes" and stored[o].get("pure"):
+                    add = [t for t in add if ":" in t]
                 if add:
                     stored[o][key] = sorted(set(stored[o].get(key) or []) | set(add))
                     followed += len(add)

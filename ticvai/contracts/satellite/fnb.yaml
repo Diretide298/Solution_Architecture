@@ -435,6 +435,53 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /production-plans:
+    get:
+      operationId: listProductionPlans
+      x-ticvai-consumed-by:
+        - "P08 BO-112 Production Planning"
+      summary: The production plans
+      description: |-
+        **Added 4 October 2026 (CHG-FXC-011; BO-112: release and the prep sheet take a planId nothing read).** The venue's production plans, ordered by `forDate` then outlet; `forDate` and `status` narrow it.
+      tags:
+      - fnb
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: forDate
+        in: query
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The production plans
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ProductionPlan'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     post:
       operationId: buildProductionPlan
       x-ticvai-consumed-by:
@@ -7266,6 +7313,24 @@ paths:
       x-ticvai-conflict-policy: serverWins
       parameters:
       - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - actionTaken
+              properties:
+                actionTaken:
+                  type: string
+                  maxLength: 1000
+                  description: '**What was done** (4 October 2026, CHG-FXC-011; SVC-FNB-FNB-17: the operation had no body
+                    to receive it): discard, re-chill, recalibrate ... Stored as `CorrectiveAction.actionTaken`.'
+                disposal:
+                  type: string
+                  nullable: true
+                  description: What happened to the affected product, as `CorrectiveAction.disposal`.
       responses:
         '200':
           headers:
@@ -8328,6 +8393,49 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
+  /food-safety/corrective-actions:
+    get:
+      operationId: listCorrectiveActions
+      x-ticvai-consumed-by:
+        - "P08 BO-044 Food Safety & HACCP"
+        - "P06 EMP-067 Food Safety Checks"
+      summary: The corrective actions
+      description: |-
+        **Added 4 October 2026 (CHG-FXC-011; BO-044, EMP-067: record, sign, escalate and close take an actionId nothing listed).** The venue's corrective actions, newest raised first; `status` narrows it.
+      tags:
+      - fnb
+      x-ticvai-permission: INCIDENT_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The corrective actions
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/CorrectiveAction'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   schemas:
 

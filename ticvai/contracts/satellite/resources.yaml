@@ -1870,6 +1870,33 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /resource-bookings/{bookingId}:
+    get:
+      operationId: getResourceBooking
+      x-ticvai-consumed-by:
+        - "P08 BO-097 Rental Desk"
+      summary: One resource booking
+      description: |-
+        **Added 4 October 2026 (CHG-FXC-011; VM-BO-097: no read of a ResourceBooking).** One `resources.booking` row: status, `conditionOut`, `conditionIn`, `depositAuthorisationId`. A rental booking (`rental.getRentalBooking`) names the resource bookings it holds; this reads one of them.
+      tags:
+      - resources
+      x-ticvai-permission: RESOURCE_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: venue
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      responses:
+        '200':
+          description: One resource booking
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ResourceBooking'
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     parameters:
     - name: bookingId
       in: path

@@ -76339,5 +76339,252 @@
   "stores": [
    "postgres"
   ]
+ },
+ "getApprovalRequest": {
+  "contract": "approvals",
+  "verb": "GET",
+  "path": "/approval-requests/{requestId}",
+  "reads": [
+   "approvals.decision",
+   "approvals.request"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "APPROVAL_VIEW",
+  "offline": false,
+  "summary": "One approval request",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getResourceBooking": {
+  "contract": "resources",
+  "verb": "GET",
+  "path": "/resource-bookings/{bookingId}",
+  "reads": [
+   "resources.booking"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "RESOURCE_VIEW",
+  "offline": false,
+  "summary": "One resource booking",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "VenueOpsService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "getWalletRiskRules": {
+  "contract": "wallet",
+  "verb": "GET",
+  "path": "/wallet-risk-rules",
+  "reads": [
+   "wallet.risk_rule",
+   "wallet.risk_rules"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "WALLET_VIEW",
+  "offline": false,
+  "summary": "The wallet risk rules",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WalletService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listCells": {
+  "contract": "subscription",
+  "verb": "GET",
+  "path": "/cells",
+  "reads": [
+   "control.cell",
+   "control.cell_instance",
+   "control.cell_job",
+   "control.cell_tenant"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "platform",
+  "perm": "PLATFORM_CELL_VIEW",
+  "offline": false,
+  "summary": "The cells, with their health",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the cells and health"
+ },
+ "listContentBlocks": {
+  "contract": "white-label",
+  "verb": "GET",
+  "path": "/content-blocks",
+  "reads": [
+   "control.content_block"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "The content blocks of a page",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listCorrectiveActions": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/food-safety/corrective-actions",
+  "reads": [
+   "fnb.corrective_action"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "INCIDENT_VIEW",
+  "offline": false,
+  "summary": "The corrective actions",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "listDeveloperMembers": {
+  "contract": "public-api",
+  "verb": "GET",
+  "path": "/developers/{developerId}/members",
+  "reads": [
+   "control.developer_member"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "DEVELOPER_VIEW",
+  "offline": false,
+  "summary": "Who is in a developer organisation",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "PlatformService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listProductionPlans": {
+  "contract": "fnb",
+  "verb": "GET",
+  "path": "/production-plans",
+  "reads": [
+   "fnb.production_plan",
+   "fnb.production_plan_line"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The production plans",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "FnbService",
+  "stores": [
+   "derived",
+   "postgres",
+   "postgres-analytical",
+   "redis"
+  ]
+ },
+ "listStockCountLines": {
+  "contract": "inventory",
+  "verb": "GET",
+  "path": "/stock-counts/{countId}/lines",
+  "reads": [
+   "inventory.count",
+   "inventory.count_line"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "venue",
+  "perm": "PRODUCT_VIEW",
+  "offline": false,
+  "summary": "The lines of a stock count",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "InventoryService",
+  "stores": [
+   "derived",
+   "postgres",
+   "redis"
+  ],
+  "fixNote": "4 October 2026 (CHG-FXC-004): the count's lines"
+ },
+ "updateContentBlock": {
+  "contract": "white-label",
+  "verb": "PATCH",
+  "path": "/content-blocks/{blockId}",
+  "reads": [
+   "control.content_block"
+  ],
+  "writes": [
+   "control.content_block"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Change a draft content block",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
  }
 }

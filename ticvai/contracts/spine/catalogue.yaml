@@ -17442,7 +17442,7 @@ paths:
         `getTaxProfileJurisdiction?taxProfileId=` and saved with `setTaxProfileJurisdiction`, which creates a profile when the
         body's `taxProfileId` is empty and updates that profile otherwise.
       tags:
-      - catalogue
+      - drafted
       x-ticvai-permission: PRODUCT_VIEW
       x-ticvai-audience:
       - staff

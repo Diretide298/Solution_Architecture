@@ -17441,7 +17441,7 @@ paths:
         `marketing.message_template_version`, so a campaign already sent keeps the version it used. A template whose
         `ownership` is `platform` is TICVAI's and is refused with 409; copy it with `createMessageTemplate` instead.
       tags:
-      - marketing
+      - message
       x-ticvai-permission: MARKETING_MANAGE
       x-ticvai-audience:
       - staff
@@ -17519,7 +17519,7 @@ paths:
         rows), `pointsExpireAfterMonths` and `isActive`. Points already earned keep the rule and the expiry they were earned
         under; the change applies to what is earned from now. Tiers are not changed here.
       tags:
-      - marketing
+      - loyalty
       x-ticvai-permission: MARKETING_MANAGE
       x-ticvai-audience:
       - staff

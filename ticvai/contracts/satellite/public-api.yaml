@@ -140,6 +140,42 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
   /developers/{developerId}/members:
+    get:
+      operationId: listDeveloperMembers
+      x-ticvai-consumed-by:
+        - "P14 DEV-002 Register & Organisation"
+      summary: Who is in a developer organisation
+      description: |-
+        **Added 4 October 2026 (CHG-FXC-011; DEV-002: setDeveloperMembers wrote members nothing read).** The organisation's `control.developer_member` rows (DeveloperMember), owner first, then by email; removed members are left out.
+      tags:
+      - publicApi
+      x-ticvai-permission: DEVELOPER_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: tenant
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: developerId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        '200':
+          description: Who is in a developer organisation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DeveloperMember'
+        '404':
+          $ref: '../shared/common.yaml#/components/responses/NotFound'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
     parameters:
       - name: developerId
         in: path

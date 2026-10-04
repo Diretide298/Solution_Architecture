@@ -4014,7 +4014,7 @@ paths:
         screen must show the checks, the impact and the stage before anyone decides.** Returns the view the PUT returns for
         one membership product version; without `version`, the latest.
       tags:
-      - subscription
+      - drafted
       x-ticvai-permission: PLATFORM_CELL_MANAGE
       x-ticvai-audience:
       - staff
@@ -9916,6 +9916,53 @@ paths:
         '429':
           $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 
+  /cells:
+    get:
+      operationId: listCells
+      x-ticvai-consumed-by:
+        - "P09 ADM-003 Platform Command Centre"
+      summary: The cells, with their health
+      description: |-
+        **Added 4 October 2026 (CHG-FXC-011; ADM-003, the cross-tenant dashboard had only per-cell and per-tenant reads).** Every cell, in the shape `getCell` returns, ordered by name; `region` and `status` narrow it.
+      tags:
+      - cell
+      x-ticvai-permission: PLATFORM_CELL_VIEW
+      x-ticvai-audience:
+      - staff
+      x-ticvai-scope-level: platform
+      x-ticvai-read-routing: replica
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      parameters:
+      - name: region
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
+      responses:
+        '200':
+          description: The cells, with their health
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/CellDetail'
+        '429':
+          $ref: '../shared/common.yaml#/components/responses/TooManyRequests'
 components:
   schemas:
     SubscriptionPlanRecommendation:
