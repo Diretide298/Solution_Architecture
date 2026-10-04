@@ -69,9 +69,10 @@ OUT = HANDOFF / "service-docs"
 TEAM = ROOT / "docs" / "active" / "team.json"
 EXTRA = ROOT / "docs" / "active" / "block-a-extra-tasks.json"
 MAX_DEPTH = 3
-# The working day (from Monday 5 October 2026) a screen whose spec needs a person may start being built: its definition
-# is due in the first week of Sprint 1, by the lead (CHG-FXP-004; Needs Chinmay: the date and who defines).
-DEFINE_DAY = 5.0
+# The working day (from Monday 5 October 2026) a screen that still needs a person may start being built: the first
+# day of Sprint 3, Monday 2 November (CHG-RFM-008). Until 4 October it was day 5 (CHG-FXP-004), inside Sprint 1, while
+# check-screen-patterns NP fails any such screen a Sprint 1 or 2 task builds; the plan now holds what the check refuses.
+DEFINE_DAY = 20.0
 
 
 def block_a_decisions() -> dict:
@@ -1620,8 +1621,21 @@ def main() -> int:
     _mp = OUT / "pms-map.json"
     pushed_hosts = ({k[len("APP-SETUP-"):] for k in json.loads(_mp.read_text(encoding="utf-8"))
                      if k.startswith("APP-SETUP-") and "#" not in k and not k.endswith("-REST")} if _mp.exists() else set())
+    # **A planned setup screen stays the host too** (4 October, CHG-RFM-006). After the fix round a tie in the cover
+    # (explainMetricChange, hosted by ADM-505 and ADM-506 alike) went to the first in id order, so ADM-506 left Block A
+    # for Block D and ADM-505, reached only through a screen outside Block A, came in (C-REACH, C-UNTICKETED). The
+    # plan this run replaces (plan-tasks.csv) names its hosts; one still hosting something uncovered is preferred
+    # after a pushed one and before the count.
+    _pt = OUT / "plan-tasks.csv"
+    planned_hosts = set()
+    if _pt.exists():
+        with _pt.open(encoding="utf-8", newline="") as fh:
+            planned_hosts = {r["key"][len("APP-SETUP-"):] for r in csv.DictReader(fh)
+                             if r["key"].startswith("APP-SETUP-") and not r["key"].endswith("-REST")
+                             and r.get("type") == "Task"}
     while uncovered:
         sid = max(sorted(hosts), key=lambda x: (bool(hosts[x] & uncovered) and x in pushed_hosts,
+                                                bool(hosts[x] & uncovered) and x in planned_hosts,
                                                 len(hosts[x] & uncovered), x.startswith("BO")))
         setup_screens[sid] = hosts[sid] & uncovered
         uncovered -= hosts[sid]
@@ -3560,7 +3574,7 @@ def main() -> int:
         if und_:
             d_ = (t_["description"] or "").rstrip()
             t_["description"] = (d_ + ("" if not d_ or d_[-1] in ".!?" else ".") + " " + ticket_done.define_sentence(
-                und_[0], DEFINE_DAY)).strip()
+                und_[0], DEFINE_DAY, ticket_done.define_reason(screens[und_[0]]))).strip()
 
     # **Every task says what finishes it** (CHG-GTR-002, 3 October). op-release.py wrote a done-when into each pointer
     # (CHG-REL-003) while the plan row ADAM indexes, and op-descriptions.py turns into ticket text, had none: after the

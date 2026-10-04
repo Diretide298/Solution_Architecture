@@ -1,0 +1,49 @@
+id: CHG-RFM-008
+date: '2026-10-04'
+source: plan
+kind: plan
+summary: 'A screen that still needs a person, or binds no operation, is not built before Sprint 3 (2 November): the plan''s
+  wait and check-screen-patterns NP use one test.'
+decision:
+  what: ticket_done.define_needed reads check-screen-patterns' phrases (screen_patterns.NEEDS_PERSON_PHRASES) and also holds
+    a screen that binds no operation (a command centre excepted); build-service-docs.py DEFINE_DAY goes from day 5 to day
+    20, the first day of Sprint 3. The task text says which of the two it waits on. Block A's BO-1018 and BO-1034 stay in
+    Block A and start no earlier than 2 November.
+  by: Chinmay
+  date: '2026-10-04'
+proposed: 2026-10-04T12:00
+why: 'check-screen-patterns NP on the merged branch (e13d7ad5): twelve Block B screens (BO-145, BO-432, BO-477, BO-483,
+  BO-646, BO-678, BO-751, BO-797, BO-812, BO-838, BO-841, BO-998) moved into Sprint 2 under the merged plan while still
+  undefined; the plan (CHG-FXP-004) waited on one phrase until day 5, the check (CHG-FXS-007) refuses three phrases or no
+  binding anywhere in Sprints 1-2. Chinmay, 4 October: harmonise the two rules.'
+keys_touched:
+  screens:
+  - BO-145
+  - BO-432
+  - BO-477
+  - BO-483
+  - BO-646
+  - BO-678
+  - BO-751
+  - BO-797
+  - BO-812
+  - BO-838
+  - BO-841
+  - BO-998
+  - BO-1018
+  - BO-1034
+  files:
+  - tools/ticket_done.py
+  - tools/build-service-docs.py
+root_class: 'new: rule-drift'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/check-screen-patterns.py
+status: open
+notes: Batch RFM (r1-fix-merge), 4 October 2026.

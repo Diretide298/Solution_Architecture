@@ -167,11 +167,32 @@ def screen_hold(s: dict, listed: dict | None = None):
     return None
 
 
+# **The same test as check-screen-patterns NP** (4 October, CHG-RFM-008): the plan waited on one phrase and on day 5,
+# the check failed any Sprint 1-2 screen with any of three phrases or binding nothing, so the merged plan pulled twelve
+# undefined Block B screens into Sprint 2 that the check then failed. Both read screen_patterns now.
+try:
+    from screen_patterns import NEEDS_PERSON_PHRASES
+except ImportError:                                   # imported from outside tools/
+    NEEDS_PERSON_PHRASES = (NEEDS_PERSON, "gives this screen nothing that can be drawn",
+                            "no display, metric or configuration directory")
+
+
+def define_reason(s: dict) -> str | None:
+    """Why a screen cannot be built yet, as check-screen-patterns NP sees it: "gaps" when the spec says a person must
+    define it (a gap with one of NEEDS_PERSON_PHRASES), "nothing" when it binds no operation (a command centre that
+    only links is the exception), else None."""
+    for g in s.get("gaps") or []:
+        if isinstance(g, dict) and any(p in str(g.get("why") or "") for p in NEEDS_PERSON_PHRASES):
+            return "gaps"
+    if not [a for a in s.get("apis") or [] if isinstance(a, dict) and a.get("operationId")]             and s.get("pattern") != "commandCentre":
+        return "nothing"
+    return None
+
+
 def define_needed(s: dict) -> bool:
-    """The screen spec says a person must define it before it is built (a gap "it needs a person before it is
-    built": the pack gave nothing drawable, or only a default shape). Its Block A build waits on a define step
-    (CHG-FXP-004)."""
-    return any(NEEDS_PERSON in str((g or {}).get("why") or "") for g in s.get("gaps") or [] if isinstance(g, dict))
+    """The screen cannot be built until a person defines it (define_reason): its build waits on the definition
+    (CHG-FXP-004; from 4 October until Sprint 3 starts, CHG-RFM-008)."""
+    return define_reason(s) is not None
 
 
 # **A split screen's tickets each say exactly what they build and who builds the rest** (CHG-FXP-001). The setup ticket
@@ -206,7 +227,7 @@ def scope_of(r) -> str:
     return "Scope: " + m.group(1) if m else ""
 
 
-def define_sentence(sid: str, day: float) -> str:
+def define_sentence(sid: str, day: float, why: str | None = "gaps") -> str:
     """The line a build task on a screen that needs a person carries, read back into the pointer (CHG-FXP-004)."""
     import datetime as _dt
     d, left = _dt.date(2026, 10, 5), int(day)
@@ -214,7 +235,9 @@ def define_sentence(sid: str, day: float) -> str:
         d += _dt.timedelta(days=1)
         if d.weekday() < 5:
             left -= 1
-    return (f"Waits for its definition: {sid}'s spec says a person must define it before it is built (its gaps), so "
+    said = (f"{sid} binds no operation yet (a person must define what it loads and saves)" if why == "nothing"
+            else f"{sid}'s spec says a person must define it before it is built (its gaps)")
+    return (f"Waits for its definition: {said}, so "
             f"this task starts once the lead has put the definition in ADAM, no earlier than {d.day} {d.strftime('%B')} "
             f"{d.year}; until then build nothing from the default layout.")
 
