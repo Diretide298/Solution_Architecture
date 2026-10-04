@@ -735,6 +735,10 @@
   "testPaymentProviderConnection": "payment configuration, as listPaymentMethods (r2: SVC-ORDER-PAYMENTS-9, Block A)."
  },
  "blockAOperations": {
+  "captureWalletHold": "r2 built it in Block A (SVC-WALLET-WALLET-1) as a setup operation of the slice: it made wallet.balance non-empty for the core reads. The fix round's lineage (CHG-FXC-002, CHG-FXC-004, 4 October) has topUpWallet write that table too, so the slice no longer took it and it fell to Block C with no decision; restored to Block A as r2 planned it (CHG-RFM-006).",
+  "holdWalletFunds": "r2 built it in Block A (SVC-WALLET-WALLET-1) as a setup operation of the slice: it made wallet.balance non-empty for the core reads. The fix round's lineage (CHG-FXC-002, CHG-FXC-004, 4 October) has topUpWallet write that table too, so the slice no longer took it and it fell to Block C with no decision; restored to Block A as r2 planned it (CHG-RFM-006).",
+  "releaseWalletHold": "r2 built it in Block A (SVC-WALLET-WALLET-2) as a setup operation of the slice: it made wallet.balance non-empty for the core reads. The fix round's lineage (CHG-FXC-002, CHG-FXC-004, 4 October) has topUpWallet write that table too, so the slice no longer took it and it fell to Block C with no decision; restored to Block A as r2 planned it (CHG-RFM-006).",
+  "expireCreditLots": "r2 built it in Block A (SVC-WALLET-WALLET-1) as a setup operation of the slice: it made wallet.credit_lot non-empty for the core reads. The fix round's lineage (CHG-FXC-002, CHG-FXC-004, 4 October) has topUpWallet write that table too, so the slice no longer took it and it fell to Block C with no decision; restored to Block A as r2 planned it (CHG-RFM-006).",
   "getUnifiedReconciliation": "BO-043 Daily Reconciliation runs the finance validation across every money source (Chinmay, 3 October, r1 additions).",
   "createPrincipal": "staff accounts are created in Block A (Chinmay, 3 October, r1 additions).",
   "requestProductionAccess": "DEV-003 Clients & Credentials, a Block A setup screen, binds it (Chinmay, 3 October, r1 additions).",
@@ -755,6 +759,11 @@
   "proposeWalkways": "the AI path proposal of the venue-map import (F26), built in Block A with BO-093 and BO-094 (the lead, 3 October, CHG-RONEP-001)."
  },
  "blockAScreens": {
+  "BO-1111": "r2 built it in Block A as expireCreditLots' setup screen (APP-SETUP-BO-1111); that operation fell out of the slice with the fix round's lineage (see blockAOperations) and the screen with it, with no decision; restored to Block A with the operation (CHG-RFM-006).",
+  "BO-346": "r2 built it in Block A (APP-SETUP-BO-346). The fix round moved the orders ticket-template operations off it (CHG-FXS-002: its designer edits access.media_template), which left it only later-block operations and moved it to Block C with no decision; restored to Block A as r2 planned it (CHG-RFM-006).",
+  "ADM-503": "an AI forecast screen r2 built in Block B (APP-CONSOLE-ADM-503). The fix round bound listForecastDefinitions on it (CHG-FXS-004), which made most of its operations the AI contract's, so it followed the AI app-module to Block D with no decision. Defaulted into Block A rather than out of it: any AI change in Block A goes to Chinmay first, and this one is his to confirm (CHG-RFM-006).",
+  "ADM-504": "an AI forecast screen r2 built in Block B (APP-CONSOLE-ADM-504). The fix round bound listForecastDefinitions on it (CHG-FXS-004), which made most of its operations the AI contract's, so it followed the AI app-module to Block D with no decision. Defaulted into Block A rather than out of it: any AI change in Block A goes to Chinmay first, and this one is his to confirm (CHG-RFM-006).",
+  "ADM-505": "an AI forecast screen r2 built in Block B (APP-CONSOLE-ADM-505). The fix round bound listForecastDefinitions on it (CHG-FXS-004), which made most of its operations the AI contract's, so it followed the AI app-module to Block D with no decision. Defaulted into Block A rather than out of it: any AI change in Block A goes to Chinmay first, and this one is his to confirm (CHG-RFM-006).",
   "BO-1065": "drawn and built whole in Block A with its AI residency section (Chinmay, 3 October, r1 additions).",
   "EMP-002": "the staff app's venue and role selection after sign-in (F08, F64): the lead's r1 finding of 3 October, 'pull EMP-002 and EMP-003 into Block A' (CHG-RONEP-006)."
  },

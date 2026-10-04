@@ -27211,6 +27211,10 @@ screens:
     - ADM-342
     - ADM-354
     - BO-1065
+    - ADM-340
+    - ADM-606
+    - BO-1018
+    - BO-1034
     entryFrom:
     - BO-108
     - BO-594
@@ -27835,6 +27839,22 @@ screens:
       trigger: Opens Currency, Timezone & Channels
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
         3 October 2026); its command centre is not in Block A'
+    - to: ADM-340
+      trigger: Opens Segregation of Duties Policy Manager
+      provenance: 'CHG-RFM-006: the section home links to the Block A setup screen it leads to (lever A,
+        CHG-RONEP-007); its command centre is not in Block A'
+    - to: ADM-606
+      trigger: Opens Partial Payment, Failure & Recovery Manager
+      provenance: 'CHG-RFM-006: the section home links to the Block A setup screen it leads to (lever A,
+        CHG-RONEP-007); its command centre is not in Block A'
+    - to: BO-1018
+      trigger: Opens Accessible Seating Master
+      provenance: 'CHG-RFM-006: the section home links to the Block A setup screen it leads to (lever A,
+        CHG-RONEP-007); its command centre is not in Block A'
+    - to: BO-1034
+      trigger: Opens Best Seat Recommendations
+      provenance: 'CHG-RFM-006: the section home links to the Block A setup screen it leads to (lever A,
+        CHG-RONEP-007); its command centre is not in Block A'
   notes: '**Built 20 August because P08 had none.** `BO-001 Queue Directory` was the declared entry point
     to a 99-screen back office — it exits to four queue screens, and **93 screens hung off nothing.**
     A back office entered through a queue list. **The module was also one bucket holding 72 of 99 screens**,
@@ -138688,6 +138708,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1013
+    - BO-100
     exitTo:
     - BO-1013
     transitions:
@@ -140421,6 +140442,7 @@ screens:
   navigation:
     entryFrom:
     - BO-1033
+    - BO-100
     exitTo:
     - BO-1033
     transitions:
@@ -203709,6 +203731,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-599
+    - BO-100
     exitTo:
     - ADM-599
     transitions:
@@ -217835,6 +217858,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-339
+    - BO-100
     exitTo:
     - ADM-339
     transitions:

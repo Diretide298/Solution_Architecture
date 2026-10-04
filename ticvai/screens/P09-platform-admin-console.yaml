@@ -408,6 +408,9 @@ screens:
     - ADM-412
     - ADM-424
     - ADM-500
+    - ADM-503
+    - ADM-504
+    - ADM-505
     - ADM-506
     - ADM-508
     - ADM-523
@@ -701,6 +704,24 @@ screens:
       trigger: Opens Forecast Configuration & Forecasting Strategy
       provenance: 'CHG-RONEP-007: the section home links to the Block A screen it leads to (lever A, Chinmay,
         3 October 2026); its command centre is not in Block A'
+      carries:
+      - tenantId
+    - to: ADM-503
+      trigger: Opens Ticket, Product & Timeslot Demand Forecast
+      provenance: 'CHG-RFM-006: the section home links to the Block A screen it leads to (lever A,
+        CHG-RONEP-007); its command centre is not in Block A'
+      carries:
+      - tenantId
+    - to: ADM-504
+      trigger: Opens Channel & Booking Pace Forecast
+      provenance: 'CHG-RFM-006: the section home links to the Block A screen it leads to (lever A,
+        CHG-RONEP-007); its command centre is not in Block A'
+      carries:
+      - tenantId
+    - to: ADM-505
+      trigger: Opens Revenue & Commercial Forecast
+      provenance: 'CHG-RFM-006: the section home links to the Block A screen it leads to (lever A,
+        CHG-RONEP-007); its command centre is not in Block A'
       carries:
       - tenantId
     - to: ADM-506
@@ -27581,6 +27602,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-499
+    - ADM-002
     exitTo:
     - ADM-499
     transitions:
@@ -27812,6 +27834,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-499
+    - ADM-002
     exitTo:
     - ADM-499
     transitions:
@@ -28027,6 +28050,7 @@ screens:
   navigation:
     entryFrom:
     - ADM-499
+    - ADM-002
     exitTo:
     - ADM-499
     transitions:
