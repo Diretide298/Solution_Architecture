@@ -1,0 +1,27 @@
+id: CHG-RFM-017
+date: '2026-10-04'
+source: cr
+kind: process
+summary: r1 is pushed into project 153 after its old work packages are deleted in place; the server refuses a fresh
+  push into a project that still holds work packages.
+decision:
+  what: tools/op-release.py accepts project 153 for a fresh push when it is named with --project. tools/op-release.rb
+    refuses (guard phase) when pms-map.json holds no pushed ticket and the project still holds work packages.
+  by: Chinmay
+  date: '2026-10-04'
+why: 'Chinmay, 4 October: "cant we just delete all the old tickets" instead of copying 153 into a new project. No work
+  had started on the old tickets; a database backup is taken before the delete. The 3 October guard (CHG-GTR-001)
+  refused 153 by number; the new guard checks the real state on the server instead.'
+keys_touched: {}
+root_class: 'new: fresh-push-into-old-project'
+tickets:
+  started: []
+  unstarted: []
+release_tag: r1
+decision_owner: Chinmay
+triage: fix-forward
+prevention:
+  type: check
+  ref: tools/op-release.py
+status: open
+notes: Batch RFM (r1 release), 4 October 2026. Closes on its commit.
